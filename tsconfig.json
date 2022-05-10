@@ -1,29 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "esnext",
     "module": "CommonJS",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
     "lib": [
-      "ES2018",
-      "ES2019",
-      "ES2020",
-      "ESNext"
+      "esnext"
     ],
-    "preserveConstEnums": true,
-    "incremental": false,
-    "declaration": true,
-    "sourceMap": true,
-    "importHelpers": true,
-    "strict": true,
-    "pretty": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
   },
   "exclude": [
     "node_modules"

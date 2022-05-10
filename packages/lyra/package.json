@@ -9,5 +9,10 @@
   },
   "bugs": {
     "url": "https://github.com/nearform/lyra"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.5.0",
+    "jest": "^28.1.0",
+    "ts-jest": "^28.0.2"
   }
 }

@@ -11,7 +11,7 @@ export class TrieNode {
   public parent: Nullable<TrieNode> = null;
   public children: Nullable<Children> = {};
   public docs: Docs = new Set();
-  public end: boolean = false;
+  public end = false;
 
   constructor(key: string) {
     this.key = key;
@@ -19,6 +19,8 @@ export class TrieNode {
 
   getWord(): [string, Docs] {
     const output = [];
+
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let node: TrieNode = this;
 
     while (node !== null) {

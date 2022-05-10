@@ -18,6 +18,8 @@ export class Trie {
         node.children![char] = new TrieNode(char);
         node.children![char].parent = node;
       }
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
       node = node?.children?.[char]!;
 
       if (i === wordAsCharList.length - 1) {
