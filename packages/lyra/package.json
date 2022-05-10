@@ -1,0 +1,13 @@
+{
+  "name": "@nearform/lyra",
+  "description": "Fast, in-memory, full-text search engine",
+  "version": "0.0.1",
+  "author": {
+    "name": "Michele Riva",
+    "email": "ciao@micheleriva.it",
+    "url": "https://github.com/MicheleRiva"
+  },
+  "bugs": {
+    "url": "https://github.com/nearform/lyra"
+  }
+}
