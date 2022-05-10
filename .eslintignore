@@ -3,3 +3,4 @@ dist
 jest.config.js
 .eslintrc.cjs
 *.yaml
+*.md
