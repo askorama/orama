@@ -4,3 +4,4 @@ jest.config.js
 .eslintrc.cjs
 *.yaml
 *.md
+*.snap

@@ -10,6 +10,10 @@
   "bugs": {
     "url": "https://github.com/nearform/lyra"
   },
+  "dependencies": {
+    "fastq": "^1.13.0",
+    "nanoid": "3.3.4"
+  },
   "devDependencies": {
     "@types/jest": "^27.5.0",
     "jest": "^28.1.0",
