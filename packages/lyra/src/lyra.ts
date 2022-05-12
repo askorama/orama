@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import * as fastq from "fastq";
 import { Trie } from "./prefix-tree/trie";
 import * as ERRORS from "./errors";
+import { tokenize } from "./tokenizer";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -15,6 +16,13 @@ export type LyraProperties = {
 };
 
 export type LyraDocs = Map<string, object>;
+
+export type SearchParams = {
+  term: string;
+  properties?: "*" | string[];
+  limit?: number;
+  offset?: number;
+};
 
 type LyraIndex = Map<string, Trie>;
 
@@ -52,6 +60,79 @@ export class Lyra {
     }
   }
 
+  async search(params: SearchParams) {
+    const tokens = tokenize(params.term).values();
+    const indices = this.getIndices(params.properties);
+    const results = [];
+
+    for (const token of tokens) {
+      for (const index of indices) {
+        const searchResult = await this._search({
+          ...params,
+          index: index,
+          term: token,
+        });
+
+        if (searchResult.length) {
+          for (const res of searchResult) {
+            results.push(res);
+          }
+        }
+      }
+    }
+
+    return results;
+  }
+
+  private getIndices(indices: SearchParams["properties"]): string[] {
+    const knownIndices = [...this.index.keys()];
+
+    if (!indices) {
+      return knownIndices;
+    }
+
+    if (typeof indices === "string") {
+      if (indices === "*") {
+        return knownIndices;
+      } else {
+        throw ERRORS.INVALID_PROPERTY(indices, knownIndices);
+      }
+    }
+
+    for (const index of indices as string[]) {
+      if (!knownIndices.includes(index)) {
+        throw ERRORS.INVALID_PROPERTY(index, knownIndices);
+      }
+    }
+
+    return indices as string[];
+  }
+
+  private async _search(params: SearchParams & { index: string }) {
+    const idx = this.index.get(params.index);
+    const searchResult = idx?.find(params.term);
+    const results = [];
+    let count = 0;
+
+    for (const key in searchResult) {
+      if (params.limit && count > params.limit) break;
+
+      const docs: string[] = [];
+
+      for (const id of (searchResult as any)[key]) {
+        const fullDoc = this.docs.get(id);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        docs.push({ id, ...fullDoc });
+      }
+
+      count++;
+      results.push(docs);
+    }
+
+    return results.flat();
+  }
+
   public async insert(doc: object): Promise<{ id: string }> {
     const id = nanoid();
 
@@ -67,8 +148,27 @@ export class Lyra {
     return { id };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private async _insert(doc: QueueDocParams): Promise<void> {}
+  private async _insert({ doc, id }: QueueDocParams): Promise<void> {
+    const index = this.index;
+    this.docs.set(id, doc);
+
+    function recursiveTrieInsertion(doc: object) {
+      for (const key in doc) {
+        if (typeof (doc as any)[key] === "object") {
+          recursiveTrieInsertion((doc as any)[key]);
+        } else {
+          const requestedTrie = index.get(key);
+          const tokens = tokenize((doc as any)[key]);
+
+          for (const token of tokens) {
+            requestedTrie?.insert(token, id);
+          }
+        }
+      }
+    }
+
+    recursiveTrieInsertion(doc);
+  }
 
   private async checkInsertDocSchema(
     doc: QueueDocParams["doc"]

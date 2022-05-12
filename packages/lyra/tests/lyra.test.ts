@@ -38,4 +38,53 @@ describe("checkInsertDocSchema", () => {
       expect(err).toMatchSnapshot();
     }
   });
+
+  it("should compare complex schemas on insertion", async () => {
+    const db = new Lyra({
+      schema: {
+        title: "string",
+        director: "string",
+        cast: {
+          photography: {
+            person1: "string",
+            person2: "string",
+          },
+        },
+      },
+    });
+
+    expect(
+      await db
+        .insert({
+          title: "The prestige",
+          director: "Nolan",
+          cast: {
+            photography: {
+              person1: "dunno",
+              person2: "dunno",
+            },
+          },
+        })
+        .then(getId)
+    ).toBeDefined();
+
+    try {
+      await db.insert({ title: "The prestige", foo: { bar: 10 } });
+    } catch (err) {
+      expect(err).toMatchSnapshot();
+    }
+
+    try {
+      await db.insert({
+        title: "The prestige",
+        cast: {
+          photography: {
+            people: "dunno",
+          },
+        },
+      });
+    } catch (err) {
+      expect(err).toMatchSnapshot();
+    }
+  });
 });
