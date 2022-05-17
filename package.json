@@ -11,7 +11,8 @@
     "test": "jest --coverage",
     "lint": "prettier --write \"packages/**/*.{ts,js}\" && eslint . --ext .js,.ts",
     "prepare": "husky install",
-    "repl": "ts-node ./packages/repl/repl.ts"
+    "repl": "ts-node ./packages/repl/repl.ts",
+    "build:lyra": "cd packages/lyra && pnpm build"
   },
   "keywords": [],
   "author": {

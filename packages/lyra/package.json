@@ -13,10 +13,12 @@
   "scripts": {
     "build:umd": "swc **/*.ts --ignore **/*.test.ts -d ./dist/umd -s -C module.type=umd",
     "build:module": "swc **/*.ts --ignore **/*.test.ts -d ./dist/esm -s -C module.type=es6",
-    "build": "pnpm build:umd && pnpm build:module"
+    "build:types": "tsc **/*.ts --declaration --emitDeclarationOnly --outdir ./dist/types",
+    "build": "pnpm build:umd && pnpm build:module && pnpm build:types"
   },
   "main": "./dist/umd/lyra.js",
   "module": "./dist/esm/lyra.js",
+  "types": "./dist/types/src/lyra.d.ts",
   "dependencies": {
     "fastq": "^1.13.0",
     "nanoid": "3.3.4"
@@ -26,6 +28,7 @@
     "@swc/core": "^1.2.185",
     "@types/jest": "^27.5.0",
     "jest": "^28.1.0",
-    "ts-jest": "^28.0.2"
+    "ts-jest": "^28.0.2",
+    "typescript": "^4.6.4"
   }
 }

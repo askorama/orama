@@ -1,5 +1,5 @@
 import readline from "readline";
-import { Lyra } from "@nearform/lyra";
+import { Lyra } from "@nearform/lyra/src/lyra";
 import dataset from "./datasets/reviews.json";
 import { commands } from "./commands";
 

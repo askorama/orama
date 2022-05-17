@@ -92,7 +92,8 @@ export class Lyra {
 
     return {
       elapsed: formatNanoseconds(getNanosecondsTime() - timeStart),
-      hits: results.slice(params.offset ?? 0, params.limit ?? 10), // @todo avoid getting all results and slicing them
+      // @todo avoid getting all results and slicing them.
+      hits: results.slice(params.offset ?? 0, params.limit ?? 10),
       count: results.length,
     };
   }
