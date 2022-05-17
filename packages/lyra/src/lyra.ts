@@ -4,6 +4,7 @@ import * as fastq from "fastq";
 import { Trie } from "./prefix-tree/trie";
 import * as ERRORS from "./errors";
 import { tokenize } from "./tokenizer";
+import { formatNanoseconds } from "./utils";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -30,6 +31,12 @@ type QueueDocParams = {
   id: string;
   doc: object;
 };
+
+type SearchResult = Promise<{
+  count: number;
+  hits: object[];
+  elapsed: string;
+}>;
 
 export class Lyra {
   private schema: PropertiesSchema;
@@ -60,10 +67,12 @@ export class Lyra {
     }
   }
 
-  async search(params: SearchParams) {
+  async search(params: SearchParams): SearchResult {
     const tokens = tokenize(params.term).values();
     const indices = this.getIndices(params.properties);
-    const results = [];
+    const results: object[] = [];
+
+    const timeStart = process.hrtime.bigint();
 
     for (const token of tokens) {
       for (const index of indices) {
@@ -81,7 +90,11 @@ export class Lyra {
       }
     }
 
-    return results;
+    return {
+      elapsed: formatNanoseconds(process.hrtime.bigint() - timeStart),
+      hits: results.slice(params.offset ?? 0, params.limit ?? 10), // @todo avoid getting all results and slicing them
+      count: results.length,
+    };
   }
 
   private getIndices(indices: SearchParams["properties"]): string[] {
@@ -108,15 +121,14 @@ export class Lyra {
     return indices as string[];
   }
 
-  private async _search(params: SearchParams & { index: string }) {
+  private async _search(
+    params: SearchParams & { index: string }
+  ): Promise<object[]> {
     const idx = this.index.get(params.index);
     const searchResult = idx?.find(params.term);
-    const results = [];
-    let count = 0;
+    const results: object[] = [];
 
     for (const key in searchResult) {
-      if (params.limit && count > params.limit) break;
-
       const docs: string[] = [];
 
       for (const id of (searchResult as any)[key]) {
@@ -126,7 +138,6 @@ export class Lyra {
         docs.push({ id, ...fullDoc });
       }
 
-      count++;
       results.push(docs);
     }
 

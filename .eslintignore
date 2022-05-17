@@ -5,3 +5,5 @@ jest.config.js
 *.yaml
 *.md
 *.snap
+*.csv
+*.sh

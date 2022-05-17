@@ -10,6 +10,7 @@
   "bugs": {
     "url": "https://github.com/nearform/lyra"
   },
+  "main": "./src/lyra.ts",
   "dependencies": {
     "fastq": "^1.13.0",
     "nanoid": "3.3.4"

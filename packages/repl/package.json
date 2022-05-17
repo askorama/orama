@@ -1,0 +1,24 @@
+{
+  "name": "@nearform/lyra-repl",
+  "description": "Repl for the Lyra search engine",
+  "version": "0.0.1",
+  "author": {
+    "name": "Michele Riva",
+    "email": "ciao@micheleriva.it",
+    "url": "https://github.com/MicheleRiva"
+  },
+  "bugs": {
+    "url": "https://github.com/nearform/lyra"
+  },
+  "dependencies": {
+    "@nearform/lyra": "workspace:^",
+    "csv": "^6.0.5",
+    "yargs": "^17.5.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.5.0",
+    "@types/yargs": "^17.0.10",
+    "jest": "^28.1.0",
+    "ts-jest": "^28.0.2"
+  }
+}
