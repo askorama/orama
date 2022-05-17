@@ -90,10 +90,12 @@ export class Lyra {
       }
     }
 
+    const { limit = 10, offset = 0 } = params;
+
     return {
       elapsed: formatNanoseconds(getNanosecondsTime() - timeStart),
       // @todo avoid getting all results and slicing them.
-      hits: results.slice(params.offset ?? 0, params.limit ?? 10),
+      hits: results.slice(offset, limit + offset),
       count: results.length,
     };
   }
