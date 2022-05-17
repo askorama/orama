@@ -3,7 +3,8 @@
     "target": "esnext",
     "module": "CommonJS",
     "lib": [
-      "esnext"
+      "esnext",
+      "DOM"
     ],
     "esModuleInterop": true,
     "declaration": true,

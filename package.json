@@ -10,7 +10,8 @@
     "commit": "pnpm lint-staged && cz",
     "test": "jest --coverage",
     "lint": "prettier --write \"packages/**/*.{ts,js}\" && eslint . --ext .js,.ts",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "repl": "ts-node ./packages/repl/repl.ts"
   },
   "keywords": [],
   "author": {

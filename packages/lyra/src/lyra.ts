@@ -4,7 +4,7 @@ import * as fastq from "fastq";
 import { Trie } from "./prefix-tree/trie";
 import * as ERRORS from "./errors";
 import { tokenize } from "./tokenizer";
-import { formatNanoseconds } from "./utils";
+import { formatNanoseconds, getNanosecondsTime } from "./utils";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -72,7 +72,7 @@ export class Lyra {
     const indices = this.getIndices(params.properties);
     const results: object[] = [];
 
-    const timeStart = process.hrtime.bigint();
+    const timeStart = getNanosecondsTime();
 
     for (const token of tokens) {
       for (const index of indices) {
@@ -91,7 +91,7 @@ export class Lyra {
     }
 
     return {
-      elapsed: formatNanoseconds(process.hrtime.bigint() - timeStart),
+      elapsed: formatNanoseconds(getNanosecondsTime() - timeStart),
       hits: results.slice(params.offset ?? 0, params.limit ?? 10), // @todo avoid getting all results and slicing them
       count: results.length,
     };

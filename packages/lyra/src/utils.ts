@@ -1,3 +1,5 @@
+export const isServer = typeof window === "undefined";
+
 export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) {
     return "0 Bytes";
@@ -18,4 +20,12 @@ export function formatNanoseconds(unit: bigint): string {
   }
 
   return `${unit / nano}ms`;
+}
+
+export function getNanosecondsTime(): bigint {
+  if (isServer) {
+    return process.hrtime.bigint();
+  }
+
+  return BigInt(performance.now() * 1000);
 }
