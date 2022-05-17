@@ -10,12 +10,20 @@
   "bugs": {
     "url": "https://github.com/nearform/lyra"
   },
-  "main": "./src/lyra.ts",
+  "scripts": {
+    "build:umd": "swc **/*.ts --ignore **/*.test.ts -d ./dist/umd -s -C module.type=umd",
+    "build:module": "swc **/*.ts --ignore **/*.test.ts -d ./dist/esm -s -C module.type=es6",
+    "build": "pnpm build:umd && pnpm build:module"
+  },
+  "main": "./dist/umd/lyra.js",
+  "module": "./dist/esm/lyra.js",
   "dependencies": {
     "fastq": "^1.13.0",
     "nanoid": "3.3.4"
   },
   "devDependencies": {
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.2.185",
     "@types/jest": "^27.5.0",
     "jest": "^28.1.0",
     "ts-jest": "^28.0.2"
