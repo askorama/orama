@@ -169,7 +169,9 @@ export class Lyra {
     function recursiveTrieInsertion(doc: object) {
       for (const key in doc) {
         if (typeof (doc as any)[key] === "object") {
-          recursiveTrieInsertion((doc as any)[key]);
+          throw ERRORS.UNSUPPORTED_NESTED_PROPERTIES();
+          // @todo nested properties will be supported with the nexrt versions
+          // recursiveTrieInsertion((doc as any)[key]);
         } else {
           const requestedTrie = index.get(key);
           const tokens = tokenize((doc as any)[key]);

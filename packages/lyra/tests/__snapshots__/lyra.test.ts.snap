@@ -1,30 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`checkInsertDocSchema should compare complex schemas on insertion 1`] = `
-"Invalid document structure. 
-Class has been initialized with the following schema: 
-
-{
-  \\"title\\": \\"string\\",
-  \\"director\\": \\"string\\",
-  \\"cast\\": {
-    \\"photography\\": {
-      \\"person1\\": \\"string\\",
-      \\"person2\\": \\"string\\"
-    }
-  }
-}
-
-but found the following doc:
-
-{
-  \\"title\\": \\"The prestige\\",
-  \\"foo\\": {
-    \\"bar\\": 10
-  }
-}"
-`;
-
 exports[`checkInsertDocSchema should compare the inserted doc with the schema definition 1`] = `
 "Invalid document structure. 
 Class has been initialized with the following schema: 

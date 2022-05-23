@@ -13,3 +13,9 @@ export const INVALID_PROPERTY = (name: string, expected: string[]) =>
   `Invalid property name. Expected a wildcard string ("*") or array containing one of the following properties: ${expected.join(
     ", "
   )}, but got: ${name}`;
+
+export const CANT_DELETE_DOC_NOT_FOUND = (id: string) =>
+  `Document with ID ${id} does not exist.`;
+
+export const UNSUPPORTED_NESTED_PROPERTIES = () =>
+  `Nested properties are not supported in this Lyra version, but will be in the future.`;
