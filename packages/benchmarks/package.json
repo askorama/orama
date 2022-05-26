@@ -1,0 +1,17 @@
+{
+  "name": "@nearform/lyra-benchmarks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "get-dataset": "sh ./get-dataset.sh",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@nearform/lyra": "workspace:*",
+    "csv-parse": "^5.1.0"
+  }
+}

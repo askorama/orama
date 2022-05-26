@@ -3,6 +3,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,osx,windows,linux,intellij
 
 dist
+*.csv
 
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
