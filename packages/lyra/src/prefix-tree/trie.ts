@@ -82,6 +82,37 @@ export class Trie {
     return output;
   }
 
+  removeDocByWord(word: string, docID: string): boolean {
+    const root = this.root;
+    if (!word) return false;
+
+    function removeWord(node: TrieNode, _word: string, docID: string): boolean {
+      const [nodeWord, docs] = node.getWord();
+
+      if (node.end && nodeWord === word) {
+        const hasChildren = Object.keys(node.children!).length > 0;
+        node.removeDoc(docID);
+
+        if (hasChildren) {
+          node.end = false;
+        }
+
+        return true;
+      }
+
+      for (const key in node.children) {
+        const ch = node?.children?.[key];
+        if (ch) {
+          removeWord(ch, _word, docID);
+        }
+      }
+
+      return false;
+    }
+
+    return removeWord(root, word, docID);
+  }
+
   remove(word: string): boolean {
     const root = this.root;
     if (!word) return false;

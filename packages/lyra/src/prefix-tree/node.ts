@@ -6,6 +6,8 @@ type Children = {
 
 type Docs = Set<string>;
 
+type NodeContent = [string, Docs];
+
 export class TrieNode {
   public key: string;
   public parent: Nullable<TrieNode> = null;
@@ -17,7 +19,7 @@ export class TrieNode {
     this.key = key;
   }
 
-  getWord(): [string, Docs] {
+  getWord(): NodeContent {
     const output = [];
 
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -29,5 +31,9 @@ export class TrieNode {
     }
 
     return [output.join(""), this.docs];
+  }
+
+  removeDoc(docID: string): boolean {
+    return this.docs.delete(docID);
   }
 }

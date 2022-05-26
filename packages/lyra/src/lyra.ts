@@ -60,7 +60,9 @@ export class Lyra {
       if (propType === "string") {
         this.index.set(prop, new Trie());
       } else if (propType === "object") {
-        this.buildIndex(prop as unknown as PropertiesSchema);
+        // @todo nested properties will be supported with the nexrt versions
+        //this.buildIndex(prop as unknown as PropertiesSchema);
+        throw ERRORS.UNSUPPORTED_NESTED_PROPERTIES();
       } else {
         throw ERRORS.INVALID_SCHEMA_TYPE(propType);
       }
@@ -122,6 +124,29 @@ export class Lyra {
     }
 
     return indices as string[];
+  }
+
+  async delete(docID: string): Promise<boolean> {
+    if (!this.docs.has(docID)) {
+      throw ERRORS.DOC_ID_DOES_NOT_EXISTS(docID);
+    }
+
+    const document = this.docs.get(docID)!;
+
+    for (const key in document) {
+      const idx = this.index.get(key)!;
+      const tokens = tokenize((document as any)[key]);
+
+      for (const token of tokens) {
+        if (idx.removeDocByWord(token, docID)) {
+          throw `Unable to remove document "${docID}" from index "${key}" on word "${token}".`;
+        }
+      }
+    }
+
+    this.docs.delete(docID);
+
+    return true;
   }
 
   private async _search(

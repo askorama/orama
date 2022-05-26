@@ -19,3 +19,6 @@ export const CANT_DELETE_DOC_NOT_FOUND = (id: string) =>
 
 export const UNSUPPORTED_NESTED_PROPERTIES = () =>
   `Nested properties are not supported in this Lyra version, but will be in the future.`;
+
+export const DOC_ID_DOES_NOT_EXISTS = (id: string) =>
+  `Document with ID ${id} does not exists`;
