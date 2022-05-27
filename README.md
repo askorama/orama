@@ -1,90 +1,121 @@
-<center>
-  <img src="./docs/lyra-logo.png" />
-</center>
-
-Fast, in-memory, full-text search engine with a powerful indexes and plugin system.
+![Lyra](./docs/lyra-logo.png)
 
 # Installation
+
+You can install Lyra using `npm`, `yarn`, `pnpm`:
 
 ```sh
 npm i @nearform/lyra
 ```
-
 ```sh
 yarn add @nearform/lyra
+```
+```sh
+pnpm add @nearform/lyra
 ```
 
 # Usage
 
-```js
-import { Lyra } from '@nearform/lyra';
+Lyra is quite simple to use. The first thing to do is to create a new database instance and set an indexing schema:
 
-// Instantiate a new Lyra instance
+```js
+import { Lyra } from '@nearform/lyra';
+
 const db = new Lyra({
   schema: {
-    title: 'string',
-    director: 'string',
-    plot: 'string',
+    author: 'string',
+    quote: 'string'
   }
-});
-
-// Insert data in the database
-await db.insert({
-  title: 'The Prestige',
-  director: 'Christopher Nolan',
-  plot: 'Two friends and fellow magicians become bitter enemies after a sudden tragedy. As they devote themselves to this rivalry, they make sacrifices that bring them fame but with terrible consequences.'
-});
-await db.insert({
-  title: 'Interstellar',
-  director: 'Christopher Nolan',
-  plot: 'When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft, along with a team of researchers, to find a new planet for humans.'
-});
-await db.insert({
-  title: 'Inception',
-  director: 'Christopher Nolan',
-  plot: 'Cobb steals information from his targets by entering their dreams. Saito offers to wipe clean Cobb\'s criminal history as payment for performing an inception on his sick competitor\'s son.'
-});
-await db.insert({
-  title: 'Gran Torino',
-  director: 'Clint Eastwood',
-  plot: 'When Walt Kowalski\'s neighbour, Thao, tries to steal his 1972 Gran Torino, he decides to help him reform. However, Walt gets involved in a feud with a local gang leader when he saves Thao from them.'
-});
-
-// Search for inserted data
-const result = await db.search({
-  term: 'nolan',
-  properties: ['director'] // Use '*' to search through all of the schema properties
 });
 ```
 
-Output:
+Lyra will only index string properties, but will allow you to set and store additional data if needed.
+
+Once the db instance is created, you can start adding some documents:
+
+```js
+await db.insert({
+  quote: 'It is during our darkest moments that we must focus to see the light.',
+  author: 'Aristotle'
+});
+
+await db.insert({
+  quote: 'If you really look closely, most overnight successes took a long time.',
+  author: 'Steve Jobs'
+});
+
+await db.insert({
+  quote: 'If you are not willing to risk the usual, you will have to settle for the ordinary.',
+  author: 'Jim Rohn'
+});
+
+await db.insert({
+  quote: 'You miss 100% of the shots you don\'t take',
+  author: 'Wayne Gretzky - Michael Scott'
+});
+```
+
+After the data has been inserted, you can finally start to query the database.
+
+```js
+const searchResult = await db.search({
+  term: 'if',
+  properties: '*'
+});
+```
+
+In the case above, you will be searching for all the documents containing the word `if`, looking up in every schema property (AKA index):
 
 ```js
 {
-  elapsed: '89μs',
+  elapsed: '99μs',
   hits: [
     {
-      id: 'lqTxrPm3bMpymR7i6BNWz',
-      title: 'The Prestige',
-      director: 'Christopher Nolan',
-      plot: 'Two friends and fellow magicians become bitter enemies after a sudden tragedy. As they devote themselves to this rivalry, they make sacrifices that bring them fame but with terrible consequences.'
+      id: 'ckAOPGTA5qLXx0MgNr1Zy',
+      quote: 'If you really look closely, most overnight successes took a long time.',
+      author: 'Steve Jobs'
     },
     {
-      id: 'NSfnakvjdxiBSTBKtGrS0',
-      title: 'Interstellar',
-      director: 'Christopher Nolan',
-      plot: 'When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft, along with a team of researchers, to find a new planet for humans.'
-    },
-    {
-      id: '3lxsbV0QCm952nqIYkpP-',
-      title: 'Inception',
-      director: 'Christopher Nolan',
-      plot: "Cobb steals information from his targets by entering their dreams. Saito offers to wipe clean Cobb's criminal history as payment for performing an inception on his sick competitor's son."
+      id: 'fyl-_1veP78IO-wszP86Z',
+      quote: 'If you are not willing to risk the usual, you will have to settle for the ordinary.',
+      author: 'Jim Rohn'
     }
   ],
-  count: 3
+  count: 2
 }
 ```
 
+You can also restrict the lookup to a specific property:
+
+```js
+const searchResult = await db.search({
+  term: 'Michael',
+  properties: ['author']
+});
+```
+
+Result:
+
+```js
+{
+  elapsed: '111μs',
+  hits: [
+    {
+      id: 'L1tpqQxc0c2djrSN2a6TJ',
+      quote: "You miss 100% of the shots you don't take",
+      author: 'Wayne Gretzky - Michael Scott'
+    }
+  ],
+  count: 1
+}
+```
+
+If needed, you can also delete a given document by using the `delete` method:
+
+```js
+await db.delete('L1tpqQxc0c2djrSN2a6TJ');
+```
+
 # License
-[Apache 2.0](/LICENSE.md)
+
+Lyra is licensed under the [Apache 2.0](/LICENSE.md) license.
