@@ -147,4 +147,55 @@ describe("lyra", () => {
     );
     expect((searchResult.hits[0] as any).id).toBe(id2);
   });
+
+  it("Should preserve identical docs after deletion", async () => {
+    const db = new Lyra({
+      schema: {
+        quote: "string",
+        author: "string",
+      },
+    });
+
+    const { id: id1 } = await db.insert({
+      quote: "Be yourself; everyone else is already taken.",
+      author: "Oscar Wilde",
+    });
+
+    const { id: id2 } = await db.insert({
+      quote: "Be yourself; everyone else is already taken.",
+      author: "Oscar Wilde",
+    });
+
+    await db.insert({
+      quote: "So many books, so little time.",
+      author: "Frank Zappa",
+    });
+
+    const res = await db.delete(id1);
+
+    const searchResult = await db.search({
+      term: "Oscar",
+      properties: ["author"],
+    });
+
+    const searchResult2 = await db.search({
+      term: "already",
+      properties: ["quote"],
+    });
+
+    expect(res).toBeTruthy();
+    expect(searchResult.count).toBe(1);
+    expect((searchResult.hits[0] as any).author).toBe("Oscar Wilde");
+    expect((searchResult.hits[0] as any).quote).toBe(
+      "Be yourself; everyone else is already taken."
+    );
+    expect((searchResult.hits[0] as any).id).toBe(id2);
+
+    expect(searchResult2.count).toBe(1);
+    expect((searchResult2.hits[0] as any).author).toBe("Oscar Wilde");
+    expect((searchResult2.hits[0] as any).quote).toBe(
+      "Be yourself; everyone else is already taken."
+    );
+    expect((searchResult2.hits[0] as any).id).toBe(id2);
+  });
 });
