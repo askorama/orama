@@ -1,6 +1,6 @@
 import fs from "fs";
 import { parse } from "csv-parse";
-import { Lyra, SearchParams } from "@nearform/lyra";
+import { Lyra, SearchParams } from "@nearform/lyra/src/lyra";
 
 const db = new Lyra({
   schema: {
