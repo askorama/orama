@@ -198,4 +198,36 @@ describe("lyra", () => {
     );
     expect((searchResult2.hits[0] as any).id).toBe(id2);
   });
+
+  it("Should be able to insert documens with non-searchable fieldsa", async () => {
+    const db = new Lyra({
+      schema: {
+        quote: "string",
+        author: "string",
+        isFavorite: "boolean",
+        rating: "number",
+      },
+    });
+
+    await db.insert({
+      quote: "Be yourself; everyone else is already taken.",
+      author: "Oscar Wilde",
+      isFavorite: false,
+      rating: 4,
+    });
+
+    await db.insert({
+      quote: "So many books, so little time.",
+      author: "Frank Zappa",
+      isFavorite: true,
+      rating: 5,
+    });
+
+    const search = await db.search({
+      term: "frank",
+    });
+
+    expect(search.count).toBe(1);
+    expect((search.hits[0] as any).author).toBe("Frank Zappa");
+  });
 });

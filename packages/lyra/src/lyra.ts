@@ -208,7 +208,7 @@ export class Lyra {
           throw ERRORS.UNSUPPORTED_NESTED_PROPERTIES();
           // @todo nested properties will be supported with the nexrt versions
           // recursiveTrieInsertion((doc as any)[key]);
-        } else {
+        } else if (typeof (doc as any)[key] === "string") {
           const requestedTrie = index.get(key);
           const tokens = tokenize((doc as any)[key]);
 
