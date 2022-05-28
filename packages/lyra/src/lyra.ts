@@ -72,33 +72,52 @@ export class Lyra {
   async search(params: SearchParams): SearchResult {
     const tokens = tokenize(params.term).values();
     const indices = this.getIndices(params.properties);
+    const { limit = 10, offset = 0 } = params;
     const results: object[] = [];
+    let totalResults = 0;
 
     const timeStart = getNanosecondsTime();
 
+    let i = limit;
+    let j = 0;
+
     for (const token of tokens) {
       for (const index of indices) {
-        const searchResult = await this._search({
+        const documentIDs = await this.getDocumentIDsFromSearch({
           ...params,
           index: index,
           term: token,
         });
 
-        if (searchResult.length) {
-          for (const res of searchResult) {
-            results.push(res);
+        totalResults += documentIDs.size;
+
+        if (i <= 0) {
+          break;
+        }
+
+        if (documentIDs.size) {
+          for (const id of documentIDs) {
+            if (j < offset) {
+              j++;
+              continue;
+            }
+
+            if (i <= 0) {
+              break;
+            }
+
+            const fullDoc = this.docs.get(id);
+            results.push({ id, ...fullDoc });
+            i--;
           }
         }
       }
     }
 
-    const { limit = 10, offset = 0 } = params;
-
     return {
       elapsed: formatNanoseconds(getNanosecondsTime() - timeStart),
-      // @todo avoid getting all results and slicing them.
-      hits: results.slice(offset, limit + offset),
-      count: results.length,
+      hits: results,
+      count: totalResults,
     };
   }
 
@@ -149,27 +168,19 @@ export class Lyra {
     return true;
   }
 
-  private async _search(
+  private async getDocumentIDsFromSearch(
     params: SearchParams & { index: string }
-  ): Promise<object[]> {
+  ): Promise<Set<string>> {
     const idx = this.index.get(params.index);
     const searchResult = idx?.find(params.term);
-    const results: object[] = [];
+    const ids = new Set<string>();
 
     for (const key in searchResult) {
-      const docs: string[] = [];
-
       for (const id of (searchResult as any)[key]) {
-        const fullDoc = this.docs.get(id);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        docs.push({ id, ...fullDoc });
+        ids.add(id);
       }
-
-      results.push(docs);
     }
-
-    return results.flat();
+    return ids;
   }
 
   public async insert(doc: object): Promise<{ id: string }> {
