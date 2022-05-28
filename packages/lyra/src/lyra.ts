@@ -73,12 +73,12 @@ export class Lyra {
     const tokens = tokenize(params.term).values();
     const indices = this.getIndices(params.properties);
     const { limit = 10, offset = 0 } = params;
-    const results: object[] = [];
+    const results: object[] = new Array({ length: limit });
     let totalResults = 0;
 
     const timeStart = getNanosecondsTime();
 
-    let i = limit;
+    let i = 0;
     let j = 0;
 
     for (const token of tokens) {
@@ -91,7 +91,7 @@ export class Lyra {
 
         totalResults += documentIDs.size;
 
-        if (i <= 0) {
+        if (i >= limit) {
           break;
         }
 
@@ -102,13 +102,13 @@ export class Lyra {
               continue;
             }
 
-            if (i <= 0) {
+            if (i >= limit) {
               break;
             }
 
             const fullDoc = this.docs.get(id);
-            results.push({ id, ...fullDoc });
-            i--;
+            results[i] = { id, ...fullDoc };
+            i++;
           }
         }
       }
