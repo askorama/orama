@@ -1,6 +1,8 @@
 import fs from "fs";
+/*global console*/
+
 import { parse } from "csv-parse";
-import { Lyra, SearchParams } from "@nearform/lyra/src/lyra";
+import { Lyra } from "@nearform/lyra";
 
 const db = new Lyra({
   schema: {
@@ -79,7 +81,7 @@ async function main() {
   );
 }
 
-async function searchBenchmark(db: Lyra, query: SearchParams) {
+async function searchBenchmark(db, query) {
   const results = Array.from({ length: 100_000 });
 
   for (let i = 0; i < results.length; i++) {
@@ -93,9 +95,7 @@ async function searchBenchmark(db: Lyra, query: SearchParams) {
     results[i] = time;
   }
 
-  const total = Math.floor(
-    (results as number[]).reduce((x, y) => x + y, 0) / results.length
-  );
+  const total = Math.floor(results.reduce((x, y) => x + y, 0) / results.length);
 
   return total > 1000 ? `${total}ms` : `${total}μs`;
 }

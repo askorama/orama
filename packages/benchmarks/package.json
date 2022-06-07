@@ -5,13 +5,22 @@
   "main": "index.js",
   "scripts": {
     "get-dataset": "sh ./get-dataset.sh",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prefix": "node ./prefixSearch",
+    "benchmark": "node ./index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "type": "module",
   "dependencies": {
     "@nearform/lyra": "workspace:*",
+    "cronometro": "^1.1.0",
     "csv-parse": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/benchmark": "^2.1.1",
+    "benchmark": "^2.1.4",
+    "benny": "^3.7.1",
+    "minisearch": "5.0.0-beta2"
   }
 }
