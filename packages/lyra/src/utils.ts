@@ -27,5 +27,5 @@ export function getNanosecondsTime(): bigint {
     return process.hrtime.bigint();
   }
 
-  return BigInt(performance.now() * 1000);
+  return BigInt(Math.floor(performance.now()) * 1000);
 }
