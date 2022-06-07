@@ -1,7 +1,7 @@
-name: Build and Deploy Vuepress Docs
+name: Run tests
 on: [push]
 jobs:
-  build-and-deploy-vuepress-docs:
+  run-tests:
     runs-on: ubuntu-latest
     steps:
 
@@ -11,7 +11,7 @@ jobs:
     - name: Install Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: 16
+        node-version: 18
 
     - name: Install pnpm
       uses: pnpm/action-setup@v2.0.1
@@ -33,14 +33,5 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
-    - name: Install dependencies
-      run: pnpm install && cd packages/docs && pnpm build
-
-    - name: vuepress-deploy
-      uses: jenkey2011/vuepress-deploy@master
-      env:
-        ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TARGET_REPO: nearform/lyra
-        TARGET_BRANCH: gh-pages
-        BUILD_DIR: packages/docs/src/.vuepress/dist/
-        COMMIT_MESSAGE: "ci(docs): builds docs via vuepress-deploy action"
+    - name: Install dependencies and run tests
+      run: pnpm install && pnpm run test
