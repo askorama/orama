@@ -1,5 +1,7 @@
 ![Lyra](./docs/lyra-logo.png)
 
+[![Tests](https://github.com/nearform/lyra/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/nearform/lyra/actions/workflows/tests.yml)
+
 # Installation
 
 You can install Lyra using `npm`, `yarn`, `pnpm`:
