@@ -8,3 +8,5 @@ jest.config.js
 *.csv
 *.sh
 *.png
+*.html
+*.svg
