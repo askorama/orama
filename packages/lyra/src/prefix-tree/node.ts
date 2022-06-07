@@ -20,17 +20,16 @@ export class TrieNode {
   }
 
   getWord(): NodeContent {
-    const output = [];
-
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     let node: TrieNode = this;
+    let output = "";
 
     while (node !== null) {
-      output.unshift(node.key);
+      output = node.key + output;
       node = node.parent!;
     }
 
-    return [output.join(""), this.docs];
+    return [output, this.docs];
   }
 
   removeDoc(docID: string): boolean {

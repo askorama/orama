@@ -60,7 +60,7 @@ export class Lyra {
       if (propType === "string") {
         this.index.set(prop, new Trie());
       } else if (propType === "object") {
-        // @todo nested properties will be supported with the nexrt versions
+        // @todo nested properties will be supported with the next versions
         //this.buildIndex(prop as unknown as PropertiesSchema);
         throw ERRORS.UNSUPPORTED_NESTED_PROPERTIES();
       } else {
