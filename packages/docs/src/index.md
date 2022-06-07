@@ -1,6 +1,6 @@
 ---
 home: true
-heroImage: /imgs/lyra.svg
+heroImage: https://nearform.github.io/lyra/imgs/lyra.svg
 tagline: Documentation for the Lyra search engine
 actionText: Quick Start →
 actionLink: /guide/

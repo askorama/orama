@@ -37,6 +37,8 @@ module.exports = {
     docsDir: "packages/docs/src",
     editLinkText: "",
     lastUpdated: false,
+    docsBranch: "main",
+    smoothScroll: true,
     nav: [
       {
         text: "Guide",
