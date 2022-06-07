@@ -12,7 +12,7 @@ export function formatBytes(bytes: number, decimals = 2): string {
 }
 
 export function formatNanoseconds(unit: bigint): string {
-  const nano = 1000000n;
+  const nano = 1_000_000n;
   const micro = 1000n;
 
   if (unit < nano) {
