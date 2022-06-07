@@ -24,6 +24,8 @@ module.exports = {
     ],
   ],
 
+  base: "/lyra",
+
   /**
    * Theme configuration, here is the default theme configuration for VuePress.
    *
@@ -35,7 +37,6 @@ module.exports = {
     docsDir: "packages/docs/src",
     editLinkText: "",
     lastUpdated: false,
-    base: "/lyra",
     nav: [
       {
         text: "Guide",
