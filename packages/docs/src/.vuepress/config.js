@@ -35,6 +35,7 @@ module.exports = {
     docsDir: "packages/docs/src",
     editLinkText: "",
     lastUpdated: false,
+    base: "/lyra",
     nav: [
       {
         text: "Guide",
