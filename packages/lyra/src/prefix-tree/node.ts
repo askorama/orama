@@ -1,8 +1,6 @@
 import type { Nullable } from "../types";
 
-type Children = {
-  [key: string]: TrieNode;
-};
+type Children = Map<string, TrieNode>;
 
 type Docs = Set<string>;
 
@@ -11,12 +9,24 @@ type NodeContent = [string, Docs];
 export class TrieNode {
   public key: string;
   public parent: Nullable<TrieNode> = null;
-  public children: Nullable<Children> = {};
+  public children: Nullable<Children> = new Map();
   public docs: Docs = new Set();
   public end = false;
 
   constructor(key: string) {
     this.key = key;
+  }
+
+  setParent(newParent: TrieNode): void {
+    this.parent = newParent;
+  }
+
+  setEnd(val: boolean): void {
+    this.end = val;
+  }
+
+  deleteChildren() {
+    this.children = null;
   }
 
   getWord(): NodeContent {

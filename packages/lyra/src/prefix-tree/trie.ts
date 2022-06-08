@@ -14,16 +14,17 @@ export class Trie {
     for (let i = 0; i < wordLength; i++) {
       const char = word[i];
 
-      if (!node.children?.[char]) {
-        node.children![char] = new TrieNode(char);
-        node.children![char].parent = node;
+      if (!node.children?.has(char)) {
+        const newTrieNode = new TrieNode(char);
+        newTrieNode.setParent(node);
+        node.children!.set(char, newTrieNode);
       }
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-      node = node?.children?.[char]!;
+      node = node.children!.get(char)!;
 
       if (i === wordLength - 1) {
-        node.end = true;
+        node.setEnd(true);
         node.docs.add(docId);
       }
     }
@@ -33,8 +34,8 @@ export class Trie {
     let node = this.root;
 
     for (const char of word) {
-      if (node?.children?.[char]) {
-        node = node.children![char];
+      if (node?.children?.has(char)) {
+        node = node.children.get(char)!;
       } else {
         return false;
       }
@@ -48,8 +49,8 @@ export class Trie {
     const output: FindResult = {};
 
     for (const char of prefix) {
-      if (node?.children?.[char]) {
-        node = node.children![char];
+      if (node?.children?.has(char)) {
+        node = node.children.get(char)!;
       } else {
         return output;
       }
@@ -72,8 +73,8 @@ export class Trie {
         }
       }
 
-      for (const child in _node.children) {
-        findAllWords(_node.children[child], _output);
+      for (const childNode of _node.children?.values() ?? []) {
+        findAllWords(childNode, _output);
       }
     }
 
@@ -88,7 +89,7 @@ export class Trie {
       const [nodeWord, _docs] = node.getWord();
 
       if (node.end && nodeWord === word) {
-        const hasChildren = Object.keys(node.children!).length > 0;
+        const hasChildren = node.children?.size ?? 0 > 0;
         node.removeDoc(docID);
 
         if (hasChildren) {
@@ -98,10 +99,9 @@ export class Trie {
         return true;
       }
 
-      for (const key in node.children) {
-        const ch = node?.children?.[key];
-        if (ch) {
-          removeWord(ch, _word, docID);
+      for (const childNode of node.children!.values()) {
+        if (childNode) {
+          removeWord(childNode, _word, docID);
         }
       }
 
@@ -117,19 +117,19 @@ export class Trie {
 
     function removeWord(node: TrieNode, _word: string): boolean {
       if (node.end && node.getWord()[0] === word) {
-        const hasChildren = Object.keys(node.children!).length > 0;
+        const hasChildren = node.children?.size ?? 0 > 0;
 
         if (hasChildren) {
           node.end = false;
         } else {
-          node.parent!.children = null;
+          node.parent!.deleteChildren();
         }
 
         return true;
       }
 
-      for (const key in node.children) {
-        removeWord(node.children[key], _word);
+      for (const childNode of node.children?.values() ?? []) {
+        removeWord(childNode, _word);
       }
 
       return false;
