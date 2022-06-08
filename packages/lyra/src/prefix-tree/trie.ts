@@ -8,11 +8,11 @@ export class Trie {
   private root = new TrieNode("");
 
   insert(word: string, docId: string): void {
-    const wordAsCharList = word.split("");
+    const wordLength = word.length;
     let node = this.root;
 
-    for (let i = 0; i < wordAsCharList.length; i++) {
-      const char = wordAsCharList[i];
+    for (let i = 0; i < wordLength; i++) {
+      const char = word[i];
 
       if (!node.children?.[char]) {
         node.children![char] = new TrieNode(char);
@@ -22,7 +22,7 @@ export class Trie {
       // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
       node = node?.children?.[char]!;
 
-      if (i === wordAsCharList.length - 1) {
+      if (i === wordLength - 1) {
         node.end = true;
         node.docs.add(docId);
       }
@@ -30,10 +30,9 @@ export class Trie {
   }
 
   contains(word: string): boolean {
-    const wordAsCharList = word.split("");
     let node = this.root;
 
-    for (const char of wordAsCharList) {
+    for (const char of word) {
       if (node?.children?.[char]) {
         node = node.children![char];
       } else {
@@ -45,11 +44,10 @@ export class Trie {
   }
 
   find(prefix: string): FindResult {
-    const prefixAsCharList = prefix.split("");
     let node = this.root;
     const output: FindResult = {};
 
-    for (const char of prefixAsCharList) {
+    for (const char of prefix) {
       if (node?.children?.[char]) {
         node = node.children![char];
       } else {
