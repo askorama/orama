@@ -1,9 +1,12 @@
-export function tokenize(input: string): Set<string> {
-  return new Set(
-    input
-      .toLowerCase()
-      .replace(/[^a-z0-9 -]/g, "")
-      .split(" ")
-      .filter(Boolean)
-  );
+import { WordTokenizer } from "natural";
+import { Language, stemArray } from "./stemmer";
+
+const tokenizer = new WordTokenizer();
+
+export function tokenize(
+  input: string,
+  language: Language = "english"
+): Set<string> {
+  const tokens = tokenizer.tokenize(input);
+  return new Set(stemArray(tokens, language));
 }

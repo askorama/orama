@@ -60,16 +60,20 @@ importers:
   packages/lyra:
     specifiers:
       '@types/jest': ^27.5.0
+      '@types/natural': ^5.1.1
       fastq: ^1.13.0
       jest: ^28.1.0
       nanoid: 3.3.4
+      natural: ^5.2.2
       ts-jest: ^28.0.2
       typescript: ^4.6.4
     dependencies:
       fastq: 1.13.0
       nanoid: 3.3.4
+      natural: 5.2.2
     devDependencies:
       '@types/jest': 27.5.2
+      '@types/natural': 5.1.1
       jest: 28.1.1
       ts-jest: 28.0.4_vz6zla63wvofljfl6elifyg77e
       typescript: 4.7.3
@@ -2084,6 +2088,12 @@ packages:
     resolution: {integrity: sha512-Klz949h02Gz2uZCMGwDUSDS1YBlTdDDgbWHi+81l29tQALUtvz4rAYi5uoVhE5Lagoq6DeqAUlbrHvW/mXDgdQ==}
     dev: true
 
+  /@types/natural/5.1.1:
+    resolution: {integrity: sha512-BqppT8eHJvc0pN81XE7Rx5P8Osg1TSnOx3iwzLWImIO+6DwNUfpKR20tvg713O2eqHoxLcqrBaL10foo1mw/Xw==}
+    dependencies:
+      '@types/node': 17.0.40
+    dev: true
+
   /@types/node/17.0.40:
     resolution: {integrity: sha512-UXdBxNGqTMtm7hCwh9HtncFVLrXoqA3oJW30j6XWp5BH/wu3mVeaxo7cq5benFdBw34HB3XDT2TRPI7rXZ+mDg==}
     dev: true
@@ -3093,6 +3103,10 @@ packages:
     engines: {node: '>=14.15.0'}
     dev: false
 
+  /afinn-165/1.0.4:
+    resolution: {integrity: sha512-7+Wlx3BImrK0HiG6y3lU4xX7SpBPSSu8T9iguPMlaueRFxjbYwAQrp9lqZUuFikqKbd/en8lVREILvP2J80uJA==}
+    dev: false
+
   /agentkeepalive/2.2.0:
     resolution: {integrity: sha512-TnB6ziK363p7lR8QpeLC8aMr8EGYBKZTpgzQLfqTs3bR0Oo5VbKdwKf8h0dSzsYrB7lSCgfJnMZKqShvlq5Oyg==}
     engines: {node: '>= 0.10.0'}
@@ -3273,6 +3287,13 @@ packages:
       normalize-path: 3.0.0
       picomatch: 2.3.1
     dev: true
+
+  /apparatus/0.0.10:
+    resolution: {integrity: sha512-KLy/ugo33KZA7nugtQ7O0E1c8kQ52N3IvD/XgIh4w/Nr28ypfkwDfA67F1ev4N1m5D+BOk1+b2dEJDfpj/VvZg==}
+    engines: {node: '>=0.2.6'}
+    dependencies:
+      sylvester: 0.0.12
+    dev: false
 
   /aproba/1.2.0:
     resolution: {integrity: sha512-Y9J6ZjXtoYh8RnXVCMOU/ttDmk1aBjunq9vO0ta5x85WDQiQfUF9sIPBITdbiiIVcBo03Hi3jMxigBtsddlXRw==}
@@ -9362,6 +9383,18 @@ packages:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
 
+  /natural/5.2.2:
+    resolution: {integrity: sha512-X2o4i/f0CeOyTTXKIsUw6lBLLlz6xSBbOxzS7nMacjmNYXlQw/M9MXOrWlRsRMuXyoiDc+rO6bnk1ZzSCaI6Fw==}
+    engines: {node: '>=0.4.10'}
+    dependencies:
+      afinn-165: 1.0.4
+      apparatus: 0.0.10
+      safe-stable-stringify: 2.3.1
+      sylvester: 0.0.12
+      underscore: 1.13.4
+      wordnet-db: 3.1.14
+    dev: false
+
   /negotiator/0.6.3:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
     engines: {node: '>= 0.6'}
@@ -10994,6 +11027,11 @@ packages:
       ret: 0.1.15
     dev: true
 
+  /safe-stable-stringify/2.3.1:
+    resolution: {integrity: sha512-kYBSfT+troD9cDA85VDnHZ1rpHC50O0g1e6WlGHVCz/g+JS+9WKLj+XwFYyR8UbrZN8ll9HUpDAAddY58MGisg==}
+    engines: {node: '>=10'}
+    dev: false
+
   /safer-buffer/2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
     dev: true
@@ -11796,6 +11834,11 @@ packages:
       util.promisify: 1.0.1
     dev: true
 
+  /sylvester/0.0.12:
+    resolution: {integrity: sha1-WohEFc0tACxX56OqyZRip1zp/bQ=}
+    engines: {node: '>=0.2.6'}
+    dev: false
+
   /table/6.8.0:
     resolution: {integrity: sha512-s/fitrbVeEyHKFa7mFdkuQMWlH1Wgw/yEXMt5xACT4ZpzWFluehAxRtUUQKPuWhaLAWhFcVx6w3oC8VKaUfPGA==}
     engines: {node: '>=10.0.0'}
@@ -12006,7 +12049,7 @@ packages:
     dependencies:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
-      jest: 28.1.1_2cdaztp7eenh32anyybg24itfi
+      jest: 28.1.1
       jest-util: 28.1.1
       json5: 2.2.1
       lodash.memoize: 4.1.2
@@ -12168,6 +12211,10 @@ packages:
       defu: 6.0.0
       jiti: 1.13.0
     dev: true
+
+  /underscore/1.13.4:
+    resolution: {integrity: sha512-BQFnUDuAQ4Yf/cYY5LNrK9NCJFKriaRbD9uR1fTeXnBeoa97W0i41qkZfGO9pSo8I5KzjAcSY2XYtdf0oKd7KQ==}
+    dev: false
 
   /undici/5.4.0:
     resolution: {integrity: sha512-A1SRXysDg7J+mVP46jF+9cKANw0kptqSFZ8tGyL+HBiv0K1spjxPX8Z4EGu+Eu6pjClJUBdnUPlxrOafR668/g==}
@@ -12961,6 +13008,11 @@ packages:
     resolution: {integrity: sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /wordnet-db/3.1.14:
+    resolution: {integrity: sha512-zVyFsvE+mq9MCmwXUWHIcpfbrHHClZWZiVOzKSxNJruIcFn2RbY55zkhiAMMxM8zCVSmtNiViq8FsAZSFpMYag==}
+    engines: {node: '>=0.6.0'}
+    dev: false
 
   /worker-farm/1.7.0:
     resolution: {integrity: sha512-rvw3QTZc8lAxyVrqcSGVm5yP/IJ2UcB3U0graE3LCFoZ0Yn2x4EoVSqJKdB/T5M+FLcRPjz4TDacRf3OCfNUzw==}

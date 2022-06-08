@@ -5,6 +5,7 @@ import { Trie } from "./prefix-tree/trie";
 import * as ERRORS from "./errors";
 import { tokenize } from "./tokenizer";
 import { formatNanoseconds, getNanosecondsTime } from "./utils";
+import { Language } from "./stemmer";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -30,6 +31,7 @@ type LyraIndex = Map<string, Trie>;
 type QueueDocParams = {
   id: string;
   doc: object;
+  language: Language;
 };
 
 type SearchResult = Promise<{
@@ -183,7 +185,10 @@ export class Lyra {
     return ids;
   }
 
-  public async insert(doc: object): Promise<{ id: string }> {
+  public async insert(
+    doc: object,
+    language: Language = "english"
+  ): Promise<{ id: string }> {
     const id = nanoid();
 
     if (!(await this.checkInsertDocSchema(doc))) {
@@ -193,12 +198,13 @@ export class Lyra {
     await this.queue.push({
       id,
       doc,
+      language,
     });
 
     return { id };
   }
 
-  private async _insert({ doc, id }: QueueDocParams): Promise<void> {
+  private async _insert({ doc, id, language }: QueueDocParams): Promise<void> {
     const index = this.index;
     this.docs.set(id, doc);
 
@@ -210,7 +216,7 @@ export class Lyra {
           // recursiveTrieInsertion((doc as any)[key]);
         } else if (typeof (doc as any)[key] === "string") {
           const requestedTrie = index.get(key);
-          const tokens = tokenize((doc as any)[key]);
+          const tokens = tokenize((doc as any)[key], language);
 
           for (const token of tokens) {
             requestedTrie?.insert(token, id);
