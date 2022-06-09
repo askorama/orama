@@ -1,6 +1,6 @@
 # Searching
 
-Given the database structure we created in the [previous document](/insert-data), we now have the following index:
+Given the database structure we created in the [previous document](./insert-data.md), we now have the following index:
 
 ```js
 import { lyra } from '@nearfom/lyra';

@@ -1,6 +1,6 @@
 # Insert data
 
-In the [previous document](/guide/creating-a-database), we saw how to instanciate a new Lyra database, so we now have the following schema:
+In the [previous document](./creating-a-database.md), we saw how to instanciate a new Lyra database, so we now have the following schema:
 
 ```js
 import { lyra } from '@nearfom/lyra';
@@ -62,4 +62,4 @@ const { id: harryPotter } = await movieDB.insert({
 
 After every insertion, the `insert` method will return a Promise containing an object with an `id` property, representing an unique ID for the document.
 
-Once we added some data, we can start [querying the database](/guide/search).
+Once we added some data, we can start [querying the database](./search.md).
