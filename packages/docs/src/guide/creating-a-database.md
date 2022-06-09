@@ -50,4 +50,4 @@ const movieDB = new Lyra({
 });
 ```
 
-Once the database is ready, you can start [adding some data to it](/guide/insert-data).
+Once the database is ready, you can start [adding some data to it](./insert-data.md).
