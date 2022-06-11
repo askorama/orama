@@ -4,6 +4,49 @@ function getId({ id }: { id: string }) {
   return id;
 }
 
+describe("defaultLanguage", () => {
+  it("should throw an error if the desired language is not supported", () => {
+    try {
+      new Lyra({
+        schema: {},
+        // @ts-expect-error latin is not supported
+        defaultLanguage: "latin",
+      });
+    } catch (e) {
+      expect(e).toMatchSnapshot();
+    }
+  });
+
+  it("should throw an error if the desired language is not supported during insertion", async () => {
+    try {
+      const db = new Lyra({
+        schema: { foo: "string" },
+      });
+
+      await db.insert(
+        {
+          foo: "bar",
+        },
+        // @ts-expect-error latin is not supported
+        "latin"
+      );
+    } catch (e) {
+      expect(e).toMatchSnapshot();
+    }
+  });
+
+  it("should not throw if if the language is supported", () => {
+    try {
+      new Lyra({
+        schema: {},
+        defaultLanguage: "portugese",
+      });
+    } catch (e) {
+      expect(e).toBeUndefined();
+    }
+  });
+});
+
 describe("checkInsertDocSchema", () => {
   it("should compare the inserted doc with the schema definition", async () => {
     const db = new Lyra({

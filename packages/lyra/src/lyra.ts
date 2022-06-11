@@ -5,7 +5,7 @@ import { Trie } from "./prefix-tree/trie";
 import * as ERRORS from "./errors";
 import { tokenize } from "./tokenizer";
 import { formatNanoseconds, getNanosecondsTime } from "./utils";
-import { Language } from "./stemmer";
+import { Language, SUPPORTED_LANGUAGES } from "./stemmer";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -53,7 +53,14 @@ export class Lyra {
   );
 
   constructor(properties: LyraProperties) {
-    this.defaultLanguage = properties.defaultLanguage || "english";
+    const defaultLanguage =
+      (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
+
+    if (!SUPPORTED_LANGUAGES.includes(defaultLanguage)) {
+      throw ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage);
+    }
+
+    this.defaultLanguage = defaultLanguage;
     this.schema = properties.schema;
     this.buildIndex(properties.schema);
   }
@@ -193,6 +200,10 @@ export class Lyra {
     language: Language = this.defaultLanguage
   ): Promise<{ id: string }> {
     const id = nanoid();
+
+    if (!SUPPORTED_LANGUAGES.includes(language)) {
+      throw ERRORS.LANGUAGE_NOT_SUPPORTED(language);
+    }
 
     if (!(await this.checkInsertDocSchema(doc))) {
       throw ERRORS.INVALID_DOC_SCHEMA(this.schema, doc);

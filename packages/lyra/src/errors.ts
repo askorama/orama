@@ -1,3 +1,5 @@
+import { SUPPORTED_LANGUAGES } from "./stemmer";
+
 function formatJSON(input: object) {
   return JSON.stringify(input, null, 2);
 }
@@ -22,3 +24,8 @@ export const UNSUPPORTED_NESTED_PROPERTIES = () =>
 
 export const DOC_ID_DOES_NOT_EXISTS = (id: string) =>
   `Document with ID ${id} does not exists`;
+
+export const LANGUAGE_NOT_SUPPORTED = (lang: string) =>
+  `Language "${lang}" is not supported.\nSupported languages are:\n - ${SUPPORTED_LANGUAGES.join(
+    "\n - "
+  )}`;
