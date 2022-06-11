@@ -15,6 +15,7 @@ export type PropertiesSchema = {
 
 export type LyraProperties = {
   schema: PropertiesSchema;
+  defaultLanguage?: Language;
 };
 
 export type LyraDocs = Map<string, object>;
@@ -41,6 +42,7 @@ type SearchResult = Promise<{
 }>;
 
 export class Lyra {
+  private defaultLanguage: Language = "english";
   private schema: PropertiesSchema;
   private docs: LyraDocs = new Map();
   private index: LyraIndex = new Map();
@@ -51,6 +53,7 @@ export class Lyra {
   );
 
   constructor(properties: LyraProperties) {
+    this.defaultLanguage = properties.defaultLanguage || "english";
     this.schema = properties.schema;
     this.buildIndex(properties.schema);
   }
@@ -187,7 +190,7 @@ export class Lyra {
 
   public async insert(
     doc: object,
-    language: Language = "english"
+    language: Language = this.defaultLanguage
   ): Promise<{ id: string }> {
     const id = nanoid();
 
