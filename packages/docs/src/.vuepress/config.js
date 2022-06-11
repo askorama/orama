@@ -24,7 +24,7 @@ module.exports = {
     ],
   ],
 
-  base: "/lyra",
+  base: "/lyra/",
 
   /**
    * Theme configuration, here is the default theme configuration for VuePress.
@@ -46,7 +46,7 @@ module.exports = {
       },
       {
         text: "Quickstart",
-        link: "/guide/getting-started",
+        link: "/guide/getting-started/",
       },
     ],
     sidebar: {
