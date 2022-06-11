@@ -50,4 +50,46 @@ const movieDB = new Lyra({
 });
 ```
 
+# Input analyzer
+By default, Lyra analyzes the input and performs a **stemming** operation, which allows the engine to perform more optimize queries, as well as saving indexing space.
+
+> In linguistic morphology and information retrieval, stemming is the process of reducing inflected (or sometimes derived) words to their word stem, base or root form—generally a written word form. The stem need not be identical to the morphological root of the word; it is usually sufficient that related words map to the same stem, even if this stem is not in itself a valid root. Algorithms for stemming have been studied in computer science since the 1960s. Many search engines treat words with the same stem as synonyms as a kind of query expansion, a process called conflation. ([Wikipedia](https://en.wikipedia.org/wiki/Stemming))
+
+By default, Lyra uses the English language analyzer, but you can override this behaviour while initializing a new Lyra insrance:
+
+```js
+import { lyra } from '@nearfom/lyra';
+
+const movieDB = new Lyra({
+  schema: {
+    title: 'string',
+    director: 'string',
+    plot: 'string',
+    year: 'number',
+    isFavorite: 'boolean'
+  },
+  defaultLanguage: 'italian'
+});
+```
+
+You can override the default language for a given document during data insertion:
+
+```js
+movieDB.insert(myDocument, 'spanish');
+```
+
+As for today, the available languages are:
+
+- dutch
+- english
+- french
+- italian
+- norwegian
+- portugese
+- russian
+- spanish
+- swedish
+
+# Inserting data
+
 Once the database is ready, you can start [adding some data to it](./insert-data.md).
