@@ -86,13 +86,12 @@ export class Trie {
     if (!word) return false;
 
     function removeWord(node: TrieNode, _word: string, docID: string): boolean {
-      const [nodeWord, _docs] = node.getWord();
+      const [nodeWord /**_docs*/] = node.getWord();
 
       if (node.end && nodeWord === word) {
-        const hasChildren = node.children?.size ?? 0 > 0;
         node.removeDoc(docID);
 
-        if (hasChildren) {
+        if (node.children?.size) {
           node.end = false;
         }
 
@@ -117,9 +116,7 @@ export class Trie {
 
     function removeWord(node: TrieNode, _word: string): boolean {
       if (node.end && node.getWord()[0] === word) {
-        const hasChildren = node.children?.size ?? 0 > 0;
-
-        if (hasChildren) {
+        if (node.children?.size) {
           node.end = false;
         } else {
           node.parent!.deleteChildren();
