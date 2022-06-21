@@ -57,6 +57,29 @@ importers:
     devDependencies:
       vuepress: 1.9.7
 
+  packages/examples/with-react:
+    specifiers:
+      '@nearform/lyra': workspace:*
+      '@types/react': ^18.0.0
+      '@types/react-dom': ^18.0.0
+      '@vitejs/plugin-react': ^1.3.0
+      react: ^18.0.0
+      react-dom: ^18.0.0
+      typescript: ^4.6.3
+      unocss: ^0.38.0
+      vite: ^2.9.9
+    dependencies:
+      '@nearform/lyra': link:../../lyra
+      react: 18.1.0
+      react-dom: 18.1.0_react@18.1.0
+    devDependencies:
+      '@types/react': 18.0.12
+      '@types/react-dom': 18.0.5
+      '@vitejs/plugin-react': 1.3.2
+      typescript: 4.7.3
+      unocss: 0.38.0_vite@2.9.10
+      vite: 2.9.10
+
   packages/lyra:
     specifiers:
       '@types/jest': ^27.5.0
@@ -77,29 +100,6 @@ importers:
       jest: 28.1.1
       ts-jest: 28.0.4_vz6zla63wvofljfl6elifyg77e
       typescript: 4.7.3
-
-  packages/react-demo:
-    specifiers:
-      '@nearform/lyra': workspace:*
-      '@types/react': ^18.0.0
-      '@types/react-dom': ^18.0.0
-      '@vitejs/plugin-react': ^1.3.0
-      react: ^18.0.0
-      react-dom: ^18.0.0
-      typescript: ^4.6.3
-      unocss: ^0.38.0
-      vite: ^2.9.9
-    dependencies:
-      '@nearform/lyra': link:../lyra
-      react: 18.1.0
-      react-dom: 18.1.0_react@18.1.0
-    devDependencies:
-      '@types/react': 18.0.12
-      '@types/react-dom': 18.0.5
-      '@vitejs/plugin-react': 1.3.2
-      typescript: 4.7.3
-      unocss: 0.38.0_vite@2.9.10
-      vite: 2.9.10
 
 packages:
 
@@ -12049,7 +12049,7 @@ packages:
     dependencies:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
-      jest: 28.1.1
+      jest: 28.1.1_2cdaztp7eenh32anyybg24itfi
       jest-util: 28.1.1
       json5: 2.2.1
       lodash.memoize: 4.1.2
