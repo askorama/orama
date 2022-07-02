@@ -44,19 +44,48 @@ export class Trie {
     return node.end;
   }
 
-  find(prefix: string): FindResult {
+  find(prefix: string, fixTypos = true): FindResult {
     let node = this.root;
     const output: FindResult = {};
+    let nodeSet = new Set<TrieNode>();
 
-    for (const char of prefix) {
-      if (node?.children?.has(char)) {
-        node = node.children.get(char)!;
-      } else {
-        return output;
-      }
+    if (prefix.length <= 1) {
+      fixTypos = false;
     }
 
-    findAllWords(node, output);
+    if (!fixTypos) {
+      for (const char of prefix) {
+        if (node?.children?.has(char)) {
+          node = node.children.get(char)!;
+        } else {
+          return output;
+        }
+      }
+      nodeSet.add(node);
+    } else traverseDown(node, prefix);
+
+    nodeSet.forEach((thisNode) => findAllWords(thisNode, output));
+
+    function traverseDown(_node: TrieNode, _prefix: string, charIndex = 0, typo = false): void {
+      if (charIndex === _prefix.length) {
+        nodeSet.add(_node);
+        return;
+      }
+
+      const char = _prefix[charIndex];
+
+      for (const child of _node?.children?.values() ?? []) {
+        if (child.key === char) {
+          traverseDown(child, _prefix, charIndex + 1, typo);
+        } else if (!typo) {
+          traverseDown(child, _prefix, charIndex + 1, true);
+        }
+      }
+
+      if (charIndex === _prefix.length - 1 && !typo) {
+        nodeSet.add(_node);
+      }
+    }
 
     function findAllWords(_node: TrieNode, _output: FindResult) {
       if (_node.end) {

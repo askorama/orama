@@ -25,6 +25,7 @@ export type SearchParams = {
   properties?: "*" | string[];
   limit?: number;
   offset?: number;
+  fixTypos?: boolean;
 };
 
 type LyraIndex = Map<string, Trie>;
@@ -184,7 +185,7 @@ export class Lyra {
     params: SearchParams & { index: string }
   ): Promise<Set<string>> {
     const idx = this.index.get(params.index);
-    const searchResult = idx?.find(params.term);
+    const searchResult = idx?.find(params.term, params.fixTypos ?? true);
     const ids = new Set<string>();
 
     for (const key in searchResult) {

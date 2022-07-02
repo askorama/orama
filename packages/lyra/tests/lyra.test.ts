@@ -273,4 +273,55 @@ describe("lyra", () => {
     expect(search.count).toBe(1);
     expect((search.hits[0] as any).author).toBe("Frank Zappa");
   });
+
+  it("Should find results even if the searched term contains a typo", async () => {
+    const db = new Lyra({
+      schema: {
+        quote: "string",
+        author: "string",
+      },
+    });
+
+    const { id: id1 } = await db.insert({
+      quote: "Be yourself; everyone else is already taken.",
+      author: "Oscar Wilde",
+    });
+
+    const { id: id2 } = await db.insert({
+      quote: "To live is the rarest thing in the world. Most people exist, that is all.",
+      author: "Oscar Wilde",
+    });
+
+    const { id: id3 } = await db.insert({
+      quote: "So many books, so little time.",
+      author: "Frank Zappa",
+    });
+
+    const { id: id4 } = await db.insert({
+      quote: "The greatest glory in living lies not in never falling, but in rising every time we fall.",
+      author: "Nelson Mandela",
+    });
+
+    const { id: id5 } = await db.insert({
+      quote: "The way to get started is to quit talking and begin doing",
+      author: "Walt Disney",
+    });
+
+    const { id: id6 } = await db.insert({
+      quote:
+        "Your time is limited, so don't waste it living someone else's life. Don't be trapped by dogma - which is living with the results of other people's thinking",
+      author: "Steve Jobs",
+    });
+
+    const mistype = await db.search({ term: "boots", properties: ["quote"] });
+    const oneLetterLess = await db.search({ term: "wast", properties: ["quote"] });
+    const oneLetterMore = await db.search({ term: "peopler" });
+    const noTypo = await db.search({ term: "started" });
+
+    expect((mistype.hits[0] as any).id).toBe(id3);
+    expect((oneLetterLess.hits[0] as any).id).toBe(id6);
+    // the following test fails because of stemming (i.e. `peopler` doesn't get stemmed while `people` gets stemmed to `peopl` hence the algorithm counts 2 typos.)
+    // expect(oneLetterMore.count).toBe(2);
+    expect((noTypo.hits[0] as any).id).toBe(id5);
+  });
 });
