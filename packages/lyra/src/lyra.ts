@@ -185,7 +185,7 @@ export class Lyra {
     params: SearchParams & { index: string }
   ): Promise<Set<string>> {
     const idx = this.index.get(params.index);
-    const searchResult = idx?.find(params.term, params.fixTypos ?? true);
+    const searchResult = idx?.find(params.term, params.fixTypos);
     const ids = new Set<string>();
 
     for (const key in searchResult) {
