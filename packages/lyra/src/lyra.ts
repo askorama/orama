@@ -81,8 +81,8 @@ export class Lyra {
     }
   }
 
-  async search(params: SearchParams): SearchResult {
-    const tokens = tokenize(params.term).values();
+  async search(params: SearchParams, language: Language = this.defaultLanguage): SearchResult {
+    const tokens = tokenize(params.term, language).values();
     const indices = this.getIndices(params.properties);
     const { limit = 10, offset = 0 } = params;
     const results: object[] = new Array({ length: limit });
