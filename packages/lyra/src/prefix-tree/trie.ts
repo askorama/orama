@@ -1,7 +1,7 @@
 import { TrieNode } from "./node";
 
 export type FindParams = {
-  prefix: string;
+  term: string;
   exact?: boolean;
 };
 
@@ -49,11 +49,11 @@ export class Trie {
     return node.end;
   }
 
-  find({ prefix, exact }: FindParams): FindResult {
+  find({ term, exact }: FindParams): FindResult {
     let node = this.root;
     const output: FindResult = {};
 
-    for (const char of prefix) {
+    for (const char of term) {
       if (node?.children?.has(char)) {
         node = node.children.get(char)!;
       } else {
@@ -67,7 +67,7 @@ export class Trie {
       if (_node.end) {
         const [word, docIDs] = _node.getWord();
 
-        if (exact && word !== prefix) {
+        if (exact && word !== term) {
           return output;
         }
 

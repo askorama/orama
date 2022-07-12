@@ -190,7 +190,7 @@ export class Lyra {
   ): Promise<Set<string>> {
     const idx = this.index.get(params.index);
     const searchResult = idx?.find({
-      prefix: params.term,
+      term: params.term,
       exact: params.exact,
     });
     const ids = new Set<string>();
