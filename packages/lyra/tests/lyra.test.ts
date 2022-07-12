@@ -273,4 +273,36 @@ describe("lyra", () => {
     expect(search.count).toBe(1);
     expect((search.hits[0] as any).author).toBe("Frank Zappa");
   });
+
+  it("Should exact match", async () => {
+    const db = new Lyra({
+      schema: {
+        author: "string",
+        quote: "string",
+      },
+    });
+
+    await db.insert({
+      quote: "Be yourself; everyone else is already taken.",
+      author: "Oscar Wilde",
+    });
+
+    const partialSearch = await db.search({
+      term: "alr",
+      exact: true,
+    });
+
+    expect(partialSearch.count).toBe(0);
+
+    const exactSearch = await db.search({
+      term: "already",
+      exact: true,
+    });
+
+    expect(exactSearch.count).toBe(1);
+    expect((exactSearch.hits[0] as any).quote).toBe(
+      "Be yourself; everyone else is already taken."
+    );
+    expect((exactSearch.hits[0] as any).author).toBe("Oscar Wilde");
+  });
 });
