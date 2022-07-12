@@ -1,8 +1,4 @@
-import {
-  formatBytes,
-  formatNanoseconds,
-  getNanosecondsTime,
-} from "../src/utils";
+import { formatBytes, formatNanoseconds } from "../src/utils";
 
 describe("utils", () => {
   it("should correctly format bytes", async () => {
