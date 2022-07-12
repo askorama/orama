@@ -30,10 +30,10 @@ describe("trie", () => {
       trie.insert(doc, id);
     }
 
-    expect(trie.find(phrases[5].doc.slice(0, 5))).toStrictEqual({
+    expect(trie.find({ term: phrases[5].doc.slice(0, 5) })).toStrictEqual({
       [phrases[5].doc]: new Set(phrases[5].id),
     });
-    expect(trie.find("th")).toMatchInlineSnapshot(`
+    expect(trie.find({ term: "th" })).toMatchInlineSnapshot(`
       Object {
         "the quick, brown fox": Set {
           "1",
@@ -61,6 +61,6 @@ describe("trie", () => {
     trie.remove(phrases[0].doc);
 
     expect(trie.contains(phrases[0].doc)).toBeFalsy();
-    expect(trie.find(phrases[0].doc)).toStrictEqual({});
+    expect(trie.find({ term: phrases[0].doc })).toStrictEqual({});
   });
 });
