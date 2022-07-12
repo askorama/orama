@@ -25,6 +25,7 @@ export type SearchParams = {
   properties?: "*" | string[];
   limit?: number;
   offset?: number;
+  exact?: boolean | undefined;
 };
 
 type LyraIndex = Map<string, Trie>;
@@ -87,7 +88,7 @@ export class Lyra {
   ): SearchResult {
     const tokens = tokenize(params.term, language).values();
     const indices = this.getIndices(params.properties);
-    const { limit = 10, offset = 0 } = params;
+    const { limit = 10, offset = 0, exact = false } = params;
     const results: object[] = new Array({ length: limit });
     let totalResults = 0;
 
@@ -102,6 +103,7 @@ export class Lyra {
           ...params,
           index: index,
           term: token,
+          exact: exact,
         });
 
         totalResults += documentIDs.size;
@@ -187,7 +189,10 @@ export class Lyra {
     params: SearchParams & { index: string }
   ): Promise<Set<string>> {
     const idx = this.index.get(params.index);
-    const searchResult = idx?.find(params.term);
+    const searchResult = idx?.find({
+      prefix: params.term,
+      exact: params.exact,
+    });
     const ids = new Set<string>();
 
     for (const key in searchResult) {

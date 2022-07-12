@@ -1,5 +1,10 @@
 import { TrieNode } from "./node";
 
+export type FindParams = {
+  prefix: string;
+  exact?: boolean;
+};
+
 export type FindResult = {
   [key: string]: Set<string>;
 };
@@ -44,7 +49,7 @@ export class Trie {
     return node.end;
   }
 
-  find(prefix: string): FindResult {
+  find({ prefix, exact }: FindParams): FindResult {
     let node = this.root;
     const output: FindResult = {};
 
@@ -61,6 +66,10 @@ export class Trie {
     function findAllWords(_node: TrieNode, _output: FindResult) {
       if (_node.end) {
         const [word, docIDs] = _node.getWord();
+
+        if (exact && word !== prefix) {
+          return output;
+        }
 
         if (!(word in _output)) {
           _output[word] = new Set();
