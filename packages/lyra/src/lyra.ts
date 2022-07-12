@@ -25,7 +25,7 @@ export type SearchParams = {
   properties?: "*" | string[];
   limit?: number;
   offset?: number;
-  exact?: boolean | undefined;
+  exact?: boolean;
 };
 
 type LyraIndex = Map<string, Trie>;
