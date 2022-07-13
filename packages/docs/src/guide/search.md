@@ -148,7 +148,44 @@ The result will be something like this:
 }
 ```
 
-As you can see, we get a `count` of `1` as well. It means that we have a total of `1` document which contains exactly the word `Chris` in the `director` index.  
+As you can see, we get a `count` of `1` as well. It means that we have a total of `1` document which contains exactly the word `Chris` in the `director` index.
+
+## Tolerance
+
+The tolerance allows you to specify the maximum distance (following the [levenshtein algorithm](https://en.wikipedia.org/wiki/Levenshtein_distance)) between the term and the searchable property.
+
+If the value is not set, Lyra will work as usual regardless of the tolerance.
+
+```js
+const result = await movieDB.search({
+  term: 'Cris',
+  properties: ['director'],
+  tolerance: 1
+});
+```
+
+The searched term is **Cris** but it's misspelled, the correct term would be **Chris**. With the tolerance set to **1** we are telling to **Lyra** that the maximum distance between the term and the searchable property is **1**, so Lyra can make just **1** operation on the term to find the word in the database.
+
+The result will be something like this:
+
+```js
+{
+  elapsed: '103μs',
+  hits: [
+    {
+      id: 'SXLYl5aURpbuNYr7fUlQI',
+      title: "Harry Potter and the Philosopher's Stone",
+      director: 'Chris Columbus',
+      plot: 'Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.',
+      year: 2001,
+      isFavorite: false
+    }
+  ],
+  count: 1
+}
+```
+
+> Note: Tolerance will not work together with the *exact* parameter.
 
 ## Defaults
 
