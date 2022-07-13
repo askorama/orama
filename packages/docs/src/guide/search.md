@@ -117,6 +117,39 @@ It will return the **second** result for our search:
 }
 ```
 
+## Exact Match
+
+Another way to search is to use the `exact` option, which will match the term exactly:
+
+```js
+const result = await movieDB.search({
+  term: 'Chris',
+  properties: ['director'],
+  exact: true
+});
+```
+
+The result will be something like this:
+
+```js
+{
+  elapsed: '94μs',
+  hits: [
+    {
+      id: 'SXLYl5aURpbuNYr7fUlQI',
+      title: "Harry Potter and the Philosopher's Stone",
+      director: 'Chris Columbus',
+      plot: 'Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.',
+      year: 2001,
+      isFavorite: false
+    }
+  ],
+  count: 1
+}
+```
+
+As you can see, we get a `count` of `1` as well. It means that we have a total of `1` document which contains exactly the word `Chris` in the `director` index.  
+
 ## Defaults
 
 By default, Lyra limits the search results to `10`, without any offset (so, `0` as `offset` value).
