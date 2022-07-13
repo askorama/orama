@@ -76,18 +76,22 @@ export class Trie {
 
         if (!(word in _output)) {
           if (tolerance) {
+            // if the tolerance is set, we need to calculate the distance using levenshtein algorithm
             distance = levenshtein(term, word);
 
+            // if the distance is greater than the tolerance, we don't need to add the word to the output
             if (distance <= tolerance) {
               _output[word] = new Set();
             }
           } else {
+            // prevent default tolerance not set
             _output[word] = new Set();
           }
         }
 
         if (docIDs?.size) {
           for (const doc of docIDs) {
+            // check if _output[word] exists and then add the doc to it
             _output[word] && _output[word].add(doc);
           }
         }
