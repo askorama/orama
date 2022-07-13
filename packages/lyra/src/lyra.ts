@@ -26,6 +26,7 @@ export type SearchParams = {
   limit?: number;
   offset?: number;
   exact?: boolean;
+  tolerance?: number;
 };
 
 type LyraIndex = Map<string, Trie>;
@@ -192,6 +193,7 @@ export class Lyra {
     const searchResult = idx?.find({
       term: params.term,
       exact: params.exact,
+      tolerance: params.tolerance,
     });
     const ids = new Set<string>();
 

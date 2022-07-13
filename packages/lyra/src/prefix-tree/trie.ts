@@ -1,8 +1,10 @@
 import { TrieNode } from "./node";
+import { levenshtein } from "../levenshtein";
 
 export type FindParams = {
   term: string;
   exact?: boolean;
+  tolerance?: number;
 };
 
 export type FindResult = {
@@ -49,14 +51,14 @@ export class Trie {
     return node.end;
   }
 
-  find({ term, exact }: FindParams): FindResult {
+  find({ term, exact, tolerance }: FindParams): FindResult {
     let node = this.root;
     const output: FindResult = {};
 
     for (const char of term) {
       if (node?.children?.has(char)) {
         node = node.children.get(char)!;
-      } else {
+      } else if (!tolerance) {
         return output;
       }
     }
@@ -72,12 +74,16 @@ export class Trie {
         }
 
         if (!(word in _output)) {
-          _output[word] = new Set();
+          const distance = levenshtein(term, word);
+
+          if (distance <= (tolerance || (tolerance !== 0 && word.length))) {
+            _output[word] = new Set();
+          }
         }
 
         if (docIDs?.size) {
           for (const doc of docIDs) {
-            _output[word].add(doc);
+            _output[word] && _output[word].add(doc);
           }
         }
       }

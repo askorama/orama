@@ -242,7 +242,7 @@ describe("lyra", () => {
     expect((searchResult2.hits[0] as any).id).toBe(id2);
   });
 
-  it("Should be able to insert documens with non-searchable fieldsa", async () => {
+  it("Should be able to insert documens with non-searchable fields", async () => {
     const db = new Lyra({
       schema: {
         quote: "string",
@@ -304,5 +304,62 @@ describe("lyra", () => {
       "Be yourself; everyone else is already taken."
     );
     expect((exactSearch.hits[0] as any).author).toBe("Oscar Wilde");
+  });
+
+  it("Shouldn't be tolerant", async () => {
+    const db = new Lyra({
+      schema: {
+        quote: "string",
+        author: "string",
+      },
+    });
+
+    await db.insert({
+      quote:
+        "Absolutely captivating creatures, seahorses seem like a product of myth and imagination rather than of nature.",
+      author: "Sara A. Lourie",
+    });
+
+    const search = await db.search({
+      term: "seahrse",
+      tolerance: 0,
+    });
+
+    expect(search.count).toBe(0);
+  });
+
+  it("Should be tolerant", async () => {
+    const db = new Lyra({
+      schema: {
+        quote: "string",
+        author: "string",
+      },
+    });
+
+    await db.insert({
+      quote:
+        "Absolutely captivating creatures, seahorses seem like a product of myth and imagination rather than of nature.",
+      author: "Sara A. Lourie",
+    });
+
+    await db.insert({
+      quote:
+        "Seahorses look mythical, like dragons, but these magnificent shy creatures are real.",
+      author: "Jennifer Keats Curtis",
+    });
+
+    const tolerantSearch = await db.search({
+      term: "seahrse",
+      tolerance: 1,
+    });
+
+    expect(tolerantSearch.count).toBe(2);
+
+    const moreTolerantSearch = await db.search({
+      term: "sahrse",
+      tolerance: 3,
+    });
+
+    expect(moreTolerantSearch.count).toBe(2);
   });
 });
