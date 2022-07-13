@@ -66,6 +66,7 @@ export class Trie {
     findAllWords(node, output);
 
     function findAllWords(_node: TrieNode, _output: FindResult) {
+      let distance = 0;
       if (_node.end) {
         const [word, docIDs] = _node.getWord();
 
@@ -74,9 +75,13 @@ export class Trie {
         }
 
         if (!(word in _output)) {
-          const distance = levenshtein(term, word);
+          if (tolerance) {
+            distance = levenshtein(term, word);
 
-          if (distance <= (tolerance || (tolerance !== 0 && word.length))) {
+            if (distance <= tolerance) {
+              _output[word] = new Set();
+            }
+          } else {
             _output[word] = new Set();
           }
         }
