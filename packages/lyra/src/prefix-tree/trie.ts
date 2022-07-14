@@ -66,7 +66,6 @@ export class Trie {
     findAllWords(node, output);
 
     function findAllWords(_node: TrieNode, _output: FindResult) {
-      let distance = 0;
       if (_node.end) {
         const [word, docIDs] = _node.getWord();
 
@@ -76,12 +75,15 @@ export class Trie {
 
         if (!(word in _output)) {
           if (tolerance) {
-            // if the tolerance is set, we need to calculate the distance using levenshtein algorithm
-            distance = levenshtein(term, word);
+            // computing the absolute difference of letters between the term and the word
+            const difference = Math.abs(term.length - word.length);
 
-            // if the distance is greater than the tolerance, we don't need to add the word to the output
-            if (distance <= tolerance) {
-              _output[word] = new Set();
+            if (difference <= tolerance) {
+              // if the tolerance is set, we need to calculate the distance using levenshtein algorithm
+              const distance = levenshtein(term, word);
+
+              // if the distance is greater than the tolerance, we don't need to add the word to the output
+              distance <= tolerance && (_output[word] = new Set());
             }
           } else {
             // prevent default tolerance not set
