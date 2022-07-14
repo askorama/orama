@@ -306,7 +306,7 @@ describe("lyra", () => {
     expect((exactSearch.hits[0] as any).author).toBe("Oscar Wilde");
   });
 
-  it("Shouldn't be tolerant", async () => {
+  it("Shouldn't tolerate typos", async () => {
     const db = new Lyra({
       schema: {
         quote: "string",
@@ -328,7 +328,7 @@ describe("lyra", () => {
     expect(search.count).toBe(0);
   });
 
-  it("Should be tolerant", async () => {
+  it("Should tolerate typos", async () => {
     const db = new Lyra({
       schema: {
         quote: "string",
