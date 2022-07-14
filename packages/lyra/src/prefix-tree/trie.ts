@@ -1,8 +1,10 @@
 import { TrieNode } from "./node";
+import { levenshtein } from "../levenshtein";
 
 export type FindParams = {
   term: string;
   exact?: boolean;
+  tolerance?: number;
 };
 
 export type FindResult = {
@@ -49,14 +51,14 @@ export class Trie {
     return node.end;
   }
 
-  find({ term, exact }: FindParams): FindResult {
+  find({ term, exact, tolerance }: FindParams): FindResult {
     let node = this.root;
     const output: FindResult = {};
 
     for (const char of term) {
       if (node?.children?.has(char)) {
         node = node.children.get(char)!;
-      } else {
+      } else if (!tolerance) {
         return output;
       }
     }
@@ -72,12 +74,27 @@ export class Trie {
         }
 
         if (!(word in _output)) {
-          _output[word] = new Set();
+          if (tolerance) {
+            // computing the absolute difference of letters between the term and the word
+            const difference = Math.abs(term.length - word.length);
+
+            if (difference <= tolerance) {
+              // if the tolerance is set, we need to calculate the distance using levenshtein algorithm
+              const distance = levenshtein(term, word);
+
+              // if the distance is greater than the tolerance, we don't need to add the word to the output
+              distance <= tolerance && (_output[word] = new Set());
+            }
+          } else {
+            // prevent default tolerance not set
+            _output[word] = new Set();
+          }
         }
 
         if (docIDs?.size) {
           for (const doc of docIDs) {
-            _output[word].add(doc);
+            // check if _output[word] exists and then add the doc to it
+            _output[word] && _output[word].add(doc);
           }
         }
       }
