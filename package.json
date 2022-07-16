@@ -11,7 +11,7 @@
     "test": "jest --coverage",
     "lint": "prettier --write \"packages/**/*.{ts,js}\" && eslint . --ext .js,.ts",
     "prepare": "husky install",
-    "benchmark": "pnpm build:lyra && ts-node ./packages/benchmark/benchmark.ts",
+    "benchmark": "pnpm build:lyra && node ./packages/benchmarks/index.js",
     "build:lyra": "cd packages/lyra && pnpm build"
   },
   "keywords": [],
