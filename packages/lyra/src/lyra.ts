@@ -10,277 +10,277 @@ import { Language, SUPPORTED_LANGUAGES } from "./stemmer";
 export type PropertyType = "string" | "number" | "boolean";
 
 export type PropertiesSchema = {
-	[key: string]: PropertyType | PropertiesSchema;
+  [key: string]: PropertyType | PropertiesSchema;
 };
 
 export type LyraProperties = {
-	schema: PropertiesSchema;
-	defaultLanguage?: Language;
+  schema: PropertiesSchema;
+  defaultLanguage?: Language;
 };
 
 export type LyraDocs = Map<string, object>;
 
 export type SearchParams = {
-	term: string;
-	properties?: "*" | string[];
-	limit?: number;
-	offset?: number;
-	exact?: boolean;
-	tolerance?: number;
+  term: string;
+  properties?: "*" | string[];
+  limit?: number;
+  offset?: number;
+  exact?: boolean;
+  tolerance?: number;
 };
 
 type LyraIndex = Map<string, Trie>;
 
 type QueueDocParams = {
-	id: string;
-	doc: object;
-	language: Language;
+  id: string;
+  doc: object;
+  language: Language;
 };
 
 type SearchResult = Promise<{
-	count: number;
-	hits: object[];
-	elapsed: string;
+  count: number;
+  hits: object[];
+  elapsed: string;
 }>;
 
 export class Lyra {
-	private defaultLanguage: Language = "english";
-	private schema: PropertiesSchema;
-	private docs: LyraDocs = new Map();
-	private index: LyraIndex = new Map();
-	private queue: queueAsPromised<QueueDocParams> = fastq.promise(
-		this,
-		this._insert,
-		1
-	);
+  private defaultLanguage: Language = "english";
+  private schema: PropertiesSchema;
+  private docs: LyraDocs = new Map();
+  private index: LyraIndex = new Map();
+  private queue: queueAsPromised<QueueDocParams> = fastq.promise(
+    this,
+    this._insert,
+    1
+  );
 
-	constructor(properties: LyraProperties) {
-		const defaultLanguage =
-			(properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
+  constructor(properties: LyraProperties) {
+    const defaultLanguage =
+      (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
-		if (!SUPPORTED_LANGUAGES.includes(defaultLanguage)) {
-			throw ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage);
-		}
+    if (!SUPPORTED_LANGUAGES.includes(defaultLanguage)) {
+      throw ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage);
+    }
 
-		this.defaultLanguage = defaultLanguage;
-		this.schema = properties.schema;
-		this.buildIndex(properties.schema);
-	}
+    this.defaultLanguage = defaultLanguage;
+    this.schema = properties.schema;
+    this.buildIndex(properties.schema);
+  }
 
-	private buildIndex(schema: PropertiesSchema, prefix = "") {
-		for (const prop in schema) {
-			const propType = typeof prop;
-			const isNested = typeof schema[prop] === "object";
+  private buildIndex(schema: PropertiesSchema, prefix = "") {
+    for (const prop in schema) {
+      const propType = typeof prop;
+      const isNested = typeof schema[prop] === "object";
 
-			if (propType !== "string") throw ERRORS.INVALID_SCHEMA_TYPE(propType);
+      if (propType !== "string") throw ERRORS.INVALID_SCHEMA_TYPE(propType);
 
-			const propName = `${prefix}${prop}`;
+      const propName = `${prefix}${prop}`;
 
-			if (isNested) {
-				this.buildIndex(schema[prop] as PropertiesSchema, `${propName}.`);
-			} else {
-				this.index.set(propName, new Trie());
-			}
-		}
-	}
+      if (isNested) {
+        this.buildIndex(schema[prop] as PropertiesSchema, `${propName}.`);
+      } else {
+        this.index.set(propName, new Trie());
+      }
+    }
+  }
 
-	async search(
-		params: SearchParams,
-		language: Language = this.defaultLanguage
-	): SearchResult {
-		const tokens = tokenize(params.term, language).values();
-		const indices = this.getIndices(params.properties);
-		const { limit = 10, offset = 0, exact = false } = params;
-		const results: object[] = new Array({ length: limit });
-		let totalResults = 0;
+  async search(
+    params: SearchParams,
+    language: Language = this.defaultLanguage
+  ): SearchResult {
+    const tokens = tokenize(params.term, language).values();
+    const indices = this.getIndices(params.properties);
+    const { limit = 10, offset = 0, exact = false } = params;
+    const results: object[] = new Array({ length: limit });
+    let totalResults = 0;
 
-		const timeStart = getNanosecondsTime();
+    const timeStart = getNanosecondsTime();
 
-		let i = 0;
-		let j = 0;
+    let i = 0;
+    let j = 0;
 
-		for (const token of tokens) {
-			for (const index of indices) {
-				const documentIDs = await this.getDocumentIDsFromSearch({
-					...params,
-					index: index,
-					term: token,
-					exact: exact,
-				});
+    for (const token of tokens) {
+      for (const index of indices) {
+        const documentIDs = await this.getDocumentIDsFromSearch({
+          ...params,
+          index: index,
+          term: token,
+          exact: exact,
+        });
 
-				totalResults += documentIDs.size;
+        totalResults += documentIDs.size;
 
-				if (i >= limit) {
-					break;
-				}
+        if (i >= limit) {
+          break;
+        }
 
-				if (documentIDs.size) {
-					for (const id of documentIDs) {
-						if (j < offset) {
-							j++;
-							continue;
-						}
+        if (documentIDs.size) {
+          for (const id of documentIDs) {
+            if (j < offset) {
+              j++;
+              continue;
+            }
 
-						if (i >= limit) {
-							break;
-						}
+            if (i >= limit) {
+              break;
+            }
 
-						const fullDoc = this.docs.get(id);
-						results[i] = { id, ...fullDoc };
-						i++;
-					}
-				}
-			}
-		}
+            const fullDoc = this.docs.get(id);
+            results[i] = { id, ...fullDoc };
+            i++;
+          }
+        }
+      }
+    }
 
-		return {
-			elapsed: formatNanoseconds(getNanosecondsTime() - timeStart),
-			hits: results,
-			count: totalResults,
-		};
-	}
+    return {
+      elapsed: formatNanoseconds(getNanosecondsTime() - timeStart),
+      hits: results,
+      count: totalResults,
+    };
+  }
 
-	private getIndices(indices: SearchParams["properties"]): string[] {
-		const knownIndices = [...this.index.keys()];
+  private getIndices(indices: SearchParams["properties"]): string[] {
+    const knownIndices = [...this.index.keys()];
 
-		if (!indices) {
-			return knownIndices;
-		}
+    if (!indices) {
+      return knownIndices;
+    }
 
-		if (typeof indices === "string") {
-			if (indices === "*") {
-				return knownIndices;
-			} else {
-				throw ERRORS.INVALID_PROPERTY(indices, knownIndices);
-			}
-		}
+    if (typeof indices === "string") {
+      if (indices === "*") {
+        return knownIndices;
+      } else {
+        throw ERRORS.INVALID_PROPERTY(indices, knownIndices);
+      }
+    }
 
-		for (const index of indices as string[]) {
-			if (!knownIndices.includes(index)) {
-				throw ERRORS.INVALID_PROPERTY(index, knownIndices);
-			}
-		}
+    for (const index of indices as string[]) {
+      if (!knownIndices.includes(index)) {
+        throw ERRORS.INVALID_PROPERTY(index, knownIndices);
+      }
+    }
 
-		return indices as string[];
-	}
+    return indices as string[];
+  }
 
-	async delete(docID: string): Promise<boolean> {
-		if (!this.docs.has(docID)) {
-			throw ERRORS.DOC_ID_DOES_NOT_EXISTS(docID);
-		}
+  async delete(docID: string): Promise<boolean> {
+    if (!this.docs.has(docID)) {
+      throw ERRORS.DOC_ID_DOES_NOT_EXISTS(docID);
+    }
 
-		const document = this.docs.get(docID)!;
+    const document = this.docs.get(docID)!;
 
-		for (const key in document) {
-			const idx = this.index.get(key)!;
-			const tokens = tokenize((document as any)[key]);
+    for (const key in document) {
+      const idx = this.index.get(key)!;
+      const tokens = tokenize((document as any)[key]);
 
-			for (const token of tokens) {
-				if (idx.removeDocByWord(token, docID)) {
-					throw `Unable to remove document "${docID}" from index "${key}" on word "${token}".`;
-				}
-			}
-		}
+      for (const token of tokens) {
+        if (idx.removeDocByWord(token, docID)) {
+          throw `Unable to remove document "${docID}" from index "${key}" on word "${token}".`;
+        }
+      }
+    }
 
-		this.docs.delete(docID);
+    this.docs.delete(docID);
 
-		return true;
-	}
+    return true;
+  }
 
-	private async getDocumentIDsFromSearch(
-		params: SearchParams & { index: string }
-	): Promise<Set<string>> {
-		const idx = this.index.get(params.index);
-		const searchResult = idx?.find({
-			term: params.term,
-			exact: params.exact,
-			tolerance: params.tolerance,
-		});
-		const ids = new Set<string>();
+  private async getDocumentIDsFromSearch(
+    params: SearchParams & { index: string }
+  ): Promise<Set<string>> {
+    const idx = this.index.get(params.index);
+    const searchResult = idx?.find({
+      term: params.term,
+      exact: params.exact,
+      tolerance: params.tolerance,
+    });
+    const ids = new Set<string>();
 
-		for (const key in searchResult) {
-			for (const id of (searchResult as any)[key]) {
-				ids.add(id);
-			}
-		}
-		return ids;
-	}
+    for (const key in searchResult) {
+      for (const id of (searchResult as any)[key]) {
+        ids.add(id);
+      }
+    }
+    return ids;
+  }
 
-	public async insert(
-		doc: object,
-		language: Language = this.defaultLanguage
-	): Promise<{ id: string }> {
-		const id = nanoid();
+  public async insert(
+    doc: object,
+    language: Language = this.defaultLanguage
+  ): Promise<{ id: string }> {
+    const id = nanoid();
 
-		if (!SUPPORTED_LANGUAGES.includes(language)) {
-			throw ERRORS.LANGUAGE_NOT_SUPPORTED(language);
-		}
+    if (!SUPPORTED_LANGUAGES.includes(language)) {
+      throw ERRORS.LANGUAGE_NOT_SUPPORTED(language);
+    }
 
-		if (!(await this.checkInsertDocSchema(doc))) {
-			throw ERRORS.INVALID_DOC_SCHEMA(this.schema, doc);
-		}
+    if (!(await this.checkInsertDocSchema(doc))) {
+      throw ERRORS.INVALID_DOC_SCHEMA(this.schema, doc);
+    }
 
-		await this.queue.push({
-			id,
-			doc,
-			language,
-		});
+    await this.queue.push({
+      id,
+      doc,
+      language,
+    });
 
-		return { id };
-	}
+    return { id };
+  }
 
-	private async _insert({ doc, id, language }: QueueDocParams): Promise<void> {
-		const index = this.index;
-		this.docs.set(id, doc);
+  private async _insert({ doc, id, language }: QueueDocParams): Promise<void> {
+    const index = this.index;
+    this.docs.set(id, doc);
 
-		function recursiveTrieInsertion(doc: object, prefix = "") {
-			for (const key in doc) {
-				const isNested = typeof (doc as any)[key] === "object";
-				const propName = `${prefix}${key}`;
-				if (isNested) {
-					recursiveTrieInsertion((doc as any)[key], `${propName}.`);
-				} else if (typeof (doc as any)[key] === "string") {
-					// Use propName here because if doc is a nested object
-					// We will get the wrong index
-					const requestedTrie = index.get(propName);
-					const tokens = tokenize((doc as any)[key], language);
+    function recursiveTrieInsertion(doc: object, prefix = "") {
+      for (const key in doc) {
+        const isNested = typeof (doc as any)[key] === "object";
+        const propName = `${prefix}${key}`;
+        if (isNested) {
+          recursiveTrieInsertion((doc as any)[key], `${propName}.`);
+        } else if (typeof (doc as any)[key] === "string") {
+          // Use propName here because if doc is a nested object
+          // We will get the wrong index
+          const requestedTrie = index.get(propName);
+          const tokens = tokenize((doc as any)[key], language);
 
-					for (const token of tokens) {
-						requestedTrie?.insert(token, id);
-					}
-				}
-			}
-		}
+          for (const token of tokens) {
+            requestedTrie?.insert(token, id);
+          }
+        }
+      }
+    }
 
-		recursiveTrieInsertion(doc);
-	}
+    recursiveTrieInsertion(doc);
+  }
 
-	private async checkInsertDocSchema(
-		doc: QueueDocParams["doc"]
-	): Promise<boolean> {
-		function recursiveCheck(
-			newDoc: QueueDocParams["doc"],
-			schema: PropertiesSchema
-		): boolean {
-			for (const key in newDoc) {
-				if (!(key in schema)) {
-					return false;
-				}
+  private async checkInsertDocSchema(
+    doc: QueueDocParams["doc"]
+  ): Promise<boolean> {
+    function recursiveCheck(
+      newDoc: QueueDocParams["doc"],
+      schema: PropertiesSchema
+    ): boolean {
+      for (const key in newDoc) {
+        if (!(key in schema)) {
+          return false;
+        }
 
-				const propType = typeof (newDoc as any)[key];
+        const propType = typeof (newDoc as any)[key];
 
-				if (propType === "object") {
-					recursiveCheck((newDoc as any)[key], schema);
-				} else {
-					if (typeof (newDoc as any)[key] !== schema[key]) {
-						return false;
-					}
-				}
-			}
+        if (propType === "object") {
+          recursiveCheck((newDoc as any)[key], schema);
+        } else {
+          if (typeof (newDoc as any)[key] !== schema[key]) {
+            return false;
+          }
+        }
+      }
 
-			return true;
-		}
+      return true;
+    }
 
-		return recursiveCheck(doc, this.schema);
-	}
+    return recursiveCheck(doc, this.schema);
+  }
 }
