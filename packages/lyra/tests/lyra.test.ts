@@ -362,4 +362,57 @@ describe("lyra", () => {
 
     expect(moreTolerantSearch.count).toBe(2);
   });
+
+  it("Should support nested properties", async () => {
+    const db = new Lyra({
+      schema: {
+        quote: "string",
+        author: {
+          name: "string",
+          surname: "string",
+        },
+      },
+    });
+
+    await db.insert({
+      quote: "Harry Potter, the boy who lived, come to die. Avada kedavra.",
+      author: {
+        name: "Tom",
+        surname: "Riddle",
+      },
+    });
+
+    await db.insert({
+      quote: "I am Homer Simpson.",
+      author: {
+        name: "Homer",
+        surname: "Simpson",
+      },
+    });
+
+    const resultAuthorSurname = await db.search({
+      term: "Riddle",
+      properties: ["author.surname"],
+    });
+
+    const resultAuthorName = await db.search({
+      term: "Riddle",
+      properties: ["author.name"],
+    });
+
+    const resultSimpsonQuote = await db.search({
+      term: "Homer",
+      properties: ["quote"],
+    });
+
+    const resultSimpsonAuthorName = await db.search({
+      term: "Homer",
+      properties: ["author.name"],
+    });
+
+    expect(resultSimpsonAuthorName.count).toBe(1);
+    expect(resultSimpsonQuote.count).toBe(1);
+    expect(resultAuthorSurname.count).toBe(1);
+    expect(resultAuthorName.count).toBe(0);
+  });
 });

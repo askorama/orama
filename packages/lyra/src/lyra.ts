@@ -67,18 +67,19 @@ export class Lyra {
     this.buildIndex(properties.schema);
   }
 
-  private buildIndex(schema: PropertiesSchema) {
+  private buildIndex(schema: PropertiesSchema, prefix = "") {
     for (const prop in schema) {
       const propType = typeof prop;
+      const isNested = typeof schema[prop] === "object";
 
-      if (propType === "string") {
-        this.index.set(prop, new Trie());
-      } else if (propType === "object") {
-        // @todo nested properties will be supported with the next versions
-        //this.buildIndex(prop as unknown as PropertiesSchema);
-        throw ERRORS.UNSUPPORTED_NESTED_PROPERTIES();
+      if (propType !== "string") throw ERRORS.INVALID_SCHEMA_TYPE(propType);
+
+      const propName = `${prefix}${prop}`;
+
+      if (isNested) {
+        this.buildIndex(schema[prop] as PropertiesSchema, `${propName}.`);
       } else {
-        throw ERRORS.INVALID_SCHEMA_TYPE(propType);
+        this.index.set(propName, new Trie());
       }
     }
   }
@@ -232,14 +233,16 @@ export class Lyra {
     const index = this.index;
     this.docs.set(id, doc);
 
-    function recursiveTrieInsertion(doc: object) {
+    function recursiveTrieInsertion(doc: object, prefix = "") {
       for (const key in doc) {
-        if (typeof (doc as any)[key] === "object") {
-          throw ERRORS.UNSUPPORTED_NESTED_PROPERTIES();
-          // @todo nested properties will be supported with the nexrt versions
-          // recursiveTrieInsertion((doc as any)[key]);
+        const isNested = typeof (doc as any)[key] === "object";
+        const propName = `${prefix}${key}`;
+        if (isNested) {
+          recursiveTrieInsertion((doc as any)[key], `${propName}.`);
         } else if (typeof (doc as any)[key] === "string") {
-          const requestedTrie = index.get(key);
+          // Use propName here because if doc is a nested object
+          // We will get the wrong index
+          const requestedTrie = index.get(propName);
           const tokens = tokenize((doc as any)[key], language);
 
           for (const token of tokens) {
