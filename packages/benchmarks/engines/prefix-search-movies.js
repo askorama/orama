@@ -64,3 +64,5 @@ const testCases = {
 };
 
 cronometro(testCases);
+
+export default testCases;
