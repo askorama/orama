@@ -19,7 +19,7 @@ const movieDB = new Lyra({
     director: 'string',
     plot: 'string',
     year: 'number',
-    isFavorite: 'boolean'
+    isFavorite: 'boolean',
   }
 });
 ```
@@ -41,7 +41,7 @@ const movieDB = new Lyra({
     director: 'string',
     plot: 'string',
     year: 'number',
-    isFavorite: 'boolean'
+    isFavorite: 'boolean',
     cast: {
       director: 'string',
       leading: 'string'
@@ -66,7 +66,7 @@ const movieDB = new Lyra({
     director: 'string',
     plot: 'string',
     year: 'number',
-    isFavorite: 'boolean'
+    isFavorite: 'boolean',
   },
   defaultLanguage: 'italian'
 });
