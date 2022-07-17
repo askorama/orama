@@ -6,7 +6,7 @@ import * as ERRORS from "./errors";
 import { tokenize } from "./tokenizer";
 import { formatNanoseconds, getNanosecondsTime } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./stemmer";
-import type { ResolveSchema } from "./types";
+import type { ResolveSchema, SearchProperties } from "./types";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -26,9 +26,9 @@ export type LyraDocs<TDoc extends PropertiesSchema> = Map<
   ResolveSchema<TDoc>
 >;
 
-export type SearchParams = {
+export type SearchParams<TSchema extends PropertiesSchema> = {
   term: string;
-  properties?: "*" | string[];
+  properties?: "*" | SearchProperties<TSchema>[];
   limit?: number;
   offset?: number;
   exact?: boolean;
@@ -96,7 +96,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   }
 
   async search(
-    params: SearchParams,
+    params: SearchParams<TSchema>,
     language: Language = this.defaultLanguage
   ): SearchResult<TSchema> {
     const tokens = tokenize(params.term, language).values();
@@ -153,7 +153,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     };
   }
 
-  private getIndices(indices: SearchParams["properties"]): string[] {
+  private getIndices(indices: SearchParams<TSchema>["properties"]): string[] {
     const knownIndices = [...this.index.keys()];
 
     if (!indices) {
@@ -201,7 +201,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   }
 
   private async getDocumentIDsFromSearch(
-    params: SearchParams & { index: string }
+    params: SearchParams<TSchema> & { index: string }
   ): Promise<Set<string>> {
     const idx = this.index.get(params.index);
     const searchResult = idx?.find({
@@ -250,17 +250,20 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     const index = this.index;
     this.docs.set(id, doc);
 
-    function recursiveTrieInsertion(doc: object, prefix = "") {
-      for (const key in doc) {
-        const isNested = typeof (doc as any)[key] === "object";
+    function recursiveTrieInsertion(doc: ResolveSchema<TSchema>, prefix = "") {
+      for (const key of Object.keys(doc)) {
+        const isNested = typeof doc[key] === "object";
         const propName = `${prefix}${key}`;
         if (isNested) {
-          recursiveTrieInsertion((doc as any)[key], `${propName}.`);
-        } else if (typeof (doc as any)[key] === "string") {
+          recursiveTrieInsertion(
+            doc[key] as ResolveSchema<TSchema>,
+            `${propName}.`
+          );
+        } else if (typeof doc[key] === "string") {
           // Use propName here because if doc is a nested object
           // We will get the wrong index
           const requestedTrie = index.get(propName);
-          const tokens = tokenize((doc as any)[key], language);
+          const tokens = tokenize(doc[key] as string, language);
 
           for (const token of tokens) {
             requestedTrie?.insert(token, id);
