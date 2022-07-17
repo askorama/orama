@@ -21,7 +21,7 @@ export type LyraProperties<
   defaultLanguage?: Language;
 };
 
-export type LyraDocs = Map<string, object>;
+export type LyraDocs<TDoc> = Map<string, TDoc>;
 
 export type SearchParams = {
   term: string;
@@ -34,25 +34,29 @@ export type SearchParams = {
 
 type LyraIndex = Map<string, Trie>;
 
-type QueueDocParams = {
+type QueueDocParams<TTSchema extends PropertiesSchema> = {
   id: string;
-  doc: object;
+  doc: ResolveSchema<TTSchema>;
   language: Language;
 };
 
-type SearchResult = Promise<{
+type SearchResult<TTSchema extends PropertiesSchema> = Promise<{
   count: number;
-  hits: object[];
+  hits: RetrievedDoc<TTSchema>[];
   elapsed: string;
 }>;
+
+type RetrievedDoc<TDoc extends PropertiesSchema> = ResolveSchema<TDoc> & {
+  id: string;
+};
 
 export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private defaultLanguage: Language = "english";
   private schema: TSchema;
-  private docs: LyraDocs = new Map();
+  private docs: LyraDocs<ResolveSchema<TSchema>> = new Map();
   private index: LyraIndex = new Map();
 
-  private queue: queueAsPromised<QueueDocParams> = fastq.promise(
+  private queue: queueAsPromised<QueueDocParams<TSchema>> = fastq.promise(
     this,
     this._insert,
     1
@@ -91,11 +95,13 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   async search(
     params: SearchParams,
     language: Language = this.defaultLanguage
-  ): SearchResult {
+  ): SearchResult<TSchema> {
     const tokens = tokenize(params.term, language).values();
     const indices = this.getIndices(params.properties);
     const { limit = 10, offset = 0, exact = false } = params;
-    const results: object[] = new Array({ length: limit });
+    const results: RetrievedDoc<TSchema>[] = Array.from({
+      length: limit,
+    });
     let totalResults = 0;
 
     const timeStart = getNanosecondsTime();
@@ -129,7 +135,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
               break;
             }
 
-            const fullDoc = this.docs.get(id);
+            const fullDoc = this.docs.get(id)!;
             results[i] = { id, ...fullDoc };
             i++;
           }
@@ -233,7 +239,11 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     return { id };
   }
 
-  private async _insert({ doc, id, language }: QueueDocParams): Promise<void> {
+  private async _insert({
+    doc,
+    id,
+    language,
+  }: QueueDocParams<TSchema>): Promise<void> {
     const index = this.index;
     this.docs.set(id, doc);
 
@@ -260,10 +270,10 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   }
 
   private async checkInsertDocSchema(
-    doc: QueueDocParams["doc"]
+    doc: QueueDocParams<TSchema>["doc"]
   ): Promise<boolean> {
     function recursiveCheck(
-      newDoc: QueueDocParams["doc"],
+      newDoc: QueueDocParams<TSchema>["doc"],
       schema: PropertiesSchema
     ): boolean {
       for (const key in newDoc) {
