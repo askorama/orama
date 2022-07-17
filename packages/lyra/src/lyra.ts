@@ -21,7 +21,10 @@ export type LyraProperties<
   defaultLanguage?: Language;
 };
 
-export type LyraDocs<TDoc> = Map<string, TDoc>;
+export type LyraDocs<TDoc extends PropertiesSchema> = Map<
+  string,
+  ResolveSchema<TDoc>
+>;
 
 export type SearchParams = {
   term: string;
@@ -53,7 +56,7 @@ type RetrievedDoc<TDoc extends PropertiesSchema> = ResolveSchema<TDoc> & {
 export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private defaultLanguage: Language = "english";
   private schema: TSchema;
-  private docs: LyraDocs<ResolveSchema<TSchema>> = new Map();
+  private docs: LyraDocs<TSchema> = new Map();
   private index: LyraIndex = new Map();
 
   private queue: queueAsPromised<QueueDocParams<TSchema>> = fastq.promise(
