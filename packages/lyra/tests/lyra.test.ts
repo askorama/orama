@@ -103,7 +103,7 @@ describe("lyra", () => {
     expect(ex1Insert.id).toBeDefined();
     expect(ex1Search.count).toBe(1);
     expect(ex1Search.elapsed).toBeDefined();
-    expect((ex1Search.hits[0] as any).example).toBe("The quick, brown, fox");
+    expect(ex1Search.hits[0].example).toBe("The quick, brown, fox");
   });
 
   it("should correctly paginate results", async () => {
@@ -126,17 +126,17 @@ describe("lyra", () => {
     const search4 = await db.search({ term: "f", limit: 2, offset: 2 });
 
     expect(search1.count).toBe(4);
-    expect((search1.hits[0] as any).animal).toBe("Quick brown fox");
+    expect(search1.hits[0].animal).toBe("Quick brown fox");
 
     expect(search2.count).toBe(4);
-    expect((search2.hits[0] as any).animal).toBe("Fast chicken");
+    expect(search2.hits[0].animal).toBe("Fast chicken");
 
     expect(search3.count).toBe(4);
-    expect((search3.hits[0] as any).animal).toBe("Fabolous ducks");
+    expect(search3.hits[0].animal).toBe("Fabolous ducks");
 
     expect(search4.count).toBe(4);
-    expect((search4.hits[0] as any).animal).toBe("Fabolous ducks");
-    expect((search4.hits[1] as any).animal).toBe("Fantastic horse");
+    expect(search4.hits[0].animal).toBe("Fabolous ducks");
+    expect(search4.hits[1].animal).toBe("Fantastic horse");
   });
 
   it("Should throw an error when searching in non-existing indices", async () => {
@@ -187,11 +187,11 @@ describe("lyra", () => {
 
     expect(res).toBeTruthy();
     expect(searchResult.count).toBe(1);
-    expect((searchResult.hits[0] as any).author).toBe("Oscar Wilde");
-    expect((searchResult.hits[0] as any).quote).toBe(
+    expect(searchResult.hits[0].author).toBe("Oscar Wilde");
+    expect(searchResult.hits[0].quote).toBe(
       "To live is the rarest thing in the world. Most people exist, that is all."
     );
-    expect((searchResult.hits[0] as any).id).toBe(id2);
+    expect(searchResult.hits[0].id).toBe(id2);
   });
 
   it("Should preserve identical docs after deletion", async () => {
@@ -231,18 +231,18 @@ describe("lyra", () => {
 
     expect(res).toBeTruthy();
     expect(searchResult.count).toBe(1);
-    expect((searchResult.hits[0] as any).author).toBe("Oscar Wilde");
-    expect((searchResult.hits[0] as any).quote).toBe(
+    expect(searchResult.hits[0].author).toBe("Oscar Wilde");
+    expect(searchResult.hits[0].quote).toBe(
       "Be yourself; everyone else is already taken."
     );
-    expect((searchResult.hits[0] as any).id).toBe(id2);
+    expect(searchResult.hits[0].id).toBe(id2);
 
     expect(searchResult2.count).toBe(1);
-    expect((searchResult2.hits[0] as any).author).toBe("Oscar Wilde");
-    expect((searchResult2.hits[0] as any).quote).toBe(
+    expect(searchResult2.hits[0].author).toBe("Oscar Wilde");
+    expect(searchResult2.hits[0].quote).toBe(
       "Be yourself; everyone else is already taken."
     );
-    expect((searchResult2.hits[0] as any).id).toBe(id2);
+    expect(searchResult2.hits[0].id).toBe(id2);
   });
 
   it("Should be able to insert documens with non-searchable fields", async () => {
@@ -274,7 +274,7 @@ describe("lyra", () => {
     });
 
     expect(search.count).toBe(1);
-    expect((search.hits[0] as any).author).toBe("Frank Zappa");
+    expect(search.hits[0].author).toBe("Frank Zappa");
   });
 
   it("Should exact match", async () => {
@@ -303,10 +303,10 @@ describe("lyra", () => {
     });
 
     expect(exactSearch.count).toBe(1);
-    expect((exactSearch.hits[0] as any).quote).toBe(
+    expect(exactSearch.hits[0].quote).toBe(
       "Be yourself; everyone else is already taken."
     );
-    expect((exactSearch.hits[0] as any).author).toBe("Oscar Wilde");
+    expect(exactSearch.hits[0].author).toBe("Oscar Wilde");
   });
 
   it("Shouldn't tolerate typos", async () => {
