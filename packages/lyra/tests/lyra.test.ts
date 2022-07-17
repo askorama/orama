@@ -61,7 +61,8 @@ describe("checkInsertDocSchema", () => {
     ).toBeDefined();
 
     try {
-      await db.insert({ quote: "hello, world!", author: true } as any);
+      // @ts-expect-error
+      await db.insert({ quote: "hello, world!", author: true });
     } catch (err) {
       expect(err).toMatchSnapshot();
     }
@@ -69,14 +70,16 @@ describe("checkInsertDocSchema", () => {
     try {
       await db.insert({
         quote: "hello, world!",
+        // @ts-expect-error
         authors: "author should be singular",
-      } as any);
+      });
     } catch (err) {
       expect(err).toMatchSnapshot();
     }
 
     try {
-      await db.insert({ quote: "hello, world!", foo: { bar: 10 } } as any);
+      // @ts-expect-error
+      await db.insert({ quote: "hello, world!", foo: { bar: 10 } });
     } catch (err) {
       expect(err).toMatchSnapshot();
     }
