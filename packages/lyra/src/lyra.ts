@@ -6,6 +6,7 @@ import * as ERRORS from "./errors";
 import { tokenize } from "./tokenizer";
 import { formatNanoseconds, getNanosecondsTime } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./stemmer";
+import type { ResolveSchema } from "./types";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -13,8 +14,10 @@ export type PropertiesSchema = {
   [key: string]: PropertyType | PropertiesSchema;
 };
 
-export type LyraProperties = {
-  schema: PropertiesSchema;
+export type LyraProperties<
+  TSchema extends PropertiesSchema = PropertiesSchema
+> = {
+  schema: TSchema;
   defaultLanguage?: Language;
 };
 
@@ -43,18 +46,19 @@ type SearchResult = Promise<{
   elapsed: string;
 }>;
 
-export class Lyra {
+export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private defaultLanguage: Language = "english";
-  private schema: PropertiesSchema;
+  private schema: TSchema;
   private docs: LyraDocs = new Map();
   private index: LyraIndex = new Map();
+
   private queue: queueAsPromised<QueueDocParams> = fastq.promise(
     this,
     this._insert,
     1
   );
 
-  constructor(properties: LyraProperties) {
+  constructor(properties: LyraProperties<TSchema>) {
     const defaultLanguage =
       (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
@@ -67,8 +71,8 @@ export class Lyra {
     this.buildIndex(properties.schema);
   }
 
-  private buildIndex(schema: PropertiesSchema, prefix = "") {
-    for (const prop in schema) {
+  private buildIndex(schema: TSchema, prefix = "") {
+    for (const prop of Object.keys(schema)) {
       const propType = typeof prop;
       const isNested = typeof schema[prop] === "object";
 
@@ -77,7 +81,7 @@ export class Lyra {
       const propName = `${prefix}${prop}`;
 
       if (isNested) {
-        this.buildIndex(schema[prop] as PropertiesSchema, `${propName}.`);
+        this.buildIndex(schema[prop] as TSchema, `${propName}.`);
       } else {
         this.index.set(propName, new Trie());
       }
@@ -207,7 +211,7 @@ export class Lyra {
   }
 
   public async insert(
-    doc: object,
+    doc: ResolveSchema<TSchema>,
     language: Language = this.defaultLanguage
   ): Promise<{ id: string }> {
     const id = nanoid();
