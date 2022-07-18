@@ -1,0 +1,157 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Should tokenize and stem correctly in english 1`] = `
+Set {
+  "the",
+  "quick",
+  "brown",
+  "fox",
+  "jump",
+  "over",
+  "lazi",
+  "dog",
+}
+`;
+
+exports[`Should tokenize and stem correctly in english 2`] = `
+Set {
+  "I",
+  "bake",
+  "some",
+  "cake",
+}
+`;
+
+exports[`Should tokenize and stem correctly in french 1`] = `
+Set {
+  "voyon",
+  "quel",
+  "temp",
+  "il",
+  "fait",
+  "dehor",
+}
+`;
+
+exports[`Should tokenize and stem correctly in french 2`] = `
+Set {
+  "j",
+  "ai",
+  "fait",
+  "de",
+  "g",
+  "teau",
+}
+`;
+
+exports[`Should tokenize and stem correctly in italian 1`] = `
+Set {
+  "ho",
+  "cucin",
+  "dell",
+  "tort",
+}
+`;
+
+exports[`Should tokenize and stem correctly in italian 2`] = `
+Set {
+  "dorm",
+  "una",
+  "cos",
+  "difficil",
+  "quand",
+  "i",
+  "test",
+  "non",
+  "pass",
+}
+`;
+
+exports[`Should tokenize and stem correctly in norwegian 1`] = `
+Set {
+  "jeg",
+  "kokt",
+  "noen",
+  "kak",
+}
+`;
+
+exports[`Should tokenize and stem correctly in norwegian 2`] = `
+Set {
+  "sov",
+  "er",
+  "en",
+  "vansk",
+  "ting",
+  "n",
+  "r",
+  "test",
+  "mislykk",
+}
+`;
+
+exports[`Should tokenize and stem correctly in portugese 1`] = `
+Set {
+  "eu",
+  "cozinh",
+  "alguns",
+  "bol",
+}
+`;
+
+exports[`Should tokenize and stem correctly in portugese 2`] = `
+Set {
+  "dorm",
+  "uma",
+  "cois",
+  "dif",
+  "cil",
+  "quand",
+  "os",
+  "test",
+  "falh",
+}
+`;
+
+exports[`Should tokenize and stem correctly in russian 1`] = `
+Set {
+  "я",
+  "приготов",
+  "пирожн",
+}
+`;
+
+exports[`Should tokenize and stem correctly in russian 2`] = `
+Set {
+  "спат",
+  "трудн",
+  "когд",
+  "тест",
+  "не",
+  "срабатыва",
+}
+`;
+
+exports[`Should tokenize and stem correctly in swedish 1`] = `
+Set {
+  "jag",
+  "lag",
+  "n",
+  "gra",
+  "kak",
+}
+`;
+
+exports[`Should tokenize and stem correctly in swedish 2`] = `
+Set {
+  "att",
+  "sov",
+  "r",
+  "en",
+  "sv",
+  "sak",
+  "n",
+  "test",
+  "misslyck",
+}
+`;
