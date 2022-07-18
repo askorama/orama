@@ -10,3 +10,4 @@ jest.config.js
 *.png
 *.html
 *.svg
+get-imdb-dataset.mjs
