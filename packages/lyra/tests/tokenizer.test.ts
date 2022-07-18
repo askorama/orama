@@ -109,7 +109,7 @@ it("Should stem an array correctly in dutch", async () => {
 
   const output = stemArray(input, "dutch");
 
-  expect(output).toEqual(expected);
+  expect(output).toStrictEqual(expected);
 });
 
 it("Should stem an array correctly in english", async () => {
@@ -121,7 +121,7 @@ it("Should stem an array correctly in english", async () => {
 
   const output = stemArray(input, "english");
 
-  expect(output).toEqual(expected);
+  expect(output).toStrictEqual(expected);
 });
 
 it("Should stem an array correctly in french", async () => {
@@ -133,7 +133,7 @@ it("Should stem an array correctly in french", async () => {
 
   const output = stemArray(input, "french");
 
-  expect(output).toEqual(expected);
+  expect(output).toStrictEqual(expected);
 });
 
 it("Should stem an array correctly in italian", async () => {
@@ -145,7 +145,7 @@ it("Should stem an array correctly in italian", async () => {
 
   const output = stemArray(input, "italian");
 
-  expect(output).toEqual(expected);
+  expect(output).toStrictEqual(expected);
 });
 
 it("Should stem an array correctly in norwegian", async () => {
@@ -157,7 +157,7 @@ it("Should stem an array correctly in norwegian", async () => {
 
   const output = stemArray(input, "norwegian");
 
-  expect(output).toEqual(expected);
+  expect(output).toStrictEqual(expected);
 });
 
 it("Should stem an array correctly in portugese", async () => {
@@ -169,7 +169,7 @@ it("Should stem an array correctly in portugese", async () => {
 
   const output = stemArray(input, "portugese");
 
-  expect(output).toEqual(expected);
+  expect(output).toStrictEqual(expected);
 });
 
 it("Should stem an array correctly in russian", async () => {
@@ -181,7 +181,7 @@ it("Should stem an array correctly in russian", async () => {
 
   const output = stemArray(input, "russian");
 
-  expect(output).toEqual(expected);
+  expect(output).toStrictEqual(expected);
 });
 
 it("Should stem an array correctly in spanish", async () => {
@@ -193,7 +193,7 @@ it("Should stem an array correctly in spanish", async () => {
 
   const output = stemArray(input, "spanish");
 
-  expect(output).toEqual(expected);
+  expect(output).toStrictEqual(expected);
 });
 
 it("Should stem an array correctly in swedish", async () => {
@@ -205,5 +205,5 @@ it("Should stem an array correctly in swedish", async () => {
 
   const output = stemArray(input, "swedish");
 
-  expect(output).toEqual(expected);
+  expect(output).toStrictEqual(expected);
 });
