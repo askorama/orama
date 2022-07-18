@@ -14,3 +14,12 @@ type ResolveTypes<TType> = TType extends "string"
 export type ResolveSchema<T extends PropertiesSchema> = {
   [P in keyof T]: ResolveTypes<T[P]>;
 };
+
+export type SearchProperties<
+  TSchema extends PropertiesSchema,
+  TKey extends keyof TSchema = keyof TSchema
+> = TKey extends string
+  ? TSchema[TKey] extends PropertiesSchema
+    ? `${TKey}.${SearchProperties<TSchema[TKey]>}`
+    : TKey
+  : never;

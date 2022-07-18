@@ -145,6 +145,7 @@ describe("lyra", () => {
     try {
       await db.search({
         term: "foo",
+        //@ts-expect-error
         properties: ["bar"],
       });
     } catch (err) {
