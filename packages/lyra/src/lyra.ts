@@ -6,6 +6,7 @@ import * as ERRORS from "./errors";
 import { tokenize } from "./tokenizer";
 import { formatNanoseconds, getNanosecondsTime } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./stemmer";
+import type { ResolveSchema, SearchProperties } from "./types";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -13,16 +14,21 @@ export type PropertiesSchema = {
   [key: string]: PropertyType | PropertiesSchema;
 };
 
-export type LyraProperties = {
-  schema: PropertiesSchema;
+export type LyraProperties<
+  TSchema extends PropertiesSchema = PropertiesSchema
+> = {
+  schema: TSchema;
   defaultLanguage?: Language;
 };
 
-export type LyraDocs = Map<string, object>;
+export type LyraDocs<TDoc extends PropertiesSchema> = Map<
+  string,
+  ResolveSchema<TDoc>
+>;
 
-export type SearchParams = {
+export type SearchParams<TSchema extends PropertiesSchema> = {
   term: string;
-  properties?: "*" | string[];
+  properties?: "*" | SearchProperties<TSchema>[];
   limit?: number;
   offset?: number;
   exact?: boolean;
@@ -31,30 +37,35 @@ export type SearchParams = {
 
 type LyraIndex = Map<string, Trie>;
 
-type QueueDocParams = {
+type QueueDocParams<TTSchema extends PropertiesSchema> = {
   id: string;
-  doc: object;
+  doc: ResolveSchema<TTSchema>;
   language: Language;
 };
 
-type SearchResult = Promise<{
+type SearchResult<TTSchema extends PropertiesSchema> = Promise<{
   count: number;
-  hits: object[];
+  hits: RetrievedDoc<TTSchema>[];
   elapsed: string;
 }>;
 
-export class Lyra {
+type RetrievedDoc<TDoc extends PropertiesSchema> = ResolveSchema<TDoc> & {
+  id: string;
+};
+
+export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private defaultLanguage: Language = "english";
-  private schema: PropertiesSchema;
-  private docs: LyraDocs = new Map();
+  private schema: TSchema;
+  private docs: LyraDocs<TSchema> = new Map();
   private index: LyraIndex = new Map();
-  private queue: queueAsPromised<QueueDocParams> = fastq.promise(
+
+  private queue: queueAsPromised<QueueDocParams<TSchema>> = fastq.promise(
     this,
     this._insert,
     1
   );
 
-  constructor(properties: LyraProperties) {
+  constructor(properties: LyraProperties<TSchema>) {
     const defaultLanguage =
       (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
@@ -67,30 +78,33 @@ export class Lyra {
     this.buildIndex(properties.schema);
   }
 
-  private buildIndex(schema: PropertiesSchema) {
-    for (const prop in schema) {
+  private buildIndex(schema: TSchema, prefix = "") {
+    for (const prop of Object.keys(schema)) {
       const propType = typeof prop;
+      const isNested = typeof schema[prop] === "object";
 
-      if (propType === "string") {
-        this.index.set(prop, new Trie());
-      } else if (propType === "object") {
-        // @todo nested properties will be supported with the next versions
-        //this.buildIndex(prop as unknown as PropertiesSchema);
-        throw ERRORS.UNSUPPORTED_NESTED_PROPERTIES();
+      if (propType !== "string") throw ERRORS.INVALID_SCHEMA_TYPE(propType);
+
+      const propName = `${prefix}${prop}`;
+
+      if (isNested) {
+        this.buildIndex(schema[prop] as TSchema, `${propName}.`);
       } else {
-        throw ERRORS.INVALID_SCHEMA_TYPE(propType);
+        this.index.set(propName, new Trie());
       }
     }
   }
 
   async search(
-    params: SearchParams,
+    params: SearchParams<TSchema>,
     language: Language = this.defaultLanguage
-  ): SearchResult {
+  ): SearchResult<TSchema> {
     const tokens = tokenize(params.term, language).values();
     const indices = this.getIndices(params.properties);
     const { limit = 10, offset = 0, exact = false } = params;
-    const results: object[] = new Array({ length: limit });
+    const results: RetrievedDoc<TSchema>[] = Array.from({
+      length: limit,
+    });
     let totalResults = 0;
 
     const timeStart = getNanosecondsTime();
@@ -124,7 +138,7 @@ export class Lyra {
               break;
             }
 
-            const fullDoc = this.docs.get(id);
+            const fullDoc = this.docs.get(id)!;
             results[i] = { id, ...fullDoc };
             i++;
           }
@@ -139,7 +153,7 @@ export class Lyra {
     };
   }
 
-  private getIndices(indices: SearchParams["properties"]): string[] {
+  private getIndices(indices: SearchParams<TSchema>["properties"]): string[] {
     const knownIndices = [...this.index.keys()];
 
     if (!indices) {
@@ -187,7 +201,7 @@ export class Lyra {
   }
 
   private async getDocumentIDsFromSearch(
-    params: SearchParams & { index: string }
+    params: SearchParams<TSchema> & { index: string }
   ): Promise<Set<string>> {
     const idx = this.index.get(params.index);
     const searchResult = idx?.find({
@@ -206,7 +220,7 @@ export class Lyra {
   }
 
   public async insert(
-    doc: object,
+    doc: ResolveSchema<TSchema>,
     language: Language = this.defaultLanguage
   ): Promise<{ id: string }> {
     const id = nanoid();
@@ -228,19 +242,28 @@ export class Lyra {
     return { id };
   }
 
-  private async _insert({ doc, id, language }: QueueDocParams): Promise<void> {
+  private async _insert({
+    doc,
+    id,
+    language,
+  }: QueueDocParams<TSchema>): Promise<void> {
     const index = this.index;
     this.docs.set(id, doc);
 
-    function recursiveTrieInsertion(doc: object) {
-      for (const key in doc) {
-        if (typeof (doc as any)[key] === "object") {
-          throw ERRORS.UNSUPPORTED_NESTED_PROPERTIES();
-          // @todo nested properties will be supported with the nexrt versions
-          // recursiveTrieInsertion((doc as any)[key]);
-        } else if (typeof (doc as any)[key] === "string") {
-          const requestedTrie = index.get(key);
-          const tokens = tokenize((doc as any)[key], language);
+    function recursiveTrieInsertion(doc: ResolveSchema<TSchema>, prefix = "") {
+      for (const key of Object.keys(doc)) {
+        const isNested = typeof doc[key] === "object";
+        const propName = `${prefix}${key}`;
+        if (isNested) {
+          recursiveTrieInsertion(
+            doc[key] as ResolveSchema<TSchema>,
+            `${propName}.`
+          );
+        } else if (typeof doc[key] === "string") {
+          // Use propName here because if doc is a nested object
+          // We will get the wrong index
+          const requestedTrie = index.get(propName);
+          const tokens = tokenize(doc[key] as string, language);
 
           for (const token of tokens) {
             requestedTrie?.insert(token, id);
@@ -253,10 +276,10 @@ export class Lyra {
   }
 
   private async checkInsertDocSchema(
-    doc: QueueDocParams["doc"]
+    doc: QueueDocParams<TSchema>["doc"]
   ): Promise<boolean> {
     function recursiveCheck(
-      newDoc: QueueDocParams["doc"],
+      newDoc: QueueDocParams<TSchema>["doc"],
       schema: PropertiesSchema
     ): boolean {
       for (const key in newDoc) {
