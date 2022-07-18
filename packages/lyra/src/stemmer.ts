@@ -1,4 +1,4 @@
-import natural from "natural";
+import natural, { Stemmer } from "natural";
 
 export type Language = typeof SUPPORTED_LANGUAGES[number];
 
@@ -15,7 +15,7 @@ export const SUPPORTED_LANGUAGES = [
 ] as const;
 
 export function stemArray(input: string[], language: Language): string[] {
-  let stemmer;
+  let stemmer: Stemmer;
 
   switch (language) {
     case "dutch":
@@ -46,12 +46,9 @@ export function stemArray(input: string[], language: Language): string[] {
       stemmer = natural.PorterStemmerSv;
       break;
     default:
+      stemmer = natural.PorterStemmer;
       break;
   }
 
-  if (stemmer) {
-    return input.map(stemmer.stem);
-  }
-
-  return input;
+  return input.map((word) => stemmer.stem(word));
 }
