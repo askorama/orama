@@ -78,7 +78,7 @@ it("Should tokenize and stem correctly in swedish", () => {
   expect(O2).toMatchSnapshot();
 });
 
-it.skip("Should tokenize and stem correctly in spanish", () => {
+it("Should tokenize and stem correctly in spanish", () => {
   const I1 = "cociné unos pasteles";
   const I2 = "dormir es algo dificil cuando las pruebas fallan";
 
@@ -89,7 +89,7 @@ it.skip("Should tokenize and stem correctly in spanish", () => {
   expect(O2).toMatchSnapshot();
 });
 
-it.skip("Should tokenize and stem correctly in dutch", () => {
+it("Should tokenize and stem correctly in dutch", () => {
   const I1 = "de kleine koeien";
   const I2 = "Ik heb wat taarten gemaakt";
 
