@@ -46,7 +46,10 @@ jobs:
         node ./packages/benchmarks/benchmark-table/index.mjs >> ./packages/benchmarks/README.md
 
     - name: stage changed files
-      run: git add .
+      run: |
+        git config --global user.email "michele.riva@nearform.com"
+        git config --global user.name "Michele Riva"
+        git add .
 
     - name: commit changed files
       run: |
