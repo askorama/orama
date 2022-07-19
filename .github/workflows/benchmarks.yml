@@ -1,0 +1,62 @@
+name: Benchmarks
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2.0.1
+      id: pnpm-install
+      with:
+        version: 7
+        run_install: false
+
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      run: |
+        echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+    - uses: actions/cache@v3
+      name: Setup pnpm cache
+      with:
+        path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Install benchmark dependencies
+      run: cd ./packages/benchmarks && pnpm install
+
+    - name: Build Lyra
+      run: cd ./packages/lyra && pnpm build
+
+    - name: Create benchmark file
+      run: |
+        node ./packages/benchmarks/benchmark-table/index.mjs >> ./packages/benchmarks/README.md
+
+    - name: stage changed files
+      run: |
+        git config --global user.email "michele.riva@nearform.com"
+        git config --global user.name "Michele Riva"
+        git add .
+
+    - name: commit changed files
+      run: |
+        git commit -m "chore(benchmarks): update benchmark table"
+
+    - name: fetch from main
+      run: git fetch origin main
+
+    - name: push code to main
+      run: git push origin HEAD:main
