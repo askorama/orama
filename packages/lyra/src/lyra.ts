@@ -19,6 +19,7 @@ export type LyraProperties<
 > = {
   schema: TSchema;
   defaultLanguage?: Language;
+  stemming?: boolean;
 };
 
 export type LyraDocs<TDoc extends PropertiesSchema> = Map<
@@ -35,12 +36,17 @@ export type SearchParams<TSchema extends PropertiesSchema> = {
   tolerance?: number;
 };
 
+export type InsertConfig = {
+  language: Language;
+  stemming: boolean;
+};
+
 type LyraIndex = Map<string, Trie>;
 
 type QueueDocParams<TTSchema extends PropertiesSchema> = {
   id: string;
   doc: ResolveSchema<TTSchema>;
-  language: Language;
+  config: InsertConfig;
 };
 
 type SearchResult<TTSchema extends PropertiesSchema> = Promise<{
@@ -58,6 +64,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private schema: TSchema;
   private docs: LyraDocs<TSchema> = new Map();
   private index: LyraIndex = new Map();
+  private enableStemming = true;
 
   private queue: queueAsPromised<QueueDocParams<TSchema>> = fastq.promise(
     this,
@@ -73,6 +80,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       throw ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage);
     }
 
+    this.enableStemming = properties?.stemming ?? true;
     this.defaultLanguage = defaultLanguage;
     this.schema = properties.schema;
     this.buildIndex(properties.schema);
@@ -221,9 +229,13 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
 
   public async insert(
     doc: ResolveSchema<TSchema>,
-    language: Language = this.defaultLanguage
+    config: InsertConfig = {
+      language: this.defaultLanguage,
+      stemming: this.enableStemming,
+    }
   ): Promise<{ id: string }> {
     const id = nanoid();
+    const language = config.language ?? this.defaultLanguage;
 
     if (!SUPPORTED_LANGUAGES.includes(language)) {
       throw ERRORS.LANGUAGE_NOT_SUPPORTED(language);
@@ -236,7 +248,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     await this.queue.push({
       id,
       doc,
-      language,
+      config,
     });
 
     return { id };
@@ -245,7 +257,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private async _insert({
     doc,
     id,
-    language,
+    config,
   }: QueueDocParams<TSchema>): Promise<void> {
     const index = this.index;
     this.docs.set(id, doc);
@@ -263,7 +275,11 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
           // Use propName here because if doc is a nested object
           // We will get the wrong index
           const requestedTrie = index.get(propName);
-          const tokens = tokenize(doc[key] as string, language);
+          const tokens = tokenize(
+            doc[key] as string,
+            config.language,
+            config.stemming
+          );
 
           for (const token of tokens) {
             requestedTrie?.insert(token, id);
