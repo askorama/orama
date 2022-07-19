@@ -154,9 +154,11 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       }
     }
 
+    const hits = results.filter(Boolean);
+
     return {
       elapsed: formatNanoseconds(getNanosecondsTime() - timeStart),
-      hits: results,
+      hits,
       count: totalResults,
     };
   }
