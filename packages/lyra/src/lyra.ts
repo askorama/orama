@@ -113,23 +113,23 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     const results: RetrievedDoc<TSchema>[] = Array.from({
       length: limit,
     });
-    let totalResults = 0;
+    let count = 0;
 
     const timeStart = getNanosecondsTime();
 
     let i = 0;
     let j = 0;
 
-    for (const token of tokens) {
+    for (const term of tokens) {
       for (const index of indices) {
         const documentIDs = await this.getDocumentIDsFromSearch({
           ...params,
-          index: index,
-          term: token,
-          exact: exact,
+          index,
+          term,
+          exact,
         });
 
-        totalResults += documentIDs.size;
+        count += documentIDs.size;
 
         if (i >= limit) {
           break;
@@ -154,10 +154,12 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       }
     }
 
+    const hits = results.filter(Boolean);
+
     return {
       elapsed: formatNanoseconds(getNanosecondsTime() - timeStart),
-      hits: results,
-      count: totalResults,
+      hits,
+      count,
     };
   }
 
