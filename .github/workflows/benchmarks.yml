@@ -43,6 +43,7 @@ jobs:
 
     - name: Create benchmark file
       run: |
+        echo -n "" > ./packages/benchmarks/README.md
         node ./packages/benchmarks/benchmark-table/index.mjs >> ./packages/benchmarks/README.md
 
     - name: stage changed files
