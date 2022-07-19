@@ -55,8 +55,8 @@ jobs:
       run: |
         git commit -m "chore(benchmarks): update benchmark table"
 
-    - name: fetch from master
-      run: git fetch origin master
+    - name: fetch from main
+      run: git fetch origin main
 
-    - name: push code to master
-      run: git push origin HEAD:master
+    - name: push code to main
+      run: git push origin HEAD:main
