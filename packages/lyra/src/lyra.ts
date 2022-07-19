@@ -6,7 +6,7 @@ import * as ERRORS from "./errors";
 import { tokenize } from "./tokenizer";
 import { formatNanoseconds, getNanosecondsTime } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./stemmer";
-import type { ResolveSchema, SearchProperties } from "./types";
+import type { ResolveSchema, SearchProperties, WhereParams } from "./types";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -33,9 +33,12 @@ export type SearchParams<TSchema extends PropertiesSchema> = {
   offset?: number;
   exact?: boolean;
   tolerance?: number;
+  where?: WhereParams<TSchema>;
 };
 
 type LyraIndex = Map<string, Trie>;
+type LyraNumbericIndex = Map<string, Map<number, Set<string>>>;
+type LyraBoolIndex = Map<string, Set<string>>;
 
 type QueueDocParams<TTSchema extends PropertiesSchema> = {
   id: string;
@@ -58,6 +61,8 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private schema: TSchema;
   private docs: LyraDocs<TSchema> = new Map();
   private index: LyraIndex = new Map();
+  private numericIndex: LyraNumbericIndex = new Map();
+  private booleanIndex: LyraBoolIndex = new Map();
 
   private queue: queueAsPromised<QueueDocParams<TSchema>> = fastq.promise(
     this,
@@ -81,6 +86,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private buildIndex(schema: TSchema, prefix = "") {
     for (const prop of Object.keys(schema)) {
       const propType = typeof prop;
+      const propValue = schema[prop];
       const isNested = typeof schema[prop] === "object";
 
       if (propType !== "string") throw ERRORS.INVALID_SCHEMA_TYPE(propType);
@@ -89,8 +95,13 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
 
       if (isNested) {
         this.buildIndex(schema[prop] as TSchema, `${propName}.`);
-      } else {
+      } else if (propValue === "string") {
         this.index.set(propName, new Trie());
+      } else if (propValue === "boolean") {
+        this.booleanIndex.set(`${propName}_true`, new Set());
+        this.booleanIndex.set(`${propName}_false`, new Set());
+      } else if (propValue === "number") {
+        this.numericIndex.set(propName, new Map());
       }
     }
   }
@@ -248,6 +259,9 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     language,
   }: QueueDocParams<TSchema>): Promise<void> {
     const index = this.index;
+    const boolIndex = this.booleanIndex;
+    const numericIndex = this.numericIndex;
+
     this.docs.set(id, doc);
 
     function recursiveTrieInsertion(doc: ResolveSchema<TSchema>, prefix = "") {
@@ -268,6 +282,13 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
           for (const token of tokens) {
             requestedTrie?.insert(token, id);
           }
+        } else if (typeof doc[key] === "boolean") {
+          boolIndex.get(`${propName}_${doc[key]}`)?.add(id);
+        } else if (typeof doc[key] === "number") {
+          const numericKey = doc[key] as number;
+          const numericMap = numericIndex.get(propName);
+          if (numericMap?.has(numericKey)) numericMap.get(numericKey)!.add(id);
+          else numericMap?.set(numericKey, new Set<string>().add(id));
         }
       }
     }

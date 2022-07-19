@@ -1,7 +1,7 @@
-import fs from "fs";
 /*global console*/
 
-import { parse } from "csv-parse";
+import fs from "fs";
+import readline from "readline";
 import { Lyra } from "@nearform/lyra";
 
 const db = new Lyra({
@@ -14,22 +14,24 @@ const db = new Lyra({
 
 function populateDB() {
   console.log("Populating the database...");
-  return new Promise((resolve) => {
-    fs.createReadStream("./dataset/title.csv")
-      .pipe(parse({ delimiter: ";", from_line: 2 }))
-      .on("data", (row) => {
-        const [, type, title, , , , , , category] = row;
+  return new Promise(async (resolve) => {
+    const fileStream = fs.createReadStream("./dataset/title.tsv");
+    const rl = readline.createInterface({
+      input: fileStream,
+      crlfDelay: Infinity,
+    });
 
-        db.insert({
-          type,
-          title,
-          category,
-        });
-      })
-      .on("end", () => {
-        console.log("Database ready");
-        resolve(1);
+    for await (const row of rl) {
+      const [, type, title, , , , , , category] = row.split("\t");
+
+      db.insert({
+        type,
+        title,
+        category,
       });
+    }
+
+    resolve(1);
   });
 }
 
@@ -37,7 +39,7 @@ async function main() {
   await populateDB();
 
   console.log("--------------------------------");
-  console.log("Results after 100.000 iterations");
+  console.log("Results after 1000 iterations");
   console.log("--------------------------------");
 
   const searchOnAllIndices = await searchBenchmark(db, {
@@ -46,6 +48,24 @@ async function main() {
   });
   console.log(
     `Searching "believe" through 1M entries in all indices: ${searchOnAllIndices}`
+  );
+
+  const exactSearchOnAllIndices = await searchBenchmark(db, {
+    term: "believe",
+    properties: "*",
+    exact: true,
+  });
+  console.log(
+    `Exact search for "believe" through 1M entries in all indices: ${exactSearchOnAllIndices}`
+  );
+
+  const typoTolerantSearch = await searchBenchmark(db, {
+    term: "belve",
+    properties: "*",
+    tolerance: 2,
+  });
+  console.log(
+    `Typo-tolerant search for "belve" through 1M entries in all indices: ${typoTolerantSearch}`
   );
 
   const searchOnSpecificIndex = await searchBenchmark(db, {
@@ -67,6 +87,7 @@ async function main() {
   const searchOnSpecificIndex3 = await searchBenchmark(db, {
     term: "musical",
     properties: ["category"],
+    exact: true,
   });
   console.log(
     `Searching "musical" through 1M entries in the "category" index: ${searchOnSpecificIndex3}`
@@ -82,7 +103,7 @@ async function main() {
 }
 
 async function searchBenchmark(db, query) {
-  const results = Array.from({ length: 100_000 });
+  const results = Array.from({ length: 1000 });
 
   for (let i = 0; i < results.length; i++) {
     const { elapsed } = await db.search(query);

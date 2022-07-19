@@ -2,7 +2,7 @@
 
 import fs from "fs";
 import cronometro from "cronometro";
-import { parse } from "csv-parse";
+import readline from "readline";
 import { Lyra } from "@nearform/lyra";
 
 const db = new Lyra({
@@ -15,22 +15,24 @@ const db = new Lyra({
 
 function populateDB() {
   console.log("Populating the database...");
-  return new Promise((resolve) => {
-    fs.createReadStream("./dataset/title.csv")
-      .pipe(parse({ delimiter: ";", from_line: 2 }))
-      .on("data", (row) => {
-        const [, type, title, , , , , , category] = row;
+  return new Promise(async (resolve) => {
+    const fileStream = fs.createReadStream("./dataset/title.tsv");
+    const rl = readline.createInterface({
+      input: fileStream,
+      crlfDelay: Infinity,
+    });
 
-        db.insert({
-          type,
-          title,
-          category,
-        });
-      })
-      .on("end", () => {
-        console.log("Database ready");
-        resolve(1);
+    for await (const row of rl) {
+      const [, type, title, , , , , , category] = row.split("\t");
+
+      db.insert({
+        type,
+        title,
+        category,
       });
+    }
+
+    resolve(1);
   });
 }
 

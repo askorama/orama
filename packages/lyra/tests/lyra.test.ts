@@ -61,7 +61,7 @@ describe("checkInsertDocSchema", () => {
     ).toBeDefined();
 
     try {
-      // @ts-expect-error
+      // @ts-expect-error test error case
       await db.insert({ quote: "hello, world!", author: true });
     } catch (err) {
       expect(err).toMatchSnapshot();
@@ -70,7 +70,7 @@ describe("checkInsertDocSchema", () => {
     try {
       await db.insert({
         quote: "hello, world!",
-        // @ts-expect-error
+        // @ts-expect-error test error case
         authors: "author should be singular",
       });
     } catch (err) {
@@ -78,7 +78,7 @@ describe("checkInsertDocSchema", () => {
     }
 
     try {
-      // @ts-expect-error
+      // @ts-expect-error test error case
       await db.insert({ quote: "hello, world!", foo: { bar: 10 } });
     } catch (err) {
       expect(err).toMatchSnapshot();
@@ -145,7 +145,7 @@ describe("lyra", () => {
     try {
       await db.search({
         term: "foo",
-        //@ts-expect-error
+        //@ts-expect-error test error case
         properties: ["bar"],
       });
     } catch (err) {
