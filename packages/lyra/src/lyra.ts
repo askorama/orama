@@ -32,6 +32,7 @@ export type LyraProperties<
 > = {
   schema: TSchema;
   defaultLanguage?: Language;
+  stemming?: boolean;
 };
 
 export type LyraDocs<TDoc extends PropertiesSchema> = Map<
@@ -49,6 +50,11 @@ export type SearchParams<TSchema extends PropertiesSchema> = {
   where?: WhereParams<TSchema>;
 };
 
+export type InsertConfig = {
+  language: Language;
+  stemming: boolean;
+};
+
 type LyraIndex = Map<string, Trie>;
 type LyraNumbericIndex = Map<string, Map<number, Set<string>>>;
 type LyraBoolIndex = Map<string, Set<string>>;
@@ -56,7 +62,7 @@ type LyraBoolIndex = Map<string, Set<string>>;
 type QueueDocParams<TTSchema extends PropertiesSchema> = {
   id: string;
   doc: ResolveSchema<TTSchema>;
-  language: Language;
+  config: InsertConfig;
 };
 
 type SearchResult<TTSchema extends PropertiesSchema> = Promise<{
@@ -86,6 +92,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private index: LyraIndex = new Map();
   private numericIndex: LyraNumbericIndex = new Map();
   private booleanIndex: LyraBoolIndex = new Map();
+  private enableStemming = true;
 
   private queue: queueAsPromised<QueueDocParams<TSchema>> = fastq.promise(
     this,
@@ -101,6 +108,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       throw ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage);
     }
 
+    this.enableStemming = properties?.stemming ?? true;
     this.defaultLanguage = defaultLanguage;
     this.schema = properties.schema;
     this.buildIndex(properties.schema);
@@ -145,7 +153,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     const results: RetrievedDoc<TSchema>[] = Array.from({
       length: limit,
     });
-    let totalResults = 0;
+    let count = 0;
 
     const timeStart = getNanosecondsTime();
 
@@ -157,12 +165,12 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       numericIndices,
     });
 
-    for (const token of tokens) {
+    for (const term of tokens) {
       for (const index of indices) {
         let documentIDs = await this.getDocumentIDsFromSearch({
           ...params,
           index: index,
-          term: token,
+          term: term,
           exact: exact,
           where: where,
         });
@@ -179,7 +187,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
         setSubtraction(documentIDs, documentAdded);
         if (documentIDs.size === 0) continue;
 
-        totalResults += documentIDs.size;
+        count += documentIDs.size;
 
         if (i >= limit) {
           break;
@@ -203,10 +211,12 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       }
     }
 
+    const hits = results.filter(Boolean);
+
     return {
       elapsed: formatNanoseconds(getNanosecondsTime() - timeStart),
-      hits: results,
-      count: totalResults,
+      hits,
+      count,
     };
   }
 
@@ -335,9 +345,13 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
 
   public async insert(
     doc: ResolveSchema<TSchema>,
-    language: Language = this.defaultLanguage
+    config: InsertConfig = {
+      language: this.defaultLanguage,
+      stemming: this.enableStemming,
+    }
   ): Promise<{ id: string }> {
     const id = nanoid();
+    const language = config.language ?? this.defaultLanguage;
 
     if (!SUPPORTED_LANGUAGES.includes(language)) {
       throw ERRORS.LANGUAGE_NOT_SUPPORTED(language);
@@ -350,7 +364,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     await this.queue.push({
       id,
       doc,
-      language,
+      config,
     });
 
     return { id };
@@ -359,7 +373,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private async _insert({
     doc,
     id,
-    language,
+    config,
   }: QueueDocParams<TSchema>): Promise<void> {
     const index = this.index;
     const boolIndex = this.booleanIndex;
@@ -380,7 +394,11 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
           // Use propName here because if doc is a nested object
           // We will get the wrong index
           const requestedTrie = index.get(propName);
-          const tokens = tokenize(doc[key] as string, language);
+          const tokens = tokenize(
+            doc[key] as string,
+            config.language,
+            config.stemming
+          );
 
           for (const token of tokens) {
             requestedTrie?.insert(token, id);

@@ -1,7 +1,7 @@
 {
   "name": "@nearform/lyra",
-  "description": "Fast, in-memory, full-text search engine",
-  "version": "0.0.1-beta-12",
+  "description": "Fast, in-memory, typo-tolerant, full-text search engine",
+  "version": "0.0.1-beta-13",
   "author": {
     "name": "Michele Riva",
     "email": "ciao@micheleriva.it",
@@ -10,9 +10,6 @@
   "bugs": {
     "url": "https://github.com/nearform/lyra"
   },
-  "files": [
-    "./src/dist"
-  ],
   "license": "Apache-2.0",
   "scripts": {
     "build:cjs": "tsc --project tsconfig.cjs.json",
@@ -25,7 +22,7 @@
   "dependencies": {
     "fastq": "^1.13.0",
     "nanoid": "3.3.4",
-    "natural": "^5.2.2"
+    "natural": "^5.2.3"
   },
   "devDependencies": {
     "@types/jest": "^27.5.0",

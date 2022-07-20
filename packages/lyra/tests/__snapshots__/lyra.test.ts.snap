@@ -66,17 +66,3 @@ Supported languages are:
  - spanish
  - swedish"
 `;
-
-exports[`defaultLanguage should throw an error if the desired language is not supported during insertion 1`] = `
-"Language \\"latin\\" is not supported.
-Supported languages are:
- - dutch
- - english
- - french
- - italian
- - norwegian
- - portugese
- - russian
- - spanish
- - swedish"
-`;

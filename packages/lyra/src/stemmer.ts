@@ -1,4 +1,15 @@
-import natural, { Stemmer } from "natural";
+import {
+  PorterStemmer,
+  PorterStemmerNl,
+  PorterStemmerFr,
+  PorterStemmerEs,
+  PorterStemmerIt,
+  PorterStemmerPt,
+  PorterStemmerSv,
+  PorterStemmerRu,
+  PorterStemmerNo,
+  Stemmer,
+} from "natural";
 
 export type Language = typeof SUPPORTED_LANGUAGES[number];
 
@@ -19,34 +30,34 @@ export function stemArray(input: string[], language: Language): string[] {
 
   switch (language) {
     case "dutch":
-      stemmer = natural.PorterStemmerNl;
+      stemmer = PorterStemmerNl;
       break;
     case "english":
-      stemmer = natural.PorterStemmer;
+      stemmer = PorterStemmer;
       break;
     case "french":
-      stemmer = natural.PorterStemmerFr;
+      stemmer = PorterStemmerFr;
       break;
     case "italian":
-      stemmer = natural.PorterStemmerIt;
+      stemmer = PorterStemmerIt;
       break;
     case "norwegian":
-      stemmer = natural.PorterStemmerNo;
+      stemmer = PorterStemmerNo;
       break;
     case "portugese":
-      stemmer = natural.PorterStemmerPt;
+      stemmer = PorterStemmerPt;
       break;
     case "russian":
-      stemmer = natural.PorterStemmerRu;
+      stemmer = PorterStemmerRu;
       break;
     case "spanish":
-      stemmer = natural.PorterStemmerEs;
+      stemmer = PorterStemmerEs;
       break;
     case "swedish":
-      stemmer = natural.PorterStemmerSv;
+      stemmer = PorterStemmerSv;
       break;
     default:
-      stemmer = natural.PorterStemmer;
+      stemmer = PorterStemmer;
       break;
   }
 
