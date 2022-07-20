@@ -1,5 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Should tokenize and stem correctly in dutch 1`] = `
+Set {
+  "de",
+  "klein",
+  "koei",
+}
+`;
+
+exports[`Should tokenize and stem correctly in dutch 2`] = `
+Set {
+  "ik",
+  "heb",
+  "wat",
+  "taart",
+  "gemaakt",
+}
+`;
+
 exports[`Should tokenize and stem correctly in english 1`] = `
 Set {
   "the",
@@ -129,6 +147,27 @@ Set {
   "тест",
   "не",
   "срабатыва",
+}
+`;
+
+exports[`Should tokenize and stem correctly in spanish 1`] = `
+Set {
+  "cocin",
+  "unos",
+  "pastel",
+}
+`;
+
+exports[`Should tokenize and stem correctly in spanish 2`] = `
+Set {
+  "dorm",
+  "es",
+  "algo",
+  "dificil",
+  "cuand",
+  "las",
+  "prueb",
+  "fall",
 }
 `;
 

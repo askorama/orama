@@ -627,3 +627,51 @@ describe("lyra", () => {
     expect(resultNotAliveAndNumber.count).toBe(0);
   });
 });
+
+describe("Disable stemming", () => {
+  it("Should disable stemming globally", async () => {
+    const db = new Lyra({
+      schema: {
+        quote: "string",
+      },
+      stemming: false,
+    });
+
+    await db.insert({
+      quote: "I am baking some cakes",
+    });
+
+    const result1 = await db.search({
+      term: "bake",
+      exact: true,
+    });
+
+    const result2 = await db.search({
+      term: "bak",
+      tolerance: 10,
+    });
+
+    // Resoults should be empty as "baking" doesn't get reduced to "bake"
+    expect(result1.count).toBe(0);
+    expect(result2.count).toBe(1);
+  });
+
+  it("Should stem by default", async () => {
+    const db = new Lyra({
+      schema: {
+        quote: "string",
+      },
+    });
+
+    await db.insert({
+      quote: "I am baking some cakes",
+    });
+
+    const result1 = await db.search({
+      term: "bake",
+      exact: true,
+    });
+
+    expect(result1.count).toBe(1);
+  });
+});
