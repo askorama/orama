@@ -424,6 +424,69 @@ describe("lyra", () => {
     const db = new Lyra({
       schema: {
         quote: "string",
+        author: {
+          alive: "boolean",
+          name: "string",
+          surname: "string",
+        },
+      },
+    });
+
+    await db.insert({
+      quote:
+        "I am Harry Potter, the boy who lived, come to die. Avada kedavra.",
+      author: {
+        alive: true,
+        name: "Harry",
+        surname: "Potter",
+      },
+    });
+
+    await db.insert({
+      quote: "Harry Potter, the boy who lived, come to die. Avada kedavra.",
+      author: {
+        alive: false,
+        name: "Tom",
+        surname: "Riddle",
+      },
+    });
+
+    await db.insert({
+      quote:
+        "It would be quite nice if you stopped jumping down out throats, Harry, because in case you haven’t noticed, Ron and I are on your side",
+      author: {
+        alive: true,
+        name: "Hermione",
+        surname: "Grenger",
+      },
+    });
+
+    const resultAlive = await db.search({
+      term: "Harry",
+      where: {
+        author: {
+          alive: true,
+        },
+      },
+    });
+
+    const resultNotAlive = await db.search({
+      term: "Harry",
+      where: {
+        author: {
+          alive: false,
+        },
+      },
+    });
+
+    expect(resultAlive.count).toBe(2);
+    expect(resultNotAlive.count).toBe(1);
+  });
+
+  it("Should support where numeric clause", async () => {
+    const db = new Lyra({
+      schema: {
+        quote: "string",
         copies: "number",
         author: {
           alive: "boolean",
@@ -454,7 +517,7 @@ describe("lyra", () => {
       },
     });
 
-    const result = await db.search({
+    const resultEquals = await db.search({
       term: "Harry",
       where: {
         copies: {
@@ -463,6 +526,104 @@ describe("lyra", () => {
       },
     });
 
-    expect(result.count).toBe(1);
+    const resultLEThan = await db.search({
+      term: "Harry",
+      where: {
+        copies: {
+          "<=": 1230,
+        },
+      },
+    });
+
+    const resultGEThan = await db.search({
+      term: "Harry",
+      where: {
+        copies: {
+          ">=": 1230,
+        },
+      },
+    });
+
+    const resultGreaterThan = await db.search({
+      term: "Harry",
+      where: {
+        copies: {
+          ">": 1230,
+        },
+      },
+    });
+
+    const resultLessThan = await db.search({
+      term: "Harry",
+      where: {
+        copies: {
+          "<": 1,
+        },
+      },
+    });
+
+    expect(resultLessThan.count).toBe(0);
+    expect(resultEquals.count).toBe(1);
+    expect(resultLEThan.count).toBe(2);
+    expect(resultGEThan.count).toBe(1);
+    expect(resultGreaterThan.count).toBe(0);
+  });
+
+  it("Should support where numeric and boolean clause", async () => {
+    const db = new Lyra({
+      schema: {
+        quote: "string",
+        copies: "number",
+        author: {
+          alive: "boolean",
+          name: "string",
+          surname: "string",
+        },
+      },
+    });
+
+    await db.insert({
+      quote:
+        "I am Harry Potter, the boy who lived, come to die. Avada kedavra.",
+      copies: 1230,
+      author: {
+        alive: true,
+        name: "Harry",
+        surname: "Potter",
+      },
+    });
+
+    await db.insert({
+      quote: "Harry Potter, the boy who lived, come to die. Avada kedavra.",
+      copies: 11,
+      author: {
+        alive: false,
+        name: "Tom",
+        surname: "Riddle",
+      },
+    });
+
+    const resultAliveAndNumber = await db.search({
+      term: "Harry",
+      where: {
+        copies: {
+          "=": 1230,
+        },
+        author: { alive: true },
+      },
+    });
+
+    const resultNotAliveAndNumber = await db.search({
+      term: "Harry",
+      where: {
+        copies: {
+          "=": 1230,
+        },
+        author: { alive: false },
+      },
+    });
+
+    expect(resultAliveAndNumber.count).toBe(1);
+    expect(resultNotAliveAndNumber.count).toBe(0);
   });
 });

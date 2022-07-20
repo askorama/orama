@@ -12,6 +12,7 @@ import {
 } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./stemmer";
 import type {
+  Nullable,
   NumberComparison,
   ResolveSchema,
   SearchProperties,
@@ -71,9 +72,12 @@ type RetrievedDoc<TDoc extends PropertiesSchema> = ResolveSchema<TDoc> & {
 type SearchIDSParams<TSchema extends PropertiesSchema> =
   SearchParams<TSchema> & {
     index: string;
-    boolIndices: string[];
-    numericIndices: string[];
   };
+
+type GetDocumentFromWhereParams = {
+  boolIndices: string[];
+  numericIndices: string[];
+};
 
 export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private defaultLanguage: Language = "english";
@@ -131,7 +135,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   ): SearchResult<TSchema> {
     const tokens = tokenize(params.term, language).values();
     const indices = this.getIndices(params.properties);
-    const { bool, numeric } = this.getNonSearchableIndices(
+    const { boolIndices, numericIndices } = this.getNonSearchableIndices(
       params.where,
       this.schema
     );
@@ -148,21 +152,30 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     let i = 0;
     let j = 0;
 
+    const documentIdsFromNonSearchable = this.getDocumentIDsFromWhere({
+      boolIndices,
+      numericIndices,
+    });
+
     for (const token of tokens) {
       for (const index of indices) {
-        const documentIDs = await this.getDocumentIDsFromSearch({
+        let documentIDs = await this.getDocumentIDsFromSearch({
           ...params,
           index: index,
           term: token,
           exact: exact,
           where: where,
-          boolIndices: bool,
-          numericIndices: numeric,
         });
 
         // To avoid duplicates we need a subtraction between added document
         // And retrieved ones.
         // We check if this is the first
+        // We use non-null assertion because setIntersection will return null only if both set are null
+        // We are sure that documentsIDs is not null, so we are safew
+        documentIDs = setIntersection(
+          documentIDs,
+          documentIdsFromNonSearchable
+        )!;
         setSubtraction(documentIDs, documentAdded);
         if (documentIDs.size === 0) continue;
 
@@ -225,10 +238,10 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     where: SearchParams<TSchema>["where"],
     schema: TSchema,
     prefix = ""
-  ): { bool: string[]; numeric: string[] } {
+  ): GetDocumentFromWhereParams {
     const boolIndices: string[] = [];
     const numericIndices: string[] = [];
-    if (!where) return { bool: boolIndices, numeric: numericIndices };
+    if (!where) return { boolIndices, numericIndices };
 
     for (const key of Object.keys(where)) {
       const propName = `${prefix}${String(key)}`;
@@ -236,13 +249,13 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       if (schema[key] === "boolean") handleBoolean(propValue, propName);
       else if (schema[key] === "number") handleNumeric(propValue, propName);
       else if (typeof schema[key] === "object") {
-        const { bool, numeric } = this.getNonSearchableIndices(
+        const result = this.getNonSearchableIndices(
           propValue,
           schema[key] as TSchema,
           `${propName}.`
         );
-        boolIndices.concat(bool);
-        numericIndices.concat(numeric);
+        boolIndices.push(...result.boolIndices);
+        numericIndices.push(...result.numericIndices);
       }
     }
 
@@ -274,7 +287,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       numericIndices.push(`${propName}.${key}.${propValue[key]}`);
     }
 
-    return { bool: boolIndices, numeric: numericIndices };
+    return { boolIndices, numericIndices };
   }
 
   async delete(docID: string): Promise<boolean> {
@@ -310,38 +323,6 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       tolerance: params.tolerance,
     });
     const ids = new Set<string>();
-    const booleanIds = new Set<string>();
-    const numericIds = new Set<string>();
-    for (const boolIndex of params.boolIndices) {
-      if (!this.booleanIndex.has(boolIndex)) continue;
-      for (const id of this.booleanIndex.get(boolIndex)!) {
-        booleanIds.add(id);
-      }
-    }
-
-    for (const virtualNumericIndex of params.numericIndices) {
-      // We need to strip the operator and the value from the index before searching it
-      // virtualNumericIndex string ->
-      // prop1.prop2.prop3.prop3....propN.>=.14590
-      const rawIndex = virtualNumericIndex.split(".");
-      const numericIndex = rawIndex.slice(0, -2).join(".");
-      const operator = rawIndex.at(-2) as keyof NumberComparison;
-      const valueSearched = Number(rawIndex.at(-1));
-
-      if (!this.numericIndex.has(numericIndex)) continue;
-
-      const predicate = this.createPredicateForNumericComparison(
-        operator,
-        valueSearched
-      );
-
-      const current = this.numericIndex.get(numericIndex)!;
-      const keys = [...current.keys()].filter(predicate);
-
-      for (const range of keys) {
-        current.get(range)?.forEach((value) => numericIds.add(value));
-      }
-    }
 
     for (const key in searchResult) {
       for (const id of (searchResult as any)[key]) {
@@ -349,12 +330,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       }
     }
 
-    const numericIntesectBool = setIntersection(
-      numericIds.size === 0 ? null : numericIds,
-      booleanIds.size === 0 ? null : numericIds
-    );
-
-    return setIntersection(numericIntesectBool, ids) || new Set();
+    return ids;
   }
 
   public async insert(
@@ -450,6 +426,52 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     }
 
     return recursiveCheck(doc, this.schema);
+  }
+
+  private getDocumentIDsFromWhere({
+    boolIndices,
+    numericIndices,
+  }: GetDocumentFromWhereParams): Nullable<Set<string>> {
+    const booleanIds = new Set<string>();
+    const numericIds = new Set<string>();
+    for (const boolIndex of boolIndices) {
+      if (!this.booleanIndex.has(boolIndex)) continue;
+      for (const id of this.booleanIndex.get(boolIndex)!) {
+        booleanIds.add(id);
+      }
+    }
+
+    for (const virtualNumericIndex of numericIndices) {
+      // We need to strip the operator and the value from the index before searching it
+      // virtualNumericIndex string ->
+      // prop1.prop2.prop3.prop3....propN.>=.14590
+      const rawIndex = virtualNumericIndex.split(".");
+      const numericIndex = rawIndex.slice(0, -2).join(".");
+      const operator = rawIndex.at(-2) as keyof NumberComparison;
+      const valueSearched = Number(rawIndex.at(-1));
+
+      if (!this.numericIndex.has(numericIndex)) continue;
+
+      const predicate = this.createPredicateForNumericComparison(
+        operator,
+        valueSearched
+      );
+
+      const current = this.numericIndex.get(numericIndex)!;
+      const keys = [...current.keys()].filter(predicate);
+
+      for (const range of keys) {
+        current.get(range)?.forEach((value) => numericIds.add(value));
+      }
+    }
+
+    const needNumberIntersect = numericIndices.length > 0;
+    const needBooleanIntersect = boolIndices.length > 0;
+
+    return setIntersection(
+      needBooleanIntersect ? booleanIds : null,
+      needNumberIntersect ? numericIds : null
+    );
   }
 
   private createPredicateForNumericComparison(
