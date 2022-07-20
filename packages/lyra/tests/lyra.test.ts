@@ -419,4 +419,50 @@ describe("lyra", () => {
     expect(resultAuthorSurname.count).toBe(1);
     expect(resultAuthorName.count).toBe(0);
   });
+
+  it("Should support where boolean clause", async () => {
+    const db = new Lyra({
+      schema: {
+        quote: "string",
+        copies: "number",
+        author: {
+          alive: "boolean",
+          name: "string",
+          surname: "string",
+        },
+      },
+    });
+
+    await db.insert({
+      quote:
+        "I am Harry Potter, the boy who lived, come to die. Avada kedavra.",
+      copies: 1230,
+      author: {
+        alive: true,
+        name: "Harry",
+        surname: "Potter",
+      },
+    });
+
+    await db.insert({
+      quote: "Harry Potter, the boy who lived, come to die. Avada kedavra.",
+      copies: 11,
+      author: {
+        alive: false,
+        name: "Tom",
+        surname: "Riddle",
+      },
+    });
+
+    const result = await db.search({
+      term: "Harry",
+      where: {
+        copies: {
+          "=": 1230,
+        },
+      },
+    });
+
+    expect(result.count).toBe(1);
+  });
 });

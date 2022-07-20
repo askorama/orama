@@ -1,3 +1,5 @@
+import { Nullable } from "./types";
+
 export const isServer = typeof window === "undefined";
 
 export function formatBytes(bytes: number, decimals = 2): string {
@@ -28,4 +30,29 @@ export function getNanosecondsTime(): bigint {
   }
 
   return BigInt(Math.floor(performance.now()) * 1000);
+}
+
+export function setIntersection<T = unknown>(
+  a: Nullable<Set<T>>,
+  b: Nullable<Set<T>>
+): Nullable<Set<T>> {
+  if (!a) return b;
+  if (!b) return a;
+
+  const smallerSet = a.size > b.size ? b : a;
+  const biggerSet = a.size > b.size ? a : b;
+  const insersection = new Set<T>();
+  for (const element of smallerSet) {
+    if (biggerSet.has(element)) insersection.add(element);
+  }
+  return insersection;
+}
+
+export function setSubtraction<T = unknown>(
+  from: Nullable<Set<T>> = new Set<T>(),
+  toRemove: Set<T> = new Set<T>()
+): void {
+  for (const element of toRemove) {
+    from?.delete(element);
+  }
 }

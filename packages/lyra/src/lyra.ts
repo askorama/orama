@@ -4,11 +4,23 @@ import * as fastq from "fastq";
 import { Trie } from "./prefix-tree/trie";
 import * as ERRORS from "./errors";
 import { tokenize } from "./tokenizer";
-import { formatNanoseconds, getNanosecondsTime } from "./utils";
+import {
+  formatNanoseconds,
+  getNanosecondsTime,
+  setIntersection,
+  setSubtraction,
+} from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./stemmer";
-import type { ResolveSchema, SearchProperties, WhereParams } from "./types";
+import type {
+  NumberComparison,
+  ResolveSchema,
+  SearchProperties,
+  WhereParams,
+} from "./types";
 
 export type PropertyType = "string" | "number" | "boolean";
+
+export const allowedNumericComparison = [">=", ">", "=", "<", "<="] as const;
 
 export type PropertiesSchema = {
   [key: string]: PropertyType | PropertiesSchema;
@@ -55,6 +67,13 @@ type SearchResult<TTSchema extends PropertiesSchema> = Promise<{
 type RetrievedDoc<TDoc extends PropertiesSchema> = ResolveSchema<TDoc> & {
   id: string;
 };
+
+type SearchIDSParams<TSchema extends PropertiesSchema> =
+  SearchParams<TSchema> & {
+    index: string;
+    boolIndices: string[];
+    numericIndices: string[];
+  };
 
 export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private defaultLanguage: Language = "english";
@@ -112,7 +131,13 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   ): SearchResult<TSchema> {
     const tokens = tokenize(params.term, language).values();
     const indices = this.getIndices(params.properties);
-    const { limit = 10, offset = 0, exact = false } = params;
+    const { bool, numeric } = this.getNonSearchableIndices(
+      params.where,
+      this.schema
+    );
+    const documentAdded: Set<string> = new Set();
+
+    const { limit = 10, offset = 0, exact = false, where } = params;
     const results: RetrievedDoc<TSchema>[] = Array.from({
       length: limit,
     });
@@ -130,7 +155,16 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
           index: index,
           term: token,
           exact: exact,
+          where: where,
+          boolIndices: bool,
+          numericIndices: numeric,
         });
+
+        // To avoid duplicates we need a subtraction between added document
+        // And retrieved ones.
+        // We check if this is the first
+        setSubtraction(documentIDs, documentAdded);
+        if (documentIDs.size === 0) continue;
 
         totalResults += documentIDs.size;
 
@@ -138,21 +172,20 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
           break;
         }
 
-        if (documentIDs.size) {
-          for (const id of documentIDs) {
-            if (j < offset) {
-              j++;
-              continue;
-            }
-
-            if (i >= limit) {
-              break;
-            }
-
-            const fullDoc = this.docs.get(id)!;
-            results[i] = { id, ...fullDoc };
-            i++;
+        for (const id of documentIDs) {
+          if (j < offset) {
+            j++;
+            continue;
           }
+
+          if (i >= limit) {
+            break;
+          }
+
+          const fullDoc = this.docs.get(id)!;
+          documentAdded.add(id);
+          results[i] = { id, ...fullDoc };
+          i++;
         }
       }
     }
@@ -188,6 +221,62 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     return indices as string[];
   }
 
+  private getNonSearchableIndices(
+    where: SearchParams<TSchema>["where"],
+    schema: TSchema,
+    prefix = ""
+  ): { bool: string[]; numeric: string[] } {
+    const boolIndices: string[] = [];
+    const numericIndices: string[] = [];
+    if (!where) return { bool: boolIndices, numeric: numericIndices };
+
+    for (const key of Object.keys(where)) {
+      const propName = `${prefix}${String(key)}`;
+      const propValue = (where as any)[key];
+      if (schema[key] === "boolean") handleBoolean(propValue, propName);
+      else if (schema[key] === "number") handleNumeric(propValue, propName);
+      else if (typeof schema[key] === "object") {
+        const { bool, numeric } = this.getNonSearchableIndices(
+          propValue,
+          schema[key] as TSchema,
+          `${propName}.`
+        );
+        boolIndices.concat(bool);
+        numericIndices.concat(numeric);
+      }
+    }
+
+    function handleBoolean(propValue: boolean, propName: string) {
+      if (typeof propValue !== "boolean")
+        throw ERRORS.INVALID_QUERY_PARAMS(propValue, ["true", "false"]);
+      boolIndices.push(`${propName}_${propValue}`);
+    }
+
+    function handleNumeric(propValue: NumberComparison, propName: string) {
+      const numericKeys = Object.keys(propValue);
+
+      // By now we just support only one operator
+      if (numericKeys.length > 1)
+        throw ERRORS.INVALID_QUERY_PARAMS(JSON.stringify(propValue), [
+          ...allowedNumericComparison,
+        ]);
+
+      const key = numericKeys[0] as keyof NumberComparison;
+      if (!allowedNumericComparison.includes(key))
+        throw ERRORS.INVALID_QUERY_PARAMS(key, [...allowedNumericComparison]);
+      if (typeof propValue[key] !== "number")
+        throw ERRORS.INVALID_QUERY_PARAMS(String(propValue[key]), ["a number"]);
+      // Checks over, we can finally push the index
+      // EX: publish.year.>=.1390
+      // Later we will split and the last 2 element will be removed
+      // Index obtained: publish.year
+      // We will use last 2 element to build the predicate
+      numericIndices.push(`${propName}.${key}.${propValue[key]}`);
+    }
+
+    return { bool: boolIndices, numeric: numericIndices };
+  }
+
   async delete(docID: string): Promise<boolean> {
     if (!this.docs.has(docID)) {
       throw ERRORS.DOC_ID_DOES_NOT_EXISTS(docID);
@@ -212,7 +301,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   }
 
   private async getDocumentIDsFromSearch(
-    params: SearchParams<TSchema> & { index: string }
+    params: SearchIDSParams<TSchema>
   ): Promise<Set<string>> {
     const idx = this.index.get(params.index);
     const searchResult = idx?.find({
@@ -221,13 +310,51 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       tolerance: params.tolerance,
     });
     const ids = new Set<string>();
+    const booleanIds = new Set<string>();
+    const numericIds = new Set<string>();
+    for (const boolIndex of params.boolIndices) {
+      if (!this.booleanIndex.has(boolIndex)) continue;
+      for (const id of this.booleanIndex.get(boolIndex)!) {
+        booleanIds.add(id);
+      }
+    }
+
+    for (const virtualNumericIndex of params.numericIndices) {
+      // We need to strip the operator and the value from the index before searching it
+      // virtualNumericIndex string ->
+      // prop1.prop2.prop3.prop3....propN.>=.14590
+      const rawIndex = virtualNumericIndex.split(".");
+      const numericIndex = rawIndex.slice(0, -2).join(".");
+      const operator = rawIndex.at(-2) as keyof NumberComparison;
+      const valueSearched = Number(rawIndex.at(-1));
+
+      if (!this.numericIndex.has(numericIndex)) continue;
+
+      const predicate = this.createPredicateForNumericComparison(
+        operator,
+        valueSearched
+      );
+
+      const current = this.numericIndex.get(numericIndex)!;
+      const keys = [...current.keys()].filter(predicate);
+
+      for (const range of keys) {
+        current.get(range)?.forEach((value) => numericIds.add(value));
+      }
+    }
 
     for (const key in searchResult) {
       for (const id of (searchResult as any)[key]) {
         ids.add(id);
       }
     }
-    return ids;
+
+    const numericIntesectBool = setIntersection(
+      numericIds.size === 0 ? null : numericIds,
+      booleanIds.size === 0 ? null : numericIds
+    );
+
+    return setIntersection(numericIntesectBool, ids) || new Set();
   }
 
   public async insert(
@@ -323,5 +450,25 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     }
 
     return recursiveCheck(doc, this.schema);
+  }
+
+  private createPredicateForNumericComparison(
+    operator: keyof NumberComparison,
+    valueSearched: number
+  ) {
+    switch (operator) {
+      case "<":
+        return (value: number) => value < valueSearched;
+      case "<=":
+        return (value: number) => value <= valueSearched;
+      case "=":
+        return (value: number) => value === valueSearched;
+      case ">":
+        return (value: number) => value > valueSearched;
+      case ">=":
+        return (value: number) => value >= valueSearched;
+      default:
+        return (value: number) => true;
+    }
   }
 }

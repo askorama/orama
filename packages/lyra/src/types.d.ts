@@ -1,4 +1,4 @@
-import type { PropertiesSchema } from "./lyra";
+import type { PropertiesSchema, allowedNumericComparison } from "./lyra";
 export type Nullable<T> = T | null;
 
 type ResolveTypes<TType> = TType extends "string"
@@ -41,8 +41,8 @@ export type WhereParams<TSchema extends PropertiesSchema> = {
     : never;
 };
 
-type NumberComparison = {
+export type NumberComparison = {
   [P in SupportedComparisons]?: number;
 };
 
-export type SupportedComparisons = ">=" | "=" | "<=" | ">" | "<";
+export type SupportedComparisons = typeof allowedNumericComparison[number];
