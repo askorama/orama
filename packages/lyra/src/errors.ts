@@ -29,3 +29,6 @@ export const LANGUAGE_NOT_SUPPORTED = (lang: string) =>
   `Language "${lang}" is not supported.\nSupported languages are:\n - ${SUPPORTED_LANGUAGES.join(
     "\n - "
   )}`;
+
+export const GETTER_SETTER_WORKS_ON_EDGE_ONLY = (method: string) =>
+  `${method} works on edge only. Use edge: true in Lyra constructor to enable it.`;

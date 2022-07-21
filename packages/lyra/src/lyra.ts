@@ -20,6 +20,7 @@ export type LyraProperties<
   schema: TSchema;
   defaultLanguage?: Language;
   stemming?: boolean;
+  edge?: boolean;
 };
 
 export type LyraDocs<TDoc extends PropertiesSchema> = Map<
@@ -65,6 +66,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private docs: LyraDocs<TSchema> = new Map();
   private index: LyraIndex = new Map();
   private enableStemming = true;
+  private edge = false;
 
   private queue: queueAsPromised<QueueDocParams<TSchema>> = fastq.promise(
     this,
@@ -78,6 +80,10 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
 
     if (!SUPPORTED_LANGUAGES.includes(defaultLanguage)) {
       throw ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage);
+    }
+
+    if (properties.edge) {
+      this.edge = true;
     }
 
     this.enableStemming = properties?.stemming ?? true;
@@ -320,5 +326,33 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     }
 
     return recursiveCheck(doc, this.schema);
+  }
+
+  get getIndex(): LyraIndex {
+    if (this.edge) return this.index;
+
+    throw ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("getIndex");
+  }
+
+  get getDocs(): LyraDocs<TSchema> {
+    if (this.edge) return this.docs;
+
+    throw ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("getDocs");
+  }
+
+  set setIndex(indexContent: LyraIndex) {
+    if (this.edge) {
+      this.index = indexContent;
+    } else {
+      throw ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("setIndex");
+    }
+  }
+
+  set setDocs(docsContent: LyraDocs<TSchema>) {
+    if (this.edge) {
+      this.docs = docsContent;
+    } else {
+      throw ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("setDocs");
+    }
   }
 }
