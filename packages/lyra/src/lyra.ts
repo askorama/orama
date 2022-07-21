@@ -220,6 +220,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     params: SearchParams<TSchema> & { index: string }
   ): Promise<Set<string>> {
     const idx = this.index.get(params.index);
+
     const searchResult = idx?.find({
       term: params.term,
       exact: params.exact,

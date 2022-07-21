@@ -57,6 +57,20 @@ importers:
     devDependencies:
       vuepress: 1.9.7
 
+  packages/edge:
+    specifiers:
+      '@nearform/lyra': workspace:*
+      '@types/jest': ^27.5.0
+      jest: ^28.1.0
+      ts-jest: ^28.0.2
+      typescript: ^4.6.4
+    devDependencies:
+      '@nearform/lyra': link:../lyra
+      '@types/jest': 27.5.2
+      jest: 28.1.1
+      ts-jest: 28.0.4_vz6zla63wvofljfl6elifyg77e
+      typescript: 4.7.3
+
   packages/examples/with-react:
     specifiers:
       '@nearform/lyra': workspace:*
@@ -11960,7 +11974,7 @@ packages:
     dev: true
 
   /to-fast-properties/2.0.0:
-    resolution: {integrity: sha1-3F5pjL0HkmW8c+A3doGk5Og/YW4=}
+    resolution: {integrity: sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==}
     engines: {node: '>=4'}
     dev: true
 
