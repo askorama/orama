@@ -107,14 +107,14 @@ export class Trie {
     return output;
   }
 
-  removeDocByWord(word: string, docID: string): boolean {
+  removeDocByWord(word: string, docID: string, exact = false): boolean {
     const root = this.root;
     if (!word) return false;
 
     function removeWord(node: TrieNode, _word: string, docID: string): boolean {
       const [nodeWord /**_docs*/] = node.getWord();
 
-      if (node.end && nodeWord === word) {
+      if (node.end || (exact && node.end && nodeWord === word)) {
         node.removeDoc(docID);
 
         if (node.children?.size) {
