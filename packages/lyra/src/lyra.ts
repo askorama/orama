@@ -5,6 +5,7 @@ import { Trie } from "./prefix-tree/trie";
 import * as ERRORS from "./errors";
 import { tokenize } from "./tokenizer";
 import {
+  binarySearch,
   formatNanoseconds,
   getNanosecondsTime,
   setIntersection,
@@ -18,6 +19,8 @@ import type {
   SearchProperties,
   WhereParams,
 } from "./types";
+import { SortedQueue } from "./sorted-queue";
+import { QueueNode } from "./sorted-queue/node";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -56,7 +59,7 @@ export type InsertConfig = {
 };
 
 type LyraIndex = Map<string, Trie>;
-type LyraNumbericIndex = Map<string, Map<number, Set<string>>>;
+type LyraNumbericIndex = Map<string, SortedQueue<Set<string>>>;
 type LyraBoolIndex = Map<string, Set<string>>;
 
 type QueueDocParams<TTSchema extends PropertiesSchema> = {
@@ -132,7 +135,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
         this.booleanIndex.set(`${propName}_true`, new Set());
         this.booleanIndex.set(`${propName}_false`, new Set());
       } else if (propValue === "number") {
-        this.numericIndex.set(propName, new Map());
+        this.numericIndex.set(propName, new SortedQueue());
       }
     }
   }
@@ -167,7 +170,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
 
     for (const term of tokens) {
       for (const index of indices) {
-        let documentIDs = await this.getDocumentIDsFromSearch({
+        const documentIDsFromText = await this.getDocumentIDsFromSearch({
           ...params,
           index: index,
           term: term,
@@ -180,10 +183,11 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
         // We check if this is the first
         // We use non-null assertion because setIntersection will return null only if both set are null
         // We are sure that documentsIDs is not null, so we are safew
-        documentIDs = setIntersection(
-          documentIDs,
+        const documentIDs = setIntersection(
+          documentIDsFromText,
           documentIdsFromNonSearchable
         )!;
+
         setSubtraction(documentIDs, documentAdded);
         if (documentIDs.size === 0) continue;
 
@@ -407,9 +411,21 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
           boolIndex.get(`${propName}_${doc[key]}`)?.add(id);
         } else if (typeof doc[key] === "number") {
           const numericKey = doc[key] as number;
-          const numericMap = numericIndex.get(propName);
-          if (numericMap?.has(numericKey)) numericMap.get(numericKey)!.add(id);
-          else numericMap?.set(numericKey, new Set<string>().add(id));
+          const numericQueue = numericIndex.get(propName);
+          if (!numericQueue) return;
+
+          const searchIndex = binarySearch(
+            numericQueue.queue,
+            (current) => current.priority - numericKey
+          );
+
+          if (searchIndex === -1) {
+            const set = new Set<string>();
+            set.add(id);
+            numericQueue.enqueue(new QueueNode(numericKey, set));
+          } else {
+            numericQueue.queue[searchIndex].payload.add(id);
+          }
         }
       }
     }
@@ -470,16 +486,27 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
 
       if (!this.numericIndex.has(numericIndex)) continue;
 
-      const predicate = this.createPredicateForNumericComparison(
-        operator,
-        valueSearched
-      );
-
       const current = this.numericIndex.get(numericIndex)!;
-      const keys = [...current.keys()].filter(predicate);
 
-      for (const range of keys) {
-        current.get(range)?.forEach((value) => numericIds.add(value));
+      const nodeIndex = binarySearch(
+        current.queue,
+        (element) => element.priority - valueSearched
+      );
+      if (nodeIndex === -1) continue;
+
+      const node = current.queue[nodeIndex];
+      if (operator === "=") {
+        node.payload.forEach((value) => numericIds.add(value));
+      } else {
+        const predicate = this.createPredicateForNumericComparison<
+          QueueNode<Set<string>>
+        >(operator, nodeIndex);
+
+        const predicateResult = predicate(current.queue);
+
+        for (const result of predicateResult) {
+          result.payload.forEach((value) => numericIds.add(value));
+        }
       }
     }
 
@@ -492,23 +519,21 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     );
   }
 
-  private createPredicateForNumericComparison(
+  private createPredicateForNumericComparison<TArray>(
     operator: keyof NumberComparison,
-    valueSearched: number
+    index: number
   ) {
     switch (operator) {
       case "<":
-        return (value: number) => value < valueSearched;
+        return (array: TArray[]) => array.slice(0, index);
       case "<=":
-        return (value: number) => value <= valueSearched;
-      case "=":
-        return (value: number) => value === valueSearched;
+        return (array: TArray[]) => array.slice(0, index + 1);
       case ">":
-        return (value: number) => value > valueSearched;
+        return (array: TArray[]) => array.slice(index + 1);
       case ">=":
-        return (value: number) => value >= valueSearched;
+        return (array: TArray[]) => array.slice(index);
       default:
-        return (value: number) => true;
+        return (array: TArray[]) => array;
     }
   }
 }

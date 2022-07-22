@@ -483,7 +483,7 @@ describe("lyra", () => {
     expect(resultNotAlive.count).toBe(1);
   });
 
-  it("Should support where numeric clause", async () => {
+  it.only("Should support where numeric clause", async () => {
     const db = new Lyra({
       schema: {
         quote: "string",
