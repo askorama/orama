@@ -218,6 +218,55 @@ describe("lyra", () => {
     expect(serach2.count).toBe(1);
   });
 
+  it("Shouldn't returns deleted documents when having a nested schema", async () => {
+    const db = new Lyra({
+      schema: {
+        txt: "string",
+        city: {
+          name: "string",
+          population: "number",
+          capital: "boolean",
+        },
+      },
+      stemming: false,
+    });
+
+    await db.insert({
+      txt: "stelle",
+      city: { name: "Rome", population: 6000000, capital: true },
+    });
+
+    await db.insert({
+      txt: "stelle",
+      city: { name: "Paris", population: 6000000, capital: true },
+    });
+
+    await db.insert({
+      txt: "stellle",
+      city: { name: "Milan", population: 4000000, capital: false },
+    });
+    await db.insert({
+      txt: "scelte",
+      city: { name: "Naples", population: 2000000, capital: false },
+    });
+
+    const search = await db.search({
+      term: "stelle",
+      where: { city: { capital: true } },
+    });
+
+    const id = search.hits[0].id;
+
+    await db.delete(id);
+
+    const serach2 = await db.search({
+      term: "stelle",
+      where: { city: { capital: true } },
+    });
+
+    expect(serach2.count).toBe(0);
+  });
+
   it("Shouldn't affects other document when deleted one", async () => {
     const db = new Lyra({
       schema: {
@@ -528,7 +577,7 @@ describe("lyra", () => {
     expect(resultNotAlive.count).toBe(1);
   });
 
-  it.only("Should support where numeric clause", async () => {
+  it("Should support where numeric clause", async () => {
     const db = new Lyra({
       schema: {
         quote: "string",
@@ -670,6 +719,77 @@ describe("lyra", () => {
 
     expect(resultAliveAndNumber.count).toBe(1);
     expect(resultNotAliveAndNumber.count).toBe(0);
+  });
+
+  it("Should throw error if where clause is not correct", async () => {
+    const db = new Lyra({
+      schema: {
+        quote: "string",
+        copies: "number",
+        author: {
+          alive: "boolean",
+          name: "string",
+          surname: "string",
+        },
+      },
+    });
+
+    try {
+      await db.search({
+        term: "e",
+        where: {
+          copies: {
+            // @ts-expect-error >= > = < <= are supported
+            A: 123123,
+          },
+        },
+      });
+    } catch (e) {
+      expect(e).toMatchSnapshot();
+    }
+
+    try {
+      await db.search({
+        term: "e",
+        where: {
+          copies: {
+            // @ts-expect-error property should be a number
+            ">": "A STRING",
+          },
+        },
+      });
+    } catch (e) {
+      expect(e).toMatchSnapshot();
+    }
+
+    try {
+      // Two operator are not supported yet
+      await db.search({
+        term: "e",
+        where: {
+          copies: {
+            "=": 123123,
+            ">=": 123454,
+          },
+        },
+      });
+    } catch (e) {
+      expect(e).toMatchSnapshot();
+    }
+
+    try {
+      await db.search({
+        term: "a",
+        where: {
+          author: {
+            // @ts-expect-error Alive should be a boolean
+            alive: "1",
+          },
+        },
+      });
+    } catch (e) {
+      expect(e).toMatchSnapshot();
+    }
   });
 });
 
