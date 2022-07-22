@@ -31,4 +31,4 @@ export const LANGUAGE_NOT_SUPPORTED = (lang: string) =>
   )}`;
 
 export const INVALID_QUERY_PARAMS = (got: string, expected: string[]) =>
-  `Invalid query parameters. Expected ${expected.join(", ")}, but got: ${name}`;
+  `Invalid query parameters. Expected ${expected.join(", ")}, but got: ${got}`;

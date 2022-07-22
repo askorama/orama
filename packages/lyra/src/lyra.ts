@@ -308,16 +308,47 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     if (!this.docs.has(docID)) {
       throw ERRORS.DOC_ID_DOES_NOT_EXISTS(docID);
     }
-
+    const textIndex = this.index;
+    const numericIndex = this.numericIndex;
+    const booleanIndex = this.booleanIndex;
     const document = this.docs.get(docID)!;
 
-    for (const key in document) {
-      const idx = this.index.get(key)!;
-      const tokens = tokenize((document as any)[key]);
+    removeDocFromIndexes(document);
 
-      for (const token of tokens) {
-        if (idx.removeDocByWord(token, docID)) {
-          throw `Unable to remove document "${docID}" from index "${key}" on word "${token}".`;
+    function removeDocFromIndexes(
+      document: ResolveSchema<TSchema>,
+      prefix = ""
+    ) {
+      for (const key of Object.keys(document)) {
+        const propName = `${prefix}${key}`;
+        const propValue = document[key];
+
+        const idx = textIndex.get(propName)!;
+
+        if (typeof propValue === "string") {
+          const tokens = tokenize(propValue);
+
+          for (const token of tokens) {
+            if (idx.removeDocByWord(token, docID)) {
+              throw `Unable to remove document "${docID}" from index "${key}" on word "${token}".`;
+            }
+          }
+        } else if (typeof propValue === "number") {
+          const idxs = numericIndex.get(propName);
+          if (!idxs) continue;
+          const nodeIndex = binarySearch(
+            idxs?.queue,
+            (current) => current.priority - propValue
+          );
+          if (nodeIndex === -1) continue;
+          idxs.queue[nodeIndex].payload.delete(docID);
+        } else if (typeof propValue === "boolean") {
+          booleanIndex.delete(`${propName}_${propValue}`);
+        } else if (typeof propValue === "object") {
+          removeDocFromIndexes(
+            propValue as ResolveSchema<TSchema>,
+            `${propName}.`
+          );
         }
       }
     }
