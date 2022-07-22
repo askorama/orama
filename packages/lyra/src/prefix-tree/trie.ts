@@ -63,6 +63,18 @@ export class Trie {
       }
     }
 
+    const [word, docIDs] = node.getWord();
+
+    if (exact && word === term) {
+      output[word] = new Set();
+
+      for (const doc of docIDs) {
+        output[word].add(doc);
+      }
+
+      return output;
+    }
+
     findAllWords(node, output);
 
     function findAllWords(_node: TrieNode, _output: FindResult) {
