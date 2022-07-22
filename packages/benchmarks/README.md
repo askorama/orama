@@ -15,3 +15,4 @@ You can find the full dataset
 | **Exact search**   | `"onde si muovono a diversi porti"` | `"*"`      | `N/A`          | 496μs        | 268     |
 | **Typo tolerance** | `"ode si mossero a divisi porte"`   | `"*"`      | `5`            | 49ms         | 43023   |
 | **Typo tolerance** | `"ode si mossero a divisi porte"`   | `["txt"]`  | `5`            | 5ms          | 7430    |
+
