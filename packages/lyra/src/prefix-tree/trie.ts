@@ -63,27 +63,34 @@ export class Trie {
       }
     }
 
+    // avoid the recursive call if the word is the same as the term
     const [word, docIDs] = node.getWord();
 
     if (exact && word === term) {
       output[word] = new Set();
 
-      for (const doc of docIDs) {
-        output[word].add(doc);
-      }
+      handleOutput(word, docIDs, output);
 
       return output;
     }
 
     findAllWords(node, output);
 
+    function handleOutput(
+      word: string,
+      docIDs: Set<string>,
+      _output: FindResult
+    ): void {
+      if (docIDs.size) {
+        for (const doc of docIDs) {
+          _output[word] && _output[word].add(doc);
+        }
+      }
+    }
+
     function findAllWords(_node: TrieNode, _output: FindResult) {
       if (_node.end) {
         const [word, docIDs] = _node.getWord();
-
-        if (exact && word !== term) {
-          return output;
-        }
 
         if (!(word in _output)) {
           if (tolerance) {
@@ -103,12 +110,7 @@ export class Trie {
           }
         }
 
-        if (docIDs?.size) {
-          for (const doc of docIDs) {
-            // check if _output[word] exists and then add the doc to it
-            _output[word] && _output[word].add(doc);
-          }
-        }
+        handleOutput(word, docIDs, _output);
       }
 
       for (const childNode of _node.children?.values() ?? []) {
