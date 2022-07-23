@@ -229,8 +229,10 @@ describe("lyra", () => {
     await db.insert({ txt: "abc" });
     await db.insert({ txt: "abc" });
     await db.insert({ txt: "abcd" });
+    await db.insert({ txt: "abc" });
+
     await db.insert({ txt: "abcd" });
-    await db.insert({ txt: "abcd" });
+    await db.insert({ txt: "abc" });
     await db.insert({ txt: "abcd" });
 
     const search = await db.search({ term: "abc", exact: true });
@@ -241,7 +243,7 @@ describe("lyra", () => {
     const search2 = await db.search({ term: "abc", exact: true });
 
     expect(search2.hits.every(({ id: docID }) => docID !== id)).toBe(true);
-    expect(search2.count).toBe(1);
+    expect(search2.count).toBe(3);
   });
 
   it("Should preserve identical docs after deletion", async () => {
