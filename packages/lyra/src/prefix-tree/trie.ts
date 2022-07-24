@@ -90,11 +90,11 @@ export class Trie {
             _output[word] = new Set();
           }
         }
-
-        if (docIDs?.size) {
+        const findResultSet: Set<string> = _output[word];
+        if (docIDs?.size && findResultSet) {
           for (const doc of docIDs) {
-            // check if _output[word] exists and then add the doc to it
-            _output[word] && _output[word].add(doc);
+            // check if findResultSet exists and then add the doc to it
+            findResultSet && findResultSet.add(doc);
           }
         }
       }
