@@ -112,12 +112,12 @@ export class Trie {
     if (!word) return false;
 
     function removeWord(node: TrieNode, _word: string, docID: string): boolean {
-      const [nodeWord /**_docs*/] = node.getWord();
+      const [nodeWord, docIDs] = node.getWord();
 
       if (node.end || (exact && node.end && nodeWord === word)) {
         node.removeDoc(docID);
 
-        if (node.children?.size) {
+        if (node.children?.size && docIDs.has(docID)) {
           node.end = false;
         }
 
