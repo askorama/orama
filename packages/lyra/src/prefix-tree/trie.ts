@@ -94,7 +94,7 @@ export class Trie {
         if (docIDs?.size && findResultSet) {
           for (const doc of docIDs) {
             // check if findResultSet exists and then add the doc to it
-            findResultSet && findResultSet.add(doc);
+            findResultSet.add(doc);
           }
         }
       }
