@@ -1,6 +1,5 @@
-import type { queueAsPromised } from "fastq";
 import { nanoid } from "nanoid";
-import * as fastq from "fastq";
+import fastq from "fastq";
 import { Trie } from "./prefix-tree/trie";
 import * as ERRORS from "./errors";
 import toFastProperties, { insertWithFastProperties } from "./fast-properties";
@@ -43,6 +42,11 @@ export type InsertConfig = {
   stemming: boolean;
 };
 
+export type LyraData<TSchema extends PropertiesSchema = PropertiesSchema> = {
+  docs: LyraDocs<TSchema>
+  index: LyraIndex, 
+}
+
 type LyraIndex = Record<string, Trie>;
 
 type QueueDocParams<TTSchema extends PropertiesSchema> = {
@@ -51,11 +55,11 @@ type QueueDocParams<TTSchema extends PropertiesSchema> = {
   config: InsertConfig;
 };
 
-type SearchResult<TTSchema extends PropertiesSchema> = Promise<{
+type SearchResult<TTSchema extends PropertiesSchema> = {
   count: number;
   hits: RetrievedDoc<TTSchema>[];
   elapsed: string;
-}>;
+};
 
 type RetrievedDoc<TDoc extends PropertiesSchema> = ResolveSchema<TDoc> & {
   id: string;
@@ -69,7 +73,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private enableStemming = true;
   private edge = false;
 
-  private queue: queueAsPromised<QueueDocParams<TSchema>> = fastq.promise(
+  private queue: fastq.queue<QueueDocParams<TSchema>> = fastq(
     this,
     this._insert,
     1
@@ -110,7 +114,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     }
   }
 
-  async search(
+  search(
     params: SearchParams<TSchema>,
     language: Language = this.defaultLanguage
   ): SearchResult<TSchema> {
@@ -129,7 +133,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
 
     for (const term of tokens) {
       for (const index of indices) {
-        const documentIDs = await this.getDocumentIDsFromSearch({
+        const documentIDs = this.getDocumentIDsFromSearch({
           ...params,
           index,
           term,
@@ -192,7 +196,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     return indices as string[];
   }
 
-  async delete(docID: string): Promise<boolean> {
+  delete(docID: string): boolean {
     if (!(docID in this.docs)) {
       throw ERRORS.DOC_ID_DOES_NOT_EXISTS(docID);
     }
@@ -216,9 +220,9 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     return true;
   }
 
-  private async getDocumentIDsFromSearch(
+  private getDocumentIDsFromSearch(
     params: SearchParams<TSchema> & { index: string }
-  ): Promise<string[]> {
+  ): string[] {
     const idx = this.index[params.index];
 
     const searchResult = idx?.find({
@@ -237,13 +241,13 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     return Array.from(ids);
   }
 
-  public async insert(
+  public insert(
     doc: ResolveSchema<TSchema>,
     config: InsertConfig = {
       language: this.defaultLanguage,
       stemming: this.enableStemming,
-    }
-  ): Promise<{ id: string }> {
+    }    
+  ): { id: string } {
     const id = nanoid();
     const language = config.language ?? this.defaultLanguage;
 
@@ -251,11 +255,11 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       throw ERRORS.LANGUAGE_NOT_SUPPORTED(language);
     }
 
-    if (!(await this.checkInsertDocSchema(doc))) {
+    if (!this.checkInsertDocSchema(doc)) {
       throw ERRORS.INVALID_DOC_SCHEMA(this.schema, doc);
     }
 
-    await this.queue.push({
+    this.queue.push({
       id,
       doc,
       config,
@@ -264,11 +268,11 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     return { id };
   }
 
-  private async _insert({
+  private _insert({
     doc,
     id,
-    config,
-  }: QueueDocParams<TSchema>): Promise<void> {
+    config    
+  }: QueueDocParams<TSchema>, cb: (error: Error | null) => void): void {
     const index = this.index;
     this.docs = insertWithFastProperties(this.docs, id, doc);
 
@@ -281,7 +285,11 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
             doc[key] as ResolveSchema<TSchema>,
             `${propName}.`
           );
-        } else if (typeof doc[key] === "string") {
+
+          return;
+        } 
+        
+        if (typeof doc[key] === "string") {
           // Use propName here because if doc is a nested object
           // We will get the wrong index
           const requestedTrie = index[propName];
@@ -295,15 +303,17 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
             requestedTrie?.insert(token, id);
           }
         }
+      
+        cb(null);
       }
     }
 
     recursiveTrieInsertion(doc);
   }
 
-  private async checkInsertDocSchema(
+  private checkInsertDocSchema(
     doc: QueueDocParams<TSchema>["doc"]
-  ): Promise<boolean> {
+  ): boolean {
     function recursiveCheck(
       newDoc: QueueDocParams<TSchema>["doc"],
       schema: PropertiesSchema
@@ -330,31 +340,16 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     return recursiveCheck(doc, this.schema);
   }
 
-  get getIndex(): LyraIndex {
-    if (this.edge) return this.index;
-
-    throw ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("getIndex");
+  save(): LyraData<TSchema> {
+    return {index: this.index, docs: this.docs};
   }
 
-  get getDocs(): LyraDocs<TSchema> {
-    if (this.edge) return this.docs;
-
-    throw ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("getDocs");
-  }
-
-  set setIndex(indexContent: LyraIndex) {
-    if (this.edge) {
-      this.index = indexContent;
-    } else {
-      throw ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("setIndex");
-    }
-  }
-
-  set setDocs(docsContent: LyraDocs<TSchema>) {
-    if (this.edge) {
-      this.docs = docsContent;
-    } else {
+  load({index, docs}: LyraData<TSchema>) {
+    if(!this.edge) {
       throw ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("setDocs");
     }
+
+    this.index = index;
+    this.docs = docs;
   }
 }

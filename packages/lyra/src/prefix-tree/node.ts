@@ -8,6 +8,7 @@ type NodeContent = [string, Docs];
 
 export class TrieNode {
   public key: string;
+  public word: string;
   public parent: Nullable<TrieNode> = null;
   public children: Nullable<Children> = {};
   public docs: Docs = [];
@@ -15,10 +16,16 @@ export class TrieNode {
 
   constructor(key: string) {
     this.key = key;
+    this.word = '';
+  }
+
+  get content(): NodeContent {
+    return [this.word, this.docs];
   }
 
   setParent(newParent: TrieNode): void {
     this.parent = newParent;
+    this.word = newParent.word + this.key;
   }
 
   setEnd(val: boolean): void {
@@ -27,19 +34,6 @@ export class TrieNode {
 
   deleteChildren() {
     this.children = null;
-  }
-
-  getWord(): NodeContent {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let node: TrieNode = this;
-    let output = "";
-
-    while (node !== null) {
-      output = node.key + output;
-      node = node.parent!;
-    }
-
-    return [output, this.docs];
   }
 
   removeDoc(docID: string): boolean {

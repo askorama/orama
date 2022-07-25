@@ -67,7 +67,7 @@ export class Trie {
 
     function findAllWords(_node: TrieNode, _output: FindResult) {
       if (_node.end) {
-        const [word, docIDs] = _node.getWord();
+        const [word, docIDs] = _node.content;
 
         if (exact && word !== term) {
           return output;
@@ -116,7 +116,7 @@ export class Trie {
     if (!word) return false;
 
     function removeWord(node: TrieNode, _word: string, docID: string): boolean {
-      const [nodeWord] = node.getWord();
+      const nodeWord = node.word;
 
       if (node.end && nodeWord === word) {
         node.removeDoc(docID);
@@ -145,7 +145,7 @@ export class Trie {
     if (!word) return false;
 
     function removeWord(node: TrieNode, _word: string): boolean {
-      if (node.end && node.getWord()[0] === word) {
+      if (node.end && node.word === word) {
         if (node.children?.size) {
           node.end = false;
         } else {

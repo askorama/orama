@@ -1,7 +1,7 @@
 import { formatBytes, formatNanoseconds } from "../src/utils";
 
 describe("utils", () => {
-  it("should correctly format bytes", async () => {
+  it("should correctly format bytes", () => {
     expect(formatBytes(0)).toBe("0 Bytes");
     expect(formatBytes(1)).toBe("1 Bytes");
     expect(formatBytes(1024)).toBe("1 KB");
@@ -13,7 +13,7 @@ describe("utils", () => {
     expect(formatBytes(1024 ** 7)).toBe("1 ZB");
   });
 
-  it("should correctly format nanoseconds", async () => {
+  it("should correctly format nanoseconds", () => {
     expect(formatNanoseconds(1_000_000n)).toBe("1ms");
     expect(formatNanoseconds(1_000_000_000n)).toBe("1000ms"); // 1s
     expect(formatNanoseconds(1_000_000_000_000n)).toBe("1000000ms"); // 1m
