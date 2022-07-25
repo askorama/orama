@@ -106,18 +106,21 @@ async function searchBenchmark(db, query) {
   const results = Array.from({ length: 1000 });
 
   for (let i = 0; i < results.length; i++) {
-    const { elapsed } = await db.search(query);
+    const { elapsed, count } = await db.search(query);
     const isMicrosecond = elapsed.endsWith("μs");
     const timeAsStr = isMicrosecond
       ? elapsed.replace("ms", "")
       : elapsed.replace("μs", "");
     const time = parseInt(timeAsStr) * (isMicrosecond ? 1 : 1000);
-    results[i] = time;
+    results[i] = [time, count];
   }
 
-  const total = Math.floor(results.reduce((x, y) => x + y, 0) / results.length);
+  const total = Math.floor(results[0].reduce((x, y) => x + y, 0) / results.length);
+  const counts = Math.floor(results[1].reduce((x, y) => x + y, 0) / results.length);
 
-  return total > 1000 ? `${total}ms` : `${total}μs`;
+  const time = total > 1000 ? `${total}ms` : `${total}μs`;
+
+  return `${counts} results in ${time}`;
 }
 
 main();
