@@ -284,8 +284,9 @@ describe("lyra", () => {
     const id = search.hits[0].id;
     await db.delete(id);
 
-    const search2 = await db.search({ term: "abc" });
+    const search2 = await db.search({ term: "abc", exact: true });
 
+    expect(search2.hits.every(({ id: docID }) => docID !== id)).toBeTruthy();
     expect(search2.count).toBe(1);
   });
 
