@@ -1,25 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Should tokenize and stem correctly in dutch 1`] = `
-Set {
+Array [
   "de",
   "klein",
   "koei",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in dutch 2`] = `
-Set {
+Array [
   "ik",
   "heb",
   "wat",
   "taart",
   "gemaakt",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in english 1`] = `
-Set {
+Array [
   "the",
   "quick",
   "brown",
@@ -28,51 +28,51 @@ Set {
   "over",
   "lazi",
   "dog",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in english 2`] = `
-Set {
+Array [
   "I",
   "bake",
   "some",
   "cake",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in french 1`] = `
-Set {
+Array [
   "voyon",
   "quel",
   "temp",
   "il",
   "fait",
   "dehor",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in french 2`] = `
-Set {
+Array [
   "j",
   "ai",
   "fait",
   "de",
   "g",
   "teau",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in italian 1`] = `
-Set {
+Array [
   "ho",
   "cucin",
   "dell",
   "tort",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in italian 2`] = `
-Set {
+Array [
   "dorm",
   "una",
   "cos",
@@ -82,20 +82,20 @@ Set {
   "test",
   "non",
   "pass",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in norwegian 1`] = `
-Set {
+Array [
   "jeg",
   "kokt",
   "noen",
   "kak",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in norwegian 2`] = `
-Set {
+Array [
   "sov",
   "er",
   "en",
@@ -105,20 +105,20 @@ Set {
   "r",
   "test",
   "mislykk",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in portugese 1`] = `
-Set {
+Array [
   "eu",
   "cozinh",
   "alguns",
   "bol",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in portugese 2`] = `
-Set {
+Array [
   "dorm",
   "uma",
   "cois",
@@ -128,38 +128,38 @@ Set {
   "os",
   "test",
   "falh",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in russian 1`] = `
-Set {
+Array [
   "я",
   "приготов",
   "пирожн",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in russian 2`] = `
-Set {
+Array [
   "спат",
   "трудн",
   "когд",
   "тест",
   "не",
   "срабатыва",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in spanish 1`] = `
-Set {
+Array [
   "cocin",
   "unos",
   "pastel",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in spanish 2`] = `
-Set {
+Array [
   "dorm",
   "es",
   "algo",
@@ -168,21 +168,21 @@ Set {
   "las",
   "prueb",
   "fall",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in swedish 1`] = `
-Set {
+Array [
   "jag",
   "lag",
   "n",
   "gra",
   "kak",
-}
+]
 `;
 
 exports[`Should tokenize and stem correctly in swedish 2`] = `
-Set {
+Array [
   "att",
   "sov",
   "r",
@@ -192,5 +192,5 @@ Set {
   "n",
   "test",
   "misslyck",
-}
+]
 `;

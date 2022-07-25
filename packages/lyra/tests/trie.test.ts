@@ -1,66 +1,66 @@
-import { Trie } from "../src/prefix-tree/trie";
+import { Trie } from '../src/prefix-tree/trie'
 
 const phrases = [
-  { id: "1", doc: "the quick, brown fox" },
-  { id: "2", doc: "jumps over the lazy dog" },
-  { id: "3", doc: "just in time!" },
-  { id: "4", doc: "there is something wrong in there" },
-  { id: "5", doc: "this is me" },
-  { id: "6", doc: "thought it was sunday" },
-  { id: "7", doc: "let's try this trie" },
-];
+  { id: '1', doc: 'the quick, brown fox' },
+  { id: '2', doc: 'jumps over the lazy dog' },
+  { id: '3', doc: 'just in time!' },
+  { id: '4', doc: 'there is something wrong in there' },
+  { id: '5', doc: 'this is me' },
+  { id: '6', doc: 'thought it was sunday' },
+  { id: '7', doc: "let's try this trie" }
+]
 
-describe("trie", () => {
-  it("should correctly index phrases into a prefix tree", () => {
-    const trie = new Trie();
+describe('trie', () => {
+  it('should correctly index phrases into a prefix tree', () => {
+    const trie = new Trie()
 
     for (const { doc, id } of phrases) {
-      trie.insert(doc, id);
+      trie.insert(doc, id)
     }
 
     for (const phrase of phrases) {
-      expect(trie.contains(phrase.doc)).toBeTruthy();
+      expect(trie.contains(phrase.doc)).toBeTruthy()
     }
-  });
+  })
 
-  it("should correctly find an element by prefix", () => {
-    const trie = new Trie();
+  it('should correctly find an element by prefix', () => {
+    const trie = new Trie()
 
     for (const { doc, id } of phrases) {
-      trie.insert(doc, id);
+      trie.insert(doc, id)
     }
 
     expect(trie.find({ term: phrases[5].doc.slice(0, 5) })).toStrictEqual({
-      [phrases[5].doc]: new Set(phrases[5].id),
-    });
-    expect(trie.find({ term: "th" })).toMatchInlineSnapshot(`
+      [phrases[5].doc]: [phrases[5].id]
+    })
+    expect(trie.find({ term: 'th' })).toMatchInlineSnapshot(`
       Object {
-        "the quick, brown fox": Set {
+        "the quick, brown fox": Array [
           "1",
-        },
-        "there is something wrong in there": Set {
+        ],
+        "there is something wrong in there": Array [
           "4",
-        },
-        "this is me": Set {
+        ],
+        "this is me": Array [
           "5",
-        },
-        "thought it was sunday": Set {
+        ],
+        "thought it was sunday": Array [
           "6",
-        },
+        ],
       }
-    `);
-  });
+    `)
+  })
 
-  it("should correctly delete a word from the trie", () => {
-    const trie = new Trie();
+  it('should correctly delete a word from the trie', () => {
+    const trie = new Trie()
 
     for (const { doc, id } of phrases) {
-      trie.insert(doc, id);
+      trie.insert(doc, id)
     }
 
-    trie.remove(phrases[0].doc);
+    trie.remove(phrases[0].doc)
 
-    expect(trie.contains(phrases[0].doc)).toBeFalsy();
-    expect(trie.find({ term: phrases[0].doc })).toStrictEqual({});
-  });
-});
+    expect(trie.contains(phrases[0].doc)).toBeFalsy()
+    expect(trie.find({ term: phrases[0].doc })).toStrictEqual({})
+  })
+})

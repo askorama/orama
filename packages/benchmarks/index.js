@@ -5,8 +5,8 @@ import indexing from "./engines/indexing.js";
 import typoTolerance from "./engines/typo-tolerance.js";
 import prefixSearchMovies from "./engines/prefix-search-movies.js";
 
-cronometro(indexing);
-cronometro(prefixSearch);
-cronometro(exactSearch);
-cronometro(typoTolerance);
-cronometro(prefixSearchMovies);
+await cronometro(indexing);
+await cronometro(prefixSearch);
+await cronometro(exactSearch);
+await cronometro(typoTolerance);
+await cronometro(prefixSearchMovies);

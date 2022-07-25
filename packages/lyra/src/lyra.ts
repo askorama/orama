@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import * as fastq from "fastq";
 import { Trie } from "./prefix-tree/trie";
 import * as ERRORS from "./errors";
+import toFastProperties, { insertWithFastProperties } from "./fast-properties";
 import { tokenize } from "./tokenizer";
 import { formatNanoseconds, getNanosecondsTime } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./stemmer";
@@ -23,7 +24,7 @@ export type LyraProperties<
   edge?: boolean;
 };
 
-export type LyraDocs<TDoc extends PropertiesSchema> = Map<
+export type LyraDocs<TDoc extends PropertiesSchema> = Record<
   string,
   ResolveSchema<TDoc>
 >;
@@ -42,7 +43,7 @@ export type InsertConfig = {
   stemming: boolean;
 };
 
-type LyraIndex = Map<string, Trie>;
+type LyraIndex = Record<string, Trie>;
 
 type QueueDocParams<TTSchema extends PropertiesSchema> = {
   id: string;
@@ -63,8 +64,8 @@ type RetrievedDoc<TDoc extends PropertiesSchema> = ResolveSchema<TDoc> & {
 export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   private defaultLanguage: Language = "english";
   private schema: TSchema;
-  private docs: LyraDocs<TSchema> = new Map();
-  private index: LyraIndex = new Map();
+  private docs: LyraDocs<TSchema> = {};
+  private index: LyraIndex = {};
   private enableStemming = true;
   private edge = false;
 
@@ -104,7 +105,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       if (isNested) {
         this.buildIndex(schema[prop] as TSchema, `${propName}.`);
       } else {
-        this.index.set(propName, new Trie());
+        this.index = insertWithFastProperties(this.index, propName, new Trie());
       }
     }
   }
@@ -113,7 +114,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     params: SearchParams<TSchema>,
     language: Language = this.defaultLanguage
   ): SearchResult<TSchema> {
-    const tokens = tokenize(params.term, language).values();
+    const tokens = tokenize(params.term, language);
     const indices = this.getIndices(params.properties);
     const { limit = 10, offset = 0, exact = false } = params;
     const results: RetrievedDoc<TSchema>[] = Array.from({
@@ -135,27 +136,25 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
           exact,
         });
 
-        count += documentIDs.size;
+        count += documentIDs.length;
 
         if (i >= limit) {
           break;
         }
 
-        if (documentIDs.size) {
-          for (const id of documentIDs) {
-            if (j < offset) {
-              j++;
-              continue;
-            }
-
-            if (i >= limit) {
-              break;
-            }
-
-            const fullDoc = this.docs.get(id)!;
-            results[i] = { id, ...fullDoc };
-            i++;
+        for (const id of documentIDs) {
+          if (j < offset) {
+            j++;
+            continue;
           }
+
+          if (i >= limit) {
+            break;
+          }
+
+          const fullDoc = this.docs[id]!;
+          results[i] = { id, ...fullDoc };
+          i++;
         }
       }
     }
@@ -170,7 +169,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   }
 
   private getIndices(indices: SearchParams<TSchema>["properties"]): string[] {
-    const knownIndices = [...this.index.keys()];
+    const knownIndices = Object.keys(this.index);
 
     if (!indices) {
       return knownIndices;
@@ -194,15 +193,15 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
   }
 
   async delete(docID: string): Promise<boolean> {
-    if (!this.docs.has(docID)) {
+    if (!(docID in this.docs)) {
       throw ERRORS.DOC_ID_DOES_NOT_EXISTS(docID);
     }
 
-    const document = this.docs.get(docID)!;
+    const document = this.docs[docID];
 
     for (const key in document) {
-      const idx = this.index.get(key)!;
-      const tokens = tokenize((document as any)[key]);
+      const idx = this.index[key];
+      const tokens = tokenize(document[key] as string);
 
       for (const token of tokens) {
         if (idx.removeDocByWord(token, docID)) {
@@ -211,15 +210,16 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
       }
     }
 
-    this.docs.delete(docID);
+    delete this.docs[docID];
+    this.docs = toFastProperties(this.docs);
 
     return true;
   }
 
   private async getDocumentIDsFromSearch(
     params: SearchParams<TSchema> & { index: string }
-  ): Promise<Set<string>> {
-    const idx = this.index.get(params.index);
+  ): Promise<string[]> {
+    const idx = this.index[params.index];
 
     const searchResult = idx?.find({
       term: params.term,
@@ -229,11 +229,12 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     const ids = new Set<string>();
 
     for (const key in searchResult) {
-      for (const id of (searchResult as any)[key]) {
+      for (const id of searchResult[key]) {
         ids.add(id);
       }
     }
-    return ids;
+
+    return Array.from(ids);
   }
 
   public async insert(
@@ -269,7 +270,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
     config,
   }: QueueDocParams<TSchema>): Promise<void> {
     const index = this.index;
-    this.docs.set(id, doc);
+    this.docs = insertWithFastProperties(this.docs, id, doc);
 
     function recursiveTrieInsertion(doc: ResolveSchema<TSchema>, prefix = "") {
       for (const key of Object.keys(doc)) {
@@ -283,7 +284,7 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
         } else if (typeof doc[key] === "string") {
           // Use propName here because if doc is a nested object
           // We will get the wrong index
-          const requestedTrie = index.get(propName);
+          const requestedTrie = index[propName];
           const tokens = tokenize(
             doc[key] as string,
             config.language,
@@ -312,12 +313,12 @@ export class Lyra<TSchema extends PropertiesSchema = PropertiesSchema> {
           return false;
         }
 
-        const propType = typeof (newDoc as any)[key];
+        const propType = typeof newDoc[key];
 
         if (propType === "object") {
-          recursiveCheck((newDoc as any)[key], schema);
+          recursiveCheck(newDoc[key] as QueueDocParams<TSchema>["doc"], schema);
         } else {
-          if (typeof (newDoc as any)[key] !== schema[key]) {
+          if (typeof newDoc[key] !== schema[key]) {
             return false;
           }
         }

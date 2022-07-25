@@ -2,7 +2,7 @@ import type { Nullable } from "../types";
 
 type Children = Record<string, TrieNode>;
 
-type Docs = Set<string> | string[];
+type Docs = string[];
 
 type NodeContent = [string, Docs];
 
@@ -10,7 +10,7 @@ export class TrieNode {
   public key: string;
   public parent: Nullable<TrieNode> = null;
   public children: Nullable<Children> = {};
-  public docs: Docs = new Set();
+  public docs: Docs = [];
   public end = false;
 
   constructor(key: string) {
@@ -43,22 +43,14 @@ export class TrieNode {
   }
 
   removeDoc(docID: string): boolean {
-    if (this.docs instanceof Set) {
-      return this.docs.delete(docID);
+    const index = this.docs.indexOf(docID);
+
+    if (index === -1) {
+      return false;
     }
 
-    if (this.docs instanceof Array) {
-      const index = this.docs.indexOf(docID);
+    this.docs.splice(index, 1);
 
-      if (index === -1) {
-        return false;
-      }
-
-      this.docs.splice(index, 1);
-
-      return true;
-    }
-
-    return false;
+    return true;
   }
 }

@@ -7,12 +7,12 @@ export function tokenize(
   input: string,
   language: Language = "english",
   enableStemming = true
-): Set<string> {
+): string[] {
   const tokens = tokenizer.tokenize(input);
 
   if (!enableStemming) {
-    return new Set(tokens);
+    return Array.from(new Set(tokens));
   }
 
-  return new Set(stemArray(tokens, language));
+  return Array.from(new Set(stemArray(tokens, language)));
 }

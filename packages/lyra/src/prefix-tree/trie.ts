@@ -8,9 +8,7 @@ export type FindParams = {
   tolerance?: number;
 };
 
-export type FindResult = {
-  [key: string]: Set<string>;
-};
+export type FindResult = Record<string,  string[]>;
 
 export class Trie {
   private root = new TrieNode("");
@@ -34,11 +32,7 @@ export class Trie {
 
       if (i === wordLength - 1) {
         node.setEnd(true);
-        if (node.docs instanceof Set) {
-          node.docs.add(docId);
-        } else {
-          node.docs.push(docId);
-        }
+        node.docs.push(docId);
       }
     }
   }
@@ -89,19 +83,23 @@ export class Trie {
               const distance = levenshtein(term, word);
 
               // if the distance is greater than the tolerance, we don't need to add the word to the output
-              distance <= tolerance && (_output[word] = new Set());
+              distance <= tolerance && (_output[word] = []);
             }
           } else {
             // prevent default tolerance not set
-            _output[word] = new Set();
+            _output[word] = [];
           }
         }
 
-        if ((docIDs as Set<string>)?.size || (docIDs as string[]).length) {
+        // check if _output[word] exists and then add the doc to it
+        if (_output[word] && docIDs.length) {
+          const docs = new Set(_output[word]);
+
           for (const doc of docIDs) {
-            // check if _output[word] exists and then add the doc to it
-            _output[word] && _output[word].add(doc);
+            docs.add(doc);
           }
+
+          _output[word] = Array.from(docs);
         }
       }
 

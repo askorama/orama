@@ -1,5 +1,3 @@
-import fs from "fs/promises";
-import { serialize, deserialize } from "v8";
 import { Lyra } from "@nearform/lyra";
 
 async function main() {

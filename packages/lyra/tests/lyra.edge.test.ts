@@ -21,7 +21,7 @@ describe("Edge getters", () => {
     });
 
     const index = db.getIndex;
-    const nameIndex = index.get("name");
+    const nameIndex = index["name"];
 
     // Remember that tokenizers an stemmers sets content to lowercase
     expect(nameIndex?.contains("john")).toBeTruthy();
@@ -49,8 +49,8 @@ describe("Edge getters", () => {
 
     const docs = db.getDocs;
 
-    expect(docs.get(doc1.id)).toStrictEqual({ name: "John", age: 30 });
-    expect(docs.get(doc2.id)).toStrictEqual({ name: "Jane", age: 25 });
+    expect(docs[doc1.id]).toStrictEqual({ name: "John", age: 30 });
+    expect(docs[doc2.id]).toStrictEqual({ name: "Jane", age: 25 });
   });
 
   it("should correctly enable index setter", async () => {
