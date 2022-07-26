@@ -90,11 +90,11 @@ export class Trie {
             _output[word] = new Set();
           }
         }
-
-        if (docIDs?.size) {
+        const findResultSet: Set<string> = _output[word];
+        if (docIDs?.size && findResultSet) {
           for (const doc of docIDs) {
-            // check if _output[word] exists and then add the doc to it
-            _output[word] && _output[word].add(doc);
+            // check if findResultSet exists and then add the doc to it
+            findResultSet.add(doc);
           }
         }
       }
@@ -107,17 +107,17 @@ export class Trie {
     return output;
   }
 
-  removeDocByWord(word: string, docID: string): boolean {
+  removeDocByWord(word: string, docID: string, exact = false): boolean {
     const root = this.root;
     if (!word) return false;
 
     function removeWord(node: TrieNode, _word: string, docID: string): boolean {
-      const [nodeWord /**_docs*/] = node.getWord();
+      const [nodeWord, docIDs] = node.getWord();
 
-      if (node.end && nodeWord === word) {
+      if (node.end || (exact && node.end && nodeWord === word)) {
         node.removeDoc(docID);
 
-        if (node.children?.size) {
+        if (node.children?.size && docIDs.has(docID)) {
           node.end = false;
         }
 

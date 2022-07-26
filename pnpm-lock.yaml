@@ -87,13 +87,13 @@ importers:
       fastq: ^1.13.0
       jest: ^28.1.0
       nanoid: 3.3.4
-      natural: ^5.2.2
+      natural: ^5.2.3
       ts-jest: ^28.0.2
       typescript: ^4.6.4
     dependencies:
       fastq: 1.13.0
       nanoid: 3.3.4
-      natural: 5.2.2
+      natural: 5.2.3
     devDependencies:
       '@types/jest': 27.5.2
       '@types/natural': 5.1.1
@@ -4485,7 +4485,7 @@ packages:
       lodash: ^4.17.20
       marko: ^3.14.4
       mote: ^0.2.0
-      mustache: ^4.0.1
+      mustache: ^3.0.0
       nunjucks: ^3.2.2
       plates: ~0.4.11
       pug: ^3.0.0
@@ -9383,8 +9383,8 @@ packages:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
 
-  /natural/5.2.2:
-    resolution: {integrity: sha512-X2o4i/f0CeOyTTXKIsUw6lBLLlz6xSBbOxzS7nMacjmNYXlQw/M9MXOrWlRsRMuXyoiDc+rO6bnk1ZzSCaI6Fw==}
+  /natural/5.2.3:
+    resolution: {integrity: sha512-fsGGpbU15YBc2oQCEsi0t7ZeF3VmKyxDhgWucQTPk4zaDFzeZtquRbZt4xlznN2ZUlH88215HcThMYaDHFM48Q==}
     engines: {node: '>=0.4.10'}
     dependencies:
       afinn-165: 1.0.4
@@ -11835,7 +11835,7 @@ packages:
     dev: true
 
   /sylvester/0.0.12:
-    resolution: {integrity: sha1-WohEFc0tACxX56OqyZRip1zp/bQ=}
+    resolution: {integrity: sha512-SzRP5LQ6Ts2G5NyAa/jg16s8e3R7rfdFjizy1zeoecYWw+nGL+YA1xZvW/+iJmidBGSdLkuvdwTYEyJEb+EiUw==}
     engines: {node: '>=0.2.6'}
     dev: false
 

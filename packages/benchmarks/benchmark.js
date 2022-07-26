@@ -107,7 +107,6 @@ async function searchBenchmark(db, query) {
 
   for (let i = 0; i < results.length; i++) {
     const { elapsed } = await db.search(query);
-
     const isMicrosecond = elapsed.endsWith("μs");
     const timeAsStr = isMicrosecond
       ? elapsed.replace("ms", "")

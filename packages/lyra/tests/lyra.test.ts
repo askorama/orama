@@ -195,6 +195,52 @@ describe("lyra", () => {
     expect(searchResult.hits[0].id).toBe(id2);
   });
 
+  it("Shouldn't returns deleted documents", async () => {
+    const db = new Lyra({
+      schema: {
+        txt: "string",
+      },
+      stemming: false,
+    });
+
+    await db.insert({ txt: "stelle" });
+    await db.insert({ txt: "stellle" });
+    await db.insert({ txt: "scelte" });
+
+    const search = await db.search({ term: "stelle" });
+
+    const id = search.hits[0].id;
+
+    await db.delete(id);
+
+    const serach2 = await db.search({ term: "stelle" });
+
+    expect(serach2.count).toBe(1);
+  });
+
+  it("Shouldn't affects other document when deleted one", async () => {
+    const db = new Lyra({
+      schema: {
+        txt: "string",
+      },
+      stemming: false,
+    });
+
+    await db.insert({ txt: "abc" });
+    await db.insert({ txt: "abc" });
+    await db.insert({ txt: "abcd" });
+
+    const search = await db.search({ term: "abc", exact: true });
+
+    const id = search.hits[0].id;
+    await db.delete(id);
+
+    const search2 = await db.search({ term: "abc", exact: true });
+
+    expect(search2.hits.every(({ id: docID }) => docID !== id)).toBeTruthy();
+    expect(search2.count).toBe(1);
+  });
+
   it("Should preserve identical docs after deletion", async () => {
     const db = new Lyra({
       schema: {
