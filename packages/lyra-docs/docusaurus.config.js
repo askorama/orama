@@ -68,7 +68,6 @@ const config = {
             position: 'left',
             label: 'Getting Started',
           },
-          {to: '/blog', label: 'Playground', position: 'left'},
           {
             
             href: 'https://github.com/nearform/lyra',

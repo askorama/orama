@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
@@ -7,10 +7,13 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
 
 import styles from './index.module.css';
 import GithubStarsButton from '../components/HomepageFeatures/buttons/GithubStars';
+import DemoButton from '../components/HomepageFeatures/buttons/DemoButton';
 //import LyraLogo from '../components/HomepageFeatures/logo/lyraLogo';
 
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
+
+
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
@@ -24,6 +27,7 @@ function HomepageHeader() {
             to="/docs/introduction/getting-started">
             Get Started
           </Link>
+          <DemoButton />
           <GithubStarsButton user='nearform' repo="lyra" size="large" />
         </div>
       </div>
