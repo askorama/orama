@@ -29,6 +29,7 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
+html{scroll-behavior: smooth;}
 
 /** Github Icon in the navbar */
 .header-github-link:hover {

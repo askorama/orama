@@ -31,7 +31,9 @@
     "@docusaurus/types": "2.0.0-rc.1",
     "@tsconfig/docusaurus": "^1.0.5",
     "@types/react": "^18.0.0",
-    "typescript": "^4.7.4"
+    "node-polyfill-webpack-plugin": "^2.0.0",
+    "typescript": "^4.7.4",
+    "webpack": "^5.74.0"
   },
   "browserslist": {
     "production": [

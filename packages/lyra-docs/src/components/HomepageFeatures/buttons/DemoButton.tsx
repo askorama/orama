@@ -1,22 +1,16 @@
-import { clickedButton } from '@site/utils/types';
+import { DemoButtonProps } from '@site/utils/types';
+import Link from '@docusaurus/Link';
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styles from './buttons.module.css';
 
-const DemoButton: any = (): JSX.Element => {
-    const targetEl = document.querySelector('.demo');
-    // Show demo logic
-    const [showDemo, setShowDemo] = useState<boolean>(false);
-    const clicked: clickedButton = (): void => {
-        setShowDemo(!showDemo);
-    }
-
+const DemoButton = ({link}: DemoButtonProps): JSX.Element => {
     return (
-        <button className={clsx("button button--secondary button--lg", styles.demoButton)}
-            onClick={clicked}
+        <Link className={clsx("button button--secondary button--lg", styles.demoButton)}
+            to={link}
         >
             <span className="btn-text">Demo</span>
-        </button>
+        </Link>
     );
 }
 

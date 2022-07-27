@@ -52,7 +52,7 @@ const config = {
       }),
     ],
   ],
-
+  plugins: [require.resolve('./docusaurusWebpack5Plugin')],
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
