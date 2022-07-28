@@ -11,19 +11,19 @@ export interface Node {
   end: boolean;
 }
 
-export function create(key = ''): Node {
+export function create(key = ""): Node {
   const node = {
     id: uniqueId(),
     key,
-    word: '',
+    word: "",
     parent: null,
     children: {},
     docs: [],
-    end: false    
-  }
+    end: false,
+  };
 
-  Object.defineProperty(node, 'toJSON', {value: serialize})
-  return node
+  Object.defineProperty(node, "toJSON", { value: serialize });
+  return node;
 }
 
 export function updateParent(node: Node, parent: Node): void {
@@ -44,7 +44,7 @@ export function removeDocument(node: Node, docID: string): boolean {
 }
 
 function serialize(this: Node): object {
-  const {key, word, children, docs, end} = this;
+  const { key, word, children, docs, end } = this;
 
-  return {key, word, children, docs, end}
+  return { key, word, children, docs, end };
 }

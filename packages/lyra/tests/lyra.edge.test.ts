@@ -91,8 +91,8 @@ describe("Edge getters", () => {
       age: 37,
     });
 
-    const {index, docs, nodes} = save(db2);
-    load(db, {index, docs, nodes});
+    const { index, docs, nodes } = save(db2);
+    load(db, { index, docs, nodes });
 
     const search1 = search(db, { term: "Jane" });
     const search2 = search(db, { term: "John" });

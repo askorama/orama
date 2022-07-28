@@ -8,8 +8,7 @@ function FastObject<T extends object>(object?: T): T {
     return result;
   }
 
-  fastProto = FastObject.prototype =
-    object == null ? Object.create(null) : object;
+  fastProto = FastObject.prototype = object == null ? Object.create(null) : object;
 
   // @ts-expect-error this is a hack to make the type checker happy (written by Copilot LOL)
   return new FastObject();

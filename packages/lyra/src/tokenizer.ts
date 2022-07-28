@@ -3,11 +3,7 @@ import { Language, stemArray } from "./stemmer";
 
 const tokenizer = new WordTokenizer();
 
-export function tokenize(
-  input: string,
-  language: Language = "english",
-  enableStemming = true
-): string[] {
+export function tokenize(input: string, language: Language = "english", enableStemming = true): string[] {
   const tokens = tokenizer.tokenize(input);
 
   if (!enableStemming) {

@@ -15,7 +15,7 @@ const db = new Lyra({
 
 function populateDB() {
   console.log("Populating the database...");
-  return new Promise(async (resolve) => {
+  return new Promise(async resolve => {
     const fileStream = fs.createReadStream("./dataset/title.tsv");
     const rl = readline.createInterface({
       input: fileStream,

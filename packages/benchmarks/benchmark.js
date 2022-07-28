@@ -1,10 +1,10 @@
 /*global console, process */
 
 import fs from "fs";
-import { readFile, writeFile } from 'fs/promises';
+import { readFile, writeFile } from "fs/promises";
 import readline from "readline";
 import { create, save, load, insert, search } from "@nearform/lyra";
-import dpack from 'dpack'
+import dpack from "dpack";
 
 const db = create({
   schema: {
@@ -12,7 +12,7 @@ const db = create({
     title: "string",
     category: "string",
   },
-  edge: true
+  edge: true,
 });
 
 async function populateDB() {
@@ -34,26 +34,26 @@ async function populateDB() {
     });
   }
 
-  const data = save(db)
+  const data = save(db);
 
-  console.time('Serializing')
-  await writeFile('./dataset/database.dpack', dpack.serialize(data))
-  console.timeEnd('Serializing')
+  console.time("Serializing");
+  await writeFile("./dataset/database.dpack", dpack.serialize(data));
+  console.timeEnd("Serializing");
 }
 
 async function restoreDB() {
   console.log("Restoring the database...");
 
-  console.time('Deserializing')
-  const serialized = dpack.parseLazy(await readFile('./dataset/database.dpack'))
-  console.timeEnd('Deserializing')
+  console.time("Deserializing");
+  const serialized = dpack.parseLazy(await readFile("./dataset/database.dpack"));
+  console.timeEnd("Deserializing");
 
-  load(db, serialized)
+  load(db, serialized);
 }
 
 async function main() {
-  if(process.env.RESTORE === 'true') {
-    await restoreDB()
+  if (process.env.RESTORE === "true") {
+    await restoreDB();
   } else {
     await populateDB();
   }
@@ -66,60 +66,46 @@ async function main() {
     term: "believe",
     properties: "*",
   });
-  console.log(
-    `Searching "believe" through 1M entries in all indices: ${searchOnAllIndices}`
-  );
+  console.log(`Searching "believe" through 1M entries in all indices: ${searchOnAllIndices}`);
 
   const exactSearchOnAllIndices = searchBenchmark(db, {
     term: "believe",
     properties: "*",
     exact: true,
   });
-  console.log(
-    `Exact search for "believe" through 1M entries in all indices: ${exactSearchOnAllIndices}`
-  );
+  console.log(`Exact search for "believe" through 1M entries in all indices: ${exactSearchOnAllIndices}`);
 
   const typoTolerantSearch = searchBenchmark(db, {
     term: "belve",
     properties: "*",
     tolerance: 2,
   });
-  console.log(
-    `Typo-tolerant search for "belve" through 1M entries in all indices: ${typoTolerantSearch}`
-  );
+  console.log(`Typo-tolerant search for "belve" through 1M entries in all indices: ${typoTolerantSearch}`);
 
   const searchOnSpecificIndex = searchBenchmark(db, {
     term: "believe",
     properties: ["title"],
   });
-  console.log(
-    `Searching "believe" through 1M entries in the "title" index: ${searchOnSpecificIndex}`
-  );
+  console.log(`Searching "believe" through 1M entries in the "title" index: ${searchOnSpecificIndex}`);
 
   const searchOnSpecificIndex2 = searchBenchmark(db, {
     term: "criminal minds",
     properties: ["title"],
   });
-  console.log(
-    `Searching "criminal minds" through 1M entries in the "title" index: ${searchOnSpecificIndex2}`
-  );
+  console.log(`Searching "criminal minds" through 1M entries in the "title" index: ${searchOnSpecificIndex2}`);
 
   const searchOnSpecificIndex3 = searchBenchmark(db, {
     term: "musical",
     properties: ["category"],
     exact: true,
   });
-  console.log(
-    `Searching "musical" through 1M entries in the "category" index: ${searchOnSpecificIndex3}`
-  );
+  console.log(`Searching "musical" through 1M entries in the "category" index: ${searchOnSpecificIndex3}`);
 
   const searchOnSpecificIndex4 = searchBenchmark(db, {
     term: "hero",
     properties: ["title"],
   });
-  console.log(
-    `Searching "hero" through 1M entries in the "title" index: ${searchOnSpecificIndex4}`
-  );
+  console.log(`Searching "hero" through 1M entries in the "title" index: ${searchOnSpecificIndex4}`);
 }
 
 function searchBenchmark(db, query) {
@@ -128,9 +114,7 @@ function searchBenchmark(db, query) {
   for (let i = 0; i < results.length; i++) {
     const { elapsed, count } = search(db, query);
     const isMicrosecond = elapsed.endsWith("μs");
-    const timeAsStr = isMicrosecond
-      ? elapsed.replace("ms", "")
-      : elapsed.replace("μs", "");
+    const timeAsStr = isMicrosecond ? elapsed.replace("ms", "") : elapsed.replace("μs", "");
     const time = parseInt(timeAsStr) * (isMicrosecond ? 1 : 1000);
     results[i] = [time, count];
   }

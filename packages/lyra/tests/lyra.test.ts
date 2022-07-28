@@ -19,12 +19,13 @@ describe("defaultLanguage", () => {
         schema: { foo: "string" },
       });
 
-      insert(db, 
+      insert(
+        db,
         {
           foo: "bar",
         },
         // @ts-expect-error latin is not supported
-        "latin"
+        "latin",
       );
     } catch (e) {
       expect(e).toMatchSnapshot();
@@ -52,9 +53,7 @@ describe("checkInsertDocSchema", () => {
       },
     });
 
-    expect(
-      insert(db, { quote: "hello, world!", author: "me" }).id
-    ).toBeDefined();
+    expect(insert(db, { quote: "hello, world!", author: "me" }).id).toBeDefined();
 
     try {
       // @ts-expect-error test error case
@@ -146,7 +145,7 @@ describe("lyra", () => {
       });
     } catch (err) {
       expect(err).toMatchInlineSnapshot(
-        `"Invalid property name. Expected a wildcard string (\\"*\\") or array containing one of the following properties: foo, baz, but got: bar"`
+        `"Invalid property name. Expected a wildcard string (\\"*\\") or array containing one of the following properties: foo, baz, but got: bar"`,
       );
     }
   });
@@ -165,8 +164,7 @@ describe("lyra", () => {
     });
 
     const { id: id2 } = insert(db, {
-      quote:
-        "To live is the rarest thing in the world. Most people exist, that is all.",
+      quote: "To live is the rarest thing in the world. Most people exist, that is all.",
       author: "Oscar Wilde",
     });
 
@@ -186,7 +184,7 @@ describe("lyra", () => {
     expect(searchResult.count).toBe(1);
     expect(searchResult.hits[0].author).toBe("Oscar Wilde");
     expect(searchResult.hits[0].quote).toBe(
-      "To live is the rarest thing in the world. Most people exist, that is all."
+      "To live is the rarest thing in the world. Most people exist, that is all.",
     );
     expect(searchResult.hits[0].id).toBe(id2);
   });
@@ -275,16 +273,12 @@ describe("lyra", () => {
     expect(res).toBeTruthy();
     expect(searchResult.count).toBe(1);
     expect(searchResult.hits[0].author).toBe("Oscar Wilde");
-    expect(searchResult.hits[0].quote).toBe(
-      "Be yourself; everyone else is already taken."
-    );
+    expect(searchResult.hits[0].quote).toBe("Be yourself; everyone else is already taken.");
     expect(searchResult.hits[0].id).toBe(id2);
 
     expect(searchResult2.count).toBe(1);
     expect(searchResult2.hits[0].author).toBe("Oscar Wilde");
-    expect(searchResult2.hits[0].quote).toBe(
-      "Be yourself; everyone else is already taken."
-    );
+    expect(searchResult2.hits[0].quote).toBe("Be yourself; everyone else is already taken.");
     expect(searchResult2.hits[0].id).toBe(id2);
   });
 
@@ -346,9 +340,7 @@ describe("lyra", () => {
     });
 
     expect(exactSearch.count).toBe(1);
-    expect(exactSearch.hits[0].quote).toBe(
-      "Be yourself; everyone else is already taken."
-    );
+    expect(exactSearch.hits[0].quote).toBe("Be yourself; everyone else is already taken.");
     expect(exactSearch.hits[0].author).toBe("Oscar Wilde");
   });
 
@@ -389,8 +381,7 @@ describe("lyra", () => {
     });
 
     insert(db, {
-      quote:
-        "Seahorses look mythical, like dragons, but these magnificent shy creatures are real.",
+      quote: "Seahorses look mythical, like dragons, but these magnificent shy creatures are real.",
       author: "Jennifer Keats Curtis",
     });
 

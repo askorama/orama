@@ -10,11 +10,11 @@ export type FindParams = {
   tolerance?: number;
 };
 
-export type FindResult = Record<string,  string[]>;
+export type FindResult = Record<string, string[]>;
 
 function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
   if (node.end) {
-    const {word, docs: docIDs} = node;
+    const { word, docs: docIDs } = node;
 
     if (exact && word !== term) {
       return;
@@ -28,7 +28,7 @@ function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string
         // if the tolerance is set, we need to calculate the distance using levenshtein algorithm
         // if the distance is greater than the tolerance, we don't need to add the word to the output
         if (difference <= tolerance && levenshtein(term, word) <= tolerance) {
-            output[word] = [];
+          output[word] = [];
         }
       } else {
         // prevent default tolerance not set
@@ -81,7 +81,7 @@ export function contains(nodes: Nodes, node: Node, word: string): boolean {
 
   for (let i = 0; i < wordLength; i++) {
     const char = word[i];
-    const next = node.children?.[char]; 
+    const next = node.children?.[char];
 
     if (next) {
       node = nodes[next];
@@ -99,7 +99,7 @@ export function find(nodes: Nodes, node: Node, { term, exact, tolerance }: FindP
 
   for (let i = 0; i < termLength; i++) {
     const char = term[i];
-    const next = node.children?.[char]; 
+    const next = node.children?.[char];
 
     if (node.children?.[char]) {
       node = nodes[next];
@@ -118,7 +118,7 @@ export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, doc
     return false;
   }
 
-  const {word: nodeWord, docs: docIDs} = node;
+  const { word: nodeWord, docs: docIDs } = node;
 
   if (node.end || (exact && node.end && nodeWord === word)) {
     removeDocument(node, docID);

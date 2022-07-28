@@ -14,19 +14,14 @@ export type PropertiesSchema = {
   [key: string]: PropertyType | PropertiesSchema;
 };
 
-export type LyraProperties<
-  T extends PropertiesSchema
-> = {
+export type LyraProperties<T extends PropertiesSchema> = {
   schema: T;
   defaultLanguage?: Language;
   stemming?: boolean;
   edge?: boolean;
 };
 
-export type LyraDocs<TDoc extends PropertiesSchema> = Record<
-  string,
-  ResolveSchema<TDoc>
->;
+export type LyraDocs<TDoc extends PropertiesSchema> = Record<string, ResolveSchema<TDoc>>;
 
 export type SearchParams<T extends PropertiesSchema> = {
   term: string;
@@ -43,10 +38,10 @@ export type InsertConfig = {
 };
 
 export type LyraData<T extends PropertiesSchema> = {
-  docs: LyraDocs<T>
-  index: LyraIndex, 
-  nodes: Nodes
-}
+  docs: LyraDocs<T>;
+  index: LyraIndex;
+  nodes: Nodes;
+};
 
 type LyraIndex = Record<string, Node>;
 
@@ -74,7 +69,7 @@ export interface Lyra<T extends PropertiesSchema> {
   index: LyraIndex;
   enableStemming: boolean;
   edge: boolean;
-  queue?: fastq.queue<QueueDocParams<T>, void>
+  queue?: fastq.queue<QueueDocParams<T>, void>;
 }
 
 function getIndices<T extends PropertiesSchema>(lyra: Lyra<T>, indices: SearchParams<T>["properties"]): string[] {
@@ -101,7 +96,10 @@ function getIndices<T extends PropertiesSchema>(lyra: Lyra<T>, indices: SearchPa
   return indices as string[];
 }
 
-function getDocumentIDsFromSearch<T extends PropertiesSchema>(lyra: Lyra<T>, params: SearchParams<T> & { index: string }): string[] {
+function getDocumentIDsFromSearch<T extends PropertiesSchema>(
+  lyra: Lyra<T>,
+  params: SearchParams<T> & { index: string },
+): string[] {
   const idx = lyra.index[params.index];
 
   const searchResult = trieFind(lyra.nodes, idx, {
@@ -137,11 +135,11 @@ function buildIndex<T extends PropertiesSchema>(lyra: Lyra<T>, schema: T, prefix
   }
 }
 
-function _insert<T extends PropertiesSchema>(this: Lyra<T>, {
-  doc,
-  id,
-  config    
-}: QueueDocParams<T>, cb: (error: Error | null) => void): void {
+function _insert<T extends PropertiesSchema>(
+  this: Lyra<T>,
+  { doc, id, config }: QueueDocParams<T>,
+  cb: (error: Error | null) => void,
+): void {
   const index = this.index;
   const nodes = this.nodes;
   this.docs = insertWithFastProperties(this.docs, id, doc);
@@ -151,29 +149,22 @@ function _insert<T extends PropertiesSchema>(this: Lyra<T>, {
       const isNested = typeof doc[key] === "object";
       const propName = `${prefix}${key}`;
       if (isNested) {
-        recursiveTrieInsertion(
-          doc[key] as ResolveSchema<T>,
-          `${propName}.`
-        );
+        recursiveTrieInsertion(doc[key] as ResolveSchema<T>, `${propName}.`);
 
         return;
-      } 
-      
+      }
+
       if (typeof doc[key] === "string") {
         // Use propName here because if doc is a nested object
         // We will get the wrong index
         const requestedTrie = index[propName];
-        const tokens = tokenize(
-          doc[key] as string,
-          config.language,
-          config.stemming
-        );
+        const tokens = tokenize(doc[key] as string, config.language, config.stemming);
 
         for (const token of tokens) {
           trieInsert(nodes, requestedTrie, token, id);
         }
       }
-    
+
       cb(null);
     }
   }
@@ -183,10 +174,7 @@ function _insert<T extends PropertiesSchema>(this: Lyra<T>, {
 }
 
 function checkInsertDocSchema<T extends PropertiesSchema>(lyra: Lyra<T>, doc: QueueDocParams<T>["doc"]): boolean {
-  function recursiveCheck(
-    newDoc: QueueDocParams<T>["doc"],
-    schema: PropertiesSchema
-  ): boolean {
+  function recursiveCheck(newDoc: QueueDocParams<T>["doc"], schema: PropertiesSchema): boolean {
     for (const key in newDoc) {
       if (!(key in schema)) {
         return false;
@@ -224,7 +212,7 @@ export function create<T extends PropertiesSchema>(properties: LyraProperties<T>
     index: {},
     enableStemming: properties.stemming ?? true,
     edge: properties.edge ?? false,
-  }
+  };
 
   instance.queue = fastq(instance, _insert.bind(instance), 1) as fastq.queue<QueueDocParams<T>>;
 
@@ -232,11 +220,12 @@ export function create<T extends PropertiesSchema>(properties: LyraProperties<T>
   return instance;
 }
 
-export function insert<T extends PropertiesSchema>(lyra: Lyra<T>, 
+export function insert<T extends PropertiesSchema>(
+  lyra: Lyra<T>,
   doc: ResolveSchema<T>,
-  config?: InsertConfig
+  config?: InsertConfig,
 ): { id: string } {
-  config = { language: lyra.defaultLanguage, stemming: lyra.enableStemming, ...config};
+  config = { language: lyra.defaultLanguage, stemming: lyra.enableStemming, ...config };
   const id = uniqueId(10);
 
   if (!SUPPORTED_LANGUAGES.includes(config.language)) {
@@ -267,7 +256,7 @@ export function remove<T extends PropertiesSchema>(lyra: Lyra<T>, docID: string)
     const idx = lyra.index[key];
     const tokens = tokenize(document[key] as string);
 
-    for (const token of tokens) {        
+    for (const token of tokens) {
       if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
         throw `Unable to remove document "${docID}" from index "${key}" on word "${token}".`;
       }
@@ -283,10 +272,10 @@ export function remove<T extends PropertiesSchema>(lyra: Lyra<T>, docID: string)
 export function search<T extends PropertiesSchema>(
   lyra: Lyra<T>,
   params: SearchParams<T>,
-  language?: Language
+  language?: Language,
 ): SearchResult<T> {
-  if(!language) {
-    language = lyra.defaultLanguage
+  if (!language) {
+    language = lyra.defaultLanguage;
   }
 
   const tokens = tokenize(params.term, language);
@@ -304,7 +293,7 @@ export function search<T extends PropertiesSchema>(
 
   for (const term of tokens) {
     for (const index of indices) {
-      const documentIDs = getDocumentIDsFromSearch(lyra, {...params, index, term, exact});
+      const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
 
       count += documentIDs.length;
 
@@ -339,11 +328,11 @@ export function search<T extends PropertiesSchema>(
 }
 
 export function save<T extends PropertiesSchema>(lyra: Lyra<T>): LyraData<T> {
-  return {index: lyra.index, docs: lyra.docs, nodes: lyra.nodes};
+  return { index: lyra.index, docs: lyra.docs, nodes: lyra.nodes };
 }
 
-export function load<T extends PropertiesSchema>(lyra: Lyra<T>, {index, docs, nodes}: LyraData<T>) {
-  if(!lyra.edge) {
+export function load<T extends PropertiesSchema>(lyra: Lyra<T>, { index, docs, nodes }: LyraData<T>) {
+  if (!lyra.edge) {
     throw ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("load");
   }
 

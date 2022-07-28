@@ -17,7 +17,7 @@ export type ResolveSchema<T extends PropertiesSchema> = {
 
 export type SearchProperties<
   TSchema extends PropertiesSchema,
-  TKey extends keyof TSchema = keyof TSchema
+  TKey extends keyof TSchema = keyof TSchema,
 > = TKey extends string
   ? TSchema[TKey] extends PropertiesSchema
     ? `${TKey}.${SearchProperties<TSchema[TKey]>}`
