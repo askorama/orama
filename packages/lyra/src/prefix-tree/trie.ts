@@ -1,6 +1,8 @@
-import toFastProperties from "../fast-properties";
-import { TrieNode } from "./node";
+import { insertWithFastProperties } from "../fast-properties";
+import { create as createNode, removeDocument, updateParent, Node } from "./node";
 import { levenshtein } from "../levenshtein";
+
+export type Nodes = Record<string, Node>;
 
 export type FindParams = {
   term: string;
@@ -10,158 +12,149 @@ export type FindParams = {
 
 export type FindResult = Record<string,  string[]>;
 
-export class Trie {
-  private root = new TrieNode("");
+function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
+  if (node.end) {
+    const {word, docs: docIDs} = node;
 
-  insert(word: string, docId: string): void {
-    const wordLength = word.length;
-    let node = this.root;
-
-    for (let i = 0; i < wordLength; i++) {
-      const char = word[i];
-
-      if (!node.children?.[char]) {
-        const newTrieNode = new TrieNode(char);
-        newTrieNode.setParent(node);
-        node.children![char] = newTrieNode;
-        node.children = toFastProperties(node.children!);
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-      node = node.children![char];
-
-      if (i === wordLength - 1) {
-        node.setEnd(true);
-        node.docs.push(docId);
-      }
+    if (exact && word !== term) {
+      return;
     }
-  }
 
-  contains(word: string): boolean {
-    let node = this.root;
+    if (!(word in output)) {
+      if (tolerance) {
+        // computing the absolute difference of letters between the term and the word
+        const difference = Math.abs(term.length - word.length);
 
-    for (const char of word) {
-      if (node.children?.[char]) {
-        node = node.children[char];
+        // if the tolerance is set, we need to calculate the distance using levenshtein algorithm
+        // if the distance is greater than the tolerance, we don't need to add the word to the output
+        if (difference <= tolerance && levenshtein(term, word) <= tolerance) {
+            output[word] = [];
+        }
       } else {
-        return false;
+        // prevent default tolerance not set
+        output[word] = [];
       }
     }
 
-    return node.end;
+    // check if _output[word] exists and then add the doc to it
+    if (output[word] && docIDs.length) {
+      const docs = new Set(output[word]);
+
+      for (const doc of docIDs) {
+        docs.add(doc);
+      }
+
+      output[word] = Array.from(docs);
+    }
   }
 
-  find({ term, exact, tolerance }: FindParams): FindResult {
-    let node = this.root;
-    const output: FindResult = {};
-
-    for (const char of term) {
-      if (node.children?.[char]) {
-        node = node.children[char];
-      } else if (!tolerance) {
-        return output;
-      }
-    }
-
-    findAllWords(node, output);
-
-    function findAllWords(_node: TrieNode, _output: FindResult) {
-      if (_node.end) {
-        const [word, docIDs] = _node.content;
-
-        if (exact && word !== term) {
-          return output;
-        }
-
-        if (!(word in _output)) {
-          if (tolerance) {
-            // computing the absolute difference of letters between the term and the word
-            const difference = Math.abs(term.length - word.length);
-
-            if (difference <= tolerance) {
-              // if the tolerance is set, we need to calculate the distance using levenshtein algorithm
-              const distance = levenshtein(term, word);
-
-              // if the distance is greater than the tolerance, we don't need to add the word to the output
-              distance <= tolerance && (_output[word] = []);
-            }
-          } else {
-            // prevent default tolerance not set
-            _output[word] = [];
-          }
-        }
-
-        // check if _output[word] exists and then add the doc to it
-        if (_output[word] && docIDs.length) {
-          const docs = new Set(_output[word]);
-
-          for (const doc of docIDs) {
-            docs.add(doc);
-          }
-
-          _output[word] = Array.from(docs);
-        }
-      }
-
-      for (const childNode in _node.children) {
-        findAllWords(_node.children[childNode], _output);
-      }
-    }
-
-    return output;
+  for (const childNode in node.children) {
+    findAllWords(nodes, nodes[node.children[childNode]], output, term, exact, tolerance);
   }
+}
 
-  removeDocByWord(word: string, docID: string): boolean {
-    const root = this.root;
-    if (!word) return false;
+export function insert(nodes: Nodes, node: Node, word: string, docId: string): void {
+  const wordLength = word.length;
 
-    function removeWord(node: TrieNode, _word: string, docID: string): boolean {
-      const nodeWord = node.word;
+  for (let i = 0; i < wordLength; i++) {
+    const char = word[i];
 
-      if (node.end && nodeWord === word) {
-        node.removeDoc(docID);
+    if (!node.children?.[char]) {
+      const newNode = createNode(char);
+      updateParent(newNode, node);
 
-        if (node.children?.size) {
-          node.end = false;
-        }
+      nodes[newNode.id] = newNode;
+      node.children = insertWithFastProperties(node.children!, char, newNode.id);
+    }
 
-        return true;
-      }
+    node = nodes[node.children[char]];
 
-      for (const childNode in node.children) {
-        if (childNode) {
-          removeWord(node.children[childNode], _word, docID);
-        }
-      }
+    if (i === wordLength - 1) {
+      node.end = true;
+      node.docs.push(docId);
+    }
+  }
+}
 
+export function contains(nodes: Nodes, node: Node, word: string): boolean {
+  const wordLength = word.length;
+
+  for (let i = 0; i < wordLength; i++) {
+    const char = word[i];
+    const next = node.children?.[char]; 
+
+    if (next) {
+      node = nodes[next];
+    } else {
       return false;
     }
-
-    return removeWord(root, word, docID);
   }
 
-  remove(word: string): boolean {
-    const root = this.root;
-    if (!word) return false;
+  return node.end;
+}
 
-    function removeWord(node: TrieNode, _word: string): boolean {
-      if (node.end && node.word === word) {
-        if (node.children?.size) {
-          node.end = false;
-        } else {
-          node.parent!.deleteChildren();
-        }
+export function find(nodes: Nodes, node: Node, { term, exact, tolerance }: FindParams): FindResult {
+  const output: FindResult = {};
+  const termLength = term.length;
 
-        return true;
-      }
+  for (let i = 0; i < termLength; i++) {
+    const char = term[i];
+    const next = node.children?.[char]; 
 
-      for (const childNode in node.children) {
-        removeWord(node.children[childNode], _word);
-      }
+    if (node.children?.[char]) {
+      node = nodes[next];
+    } else if (!tolerance) {
+      return output;
+    }
+  }
 
-      return false;
+  findAllWords(nodes, node, output, term, exact, tolerance);
+
+  return output;
+}
+
+export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, docID: string): boolean {
+  if (!word) {
+    return false;
+  }
+
+  const nodeWord = node.word;
+
+  if (node.end && nodeWord === word) {
+    removeDocument(node, docID);
+
+    if (node.children?.size) {
+      node.end = false;
     }
 
-    return removeWord(root, word);
+    return true;
   }
+
+  for (const childNode in node.children) {
+    removeDocumentByWord(nodes, nodes[node.children[childNode]], word, docID);
+  }
+
+  return false;
+}
+
+export function removeWord(nodes: Nodes, node: Node, word: string): boolean {
+  if (!word) {
+    return false;
+  }
+
+  if (node.end && node.word === word) {
+    if (node.children?.size) {
+      node.end = false;
+    } else {
+      nodes[node.parent!].children = {};
+    }
+
+    return true;
+  }
+
+  for (const childNode in node.children) {
+    removeWord(nodes, nodes[node.children[childNode]], word);
+  }
+
+  return false;
 }

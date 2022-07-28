@@ -1,9 +1,9 @@
-import { Lyra } from "../src/lyra";
+import { create, insert, search, remove } from "../src/lyra";
 
 describe("defaultLanguage", () => {
   it("should throw an error if the desired language is not supported", () => {
     try {
-      new Lyra({
+      create({
         schema: {},
         // @ts-expect-error latin is not supported
         defaultLanguage: "latin",
@@ -15,11 +15,11 @@ describe("defaultLanguage", () => {
 
   it("should throw an error if the desired language is not supported during insertion", () => {
     try {
-      const db = new Lyra({
+      const db = create({
         schema: { foo: "string" },
       });
 
-      db.insert(
+      insert(db, 
         {
           foo: "bar",
         },
@@ -33,7 +33,7 @@ describe("defaultLanguage", () => {
 
   it("should not throw if if the language is supported", () => {
     try {
-      new Lyra({
+      create({
         schema: {},
         defaultLanguage: "portugese",
       });
@@ -45,7 +45,7 @@ describe("defaultLanguage", () => {
 
 describe("checkInsertDocSchema", () => {
   it("should compare the inserted doc with the schema definition", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         quote: "string",
         author: "string",
@@ -53,18 +53,18 @@ describe("checkInsertDocSchema", () => {
     });
 
     expect(
-      db.insert({ quote: "hello, world!", author: "me" }).id
+      insert(db, { quote: "hello, world!", author: "me" }).id
     ).toBeDefined();
 
     try {
       // @ts-expect-error test error case
-      db.insert({ quote: "hello, world!", author: true });
+      insert(db, { quote: "hello, world!", author: true });
     } catch (err) {
       expect(err).toMatchSnapshot();
     }
 
     try {
-      db.insert({
+      insert(db, {
         quote: "hello, world!",
         // @ts-expect-error test error case
         authors: "author should be singular",
@@ -75,7 +75,7 @@ describe("checkInsertDocSchema", () => {
 
     try {
       // @ts-expect-error test error case
-      db.insert({ quote: "hello, world!", foo: { bar: 10 } });
+      insert(db, { quote: "hello, world!", foo: { bar: 10 } });
     } catch (err) {
       expect(err).toMatchSnapshot();
     }
@@ -84,14 +84,14 @@ describe("checkInsertDocSchema", () => {
 
 describe("lyra", () => {
   it("should correctly insert and retrieve data", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         example: "string",
       },
     });
 
-    const ex1Insert = db.insert({ example: "The quick, brown, fox" });
-    const ex1Search = db.search({
+    const ex1Insert = insert(db, { example: "The quick, brown, fox" });
+    const ex1Search = search(db, {
       term: "quick",
       properties: ["example"],
     });
@@ -103,23 +103,23 @@ describe("lyra", () => {
   });
 
   it("should correctly paginate results", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         animal: "string",
       },
     });
 
-    db.insert({ animal: "Quick brown fox" });
-    db.insert({ animal: "Lazy dog" });
-    db.insert({ animal: "Jumping penguin" });
-    db.insert({ animal: "Fast chicken" });
-    db.insert({ animal: "Fabolous ducks" });
-    db.insert({ animal: "Fantastic horse" });
+    insert(db, { animal: "Quick brown fox" });
+    insert(db, { animal: "Lazy dog" });
+    insert(db, { animal: "Jumping penguin" });
+    insert(db, { animal: "Fast chicken" });
+    insert(db, { animal: "Fabolous ducks" });
+    insert(db, { animal: "Fantastic horse" });
 
-    const search1 = db.search({ term: "f", limit: 1, offset: 0 });
-    const search2 = db.search({ term: "f", limit: 1, offset: 1 });
-    const search3 = db.search({ term: "f", limit: 1, offset: 2 });
-    const search4 = db.search({ term: "f", limit: 2, offset: 2 });
+    const search1 = search(db, { term: "f", limit: 1, offset: 0 });
+    const search2 = search(db, { term: "f", limit: 1, offset: 1 });
+    const search3 = search(db, { term: "f", limit: 1, offset: 2 });
+    const search4 = search(db, { term: "f", limit: 2, offset: 2 });
 
     expect(search1.count).toBe(4);
     expect(search1.hits[0].animal).toBe("Quick brown fox");
@@ -136,10 +136,10 @@ describe("lyra", () => {
   });
 
   it("Should throw an error when searching in non-existing indices", () => {
-    const db = new Lyra({ schema: { foo: "string", baz: "string" } });
+    const db = create({ schema: { foo: "string", baz: "string" } });
 
     try {
-      db.search({
+      search(db, {
         term: "foo",
         //@ts-expect-error test error case
         properties: ["bar"],
@@ -152,32 +152,32 @@ describe("lyra", () => {
   });
 
   it("Should correctly remove a document after its insertion", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
 
-    const { id: id1 } = db.insert({
+    const { id: id1 } = insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
     });
 
-    const { id: id2 } = db.insert({
+    const { id: id2 } = insert(db, {
       quote:
         "To live is the rarest thing in the world. Most people exist, that is all.",
       author: "Oscar Wilde",
     });
 
-    db.insert({
+    insert(db, {
       quote: "So many books, so little time.",
       author: "Frank Zappa",
     });
 
-    const res = db.delete(id1);
+    const res = remove(db, id1);
 
-    const searchResult = db.search({
+    const searchResult = search(db, {
       term: "Oscar",
       properties: ["author"],
     });
@@ -192,36 +192,36 @@ describe("lyra", () => {
   });
 
   it("Should preserve identical docs after deletion", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
 
-    const { id: id1 } = db.insert({
+    const { id: id1 } = insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
     });
 
-    const { id: id2 } = db.insert({
+    const { id: id2 } = insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
     });
 
-    db.insert({
+    insert(db, {
       quote: "So many books, so little time.",
       author: "Frank Zappa",
     });
 
-    const res = db.delete(id1);
+    const res = remove(db, id1);
 
-    const searchResult = db.search({
+    const searchResult = search(db, {
       term: "Oscar",
       properties: ["author"],
     });
 
-    const searchResult2 = db.search({
+    const searchResult2 = search(db, {
       term: "already",
       properties: ["quote"],
     });
@@ -243,7 +243,7 @@ describe("lyra", () => {
   });
 
   it("Should be able to insert documens with non-searchable fields", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         quote: "string",
         author: "string",
@@ -252,49 +252,49 @@ describe("lyra", () => {
       },
     });
 
-    db.insert({
+    insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
       isFavorite: false,
       rating: 4,
     });
 
-    db.insert({
+    insert(db, {
       quote: "So many books, so little time.",
       author: "Frank Zappa",
       isFavorite: true,
       rating: 5,
     });
 
-    const search = db.search({
+    const searchResult = search(db, {
       term: "frank",
     });
 
-    expect(search.count).toBe(1);
-    expect(search.hits[0].author).toBe("Frank Zappa");
+    expect(searchResult.count).toBe(1);
+    expect(searchResult.hits[0].author).toBe("Frank Zappa");
   });
 
   it("Should exact match", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         author: "string",
         quote: "string",
       },
     });
 
-    db.insert({
+    insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
     });
 
-    const partialSearch = db.search({
+    const partialSearch = search(db, {
       term: "alr",
       exact: true,
     });
 
     expect(partialSearch.count).toBe(0);
 
-    const exactSearch = db.search({
+    const exactSearch = search(db, {
       term: "already",
       exact: true,
     });
@@ -307,55 +307,55 @@ describe("lyra", () => {
   });
 
   it("Shouldn't tolerate typos", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
 
-    db.insert({
+    insert(db, {
       quote:
         "Absolutely captivating creatures, seahorses seem like a product of myth and imagination rather than of nature.",
       author: "Sara A. Lourie",
     });
 
-    const search = db.search({
+    const searchResult = search(db, {
       term: "seahrse",
       tolerance: 0,
     });
 
-    expect(search.count).toBe(0);
+    expect(searchResult.count).toBe(0);
   });
 
   it("Should tolerate typos", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
 
-    db.insert({
+    insert(db, {
       quote:
         "Absolutely captivating creatures, seahorses seem like a product of myth and imagination rather than of nature.",
       author: "Sara A. Lourie",
     });
 
-    db.insert({
+    insert(db, {
       quote:
         "Seahorses look mythical, like dragons, but these magnificent shy creatures are real.",
       author: "Jennifer Keats Curtis",
     });
 
-    const tolerantSearch = db.search({
+    const tolerantSearch = search(db, {
       term: "seahrse",
       tolerance: 1,
     });
 
     expect(tolerantSearch.count).toBe(2);
 
-    const moreTolerantSearch = db.search({
+    const moreTolerantSearch = search(db, {
       term: "sahrse",
       tolerance: 3,
     });
@@ -364,7 +364,7 @@ describe("lyra", () => {
   });
 
   it("Should support nested properties", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         quote: "string",
         author: {
@@ -374,7 +374,7 @@ describe("lyra", () => {
       },
     });
 
-    db.insert({
+    insert(db, {
       quote: "Harry Potter, the boy who lived, come to die. Avada kedavra.",
       author: {
         name: "Tom",
@@ -382,7 +382,7 @@ describe("lyra", () => {
       },
     });
 
-    db.insert({
+    insert(db, {
       quote: "I am Homer Simpson.",
       author: {
         name: "Homer",
@@ -390,22 +390,22 @@ describe("lyra", () => {
       },
     });
 
-    const resultAuthorSurname = db.search({
+    const resultAuthorSurname = search(db, {
       term: "Riddle",
       properties: ["author.surname"],
     });
 
-    const resultAuthorName = db.search({
+    const resultAuthorName = search(db, {
       term: "Riddle",
       properties: ["author.name"],
     });
 
-    const resultSimpsonQuote = db.search({
+    const resultSimpsonQuote = search(db, {
       term: "Homer",
       properties: ["quote"],
     });
 
-    const resultSimpsonAuthorName = db.search({
+    const resultSimpsonAuthorName = search(db, {
       term: "Homer",
       properties: ["author.name"],
     });
@@ -419,23 +419,23 @@ describe("lyra", () => {
 
 describe("Disable stemming", () => {
   it("Should disable stemming globally", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         quote: "string",
       },
       stemming: false,
     });
 
-    db.insert({
+    insert(db, {
       quote: "I am baking some cakes",
     });
 
-    const result1 = db.search({
+    const result1 = search(db, {
       term: "bake",
       exact: true,
     });
 
-    const result2 = db.search({
+    const result2 = search(db, {
       term: "bak",
       tolerance: 10,
     });
@@ -446,17 +446,17 @@ describe("Disable stemming", () => {
   });
 
   it("Should stem by default", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         quote: "string",
       },
     });
 
-    db.insert({
+    insert(db, {
       quote: "I am baking some cakes",
     });
 
-    const result1 = db.search({
+    const result1 = search(db, {
       term: "bake",
       exact: true,
     });

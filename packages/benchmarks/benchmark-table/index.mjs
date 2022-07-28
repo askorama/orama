@@ -1,12 +1,12 @@
 /* global console */
 
 import {readFile} from 'fs/promises';
-import { Lyra } from "@nearform/lyra";
+import { create, insert, search } from "@nearform/lyra";
 import { URL } from 'node:url';
 
 const lines = JSON.parse(await readFile(new URL("../dataset/divinaCommedia.json", import.meta.url).pathname))
 
-const db = new Lyra({
+const db = create({
   schema: {
     id: "string",
     txt: "string",
@@ -14,39 +14,39 @@ const db = new Lyra({
 });
 
 for (const line of lines) {
-  await db.insert(line);
+  insert(db, line);
 }
 
-const d1 = await db.search({
+const d1 =  search(db, {
   term: "stelle",
   properties: ["txt"],
   exact: true,
 });
 
-const d2 = await db.search({
+const d2 =  search(db, {
   term: "stelle",
   exact: true,
 });
 
-const d3 = await db.search({
+const d3 =  search(db, {
   term: "stele",
   properties: "*",
   tolerance: 1,
 });
 
-const d4 = await db.search({
+const d4 =  search(db, {
   term: "onde si muovono a diversi porti",
   properties: "*",
   exact: true,
 });
 
-const d5 = await db.search({
+const d5 =  search(db, {
   term: "ode si mossero a divisi porte",
   properties: "*",
   tolerance: 5
 });
 
-const d6 = await db.search({
+const d6 =  search(db, {
   term: "ode si mossero a divisi porte",
   properties: ["txt"],
   tolerance: 5

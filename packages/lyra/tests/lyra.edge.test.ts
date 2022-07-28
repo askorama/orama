@@ -1,8 +1,9 @@
-import { Lyra } from "../src/lyra";
+import { create, insert, save, load, search } from "../src/lyra";
+import { contains as trieContains } from "../src/prefix-tree/trie";
 
 describe("Edge getters", () => {
   it("should correctly enable edge index getter", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         name: "string",
         age: "number",
@@ -10,26 +11,26 @@ describe("Edge getters", () => {
       edge: true,
     });
 
-    db.insert({
+    insert(db, {
       name: "John",
       age: 30,
     });
 
-    db.insert({
+    insert(db, {
       name: "Jane",
       age: 25,
     });
 
-    const index = db.save().index;
+    const index = save(db).index;
     const nameIndex = index["name"];
 
     // Remember that tokenizers an stemmers sets content to lowercase
-    expect(nameIndex?.contains("john")).toBeTruthy();
-    expect(nameIndex?.contains("jane")).toBeTruthy();
+    expect(trieContains(db.nodes, nameIndex, "john")).toBeTruthy();
+    expect(trieContains(db.nodes, nameIndex, "jane")).toBeTruthy();
   });
 
   it("should correctly enable edge docs getter", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         name: "string",
         age: "number",
@@ -37,24 +38,24 @@ describe("Edge getters", () => {
       edge: true,
     });
 
-    const doc1 = db.insert({
+    const doc1 = insert(db, {
       name: "John",
       age: 30,
     });
 
-    const doc2 = db.insert({
+    const doc2 = insert(db, {
       name: "Jane",
       age: 25,
     });
 
-    const docs = db.save().docs;
+    const docs = save(db).docs;
 
     expect(docs[doc1.id]).toStrictEqual({ name: "John", age: 30 });
     expect(docs[doc2.id]).toStrictEqual({ name: "Jane", age: 25 });
   });
 
   it("should correctly enable index setter", () => {
-    const db = new Lyra({
+    const db = create({
       schema: {
         name: "string",
         age: "number",
@@ -62,17 +63,17 @@ describe("Edge getters", () => {
       edge: true,
     });
 
-    db.insert({
+    insert(db, {
       name: "John",
       age: 30,
     });
 
-    db.insert({
+    insert(db, {
       name: "Jane",
       age: 25,
     });
 
-    const db2 = new Lyra({
+    const db2 = create({
       schema: {
         name: "string",
         age: "number",
@@ -80,23 +81,23 @@ describe("Edge getters", () => {
       edge: true,
     });
 
-    const id1 = db2.insert({
+    const id1 = insert(db2, {
       name: "Michele",
       age: 27,
     });
 
-    const id2 = db2.insert({
+    const id2 = insert(db2, {
       name: "Paolo",
       age: 37,
     });
 
-    const {index, docs} = db2.save();
-    db.load({index, docs});
+    const {index, docs, nodes} = save(db2);
+    load(db, {index, docs, nodes});
 
-    const search1 = db.search({ term: "Jane" });
-    const search2 = db.search({ term: "John" });
-    const search3 = db.search({ term: "Paolo" });
-    const search4 = db.search({ term: "Michele" });
+    const search1 = search(db, { term: "Jane" });
+    const search2 = search(db, { term: "John" });
+    const search3 = search(db, { term: "Paolo" });
+    const search4 = search(db, { term: "Michele" });
 
     expect(search1.count).toBe(0);
     expect(search2.count).toBe(0);

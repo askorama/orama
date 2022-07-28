@@ -1,4 +1,8 @@
+import {customAlphabet} from 'nanoid';
+
 export const isServer = typeof window === "undefined";
+
+export const uniqueId = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 10);
 
 export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) {

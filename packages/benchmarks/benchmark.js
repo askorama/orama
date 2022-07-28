@@ -1,48 +1,68 @@
-/*global console*/
+/*global console, process */
 
 import fs from "fs";
+import { readFile, writeFile } from 'fs/promises';
 import readline from "readline";
-import { Lyra } from "@nearform/lyra";
+import { create, save, load, insert, search } from "@nearform/lyra";
+import dpack from 'dpack'
 
-const db = new Lyra({
+const db = create({
   schema: {
     type: "string",
     title: "string",
     category: "string",
   },
+  edge: true
 });
 
-function populateDB() {
+async function populateDB() {
   console.log("Populating the database...");
-  return new Promise(async (resolve) => {
-    const fileStream = fs.createReadStream("./dataset/title.tsv");
-    const rl = readline.createInterface({
-      input: fileStream,
-      crlfDelay: Infinity,
-    });
 
-    for await (const row of rl) {
-      const [, type, title, , , , , , category] = row.split("\t");
-
-      db.insert({
-        type,
-        title,
-        category,
-      });
-    }
-
-    resolve(1);
+  const fileStream = fs.createReadStream("./dataset/title.tsv");
+  const rl = readline.createInterface({
+    input: fileStream,
+    crlfDelay: Infinity,
   });
+
+  for await (const row of rl) {
+    const [, type, title, , , , , , category] = row.split("\t");
+
+    insert(db, {
+      type,
+      title,
+      category,
+    });
+  }
+
+  const data = save(db)
+
+  console.time('Serializing')
+  await writeFile('./dataset/database.dpack', dpack.serialize(data))
+  console.timeEnd('Serializing')
+}
+
+async function restoreDB() {
+  console.log("Restoring the database...");
+
+  console.time('Deserializing')
+  const serialized = dpack.parseLazy(await readFile('./dataset/database.dpack'))
+  console.timeEnd('Deserializing')
+
+  load(db, serialized)
 }
 
 async function main() {
-  await populateDB();
+  if(process.env.RESTORE === 'true') {
+    await restoreDB()
+  } else {
+    await populateDB();
+  }
 
   console.log("--------------------------------");
   console.log("Results after 1000 iterations");
   console.log("--------------------------------");
 
-  const searchOnAllIndices = await searchBenchmark(db, {
+  const searchOnAllIndices = searchBenchmark(db, {
     term: "believe",
     properties: "*",
   });
@@ -50,7 +70,7 @@ async function main() {
     `Searching "believe" through 1M entries in all indices: ${searchOnAllIndices}`
   );
 
-  const exactSearchOnAllIndices = await searchBenchmark(db, {
+  const exactSearchOnAllIndices = searchBenchmark(db, {
     term: "believe",
     properties: "*",
     exact: true,
@@ -59,7 +79,7 @@ async function main() {
     `Exact search for "believe" through 1M entries in all indices: ${exactSearchOnAllIndices}`
   );
 
-  const typoTolerantSearch = await searchBenchmark(db, {
+  const typoTolerantSearch = searchBenchmark(db, {
     term: "belve",
     properties: "*",
     tolerance: 2,
@@ -68,7 +88,7 @@ async function main() {
     `Typo-tolerant search for "belve" through 1M entries in all indices: ${typoTolerantSearch}`
   );
 
-  const searchOnSpecificIndex = await searchBenchmark(db, {
+  const searchOnSpecificIndex = searchBenchmark(db, {
     term: "believe",
     properties: ["title"],
   });
@@ -76,7 +96,7 @@ async function main() {
     `Searching "believe" through 1M entries in the "title" index: ${searchOnSpecificIndex}`
   );
 
-  const searchOnSpecificIndex2 = await searchBenchmark(db, {
+  const searchOnSpecificIndex2 = searchBenchmark(db, {
     term: "criminal minds",
     properties: ["title"],
   });
@@ -84,7 +104,7 @@ async function main() {
     `Searching "criminal minds" through 1M entries in the "title" index: ${searchOnSpecificIndex2}`
   );
 
-  const searchOnSpecificIndex3 = await searchBenchmark(db, {
+  const searchOnSpecificIndex3 = searchBenchmark(db, {
     term: "musical",
     properties: ["category"],
     exact: true,
@@ -93,7 +113,7 @@ async function main() {
     `Searching "musical" through 1M entries in the "category" index: ${searchOnSpecificIndex3}`
   );
 
-  const searchOnSpecificIndex4 = await searchBenchmark(db, {
+  const searchOnSpecificIndex4 = searchBenchmark(db, {
     term: "hero",
     properties: ["title"],
   });
@@ -102,11 +122,11 @@ async function main() {
   );
 }
 
-async function searchBenchmark(db, query) {
+function searchBenchmark(db, query) {
   const results = Array.from({ length: 1000 });
 
   for (let i = 0; i < results.length; i++) {
-    const { elapsed, count } = await db.search(query);
+    const { elapsed, count } = search(db, query);
     const isMicrosecond = elapsed.endsWith("μs");
     const timeAsStr = isMicrosecond
       ? elapsed.replace("ms", "")

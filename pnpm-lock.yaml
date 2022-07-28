@@ -40,11 +40,13 @@ importers:
       benny: ^3.7.1
       cronometro: ^1.1.0
       csv-parse: ^5.1.0
+      dpack: ^0.6.22
       minisearch: 5.0.0-beta2
     dependencies:
       '@nearform/lyra': link:../lyra
       cronometro: 1.1.0
       csv-parse: 5.1.0
+      dpack: 0.6.22
     devDependencies:
       '@types/benchmark': 2.1.1
       benchmark: 2.1.4
@@ -5474,6 +5476,10 @@ packages:
     dependencies:
       is-obj: 2.0.0
     dev: true
+
+  /dpack/0.6.22:
+    resolution: {integrity: sha512-WGPNlW2OAE7Bj0eODMpAHUcEqxrlg01e9OFZDxQodminIgC194/cRHT7K04Z1j7AUEWTeeplYGrIv/xRdwU9Hg==}
+    dev: false
 
   /duplexer/0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}

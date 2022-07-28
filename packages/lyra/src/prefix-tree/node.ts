@@ -1,50 +1,50 @@
 import type { Nullable } from "../types";
+import { uniqueId } from "../utils";
 
-type Children = Record<string, TrieNode>;
+export interface Node {
+  id: string;
+  key: string;
+  word: string;
+  parent: Nullable<string>;
+  children: Record<string, string>;
+  docs: string[];
+  end: boolean;
+}
 
-type Docs = string[];
-
-type NodeContent = [string, Docs];
-
-export class TrieNode {
-  public key: string;
-  public word: string;
-  public parent: Nullable<TrieNode> = null;
-  public children: Nullable<Children> = {};
-  public docs: Docs = [];
-  public end = false;
-
-  constructor(key: string) {
-    this.key = key;
-    this.word = '';
+export function create(key = ''): Node {
+  const node = {
+    id: uniqueId(),
+    key,
+    word: '',
+    parent: null,
+    children: {},
+    docs: [],
+    end: false    
   }
 
-  get content(): NodeContent {
-    return [this.word, this.docs];
+  Object.defineProperty(node, 'toJSON', {value: serialize})
+  return node
+}
+
+export function updateParent(node: Node, parent: Node): void {
+  node.parent = parent.id;
+  node.word = parent.word + node.key;
+}
+
+export function removeDocument(node: Node, docID: string): boolean {
+  const index = node.docs.indexOf(docID);
+
+  if (index === -1) {
+    return false;
   }
 
-  setParent(newParent: TrieNode): void {
-    this.parent = newParent;
-    this.word = newParent.word + this.key;
-  }
+  node.docs.splice(index, 1);
 
-  setEnd(val: boolean): void {
-    this.end = val;
-  }
+  return true;
+}
 
-  deleteChildren() {
-    this.children = null;
-  }
+function serialize(this: Node): object {
+  const {key, word, children, docs, end} = this;
 
-  removeDoc(docID: string): boolean {
-    const index = this.docs.indexOf(docID);
-
-    if (index === -1) {
-      return false;
-    }
-
-    this.docs.splice(index, 1);
-
-    return true;
-  }
+  return {key, word, children, docs, end}
 }
