@@ -100,7 +100,7 @@ it("Should tokenize and stem correctly in dutch", () => {
   expect(O2).toMatchSnapshot();
 });
 
-it("Should stem an array correctly in dutch", async () => {
+it("Should stem an array correctly in dutch", () => {
   // some words in dutch
   const input: string[] = ["banken"];
 
@@ -112,7 +112,7 @@ it("Should stem an array correctly in dutch", async () => {
   expect(output).toStrictEqual(expected);
 });
 
-it("Should stem an array correctly in english", async () => {
+it("Should stem an array correctly in english", () => {
   // some words in english
   const input: string[] = ["awesome"];
 
@@ -124,7 +124,7 @@ it("Should stem an array correctly in english", async () => {
   expect(output).toStrictEqual(expected);
 });
 
-it("Should stem an array correctly in french", async () => {
+it("Should stem an array correctly in french", () => {
   // some words in french
   const input: string[] = ["haussant"];
 
@@ -136,7 +136,7 @@ it("Should stem an array correctly in french", async () => {
   expect(output).toStrictEqual(expected);
 });
 
-it("Should stem an array correctly in italian", async () => {
+it("Should stem an array correctly in italian", () => {
   // some words in italian
   const input: string[] = ["indicatore"];
 
@@ -148,7 +148,7 @@ it("Should stem an array correctly in italian", async () => {
   expect(output).toStrictEqual(expected);
 });
 
-it("Should stem an array correctly in norwegian", async () => {
+it("Should stem an array correctly in norwegian", () => {
   // some words in norwegian
   const input: string[] = ["hjemlet"];
 
@@ -160,7 +160,7 @@ it("Should stem an array correctly in norwegian", async () => {
   expect(output).toStrictEqual(expected);
 });
 
-it("Should stem an array correctly in portugese", async () => {
+it("Should stem an array correctly in portugese", () => {
   // some words in portugese
   const input: string[] = ["velhas"];
 
@@ -172,7 +172,7 @@ it("Should stem an array correctly in portugese", async () => {
   expect(output).toStrictEqual(expected);
 });
 
-it("Should stem an array correctly in russian", async () => {
+it("Should stem an array correctly in russian", () => {
   // some words in russian
   const input: string[] = ["вагоне"];
 
@@ -184,7 +184,7 @@ it("Should stem an array correctly in russian", async () => {
   expect(output).toStrictEqual(expected);
 });
 
-it("Should stem an array correctly in spanish", async () => {
+it("Should stem an array correctly in spanish", () => {
   // some words in spanish
   const input: string[] = ["avenida"];
 
@@ -196,7 +196,7 @@ it("Should stem an array correctly in spanish", async () => {
   expect(output).toStrictEqual(expected);
 });
 
-it("Should stem an array correctly in swedish", async () => {
+it("Should stem an array correctly in swedish", () => {
   // some words in swedish
   const input: string[] = ["jemförelser"];
 

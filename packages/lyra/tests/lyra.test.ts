@@ -191,7 +191,7 @@ describe("lyra", () => {
     expect(searchResult.hits[0].id).toBe(id2);
   });
 
-  it("Shouldn't returns deleted documents", async () => {
+  it("Shouldn't returns deleted documents", () => {
     const db = create({
       schema: {
         txt: "string",
@@ -199,22 +199,22 @@ describe("lyra", () => {
       stemming: false,
     });
 
-    await insert(db, { txt: "stelle" });
-    await insert(db, { txt: "stellle" });
-    await insert(db, { txt: "scelte" });
+    insert(db, { txt: "stelle" });
+    insert(db, { txt: "stellle" });
+    insert(db, { txt: "scelte" });
 
-    const searchResult = await search(db, { term: "stelle" });
+    const searchResult = search(db, { term: "stelle" });
 
     const id = searchResult.hits[0].id;
 
-    await remove(db, id);
+    remove(db, id);
 
-    const searchResult2 = await search(db, { term: "stelle" });
+    const searchResult2 = search(db, { term: "stelle" });
 
     expect(searchResult2.count).toBe(1);
   });
 
-  it("Shouldn't affects other document when deleted one", async () => {
+  it("Shouldn't affects other document when deleted one", () => {
     const db = create({
       schema: {
         txt: "string",
@@ -222,16 +222,16 @@ describe("lyra", () => {
       stemming: false,
     });
 
-    await insert(db, { txt: "abc" });
-    await insert(db, { txt: "abc" });
-    await insert(db, { txt: "abcd" });
+    insert(db, { txt: "abc" });
+    insert(db, { txt: "abc" });
+    insert(db, { txt: "abcd" });
 
-    const searchResult = await search(db, { term: "abc", exact: true });
+    const searchResult = search(db, { term: "abc", exact: true });
 
     const id = searchResult.hits[0].id;
-    await remove(db, id);
+    remove(db, id);
 
-    const searchResult2 = await search(db, { term: "abc", exact: true });
+    const searchResult2 = search(db, { term: "abc", exact: true });
 
     expect(searchResult2.hits.every(({ id: docID }) => docID !== id)).toBeTruthy();
     expect(searchResult2.count).toBe(1);
