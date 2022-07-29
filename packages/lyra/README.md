@@ -68,7 +68,7 @@ In the case above, you will be searching for all the documents containing the wo
 
 ```js
 {
-  elapsed: '99μs',
+  elapsed: 99,
   hits: [
     {
       id: 'ckAOPGTA5qLXx0MgNr1Zy',
@@ -98,7 +98,7 @@ Result:
 
 ```js
 {
-  elapsed: '111μs',
+  elapsed: 111,
   hits: [
     {
       id: 'L1tpqQxc0c2djrSN2a6TJ',

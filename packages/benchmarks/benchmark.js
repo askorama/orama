@@ -5,6 +5,7 @@ import { readFile, writeFile } from "fs/promises";
 import readline from "readline";
 import { create, save, load, insert, search } from "@nearform/lyra";
 import dpack from "dpack";
+import { formatNanoseconds } from "@nearform/lyra";
 
 const db = create({
   schema: {
@@ -112,19 +113,17 @@ function searchBenchmark(db, query) {
   const results = Array.from({ length: 1000 });
 
   for (let i = 0; i < results.length; i++) {
-    const { elapsed, count } = search(db, query);
-    const isMicrosecond = elapsed.endsWith("μs");
-    const timeAsStr = isMicrosecond ? elapsed.replace("ms", "") : elapsed.replace("μs", "");
-    const time = parseInt(timeAsStr) * (isMicrosecond ? 1 : 1000);
-    results[i] = [time, count];
+    results[i] = search(db, query);
   }
 
-  const total = Math.floor(results[0].reduce((x, y) => x + y, 0) / results.length);
-  const counts = Math.floor(results[1].reduce((x, y) => x + y, 0) / results.length);
+  const time = Math.floor(Number(results.reduce((accu, result) => accu + result.elapsed, 0n)) / results.length);
+  const counts = new Set(results.map(result => result.count));
 
-  const time = total > 1000 ? `${total}ms` : `${total}μs`;
+  if (counts.size > 1) {
+    throw new Error(`The benchmark is not reliable. Different counts returned in results: ${Array.from(counts)}`);
+  }
 
-  return `${counts} results in ${time}`;
+  return `${Array.from(counts)[0]} results in ${formatNanoseconds(time)}`;
 }
 
 main();

@@ -2,11 +2,13 @@ import fastq from "fastq";
 import * as ERRORS from "./errors";
 import toFastProperties, { insertWithFastProperties } from "./fast-properties";
 import { tokenize } from "./tokenizer";
-import { formatNanoseconds, getNanosecondsTime, uniqueId } from "./utils";
+import { getNanosecondsTime, uniqueId } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./stemmer";
 import type { ResolveSchema, SearchProperties } from "./types";
 import { create as createNode, Node } from "./prefix-tree/node";
 import { find as trieFind, insert as trieInsert, removeDocumentByWord, Nodes } from "./prefix-tree/trie";
+
+export { formatNanoseconds } from "./utils";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -54,7 +56,7 @@ type QueueDocParams<T extends PropertiesSchema> = {
 type SearchResult<T extends PropertiesSchema> = {
   count: number;
   hits: RetrievedDoc<T>[];
-  elapsed: string;
+  elapsed: bigint;
 };
 
 type RetrievedDoc<TDoc extends PropertiesSchema> = ResolveSchema<TDoc> & {
@@ -214,7 +216,7 @@ export function create<T extends PropertiesSchema>(properties: LyraProperties<T>
     edge: properties.edge ?? false,
   };
 
-  instance.queue = fastq(instance, _insert.bind(instance), 1) as fastq.queue<QueueDocParams<T>>;
+  instance.queue = fastq(instance, _insert.bind(instance), 1000) as fastq.queue<QueueDocParams<T>>;
 
   buildIndex(instance, properties.schema);
   return instance;
@@ -321,7 +323,7 @@ export function search<T extends PropertiesSchema>(
   const hits = results.filter(Boolean);
 
   return {
-    elapsed: formatNanoseconds(getNanosecondsTime() - timeStart),
+    elapsed: getNanosecondsTime() - timeStart,
     hits,
     count,
   };

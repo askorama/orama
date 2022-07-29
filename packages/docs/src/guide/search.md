@@ -31,7 +31,7 @@ In that case, we are searching for the word `Chris` in the `director` index excl
 
 ```js
 {
-  elapsed: '102μs',
+  elapsed: 102,
   hits: [
     {
       id: 'z3xoJ_VbaBnXsRHnsStpw',
@@ -74,7 +74,7 @@ And we'll get back the following result:
 
 ```js
 {
-  elapsed: '102μs',
+  elapsed: 102
   hits: [
     {
       id: 'z3xoJ_VbaBnXsRHnsStpw',
@@ -104,7 +104,7 @@ It will return the **second** result for our search:
 
 ```js
 {
-  elapsed: '102μs',
+  elapsed: 102
   hits: [
     {
       id: 'VcaClDjvvriskxi1nBnPW',
@@ -133,7 +133,7 @@ The result will be something like this:
 
 ```js
 {
-  elapsed: '94μs',
+  elapsed: 94
   hits: [
     {
       id: 'SXLYl5aURpbuNYr7fUlQI',
@@ -170,7 +170,7 @@ The result will be something like this:
 
 ```js
 {
-  elapsed: '103μs',
+  elapsed: 103
   hits: [
     {
       id: 'SXLYl5aURpbuNYr7fUlQI',

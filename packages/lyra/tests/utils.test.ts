@@ -19,11 +19,20 @@ t.test("utils", t => {
   });
 
   t.test("should correctly format nanoseconds", t => {
-    t.plan(4);
+    t.plan(13);
 
+    t.equal(formatNanoseconds(1n), "1ns");
+    t.equal(formatNanoseconds(10n), "10ns");
+    t.equal(formatNanoseconds(100n), "100ns");
+    t.equal(formatNanoseconds(1_000n), "1μs");
+    t.equal(formatNanoseconds(10_000n), "10μs");
+    t.equal(formatNanoseconds(100_000n), "100μs");
     t.equal(formatNanoseconds(1_000_000n), "1ms");
-    t.equal(formatNanoseconds(1_000_000_000n), "1000ms"); // 1s
-    t.equal(formatNanoseconds(1_000_000_000_000n), "1000000ms"); // 1m
-    t.equal(formatNanoseconds(1_000_000_000_000_000n), "1000000000ms"); // 1h
+    t.equal(formatNanoseconds(10_000_000n), "10ms");
+    t.equal(formatNanoseconds(100_000_000n), "100ms");
+    t.equal(formatNanoseconds(1000_000_000n), "1s");
+    t.equal(formatNanoseconds(10_000_000_000n), "10s");
+    t.equal(formatNanoseconds(100_000_000_000n), "100s");
+    t.equal(formatNanoseconds(1000_000_000_000n), "1000s");
   });
 });
