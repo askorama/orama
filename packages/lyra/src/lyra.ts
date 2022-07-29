@@ -258,7 +258,7 @@ export function remove<T extends PropertiesSchema>(lyra: Lyra<T>, docID: string)
 
     for (const token of tokens) {
       if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
-        throw `Unable to remove document "${docID}" from index "${key}" on word "${token}".`;
+        throw ERRORS.CANT_DELETE_DOCUMENT(docID, key, token);
       }
     }
   }
