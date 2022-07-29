@@ -61,7 +61,7 @@ After the data has been inserted, you can finally start to query the database.
 
 ```js
 const searchResult = search(db, {
-  term: 'if',
+  term: 'If',
   properties: '*'
 });
 ```
