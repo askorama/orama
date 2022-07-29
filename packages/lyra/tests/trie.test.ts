@@ -46,7 +46,7 @@ t.test("trie", t => {
     }
 
     t.strictSame(trieFind(nodes, trie, { term: phrases[5].doc.slice(0, 5) }), { [phrases[5].doc]: [phrases[5].id] });
-    t.matchSnapshot(trieFind(nodes, trie, { term: "th" }), t.name);
+    t.matchSnapshot(trieFind(nodes, trie, { term: "Th" }), t.name);
   });
 
   t.test("should correctly delete a word from the trie", t => {

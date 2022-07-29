@@ -96,13 +96,18 @@ export function contains(nodes: Nodes, node: Node, word: string): boolean {
 export function find(nodes: Nodes, node: Node, { term, exact, tolerance }: FindParams): FindResult {
   const output: FindResult = {};
   const termLength = term.length;
-
   for (let i = 0; i < termLength; i++) {
-    const char = term[i];
-    const next = node.children?.[char];
+    const charLowerCase = term[i].toLowerCase();
+    const charUpperCase = term[i].toUpperCase();
+    const nextLowerCase = node.children?.[charLowerCase];
+    const nextUpperCase = node.children?.[charUpperCase];
 
-    if (node.children?.[char]) {
-      node = nodes[next];
+    if (node.children?.[charLowerCase] || node.children?.[charUpperCase]) {
+      if (node.children?.[charLowerCase]) {
+        node = nodes[nextLowerCase];
+      } else {
+        node = nodes[nextUpperCase];
+      }
     } else if (!tolerance) {
       return output;
     }
