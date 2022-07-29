@@ -1,0 +1,29 @@
+{
+  "name": "@nearform/lyra-plugin-edge",
+  "description": "A plugin for Lyra that adds support for Edge computing",
+  "version": "0.0.1-beta-13",
+  "author": {
+    "name": "Michele Riva",
+    "email": "ciao@micheleriva.it",
+    "url": "https://github.com/MicheleRiva"
+  },
+  "bugs": {
+    "url": "https://github.com/nearform/lyra"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:module": "tsc --project tsconfig.esm.json",
+    "build": "pnpm build:module && pnpm build:cjs"
+  },
+  "main": "./dist/cjs/lyra-edge.js",
+  "module": "./dist/esm/lyra-edge.js",
+  "types": "./dist/esm/lyra-edge.d.ts",
+  "devDependencies": {
+    "@nearform/lyra": "workspace:*",
+    "@types/jest": "^27.5.0",
+    "jest": "^28.1.0",
+    "ts-jest": "^28.0.2",
+    "typescript": "^4.6.4"
+  }
+}

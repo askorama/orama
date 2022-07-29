@@ -1,48 +1,50 @@
 import type { Nullable } from "../types";
+import { uniqueId } from "../utils";
 
-type Children = Map<string, TrieNode>;
+export interface Node {
+  id: string;
+  key: string;
+  word: string;
+  parent: Nullable<string>;
+  children: Record<string, string>;
+  docs: string[];
+  end: boolean;
+}
 
-type Docs = Set<string>;
+export function create(key = ""): Node {
+  const node = {
+    id: uniqueId(),
+    key,
+    word: "",
+    parent: null,
+    children: {},
+    docs: [],
+    end: false,
+  };
 
-type NodeContent = [string, Docs];
+  Object.defineProperty(node, "toJSON", { value: serialize });
+  return node;
+}
 
-export class TrieNode {
-  public key: string;
-  public parent: Nullable<TrieNode> = null;
-  public children: Nullable<Children> = new Map();
-  public docs: Docs = new Set();
-  public end = false;
+export function updateParent(node: Node, parent: Node): void {
+  node.parent = parent.id;
+  node.word = parent.word + node.key;
+}
 
-  constructor(key: string) {
-    this.key = key;
+export function removeDocument(node: Node, docID: string): boolean {
+  const index = node.docs.indexOf(docID);
+
+  if (index === -1) {
+    return false;
   }
 
-  setParent(newParent: TrieNode): void {
-    this.parent = newParent;
-  }
+  node.docs.splice(index, 1);
 
-  setEnd(val: boolean): void {
-    this.end = val;
-  }
+  return true;
+}
 
-  deleteChildren() {
-    this.children = null;
-  }
+function serialize(this: Node): object {
+  const { key, word, children, docs, end } = this;
 
-  getWord(): NodeContent {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let node: TrieNode = this;
-    let output = "";
-
-    while (node !== null) {
-      output = node.key + output;
-      node = node.parent!;
-    }
-
-    return [output, this.docs];
-  }
-
-  removeDoc(docID: string): boolean {
-    return this.docs.delete(docID);
-  }
+  return { key, word, children, docs, end };
 }

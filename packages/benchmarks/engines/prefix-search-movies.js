@@ -1,64 +1,58 @@
-/*global console*/
-
 import fs from "fs";
 import cronometro from "cronometro";
 import readline from "readline";
-import { Lyra } from "@nearform/lyra";
+import { create, insert, search } from "@nearform/lyra";
+import { isMainThread } from "node:worker_threads";
 
-const db = new Lyra({
-  schema: {
-    type: "string",
-    title: "string",
-    category: "string",
-  },
-});
+let db;
 
-function populateDB() {
-  console.log("Populating the database...");
-  return new Promise(async (resolve) => {
-    const fileStream = fs.createReadStream("./dataset/title.tsv");
-    const rl = readline.createInterface({
-      input: fileStream,
-      crlfDelay: Infinity,
-    });
-
-    for await (const row of rl) {
-      const [, type, title, , , , , , category] = row.split("\t");
-
-      db.insert({
-        type,
-        title,
-        category,
-      });
-    }
-
-    resolve(1);
+if (!isMainThread) {
+  db = create({
+    schema: {
+      type: "string",
+      title: "string",
+      category: "string",
+    },
   });
-}
 
-await populateDB();
+  const fileStream = fs.createReadStream("./dataset/title.tsv");
+  const rl = readline.createInterface({
+    input: fileStream,
+    crlfDelay: Infinity,
+  });
+
+  for await (const row of rl) {
+    const [, type, title, , , , , , category] = row.split("\t");
+
+    insert(db, {
+      type,
+      title,
+      category,
+    });
+  }
+}
 
 const testCases = {
   [`Searching "believe" through 1M entries in all indices:`]() {
-    return db.search({ term: "believe" });
+    return search(db, { term: "believe" });
   },
   [`Searching "believe" through 1M entries in "title" index:`]() {
-    return db.search({ term: "believe", properties: ["title"] });
+    return search(db, { term: "believe", properties: ["title"] });
   },
   [`Searching "criminal minds" through 1M entries in the "title" index`]() {
-    return db.search({
+    return search(db, {
       term: "criminal minds",
       properties: ["title"],
     });
   },
   [`Searching "musical" through 1M entries in the "category" index`]() {
-    return db.search({
+    return search(db, {
       term: "musical",
       properties: ["category"],
     });
   },
   [`Searching "hero" through 1M entries in the "title" index`]() {
-    return db.search({
+    return search(db, {
       term: "hero",
       properties: ["title"],
     });
