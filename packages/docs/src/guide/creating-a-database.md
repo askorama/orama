@@ -3,17 +3,17 @@
 You can create a new Lyra instance by importing the `Lyra` class in your project.
 
 ```js
-import { Lyra } from '@nearform/lyra';
+import { create } from '@nearform/lyra';
 
-const db = new Lyra();
+const db = create();
 ```
 
 The Lyra class needs a **schema** to be able to process data and indices. The schema represents the documents we're going to insert into the database.
 
 ```js
-import { lyra } from '@nearfom/lyra';
+import { create } from '@nearfom/lyra';
 
-const movieDB = new Lyra({
+const movieDB = create({
   schema: {
     title: 'string',
     director: 'string',
@@ -33,9 +33,9 @@ With the current version of Lyra, nested properties are not supported.
 The following schema will be rejected:
 
 ```js
-import { lyra } from '@nearfom/lyra';
+import { create } from '@nearfom/lyra';
 
-const movieDB = new Lyra({
+const movieDB = create({
   schema: {
     title: 'string',
     director: 'string',
@@ -58,7 +58,7 @@ By default, Lyra analyzes the input and performs a **stemming** operation, which
 By default, Lyra uses the English language analyzer, but you can override this behaviour while initializing a new Lyra insrance:
 
 ```js
-import { lyra } from '@nearfom/lyra';
+import { create } from '@nearfom/lyra';
 
 const movieDB = new Lyra({
   schema: {
@@ -75,7 +75,7 @@ const movieDB = new Lyra({
 You can override the default language for a given document during data insertion:
 
 ```js
-movieDB.insert(myDocument, 'spanish');
+insert(movieDB, myDocument, { language: 'spanish' });
 ```
 
 As for today, the available languages are:

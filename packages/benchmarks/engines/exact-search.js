@@ -1,28 +1,36 @@
 import cronometro from "cronometro";
-import { Lyra } from "@nearform/lyra";
-import lines from "../dataset/divinaCommedia.json" assert { type: "json" };
+import { readFile } from "fs/promises";
+import { create, insert, search } from "@nearform/lyra";
+import { URL } from "node:url";
+import { isMainThread } from "node:worker_threads";
 
-const db = new Lyra({
-  schema: {
-    id: "string",
-    txt: "string",
-  },
-});
+let db;
 
-for (const line of lines) {
-  await db.insert(line);
+if (!isMainThread) {
+  const lines = JSON.parse(await readFile(new URL("../dataset/divinaCommedia.json", import.meta.url).pathname));
+
+  db = create({
+    schema: {
+      id: "string",
+      txt: "string",
+    },
+  });
+
+  for (const line of lines) {
+    insert(db, line);
+  }
 }
 
 const testCases = {
   ['Lyra exact search. Searching "comandamento" in Divina Commedia, "txt" index']() {
-    return db.search({
+    return search(db, {
       term: "comandamento",
       properties: ["txt"],
       exact: true,
     });
   },
   ['Lyra exact search. Searching "incominciai" in Divina Commedia all indexes']() {
-    return db.search({ term: "incominciai", exact: true });
+    return search(db, { term: "incominciai", exact: true });
   },
 };
 

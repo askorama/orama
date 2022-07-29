@@ -1,209 +1,250 @@
+import t from "tap";
 import { stemArray } from "../src/stemmer";
 import { tokenize } from "../src/tokenizer";
 
-it("Should tokenize and stem correctly in english", () => {
-  const I1 = "the quick brown fox jumps over the lazy dog";
-  const I2 = "I baked some cakes";
+t.test("Tokenizer", t => {
+  t.plan(18);
 
-  const O1 = tokenize(I1, "english");
-  const O2 = tokenize(I2, "english");
+  t.test("Should tokenize and stem correctly in english", t => {
+    t.plan(2);
 
-  expect(O1).toMatchSnapshot();
-  expect(O2).toMatchSnapshot();
-});
+    const I1 = "the quick brown fox jumps over the lazy dog";
+    const I2 = "I baked some cakes";
 
-it("Should tokenize and stem correctly in french", () => {
-  const I1 = "voyons quel temps il fait dehors";
-  const I2 = "j'ai fait des gâteaux";
+    const O1 = tokenize(I1, "english");
+    const O2 = tokenize(I2, "english");
 
-  const O1 = tokenize(I1, "french");
-  const O2 = tokenize(I2, "french");
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
 
-  expect(O1).toMatchSnapshot();
-  expect(O2).toMatchSnapshot();
-});
+  t.test("Should tokenize and stem correctly in french", t => {
+    t.plan(2);
 
-it("Should tokenize and stem correctly in italian", () => {
-  const I1 = "ho cucinato delle torte";
-  const I2 = "dormire è una cosa difficile quando i test non passano";
+    const I1 = "voyons quel temps il fait dehors";
+    const I2 = "j'ai fait des gâteaux";
 
-  const O1 = tokenize(I1, "italian");
-  const O2 = tokenize(I2, "italian");
+    const O1 = tokenize(I1, "french");
+    const O2 = tokenize(I2, "french");
 
-  expect(O1).toMatchSnapshot();
-  expect(O2).toMatchSnapshot();
-});
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
 
-it("Should tokenize and stem correctly in norwegian", () => {
-  const I1 = "Jeg kokte noen kaker";
-  const I2 = "å sove er en vanskelig ting når testene mislykkes";
+  t.test("Should tokenize and stem correctly in italian", t => {
+    t.plan(2);
 
-  const O1 = tokenize(I1, "norwegian");
-  const O2 = tokenize(I2, "norwegian");
+    const I1 = "ho cucinato delle torte";
+    const I2 = "dormire è una cosa difficile quando i test non passano";
 
-  expect(O1).toMatchSnapshot();
-  expect(O2).toMatchSnapshot();
-});
+    const O1 = tokenize(I1, "italian");
+    const O2 = tokenize(I2, "italian");
 
-it("Should tokenize and stem correctly in portugese", () => {
-  const I1 = "Eu cozinhei alguns bolos";
-  const I2 = "dormir é uma coisa difícil quando os testes falham";
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
 
-  const O1 = tokenize(I1, "portugese");
-  const O2 = tokenize(I2, "portugese");
+  t.test("Should tokenize and stem correctly in norwegian", t => {
+    t.plan(2);
 
-  expect(O1).toMatchSnapshot();
-  expect(O2).toMatchSnapshot();
-});
+    const I1 = "Jeg kokte noen kaker";
+    const I2 = "å sove er en vanskelig ting når testene mislykkes";
 
-it("Should tokenize and stem correctly in russian", () => {
-  const I1 = "я приготовила пирожные";
-  const I2 = "спать трудно, когда тесты не срабатывают";
+    const O1 = tokenize(I1, "norwegian");
+    const O2 = tokenize(I2, "norwegian");
 
-  const O1 = tokenize(I1, "russian");
-  const O2 = tokenize(I2, "russian");
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
 
-  expect(O1).toMatchSnapshot();
-  expect(O2).toMatchSnapshot();
-});
+  t.test("Should tokenize and stem correctly in portugese", t => {
+    t.plan(2);
 
-it("Should tokenize and stem correctly in swedish", () => {
-  const I1 = "Jag lagade några kakor";
-  const I2 = "att sova är en svår sak när testerna misslyckas";
+    const I1 = "Eu cozinhei alguns bolos";
+    const I2 = "dormir é uma coisa difícil quando os testes falham";
 
-  const O1 = tokenize(I1, "swedish");
-  const O2 = tokenize(I2, "swedish");
+    const O1 = tokenize(I1, "portugese");
+    const O2 = tokenize(I2, "portugese");
 
-  expect(O1).toMatchSnapshot();
-  expect(O2).toMatchSnapshot();
-});
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
 
-it("Should tokenize and stem correctly in spanish", () => {
-  const I1 = "cociné unos pasteles";
-  const I2 = "dormir es algo dificil cuando las pruebas fallan";
+  t.test("Should tokenize and stem correctly in russian", t => {
+    t.plan(2);
 
-  const O1 = tokenize(I1, "spanish");
-  const O2 = tokenize(I2, "spanish");
+    const I1 = "я приготовила пирожные";
+    const I2 = "спать трудно, когда тесты не срабатывают";
 
-  expect(O1).toMatchSnapshot();
-  expect(O2).toMatchSnapshot();
-});
+    const O1 = tokenize(I1, "russian");
+    const O2 = tokenize(I2, "russian");
 
-it("Should tokenize and stem correctly in dutch", () => {
-  const I1 = "de kleine koeien";
-  const I2 = "Ik heb wat taarten gemaakt";
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
 
-  const O1 = tokenize(I1, "dutch");
-  const O2 = tokenize(I2, "dutch");
+  t.test("Should tokenize and stem correctly in swedish", t => {
+    t.plan(2);
 
-  expect(O1).toMatchSnapshot();
-  expect(O2).toMatchSnapshot();
-});
+    const I1 = "Jag lagade några kakor";
+    const I2 = "att sova är en svår sak när testerna misslyckas";
 
-it("Should stem an array correctly in dutch", async () => {
-  // some words in dutch
-  const input: string[] = ["banken"];
+    const O1 = tokenize(I1, "swedish");
+    const O2 = tokenize(I2, "swedish");
 
-  // the expected output
-  const expected = ["bank"];
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
 
-  const output = stemArray(input, "dutch");
+  t.test("Should tokenize and stem correctly in spanish", t => {
+    t.plan(2);
 
-  expect(output).toStrictEqual(expected);
-});
+    const I1 = "cociné unos pasteles";
+    const I2 = "dormir es algo dificil cuando las pruebas fallan";
 
-it("Should stem an array correctly in english", async () => {
-  // some words in english
-  const input: string[] = ["awesome"];
+    const O1 = tokenize(I1, "spanish");
+    const O2 = tokenize(I2, "spanish");
 
-  // the expected output
-  const expected = ["awesom"];
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
 
-  const output = stemArray(input, "english");
+  t.test("Should tokenize and stem correctly in dutch", t => {
+    t.plan(2);
 
-  expect(output).toStrictEqual(expected);
-});
+    const I1 = "de kleine koeien";
+    const I2 = "Ik heb wat taarten gemaakt";
 
-it("Should stem an array correctly in french", async () => {
-  // some words in french
-  const input: string[] = ["haussant"];
+    const O1 = tokenize(I1, "dutch");
+    const O2 = tokenize(I2, "dutch");
 
-  // the expected output
-  const expected = ["hauss"];
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
 
-  const output = stemArray(input, "french");
+  t.test("Should stem an array correctly in dutch", t => {
+    t.plan(1);
 
-  expect(output).toStrictEqual(expected);
-});
+    // some words in dutch
+    const input: string[] = ["banken"];
 
-it("Should stem an array correctly in italian", async () => {
-  // some words in italian
-  const input: string[] = ["indicatore"];
+    // the expected output
+    const expected = ["bank"];
 
-  // the expected output
-  const expected = ["indic"];
+    const output = stemArray(input, "dutch");
 
-  const output = stemArray(input, "italian");
+    t.strictSame(output, expected);
+  });
 
-  expect(output).toStrictEqual(expected);
-});
+  t.test("Should stem an array correctly in english", t => {
+    t.plan(1);
 
-it("Should stem an array correctly in norwegian", async () => {
-  // some words in norwegian
-  const input: string[] = ["hjemlet"];
+    // some words in english
+    const input: string[] = ["awesome"];
 
-  // the expected output
-  const expected = ["hjeml"];
+    // the expected output
+    const expected = ["awesom"];
 
-  const output = stemArray(input, "norwegian");
+    const output = stemArray(input, "english");
 
-  expect(output).toStrictEqual(expected);
-});
+    t.strictSame(output, expected);
+  });
 
-it("Should stem an array correctly in portugese", async () => {
-  // some words in portugese
-  const input: string[] = ["velhas"];
+  t.test("Should stem an array correctly in french", t => {
+    t.plan(1);
 
-  // the expected output
-  const expected = ["velh"];
+    // some words in french
+    const input: string[] = ["haussant"];
 
-  const output = stemArray(input, "portugese");
+    // the expected output
+    const expected = ["hauss"];
 
-  expect(output).toStrictEqual(expected);
-});
+    const output = stemArray(input, "french");
 
-it("Should stem an array correctly in russian", async () => {
-  // some words in russian
-  const input: string[] = ["вагоне"];
+    t.strictSame(output, expected);
+  });
 
-  // the expected output
-  const expected = ["вагон"];
+  t.test("Should stem an array correctly in italian", t => {
+    t.plan(1);
 
-  const output = stemArray(input, "russian");
+    // some words in italian
+    const input: string[] = ["indicatore"];
 
-  expect(output).toStrictEqual(expected);
-});
+    // the expected output
+    const expected = ["indic"];
 
-it("Should stem an array correctly in spanish", async () => {
-  // some words in spanish
-  const input: string[] = ["avenida"];
+    const output = stemArray(input, "italian");
 
-  // the expected output
-  const expected = ["aven"];
+    t.strictSame(output, expected);
+  });
 
-  const output = stemArray(input, "spanish");
+  t.test("Should stem an array correctly in norwegian", t => {
+    t.plan(1);
 
-  expect(output).toStrictEqual(expected);
-});
+    // some words in norwegian
+    const input: string[] = ["hjemlet"];
 
-it("Should stem an array correctly in swedish", async () => {
-  // some words in swedish
-  const input: string[] = ["jemförelser"];
+    // the expected output
+    const expected = ["hjeml"];
 
-  // the expected output
-  const expected = ["jemför"];
+    const output = stemArray(input, "norwegian");
 
-  const output = stemArray(input, "swedish");
+    t.strictSame(output, expected);
+  });
 
-  expect(output).toStrictEqual(expected);
+  t.test("Should stem an array correctly in portugese", t => {
+    t.plan(1);
+
+    // some words in portugese
+    const input: string[] = ["velhas"];
+
+    // the expected output
+    const expected = ["velh"];
+
+    const output = stemArray(input, "portugese");
+
+    t.strictSame(output, expected);
+  });
+
+  t.test("Should stem an array correctly in russian", t => {
+    t.plan(1);
+
+    // some words in russian
+    const input: string[] = ["вагоне"];
+
+    // the expected output
+    const expected = ["вагон"];
+
+    const output = stemArray(input, "russian");
+
+    t.strictSame(output, expected);
+  });
+
+  t.test("Should stem an array correctly in spanish", t => {
+    t.plan(1);
+
+    // some words in spanish
+    const input: string[] = ["avenida"];
+
+    // the expected output
+    const expected = ["aven"];
+
+    const output = stemArray(input, "spanish");
+
+    t.strictSame(output, expected);
+  });
+
+  t.test("Should stem an array correctly in swedish", t => {
+    t.plan(1);
+
+    // some words in swedish
+    const input: string[] = ["jemförelser"];
+
+    // the expected output
+    const expected = ["jemför"];
+
+    const output = stemArray(input, "swedish");
+
+    t.strictSame(output, expected);
+  });
 });

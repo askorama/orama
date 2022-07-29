@@ -1,7 +1,7 @@
+import { create, insert, search as lyraSearch } from '@nearform/lyra/dist/esm/lyra';
 import { useEffect, useState } from 'react';
-import { Lyra } from '@nearform/lyra/dist/esm/lyra';
 
-const db = new Lyra({
+const db = create({
   schema: {
     id: 'number',
     name: 'string',
@@ -17,9 +17,9 @@ function App() {
   useEffect(() => {
     fetch('/pokedex.json')
       .then((data) => data.json())
-      .then(async (pokeList) => {
+      .then((pokeList) => {
         for (const { id, name } of pokeList.pokemon) {
-          await db.insert({
+          insert(db, {
             id, name
           });
         }
@@ -32,20 +32,19 @@ function App() {
 
   useEffect(() => {
     if (search) {
-      db.search({
+      const result = lyraSearch(db, {
         term: search,
         properties: '*'
       })
-        .then((result) => {
-          const pokemons = result.hits.map((d) => pokemon?.find(p => p.id === (d as any).id));
 
-          if (pokemons.length && !pokemons.some((x) => !x)) {
-            setSearchPokemon([...new Set(pokemons)]);
-          } else {
-            setSearchPokemon([]);
-          }
-        })
-        .catch(console.log)
+      
+      const pokemons = result.hits.map((d) => pokemon?.find(p => p.id === (d as any).id));
+
+      if (pokemons.length && !pokemons.some((x) => !x)) {
+        setSearchPokemon([...new Set(pokemons)]);
+      } else {
+        setSearchPokemon([]);
+      }
     }
   }, [search]);
 

@@ -3,7 +3,7 @@
 Given the database structure we created in the [previous document](./insert-data.md), we now have the following index:
 
 ```js
-import { lyra } from '@nearfom/lyra';
+import { create, search } from '@nearfom/lyra';
 
 const movieDB = new Lyra({
   schema: {
@@ -21,7 +21,7 @@ Which means that we can make a search through all the _searchable properties_ (a
 To do that, we can simply use the `search` method:
 
 ```js
-const result = await movieDB.search({
+const result = await search(movieDB, {
   term: 'Chris',
   properties: ['director']
 });
@@ -31,7 +31,7 @@ In that case, we are searching for the word `Chris` in the `director` index excl
 
 ```js
 {
-  elapsed: '102μs',
+  elapsed: 102,
   hits: [
     {
       id: 'z3xoJ_VbaBnXsRHnsStpw',
@@ -63,7 +63,7 @@ If the `properties` property is not set, Lyra will search through all the search
 We could also limit the search to `1` result by using the `limit` option:
 
 ```js
-const result = await movieDB.search({
+const result = search(movieDB, {
   term: 'Chris',
   properties: ['director'],
   limit: 1
@@ -74,7 +74,7 @@ And we'll get back the following result:
 
 ```js
 {
-  elapsed: '102μs',
+  elapsed: 102
   hits: [
     {
       id: 'z3xoJ_VbaBnXsRHnsStpw',
@@ -92,7 +92,7 @@ As you can notice, we still get the `3` as a value for the `count` property. It 
 It also tells us that we can paginate our search, and we can do that by setting the `offset` property:
 
 ```js
-const result = await movieDB.search({
+const result = search(movieDB, {
   term: 'Chris',
   properties: ['director'],
   limit: 1,
@@ -104,7 +104,7 @@ It will return the **second** result for our search:
 
 ```js
 {
-  elapsed: '102μs',
+  elapsed: 102
   hits: [
     {
       id: 'VcaClDjvvriskxi1nBnPW',
@@ -122,7 +122,7 @@ It will return the **second** result for our search:
 Another way to search is to use the `exact` option, which will match the term exactly:
 
 ```js
-const result = await movieDB.search({
+const result = search(movieDB, {
   term: 'Chris',
   properties: ['director'],
   exact: true
@@ -133,7 +133,7 @@ The result will be something like this:
 
 ```js
 {
-  elapsed: '94μs',
+  elapsed: 94
   hits: [
     {
       id: 'SXLYl5aURpbuNYr7fUlQI',
@@ -157,7 +157,7 @@ The tolerance allows you to specify the maximum distance (following the [levensh
 If the value is not set, Lyra will work as usual regardless of the tolerance.
 
 ```js
-const result = await movieDB.search({
+const result = search(movieDB, {
   term: 'Cris',
   properties: ['director'],
   tolerance: 1
@@ -170,7 +170,7 @@ The result will be something like this:
 
 ```js
 {
-  elapsed: '103μs',
+  elapsed: 103
   hits: [
     {
       id: 'SXLYl5aURpbuNYr7fUlQI',

@@ -1,4 +1,11 @@
-import { Trie } from "../src/prefix-tree/trie";
+import t from "tap";
+import { create as createNode } from "../src/prefix-tree/node";
+import {
+  contains as trieContains,
+  find as trieFind,
+  insert as trieInsert,
+  removeWord as trieRemoveWord,
+} from "../src/prefix-tree/trie";
 
 const phrases = [
   { id: "1", doc: "the quick, brown fox" },
@@ -10,57 +17,51 @@ const phrases = [
   { id: "7", doc: "let's try this trie" },
 ];
 
-describe("trie", () => {
-  it("should correctly index phrases into a prefix tree", () => {
-    const trie = new Trie();
+t.test("trie", t => {
+  t.plan(3);
+
+  t.test("should correctly index phrases into a prefix tree", t => {
+    t.plan(phrases.length);
+
+    const nodes = {};
+    const trie = createNode();
 
     for (const { doc, id } of phrases) {
-      trie.insert(doc, id);
+      trieInsert(nodes, trie, doc, id);
     }
 
     for (const phrase of phrases) {
-      expect(trie.contains(phrase.doc)).toBeTruthy();
+      t.ok(trieContains(nodes, trie, phrase.doc));
     }
   });
 
-  it("should correctly find an element by prefix", () => {
-    const trie = new Trie();
+  t.test("should correctly find an element by prefix", t => {
+    t.plan(2);
+
+    const nodes = {};
+    const trie = createNode();
 
     for (const { doc, id } of phrases) {
-      trie.insert(doc, id);
+      trieInsert(nodes, trie, doc, id);
     }
 
-    expect(trie.find({ term: phrases[5].doc.slice(0, 5) })).toStrictEqual({
-      [phrases[5].doc]: new Set(phrases[5].id),
-    });
-    expect(trie.find({ term: "th" })).toMatchInlineSnapshot(`
-      Object {
-        "the quick, brown fox": Set {
-          "1",
-        },
-        "there is something wrong in there": Set {
-          "4",
-        },
-        "this is me": Set {
-          "5",
-        },
-        "thought it was sunday": Set {
-          "6",
-        },
-      }
-    `);
+    t.strictSame(trieFind(nodes, trie, { term: phrases[5].doc.slice(0, 5) }), { [phrases[5].doc]: [phrases[5].id] });
+    t.matchSnapshot(trieFind(nodes, trie, { term: "th" }), t.name);
   });
 
-  it("should correctly delete a word from the trie", () => {
-    const trie = new Trie();
+  t.test("should correctly delete a word from the trie", t => {
+    t.plan(2);
+
+    const nodes = {};
+    const trie = createNode();
 
     for (const { doc, id } of phrases) {
-      trie.insert(doc, id);
+      trieInsert(nodes, trie, doc, id);
     }
 
-    trie.remove(phrases[0].doc);
+    trieRemoveWord(nodes, trie, phrases[0].doc);
 
-    expect(trie.contains(phrases[0].doc)).toBeFalsy();
-    expect(trie.find({ term: phrases[0].doc })).toStrictEqual({});
+    t.notOk(trieContains(nodes, trie, phrases[0].doc));
+    t.strictSame(trieFind(nodes, trie, { term: phrases[0].doc }), {});
   });
 });
