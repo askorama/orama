@@ -28,9 +28,11 @@
   },
   "devDependencies": {
     "@types/natural": "^5.1.1",
+    "@types/node": "^18.6.2",
     "@types/tap": "^15.0.7",
     "c8": "^7.12.0",
     "tap": "^16.3.0",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "ts-node": "^10.9.1"
   }
 }
