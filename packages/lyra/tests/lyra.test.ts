@@ -1,7 +1,12 @@
+import t from "tap";
 import { create, insert, search, remove } from "../src/lyra";
 
-describe("defaultLanguage", () => {
-  it("should throw an error if the desired language is not supported", () => {
+t.test("defaultLanguage", t => {
+  t.plan(3);
+
+  t.test("should throw an error if the desired language is not supported", t => {
+    t.plan(1);
+
     try {
       create({
         schema: {},
@@ -9,11 +14,13 @@ describe("defaultLanguage", () => {
         defaultLanguage: "latin",
       });
     } catch (e) {
-      expect(e).toMatchSnapshot();
+      t.matchSnapshot(e, t.name);
     }
   });
 
-  it("should throw an error if the desired language is not supported during insertion", () => {
+  t.test("should throw an error if the desired language is not supported during insertion", t => {
+    t.plan(1);
+
     try {
       const db = create({
         schema: { foo: "string" },
@@ -25,27 +32,35 @@ describe("defaultLanguage", () => {
           foo: "bar",
         },
         // @ts-expect-error latin is not supported
-        "latin",
+        { language: "latin" },
       );
     } catch (e) {
-      expect(e).toMatchSnapshot();
+      t.matchSnapshot(e, t.name);
     }
   });
 
-  it("should not throw if if the language is supported", () => {
+  t.test("should not throw if if the language is supported", t => {
+    t.plan(1);
+
     try {
       create({
         schema: {},
         defaultLanguage: "portugese",
       });
+
+      t.pass();
     } catch (e) {
-      expect(e).toBeUndefined();
+      t.fail();
     }
   });
 });
 
-describe("checkInsertDocSchema", () => {
-  it("should compare the inserted doc with the schema definition", () => {
+t.test("checkInsertDocSchema", t => {
+  t.plan(1);
+
+  t.test("should compare the inserted doc with the schema definition", t => {
+    t.plan(4);
+
     const db = create({
       schema: {
         quote: "string",
@@ -53,13 +68,13 @@ describe("checkInsertDocSchema", () => {
       },
     });
 
-    expect(insert(db, { quote: "hello, world!", author: "me" }).id).toBeDefined();
+    t.ok(insert(db, { quote: "hello, world!", author: "me" }).id);
 
     try {
       // @ts-expect-error test error case
       insert(db, { quote: "hello, world!", author: true });
     } catch (err) {
-      expect(err).toMatchSnapshot();
+      t.matchSnapshot(err, `${t.name} - 1`);
     }
 
     try {
@@ -69,20 +84,24 @@ describe("checkInsertDocSchema", () => {
         authors: "author should be singular",
       });
     } catch (err) {
-      expect(err).toMatchSnapshot();
+      t.matchSnapshot(err, `${t.name} - 2`);
     }
 
     try {
       // @ts-expect-error test error case
       insert(db, { quote: "hello, world!", foo: { bar: 10 } });
     } catch (err) {
-      expect(err).toMatchSnapshot();
+      t.matchSnapshot(err, `${t.name} - 3`);
     }
   });
 });
 
-describe("lyra", () => {
-  it("should correctly insert and retrieve data", () => {
+t.test("lyra", t => {
+  t.plan(12);
+
+  t.test("should correctly insert and retrieve data", t => {
+    t.plan(4);
+
     const db = create({
       schema: {
         example: "string",
@@ -95,13 +114,15 @@ describe("lyra", () => {
       properties: ["example"],
     });
 
-    expect(ex1Insert.id).toBeDefined();
-    expect(ex1Search.count).toBe(1);
-    expect(ex1Search.elapsed).toBeDefined();
-    expect(ex1Search.hits[0].example).toBe("The quick, brown, fox");
+    t.ok(ex1Insert.id);
+    t.equal(ex1Search.count, 1);
+    t.ok(ex1Search.elapsed);
+    t.equal(ex1Search.hits[0].example, "The quick, brown, fox");
   });
 
-  it("should correctly paginate results", () => {
+  t.test("should correctly paginate results", t => {
+    t.plan(9);
+
     const db = create({
       schema: {
         animal: "string",
@@ -120,37 +141,37 @@ describe("lyra", () => {
     const search3 = search(db, { term: "f", limit: 1, offset: 2 });
     const search4 = search(db, { term: "f", limit: 2, offset: 2 });
 
-    expect(search1.count).toBe(4);
-    expect(search1.hits[0].animal).toBe("Quick brown fox");
+    t.equal(search1.count, 4);
+    t.equal(search1.hits[0].animal, "Quick brown fox");
 
-    expect(search2.count).toBe(4);
-    expect(search2.hits[0].animal).toBe("Fast chicken");
+    t.equal(search2.count, 4);
+    t.equal(search2.hits[0].animal, "Fast chicken");
 
-    expect(search3.count).toBe(4);
-    expect(search3.hits[0].animal).toBe("Fabolous ducks");
+    t.equal(search3.count, 4);
+    t.equal(search3.hits[0].animal, "Fabolous ducks");
 
-    expect(search4.count).toBe(4);
-    expect(search4.hits[0].animal).toBe("Fabolous ducks");
-    expect(search4.hits[1].animal).toBe("Fantastic horse");
+    t.equal(search4.count, 4);
+    t.equal(search4.hits[0].animal, "Fabolous ducks");
+    t.equal(search4.hits[1].animal, "Fantastic horse");
   });
 
-  it("Should throw an error when searching in non-existing indices", () => {
+  t.test("Should throw an error when searching in non-existing indices", t => {
+    t.plan(1);
+
     const db = create({ schema: { foo: "string", baz: "string" } });
 
-    try {
+    t.throws(() => {
       search(db, {
         term: "foo",
         //@ts-expect-error test error case
         properties: ["bar"],
       });
-    } catch (err) {
-      expect(err).toMatchInlineSnapshot(
-        `"Invalid property name. Expected a wildcard string (\\"*\\") or array containing one of the following properties: foo, baz, but got: bar"`,
-      );
-    }
+    }, `"Invalid property name. Expected a wildcard string (\\"*\\") or array containing one of the following properties: foo, baz, but got: bar"`);
   });
 
-  it("Should correctly remove a document after its insertion", () => {
+  t.test("Should correctly remove a document after its insertion", t => {
+    t.plan(5);
+
     const db = create({
       schema: {
         quote: "string",
@@ -180,16 +201,16 @@ describe("lyra", () => {
       properties: ["author"],
     });
 
-    expect(res).toBeTruthy();
-    expect(searchResult.count).toBe(1);
-    expect(searchResult.hits[0].author).toBe("Oscar Wilde");
-    expect(searchResult.hits[0].quote).toBe(
-      "To live is the rarest thing in the world. Most people exist, that is all.",
-    );
-    expect(searchResult.hits[0].id).toBe(id2);
+    t.ok(res);
+    t.equal(searchResult.count, 1);
+    t.equal(searchResult.hits[0].author, "Oscar Wilde");
+    t.equal(searchResult.hits[0].quote, "To live is the rarest thing in the world. Most people exist, that is all.");
+    t.equal(searchResult.hits[0].id, id2);
   });
 
-  it("Shouldn't returns deleted documents", () => {
+  t.test("Shouldn't returns deleted documents", t => {
+    t.plan(1);
+
     const db = create({
       schema: {
         txt: "string",
@@ -209,10 +230,12 @@ describe("lyra", () => {
 
     const searchResult2 = search(db, { term: "stelle" });
 
-    expect(searchResult2.count).toBe(1);
+    t.equal(searchResult2.count, 1);
   });
 
-  it("Shouldn't affects other document when deleted one", () => {
+  t.test("Shouldn't affects other document when deleted one", t => {
+    t.plan(2);
+
     const db = create({
       schema: {
         txt: "string",
@@ -231,11 +254,13 @@ describe("lyra", () => {
 
     const searchResult2 = search(db, { term: "abc", exact: true });
 
-    expect(searchResult2.hits.every(({ id: docID }) => docID !== id)).toBeTruthy();
-    expect(searchResult2.count).toBe(1);
+    t.ok(searchResult2.hits.every(({ id: docID }) => docID !== id));
+    t.equal(searchResult2.count, 1);
   });
 
-  it("Should preserve identical docs after deletion", () => {
+  t.test("Should preserve identical docs after deletion", t => {
+    t.plan(9);
+
     const db = create({
       schema: {
         quote: "string",
@@ -270,19 +295,21 @@ describe("lyra", () => {
       properties: ["quote"],
     });
 
-    expect(res).toBeTruthy();
-    expect(searchResult.count).toBe(1);
-    expect(searchResult.hits[0].author).toBe("Oscar Wilde");
-    expect(searchResult.hits[0].quote).toBe("Be yourself; everyone else is already taken.");
-    expect(searchResult.hits[0].id).toBe(id2);
+    t.ok(res);
+    t.equal(searchResult.count, 1);
+    t.equal(searchResult.hits[0].author, "Oscar Wilde");
+    t.equal(searchResult.hits[0].quote, "Be yourself; everyone else is already taken.");
+    t.equal(searchResult.hits[0].id, id2);
 
-    expect(searchResult2.count).toBe(1);
-    expect(searchResult2.hits[0].author).toBe("Oscar Wilde");
-    expect(searchResult2.hits[0].quote).toBe("Be yourself; everyone else is already taken.");
-    expect(searchResult2.hits[0].id).toBe(id2);
+    t.equal(searchResult2.count, 1);
+    t.equal(searchResult2.hits[0].author, "Oscar Wilde");
+    t.equal(searchResult2.hits[0].quote, "Be yourself; everyone else is already taken.");
+    t.equal(searchResult2.hits[0].id, id2);
   });
 
-  it("Should be able to insert documens with non-searchable fields", () => {
+  t.test("Should be able to insert documens with non-searchable fields", t => {
+    t.plan(2);
+
     const db = create({
       schema: {
         quote: "string",
@@ -310,11 +337,13 @@ describe("lyra", () => {
       term: "frank",
     });
 
-    expect(searchResult.count).toBe(1);
-    expect(searchResult.hits[0].author).toBe("Frank Zappa");
+    t.equal(searchResult.count, 1);
+    t.equal(searchResult.hits[0].author, "Frank Zappa");
   });
 
-  it("Should exact match", () => {
+  t.test("Should exact match", t => {
+    t.plan(4);
+
     const db = create({
       schema: {
         author: "string",
@@ -332,19 +361,21 @@ describe("lyra", () => {
       exact: true,
     });
 
-    expect(partialSearch.count).toBe(0);
+    t.equal(partialSearch.count, 0);
 
     const exactSearch = search(db, {
       term: "already",
       exact: true,
     });
 
-    expect(exactSearch.count).toBe(1);
-    expect(exactSearch.hits[0].quote).toBe("Be yourself; everyone else is already taken.");
-    expect(exactSearch.hits[0].author).toBe("Oscar Wilde");
+    t.equal(exactSearch.count, 1);
+    t.equal(exactSearch.hits[0].quote, "Be yourself; everyone else is already taken.");
+    t.equal(exactSearch.hits[0].author, "Oscar Wilde");
   });
 
-  it("Shouldn't tolerate typos", () => {
+  t.test("Shouldn't tolerate typos", t => {
+    t.plan(1);
+
     const db = create({
       schema: {
         quote: "string",
@@ -363,10 +394,12 @@ describe("lyra", () => {
       tolerance: 0,
     });
 
-    expect(searchResult.count).toBe(0);
+    t.equal(searchResult.count, 0);
   });
 
-  it("Should tolerate typos", () => {
+  t.test("Should tolerate typos", t => {
+    t.plan(2);
+
     const db = create({
       schema: {
         quote: "string",
@@ -390,17 +423,19 @@ describe("lyra", () => {
       tolerance: 1,
     });
 
-    expect(tolerantSearch.count).toBe(2);
+    t.equal(tolerantSearch.count, 2);
 
     const moreTolerantSearch = search(db, {
       term: "sahrse",
       tolerance: 3,
     });
 
-    expect(moreTolerantSearch.count).toBe(2);
+    t.equal(moreTolerantSearch.count, 2);
   });
 
-  it("Should support nested properties", () => {
+  t.test("Should support nested properties", t => {
+    t.plan(4);
+
     const db = create({
       schema: {
         quote: "string",
@@ -447,15 +482,19 @@ describe("lyra", () => {
       properties: ["author.name"],
     });
 
-    expect(resultSimpsonAuthorName.count).toBe(1);
-    expect(resultSimpsonQuote.count).toBe(1);
-    expect(resultAuthorSurname.count).toBe(1);
-    expect(resultAuthorName.count).toBe(0);
+    t.equal(resultSimpsonAuthorName.count, 1);
+    t.equal(resultSimpsonQuote.count, 1);
+    t.equal(resultAuthorSurname.count, 1);
+    t.equal(resultAuthorName.count, 0);
   });
 });
 
-describe("Disable stemming", () => {
-  it("Should disable stemming globally", () => {
+t.test("Disable stemming", t => {
+  t.plan(2);
+
+  t.test("Should disable stemming globally", t => {
+    t.plan(2);
+
     const db = create({
       schema: {
         quote: "string",
@@ -478,11 +517,13 @@ describe("Disable stemming", () => {
     });
 
     // Resoults should be empty as "baking" doesn't get reduced to "bake"
-    expect(result1.count).toBe(0);
-    expect(result2.count).toBe(1);
+    t.equal(result1.count, 0);
+    t.equal(result2.count, 1);
   });
 
-  it("Should stem by default", () => {
+  t.test("Should stem by default", t => {
+    t.plan(1);
+
     const db = create({
       schema: {
         quote: "string",
@@ -498,6 +539,6 @@ describe("Disable stemming", () => {
       exact: true,
     });
 
-    expect(result1.count).toBe(1);
+    t.equal(result1.count, 1);
   });
 });

@@ -1,8 +1,7 @@
-import { customAlphabet } from "nanoid";
+const baseId = Date.now().toString().slice(5);
+let lastId = 0;
 
 export const isServer = typeof window === "undefined";
-
-export const uniqueId = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 10);
 
 export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) {
@@ -32,4 +31,8 @@ export function getNanosecondsTime(): bigint {
   }
 
   return BigInt(Math.floor(performance.now()) * 1000);
+}
+
+export function uniqueId(): string {
+  return `${baseId}-${lastId++}`;
 }

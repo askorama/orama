@@ -1,3 +1,4 @@
+import t from "tap";
 import { create as createNode } from "../src/prefix-tree/node";
 import {
   contains as trieContains,
@@ -16,8 +17,12 @@ const phrases = [
   { id: "7", doc: "let's try this trie" },
 ];
 
-describe("trie", () => {
-  it("should correctly index phrases into a prefix tree", () => {
+t.test("trie", t => {
+  t.plan(3);
+
+  t.test("should correctly index phrases into a prefix tree", t => {
+    t.plan(phrases.length);
+
     const nodes = {};
     const trie = createNode();
 
@@ -26,11 +31,13 @@ describe("trie", () => {
     }
 
     for (const phrase of phrases) {
-      expect(trieContains(nodes, trie, phrase.doc)).toBeTruthy();
+      t.ok(trieContains(nodes, trie, phrase.doc));
     }
   });
 
-  it("should correctly find an element by prefix", () => {
+  t.test("should correctly find an element by prefix", t => {
+    t.plan(2);
+
     const nodes = {};
     const trie = createNode();
 
@@ -38,28 +45,13 @@ describe("trie", () => {
       trieInsert(nodes, trie, doc, id);
     }
 
-    expect(trieFind(nodes, trie, { term: phrases[5].doc.slice(0, 5) })).toStrictEqual({
-      [phrases[5].doc]: [phrases[5].id],
-    });
-    expect(trieFind(nodes, trie, { term: "th" })).toMatchInlineSnapshot(`
-      Object {
-        "the quick, brown fox": Array [
-          "1",
-        ],
-        "there is something wrong in there": Array [
-          "4",
-        ],
-        "this is me": Array [
-          "5",
-        ],
-        "thought it was sunday": Array [
-          "6",
-        ],
-      }
-    `);
+    t.strictSame(trieFind(nodes, trie, { term: phrases[5].doc.slice(0, 5) }), { [phrases[5].doc]: [phrases[5].id] });
+    t.matchSnapshot(trieFind(nodes, trie, { term: "th" }), t.name);
   });
 
-  it("should correctly delete a word from the trie", () => {
+  t.test("should correctly delete a word from the trie", t => {
+    t.plan(2);
+
     const nodes = {};
     const trie = createNode();
 
@@ -69,7 +61,7 @@ describe("trie", () => {
 
     trieRemoveWord(nodes, trie, phrases[0].doc);
 
-    expect(trieContains(nodes, trie, phrases[0].doc)).toBeFalsy();
-    expect(trieFind(nodes, trie, { term: phrases[0].doc })).toStrictEqual({});
+    t.notOk(trieContains(nodes, trie, phrases[0].doc));
+    t.strictSame(trieFind(nodes, trie, { term: phrases[0].doc }), {});
   });
 });

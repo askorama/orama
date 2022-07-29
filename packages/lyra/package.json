@@ -14,21 +14,23 @@
   "scripts": {
     "build:cjs": "tsc --project tsconfig.cjs.json",
     "build:module": "tsc --project tsconfig.esm.json",
-    "build": "pnpm build:module && pnpm build:cjs"
+    "build": "pnpm build:module && pnpm build:cjs",
+    "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
+    "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
+    "ci": "npm run build && npm run test:ci"
   },
   "main": "./dist/cjs/lyra.js",
   "module": "./dist/esm/lyra.js",
   "types": "./dist/esm/lyra.d.ts",
   "dependencies": {
     "fastq": "^1.13.0",
-    "nanoid": "3.3.4",
     "natural": "^5.2.3"
   },
   "devDependencies": {
-    "@types/jest": "^27.5.0",
     "@types/natural": "^5.1.1",
-    "jest": "^28.1.0",
-    "ts-jest": "^28.0.2",
-    "typescript": "^4.6.4"
+    "@types/tap": "^15.0.7",
+    "c8": "^7.12.0",
+    "tap": "^16.3.0",
+    "typescript": "^4.7.4"
   }
 }

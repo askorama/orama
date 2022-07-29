@@ -1,22 +1,29 @@
+import t from "tap";
 import { formatBytes, formatNanoseconds } from "../src/utils";
 
-describe("utils", () => {
-  it("should correctly format bytes", () => {
-    expect(formatBytes(0)).toBe("0 Bytes");
-    expect(formatBytes(1)).toBe("1 Bytes");
-    expect(formatBytes(1024)).toBe("1 KB");
-    expect(formatBytes(1024 ** 2)).toBe("1 MB");
-    expect(formatBytes(1024 ** 3)).toBe("1 GB");
-    expect(formatBytes(1024 ** 4)).toBe("1 TB");
-    expect(formatBytes(1024 ** 5)).toBe("1 PB");
-    expect(formatBytes(1024 ** 6)).toBe("1 EB");
-    expect(formatBytes(1024 ** 7)).toBe("1 ZB");
+t.test("utils", t => {
+  t.plan(2);
+
+  t.test("should correctly format bytes", t => {
+    t.plan(9);
+
+    t.equal(formatBytes(0), "0 Bytes");
+    t.equal(formatBytes(1), "1 Bytes");
+    t.equal(formatBytes(1024), "1 KB");
+    t.equal(formatBytes(1024 ** 2), "1 MB");
+    t.equal(formatBytes(1024 ** 3), "1 GB");
+    t.equal(formatBytes(1024 ** 4), "1 TB");
+    t.equal(formatBytes(1024 ** 5), "1 PB");
+    t.equal(formatBytes(1024 ** 6), "1 EB");
+    t.equal(formatBytes(1024 ** 7), "1 ZB");
   });
 
-  it("should correctly format nanoseconds", () => {
-    expect(formatNanoseconds(1_000_000n)).toBe("1ms");
-    expect(formatNanoseconds(1_000_000_000n)).toBe("1000ms"); // 1s
-    expect(formatNanoseconds(1_000_000_000_000n)).toBe("1000000ms"); // 1m
-    expect(formatNanoseconds(1_000_000_000_000_000n)).toBe("1000000000ms"); // 1h
+  t.test("should correctly format nanoseconds", t => {
+    t.plan(4);
+
+    t.equal(formatNanoseconds(1_000_000n), "1ms");
+    t.equal(formatNanoseconds(1_000_000_000n), "1000ms"); // 1s
+    t.equal(formatNanoseconds(1_000_000_000_000n), "1000000ms"); // 1m
+    t.equal(formatNanoseconds(1_000_000_000_000_000n), "1000000000ms"); // 1h
   });
 });

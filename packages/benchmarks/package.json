@@ -17,11 +17,5 @@
     "cronometro": "^1.1.0",
     "csv-parse": "^5.1.0",
     "dpack": "^0.6.22"
-  },
-  "devDependencies": {
-    "@types/benchmark": "^2.1.1",
-    "benchmark": "^2.1.4",
-    "benny": "^3.7.1",
-    "minisearch": "5.0.0-beta2"
   }
 }

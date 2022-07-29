@@ -7,8 +7,8 @@
     "packages/**"
   ],
   "scripts": {
+    "test": "cd packages/lyra && pnpm test",
     "commit": "pnpm lint-staged && cz",
-    "test": "jest --coverage",
     "format": "prettier --write \"packages/**/*.{ts,js}\"",
     "lint": "pnpm run format && eslint . --ext .js,.ts",
     "prepare": "husky install",
@@ -31,19 +31,15 @@
     }
   },
   "devDependencies": {
-    "@types/jest": "^27.5.0",
-    "@types/node": "^17.0.31",
-    "@typescript-eslint/eslint-plugin": "^5.23.0",
-    "@typescript-eslint/parser": "^5.23.0",
-    "commitizen": "^4.2.4",
-    "eslint": "^8.15.0",
-    "husky": "^8.0.0",
-    "jest": "^28.1.0",
-    "lint-staged": "^12.4.1",
-    "prettier": "^2.6.2",
-    "ts-jest": "^28.0.2",
-    "ts-node": "^10.7.0",
-    "typescript": "^4.6.4"
+    "@types/node": "^18.6.2",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "commitizen": "^4.2.5",
+    "eslint": "^8.20.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
+    "typescript": "^4.7.4"
   },
   "pnpm": {
     "peerDependencyRules": {

@@ -1,8 +1,13 @@
+import t from "tap";
 import { create, insert, save, load, search } from "../src/lyra";
 import { contains as trieContains } from "../src/prefix-tree/trie";
 
-describe("Edge getters", () => {
-  it("should correctly enable edge index getter", () => {
+t.test("Edge getters", t => {
+  t.plan(3);
+
+  t.test("should correctly enable edge index getter", t => {
+    t.plan(2);
+
     const db = create({
       schema: {
         name: "string",
@@ -25,11 +30,13 @@ describe("Edge getters", () => {
     const nameIndex = index["name"];
 
     // Remember that tokenizers an stemmers sets content to lowercase
-    expect(trieContains(db.nodes, nameIndex, "john")).toBeTruthy();
-    expect(trieContains(db.nodes, nameIndex, "jane")).toBeTruthy();
+    t.ok(trieContains(db.nodes, nameIndex, "john"));
+    t.ok(trieContains(db.nodes, nameIndex, "jane"));
   });
 
-  it("should correctly enable edge docs getter", () => {
+  t.test("should correctly enable edge docs getter", t => {
+    t.plan(2);
+
     const db = create({
       schema: {
         name: "string",
@@ -50,11 +57,13 @@ describe("Edge getters", () => {
 
     const docs = save(db).docs;
 
-    expect(docs[doc1.id]).toStrictEqual({ name: "John", age: 30 });
-    expect(docs[doc2.id]).toStrictEqual({ name: "Jane", age: 25 });
+    t.strictSame(docs[doc1.id], { name: "John", age: 30 });
+    t.strictSame(docs[doc2.id], { name: "Jane", age: 25 });
   });
 
-  it("should correctly enable index setter", () => {
+  t.test("should correctly enable index setter", t => {
+    t.plan(6);
+
     const db = create({
       schema: {
         name: "string",
@@ -99,25 +108,12 @@ describe("Edge getters", () => {
     const search3 = search(db, { term: "Paolo" });
     const search4 = search(db, { term: "Michele" });
 
-    expect(search1.count).toBe(0);
-    expect(search2.count).toBe(0);
-    expect(search3.count).toBe(1);
-    expect(search4.count).toBe(1);
+    t.equal(search1.count, 0);
+    t.equal(search2.count, 0);
+    t.equal(search3.count, 1);
+    t.equal(search4.count, 1);
 
-    expect(search3.hits).toStrictEqual([
-      {
-        name: "Paolo",
-        id: id2.id,
-        age: 37,
-      },
-    ]);
-
-    expect(search4.hits).toStrictEqual([
-      {
-        name: "Michele",
-        id: id1.id,
-        age: 27,
-      },
-    ]);
+    t.strictSame(search3.hits, [{ name: "Paolo", id: id2.id, age: 37 }]);
+    t.strictSame(search4.hits, [{ name: "Michele", id: id1.id, age: 27 }]);
   });
 });

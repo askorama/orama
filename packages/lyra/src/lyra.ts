@@ -83,13 +83,13 @@ function getIndices<T extends PropertiesSchema>(lyra: Lyra<T>, indices: SearchPa
     if (indices === "*") {
       return knownIndices;
     } else {
-      throw ERRORS.INVALID_PROPERTY(indices, knownIndices);
+      throw new Error(ERRORS.INVALID_PROPERTY(indices, knownIndices));
     }
   }
 
   for (const index of indices as string[]) {
     if (!knownIndices.includes(index)) {
-      throw ERRORS.INVALID_PROPERTY(index, knownIndices);
+      throw new Error(ERRORS.INVALID_PROPERTY(index, knownIndices));
     }
   }
 
@@ -123,7 +123,7 @@ function buildIndex<T extends PropertiesSchema>(lyra: Lyra<T>, schema: T, prefix
     const propType = typeof prop;
     const isNested = typeof schema[prop] === "object";
 
-    if (propType !== "string") throw ERRORS.INVALID_SCHEMA_TYPE(propType);
+    if (propType !== "string") throw new Error(ERRORS.INVALID_SCHEMA_TYPE(propType));
 
     const propName = `${prefix}${prop}`;
 
@@ -201,7 +201,7 @@ export function create<T extends PropertiesSchema>(properties: LyraProperties<T>
   const defaultLanguage = (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
   if (!SUPPORTED_LANGUAGES.includes(defaultLanguage)) {
-    throw ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage);
+    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage));
   }
 
   const instance: Lyra<T> = {
@@ -226,14 +226,14 @@ export function insert<T extends PropertiesSchema>(
   config?: InsertConfig,
 ): { id: string } {
   config = { language: lyra.defaultLanguage, stemming: lyra.enableStemming, ...config };
-  const id = uniqueId(10);
+  const id = uniqueId();
 
   if (!SUPPORTED_LANGUAGES.includes(config.language)) {
-    throw ERRORS.LANGUAGE_NOT_SUPPORTED(config.language);
+    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(config.language));
   }
 
   if (!checkInsertDocSchema(lyra, doc)) {
-    throw ERRORS.INVALID_DOC_SCHEMA(lyra.schema, doc);
+    throw new Error(ERRORS.INVALID_DOC_SCHEMA(lyra.schema, doc));
   }
 
   lyra.queue!.push({
@@ -247,7 +247,7 @@ export function insert<T extends PropertiesSchema>(
 
 export function remove<T extends PropertiesSchema>(lyra: Lyra<T>, docID: string): boolean {
   if (!(docID in lyra.docs)) {
-    throw ERRORS.DOC_ID_DOES_NOT_EXISTS(docID);
+    throw new Error(ERRORS.DOC_ID_DOES_NOT_EXISTS(docID));
   }
 
   const document = lyra.docs[docID];
@@ -258,7 +258,7 @@ export function remove<T extends PropertiesSchema>(lyra: Lyra<T>, docID: string)
 
     for (const token of tokens) {
       if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
-        throw ERRORS.CANT_DELETE_DOCUMENT(docID, key, token);
+        throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
       }
     }
   }
@@ -333,7 +333,7 @@ export function save<T extends PropertiesSchema>(lyra: Lyra<T>): LyraData<T> {
 
 export function load<T extends PropertiesSchema>(lyra: Lyra<T>, { index, docs, nodes }: LyraData<T>) {
   if (!lyra.edge) {
-    throw ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("load");
+    throw new Error(ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("load"));
   }
 
   lyra.index = index;
