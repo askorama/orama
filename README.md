@@ -21,9 +21,9 @@ pnpm add @nearform/lyra
 Lyra is quite simple to use. The first thing to do is to create a new database instance and set an indexing schema:
 
 ```js
-import { Lyra } from '@nearform/lyra';
+import { create, insert, search } from '@nearform/lyra';
 
-const db = new Lyra({
+const db = create({
   schema: {
     author: 'string',
     quote: 'string'
@@ -36,22 +36,22 @@ Lyra will only index string properties, but will allow you to set and store addi
 Once the db instance is created, you can start adding some documents:
 
 ```js
-await db.insert({
+insert(db, {
   quote: 'It is during our darkest moments that we must focus to see the light.',
   author: 'Aristotle'
 });
 
-await db.insert({
+insert(db, {
   quote: 'If you really look closely, most overnight successes took a long time.',
   author: 'Steve Jobs'
 });
 
-await db.insert({
+insert(db, {
   quote: 'If you are not willing to risk the usual, you will have to settle for the ordinary.',
   author: 'Jim Rohn'
 });
 
-await db.insert({
+insert(db, {
   quote: 'You miss 100% of the shots you don\'t take',
   author: 'Wayne Gretzky - Michael Scott'
 });
@@ -60,7 +60,7 @@ await db.insert({
 After the data has been inserted, you can finally start to query the database.
 
 ```js
-const searchResult = await db.search({
+const searchResult = search(db, {
   term: 'if',
   properties: '*'
 });
@@ -70,7 +70,7 @@ In the case above, you will be searching for all the documents containing the wo
 
 ```js
 {
-  elapsed: '99μs',
+  elapsed: 99,
   hits: [
     {
       id: 'ckAOPGTA5qLXx0MgNr1Zy',
@@ -90,7 +90,7 @@ In the case above, you will be searching for all the documents containing the wo
 You can also restrict the lookup to a specific property:
 
 ```js
-const searchResult = await db.search({
+const searchResult = search(db, {
   term: 'Michael',
   properties: ['author']
 });
@@ -100,7 +100,7 @@ Result:
 
 ```js
 {
-  elapsed: '111μs',
+  elapsed: 111,
   hits: [
     {
       id: 'L1tpqQxc0c2djrSN2a6TJ',
@@ -115,7 +115,7 @@ Result:
 If needed, you can also delete a given document by using the `delete` method:
 
 ```js
-await db.delete('L1tpqQxc0c2djrSN2a6TJ');
+delete(db, 'L1tpqQxc0c2djrSN2a6TJ');
 ```
 
 # License

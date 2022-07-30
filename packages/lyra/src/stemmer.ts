@@ -61,5 +61,5 @@ export function stemArray(input: string[], language: Language): string[] {
       break;
   }
 
-  return input.map((word) => stemmer.stem(word));
+  return input.map(word => stemmer.stem(word));
 }

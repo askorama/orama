@@ -1,30 +1,38 @@
 import cronometro from "cronometro";
-import { Lyra } from "@nearform/lyra";
-import lines from "../dataset/divinaCommedia.json" assert { type: "json" };
+import { readFile } from "fs/promises";
+import { create, insert, search } from "@nearform/lyra";
+import { URL } from "node:url";
+import { isMainThread } from "node:worker_threads";
 
-const db = new Lyra({
-  schema: {
-    id: "string",
-    txt: "string",
-  },
-});
+let db;
 
-for (const line of lines) {
-  await db.insert(line);
+if (!isMainThread) {
+  const lines = JSON.parse(await readFile(new URL("../dataset/divinaCommedia.json", import.meta.url).pathname));
+
+  db = create({
+    schema: {
+      id: "string",
+      txt: "string",
+    },
+  });
+
+  for (const line of lines) {
+    insert(db, line);
+  }
 }
 
 const testCases = {
   ['Lyra prefix search. Searching "vir" in Divina Commedia, "txt" index']() {
-    return db.search({ term: "vir", properties: ["txt"] });
+    return search(db, { term: "vir", properties: ["txt"] });
   },
   ['Lyra prefix search. Searching "virtut" in Divina Commedia, "txt" index']() {
-    return db.search({ term: "virtut", properties: ["txt"] });
+    return search(db, { term: "virtut", properties: ["txt"] });
   },
   ['Lyra prefix search. Searching "vir" in Divina Commedia all indexes']() {
-    return db.search({ term: "vir" });
+    return search(db, { term: "vir" });
   },
   ['Lyra prefix search. Searching "virtut" in Divina Commedia all indexes']() {
-    return db.search({ term: "virtut" });
+    return search(db, { term: "virtut" });
   },
 };
 

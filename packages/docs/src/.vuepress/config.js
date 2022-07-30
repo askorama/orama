@@ -18,10 +18,7 @@ module.exports = {
   head: [
     ["meta", { name: "theme-color", content: "#3eaf7c" }],
     ["meta", { name: "apple-mobile-web-app-capable", content: "yes" }],
-    [
-      "meta",
-      { name: "apple-mobile-web-app-status-bar-style", content: "black" },
-    ],
+    ["meta", { name: "apple-mobile-web-app-status-bar-style", content: "black" }],
   ],
 
   base: "/lyra/",
@@ -54,12 +51,7 @@ module.exports = {
         {
           title: "Guide",
           collapsable: false,
-          children: [
-            "getting-started",
-            "creating-a-database",
-            "insert-data",
-            "search",
-          ],
+          children: ["getting-started", "creating-a-database", "insert-data", "search"],
         },
       ],
     },
