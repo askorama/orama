@@ -3,7 +3,7 @@ import * as ERRORS from "./errors";
 import toFastProperties, { insertWithFastProperties } from "./fast-properties";
 import { tokenize } from "./tokenizer";
 import { getNanosecondsTime, uniqueId } from "./utils";
-import { Language, SUPPORTED_LANGUAGES } from "./stemmer";
+import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import type { ResolveSchema, SearchProperties } from "./types";
 import { create as createNode, Node } from "./prefix-tree/node";
 import { find as trieFind, insert as trieInsert, removeDocumentByWord, Nodes } from "./prefix-tree/trie";
@@ -19,7 +19,6 @@ export type PropertiesSchema = {
 export type LyraProperties<T extends PropertiesSchema> = {
   schema: T;
   defaultLanguage?: Language;
-  stemming?: boolean;
   edge?: boolean;
 };
 
@@ -36,7 +35,6 @@ export type SearchParams<T extends PropertiesSchema> = {
 
 export type InsertConfig = {
   language: Language;
-  stemming: boolean;
 };
 
 export type LyraData<T extends PropertiesSchema> = {
@@ -69,7 +67,6 @@ export interface Lyra<T extends PropertiesSchema> {
   docs: LyraDocs<T>;
   nodes: Nodes;
   index: LyraIndex;
-  enableStemming: boolean;
   edge: boolean;
   queue?: fastq.queue<QueueDocParams<T>, void>;
 }
@@ -160,7 +157,7 @@ function _insert<T extends PropertiesSchema>(
         // Use propName here because if doc is a nested object
         // We will get the wrong index
         const requestedTrie = index[propName];
-        const tokens = tokenize(doc[key] as string, config.language, config.stemming);
+        const tokens = tokenize(doc[key] as string, config.language);
 
         for (const token of tokens) {
           trieInsert(nodes, requestedTrie, token, id);
@@ -212,7 +209,6 @@ export function create<T extends PropertiesSchema>(properties: LyraProperties<T>
     docs: {},
     nodes: {},
     index: {},
-    enableStemming: properties.stemming ?? true,
     edge: properties.edge ?? false,
   };
 
@@ -227,7 +223,7 @@ export function insert<T extends PropertiesSchema>(
   doc: ResolveSchema<T>,
   config?: InsertConfig,
 ): { id: string } {
-  config = { language: lyra.defaultLanguage, stemming: lyra.enableStemming, ...config };
+  config = { language: lyra.defaultLanguage, ...config };
   const id = uniqueId();
 
   if (!SUPPORTED_LANGUAGES.includes(config.language)) {
