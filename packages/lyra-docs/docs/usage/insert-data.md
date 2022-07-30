@@ -4,6 +4,20 @@ sidebar_position: 2
 
 # Insert Data
 
+export const Highlight = ({children, color}) => (
+  <span
+    style={{
+      backgroundColor: color,
+      borderRadius: '8px',
+      color: '#fff',
+      padding: '10px',
+      cursor: 'pointer',
+    }}
+    >
+    {children}
+  </span>
+);
+
 Whenever we create a database with Lyra we must specify a `Schema`, which represents the entry we are going to insert.
 
 > <small>If you don't know how to create a lyra database, <a href="/docs/usage/creating-a-new-lyra-instance">go check it out</a> before proceeding.</small>
@@ -64,4 +78,12 @@ The optional parameters can be configurations properties (e.g. <a href="/docs/us
 
 ```js title="lyra.js"
 insert(movieDB, myDocument, { language: 'spanish' });
+```
+<hr/>
+
+### <Highlight color="#ff5b9b">Doc IDs</Highlight>
+
+The **insert** method returns the unique `id` of the inserted document.
+```js
+console.log(harryPotter) // 79741872-5
 ```

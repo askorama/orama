@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-undef */
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 

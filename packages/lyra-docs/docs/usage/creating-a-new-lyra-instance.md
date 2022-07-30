@@ -4,9 +4,8 @@ sidebar_position: 1
 
 # Create a new Lyra instance
 
-## Create
-
 Creating a new instance is very simple.
+## Create
 
 We `create` a new database instance with an **indexing `schema`**.<br/>
 The schema represents **the structure** of the entry to be inserted into the database.
