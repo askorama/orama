@@ -4,52 +4,64 @@ sidebar_position: 2
 
 # Insert Data
 
-Documents are **groups of pages** connected through:
+Whenever we create a database with Lyra we must specify a `Schema`, which represents the entry we are going to insert.
 
-- a **sidebar**
-- **previous/next navigation**
-- **versioning**
+> <small>If you don't know how to create a lyra database, <a href="/docs/usage/creating-a-new-lyra-instance">go check it out</a> before proceeding.</small>
 
-## Create your first Doc
+Our database and schema look like this:
 
-Create a Markdown file at `docs/hello.md`:
+```js title="lyra.js"
+import { create, insert } from '@nearfom/lyra'; 
 
-```md title="docs/hello.md"
-# Hello
+const movieDB = create({
+  schema: {
+    title: 'string',
+    director: 'string',
+    plot: 'string',
+    year: 'number',
+    isFavorite: 'boolean'
+  }
+});
+```
+and notice that we are now also **importing** the `insert` method to do our insertions.
 
-This is my **first Docusaurus document**!
+## Insert
+Data insertion in Lyra is quick and intuitive
+
+```js title="lyra.js"
+const { id: thePrestige } = insert(movieDB, {
+  title: 'The prestige',
+  director: 'Christopher Nolan',
+  plot: 'Two friends and fellow magicians become bitter enemies after a sudden tragedy. As they devote themselves to this rivalry, they make sacrifices that bring them fame but with terrible consequences.',
+  year: 2006,
+  isFavorite: true
+});
+
+const { id: bigFish } = insert(movieDB, {
+  title: 'Big Fish',
+  director: 'Tim Burton',
+  plot: 'Will Bloom returns home to care for his dying father, who had a penchant for telling unbelievable stories. After he passes away, Will tries to find out if his tales were really true.',
+  year: 2004,
+  isFavorite: true
+});
+
+const { id: harryPotter } = insert(movieDB, {
+  title: 'Harry Potter and the Philosopher\'s Stone',
+  director: 'Chris Columbus',
+  plot: 'Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.',
+  year: 2001,
+  isFavorite: false
+});
 ```
 
-A new document is now available at [http://localhost:3000/docs/hello](http://localhost:3000/docs/hello).
+### Parameters
+The **insert** method takes two mandatory parameters: 
 
-## Configure the Sidebar
+1. the `database` in which we want the insertion to occurr
+2. the `document` to insert (which must abide to the aforementioned **schema**)
 
-Docusaurus automatically **creates a sidebar** from the `docs` folder.
+The optional parameters can be configurations properties (e.g. <a href="/docs/usage/creating-a-new-lyra-instance#input-analyzer">the override</a> of the default language for the given document).
 
-Add metadata to customize the sidebar label and position:
-
-```md title="docs/hello.md" {1-4}
----
-sidebar_label: 'Hi!'
-sidebar_position: 3
----
-
-# Hello
-
-This is my **first Docusaurus document**!
-```
-
-It is also possible to create your sidebar explicitly in `sidebars.js`:
-
-```js title="sidebars.js"
-module.exports = {
-  tutorialSidebar: [
-    {
-      type: 'category',
-      label: 'Tutorial',
-      // highlight-next-line
-      items: ['hello'],
-    },
-  ],
-};
+```js title="lyra.js"
+insert(movieDB, myDocument, { language: 'spanish' });
 ```

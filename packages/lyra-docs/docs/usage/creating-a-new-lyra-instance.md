@@ -76,3 +76,15 @@ const db = new Lyra({
   defaultLanguage: 'italian',
 });
 ```
+
+Currently the available languages are:
+
+- dutch
+- english (default)
+- french
+- italian
+- norwegian
+- portugese
+- russian
+- spanish
+- swedish
