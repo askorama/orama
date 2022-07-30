@@ -7,8 +7,6 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
 
 import styles from './index.module.css';
 import GithubStarsButton from '../components/HomepageFeatures/buttons/GithubStars';
-import DemoButton from '../components/HomepageFeatures/buttons/DemoButton';
-import LyraDemo from '../components/Demo/LyraDemo';
 //import LyraLogo from '../components/HomepageFeatures/logo/lyraLogo';
 
 function HomepageHeader() {
@@ -28,7 +26,6 @@ function HomepageHeader() {
             to="/docs/introduction/getting-started">
             Get Started
           </Link>
-          <DemoButton link='#try-lyra' />
           <GithubStarsButton user='nearform' repo="lyra" size="large" />
         </div>
       </div>
@@ -45,7 +42,6 @@ export default function Home(): JSX.Element {
       <HomepageHeader />
       <main>
         <HomepageFeatures />
-        <LyraDemo />
       </main>
     </Layout>
   );
