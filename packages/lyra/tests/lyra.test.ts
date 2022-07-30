@@ -215,22 +215,21 @@ t.test("lyra", t => {
       schema: {
         txt: "string",
       },
-      stemming: false,
     });
 
     insert(db, { txt: "stelle" });
     insert(db, { txt: "stellle" });
     insert(db, { txt: "scelte" });
 
-    const searchResult = search(db, { term: "stelle" });
+    const searchResult = search(db, { term: "stelle", exact: true });
 
-    const id = searchResult.hits[0].id;
+    const { id } = searchResult.hits[0];
 
     remove(db, id);
 
-    const searchResult2 = search(db, { term: "stelle" });
+    const searchResult2 = search(db, { term: "stelle", exact: true });
 
-    t.equal(searchResult2.count, 1);
+    t.equal(searchResult2.count, 0);
   });
 
   t.test("Shouldn't affects other document when deleted one", t => {
@@ -240,7 +239,6 @@ t.test("lyra", t => {
       schema: {
         txt: "string",
       },
-      stemming: false,
     });
 
     insert(db, { txt: "abc" });
@@ -420,14 +418,14 @@ t.test("lyra", t => {
 
     const tolerantSearch = search(db, {
       term: "seahrse",
-      tolerance: 1,
+      tolerance: 2,
     });
 
     t.equal(tolerantSearch.count, 2);
 
     const moreTolerantSearch = search(db, {
       term: "sahrse",
-      tolerance: 3,
+      tolerance: 5,
     });
 
     t.equal(moreTolerantSearch.count, 2);
@@ -486,59 +484,5 @@ t.test("lyra", t => {
     t.equal(resultSimpsonQuote.count, 1);
     t.equal(resultAuthorSurname.count, 1);
     t.equal(resultAuthorName.count, 0);
-  });
-});
-
-t.test("Disable stemming", t => {
-  t.plan(2);
-
-  t.test("Should disable stemming globally", t => {
-    t.plan(2);
-
-    const db = create({
-      schema: {
-        quote: "string",
-      },
-      stemming: false,
-    });
-
-    insert(db, {
-      quote: "I am baking some cakes",
-    });
-
-    const result1 = search(db, {
-      term: "bake",
-      exact: true,
-    });
-
-    const result2 = search(db, {
-      term: "bak",
-      tolerance: 10,
-    });
-
-    // Resoults should be empty as "baking" doesn't get reduced to "bake"
-    t.equal(result1.count, 0);
-    t.equal(result2.count, 1);
-  });
-
-  t.test("Should stem by default", t => {
-    t.plan(1);
-
-    const db = create({
-      schema: {
-        quote: "string",
-      },
-    });
-
-    insert(db, {
-      quote: "I am baking some cakes",
-    });
-
-    const result1 = search(db, {
-      term: "bake",
-      exact: true,
-    });
-
-    t.equal(result1.count, 1);
   });
 });

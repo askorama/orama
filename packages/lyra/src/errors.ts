@@ -1,4 +1,4 @@
-import { SUPPORTED_LANGUAGES } from "./stemmer";
+import { SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 
 function formatJSON(input: object) {
   return JSON.stringify(input, null, 2);

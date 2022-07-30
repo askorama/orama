@@ -1,9 +1,8 @@
 import t from "tap";
-import { stemArray } from "../src/stemmer";
 import { tokenize } from "../src/tokenizer";
 
 t.test("Tokenizer", t => {
-  t.plan(18);
+  t.plan(9);
 
   t.test("Should tokenize and stem correctly in english", t => {
     t.plan(2);
@@ -120,131 +119,5 @@ t.test("Tokenizer", t => {
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
-  });
-
-  t.test("Should stem an array correctly in dutch", t => {
-    t.plan(1);
-
-    // some words in dutch
-    const input: string[] = ["banken"];
-
-    // the expected output
-    const expected = ["bank"];
-
-    const output = stemArray(input, "dutch");
-
-    t.strictSame(output, expected);
-  });
-
-  t.test("Should stem an array correctly in english", t => {
-    t.plan(1);
-
-    // some words in english
-    const input: string[] = ["awesome"];
-
-    // the expected output
-    const expected = ["awesom"];
-
-    const output = stemArray(input, "english");
-
-    t.strictSame(output, expected);
-  });
-
-  t.test("Should stem an array correctly in french", t => {
-    t.plan(1);
-
-    // some words in french
-    const input: string[] = ["haussant"];
-
-    // the expected output
-    const expected = ["hauss"];
-
-    const output = stemArray(input, "french");
-
-    t.strictSame(output, expected);
-  });
-
-  t.test("Should stem an array correctly in italian", t => {
-    t.plan(1);
-
-    // some words in italian
-    const input: string[] = ["indicatore"];
-
-    // the expected output
-    const expected = ["indic"];
-
-    const output = stemArray(input, "italian");
-
-    t.strictSame(output, expected);
-  });
-
-  t.test("Should stem an array correctly in norwegian", t => {
-    t.plan(1);
-
-    // some words in norwegian
-    const input: string[] = ["hjemlet"];
-
-    // the expected output
-    const expected = ["hjeml"];
-
-    const output = stemArray(input, "norwegian");
-
-    t.strictSame(output, expected);
-  });
-
-  t.test("Should stem an array correctly in portugese", t => {
-    t.plan(1);
-
-    // some words in portugese
-    const input: string[] = ["velhas"];
-
-    // the expected output
-    const expected = ["velh"];
-
-    const output = stemArray(input, "portugese");
-
-    t.strictSame(output, expected);
-  });
-
-  t.test("Should stem an array correctly in russian", t => {
-    t.plan(1);
-
-    // some words in russian
-    const input: string[] = ["вагоне"];
-
-    // the expected output
-    const expected = ["вагон"];
-
-    const output = stemArray(input, "russian");
-
-    t.strictSame(output, expected);
-  });
-
-  t.test("Should stem an array correctly in spanish", t => {
-    t.plan(1);
-
-    // some words in spanish
-    const input: string[] = ["avenida"];
-
-    // the expected output
-    const expected = ["aven"];
-
-    const output = stemArray(input, "spanish");
-
-    t.strictSame(output, expected);
-  });
-
-  t.test("Should stem an array correctly in swedish", t => {
-    t.plan(1);
-
-    // some words in swedish
-    const input: string[] = ["jemförelser"];
-
-    // the expected output
-    const expected = ["jemför"];
-
-    const output = stemArray(input, "swedish");
-
-    t.strictSame(output, expected);
   });
 });
