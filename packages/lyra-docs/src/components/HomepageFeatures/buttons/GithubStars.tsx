@@ -1,7 +1,7 @@
 import React from 'react';
 
 // utils
-import { GithubStars } from '../../../../utils/types';
+import { GithubStars } from '@site/utils/types';
 
 const GithubStarsButton = ({ user, repo, size }: GithubStars): JSX.Element => {
     return (

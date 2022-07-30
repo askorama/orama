@@ -55,4 +55,4 @@ import { Lyra } from '@nearform/lyra'
 const { Lyra } = require('@nearform/lyra');
 ```
 
-> Lyra exposes its own types, ESM modules, and CJS modules.
+> Lyra exposes its own types, ESM modules and CJS modules.
