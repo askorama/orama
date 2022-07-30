@@ -128,8 +128,11 @@ const searchResult = search(movieDB, {
 ```
 We are searching all the documents that contain a term with an edit distance of `1` (e.g. `Chris`) in the `director` property.
 
+:::caution
 
-> Tolerance will not work together with the exact parameter
+`Tolerance` doesn't work together with the `exact` parameter
+
+:::
 
 ### <Highlight color="#ff5b9b">Limit</Highlight>
 The `limit` property limits the result at the specified number.

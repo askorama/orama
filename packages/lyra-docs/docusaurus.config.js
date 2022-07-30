@@ -9,12 +9,12 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Lyra✨',
-  tagline: 'Blazingly fast text search engine',
+  tagline: 'A blazingly fast text search engine',
   url: 'https://github.com/nearform/lyra',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'https://nearform.github.io/lyra/imgs/lyra.svg',
+  favicon: '/img/lyra-logo.svg',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -28,7 +28,7 @@ const config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
-
+  plugins: [require.resolve("@cmfcmf/docusaurus-search-local")],
   presets: [
     [
       'classic',
@@ -60,7 +60,7 @@ const config = {
       navbar: {
         logo: {
           alt: 'Lyra Logo',
-          src: 'https://nearform.github.io/lyra/imgs/lyra.svg',
+          src: '/img/lyra.svg',
         },
         items: [
           {

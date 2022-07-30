@@ -4,11 +4,11 @@
  */
 
 [data-theme="dark"] .title {
-  color: #fff;
+  color: var(--ifm-color-default);
 }
 
 [data-theme="dark"] .heroBanner {
-  color: #fff;
+  color: var(--ifm-color-default);
 }
 
 .heroBanner {
