@@ -4,40 +4,75 @@ sidebar_position: 1
 
 # Create a new Lyra instance
 
-Add **Markdown or React** files to `src/pages` to create a **standalone page**:
+## Create
 
-- `src/pages/index.js` → `localhost:3000/`
-- `src/pages/foo.md` → `localhost:3000/foo`
-- `src/pages/foo/bar.js` → `localhost:3000/foo/bar`
+Creating a new instance is very simple.
 
-## Create your first React Page
+We `create` a new database instance with an **indexing `schema`**.<br/>
+The schema represents **the structure** of the entry to be inserted into the database.
 
-Create a file at `src/pages/my-react-page.js`:
+A database can be as simple as:
 
-```jsx title="src/pages/my-react-page.js"
-import React from 'react';
-import Layout from '@theme/Layout';
+```js title="lyra.js"
+import { create } from '@nearform/lyra';
 
-export default function MyReactPage() {
-  return (
-    <Layout>
-      <h1>My React page</h1>
-      <p>This is a React page</p>
-    </Layout>
-  );
-}
+const db = create({
+  schema: {
+    word: 'string',
+  }
+});
 ```
 
-A new page is now available at [http://localhost:3000/my-react-page](http://localhost:3000/my-react-page).
+or more variegated
 
-## Create your first Markdown Page
+```js title="lyra.js"
+import { create } from '@nearform/lyra';
 
-Create a file at `src/pages/my-markdown-page.md`:
+const movieDB = create({
+  schema: {
+    title: 'string',
+    director: 'string',
+    plot: 'string',
+    year: 'number',
+    isFavorite: 'boolean',
+  }
+});
+```
+### Don't do this
 
-```mdx title="src/pages/my-markdown-page.md"
-# My Markdown page
+With the current version of Lyra, nested properties are not supported.<br/>
+The following schema will be rejected
 
-This is a Markdown page
+```js title="this-is-wrong.js"
+const movieDB = create({
+  schema: {
+    title: 'string',
+    director: 'string',
+    plot: 'string',
+    year: 'number',
+    isFavorite: 'boolean',
+    cast: { // Cannot do this yet
+      director: 'string',
+      leading: 'string'
+    }
+  }
+});
 ```
 
-A new page is now available at [http://localhost:3000/my-markdown-page](http://localhost:3000/my-markdown-page).
+## Input Analyzer
+By default, Lyra analyzes the input and performs a stemming operation, which allows the engine to perform more optimize queries, as well as saving indexing space.
+
+<details><summary>What is stemming?</summary>
+In linguistic morphology and information retrieval, stemming is the process of reducing inflected (or sometimes derived) words to their word stem, base or root form—generally a written word form. The stem need not be identical to the morphological root of the word; it is usually sufficient that related words map to the same stem, even if this stem is not in itself a valid root. Algorithms for stemming have been studied in computer science since the 1960s. Many search engines treat words with the same stem as synonyms as a kind of query expansion, a process called conflation. (Wikipedia (opens new window))
+</details>
+
+By default, Lyra uses **the English language analyzer**, but you can override this behaviour while initializing a new Lyra instance by setting the property `defaultLanguage` at database initialization.
+
+```js title="lyra.js"
+const db = new Lyra({
+  schema: {
+    word: 'string'
+  },
+  defaultLanguage: 'italian',
+});
+```

@@ -4,44 +4,55 @@ sidebar_position: 1
 
 # Getting Started with Lyra
 
-Let's discover **Docusaurus in less than 5 minutes**.
+Lyra is a **blazingly fast, in-memory, full-text search engine** capable of working both on client and server.
 
-## Getting Started
+Through the implementation of an optimized prefix tree and some clever tweaks, Lyra can perform searches through millions of entries in **microseconds**.
 
-Get started by **creating a new site**.
+### Requirements
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+- [Node.js](https://nodejs.org/en/download/) and a **package manager** of your choice (npm, yarn, pnpm).
 
-### What you'll need
+## Installation
 
-- [Node.js](https://nodejs.org/en/download/) version 16.14 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+Lyra can be installed using either ***npm***, ***yarn***, or ***pnpm***.
 
-## Generate a new site
-
-Generate a new Docusaurus site using the **classic template**.
-
-The classic template will automatically be added to your project after you run the command:
+<details open><summary>npm</summary>
 
 ```bash
-npm init docusaurus@latest my-website classic
+npm install @nearform/lyra
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+</details>
 
-The command also installs all necessary dependencies you need to run Docusaurus.
 
-## Start your site
-
-Run the development server:
+<details><summary>yarn</summary>
 
 ```bash
-cd my-website
-npm run start
+yarn add @nearform/lyra
 ```
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+</details>
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
+<details><summary>pnpm</summary>
 
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+```bash
+pnpm add @nearform/lyra
+```
+
+</details>
+
+## Start working with Lyra
+
+Once Lyra is installed, you can easily import it in any project. 
+
+**esm**
+```js
+import { Lyra } from '@nearform/lyra'
+```
+
+**cjs**
+```js
+const { Lyra } = require('@nearform/lyra');
+```
+
+> Lyra exposes its own types, ESM modules, and CJS modules.
