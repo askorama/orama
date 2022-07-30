@@ -106,7 +106,7 @@ const config = {
         ],
         logo: {
           alt: 'Lyra Logo',
-          src: 'https://nearform.github.io/lyra/imgs/lyra.svg',
+          src: '/img/lyra.svg',
         },
         copyright: `Copyright © ${new Date().getFullYear()}\n Made by NearForm with ❤️`,
       },
