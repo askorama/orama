@@ -12,10 +12,16 @@ const splitRegex: Record<Language, RegExp> = {
   swedish: /[^a-z0-9_åÅäÄöÖüÜ-]+/gim,
 };
 
-export function tokenize(input: string, language: Language = "english") {
+export function tokenize(input: string, language: Language = "english", allowDuplicates = false) {
   const splitRule = splitRegex[language];
   const tokens = input.toLowerCase().split(splitRule);
-  return Array.from(new Set(trim(tokens)));
+  const trimTokens = trim(tokens);
+
+  if (!allowDuplicates) {
+    return Array.from(new Set(trimTokens));
+  }
+
+  return trimTokens;
 }
 
 function trim(text: string[]): string[] {

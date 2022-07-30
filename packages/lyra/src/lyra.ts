@@ -2,7 +2,7 @@ import fastq from "fastq";
 import * as ERRORS from "./errors";
 import toFastProperties, { insertWithFastProperties } from "./fast-properties";
 import { tokenize } from "./tokenizer";
-import { getNanosecondsTime, uniqueId } from "./utils";
+import { getNanosecondsTime, uniqueId, getAllTokensInAllDocsByProperty, countOccurrencies } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import type { ResolveSchema, SearchProperties } from "./types";
 import { create as createNode, Node } from "./prefix-tree/node";
@@ -338,3 +338,60 @@ export function load<T extends PropertiesSchema>(lyra: Lyra<T>, { index, docs, n
   lyra.docs = docs;
   lyra.nodes = nodes;
 }
+
+export function generateWeights<T extends PropertiesSchema>(lyra: Lyra<T>) {
+  const docs = lyra.docs;
+  const N = Object.keys(docs).length;
+  const allTokensInDocs = getAllTokensInAllDocsByProperty(lyra);
+  const weights = {};
+
+  for (const docID in docs) {
+    const properties = docs[docID];
+
+    for (const property in properties) {
+      if (!(property in weights)) {
+        // @ts-ignore
+        weights[property] = {};
+      }
+
+      const d = properties[property];
+
+      const tokens = tokenize(d as string, lyra.defaultLanguage, true);
+
+      for (const t of tokens) {
+        const tf = countOccurrencies(tokens, t) / tokens.length;
+        const df = countOccurrencies(allTokensInDocs[property], t);
+        const idf = Math.log(N / df);
+        const tfIdf = tf * idf;
+
+        // @ts-ignore
+        if (!(docID in weights[property])) {
+          // @ts-ignore
+          weights[property][docID] = {
+            [t]: tfIdf,
+          };
+        } else {
+          // @ts-ignore
+          weights[property][docID][t] = tfIdf;
+        }
+      }
+    }
+  }
+
+  return weights;
+}
+
+const db = create({
+  schema: {
+    txt: "string",
+    author: "string",
+  },
+  defaultLanguage: "english",
+});
+
+insert(db, { txt: "the quick, brown fox jumps over the lazy dog. What a fox!", author: "Michele Riva" });
+insert(db, { txt: "fox is my favorite animal", author: "Michele Sleva" });
+insert(db, { txt: "the lazy dog is a lazy dog", author: "Valeriano Riva" });
+insert(db, { txt: "i have no idea what i'm doing right now", author: "John Doe" });
+
+generateWeights(db);

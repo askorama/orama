@@ -1,3 +1,6 @@
+import { Lyra, PropertiesSchema } from "./lyra";
+import { tokenize } from "./tokenizer";
+
 const baseId = Date.now().toString().slice(5);
 let lastId = 0;
 
@@ -44,4 +47,29 @@ export function getNanosecondsTime(): bigint {
 
 export function uniqueId(): string {
   return `${baseId}-${lastId++}`;
+}
+
+export function getAllTokensInAllDocsByProperty<T extends PropertiesSchema>(
+  lyra: Lyra<T>,
+): { [key: string]: string[] } {
+  const docs = lyra.docs;
+  const properties = Object.keys(lyra.schema).filter(property => lyra.schema[property] === "string");
+  const individualTokens = properties.reduce((acc, property) => ({ ...acc, [property]: [] }), {});
+
+  for (const property of properties) {
+    const individualProperty = (individualTokens as any)[property];
+    for (const doc in docs) {
+      const currentDoc = docs[doc][property];
+      const tokens = tokenize(currentDoc as string);
+      individualProperty.push(...tokens);
+    }
+
+    (individualTokens as any)[property] = individualProperty;
+  }
+
+  return individualTokens;
+}
+
+export function countOccurrencies<T>(list: T[], target: T): number {
+  return list.reduce((acc, item) => (item === target ? acc + 1 : acc), 0);
 }
