@@ -12,3 +12,4 @@ jest.config.js
 *.svg
 *.dpack
 get-imdb-dataset.mjs
+**/tap-snapshots/**
