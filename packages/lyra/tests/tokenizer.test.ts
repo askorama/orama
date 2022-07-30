@@ -2,7 +2,7 @@ import t from "tap";
 import { tokenize } from "../src/tokenizer";
 
 t.test("Tokenizer", t => {
-  t.plan(9);
+  t.plan(11);
 
   t.test("Should tokenize and stem correctly in english", t => {
     t.plan(2);
@@ -116,6 +116,32 @@ t.test("Tokenizer", t => {
 
     const O1 = tokenize(I1, "dutch");
     const O2 = tokenize(I2, "dutch");
+
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
+
+  t.test("Should tokenize maintaining duplicates", t => {
+    t.plan(2);
+
+    const I1 = "This phrase contains some duplicates. Duplicates you said?";
+    const I2 = "It's alive! It's alive!";
+
+    const O1 = tokenize(I1, "english", true);
+    const O2 = tokenize(I2, "english", true);
+
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
+
+  t.test("Should tokenize disabling duplicates", t => {
+    t.plan(2);
+
+    const I1 = "This phrase contains some duplicates. Duplicates you said?";
+    const I2 = "It's alive! It's alive!";
+
+    const O1 = tokenize(I1, "english", false);
+    const O2 = tokenize(I2, "english", false);
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);

@@ -197,3 +197,44 @@ Array [
   "misslyckas",
 ]
 `
+
+exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize disabling duplicates > Should tokenize disabling duplicates-O1 1`] = `
+Array [
+  "this",
+  "phrase",
+  "contains",
+  "some",
+  "duplicates",
+  "you",
+  "said",
+]
+`
+
+exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize disabling duplicates > Should tokenize disabling duplicates-O2 1`] = `
+Array [
+  "it's",
+  "alive",
+]
+`
+
+exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize maintaining duplicates > Should tokenize maintaining duplicates-O1 1`] = `
+Array [
+  "this",
+  "phrase",
+  "contains",
+  "some",
+  "duplicates",
+  "duplicates",
+  "you",
+  "said",
+]
+`
+
+exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize maintaining duplicates > Should tokenize maintaining duplicates-O2 1`] = `
+Array [
+  "it's",
+  "alive",
+  "it's",
+  "alive",
+]
+`

@@ -1,8 +1,9 @@
 import t from "tap";
-import { formatBytes, formatNanoseconds } from "../src/utils";
+import { create, insert } from "../src/lyra";
+import { formatBytes, formatNanoseconds, countOccurrencies, getAllTokensInAllDocsByProperty } from "../src/utils";
 
 t.test("utils", t => {
-  t.plan(2);
+  t.plan(4);
 
   t.test("should correctly format bytes", t => {
     t.plan(9);
@@ -34,5 +35,38 @@ t.test("utils", t => {
     t.equal(formatNanoseconds(10_000_000_000n), "10s");
     t.equal(formatNanoseconds(100_000_000_000n), "100s");
     t.equal(formatNanoseconds(1000_000_000_000n), "1000s");
+  });
+
+  t.test("should correctly count occurrences of an element in an array", t => {
+    t.plan(3);
+
+    t.equal(countOccurrencies(["hello", "hello", "there"], "hello"), 2);
+    t.equal(countOccurrencies([10, 2030, 120, 3020, 849, 9249, 10], 10), 2);
+    t.equal(countOccurrencies([10, 2030, 120, 3020, 849, 9249, 10], 3), 0);
+  });
+
+  t.test("should correctly get all tokens in all docs by property", t => {
+    t.plan(1);
+
+    const lyra = create({
+      schema: {
+        name: "string",
+        description: "string",
+      },
+    });
+
+    insert(lyra, {
+      name: "John Doe",
+      description: "My example description",
+    });
+
+    insert(lyra, {
+      name: "Jane Doe",
+      description: "Another example description",
+    });
+
+    const result = getAllTokensInAllDocsByProperty(lyra);
+
+    t.matchSnapshot(result, `${t.name}-O1`);
   });
 });

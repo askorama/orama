@@ -394,4 +394,4 @@ insert(db, { txt: "fox is my favorite animal", author: "Michele Sleva" });
 insert(db, { txt: "the lazy dog is a lazy dog", author: "Valeriano Riva" });
 insert(db, { txt: "i have no idea what i'm doing right now", author: "John Doe" });
 
-generateWeights(db);
+console.log(generateWeights(db));
