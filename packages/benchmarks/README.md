@@ -15,5 +15,3 @@ You can find the full dataset [here](https://github.com/nearform/lyra/blob/main/
 | **Exact search**   | `"onde si muovono a diversi porti"` | `"*"`    | `N/A`        | 251μs | 135 | 
 | **Typo tolerance** | `"ode si mossero a divisi porte"`   | `"*"`    | `5`          | 51ms | 44130 | 
 | **Typo tolerance** | `"ode si mossero a divisi porte"`   | `["txt"]`| `5`          | 4ms | 6018 |
-
-
