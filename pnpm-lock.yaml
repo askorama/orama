@@ -58,7 +58,7 @@ importers:
 
   packages/examples/with-react:
     specifiers:
-      '@nearform/lyra': workspace:*
+      '@nearform/lyra': 0.0.1-beta-16
       '@types/react': ^18.0.15
       '@types/react-dom': ^18.0.6
       '@vitejs/plugin-react': ^2.0.0
@@ -68,7 +68,7 @@ importers:
       unocss: ^0.44.7
       vite: ^3.0.3
     dependencies:
-      '@nearform/lyra': link:../../lyra
+      '@nearform/lyra': 0.0.1-beta-16
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     devDependencies:
@@ -85,6 +85,7 @@ importers:
       '@types/tap': ^15.0.7
       c8: ^7.12.0
       fastq: ^1.13.0
+      rimraf: ^3.0.2
       tap: ^16.3.0
       ts-node: ^10.9.1
       typescript: ^4.7.4
@@ -94,6 +95,7 @@ importers:
       '@types/node': 18.6.2
       '@types/tap': 15.0.7
       c8: 7.12.0
+      rimraf: 3.0.2
       tap: 16.3.0_6oasmw356qmm23djlsjgkwvrtm
       ts-node: 10.9.1_cyi3jronpmwutj7hw2n2p72xty
       typescript: 4.7.4
@@ -2741,6 +2743,12 @@ packages:
       call-me-maybe: 1.0.1
       glob-to-regexp: 0.3.0
     dev: true
+
+  /@nearform/lyra/0.0.1-beta-16:
+    resolution: {integrity: sha512-xJt/povvt4/fxULqTP58xDy4sRuzTk2jCRzH1yvPXqNW09qlorvDod3QnUhPPTsetC/N1u7l2Vk3INCNZ42RZw==}
+    dependencies:
+      fastq: 1.13.0
+    dev: false
 
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
