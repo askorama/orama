@@ -97,7 +97,7 @@ t.test("checkInsertDocSchema", t => {
 });
 
 t.test("lyra", t => {
-  t.plan(12);
+  t.plan(13);
 
   t.test("should correctly insert and retrieve data", t => {
     t.plan(4);
@@ -206,6 +206,46 @@ t.test("lyra", t => {
     t.equal(searchResult.hits[0].author, "Oscar Wilde");
     t.equal(searchResult.hits[0].quote, "To live is the rarest thing in the world. Most people exist, that is all.");
     t.equal(searchResult.hits[0].id, id2);
+  });
+
+  t.test("Should remove a document with a nested schema", t => {
+    t.plan(4);
+
+    const movieDB = create({
+      schema: {
+        title: "string",
+        director: "string",
+        plot: "string",
+        year: "number",
+        isFavorite: "boolean",
+      },
+    });
+
+    const { id: harryPotter } = insert(movieDB, {
+      title: "Harry Potter and the Philosopher's Stone",
+      director: "Chris Columbus",
+      plot: "Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.",
+      year: 2001,
+      isFavorite: false,
+    });
+
+    const testSearch1 = search(movieDB, {
+      term: "Harry Potter",
+      properties: ["title", "director", "plot"],
+    });
+
+    remove(movieDB, harryPotter);
+
+    const testSearch2 = search(movieDB, {
+      term: "Harry Potter",
+      properties: ["title", "director", "plot"],
+    });
+
+    t.ok(testSearch1);
+    t.equal(testSearch1.hits[0].title, "Harry Potter and the Philosopher's Stone");
+
+    t.ok(testSearch2);
+    t.equal(testSearch2.count, 0);
   });
 
   t.test("Shouldn't returns deleted documents", t => {

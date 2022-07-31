@@ -37,7 +37,7 @@ function App() {
         properties: '*'
       })
 
-      
+
       const pokemons = result.hits.map((d) => pokemon?.find(p => p.id === (d as any).id));
 
       if (pokemons.length && !pokemons.some((x) => !x)) {

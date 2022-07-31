@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@nearform/lyra": "0.0.1-beta-16",
+    "@nearform/lyra": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

@@ -251,12 +251,16 @@ export function remove<T extends PropertiesSchema>(lyra: Lyra<T>, docID: string)
   const document = lyra.docs[docID];
 
   for (const key in document) {
-    const idx = lyra.index[key];
-    const tokens = tokenize(document[key] as string);
+    const propertyType = lyra.schema[key];
 
-    for (const token of tokens) {
-      if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
-        throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
+    if (propertyType === "string") {
+      const idx = lyra.index[key];
+      const tokens = tokenize(document[key] as string);
+
+      for (const token of tokens) {
+        if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
+          throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
+        }
       }
     }
   }
