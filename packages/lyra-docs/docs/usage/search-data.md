@@ -24,7 +24,7 @@ export const Highlight = ({children, color}) => (
 
 ## Search
 
-Let's say we have the following database with `n` inserted documents:
+Let's say we have a database that contains some elements:
 
 ```js title="lyra.js"
 import { create, insert, search } from '@nearfom/lyra'; 
@@ -63,8 +63,11 @@ const { id: harryPotter } = insert(movieDB, {
   isFavorite: false
 });
 ```
+> Notice that we are also importing the `search` method
 
-We can now search for a document as easily as:
+<br/>
+
+We can now search for one (or multiple) document(s) as easily as:
 
 ```js
 const searchResult = search(movieDB, {
@@ -80,15 +83,15 @@ The **`search`** method takes two mandatory parameters:
 
 ## Filters
 The object that defines our query, in this case `{term: 'Harry', properties: '*'}`,
-can be shaped, by setting other properties (filters), to make our query **less** or **more** specific.
+can be shaped, by setting additional properties (filters), to **"tighten"** or **"loosen"** our query.
 ### <Highlight color="#ff5b9b">Term</Highlight>
-The `term` property specifies the `word` to be searched
+The `term` property specifies the `word` to be searched.
 ```js title="lyra.js"
 const searchResult = search(movieDB, {
   term: 'Chris',
 });
 ```
-We are searching all the documents that contains the word `Chris`.
+We are searching for all the documents that contain the word `Chris`.
 
 ### <Highlight color="#ff5b9b">Properties</Highlight>
 The `properties` property defines in which property to run our query.
@@ -98,7 +101,7 @@ const searchResult = search(movieDB, {
   properties: ['director']
 });
 ```
-We are searching for all the documents that contains the word `Chris` in the `director` property.
+We are searching for all the documents that contain the word `Chris` in the `director` property.
 
 <details><summary>Nested properties</summary>
 We can also search through nested properties:
@@ -124,7 +127,7 @@ const searchResult = search(movieDB, {
 ```
 We are searching for all the documents that contain **`exactly`** the word `Chris` in the `director` property.
 
-> Without the `exact` property, for example, the term `Christopher Nolan` would match the term as well as it contains the word `Chris`.
+> Without the `exact` property, for example, the term `Christopher Nolan` would be returned as well, as it contains the word `Chris`.
 
 ### <Highlight color="#ff5b9b">Tolerance</Highlight>
 The `tolerance` property allows to specify the maximum distance (following the levenshtein algorithm) between the term and the searchable property.
@@ -185,7 +188,7 @@ const searchResult = search(movieDB, {
   tolerance: 1
 });
 ```
-The result will be:
+Whether the document was found or not, Lyra gives back an `object` with the following properties:
 
 ```bash
 {
@@ -203,7 +206,6 @@ The result will be:
   count: 1
 }
 ```
-Whether the document was found or not, Lyra gives back an `object` with the following properties:
 
 ### Elapsed
 The time it took for Lyra **to find** (or not) the documents.

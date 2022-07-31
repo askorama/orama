@@ -37,10 +37,10 @@ const movieDB = create({
   }
 });
 ```
-and notice that we are now also **importing** the `insert` method to do our insertions.
+> Notice that we are now also **importing** the `insert` method to do our insertions.
 
 ## Insert
-Data insertion in Lyra is quick and intuitive
+Data insertion in Lyra is quick and intuitive:
 
 ```js title="lyra.js"
 const { id: thePrestige } = insert(movieDB, {
@@ -72,9 +72,9 @@ const { id: harryPotter } = insert(movieDB, {
 The **insert** method takes two mandatory parameters: 
 
 1. the `database` in which we want the insertion to occur
-2. the `document` to insert (which must abide to the aforementioned **schema**)
+2. the `document` to insert (which must abide to the specified **schema**)
 
-The optional parameters can be configurations properties (e.g. <a href="/docs/usage/creating-a-new-lyra-instance#input-analyzer">the override</a> of the default language for the given document).
+The optional parameters can be configuration properties (e.g. <a href="/docs/usage/creating-a-new-lyra-instance#input-analyzer">the override</a> of the default language for the given document).
 
 ```js title="lyra.js"
 insert(movieDB, myDocument, { language: 'spanish' });
@@ -83,7 +83,7 @@ insert(movieDB, myDocument, { language: 'spanish' });
 
 ### <Highlight color="#ff5b9b">Doc IDs</Highlight>
 
-The **insert** method returns the unique `id` of the inserted document.
+The **insert** method returns a unique `id` for the inserted document.
 ```js
 console.log(harryPotter) // 79741872-5
 ```

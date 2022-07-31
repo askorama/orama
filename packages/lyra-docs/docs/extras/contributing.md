@@ -20,9 +20,9 @@ export const Highlight = ({children, color}) => (
 
 # Contributing
 
-When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change. 
+When contributing to Lyra, please first discuss the change you wish to make via issue, email, or any other method with the owners of [the repository](https://github.com/nearform/lyra) before making a change. 
 
-Please note we have a code of conduct, please follow it in all your interactions with the project.
+Please note that we have a [code of conduct](https://github.com/nearform/lyra/blob/main/CONTRIBUTING.md#code-of-conduct) and we kindly ask any contributors to follow it in all of their interactions with the project.
 
 ### Pull Request Process
 
