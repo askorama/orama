@@ -74,5 +74,5 @@ Simple as that.
 
 The `remove` method accepts two mandatory parameters.
 
-1. the `database` in which the deletion should occurr.
+1. the `database` in which the deletion should occur.
 2. the `id` of the document to be deleted.

@@ -37,23 +37,25 @@ const movieDB = create({
   }
 });
 ```
-### Don't do this
+### Nested Properties
 
-With the current version of Lyra, nested properties are not supported.<br/>
-The following schema will be rejected
+:::tip 
 
-```js title="this-is-wrong.js"
+Lyra now supports nested properties! Try them out.
+
+:::
+
+```js title="nested-properties.js"
 const movieDB = create({
   schema: {
     title: 'string',
-    director: 'string',
     plot: 'string',
-    year: 'number',
-    isFavorite: 'boolean',
-    cast: { // Cannot do this yet
+    cast: { 
       director: 'string',
       leading: 'string'
-    }
+    },
+    year: 'number',
+    isFavorite: 'boolean',
   }
 });
 ```

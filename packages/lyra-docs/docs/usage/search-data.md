@@ -75,7 +75,7 @@ const searchResult = search(movieDB, {
 ## Parameters
 The **`search`** method takes two mandatory parameters:
 
-1. the database in which the **search** should occurr
+1. the database in which the **search** should occur
 2. what has to be searched
 
 ## Filters
@@ -98,7 +98,20 @@ const searchResult = search(movieDB, {
   properties: ['director']
 });
 ```
-We are searching all the documents that contains the word `Chris` in the `director` property.
+We are searching for all the documents that contains the word `Chris` in the `director` property.
+
+<details><summary>Nested properties</summary>
+We can also search through nested properties:
+
+```js title="nested-properties.js"
+const searchResult = search(movieDB, {
+  term: 'Chris',
+  properties: ['cast.director'],
+  offset: 1,
+});
+```
+
+</details>
 
 ### <Highlight color="#ff5b9b">Exact</Highlight>
 The `exact` property finds all the document with an exact match of the `term` property.
@@ -109,7 +122,7 @@ const searchResult = search(movieDB, {
   exact: true,
 });
 ```
-We are searching all the documents that contain **`exactly`** the word `Chris` in the `director` property.
+We are searching for all the documents that contain **`exactly`** the word `Chris` in the `director` property.
 
 > Without the `exact` property, for example, the term `Christopher Nolan` would match the term as well as it contains the word `Chris`.
 
@@ -126,7 +139,7 @@ const searchResult = search(movieDB, {
   tolerance: 1,
 });
 ```
-We are searching all the documents that contain a term with an edit distance of `1` (e.g. `Chris`) in the `director` property.
+We are searching for all the documents that contain a term with an edit distance of `1` (e.g. `Chris`) in the `director` property.
 
 :::caution
 

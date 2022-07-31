@@ -71,7 +71,7 @@ const { id: harryPotter } = insert(movieDB, {
 ### Parameters
 The **insert** method takes two mandatory parameters: 
 
-1. the `database` in which we want the insertion to occurr
+1. the `database` in which we want the insertion to occur
 2. the `document` to insert (which must abide to the aforementioned **schema**)
 
 The optional parameters can be configurations properties (e.g. <a href="/docs/usage/creating-a-new-lyra-instance#input-analyzer">the override</a> of the default language for the given document).
