@@ -34,12 +34,16 @@ jobs:
           ${{ runner.os }}-pnpm-store-
 
     - name: Install dependencies
-      run: pnpm install && cd packages/docs && pnpm build
+      run: pnpm install && cd packages/lyra-docs && pnpm build
 
-    - name: vuepress-deploy
-      uses: jenkey2011/vuepress-deploy@master
+    - name: Deploy to GitHub pages
+      if: success()
+      uses: crazy-max/ghaction-github-pages@v2
+      with:
+        target_branch: gh-pages
+        build_dir: packages/lyra-docs/build
       env:
-        ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TARGET_REPO: nearform/lyra
         TARGET_BRANCH: gh-pages
         BUILD_DIR: packages/docs/src/.vuepress/dist/

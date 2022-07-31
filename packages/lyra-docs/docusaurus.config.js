@@ -10,11 +10,12 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "Lyra✨",
   tagline: "An immutable, edge, full-text search engine",
-  url: "https://github.com/nearform/lyra",
-  baseUrl: "/",
+  url: "https://nearform.github.io",
+  baseUrl: "/lyra/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "/img/lyra-logo.svg",
+  deploymentBranch: "gh-pages",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
