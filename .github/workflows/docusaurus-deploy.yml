@@ -1,7 +1,7 @@
-name: Build and Deploy Vuepress Docs
+name: Build and Deploy Docusaurus Docs
 on: [push]
 jobs:
-  build-and-deploy-vuepress-docs:
+  build-and-deploy-docusaurus-docs:
     runs-on: ubuntu-latest
     steps:
 
@@ -44,7 +44,3 @@ jobs:
         build_dir: packages/lyra-docs/build
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TARGET_REPO: nearform/lyra
-        TARGET_BRANCH: gh-pages
-        BUILD_DIR: packages/docs/src/.vuepress/dist/
-        COMMIT_MESSAGE: "ci(docs): builds docs via vuepress-deploy action"
