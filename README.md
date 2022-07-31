@@ -21,7 +21,7 @@ pnpm add @nearform/lyra
 Lyra is quite simple to use. The first thing to do is to create a new database instance and set an indexing schema:
 
 ```js
-import { create, insert, search } from '@nearform/lyra';
+import { create, insert, search, remove } from '@nearform/lyra';
 
 const db = create({
   schema: {
@@ -112,10 +112,10 @@ Result:
 }
 ```
 
-If needed, you can also delete a given document by using the `delete` method:
+If needed, you can also delete a given document by using the `remove` method:
 
 ```js
-delete(db, 'L1tpqQxc0c2djrSN2a6TJ');
+remove(db, 'L1tpqQxc0c2djrSN2a6TJ');
 ```
 
 # License
