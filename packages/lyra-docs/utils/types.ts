@@ -1,14 +1,13 @@
-
 export type GithubStars = {
-    user: string;
-    repo: string;
-    size: string;
-}
+  user: string;
+  repo: string;
+  size: string;
+};
 
 export type YoutubeProps = {
-    embedId: string;
-}
+  embedId: string;
+};
 
 export type DemoButtonProps = {
-    link: string;
-}
+  link: string;
+};

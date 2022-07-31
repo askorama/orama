@@ -20,6 +20,7 @@
 
 .buttons {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
@@ -30,6 +31,7 @@
 
 .buttons .getStartedButton {
   margin-right: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 @media screen and (max-width: 996px) {

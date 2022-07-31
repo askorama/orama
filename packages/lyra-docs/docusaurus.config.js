@@ -3,52 +3,50 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const lightCodeTheme = require("prism-react-renderer/themes/github");
+const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Lyra✨',
-  tagline: 'A blazingly fast text search engine',
-  url: 'https://github.com/nearform/lyra',
-  baseUrl: '/',
-  onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
-  favicon: '/img/lyra-logo.svg',
+  title: "Lyra✨",
+  tagline: "An immutable, edge, full-text search engine",
+  url: "https://github.com/nearform/lyra",
+  baseUrl: "/",
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "warn",
+  favicon: "/img/lyra-logo.svg",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'nearform', // Usually your GitHub org/user name.
-  projectName: 'lyra', // Usually your repo name.
+  organizationName: "nearform", // Usually your GitHub org/user name.
+  projectName: "lyra", // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
   // to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: "en",
+    locales: ["en"],
   },
   presets: [
     [
-      'classic',
+      "classic",
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          sidebarPath: './sidebars.js',
+          sidebarPath: "./sidebars.js",
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          editUrl: "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          editUrl: "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
         },
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: "./src/css/custom.css",
         },
       }),
     ],
@@ -58,20 +56,19 @@ const config = {
     ({
       navbar: {
         logo: {
-          alt: 'Lyra Logo',
-          src: '/img/lyra.svg',
+          alt: "Lyra Logo",
+          src: "/img/lyra.svg",
         },
         items: [
           {
-            type: 'doc',
-            docId: 'introduction/getting-started',
-            position: 'left',
-            label: 'Getting Started',
+            type: "doc",
+            docId: "introduction/getting-started",
+            position: "left",
+            label: "Getting Started",
           },
           {
-            
-            href: 'https://github.com/nearform/lyra',
-            position: 'right',
+            href: "https://github.com/nearform/lyra",
+            position: "right",
             className: "header-github-link",
             "aria-label": "Lyra on GitHub",
           },
@@ -82,35 +79,35 @@ const config = {
       //   contextualSearch: true,
       // },
       footer: {
-        style: 'light',
+        style: "light",
         links: [
           {
-            title: 'Docs',
+            title: "Docs",
             items: [
               {
-                label: 'Getting Started',
-                to: '/docs/introduction/getting-started',
+                label: "Getting Started",
+                to: "/docs/introduction/getting-started",
               },
             ],
           },
           {
-            title: 'More',
+            title: "More",
             items: [
               {
-                label: 'GitHub',
-                href: 'https://github.com/nearform/lyra',
+                label: "GitHub",
+                href: "https://github.com/nearform/lyra",
               },
             ],
           },
         ],
         logo: {
-          alt: 'Lyra Logo',
-          src: '/img/lyra.svg',
+          alt: "Lyra Logo",
+          src: "/img/lyra.svg",
         },
         copyright: `Copyright © ${new Date().getFullYear()}\n Made by NearForm with ❤️`,
       },
       colorMode: {
-        defaultMode: 'dark',
+        defaultMode: "dark",
       },
       prism: {
         theme: lightCodeTheme,
