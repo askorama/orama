@@ -38,13 +38,13 @@ const config = {
           sidebarPath: "./sidebars.js",
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: "https://github.com/nearform/lyra/edit/main/packages/lyra-docs/",
+          editUrl: "https://github.com/nearform/lyra/edit/main/packages/docs/",
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: "https://github.com/nearform/lyra/edit/main/packages/lyra-docs/",
+          editUrl: "https://github.com/nearform/lyra/edit/main/packages/docs/",
         },
         theme: {
           customCss: "./src/css/custom.css",

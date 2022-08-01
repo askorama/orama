@@ -34,13 +34,13 @@ jobs:
           ${{ runner.os }}-pnpm-store-
 
     - name: Install dependencies
-      run: pnpm install && cd packages/lyra-docs && pnpm build
+      run: pnpm install && cd packages/docs && pnpm build
 
     - name: Deploy to GitHub pages
       if: success()
       uses: crazy-max/ghaction-github-pages@v2
       with:
         target_branch: gh-pages
-        build_dir: packages/lyra-docs/build
+        build_dir: packages/docs/build
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
