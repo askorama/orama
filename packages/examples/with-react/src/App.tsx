@@ -1,47 +1,56 @@
-import { create, insert, search as lyraSearch } from '@nearform/lyra';
-import { useEffect, useState } from 'react';
+import { create, insert, search as lyraSearch } from "@nearform/lyra/dist/esm/lyra";
+import { formatNanoseconds, getNanosecondsTime } from "@nearform/lyra/dist/esm/utils";
+import { useEffect, useState } from "react";
+import type { Pokemon } from "./types/pokemon";
 
 const db = create({
   schema: {
-    id: 'number',
-    name: 'string',
-  }
+    id: "number",
+    name: "string",
+  },
 });
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [pokemon, setPokemon] = useState<any[]>();
-  const [searchPokemon, setSearchPokemon] = useState<any[]>();
-  const [search, setSearch] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [pokemon, setPokemon] = useState<Pokemon[]>();
+  const [searchPokemon, setSearchPokemon] = useState<Pokemon[]>();
+  const [search, setSearch] = useState("");
+  const [elapsedTime, setElapsedTime] = useState<string>("");
 
   useEffect(() => {
-    fetch('/pokedex.json')
-      .then((data) => data.json())
-      .then((pokeList) => {
+    fetch("/pokedex.json")
+      .then(data => data.json())
+      .then(pokeList => {
         for (const { id, name } of pokeList.pokemon) {
           insert(db, {
-            id, name
+            id,
+            name,
           });
         }
 
         setPokemon(pokeList.pokemon);
       })
-      .catch(console.log)
+      .catch(console.error)
       .finally(() => setIsLoading(false));
   }, []);
 
   useEffect(() => {
     if (search) {
+      const timeStart = getNanosecondsTime();
+
       const result = lyraSearch(db, {
         term: search,
-        properties: '*'
-      })
+        properties: "*",
+      });
 
+      setElapsedTime(formatNanoseconds(getNanosecondsTime() - timeStart));
 
-      const pokemons = result.hits.map((d) => pokemon?.find(p => p.id === (d as any).id));
+      const pokemons = result.hits.map(({ id: hitID }: any) =>
+        pokemon?.find(({ id: pokemonID }) => pokemonID === hitID),
+      ) as Pokemon[];
 
-      if (pokemons.length && !pokemons.some((x) => !x)) {
-        setSearchPokemon(pokemons);
+      if (pokemons.length && !pokemons.some((x: any) => !x)) {
+        setSearchPokemon([...new Set<Pokemon>(pokemons)]);
       } else {
         setSearchPokemon([]);
       }
@@ -49,34 +58,51 @@ function App() {
   }, [search]);
 
   return (
-    <div>
+    <div className="ma">
       <h1> Lyra preview in React. Search for a Pokemon </h1>
 
-      {isLoading && (
-        <div> Loading pokemons... </div>
-      )}
+      {isLoading && <div> Loading pokemons... </div>}
 
-      <div>
-        <input type='text' value={search} onChange={(e) => setSearch(e.target.value)} />
+      <div className="w-full h-8">
+        <input
+          className="w-full h-full border-rounded border-1 border-gray-500 pl-2"
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Find a Pokemon..."
+        />
       </div>
 
       {!isLoading && (
-        <div className='grid'>
-          {searchPokemon?.map((p) => (
-            <div className='grid grid-cols-2' key={p.id}>
-              <img src={p.img} />
-              <div>
-                <h1 className='text-lg'>
-                  {p.name}
-                </h1>
-                <p> Type: {p.type.join(', ')} </p>
+        <>
+          <div className="grid mt-4">
+            {/* Render Pokemon grid */}
+            {searchPokemon?.map(p => (
+              <div className="grid grid-cols-2 my-2" key={p.id}>
+                <img src={p.img} />
+
+                <div>
+                  <h1 className="text-lg">{p.name}</h1>
+                  <p> Type: {p.type.join(", ")} </p>
+                </div>
               </div>
+            ))}
+          </div>
+
+          {/* Render Elapsed time */}
+          {searchPokemon?.length && elapsedTime ? (
+            <div className="font-mono">
+              <small>
+                Elapsed time: <strong>{elapsedTime}</strong>
+              </small>
             </div>
-          ))}
-        </div>
+          ) : (
+            <></>
+          )}
+        </>
       )}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
