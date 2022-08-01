@@ -19,7 +19,7 @@ export const Highlight = ({children, color}) => (
   </span>
 );
 
-Deletion is one of the easiest things to do in Lyra
+Deletion is one of the easiest things to do in Lyra.<br/>
 Let's say we have the following database with the following inserted documents:
 
 ```js title="lyra.js"
@@ -68,7 +68,7 @@ To delete a single document from the database we use the <a href="/docs/usage/in
 ```js title="lyra.js"
 remove(movieDB, harryPotter);
 ```
-Simple as that.
+As simple as that.
 
 ### Parameters
 

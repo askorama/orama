@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Getting Started with Lyra
 
-Lyra is a **blazingly fast, in-memory, full-text search engine** capable of working both on client and server.
+Lyra is a **blazingly fast, immutable, edge and in-memory full-text search engine** capable of working both on client and server.
 
 Through the implementation of an optimized prefix tree and some clever tweaks, Lyra can perform searches through millions of entries in **microseconds**.
 
@@ -43,7 +43,7 @@ pnpm add @nearform/lyra
 
 ## Start working with Lyra
 
-Once Lyra is installed, you can easily import it in any project. 
+Once Lyra is installed, it can easily be imported it in any project. 
 
 **esm**
 ```js
