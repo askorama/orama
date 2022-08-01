@@ -74,16 +74,6 @@ function parseCommand(cmd: string) {
     }).argv;
 }
 
-function performSearch(cmd: SearchParams<any>) {
-  return search(db, {
-    term: cmd.term,
-    limit: cmd.limit,
-    offset: cmd.offset,
-    exact: cmd.exact,
-    tolerance: cmd.tolerance,
-  });
-}
-
 console.clear();
 
 const rl = readline.createInterface({
@@ -101,6 +91,13 @@ rl.on("line", async (cmd: string) => {
     return;
   }
 
-  const searchResult = performSearch(parsed as unknown as SearchParams<any>) as any;
-  log(searchResult);
+  const searchResult = search(db, {
+    term: parsed.search,
+    limit: parsed.limit ?? 10,
+    offset: parsed.offset ?? 0,
+    exact: parsed.exact,
+    tolerance: parsed.tolerance ?? 0,
+  } as unknown as SearchParams<any>);
+
+  log(searchResult as any);
 });
