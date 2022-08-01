@@ -1,0 +1,29 @@
+{
+  "name": "@nearform/lyra-development-repl",
+  "description": "Simple REPL for developing and testing Lyra live",
+  "version": "0.0.1",
+  "author": {
+    "name": "Michele Riva",
+    "email": "ciao@micheleriva.it",
+    "url": "https://github.com/MicheleRiva"
+  },
+  "bugs": {
+    "url": "https://github.com/nearform/lyra"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:module": "tsc --project tsconfig.esm.json",
+    "build": "pnpm build:module && pnpm build:cjs"
+  },
+  "devDependencies": {
+    "@nearform/lyra": "workspace:*",
+    "@types/cli-progress": "^3.11.0",
+    "@types/node": "^18.6.2",
+    "@types/yargs": "^17.0.10",
+    "cli-progress": "^3.11.2",
+    "dpack": "0.6.22",
+    "typescript": "^4.6.4",
+    "yargs": "^17.5.1"
+  }
+}

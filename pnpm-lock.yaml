@@ -36,6 +36,26 @@ importers:
       csv-parse: 5.3.0
       dpack: 0.6.22
 
+  packages/development-repl:
+    specifiers:
+      '@nearform/lyra': workspace:*
+      '@types/cli-progress': ^3.11.0
+      '@types/node': ^18.6.2
+      '@types/yargs': ^17.0.10
+      cli-progress: ^3.11.2
+      dpack: 0.6.22
+      typescript: ^4.6.4
+      yargs: ^17.5.1
+    devDependencies:
+      '@nearform/lyra': link:../lyra
+      '@types/cli-progress': 3.11.0
+      '@types/node': 18.6.2
+      '@types/yargs': 17.0.10
+      cli-progress: 3.11.2
+      dpack: 0.6.22
+      typescript: 4.7.4
+      yargs: 17.5.1
+
   packages/docs:
     specifiers:
       '@algolia/client-search': ^4.14.0
@@ -3067,6 +3087,12 @@ packages:
       '@types/node': 18.6.2
     dev: false
 
+  /@types/cli-progress/3.11.0:
+    resolution: {integrity: sha512-XhXhBv1R/q2ahF3BM7qT5HLzJNlIL0wbcGyZVjqOTqAybAnsLisd7gy1UCyIqpL+5Iv6XhlSyzjLCnI2sIdbCg==}
+    dependencies:
+      '@types/node': 18.6.2
+    dev: true
+
   /@types/connect-history-api-fallback/1.3.5:
     resolution: {integrity: sha512-h8QJa8xSb1WD4fpKBDcATDNGXghFj6/3GRWG6dhmRcu0RX1Ubasur2Uvx5aeEwlf0MwblEC2bMzzMQntxnw/Cw==}
     dependencies:
@@ -4461,6 +4487,13 @@ packages:
       restore-cursor: 3.1.0
     dev: true
 
+  /cli-progress/3.11.2:
+    resolution: {integrity: sha512-lCPoS6ncgX4+rJu5bS3F/iCz17kZ9MPZ6dpuTtI0KXKABkhyXIdYB3Inby1OpaGti3YlI3EeEkM9AuWpelJrVA==}
+    engines: {node: '>=4'}
+    dependencies:
+      string-width: 4.2.3
+    dev: true
+
   /cli-spinners/2.7.0:
     resolution: {integrity: sha512-qu3pN8Y3qHNgE2AFweciB1IfMnmZ/fsNTEE+NOFjmGB2F/7rLhnhzppvpCnN4FovtP26k8lHyy9ptEbNwWFLzw==}
     engines: {node: '>=6'}
@@ -5322,7 +5355,6 @@ packages:
 
   /dpack/0.6.22:
     resolution: {integrity: sha512-WGPNlW2OAE7Bj0eODMpAHUcEqxrlg01e9OFZDxQodminIgC194/cRHT7K04Z1j7AUEWTeeplYGrIv/xRdwU9Hg==}
-    dev: false
 
   /duplexer/0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
