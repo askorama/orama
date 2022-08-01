@@ -1,4 +1,4 @@
-import { create, insert, search as lyraSearch } from '@nearform/lyra/dist/esm/lyra';
+import { create, insert, search as lyraSearch } from '@nearform/lyra';
 import { useEffect, useState } from 'react';
 
 const db = create({
@@ -41,7 +41,7 @@ function App() {
       const pokemons = result.hits.map((d) => pokemon?.find(p => p.id === (d as any).id));
 
       if (pokemons.length && !pokemons.some((x) => !x)) {
-        setSearchPokemon([...new Set(pokemons)]);
+        setSearchPokemon(pokemons);
       } else {
         setSearchPokemon([]);
       }

@@ -51,7 +51,7 @@ type QueueDocParams<T extends PropertiesSchema> = {
   config: InsertConfig;
 };
 
-type SearchResult<T extends PropertiesSchema> = {
+export type SearchResult<T extends PropertiesSchema> = {
   count: number;
   hits: RetrievedDoc<T>[];
   elapsed: bigint;
