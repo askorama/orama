@@ -282,11 +282,11 @@ export function search<T extends PropertiesSchema>(
 
   const tokens = tokenize(params.term, language);
   const indices = getIndices(lyra, params.properties);
+  const uniqueDocIds = new Set<string>();
   const { limit = 10, offset = 0, exact = false } = params;
   const results: RetrievedDoc<T>[] = Array.from({
     length: limit,
   });
-  let count = 0;
 
   const timeStart = getNanosecondsTime();
 
@@ -297,13 +297,15 @@ export function search<T extends PropertiesSchema>(
     for (const index of indices) {
       const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
 
-      count += documentIDs.length;
+      for (const id of documentIDs) {
+        uniqueDocIds.add(id);
+      }
 
       if (i >= limit) {
         break;
       }
 
-      for (const id of documentIDs) {
+      for (const id of uniqueDocIds) {
         if (j < offset) {
           j++;
           continue;
@@ -313,8 +315,10 @@ export function search<T extends PropertiesSchema>(
           break;
         }
 
-        const fullDoc = lyra.docs[id]!;
-        results[i] = { id, ...fullDoc };
+        if (results.findIndex(x => x?.id === id) === -1) {
+          const fullDoc = lyra.docs[id]!;
+          results[i] = { id, ...fullDoc };
+        }
         i++;
       }
     }
@@ -325,7 +329,7 @@ export function search<T extends PropertiesSchema>(
   return {
     elapsed: getNanosecondsTime() - timeStart,
     hits,
-    count,
+    count: uniqueDocIds.size,
   };
 }
 
