@@ -3,3 +3,4 @@
 *.mjs linguist-detectable=false
 *.html linguist-detectable=false
 *.vue linguist-detectable=false
+*.css linguist-detectable=false
