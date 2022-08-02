@@ -1,5 +1,5 @@
 import t from "tap";
-import { create, insert, search, SearchResult } from "../src/lyra";
+import { create, insert, remove, search, SearchResult } from "../src/lyra";
 import dataset from "./datasets/events.json";
 
 function removeVariadicData(res: SearchResult<any>): SearchResult<any> {
@@ -40,7 +40,7 @@ for (const event of (dataset as any).result.events) {
 }
 
 t.test("lyra.dataset", async t => {
-  t.plan(2);
+  t.plan(3);
 
   t.test("should correctly populate the database with a large dataset", t => {
     t.plan(4);
@@ -132,5 +132,31 @@ t.test("lyra.dataset", async t => {
 
     t.equal(s4.count, 2240);
     t.equal(s5.hits.length, 1);
+  });
+
+  t.test("should correctly delete documents", t => {
+    t.plan(1);
+
+    const documentsToDelete = search(db, {
+      term: "war",
+      exact: true,
+      properties: ["description"],
+      limit: 10,
+      offset: 0,
+    });
+
+    for (const doc of documentsToDelete.hits) {
+      remove(db, doc.id);
+    }
+
+    const newSearch = search(db, {
+      term: "war",
+      exact: true,
+      properties: ["description"],
+      limit: 10,
+      offset: 0,
+    });
+
+    t.equal(newSearch.count, 2230);
   });
 });
