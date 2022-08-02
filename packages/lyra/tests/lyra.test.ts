@@ -97,7 +97,7 @@ t.test("checkInsertDocSchema", t => {
 });
 
 t.test("lyra", t => {
-  t.plan(14);
+  t.plan(15);
 
   t.test("should correctly search for data", t => {
     t.plan(6);
@@ -243,6 +243,29 @@ t.test("lyra", t => {
     t.equal(searchResult.hits[0].author, "Oscar Wilde");
     t.equal(searchResult.hits[0].quote, "To live is the rarest thing in the world. Most people exist, that is all.");
     t.equal(searchResult.hits[0].id, id2);
+  });
+
+  // Tests for https://github.com/nearform/lyra/issues/52
+  t.test("Should correctly remove documents via substring search", t => {
+    t.plan(1);
+
+    const lyra = create({
+      schema: {
+        word: "string",
+      },
+    });
+
+    const { id: halo } = insert(lyra, { word: "Halo" });
+    insert(lyra, { word: "Halloween" });
+    insert(lyra, { word: "Hal" });
+
+    remove(lyra, halo);
+
+    const searchResult = search(lyra, {
+      term: "Hal",
+    });
+
+    t.equal(searchResult.count, 2);
   });
 
   t.test("Should remove a document with a nested schema", t => {

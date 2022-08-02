@@ -113,14 +113,14 @@ export function find(nodes: Nodes, node: Node, { term, exact, tolerance }: FindP
   return output;
 }
 
-export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, docID: string, exact = false): boolean {
+export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, docID: string, exact = true): boolean {
   if (!word) {
     return false;
   }
 
   const { word: nodeWord, docs: docIDs } = node;
 
-  if (node.end || (exact && node.end && nodeWord === word)) {
+  if (exact && node.end && nodeWord === word) {
     removeDocument(node, docID);
 
     if (node.children?.size && docIDs.includes(docID)) {
