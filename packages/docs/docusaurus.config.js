@@ -68,6 +68,12 @@ const config = {
             label: "Getting Started",
           },
           {
+            href: "/demo",
+            position: "left",
+            label: "Try Lyra",
+            "aria-label": "Try Lyra",
+          },
+          {
             href: "https://github.com/nearform/lyra",
             position: "right",
             className: "header-github-link",
