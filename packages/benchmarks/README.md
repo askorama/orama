@@ -9,10 +9,10 @@ You can find the full dataset [here](https://github.com/nearform/lyra/blob/main/
 
 | Search             | Term                                  | Properties | Typo tolerance | Time Elapsed  | Results     |
 |--------------------|---------------------------------------|------------|----------------|---------------|-------------|
-| **Exact search**   | `"stelle"`                          | `["txt"]`| `N/A`        | 276μs | 25 |
+| **Exact search**   | `"stelle"`                          | `["txt"]`| `N/A`        | 267μs | 25 |
 | **Exact search**   | `"stelle"`                          | `"*"`    | `N/A`        | 59μs | 25 |
-| **Typo tolerance** | `"stele"`                           | `"*"`    | `1`          | 811μs | 28 | 
-| **Exact search**   | `"onde si muovono a diversi porti"` | `"*"`    | `N/A`        | 161μs | 135 | 
+| **Typo tolerance** | `"stele"`                           | `"*"`    | `1`          | 786μs | 28 | 
+| **Exact search**   | `"onde si muovono a diversi porti"` | `"*"`    | `N/A`        | 162μs | 135 | 
 | **Typo tolerance** | `"ode si mossero a divisi porte"`   | `"*"`    | `5`          | 54ms | 14097 | 
 | **Typo tolerance** | `"ode si mossero a divisi porte"`   | `["txt"]`| `5`          | 5ms | 5544 |
 
