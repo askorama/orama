@@ -1,4 +1,4 @@
-![Lyra](./docs/lyra-logo.png)
+![Lyra](./misc/lyra-logo.png)
 
 [![Tests](https://github.com/nearform/lyra/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/nearform/lyra/actions/workflows/tests.yml)
 
@@ -70,7 +70,7 @@ In the case above, you will be searching for all the documents containing the wo
 
 ```js
 {
-  elapsed: 99,
+  elapsed: 99, // elapsed time is in microseconds
   hits: [
     {
       id: 'ckAOPGTA5qLXx0MgNr1Zy',

@@ -1,4 +1,4 @@
-![Lyra](https://raw.githubusercontent.com/nearform/lyra/main/docs/lyra-logo.png?token=GHSAT0AAAAAABTJOQRPLKOPT2AXUFO6TAOGYUQR75A)
+![Lyra](https://raw.githubusercontent.com/nearform/lyra/main/misc/lyra-logo.png?token=GHSAT0AAAAAABTJOQRPLKOPT2AXUFO6TAOGYUQR75A)
 
 # Installation
 
@@ -68,7 +68,7 @@ In the case above, you will be searching for all the documents containing the wo
 
 ```js
 {
-  elapsed: 99,
+  elapsed: 99, // elapsed time is in microseconds
   hits: [
     {
       id: 'ckAOPGTA5qLXx0MgNr1Zy',
