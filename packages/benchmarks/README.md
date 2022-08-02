@@ -9,11 +9,11 @@ You can find the full dataset [here](https://github.com/nearform/lyra/blob/main/
 
 | Search             | Term                                  | Properties | Typo tolerance | Time Elapsed  | Results     |
 |--------------------|---------------------------------------|------------|----------------|---------------|-------------|
-| **Exact search**   | `"stelle"`                          | `["txt"]`| `N/A`        | 268μs | 25 |
-| **Exact search**   | `"stelle"`                          | `"*"`    | `N/A`        | 63μs | 25 |
-| **Typo tolerance** | `"stele"`                           | `"*"`    | `1`          | 791μs | 28 | 
-| **Exact search**   | `"onde si muovono a diversi porti"` | `"*"`    | `N/A`        | 144μs | 135 | 
-| **Typo tolerance** | `"ode si mossero a divisi porte"`   | `"*"`    | `5`          | 50ms | 14097 | 
+| **Exact search**   | `"stelle"`                          | `["txt"]`| `N/A`        | 269μs | 25 |
+| **Exact search**   | `"stelle"`                          | `"*"`    | `N/A`        | 62μs | 25 |
+| **Typo tolerance** | `"stele"`                           | `"*"`    | `1`          | 794μs | 28 | 
+| **Exact search**   | `"onde si muovono a diversi porti"` | `"*"`    | `N/A`        | 181μs | 135 | 
+| **Typo tolerance** | `"ode si mossero a divisi porte"`   | `"*"`    | `5`          | 57ms | 14097 | 
 | **Typo tolerance** | `"ode si mossero a divisi porte"`   | `["txt"]`| `5`          | 5ms | 5544 |
 
 
