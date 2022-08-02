@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@algolia/client-search": "^4.14.0",
-    "@nearform/lyra": "workspace:*",
+    "@nearform/lyra": "latest",
     "@docusaurus/core": "2.0.0-rc.1",
     "@docusaurus/preset-classic": "2.0.0-rc.1",
     "@mdx-js/react": "^1.6.22",
