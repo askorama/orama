@@ -1,28 +1,56 @@
 import React, { useEffect, useState } from "react";
 import { create, insert, search, formatNanoseconds } from "@nearform/lyra";
 import styles from "./style.module.css";
-import dataset from "./divinaCommedia";
+import dataset from "./events";
 
 const db = create({
   schema: {
-    txt: "string",
-    id: "string"
+    date: "string",
+    description: "string",
+    categories: {
+      category1: "string",
+      category2: "string",
+    },
+    granularity: "string",
   }
 });
 
+function formatYear(date: string) {
+  if (date.startsWith("-")) {
+    return date.slice(1) + " BC";
+  }
+
+  return date;
+}
+
+function formatNumber(number: number) {
+  return number.toLocaleString();
+}
+
 export function LyraDemo() {
+  const [indexing, setIndexing] = useState(true);
   const [term, setTerm] = useState("");
   const [results, setResults] = useState([]);
   const [meta, setMeta] = useState({});
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
   const [tolerance, setTolerance] = useState(0);
-  const [exact, setExact] = useState(true);
+  const [exact, setExact] = useState(false);
 
   useEffect(() => {
-    for (const data of dataset) {
-      insert(db, data);
+    for (const data of dataset.result.events) {
+      insert(db, {
+        date: data.date,
+        description: data.description,
+        categories: {
+          category1: data.category1,
+          category2: data.category2,
+        },
+        granularity: data.granularity,
+      });
     }
+
+    setIndexing(false);
   }, []);
 
   useEffect(() => {
@@ -31,7 +59,6 @@ export function LyraDemo() {
       limit,
       offset,
       exact,
-      properties: ["txt"],
       tolerance,
     });
 
@@ -44,7 +71,7 @@ export function LyraDemo() {
     <>
       <div className={styles.hero}>
         <h1> Try Lyra </h1>
-        <p> Type a search term to perform a full-text search on the full Divina Commedia </p>
+        <p> Type a search term to perform a full-text search on a dataset of {formatNumber(dataset.result.count)} hystorical events </p>
       </div>
 
       <div className={styles.container}>
@@ -75,25 +102,40 @@ export function LyraDemo() {
           </div>
         </div>
 
-        <div className={styles.meta}>
-          <div>
-            Results: {(meta as any).count}
-          </div>
-          <div>
-            Elapsed: {formatNanoseconds((meta as any).elapsed ?? 0)}
-          </div>
-        </div>
+        {
+          indexing && (
+            <div className={styles.loading}>
+              <p>Indexing {formatNumber(dataset.result.count)} events...</p>
+            </div>
+          )
+        }
 
-        <div className={styles.overflow}>
-          {
-            results.map(result => (
-              <p key={result.id} className={styles.resultBox}>
-                <span className={styles.id}> {result.id} </span>
-                <span className={styles.txt}>{result.txt}</span>
-              </p>
-            ))
-          }
-        </div>
+        {
+          !indexing && (
+            <>
+              <div className={styles.meta}>
+                <div>
+                  Results: {(meta as any).count}
+                </div>
+                <div>
+                  Elapsed: {formatNanoseconds((meta as any).elapsed ?? 0)}
+                </div>
+              </div>
+
+              <div className={styles.overflow}>
+                {
+                  results.map((result, i) => (
+                    <p key={i + result.description} className={styles.resultBox}>
+                      <span className={styles.id}> Year: {formatYear(result.date)} </span>
+                      <span className={styles.id}>{result.categories.category1} ({result.categories.category2}). Granularity: {result.granularity}</span>
+                      <span className={styles.txt}>{result.description}</span>
+                    </p>
+                  ))
+                }
+              </div>
+            </>
+          )
+        }
       </div>
     </>
   )
