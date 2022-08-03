@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { create, insert, search, formatNanoseconds } from "@nearform/lyra";
+// Had to manually import the ESM vestion to satisfy GitHub actions requirements
+import { create, insert, search, formatNanoseconds } from "@nearform/lyra/dist/esm/lyra";
 import styles from "./style.module.css";
 import dataset from "./events";
 

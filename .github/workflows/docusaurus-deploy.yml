@@ -33,8 +33,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
+    - name: Build fresh Lyra instance
+      run: pnpm install && pnpm build:lyra
+
     - name: Install dependencies
-      run: pnpm install && cd packages/docs && pnpm build
+      run: cd packages/docs && pnpm build
 
     - name: Deploy to GitHub pages
       if: success()
