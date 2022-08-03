@@ -14,8 +14,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background-color: var(--ifm-color-primary);
-  color: white;
+  /* color: var(--ifm-color-primary); */
   margin-bottom: 2rem;
   padding: 2rem;
   text-align: center;
@@ -23,6 +22,10 @@
 
 .hero h1 {
   margin: 0;
+  font-size: 6rem;
+  background: linear-gradient(315deg,var(--ifm-color-primary) 25%,var(--ifm-color-secondary));
+  background-clip: text;
+  color: transparent;
 }
 
 .inputContainer {
@@ -38,6 +41,11 @@
   border: solid 1px #e6e6e6;
   font-size: 1.25rem;
   line-height: 1.75rem;
+}
+input:focus,
+input:active{
+  border-color: var(--ifm-color-primary);
+  outline: none;
 }
 
 .smallInput {
@@ -60,28 +68,28 @@
 }
 
 .overflow {
-  max-height: 50vh;
-  overflow: auto;
+  /* max-height: 50vh; */
+  /* overflow: auto; */
   margin-bottom: 2rem;
   margin-top: 2rem;
 }
 
 .resultBox {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
   background-color: #f5f5f5;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
+  padding: 1rem;
+  border-radius: .6rem;
+  margin-bottom: 2rem;
 }
 
 [data-theme="dark"] .resultBox {
-  color: rgb(253 253 254);
   background-color: #3b3b3b;
 }
 
+.resultBoxHeader{
+  font-size: .9rem;
+}
+
 .id {
-  font-weight: bold;
   width: 100%;
   margin: 0;
 }
@@ -98,8 +106,8 @@
 .configurations {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   width: 100%;
+  justify-content: space-between;
   margin: auto;
 }
 
@@ -109,7 +117,6 @@
 }
 
 .configuration {
-  width: 100%;
   display: flex;
   align-items: center;
   margin-bottom: 1rem;

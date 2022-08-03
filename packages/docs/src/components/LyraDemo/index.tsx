@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 // Had to manually import the ESM vesrion to satisfy GitHub actions requirements
 import { create, insert, search, formatNanoseconds } from "@nearform/lyra/dist/esm/lyra";
 import styles from "./style.module.css";
@@ -38,6 +38,9 @@ export function LyraDemo() {
   const [tolerance, setTolerance] = useState(0);
   const [exact, setExact] = useState(false);
 
+  const searchReference = useRef(null);
+
+
   useEffect(() => {
     for (const data of dataset.result.events) {
       insert(db, {
@@ -52,6 +55,8 @@ export function LyraDemo() {
     }
 
     setIndexing(false);
+    
+    searchReference.current.focus();
   }, []);
 
   useEffect(() => {
@@ -80,11 +85,13 @@ export function LyraDemo() {
       <div className={styles.container}>
         <div className={styles.inputContainer}>
           <input
+            tabindex="1"
             type="text"
             value={term}
             onChange={e => setTerm(e.target.value)}
             className={styles.input}
-            placeholder="Type a search term here..."
+            ref={searchReference}
+            placeholder="Eg: The Great War"
           />
         </div>
 
@@ -152,13 +159,19 @@ export function LyraDemo() {
 
             <div className={styles.overflow}>
               {results.map((result, i) => (
-                <p key={i + result.description} className={styles.resultBox}>
-                  <span className={styles.id}> Year: {formatYear(result.date)} </span>
-                  <span className={styles.id}>
-                    {result.categories.category1} ({result.categories.category2}). Granularity: {result.granularity}
-                  </span>
-                  <span className={styles.txt}>{result.description}</span>
-                </p>
+                <article key={i + result.description} className={styles.resultBox}>
+                  <header className={styles.resultBoxHeader}>
+                    {/* Year:  > */}
+                    <b>{formatYear(result.date)} </b>
+                    <span className={styles.id}>
+                      {result.categories.category1}
+                      {result.categories.category2 ? 
+                      <>({result.categories.category2})</> : ""}.
+                      Granularity: {result.granularity}
+                    </span>
+                  </header>
+                  <p className={styles.txt}>{result.description}</p>
+                </article>
               ))}
             </div>
           </>
