@@ -56,14 +56,14 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
 
-  t.test("Should tokenize and stem correctly in portugese", t => {
+  t.test("Should tokenize and stem correctly in portuguese", t => {
     t.plan(2);
 
     const I1 = "Eu cozinhei alguns bolos";
     const I2 = "dormir é uma coisa difícil quando os testes falham";
 
-    const O1 = tokenize(I1, "portugese");
-    const O2 = tokenize(I2, "portugese");
+    const O1 = tokenize(I1, "portuguese");
+    const O2 = tokenize(I2, "portuguese");
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);

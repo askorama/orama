@@ -6,7 +6,7 @@ export const SUPPORTED_LANGUAGES = [
   "french",
   "italian",
   "norwegian",
-  "portugese",
+  "portuguese",
   "russian",
   "spanish",
   "swedish",

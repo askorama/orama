@@ -6,7 +6,7 @@ const splitRegex: Record<Language, RegExp> = {
   french: /[^a-z0-9äâàéèëêïîöôùüûœç-]+/gim,
   italian: /[^a-z0-9_'-]+/gim,
   norwegian: /[^a-z0-9_æøåÆØÅäÄöÖüÜ]+/gim,
-  portugese: /[^a-zà-úÀ-Ú]/gim,
+  portuguese: /[^a-zà-úÀ-Ú]/gim,
   russian: /[^a-zа-яА-ЯёЁ]+/gim,
   spanish: /[^a-zA-Zá-úÁ-ÚñÑüÜ]+/gim,
   swedish: /[^a-z0-9_åÅäÄöÖüÜ-]+/gim,

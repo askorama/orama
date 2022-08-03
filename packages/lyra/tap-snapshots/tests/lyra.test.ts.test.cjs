@@ -66,7 +66,7 @@ Supported languages are:
  - french
  - italian
  - norwegian
- - portugese
+ - portuguese
  - russian
  - spanish
  - swedish
@@ -80,7 +80,7 @@ Supported languages are:
  - french
  - italian
  - norwegian
- - portugese
+ - portuguese
  - russian
  - spanish
  - swedish

@@ -112,7 +112,7 @@ Array [
 ]
 `
 
-exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in portugese > Should tokenize and stem correctly in portugese-O1 1`] = `
+exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in portuguese > Should tokenize and stem correctly in portuguese-O1 1`] = `
 Array [
   "eu",
   "cozinhei",
@@ -121,7 +121,7 @@ Array [
 ]
 `
 
-exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in portugese > Should tokenize and stem correctly in portugese-O2 1`] = `
+exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in portuguese > Should tokenize and stem correctly in portuguese-O2 1`] = `
 Array [
   "dormir",
   "é",

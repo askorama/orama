@@ -1,5 +1,5 @@
 import t from "tap";
-import { create, insert, search, remove } from "../src/lyra";
+import { create, insert, remove, search } from "../src/lyra";
 
 t.test("defaultLanguage", t => {
   t.plan(3);
@@ -45,7 +45,7 @@ t.test("defaultLanguage", t => {
     try {
       create({
         schema: {},
-        defaultLanguage: "portugese",
+        defaultLanguage: "portuguese",
       });
 
       t.pass();
