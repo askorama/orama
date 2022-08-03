@@ -25,10 +25,38 @@
   margin: 0;
 }
 
+.inputContainer {
+  margin: 1.3rem auto;
+}
+
 .input {
   width: 100%;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
+  height: 4rem;
+  padding: 0.5rem 1rem;
+  box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+  border-radius: 0.5rem;
+  border: solid 1px #e6e6e6;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.smallInput {
+  width: 5rem;
+  height: 3rem;
+  padding: 0.5rem 1rem;
+  box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+  border-radius: 0.5rem;
+  border: solid 1px #e6e6e6;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 2rem;
+  border: solid 1px #e6e6e6;
+  margin-right: 1rem;
 }
 
 .overflow {
@@ -68,13 +96,37 @@
 }
 
 .configurations {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   width: 100%;
+  margin: auto;
+}
+
+.configuration label {
+  font-weight: bold;
+  margin-right: 1rem;
+}
+
+.configuration {
+  width: 100%;
+  display: flex;
+  align-items: center;
   margin-bottom: 1rem;
 }
 
-.configurations label {
-  font-weight: bold;
-  margin-right: 1rem;
+@media (max-width: 900px) {
+  .configurations {
+    flex-direction: column;
+  }
+
+  .configuration {
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .configuration label {
+    width: 8rem;
+  }
 }
