@@ -70,8 +70,8 @@ const config = {
           {
             href: "/demo",
             position: "left",
-            label: "Try Lyra",
-            "aria-label": "Try Lyra",
+            label: "Live Demo",
+            "aria-label": "Live Demo",
           },
           {
             href: "https://github.com/nearform/lyra",
@@ -81,6 +81,16 @@ const config = {
           },
         ],
       },
+      metadata: [
+        {
+          name: "og:image",
+          content: "https://nearform.github.io/lyra/img/ogimg.png",
+        },
+        {
+          name: "og:title",
+          content: "Lyra, a fast, in-memory, typo-tolerant, full-text search engine written in TypeScript.",
+        },
+      ],
       // algolia: {
       //   appId: "lyra",
       //   contextualSearch: true,

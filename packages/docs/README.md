@@ -1,41 +1,125 @@
-# Website
+![Lyra](./misc/lyra-logo.png)
 
-This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
+[![Tests](https://github.com/nearform/lyra/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/nearform/lyra/actions/workflows/tests.yml)
 
-### Installation
+Try the [live demo](https://nearform.github.io/lyra/demo)
 
+# Installation
+
+You can install Lyra using `npm`, `yarn`, `pnpm`:
+
+```sh
+npm i @nearform/lyra
 ```
-$ yarn
+```sh
+yarn add @nearform/lyra
 ```
-
-### Local Development
-
-```
-$ yarn start
-```
-
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
-
-### Build
-
-```
-$ yarn build
+```sh
+pnpm add @nearform/lyra
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+# Usage
 
-### Deployment
+Lyra is quite simple to use. The first thing to do is to create a new database instance and set an indexing schema:
 
-Using SSH:
+```js
+import { create, insert, search, remove } from '@nearform/lyra';
 
+const db = create({
+  schema: {
+    author: 'string',
+    quote: 'string'
+  }
+});
 ```
-$ USE_SSH=true yarn deploy
+
+Lyra will only index string properties, but will allow you to set and store additional data if needed.
+
+Once the db instance is created, you can start adding some documents:
+
+```js
+insert(db, {
+  quote: 'It is during our darkest moments that we must focus to see the light.',
+  author: 'Aristotle'
+});
+
+insert(db, {
+  quote: 'If you really look closely, most overnight successes took a long time.',
+  author: 'Steve Jobs'
+});
+
+insert(db, {
+  quote: 'If you are not willing to risk the usual, you will have to settle for the ordinary.',
+  author: 'Jim Rohn'
+});
+
+insert(db, {
+  quote: 'You miss 100% of the shots you don\'t take',
+  author: 'Wayne Gretzky - Michael Scott'
+});
 ```
 
-Not using SSH:
+After the data has been inserted, you can finally start to query the database.
 
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
+```js
+const searchResult = search(db, {
+  term: 'if',
+  properties: '*'
+});
 ```
 
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+In the case above, you will be searching for all the documents containing the word `if`, looking up in every schema property (AKA index):
+
+```js
+{
+  elapsed: 99, // elapsed time is in microseconds
+  hits: [
+    {
+      id: 'ckAOPGTA5qLXx0MgNr1Zy',
+      quote: 'If you really look closely, most overnight successes took a long time.',
+      author: 'Steve Jobs'
+    },
+    {
+      id: 'fyl-_1veP78IO-wszP86Z',
+      quote: 'If you are not willing to risk the usual, you will have to settle for the ordinary.',
+      author: 'Jim Rohn'
+    }
+  ],
+  count: 2
+}
+```
+
+You can also restrict the lookup to a specific property:
+
+```js
+const searchResult = search(db, {
+  term: 'Michael',
+  properties: ['author']
+});
+```
+
+Result:
+
+```js
+{
+  elapsed: 111,
+  hits: [
+    {
+      id: 'L1tpqQxc0c2djrSN2a6TJ',
+      quote: "You miss 100% of the shots you don't take",
+      author: 'Wayne Gretzky - Michael Scott'
+    }
+  ],
+  count: 1
+}
+```
+
+If needed, you can also delete a given document by using the `remove` method:
+
+```js
+remove(db, 'L1tpqQxc0c2djrSN2a6TJ');
+```
+
+# License
+
+Lyra is licensed under the [Apache 2.0](/LICENSE.md) license.
