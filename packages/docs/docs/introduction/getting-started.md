@@ -47,12 +47,12 @@ Once Lyra is installed, it can easily be imported it in any project.
 
 **esm**
 ```js
-import { Lyra } from '@nearform/lyra'
+import { create, insert, remove, search } from '@nearform/lyra'
 ```
 
 **cjs**
 ```js
-const { Lyra } = require('@nearform/lyra');
+const { create, insert, remove, search } = require('@nearform/lyra');
 ```
 
 > Lyra exposes its own types, ESM modules and CJS modules.
