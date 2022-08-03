@@ -85,7 +85,7 @@ Currently the available languages are:
 - french
 - italian
 - norwegian
-- portugese
+- portuguese
 - russian
 - spanish
 - swedish
