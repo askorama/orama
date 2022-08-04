@@ -1,4 +1,5 @@
 import { Language } from "./languages";
+import { replaceDiacritics } from "./diacritics";
 
 const splitRegex: Record<Language, RegExp> = {
   dutch: /[^a-z0-9_'-]+/gim,
@@ -16,7 +17,7 @@ export function tokenize(input: string, language: Language = "english") {
   if (typeof input !== "string") return [input];
 
   const splitRule = splitRegex[language];
-  const tokens = input.toLowerCase().split(splitRule);
+  const tokens = input.toLowerCase().split(splitRule).map(replaceDiacritics);
   return Array.from(new Set(trim(tokens)));
 }
 

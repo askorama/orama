@@ -62,7 +62,7 @@ Array [
   "ai",
   "fait",
   "des",
-  "gâteaux",
+  "gateaux",
 ]
 `
 
@@ -100,13 +100,13 @@ Array [
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in norwegian > Should tokenize and stem correctly in norwegian-O2 1`] = `
 Array [
-  "å",
+  "a",
   "sove",
   "er",
   "en",
   "vanskelig",
   "ting",
-  "når",
+  "nar",
   "testene",
   "mislykkes",
 ]
@@ -124,10 +124,10 @@ Array [
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in portuguese > Should tokenize and stem correctly in portuguese-O2 1`] = `
 Array [
   "dormir",
-  "é",
+  "e",
   "uma",
   "coisa",
-  "difícil",
+  "dificil",
   "quando",
   "os",
   "testes",
@@ -156,7 +156,7 @@ Array [
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in spanish > Should tokenize and stem correctly in spanish-O1 1`] = `
 Array [
-  "cociné",
+  "cocine",
   "unos",
   "pasteles",
 ]
@@ -179,7 +179,7 @@ exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctl
 Array [
   "jag",
   "lagade",
-  "några",
+  "nagra",
   "kakor",
 ]
 `
@@ -188,11 +188,11 @@ exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctl
 Array [
   "att",
   "sova",
-  "är",
+  "ar",
   "en",
-  "svår",
+  "svar",
   "sak",
-  "när",
+  "nar",
   "testerna",
   "misslyckas",
 ]
