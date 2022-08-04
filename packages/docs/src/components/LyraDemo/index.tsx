@@ -142,13 +142,6 @@ export function LyraDemo() {
 
         <div className={styles.configurations}>
           <div className={styles.configuration}>
-            <input
-              id="exact"
-              type="checkbox"
-              className={styles.checkbox}
-              checked={exact}
-              onChange={() => setExact(!exact)}
-            />
             <label htmlFor="exact">Exact</label>
             <select id="exact" value={exact.toString()} onChange={() => setExact(exact => !exact)}>
               <option value={"false"}>No</option>

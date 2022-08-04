@@ -100,3 +100,9 @@ select {
 .txt {
   margin: 1rem 0 0 0;
 }
+
+@media (max-width: 700px) {
+  .configurations{
+    grid-template-columns: 2fr 2fr;
+  }
+}
