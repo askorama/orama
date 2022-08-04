@@ -1,4 +1,3 @@
-import { insertWithFastProperties } from "../fast-properties";
 import { create as createNode, removeDocument, updateParent, Node } from "./node";
 import { levenshtein } from "../levenshtein";
 
@@ -64,7 +63,7 @@ export function insert(nodes: Nodes, node: Node, word: string, docId: string): v
       updateParent(newNode, node);
 
       nodes[newNode.id] = newNode;
-      node.children = insertWithFastProperties(node.children!, char, newNode.id);
+      node.children[char] = newNode.id;
     }
 
     node = nodes[node.children[char]];

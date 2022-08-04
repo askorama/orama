@@ -1,6 +1,5 @@
 import fastq from "fastq";
 import * as ERRORS from "./errors";
-import toFastProperties, { insertWithFastProperties } from "./fast-properties";
 import { tokenize } from "./tokenizer";
 import { getNanosecondsTime, uniqueId } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
@@ -22,7 +21,7 @@ export type LyraProperties<T extends PropertiesSchema> = {
   edge?: boolean;
 };
 
-export type LyraDocs<TDoc extends PropertiesSchema> = Record<string, ResolveSchema<TDoc>>;
+export type LyraDocs<TDoc extends PropertiesSchema> = Record<string, ResolveSchema<TDoc> | undefined>;
 
 export type SearchParams<T extends PropertiesSchema> = {
   term: string;
@@ -129,7 +128,7 @@ function buildIndex<T extends PropertiesSchema>(lyra: Lyra<T>, schema: T, prefix
     if (isNested) {
       buildIndex(lyra, schema[prop] as T, `${propName}.`);
     } else {
-      lyra.index = insertWithFastProperties(lyra.index, propName, createNode());
+      lyra.index[propName] = createNode();
     }
   }
 }
@@ -141,7 +140,7 @@ function _insert<T extends PropertiesSchema>(
 ): void {
   const index = this.index;
   const nodes = this.nodes;
-  this.docs = insertWithFastProperties(this.docs, id, doc);
+  this.docs[id] = doc;
 
   function recursiveTrieInsertion(doc: ResolveSchema<T>, prefix = "") {
     for (const key of Object.keys(doc)) {
@@ -169,7 +168,6 @@ function _insert<T extends PropertiesSchema>(
   }
 
   recursiveTrieInsertion(doc);
-  this.nodes = toFastProperties(this.nodes);
 }
 
 function checkInsertDocSchema<T extends PropertiesSchema>(lyra: Lyra<T>, doc: QueueDocParams<T>["doc"]): boolean {
@@ -265,8 +263,7 @@ export function remove<T extends PropertiesSchema>(lyra: Lyra<T>, docID: string)
     }
   }
 
-  delete lyra.docs[docID];
-  lyra.docs = toFastProperties(lyra.docs);
+  lyra.docs[docID] = undefined;
 
   return true;
 }
