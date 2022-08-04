@@ -14,7 +14,7 @@ const config = {
   baseUrl: "/lyra/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "/img/lyra-logo.svg",
+  favicon: "/img/lyra.svg",
   deploymentBranch: "gh-pages",
 
   // GitHub pages deployment config.
