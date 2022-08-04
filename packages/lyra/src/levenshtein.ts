@@ -1,6 +1,13 @@
 export function levenshtein(a: string, b: string): number {
-  if (!a.length) return b.length;
-  if (!b.length) return a.length;
+  /* c8 ignore next 3 */
+  if (!a.length) {
+    return b.length;
+  }
+
+  /* c8 ignore next 3 */
+  if (!b.length) {
+    return a.length;
+  }
 
   let tmp;
 
