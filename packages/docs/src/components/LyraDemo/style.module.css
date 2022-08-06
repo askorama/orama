@@ -25,12 +25,17 @@ select {
   background-color: white;
 }
 
-[data-theme="dark"] input, [data-theme="dark"] select {
+[data-theme="dark"] input,
+[data-theme="dark"] select {
   border: 0.2rem solid #6b6b6b;
   background-color: #3b3b3b;
   color: white;
 }
 
+input:active,
+input:focus{
+  border-color: var(--ifm-color-primary);
+}
 .container {
   width: 80vw;
   margin: auto;
@@ -53,9 +58,43 @@ select {
   flex-direction: column;
   background-color: var(--ifm-color-primary);
   color: white;
-  margin-bottom: 2rem;
   padding: 2rem;
   text-align: center;
+  position:relative;
+}
+.hero > *{
+  position:realative;
+  z-index: 2;
+}
+
+.heroCompleted:after{
+  animation: heroCompletedAnimation .6s forwards;
+  background: linear-gradient(52deg, var(--ifm-color-secondary) 3%, var(--ifm-color-primary) 63%);
+  position:absolute;
+  content: " ";
+  top:100%;
+  bottom:0%;
+  left:0%;
+  right:0%;
+  animation: .6s heroCompleted forwards;
+  z-index: 1;
+  opacity: 0;
+}
+
+@keyframes heroCompleted{
+  to{
+    opacity: 1;
+    top:0%;
+  }
+}
+
+.loadingBarContainer{
+  margin-bottom: 2rem;
+}
+.loadingBar{
+  min-height: .5rem;
+  transition: width .3s;
+  background: linear-gradient(52deg, var(--ifm-color-secondary) 3%, var(--ifm-color-primary) 63%);
 }
 
 .hero h1 {
@@ -84,7 +123,9 @@ select {
   background-color: #f5f5f5;
   padding: 0.5rem;
   border-radius: 0.5rem;
+  margin-bottom: 1rem;
 }
+
 
 [data-theme="dark"] .result {
   color: rgb(253 253 254);
@@ -101,7 +142,17 @@ select {
   margin: 1rem 0 0 0;
 }
 
-@media (max-width: 700px) {
+@media(min-width: 768px) {
+  .resultHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }  
+  .resultHeader > * {
+    width: 50%;
+  }
+}
+@media (max-width: 767px) {
   .configurations{
     grid-template-columns: 2fr 2fr;
   }

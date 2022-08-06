@@ -44,12 +44,22 @@ function formatNumber(number: number) {
   return number.toLocaleString();
 }
 
-function Header({ count }: { count: number }) {
+function Header({ count, percentageLoaded }: { count: number, percentageLoaded: number }) {
   return (
-    <div className={styles.hero}>
-      <h1> Try Lyra </h1>
-      <p> Type a search term to perform a full-text search on a dataset of {formatNumber(count)} hystorical events </p>
-    </div>
+    <>
+      <div className={`${styles.hero} ${percentageLoaded === 1 ? styles.heroCompleted : ''}  `}>
+        <div>
+          <h1> Try Lyra </h1>
+          <p> Type a search term to perform a full-text search on a dataset of {formatNumber(count)} hystorical events </p>
+        </div>
+      </div>
+      
+      <div className={styles.loadingBarContainer}>
+        <div className={styles.loadingBar} style={{
+            width: (percentageLoaded *100 )+ "%"
+        }}></div>
+      </div>
+    </>
   );
 }
 
@@ -112,11 +122,11 @@ export function LyraDemo() {
   if (indexing > 0) {
     return (
       <>
-        <Header count={dataset.result.count} />
+        <Header count={dataset.result.count} percentageLoaded={(dataset.result.count - indexing) / dataset.result.count} />
         <div className={styles.container}>
           <div className={styles.loading}>
             <h2>
-              Indexing <strong>{formatNumber(indexing)}</strong> events
+              Indexing <strong>{formatNumber(indexing)} </strong> events
             </h2>
             <p>We will get back to you shortly ...</p>
           </div>
@@ -127,8 +137,7 @@ export function LyraDemo() {
 
   return (
     <>
-      <Header count={dataset.result.count} />
-
+      <Header count={dataset.result.count} percentageLoaded={1} />
       <div className={styles.container}>
         <label htmlFor="term">Term</label>
         <input
@@ -138,6 +147,7 @@ export function LyraDemo() {
           onChange={e => setTerm(e.target.value)}
           className={styles.input}
           placeholder="Type a search term here..."
+          tabIndex={0}
         />
 
         <div className={styles.configurations}>
@@ -177,21 +187,27 @@ export function LyraDemo() {
 
             <div className={styles.overflow}>
               {results.hits.map((result, i) => (
-                <p key={i + result.description} className={styles.result}>
-                  <span className={styles.id}>
-                    Year: <strong>{formatYear(result.date)}</strong>
-                  </span>
-                  <span className={styles.id}>
-                    Category 1: <strong>{result.categories.category1}</strong>
-                  </span>
-                  <span className={styles.id}>
-                    Category 2: <strong>{result.categories.category2}</strong>
-                  </span>
-                  <span className={styles.id}>
-                    Granularity: <strong>{result.granularity}</strong>
-                  </span>
+                <div key={i + result.description} className={styles.result}>
+                  <header className={styles.resultHeader}>
+                    <div>
+                      <span className={styles.id}>
+                        Year: <strong>{formatYear(result.date)}</strong>
+                      </span>
+                      <span className={styles.id}>
+                        Granularity: <strong>{result.granularity}</strong>
+                      </span>
+                    </div>
+                    <div>
+                      <span className={styles.id}>
+                        Category 1: <strong dangerouslySetInnerHTML={{__html: result.categories.category1}}></strong>
+                      </span>
+                      <span className={styles.id}>
+                        Category 2: <strong dangerouslySetInnerHTML={{__html: result.categories.category2}}></strong>
+                      </span>
+                    </div>
+                  </header>
                   <span className={styles.txt} dangerouslySetInnerHTML={{ __html: result.description }}></span>
-                </p>
+                </div>
               ))}
             </div>
           </>
