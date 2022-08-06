@@ -27,20 +27,41 @@ const db = create({
   },
 });
 
-for (const event of (dataset as any).result.events) {
-  insert(db, {
-    date: event.date,
-    description: event.description,
-    granularity: event.granularity,
-    categories: {
-      first: event.category1 ?? "",
-      second: event.category2 ?? "",
-    },
-  });
-}
-
 t.test("lyra.dataset", async t => {
   t.plan(3);
+
+  t.before(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const events = (dataset as any).result.events;
+
+    let i = 0;
+    return new Promise<void>(resolve => {
+      function insertBatch() {
+        const batch = events.slice(i * 1000, (i + 1) * 1000);
+        i++;
+
+        if (!batch.length) {
+          return resolve();
+        }
+
+        for (const event of batch) {
+          insert(db, {
+            date: event.date,
+            description: event.description,
+            granularity: event.granularity,
+            categories: {
+              first: event.category1 ?? "",
+              second: event.category2 ?? "",
+            },
+          });
+        }
+
+        setImmediate(insertBatch);
+      }
+
+      setImmediate(insertBatch);
+    });
+  });
 
   t.test("should correctly populate the database with a large dataset", t => {
     t.plan(4);

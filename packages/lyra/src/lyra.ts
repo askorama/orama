@@ -1,12 +1,13 @@
-import fastq from "fastq";
 import * as ERRORS from "./errors";
-import toFastProperties, { insertWithFastProperties } from "./fast-properties";
 import { tokenize } from "./tokenizer";
 import { getNanosecondsTime, uniqueId } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import type { ResolveSchema, SearchProperties } from "./types";
 import { create as createNode, Node } from "./prefix-tree/node";
 import { find as trieFind, insert as trieInsert, removeDocumentByWord, Nodes } from "./prefix-tree/trie";
+import { trackInsertion } from "./insertion-checker";
+
+type Index = Record<string, Node>;
 
 export { formatNanoseconds } from "./utils";
 
@@ -16,62 +17,118 @@ export type PropertiesSchema = {
   [key: string]: PropertyType | PropertiesSchema;
 };
 
-export type LyraProperties<T extends PropertiesSchema> = {
-  schema: T;
+export type Configuration<S extends PropertiesSchema> = {
+  schema: S;
   defaultLanguage?: Language;
   edge?: boolean;
 };
 
-export type LyraDocs<TDoc extends PropertiesSchema> = Record<string, ResolveSchema<TDoc>>;
+export type Data<S extends PropertiesSchema> = {
+  docs: Record<string, ResolveSchema<S> | undefined>;
+  index: Index;
+  nodes: Nodes;
+};
 
-export type SearchParams<T extends PropertiesSchema> = {
+export interface Lyra<S extends PropertiesSchema> extends Data<S> {
+  defaultLanguage: Language;
+  schema: S;
+  edge: boolean;
+}
+
+export type InsertConfig = {
+  language: Language;
+};
+
+export type SearchParams<S extends PropertiesSchema> = {
   term: string;
-  properties?: "*" | SearchProperties<T>[];
+  properties?: "*" | SearchProperties<S>[];
   limit?: number;
   offset?: number;
   exact?: boolean;
   tolerance?: number;
 };
 
-export type InsertConfig = {
-  language: Language;
-};
-
-export type LyraData<T extends PropertiesSchema> = {
-  docs: LyraDocs<T>;
-  index: LyraIndex;
-  nodes: Nodes;
-};
-
-type LyraIndex = Record<string, Node>;
-
-type QueueDocParams<T extends PropertiesSchema> = {
-  id: string;
-  doc: ResolveSchema<T>;
-  config: InsertConfig;
-};
-
-export type SearchResult<T extends PropertiesSchema> = {
+export type SearchResult<S extends PropertiesSchema> = {
   count: number;
-  hits: RetrievedDoc<T>[];
+  hits: RetrievedDoc<S>[];
   elapsed: bigint;
 };
 
-type RetrievedDoc<TDoc extends PropertiesSchema> = ResolveSchema<TDoc> & {
+export type RetrievedDoc<S extends PropertiesSchema> = ResolveSchema<S> & {
   id: string;
 };
 
-export interface Lyra<T extends PropertiesSchema> {
-  defaultLanguage: Language;
-  schema: T;
-  docs: LyraDocs<T>;
-  nodes: Nodes;
-  index: LyraIndex;
-  edge: boolean;
-  queue?: fastq.queue<QueueDocParams<T>, void>;
+function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix = "") {
+  for (const prop of Object.keys(schema)) {
+    const propType = typeof prop;
+    const isNested = typeof schema[prop] === "object";
+
+    if (propType !== "string") throw new Error(ERRORS.INVALID_SCHEMA_TYPE(propType));
+
+    const propName = `${prefix}${prop}`;
+
+    if (isNested) {
+      buildIndex(lyra, schema[prop] as S, `${propName}.`);
+    } else {
+      lyra.index[propName] = createNode();
+    }
+  }
 }
 
-function getIndices<T extends PropertiesSchema>(lyra: Lyra<T>, indices: SearchParams<T>["properties"]): string[] {
+function recursiveCheckDocSchema<S extends PropertiesSchema>(
+  newDoc: ResolveSchema<S>,
+  schema: PropertiesSchema,
+): boolean {
+  for (const key in newDoc) {
+    if (!(key in schema)) {
+      return false;
+    }
+
+    const propType = typeof newDoc[key];
+
+    if (propType === "object") {
+      recursiveCheckDocSchema(newDoc[key] as ResolveSchema<S>, schema);
+    } else {
+      if (typeof newDoc[key] !== schema[key]) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+function recursiveTrieInsertion<S extends PropertiesSchema>(
+  index: Index,
+  nodes: Nodes,
+  doc: ResolveSchema<S>,
+  id: string,
+  config: InsertConfig,
+  prefix = "",
+) {
+  for (const key of Object.keys(doc)) {
+    const isNested = typeof doc[key] === "object";
+    const propName = `${prefix}${key}`;
+    if (isNested) {
+      recursiveTrieInsertion(index, nodes, doc[key] as ResolveSchema<S>, id, config, propName + ".");
+
+      return;
+    }
+
+    if (typeof doc[key] === "string") {
+      // Use propName here because if doc is a nested object
+      // We will get the wrong index
+      const requestedTrie = index[propName];
+      const tokens = tokenize(doc[key] as string, config.language);
+
+      for (const token of tokens) {
+        trieInsert(nodes, requestedTrie, token, id);
+      }
+    }
+  }
+}
+
+function getIndices<S extends PropertiesSchema>(lyra: Lyra<S>, indices: SearchParams<S>["properties"]): string[] {
   const knownIndices = Object.keys(lyra.index);
 
   if (!indices) {
@@ -95,9 +152,9 @@ function getIndices<T extends PropertiesSchema>(lyra: Lyra<T>, indices: SearchPa
   return indices as string[];
 }
 
-function getDocumentIDsFromSearch<T extends PropertiesSchema>(
-  lyra: Lyra<T>,
-  params: SearchParams<T> & { index: string },
+function getDocumentIDsFromSearch<S extends PropertiesSchema>(
+  lyra: Lyra<S>,
+  params: SearchParams<S> & { index: string },
 ): string[] {
   const idx = lyra.index[params.index];
 
@@ -117,93 +174,14 @@ function getDocumentIDsFromSearch<T extends PropertiesSchema>(
   return Array.from(ids);
 }
 
-function buildIndex<T extends PropertiesSchema>(lyra: Lyra<T>, schema: T, prefix = "") {
-  for (const prop of Object.keys(schema)) {
-    const propType = typeof prop;
-    const isNested = typeof schema[prop] === "object";
-
-    if (propType !== "string") throw new Error(ERRORS.INVALID_SCHEMA_TYPE(propType));
-
-    const propName = `${prefix}${prop}`;
-
-    if (isNested) {
-      buildIndex(lyra, schema[prop] as T, `${propName}.`);
-    } else {
-      lyra.index = insertWithFastProperties(lyra.index, propName, createNode());
-    }
-  }
-}
-
-function _insert<T extends PropertiesSchema>(
-  this: Lyra<T>,
-  { doc, id, config }: QueueDocParams<T>,
-  cb: (error: Error | null) => void,
-): void {
-  const index = this.index;
-  const nodes = this.nodes;
-  this.docs = insertWithFastProperties(this.docs, id, doc);
-
-  function recursiveTrieInsertion(doc: ResolveSchema<T>, prefix = "") {
-    for (const key of Object.keys(doc)) {
-      const isNested = typeof doc[key] === "object";
-      const propName = `${prefix}${key}`;
-      if (isNested) {
-        recursiveTrieInsertion(doc[key] as ResolveSchema<T>, `${propName}.`);
-
-        return;
-      }
-
-      if (typeof doc[key] === "string") {
-        // Use propName here because if doc is a nested object
-        // We will get the wrong index
-        const requestedTrie = index[propName];
-        const tokens = tokenize(doc[key] as string, config.language);
-
-        for (const token of tokens) {
-          trieInsert(nodes, requestedTrie, token, id);
-        }
-      }
-
-      cb(null);
-    }
-  }
-
-  recursiveTrieInsertion(doc);
-  this.nodes = toFastProperties(this.nodes);
-}
-
-function checkInsertDocSchema<T extends PropertiesSchema>(lyra: Lyra<T>, doc: QueueDocParams<T>["doc"]): boolean {
-  function recursiveCheck(newDoc: QueueDocParams<T>["doc"], schema: PropertiesSchema): boolean {
-    for (const key in newDoc) {
-      if (!(key in schema)) {
-        return false;
-      }
-
-      const propType = typeof newDoc[key];
-
-      if (propType === "object") {
-        recursiveCheck(newDoc[key] as QueueDocParams<T>["doc"], schema);
-      } else {
-        if (typeof newDoc[key] !== schema[key]) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
-
-  return recursiveCheck(doc, lyra.schema);
-}
-
-export function create<T extends PropertiesSchema>(properties: LyraProperties<T>): Lyra<T> {
+export function create<S extends PropertiesSchema>(properties: Configuration<S>): Lyra<S> {
   const defaultLanguage = (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
   if (!SUPPORTED_LANGUAGES.includes(defaultLanguage)) {
     throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage));
   }
 
-  const instance: Lyra<T> = {
+  const instance: Lyra<S> = {
     defaultLanguage,
     schema: properties.schema,
     docs: {},
@@ -212,15 +190,13 @@ export function create<T extends PropertiesSchema>(properties: LyraProperties<T>
     edge: properties.edge ?? false,
   };
 
-  instance.queue = fastq(instance, _insert.bind(instance), 1000) as fastq.queue<QueueDocParams<T>>;
-
   buildIndex(instance, properties.schema);
   return instance;
 }
 
-export function insert<T extends PropertiesSchema>(
-  lyra: Lyra<T>,
-  doc: ResolveSchema<T>,
+export function insert<S extends PropertiesSchema>(
+  lyra: Lyra<S>,
+  doc: ResolveSchema<S>,
   config?: InsertConfig,
 ): { id: string } {
   config = { language: lyra.defaultLanguage, ...config };
@@ -230,20 +206,18 @@ export function insert<T extends PropertiesSchema>(
     throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(config.language));
   }
 
-  if (!checkInsertDocSchema(lyra, doc)) {
+  if (!recursiveCheckDocSchema(doc, lyra.schema)) {
     throw new Error(ERRORS.INVALID_DOC_SCHEMA(lyra.schema, doc));
   }
 
-  lyra.queue!.push({
-    id,
-    doc,
-    config,
-  });
+  lyra.docs[id] = doc;
+  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config);
+  trackInsertion(lyra);
 
   return { id };
 }
 
-export function remove<T extends PropertiesSchema>(lyra: Lyra<T>, docID: string): boolean {
+export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string): boolean {
   if (!(docID in lyra.docs)) {
     throw new Error(ERRORS.DOC_ID_DOES_NOT_EXISTS(docID));
   }
@@ -265,17 +239,16 @@ export function remove<T extends PropertiesSchema>(lyra: Lyra<T>, docID: string)
     }
   }
 
-  delete lyra.docs[docID];
-  lyra.docs = toFastProperties(lyra.docs);
+  lyra.docs[docID] = undefined;
 
   return true;
 }
 
-export function search<T extends PropertiesSchema>(
-  lyra: Lyra<T>,
-  params: SearchParams<T>,
+export function search<S extends PropertiesSchema>(
+  lyra: Lyra<S>,
+  params: SearchParams<S>,
   language?: Language,
-): SearchResult<T> {
+): SearchResult<S> {
   if (!language) {
     language = lyra.defaultLanguage;
   }
@@ -284,7 +257,7 @@ export function search<T extends PropertiesSchema>(
   const indices = getIndices(lyra, params.properties);
   const uniqueDocIds = new Set<string>();
   const { limit = 10, offset = 0, exact = false } = params;
-  const results: RetrievedDoc<T>[] = Array.from({
+  const results: RetrievedDoc<S>[] = Array.from({
     length: limit,
   });
 
@@ -333,11 +306,11 @@ export function search<T extends PropertiesSchema>(
   };
 }
 
-export function save<T extends PropertiesSchema>(lyra: Lyra<T>): LyraData<T> {
+export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
   return { index: lyra.index, docs: lyra.docs, nodes: lyra.nodes };
 }
 
-export function load<T extends PropertiesSchema>(lyra: Lyra<T>, { index, docs, nodes }: LyraData<T>) {
+export function load<S extends PropertiesSchema>(lyra: Lyra<S>, { index, docs, nodes }: Data<S>) {
   if (!lyra.edge) {
     throw new Error(ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("load"));
   }

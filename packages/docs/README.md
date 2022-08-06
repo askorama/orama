@@ -1,4 +1,4 @@
-![Lyra](./misc/lyra-logo.png)
+![Lyra](/misc/lyra-logo.png)
 
 [![Tests](https://github.com/nearform/lyra/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/nearform/lyra/actions/workflows/tests.yml)
 

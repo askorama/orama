@@ -1,7 +1,7 @@
 {
   "name": "@nearform/lyra",
   "description": "Fast, in-memory, typo-tolerant, full-text search engine",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "name": "Michele Riva",
     "email": "ciao@micheleriva.it",
@@ -22,9 +22,6 @@
   "main": "./dist/cjs/lyra.js",
   "module": "./dist/esm/lyra.js",
   "types": "./dist/esm/lyra.d.ts",
-  "dependencies": {
-    "fastq": "^1.13.0"
-  },
   "devDependencies": {
     "@types/node": "^18.6.2",
     "@types/tap": "^15.0.7",

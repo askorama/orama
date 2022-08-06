@@ -34,6 +34,7 @@ export function updateParent(node: Node, parent: Node): void {
 export function removeDocument(node: Node, docID: string): boolean {
   const index = node.docs.indexOf(docID);
 
+  /* c8 ignore next 3 */
   if (index === -1) {
     return false;
   }
@@ -43,6 +44,7 @@ export function removeDocument(node: Node, docID: string): boolean {
   return true;
 }
 
+/* c8 ignore next 5 */
 function serialize(this: Node): object {
   const { key, word, children, docs, end } = this;
 
