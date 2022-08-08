@@ -178,7 +178,7 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
  * Creates a new database.
  * @param properties Options to initialize the database with.
  * @example
- * // Create a database that stores documents containing author and quote fields.
+ * // Create a database that stores documents containing 'author' and 'quote' fields.
  * const db = create({
  *   schema: {
  *     author: 'string',
