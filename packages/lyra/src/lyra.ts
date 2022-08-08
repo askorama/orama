@@ -174,6 +174,18 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
   return Array.from(ids);
 }
 
+/**
+ * Creates a new database.
+ * @param properties Options to initialize the database with.
+ * @example
+ * // Create a database that stores documents containing author and quote fields.
+ * const db = create({
+ *   schema: {
+ *     author: 'string',
+ *     quote: 'string'
+ *   }
+ * });
+ */
 export function create<S extends PropertiesSchema>(properties: Configuration<S>): Lyra<S> {
   const defaultLanguage = (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
@@ -194,6 +206,18 @@ export function create<S extends PropertiesSchema>(properties: Configuration<S>)
   return instance;
 }
 
+/**
+ * Inserts a document into a database.
+ * @param lyra The database to insert document into.
+ * @param doc The document to insert.
+ * @param config Optional parameter for overriding default configuration.
+ * @returns An object containing id of the inserted document.
+ * @example
+ * const { id } = insert(db, {
+ *   quote: 'You miss 100% of the shots you don\'t take',
+ *   author: 'Wayne Gretzky - Michael Scott'
+ * });
+ */
 export function insert<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   doc: ResolveSchema<S>,
@@ -217,6 +241,13 @@ export function insert<S extends PropertiesSchema>(
   return { id };
 }
 
+/**
+ * Removes a document from a database.
+ * @param lyra The database to remove the document from.
+ * @param docID The id of the document to remove.
+ * @example
+ * const isDeleted = remove(db, 'L1tpqQxc0c2djrSN2a6TJ');
+ */
 export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string): boolean {
   if (!(docID in lyra.docs)) {
     throw new Error(ERRORS.DOC_ID_DOES_NOT_EXISTS(docID));
@@ -244,6 +275,18 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
   return true;
 }
 
+/**
+ * Searches for documents in a database.
+ * @param lyra The database to search.
+ * @param params The search query.
+ * @param language Optional parameter to override the default language analyzer.
+ * @example
+ * // Search for documents that contain 'Michael' in the 'author' field.
+ * const result = search(db, {
+ *   term: 'Michael',
+ *   properties: ['author']
+ * });
+ */
 export function search<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   params: SearchParams<S>,
