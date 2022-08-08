@@ -1,0 +1,131 @@
+name: Benchmark Compare
+
+on:
+  pull_request_target:
+    types: [labeled]
+
+jobs:
+  benchmark:
+    if: ${{ github.event.label.name == 'benchmark' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      PR-BENCH-14: ${{ steps.benchmark-pr.outputs.BENCH_RESULT14 }}
+      PR-BENCH-16: ${{ steps.benchmark-pr.outputs.BENCH_RESULT16 }}
+      PR-BENCH-18: ${{ steps.benchmark-pr.outputs.BENCH_RESULT18 }}
+      MAIN-BENCH-14: ${{ steps.benchmark-main.outputs.BENCH_RESULT14 }}
+      MAIN-BENCH-16: ${{ steps.benchmark-main.outputs.BENCH_RESULT16 }}
+      MAIN-BENCH-18: ${{ steps.benchmark-main.outputs.BENCH_RESULT18 }}
+    strategy:
+      matrix:
+        node-version: [14, 16, 18]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          ref: ${{github.event.pull_request.head.sha}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.0.1
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Install benchmark dependencies
+        run: cd ./packages/benchmarks && pnpm install
+
+      - name: Build Lyra
+        run: cd ./packages/lyra && pnpm build
+
+      - name: Run benchmark
+        id: benchmark-pr
+        run: |
+          node ./packages/benchmarks/benchmark-table/index.mjs > ./bench-result.md
+          result=$(cat ./bench-result.md)
+          # output multiline string
+          result="${result//'%'/'%25'}"
+          result="${result//$'\n'/'%0A'}"
+          result="${result//$'\r'/'%0D'}"
+          echo "::set-output name=BENCH_RESULT${{matrix.node-version}}::$result"
+
+      # main benchmark
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          ref: 'main'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Install benchmark dependencies
+        run: cd ./packages/benchmarks && pnpm install
+
+      - name: Build Lyra
+        run: cd ./packages/lyra && pnpm build
+
+      - name: Run benchmark
+        id: benchmark-main
+        run: |
+          node ./packages/benchmarks/benchmark-table/index.mjs > ./bench-result.md
+          result=$(cat ./bench-result.md)
+          # output multiline string
+          result="${result//'%'/'%25'}"
+          result="${result//$'\n'/'%0A'}"
+          result="${result//$'\r'/'%0D'}"
+          echo "::set-output name=BENCH_RESULT${{matrix.node-version}}::$result"
+
+  output-benchmark:
+    needs: [benchmark]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: |
+            **Node**: 14
+            **PR**: ${{ needs.benchmark.outputs.PR-BENCH-14 }}
+            **MAIN**: ${{ needs.benchmark.outputs.MAIN-BENCH-14 }}
+
+            ---
+
+            **Node**: 16
+            **PR**: ${{ needs.benchmark.outputs.PR-BENCH-16 }}
+            **MAIN**: ${{ needs.benchmark.outputs.MAIN-BENCH-16 }}
+
+            ---
+
+            **Node**: 18
+            **PR**: ${{ needs.benchmark.outputs.PR-BENCH-18 }}
+            **MAIN**: ${{ needs.benchmark.outputs.MAIN-BENCH-18 }}
+
+      - uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: |
+            benchmark
+          github_token: ${{ secrets.GITHUB_TOKEN }}
