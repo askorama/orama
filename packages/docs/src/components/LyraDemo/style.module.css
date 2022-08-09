@@ -62,7 +62,7 @@ input:focus{
   text-align: center;
   position:relative;
 }
-.hero > *{
+.hero .heroContent{
   position:realative;
   z-index: 2;
 }
@@ -148,7 +148,7 @@ input:focus{
     justify-content: space-between;
     align-items: flex-start;
   }  
-  .resultHeader > * {
+  .resultHeader > .resultHeaderColumn {
     width: 50%;
   }
 }

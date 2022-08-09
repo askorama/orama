@@ -48,7 +48,7 @@ function Header({ count, percentageLoaded }: { count: number, percentageLoaded: 
   return (
     <>
       <div className={`${styles.hero} ${percentageLoaded === 1 ? styles.heroCompleted : ''}  `}>
-        <div>
+        <div className={styles.heroContent}>
           <h1> Try Lyra </h1>
           <p> Type a search term to perform a full-text search on a dataset of {formatNumber(count)} hystorical events </p>
         </div>
@@ -189,7 +189,7 @@ export function LyraDemo() {
               {results.hits.map((result, i) => (
                 <div key={i + result.description} className={styles.result}>
                   <header className={styles.resultHeader}>
-                    <div>
+                    <div className={styles.resultHeaderColumn}>
                       <span className={styles.id}>
                         Year: <strong>{formatYear(result.date)}</strong>
                       </span>
@@ -197,7 +197,7 @@ export function LyraDemo() {
                         Granularity: <strong>{result.granularity}</strong>
                       </span>
                     </div>
-                    <div>
+                    <div className={styles.resultHeaderColumn}>
                       <span className={styles.id}>
                         Category 1: <strong dangerouslySetInnerHTML={{__html: result.categories.category1}}></strong>
                       </span>
