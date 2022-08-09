@@ -27,6 +27,7 @@ export type Data<S extends PropertiesSchema> = {
   docs: Record<string, ResolveSchema<S> | undefined>;
   index: Index;
   nodes: Nodes;
+  schema: S;
 };
 
 export interface Lyra<S extends PropertiesSchema> extends Data<S> {
@@ -307,10 +308,15 @@ export function search<S extends PropertiesSchema>(
 }
 
 export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
-  return { index: lyra.index, docs: lyra.docs, nodes: lyra.nodes };
+  return {
+    index: lyra.index,
+    docs: lyra.docs,
+    nodes: lyra.nodes,
+    schema: lyra.schema,
+  };
 }
 
-export function load<S extends PropertiesSchema>(lyra: Lyra<S>, { index, docs, nodes }: Data<S>) {
+export function load<S extends PropertiesSchema>(lyra: Lyra<S>, { index, docs, nodes, schema }: Data<S>) {
   if (!lyra.edge) {
     throw new Error(ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("load"));
   }
@@ -318,4 +324,5 @@ export function load<S extends PropertiesSchema>(lyra: Lyra<S>, { index, docs, n
   lyra.index = index;
   lyra.docs = docs;
   lyra.nodes = nodes;
+  lyra.schema = schema;
 }
