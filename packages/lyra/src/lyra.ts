@@ -18,7 +18,13 @@ export type PropertiesSchema = {
 };
 
 export type Configuration<S extends PropertiesSchema> = {
+  /**
+   * The structure of the document to be inserted into the database.
+   */
   schema: S;
+  /**
+   * The default language analyzer to use.
+   */
   defaultLanguage?: Language;
   edge?: boolean;
 };
@@ -30,31 +36,71 @@ export type Data<S extends PropertiesSchema> = {
 };
 
 export interface Lyra<S extends PropertiesSchema> extends Data<S> {
+  /**
+   * The default language analyzer in use.
+   */
   defaultLanguage: Language;
+  /**
+   * The structure of documents stored in the database.
+   */
   schema: S;
   edge: boolean;
 }
 
 export type InsertConfig = {
+  /**
+   * The language analyzer to use.
+   */
   language: Language;
 };
 
 export type SearchParams<S extends PropertiesSchema> = {
+  /**
+   * The word to search.
+   */
   term: string;
+  /**
+   * The properties of the document to search in.
+   */
   properties?: "*" | SearchProperties<S>[];
+  /**
+   * The number of matched documents to return.
+   */
   limit?: number;
+  /**
+   * The number of matched documents to skip.
+   */
   offset?: number;
+  /**
+   * Whether to match the term exactly.
+   */
   exact?: boolean;
+  /**
+   * The maximum [levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
+   * between the term and the searchable property.
+   */
   tolerance?: number;
 };
 
 export type SearchResult<S extends PropertiesSchema> = {
+  /**
+   * The number of all the matched documents.
+   */
   count: number;
+  /**
+   * An array of matched documents taking `limit` and `offset` into account.
+   */
   hits: RetrievedDoc<S>[];
+  /**
+   * The time taken to search.
+   */
   elapsed: bigint;
 };
 
 export type RetrievedDoc<S extends PropertiesSchema> = ResolveSchema<S> & {
+  /**
+   * The id of the document.
+   */
   id: string;
 };
 
