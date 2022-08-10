@@ -25,7 +25,7 @@ Whenever we create a database with Lyra we must specify a `Schema`, which repres
 Our database and schema look like this:
 
 ```js title="lyra.js"
-import { create, insert } from '@nearfom/lyra'; 
+import { create, insert } from '@nearform/lyra'; 
 
 const movieDB = create({
   schema: {

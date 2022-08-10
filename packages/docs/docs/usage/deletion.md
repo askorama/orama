@@ -23,7 +23,7 @@ Deletion is one of the easiest things to do in Lyra.<br/>
 Let's say we have the following database with the following inserted documents:
 
 ```js title="lyra.js"
-import { create, insert, search, remove } from '@nearfom/lyra'; 
+import { create, insert, search, remove } from '@nearform/lyra'; 
 
 const movieDB = create({
   schema: {

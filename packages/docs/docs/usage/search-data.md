@@ -27,7 +27,7 @@ export const Highlight = ({children, color}) => (
 Let's say we have a database that contains some elements:
 
 ```js title="lyra.js"
-import { create, insert, search } from '@nearfom/lyra'; 
+import { create, insert, search } from '@nearform/lyra'; 
 
 const movieDB = create({
   schema: {
