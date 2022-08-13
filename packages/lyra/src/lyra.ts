@@ -36,21 +36,12 @@ export type Data<S extends PropertiesSchema> = {
 };
 
 export interface Lyra<S extends PropertiesSchema> extends Data<S> {
-  /**
-   * The default language analyzer in use.
-   */
   defaultLanguage: Language;
-  /**
-   * The structure of documents stored in the database.
-   */
   schema: S;
   edge: boolean;
 }
 
 export type InsertConfig = {
-  /**
-   * The language analyzer to use.
-   */
   language: Language;
 };
 
