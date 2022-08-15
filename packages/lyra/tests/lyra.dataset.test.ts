@@ -3,7 +3,7 @@ import { create, insert, remove, search } from "../src/lyra";
 import type { PropertiesSchema, SearchResult } from "../src/lyra";
 import dataset from "./datasets/events.json";
 
-function removeVariadicData(res: SearchResult<PropertiesSchema>): SearchResult<PropertiesSchema> {
+function removeVariadicData<T extends PropertiesSchema>(res: SearchResult<T>): SearchResult<T> {
   const hits = res.hits.map(h => {
     h.id = "";
     return h;
