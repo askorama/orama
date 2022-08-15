@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as readline from "node:readline";
 import * as util from "node:util";
-import { create, insert, search, PropertiesSchema, SearchParams } from "@nearform/lyra";
+import { create, insert, search } from "@nearform/lyra";
 import yargs from "yargs";
 import progress from "cli-progress";
 
@@ -40,7 +40,7 @@ async function populateDB() {
   bar.stop();
 }
 
-function log(cmd: string) {
+function log(cmd: string | object) {
   console.log(util.inspect(cmd, true, null, true));
 }
 
@@ -55,22 +55,28 @@ function parseCommand(cmd: string) {
     .option("search", {
       alias: "s",
       describe: "Search the database",
+      type: "string",
+      demandOption: true,
     })
     .option("limit", {
       alias: "l",
       describe: "Limit the number of results",
+      type: "number",
     })
     .option("offset", {
       alias: "o",
       describe: "Offset the results",
+      type: "number",
     })
     .option("exact", {
       alias: "e",
       describe: "Search for an exact match",
+      type: "boolean",
     })
     .option("tolerance", {
       alias: "t",
       describe: "Tolerance for fuzzy search",
+      type: "number",
     }).argv;
 }
 
@@ -97,7 +103,7 @@ rl.on("line", async (cmd: string) => {
     offset: parsed.offset ?? 0,
     exact: parsed.exact,
     tolerance: parsed.tolerance ?? 0,
-  } as SearchParams<PropertiesSchema>);
+  });
 
   log(searchResult);
 });
