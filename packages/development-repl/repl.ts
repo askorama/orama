@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as readline from "node:readline";
 import * as util from "node:util";
-import { create, insert, search, SearchParams } from "@nearform/lyra";
+import { create, insert, search, PropertiesSchema, SearchParams } from "@nearform/lyra";
 import yargs from "yargs";
 import progress from "cli-progress";
 
@@ -97,7 +97,7 @@ rl.on("line", async (cmd: string) => {
     offset: parsed.offset ?? 0,
     exact: parsed.exact,
     tolerance: parsed.tolerance ?? 0,
-  } as SearchParams<unknown>);
+  } as SearchParams<PropertiesSchema>);
 
   log(searchResult);
 });
