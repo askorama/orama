@@ -1,8 +1,9 @@
 import t from "tap";
-import { create, insert, remove, search, SearchResult } from "../src/lyra";
+import { create, insert, remove, search } from "../src/lyra";
+import type { PropertiesSchema, SearchResult } from "../src/lyra";
 import dataset from "./datasets/events.json";
 
-function removeVariadicData(res: SearchResult<any>): SearchResult<any> {
+function removeVariadicData(res: SearchResult<PropertiesSchema>): SearchResult<PropertiesSchema> {
   const hits = res.hits.map(h => {
     h.id = "";
     return h;

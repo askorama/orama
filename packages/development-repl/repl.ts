@@ -97,7 +97,7 @@ rl.on("line", async (cmd: string) => {
     offset: parsed.offset ?? 0,
     exact: parsed.exact,
     tolerance: parsed.tolerance ?? 0,
-  } as unknown as SearchParams<any>);
+  } as SearchParams<unknown>);
 
-  log(searchResult as any);
+  log(searchResult);
 });
