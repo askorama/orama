@@ -4,7 +4,18 @@ sidebar_position: 5
 
 # Persistence
 
-## Saving the DB
+## Disk Persistence Plugin
+
+To persist Lyra databases and to load them again into memory, you can use the
+(still experimental)
+[Disk Persistence Plugin](https://github.com/LyraSearch/plugin-disk-persistence).
+
+## Low-Level methods
+
+As an alternative, we can also rely on some "low level" methods, although they
+won't be as convenient as the plugin.
+
+### Saving the DB
 
 Let's say we have a database that contains some elements:
 
@@ -61,7 +72,7 @@ const dbData = save(movieDB)
 await writeFile('./myLocalDb.json', JSON.stringify(dbData), { encoding: 'utf8' })
 ```
 
-## Loading the DB
+### Loading the DB
 
 Loading a persisted DB requires us to create our DB object in `edge` mode:
 
