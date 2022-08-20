@@ -1,5 +1,5 @@
 import t from "tap";
-import { create, insert, remove, search, insertBatch } from "../src/lyra";
+import { create, insert, remove, search, insertBatch, insertWithHooks } from "../src/lyra";
 
 t.test("defaultLanguage", t => {
   t.plan(3);
@@ -629,5 +629,49 @@ t.test("lyra", t => {
     } catch (_e) {}
 
     t.rejects(insertBatch(db, wrongSchemaDocs));
+  });
+});
+
+t.test("lyra - hooks", t => {
+  t.plan(2);
+  t.test("should validate on lyra creation", t => {
+    t.plan(1);
+    t.throws(() => {
+      create({
+        schema: { date: "string" },
+        hooks: {
+          ["anotherHookName" as string]: () => {
+            t.fail("it shouldn't be called");
+          },
+        },
+      });
+    });
+  });
+
+  t.test("afterInsert hook", async t => {
+    let callOrder = 0;
+    const db = create({
+      schema: {
+        quote: "string",
+        author: {
+          name: "string",
+          surname: "string",
+        },
+      },
+      hooks: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        afterInsert: function (_id: string): void {
+          t.same(++callOrder, 1);
+        },
+      },
+    });
+    await insertWithHooks(db, {
+      quote: "Harry Potter, the boy who lived, come to die. Avada kedavra.",
+      author: {
+        name: "Tom",
+        surname: "Riddle",
+      },
+    });
+    t.same(++callOrder, 2);
   });
 });
