@@ -35,11 +35,16 @@ export function formatNanoseconds(value: number | bigint): string {
 }
 
 export function getNanosecondsTime(): bigint {
-  if (isServer) {
+  if (typeof process !== "undefined") {
     return process.hrtime.bigint();
   }
 
-  return BigInt(Math.floor(performance.now() * 1e6));
+  if (typeof performance !== "undefined") {
+    return BigInt(Math.floor(performance.now() * 1e6));
+  }
+
+  // @todo: fallback to V8 native method to get microtime
+  return BigInt(0);
 }
 
 export function uniqueId(): string {
