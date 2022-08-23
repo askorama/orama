@@ -56,7 +56,21 @@ t.test("defaultLanguage", t => {
 });
 
 t.test("checkInsertDocSchema", t => {
-  t.plan(1);
+  t.plan(2);
+
+  t.test("should not allow insertion of reserved property names", t => {
+    t.plan(1);
+
+    try {
+      create({
+        schema: {
+          id: "string",
+        },
+      });
+    } catch (e) {
+      t.matchSnapshot(e, `${t.name}_1`);
+    }
+  });
 
   t.test("should compare the inserted doc with the schema definition", t => {
     t.plan(4);

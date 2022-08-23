@@ -1,6 +1,6 @@
 import * as ERRORS from "./errors";
 import { tokenize } from "./tokenizer";
-import { getNanosecondsTime, uniqueId } from "./utils";
+import { getNanosecondsTime, uniqueId, reservedPropertyNames } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import type { ResolveSchema, SearchProperties } from "./types";
 import { create as createNode, Node } from "./prefix-tree/node";
@@ -98,6 +98,10 @@ export type RetrievedDoc<S extends PropertiesSchema> = ResolveSchema<S> & {
 
 function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix = "") {
   for (const prop of Object.keys(schema)) {
+    if (reservedPropertyNames.includes(prop)) {
+      throw new Error(ERRORS.RESERVED_PROPERTY_NAME(prop));
+    }
+
     const propType = typeof prop;
     const isNested = typeof schema[prop] === "object";
 

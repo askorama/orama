@@ -58,6 +58,10 @@ but found the following doc:
 }
 `
 
+exports[`tests/lyra.test.ts TAP checkInsertDocSchema should not allow insertion of reserved property names > should not allow insertion of reserved property names_1 1`] = `
+Error: "id" is a reserved property name. Please change it to "__id", "id__", "_id_", or similar.
+`
+
 exports[`tests/lyra.test.ts TAP defaultLanguage should throw an error if the desired language is not supported > should throw an error if the desired language is not supported 1`] = `
 Error: Language "latin" is not supported.
 Supported languages are:

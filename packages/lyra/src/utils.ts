@@ -50,3 +50,5 @@ export function getNanosecondsTime(): bigint {
 export function uniqueId(): string {
   return `${baseId}-${lastId++}`;
 }
+
+export const reservedPropertyNames = ["id"];
