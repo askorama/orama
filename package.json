@@ -1,20 +1,31 @@
 {
-  "name": "lyra",
+  "name": "@lyrasearch/lyra",
   "version": "0.1.1",
   "description": "",
   "main": "index.js",
   "workspaces": [
     "packages/**"
   ],
+  "bugs": {
+    "url": "https://github.com/lyrasearch/lyra"
+  },
+  "repositoy": {
+    "url": "https://github.com/lyrasearch/lyra"
+  },
   "scripts": {
-    "test": "cd packages/lyra && pnpm test",
     "changelog": "auto-changelog -p",
     "commit": "pnpm lint-staged && cz",
-    "format": "prettier --write \"packages/**/*.{ts,js}\"",
+    "format": "prettier --write \"**/*.{ts,js}\"",
     "lint": "pnpm run format && eslint . --ext .js,.ts",
     "prepare": "husky install",
-    "benchmark": "pnpm build:lyra && node ./packages/benchmarks/index.js",
-    "build:lyra": "cd packages/lyra && pnpm build"
+    "benchmark": "pnpm build:lyra && node ./benchmarks/index.js",
+    "build:lyra": "cd packages/lyra && pnpm build",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:module": "tsc --project tsconfig.esm.json",
+    "build": "rimraf ./dist && pnpm build:module && pnpm build:cjs",
+    "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
+    "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
+    "ci": "npm run build && npm run test:ci"
   },
   "keywords": [],
   "author": {
@@ -41,6 +52,11 @@
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
+    "@types/tap": "^15.0.7",
+    "c8": "^7.12.0",
+    "rimraf": "^3.0.2",
+    "tap": "^16.3.0",
+    "ts-node": "^10.9.1",
     "typescript": "^4.7.4"
   },
   "pnpm": {

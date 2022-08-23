@@ -9,7 +9,7 @@
     "preview": "vite preview --port 4173"
   },
   "dependencies": {
-    "@lyrasearch/lyra": "workspace:*",
+    "@lyrasearch/lyra": "0.1.1",
     "vue": "^3.2.37"
   },
   "devDependencies": {
