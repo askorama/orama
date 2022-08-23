@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/nearform/lyra/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/nearform/lyra/actions/workflows/tests.yml)
 
-Try the [live demo](https://nearform.github.io/lyra/demo)
+Try the [live demo](https://docs.lyrajs.io/demo)
 
 # Installation
 
