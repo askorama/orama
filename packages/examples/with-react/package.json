@@ -1,5 +1,5 @@
 {
-  "name": "@nearform/lyra-react-demo",
+  "name": "@lyrasearch/lyra-react-demo",
   "private": true,
   "version": "0.0.1",
   "scripts": {
@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@nearform/lyra": "workspace:*",
+    "@lyrasearch/lyra": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

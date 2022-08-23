@@ -1,5 +1,5 @@
-import { create, insert, search as lyraSearch } from "@nearform/lyra/dist/esm/lyra";
-import { formatNanoseconds, getNanosecondsTime } from "@nearform/lyra/dist/esm/utils";
+import { create, insert, search as lyraSearch } from "@lyrasearch/lyra/dist/esm/lyra";
+import { formatNanoseconds, getNanosecondsTime } from "@lyrasearch/lyra/dist/esm/utils";
 import { useEffect, useState } from "react";
 import type { Pokemon } from "./types/pokemon";
 

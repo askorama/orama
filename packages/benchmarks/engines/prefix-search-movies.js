@@ -1,7 +1,7 @@
 import fs from "fs";
 import cronometro from "cronometro";
 import readline from "readline";
-import { create, insert, search } from "@nearform/lyra";
+import { create, insert, search } from "@lyrasearch/lyra";
 import { isMainThread } from "node:worker_threads";
 
 let db;

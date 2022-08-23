@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { URL } from "node:url";
 import { isMainThread } from "node:worker_threads"
 import cronometro from 'cronometro'
-import { create, insert, search } from '@nearform/lyra'
+import { create, insert, search } from '@lyrasearch/lyra'
 import Minisearch from 'minisearch'
 import lunr from 'lunr'
 

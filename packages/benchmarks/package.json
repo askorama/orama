@@ -1,5 +1,5 @@
 {
-  "name": "@nearform/lyra-benchmarks",
+  "name": "@lyrasearch/lyra-benchmarks",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,7 +13,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@nearform/lyra": "workspace:*",
+    "@lyrasearch/lyra": "workspace:*",
     "cronometro": "^1.1.0",
     "csv-parse": "^5.1.0",
     "dpack": "^0.6.22",

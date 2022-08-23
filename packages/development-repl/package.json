@@ -1,5 +1,5 @@
 {
-  "name": "@nearform/lyra-development-repl",
+  "name": "@lyrasearch/lyra-development-repl",
   "description": "Simple REPL for developing and testing Lyra live",
   "version": "0.0.1",
   "author": {
@@ -17,7 +17,7 @@
     "build": "pnpm build:module && pnpm build:cjs"
   },
   "devDependencies": {
-    "@nearform/lyra": "workspace:*",
+    "@lyrasearch/lyra": "workspace:*",
     "@types/cli-progress": "^3.11.0",
     "@types/node": "^18.6.2",
     "@types/yargs": "^17.0.10",

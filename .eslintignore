@@ -16,3 +16,4 @@ get-imdb-dataset.mjs
 **/dist/**
 **/tap-snapshots/**
 **/datasets/*.json
+*.vue

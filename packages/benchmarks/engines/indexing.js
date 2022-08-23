@@ -1,6 +1,6 @@
 import cronometro from "cronometro";
 import { readFile } from "fs/promises";
-import { create, insert } from "@nearform/lyra";
+import { create, insert } from "@lyrasearch/lyra";
 import { URL } from "node:url";
 
 const lines = JSON.parse(await readFile(new URL("../dataset/divinaCommedia.json", import.meta.url).pathname));

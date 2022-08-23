@@ -1,7 +1,7 @@
 /* global console , setImmediate*/
 
 import { readFile } from "fs/promises";
-import { create, insert, search, formatNanoseconds } from "@nearform/lyra";
+import { create, insert, search, formatNanoseconds } from "@lyrasearch/lyra";
 import { URL } from "node:url";
 
 async function populateDB(db, lines) {

@@ -1,6 +1,6 @@
 import cronometro from "cronometro";
 import { readFile } from "fs/promises";
-import { create, insert, search } from "@nearform/lyra";
+import { create, insert, search } from "@lyrasearch/lyra";
 import { URL } from "node:url";
 import { isMainThread } from "node:worker_threads";
 

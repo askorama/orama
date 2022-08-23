@@ -9,7 +9,7 @@
     "preview": "vite preview --port 4173"
   },
   "dependencies": {
-    "@nearform/lyra": "workspace:*",
+    "@lyrasearch/lyra": "workspace:*",
     "vue": "^3.2.37"
   },
   "devDependencies": {

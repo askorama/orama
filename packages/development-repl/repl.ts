@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as readline from "node:readline";
 import * as util from "node:util";
-import { create, insert, search } from "@nearform/lyra";
+import { create, insert, search } from "@lyrasearch/lyra";
 import yargs from "yargs";
 import progress from "cli-progress";
 

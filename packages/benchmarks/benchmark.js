@@ -3,9 +3,9 @@
 import fs from "fs";
 import { readFile, writeFile } from "fs/promises";
 import readline from "readline";
-import { create, save, load, insert, search } from "@nearform/lyra";
+import { create, save, load, insert, search } from "@lyrasearch/lyra";
 import dpack from "dpack";
-import { formatNanoseconds } from "@nearform/lyra";
+import { formatNanoseconds } from "@lyrasearch/lyra";
 
 const db = create({
   schema: {
