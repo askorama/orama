@@ -1,7 +1,7 @@
 {
-  "name": "@nearform/lyra",
+  "name": "@lyrasearch/lyra",
   "description": "Fast, in-memory, typo-tolerant, full-text search engine",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "author": {
     "name": "Michele Riva",
     "email": "ciao@micheleriva.it",
