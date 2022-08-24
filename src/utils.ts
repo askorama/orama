@@ -35,7 +35,7 @@ export function formatNanoseconds(value: number | bigint): string {
 }
 
 export function getNanosecondsTime(): bigint {
-  if (typeof process !== "undefined") {
+  if (typeof process !== "undefined" && process.hrtime !== undefined) {
     return process.hrtime.bigint();
   }
 
