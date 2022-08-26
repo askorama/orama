@@ -45,6 +45,24 @@ Array [
 ]
 `
 
+exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in english and allow duplicates > Should tokenize and stem correctly in english and allow duplicates-O1 1`] = `
+Array [
+  "this",
+  "is",
+  "a",
+  "test",
+  "with",
+  "duplicates",
+]
+`
+
+exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in english and allow duplicates > Should tokenize and stem correctly in english and allow duplicates-O2 1`] = `
+Array [
+  "it's",
+  "alive",
+]
+`
+
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in french > Should tokenize and stem correctly in french-O1 1`] = `
 Array [
   "voyons",

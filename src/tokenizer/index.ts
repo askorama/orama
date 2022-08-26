@@ -13,7 +13,7 @@ const splitRegex: Record<Language, RegExp> = {
   swedish: /[^a-z0-9_åÅäÄöÖüÜ-]+/gim,
 };
 
-export function tokenize(input: string, language: Language = "english") {
+export function tokenize(input: string, language: Language = "english", allowDuplicates = false) {
   /* c8 ignore next 3 */
   if (typeof input !== "string") {
     return [input];
@@ -21,7 +21,13 @@ export function tokenize(input: string, language: Language = "english") {
 
   const splitRule = splitRegex[language];
   const tokens = input.toLowerCase().split(splitRule).map(replaceDiacritics);
-  return Array.from(new Set(trim(tokens)));
+  const trimTokens = trim(tokens);
+
+  if (!allowDuplicates) {
+    return Array.from(new Set(trimTokens));
+  }
+
+  return trimTokens;
 }
 
 function trim(text: string[]): string[] {

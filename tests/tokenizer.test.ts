@@ -2,13 +2,26 @@ import t from "tap";
 import { tokenize } from "../src/tokenizer";
 
 t.test("Tokenizer", t => {
-  t.plan(9);
+  t.plan(10);
 
   t.test("Should tokenize and stem correctly in english", t => {
     t.plan(2);
 
     const I1 = "the quick brown fox jumps over the lazy dog";
     const I2 = "I baked some cakes";
+
+    const O1 = tokenize(I1, "english");
+    const O2 = tokenize(I2, "english");
+
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
+
+  t.test("Should tokenize and stem correctly in english and allow duplicates", t => {
+    t.plan(2);
+
+    const I1 = "this is a test with test duplicates";
+    const I2 = "it's alive! it's alive!";
 
     const O1 = tokenize(I1, "english");
     const O2 = tokenize(I2, "english");

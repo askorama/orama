@@ -10,6 +10,7 @@ import { trackInsertion } from "./insertion-checker";
 type Index = Record<string, Node>;
 
 export { formatNanoseconds } from "./utils";
+export { tokenize } from "./tokenizer";
 
 export type PropertyType = "string" | "number" | "boolean";
 
