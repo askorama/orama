@@ -1,7 +1,7 @@
 {
   "name": "@lyrasearch/lyra",
   "version": "0.1.3",
-  "description": "",
+  "description": "Fast, in-memory, typo-tolerant, full-text search engine written in TypeScript",
   "main": "./dist/cjs/lyra.js",
   "module": "./dist/esm/lyra.js",
   "types": "./dist/esm/lyra.d.ts",
@@ -33,7 +33,7 @@
     "email": "ciao@micheleriva.it",
     "url": "https://github.com/MicheleRiva"
   },
-  "license": "ISC",
+  "license": "Apache-2.0",
   "lint-staged": {
     "*": "pnpm lint"
   },
