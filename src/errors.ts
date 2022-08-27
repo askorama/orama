@@ -9,7 +9,7 @@ export function INVALID_SCHEMA_TYPE(type: string): string {
 }
 
 export function INVALID_DOC_SCHEMA(expected: object, found: object): string {
-  return `Invalid document structure. \nClass has been initialized with the following schema: \n\n${formatJSON(
+  return `Invalid document structure. \nLyra has been initialized with the following schema: \n\n${formatJSON(
     expected,
   )}\n\nbut found the following doc:\n\n${formatJSON(found)}`;
 }
