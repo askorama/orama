@@ -7,7 +7,7 @@
 'use strict'
 exports[`tests/lyra.test.ts TAP checkInsertDocSchema should compare the inserted doc with the schema definition > should compare the inserted doc with the schema definition - 1 1`] = `
 Error: Invalid document structure. 
-Class has been initialized with the following schema: 
+Lyra has been initialized with the following schema: 
 
 {
   "quote": "string",
@@ -24,7 +24,7 @@ but found the following doc:
 
 exports[`tests/lyra.test.ts TAP checkInsertDocSchema should compare the inserted doc with the schema definition > should compare the inserted doc with the schema definition - 2 1`] = `
 Error: Invalid document structure. 
-Class has been initialized with the following schema: 
+Lyra has been initialized with the following schema: 
 
 {
   "quote": "string",
@@ -41,7 +41,7 @@ but found the following doc:
 
 exports[`tests/lyra.test.ts TAP checkInsertDocSchema should compare the inserted doc with the schema definition > should compare the inserted doc with the schema definition - 3 1`] = `
 Error: Invalid document structure. 
-Class has been initialized with the following schema: 
+Lyra has been initialized with the following schema: 
 
 {
   "quote": "string",
