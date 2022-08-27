@@ -66,6 +66,35 @@ insert(db, {
 });
 ```
 
+Please note that the `insert` function is synchronous. If you have a large
+number of documents, we highly recommend using the `insertBatch` function
+instead, which prevents the event loop from blocking. This operation is
+asynchronous and returns a promise:
+
+```js
+await insertBatch(db, [
+  {
+    quote:
+      "It is during our darkest moments that we must focus to see the light.",
+    author: "Aristotle",
+  },
+  {
+    quote:
+      "If you really look closely, most overnight successes took a long time.",
+    author: "Steve Jobs",
+  },
+  {
+    quote:
+      "If you are not willing to risk the usual, you will have to settle for the ordinary.",
+    author: "Jim Rohn",
+  },
+  {
+    quote: "You miss 100% of the shots you don't take",
+    author: "Wayne Gretzky - Michael Scott",
+  },
+]);
+```
+
 After the data has been inserted, you can finally start to query the database.
 
 ```js
