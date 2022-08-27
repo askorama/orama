@@ -1,5 +1,5 @@
 import t from "tap";
-import { create, insert, remove, search } from "../src/lyra";
+import { create, insert, remove, search, insertBatch } from "../src/lyra";
 
 t.test("defaultLanguage", t => {
   t.plan(3);
@@ -111,7 +111,7 @@ t.test("checkInsertDocSchema", t => {
 });
 
 t.test("lyra", t => {
-  t.plan(15);
+  t.plan(16);
 
   t.test("should correctly search for data", t => {
     t.plan(6);
@@ -598,5 +598,36 @@ t.test("lyra", t => {
     t.equal(resultSimpsonQuote.count, 1);
     t.equal(resultAuthorSurname.count, 1);
     t.equal(resultAuthorName.count, 0);
+  });
+
+  t.test("should suport batch insert of documents", async t => {
+    t.plan(2);
+
+    const db = create({
+      schema: {
+        date: "string",
+        description: "string",
+        lang: "string",
+        category1: "string",
+        category2: "string",
+        granularity: "string",
+      },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const docs = require("./datasets/events.json").result.events.slice(0, 4000);
+    const wrongSchemaDocs = docs.map((doc: any) => ({
+      ...doc,
+      date: +new Date(),
+    }));
+
+    try {
+      await insertBatch(db, docs);
+      t.equal(Object.keys(db.docs).length, 4000);
+
+      // eslint-disable-next-line no-empty
+    } catch (_e) {}
+
+    t.rejects(insertBatch(db, wrongSchemaDocs));
   });
 });

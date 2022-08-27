@@ -47,6 +47,10 @@ export type InsertConfig = {
   language: Language;
 };
 
+export type InsertBatchConfig = InsertConfig & {
+  batchSize?: number;
+};
+
 export type SearchParams<S extends PropertiesSchema> = {
   /**
    * The word to search.
@@ -282,6 +286,57 @@ export function insert<S extends PropertiesSchema>(
   trackInsertion(lyra);
 
   return { id };
+}
+
+/**
+ * Inserts a large array of documents into a database without blocking the event loop.
+ * @param lyra The database to insert document into.
+ * @param docs Array of documents to insert.
+ * @param config Optional parameter for overriding default configuration.
+ * @returns Promise<void>.
+ * @example
+ * insertBatch(db, [
+ *   {
+ *     quote: 'You miss 100% of the shots you don\'t take',
+ *     author: 'Wayne Gretzky - Michael Scott'
+ *   },
+ *   {
+ *     quote: 'What I cannot createm I do not understand',
+ *     author: 'Richard Feynman'
+ *   }
+ * ]);
+ */
+
+export async function insertBatch<S extends PropertiesSchema>(
+  lyra: Lyra<S>,
+  docs: ResolveSchema<S>[],
+  config?: InsertBatchConfig,
+): Promise<void> {
+  const batchSize = config?.batchSize ?? 1000;
+
+  return new Promise((resolve, reject) => {
+    let i = 0;
+    function insertBatch() {
+      const batch = docs.slice(i * batchSize, (i + 1) * batchSize);
+      i++;
+
+      if (!batch.length) {
+        return resolve();
+      }
+
+      for (const line of batch) {
+        try {
+          insert(lyra, line, config);
+        } catch (err) {
+          reject(err);
+        }
+      }
+
+      setImmediate(insertBatch);
+    }
+
+    setImmediate(insertBatch);
+  });
 }
 
 /**
