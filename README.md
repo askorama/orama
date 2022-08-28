@@ -157,6 +157,59 @@ If needed, you can also delete a given document by using the `remove` method:
 remove(db, "L1tpqQxc0c2djrSN2a6TJ");
 ```
 
+## Hooks
+
+When dealing with asynchronous operations, hooks are an excelent mechanism to
+intercept and perform operations during the workflow.
+Lyra supports hooks natively. The `create` function allows you to specific a
+sequence of hooks.
+
+```js
+import { create } from "@lyrasearch/lyra";
+
+const db = create({
+  schema: {},
+  hooks: {
+    // HERE
+  },
+});
+```
+
+**Important**: The hooks run in the same context as the main function execution.
+It means, that if your hook takes X milliseconds to resolve, the Lyra function
+will take X + Y (where Y = Lyra operation).
+
+### afterInsert hook
+
+The `afterInsert` hook is called after the insertion of a document into the
+database. The `hook` will be called with the `id` of the inserted document.
+
+Example:
+
+```
+import { create, insertWithHooks } from "@lyrasearch/lyra";
+
+async function hook1 (id: string): Promise<void> {
+  // called before hook2
+}
+
+function hook2 (id: string): void {
+  // ...
+}
+
+const db = create({
+  schema: {
+    author: "string",
+    quote: "string",
+  },
+  hooks: {
+    afterInsert: [hook1, hook2],
+  },
+});
+
+await insertWithHooks(db, { author: "test", quote: "test" })
+```
+
 # License
 
 Lyra is licensed under the [Apache 2.0](/LICENSE.md) license.
