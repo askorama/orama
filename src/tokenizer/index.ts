@@ -1,5 +1,6 @@
 import { Language } from "./languages";
 import { replaceDiacritics } from "./diacritics";
+import { availableStemmers, stemmers } from "./stemmer";
 
 const splitRegex: Record<Language, RegExp> = {
   dutch: /[^a-z0-9_'-]+/gim,
@@ -13,6 +14,23 @@ const splitRegex: Record<Language, RegExp> = {
   swedish: /[^a-z0-9_åÅäÄöÖüÜ-]+/gim,
 };
 
+const normalizationCache = new Map();
+
+function normalizeToken(token: string, language: Language): string {
+  const key = `${language}-${token}`;
+  if (normalizationCache.has(key)) {
+    return normalizationCache.get(key)!;
+  } else {
+    if (availableStemmers.includes(language)) {
+      token = stemmers[language]!(token);
+    }
+
+    token = replaceDiacritics(token);
+    normalizationCache.set(key, token);
+    return token;
+  }
+}
+
 export function tokenize(input: string, language: Language = "english", allowDuplicates = false) {
   /* c8 ignore next 3 */
   if (typeof input !== "string") {
@@ -20,7 +38,11 @@ export function tokenize(input: string, language: Language = "english", allowDup
   }
 
   const splitRule = splitRegex[language];
-  const tokens = input.toLowerCase().split(splitRule).map(replaceDiacritics);
+  const tokens = input
+    .toLowerCase()
+    .split(splitRule)
+    .map(token => normalizeToken(token, language));
+
   const trimTokens = trim(tokens);
 
   if (!allowDuplicates) {
