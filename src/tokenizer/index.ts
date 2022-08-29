@@ -1,7 +1,8 @@
-import { Language } from "./languages";
+import type { Language } from "./languages";
+import type { TokenizerConfig } from "../lyra";
+import { defaultTokenizerConfig } from "../lyra";
 import { replaceDiacritics } from "./diacritics";
-import { availableStemmers, stemmers } from "./stemmer";
-import { availableStopWords, stopWords } from "./stop-words";
+import { stemmers } from "./stemmer";
 
 const splitRegex: Record<Language, RegExp> = {
   dutch: /[^a-z0-9_'-]+/gim,
@@ -17,23 +18,28 @@ const splitRegex: Record<Language, RegExp> = {
 
 const normalizationCache = new Map();
 
-function normalizeToken(token: string, language: Language): string {
+function normalizeToken(token: string, language: Language, tokenizerConfig: TokenizerConfig): string {
   const key = `${language}-${token}`;
+
   if (normalizationCache.has(key)) {
     return normalizationCache.get(key)!;
   } else {
-    // Remove stop-words
-    if (availableStopWords.includes(language)) {
-      if (stopWords[language]!.includes(token)) {
+    // Check if stop-words removal is enabled
+    if (tokenizerConfig?.enableStopWords) {
+      // Remove stop-words
+      if ((tokenizerConfig?.customStopWords as string[]).includes(token)) {
         const token = "";
         normalizationCache.set(key, token);
         return token;
       }
     }
 
-    // Stem token
-    if (availableStemmers.includes(language)) {
-      token = stemmers[language]!(token);
+    // Check if stemming is enabled
+    if (tokenizerConfig?.enableStemming) {
+      // Stem token when a stemming function is available
+      if (typeof tokenizerConfig?.stemmingFn === "function") {
+        token = stemmers[language]!(token);
+      }
     }
 
     token = replaceDiacritics(token);
@@ -42,7 +48,12 @@ function normalizeToken(token: string, language: Language): string {
   }
 }
 
-export function tokenize(input: string, language: Language = "english", allowDuplicates = false) {
+export function tokenize(
+  input: string,
+  language: Language = "english",
+  allowDuplicates = false,
+  tokenizerConfig: TokenizerConfig = defaultTokenizerConfig(language),
+) {
   /* c8 ignore next 3 */
   if (typeof input !== "string") {
     return [input];
@@ -52,7 +63,7 @@ export function tokenize(input: string, language: Language = "english", allowDup
   const tokens = input
     .toLowerCase()
     .split(splitRule)
-    .map(token => normalizeToken(token, language));
+    .map(token => normalizeToken(token, language, tokenizerConfig!));
 
   const trimTokens = trim(tokens);
 

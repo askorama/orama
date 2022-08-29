@@ -127,8 +127,8 @@ t.test("Tokenizer", t => {
     const I1 = "de kleine koeien";
     const I2 = "Ik heb wat taarten gemaakt";
 
-    const O1 = tokenize(I1, "dutch");
     const O2 = tokenize(I2, "dutch");
+    const O1 = tokenize(I1, "dutch");
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
