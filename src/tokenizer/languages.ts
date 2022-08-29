@@ -10,4 +10,7 @@ export const SUPPORTED_LANGUAGES = [
   "russian",
   "spanish",
   "swedish",
+  "german",
+  "finnish",
+  "danish",
 ] as const;

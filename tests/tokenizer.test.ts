@@ -3,7 +3,7 @@ import { create } from "../src/lyra";
 import { tokenize, normalizationCache } from "../src/tokenizer";
 
 t.test("Tokenizer", t => {
-  t.plan(10);
+  t.plan(13);
 
   t.test("Should tokenize and stem correctly in english", t => {
     t.plan(2);
@@ -130,6 +130,45 @@ t.test("Tokenizer", t => {
 
     const O2 = tokenize(I2, "dutch");
     const O1 = tokenize(I1, "dutch");
+
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
+
+  t.test("Should tokenize and stem correctly in german", t => {
+    t.plan(2);
+
+    const I1 = "Schlaf ist eine harte Sache, wenn Tests fehlschlagen";
+    const I2 = "Ich habe ein paar Kekse gebacken";
+
+    const O1 = tokenize(I1, "german");
+    const O2 = tokenize(I2, "german");
+
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
+
+  t.test("Should tokenize and stem correctly in finnish", t => {
+    t.plan(2);
+
+    const I1 = "Uni on vaikea asia, kun testit epäonnistuvat";
+    const I2 = "Leivoin keksejä";
+
+    const O1 = tokenize(I1, "finnish");
+    const O2 = tokenize(I2, "finnish");
+
+    t.matchSnapshot(O1, `${t.name}-O1`);
+    t.matchSnapshot(O2, `${t.name}-O2`);
+  });
+
+  t.test("Should tokenize and stem correctly in danish", t => {
+    t.plan(2);
+
+    const I1 = "Søvn er en svær ting, når prøver mislykkes";
+    const I2 = "Jeg bagte småkager";
+
+    const O1 = tokenize(I1, "danish");
+    const O2 = tokenize(I2, "danish");
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
