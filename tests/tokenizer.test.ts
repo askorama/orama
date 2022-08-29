@@ -1,5 +1,6 @@
 import t from "tap";
-import { tokenize } from "../src/tokenizer";
+import { create } from "../src/lyra";
+import { tokenize, normalizationCache } from "../src/tokenizer";
 
 t.test("Tokenizer", t => {
   t.plan(10);
@@ -127,10 +128,129 @@ t.test("Tokenizer", t => {
     const I1 = "de kleine koeien";
     const I2 = "Ik heb wat taarten gemaakt";
 
-    const O1 = tokenize(I1, "dutch");
     const O2 = tokenize(I2, "dutch");
+    const O1 = tokenize(I1, "dutch");
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
+  });
+});
+
+t.test("Custom stop-words rules", t => {
+  t.plan(5);
+
+  t.test("custom array of stop-words", t => {
+    t.plan(2);
+
+    const db = create({
+      schema: {},
+      tokenizer: {
+        customStopWords: ["quick", "brown", "fox", "dog"],
+      },
+    });
+
+    normalizationCache.clear();
+
+    const I1 = "the quick brown fox jumps over the lazy dog";
+    const I2 = "I baked some cakes";
+
+    const O1 = tokenize(I1, "english", false, db.tokenizer);
+    const O2 = tokenize(I2, "english", false, db.tokenizer);
+
+    t.same(O1, ["the", "jump", "over", "lazi"]);
+    t.same(O2, ["i", "bake", "some", "cake"]);
+  });
+
+  t.test("custom stop-words function", t => {
+    t.plan(2);
+
+    const db = create({
+      schema: {},
+      tokenizer: {
+        customStopWords(words: string[]): string[] {
+          return [...words, "quick", "brown", "fox", "dog"];
+        },
+      },
+    });
+
+    normalizationCache.clear();
+
+    const I1 = "the quick brown fox jumps over the lazy dog";
+    const I2 = "I baked some cakes";
+
+    const O1 = tokenize(I1, "english", false, db.tokenizer);
+    const O2 = tokenize(I2, "english", false, db.tokenizer);
+
+    t.same(O1, ["jump", "lazi"]);
+    t.same(O2, ["bake", "cake"]);
+  });
+
+  t.test("disable stop-words", t => {
+    t.plan(2);
+
+    const db = create({
+      schema: {},
+      tokenizer: {
+        enableStopWords: false,
+      },
+    });
+
+    normalizationCache.clear();
+
+    const I1 = "the quick brown fox jumps over the lazy dog";
+    const I2 = "I baked some cakes";
+
+    const O1 = tokenize(I1, "english", false, db.tokenizer);
+    const O2 = tokenize(I2, "english", false, db.tokenizer);
+
+    t.same(O1, ["the", "quick", "brown", "fox", "jump", "over", "lazi", "dog"]);
+    t.same(O2, ["i", "bake", "some", "cake"]);
+  });
+
+  t.test("disable stemming", t => {
+    t.plan(2);
+
+    const db = create({
+      schema: {},
+      tokenizer: {
+        enableStemming: false,
+      },
+    });
+
+    normalizationCache.clear();
+
+    const I1 = "the quick brown fox jumps over the lazy dog";
+    const I2 = "I baked some cakes";
+
+    const O1 = tokenize(I1, "english", false, db.tokenizer);
+    const O2 = tokenize(I2, "english", false, db.tokenizer);
+
+    t.same(O1, ["quick", "brown", "fox", "jumps", "lazy", "dog"]);
+    t.same(O2, ["baked", "cakes"]);
+  });
+
+  t.test("custom stemming function", t => {
+    t.plan(2);
+
+    const db = create({
+      schema: {},
+      tokenizer: {
+        stemmingFn: word => `${word}-ish`,
+      },
+    });
+
+    normalizationCache.clear();
+
+    const I1 = "the quick brown fox jumps over the lazy dog";
+    const I2 = "I baked some cakes";
+
+    const O1 = tokenize(I1, "english", false, db.tokenizer);
+    const O2 = tokenize(I2, "english", false, db.tokenizer);
+
+    console.log(O1);
+    console.log(O2);
+
+    t.same(O1, ["quick-ish", "brown-ish", "fox-ish", "jumps-ish", "lazy-ish", "dog-ish"]);
+    t.same(O2, ["baked-ish", "cakes-ish"]);
   });
 });

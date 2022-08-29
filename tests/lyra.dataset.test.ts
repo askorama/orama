@@ -1,5 +1,5 @@
 import t from "tap";
-import { create, insert, remove, search } from "../src/lyra";
+import { create, insert, insertBatch, remove, search } from "../src/lyra";
 import type { PropertiesSchema, SearchResult } from "../src/lyra";
 import dataset from "./datasets/events.json";
 
@@ -31,37 +31,19 @@ const db = create({
 t.test("lyra.dataset", async t => {
   t.plan(3);
 
-  t.before(() => {
+  t.before(async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const events = (dataset as any).result.events;
+    const events = (dataset as any).result.events.map((ev: any) => ({
+      date: ev.date,
+      description: ev.description,
+      granularity: ev.granularity,
+      categories: {
+        first: ev.category1 ?? "",
+        second: ev.category2 ?? "",
+      },
+    }));
 
-    let i = 0;
-    return new Promise<void>(resolve => {
-      function insertBatch() {
-        const batch = events.slice(i * 1000, (i + 1) * 1000);
-        i++;
-
-        if (!batch.length) {
-          return resolve();
-        }
-
-        for (const event of batch) {
-          insert(db, {
-            date: event.date,
-            description: event.description,
-            granularity: event.granularity,
-            categories: {
-              first: event.category1 ?? "",
-              second: event.category2 ?? "",
-            },
-          });
-        }
-
-        setImmediate(insertBatch);
-      }
-
-      setImmediate(insertBatch);
-    });
+    await insertBatch(db, events);
   });
 
   t.test("should correctly populate the database with a large dataset", t => {
@@ -152,8 +134,8 @@ t.test("lyra.dataset", async t => {
     t.matchSnapshot(s2, `${t.name}-page-2`);
     t.matchSnapshot(s3, `${t.name}-page-3`);
 
-    t.equal(s4.count, 2240);
-    t.equal(s5.hits.length, 1);
+    t.equal(s4.count, 2357);
+    t.equal(s5.hits.length, 10);
   });
 
   t.test("should correctly delete documents", t => {
@@ -179,6 +161,6 @@ t.test("lyra.dataset", async t => {
       offset: 0,
     });
 
-    t.equal(newSearch.count, 2230);
+    t.equal(newSearch.count, 2347);
   });
 });

@@ -1,5 +1,8 @@
-import { Language } from "./languages";
+import type { Language } from "./languages";
+import type { TokenizerConfig } from "../lyra";
+import { defaultTokenizerConfig } from "../lyra";
 import { replaceDiacritics } from "./diacritics";
+import { stemmers } from "./stemmer";
 
 const splitRegex: Record<Language, RegExp> = {
   dutch: /[^a-z0-9_'-]+/gim,
@@ -13,14 +16,56 @@ const splitRegex: Record<Language, RegExp> = {
   swedish: /[^a-z0-9_åÅäÄöÖüÜ-]+/gim,
 };
 
-export function tokenize(input: string, language: Language = "english", allowDuplicates = false) {
+export const normalizationCache = new Map();
+
+function normalizeToken(token: string, language: Language, tokenizerConfig: TokenizerConfig): string {
+  const key = `${language}:${token}`;
+
+  if (normalizationCache.has(key)) {
+    return normalizationCache.get(key)!;
+  } else {
+    // Check if stop-words removal is enabled
+    if (tokenizerConfig?.enableStopWords) {
+      // Remove stop-words
+      if ((tokenizerConfig?.customStopWords as string[]).includes(token)) {
+        const token = "";
+        normalizationCache.set(key, token);
+        return token;
+      }
+    }
+
+    // Check if stemming is enabled
+    if (tokenizerConfig?.enableStemming) {
+      // Stem token when a stemming function is available
+      if (typeof tokenizerConfig?.stemmingFn === "function") {
+        token = tokenizerConfig?.stemmingFn(token);
+      }
+    }
+
+    token = replaceDiacritics(token);
+    normalizationCache.set(key, token);
+    return token;
+  }
+}
+
+export function tokenize(
+  input: string,
+  language: Language = "english",
+  allowDuplicates = false,
+  tokenizerConfig: TokenizerConfig = defaultTokenizerConfig(language),
+) {
   /* c8 ignore next 3 */
   if (typeof input !== "string") {
     return [input];
   }
 
   const splitRule = splitRegex[language];
-  const tokens = input.toLowerCase().split(splitRule).map(replaceDiacritics);
+  const tokens = input
+    .toLowerCase()
+    .split(splitRule)
+    .map(token => normalizeToken(token, language, tokenizerConfig!))
+    .filter(Boolean);
+
   const trimTokens = trim(tokens);
 
   if (!allowDuplicates) {

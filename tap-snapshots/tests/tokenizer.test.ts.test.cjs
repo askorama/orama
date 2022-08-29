@@ -25,41 +25,33 @@ Array [
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in english > Should tokenize and stem correctly in english-O1 1`] = `
 Array [
-  "the",
   "quick",
   "brown",
   "fox",
-  "jumps",
-  "over",
-  "lazy",
+  "jump",
+  "lazi",
   "dog",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in english > Should tokenize and stem correctly in english-O2 1`] = `
 Array [
-  "i",
-  "baked",
-  "some",
-  "cakes",
+  "bake",
+  "cake",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in english and allow duplicates > Should tokenize and stem correctly in english and allow duplicates-O1 1`] = `
 Array [
-  "this",
-  "is",
   "a",
   "test",
-  "with",
-  "duplicates",
+  "duplic",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in english and allow duplicates > Should tokenize and stem correctly in english and allow duplicates-O2 1`] = `
 Array [
-  "it's",
-  "alive",
+  "aliv",
 ]
 `
 

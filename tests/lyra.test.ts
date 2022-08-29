@@ -132,8 +132,8 @@ t.test("lyra", t => {
     const result1 = search(db, { term: "fox", exact: true });
     const result2 = search(db, { term: "dog", exact: true });
 
-    t.equal(result1.count, 1);
-    t.equal(result2.count, 2);
+    t.equal(result1.count, 2);
+    t.equal(result2.count, 3);
 
     // Prefix search
     const result3 = search(db, { term: "fox", exact: false });
@@ -146,7 +146,7 @@ t.test("lyra", t => {
     const result5 = search(db, { term: "fx", tolerance: 1 });
     const result6 = search(db, { term: "dg", tolerance: 2 });
 
-    t.equal(result5.count, 1);
+    t.equal(result5.count, 2);
     t.equal(result6.count, 4);
   });
 
