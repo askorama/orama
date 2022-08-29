@@ -116,12 +116,12 @@ export type RetrievedDoc<S extends PropertiesSchema> = ResolveSchema<S> & {
 function validateHooks(hooks?: Hooks): void | never {
   if (hooks) {
     if (typeof hooks !== "object") {
-      throw new Error("Invalid hooks object");
+      throw new Error(ERRORS.INVALID_HOOKS_OBJECT());
     }
 
     const invalidHooks = Object.keys(hooks).filter(hook => !SUPPORTED_HOOKS.includes(hook));
     if (invalidHooks.length) {
-      throw new Error(`The following hooks aren't supported. Hooks: ${invalidHooks}`);
+      throw new Error(ERRORS.NON_SUPPORTED_HOOKS(invalidHooks));
     }
   }
 }

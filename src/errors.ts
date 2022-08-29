@@ -47,3 +47,11 @@ export function GETTER_SETTER_WORKS_ON_EDGE_ONLY(method: string): string {
 export function RESERVED_PROPERTY_NAME(name: string): string {
   return `"${name}" is a reserved property name. Please change it to "__${name}", "${name}__", "_${name}_", or similar.`;
 }
+
+export function INVALID_HOOKS_OBJECT(): string {
+  return "Invalid hooks object";
+}
+
+export function NON_SUPPORTED_HOOKS(invalidHooks: string[]): string {
+  return `The following hooks aren't supported. Hooks: ${invalidHooks}`;
+}
