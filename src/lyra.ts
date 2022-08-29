@@ -28,6 +28,7 @@ const SUPPORTED_HOOKS = ["afterInsert"];
 
 type Hooks = {
   afterInsert?: AfterInsertHook | AfterInsertHook[];
+};
 
 export type TokenizerConfig = {
   enableStemming?: boolean;
@@ -379,7 +380,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   }
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config);
+  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer!);
   trackInsertion(lyra);
   if (lyra.hooks.afterInsert) {
     await hookRunner.call(lyra, lyra.hooks.afterInsert, id);
