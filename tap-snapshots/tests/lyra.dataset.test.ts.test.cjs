@@ -7,7 +7,7 @@
 'use strict'
 exports[`tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-1 1`] = `
 Object {
-  "count": 2240,
+  "count": 2357,
   "elapsed": 0n,
   "hits": Array [
     Object {
@@ -83,6 +83,16 @@ Object {
     Object {
       "categories": Object {
         "first": "By place",
+        "second": "Egypt",
+      },
+      "date": "-276",
+      "description": "The first of the Syrian Wars starts between Egypt's Ptolemy II and Seleucid emperor Antiochus I Soter. The Egyptians invade northern Syria, but Antiochus defeats and repels his opponent's army.",
+      "granularity": "year",
+      "id": "",
+    },
+    Object {
+      "categories": Object {
+        "first": "By place",
         "second": "Seleucid Empire",
       },
       "date": "-272",
@@ -100,6 +110,15 @@ Object {
       "granularity": "year",
       "id": "",
     },
+  ],
+}
+`
+
+exports[`tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-2 1`] = `
+Object {
+  "count": 2357,
+  "elapsed": 0n,
+  "hits": Array [
     Object {
       "categories": Object {
         "first": "By place",
@@ -110,15 +129,6 @@ Object {
       "granularity": "year",
       "id": "",
     },
-  ],
-}
-`
-
-exports[`tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-2 1`] = `
-Object {
-  "count": 2240,
-  "elapsed": 0n,
-  "hits": Array [
     Object {
       "categories": Object {
         "first": "By place",
@@ -126,6 +136,16 @@ Object {
       },
       "date": "-262",
       "description": "After Athens surrenders following a long siege by Macedonian forces, Antigonus II Gonatas re-garrisons Athens and forbids the city from making war. Otherwise, he leaves Athens alone as the seat of philosophy and learning in Greece.",
+      "granularity": "year",
+      "id": "",
+    },
+    Object {
+      "categories": Object {
+        "first": "By place",
+        "second": "China",
+      },
+      "date": "-260",
+      "description": "In the Battle of Changping, the army of the Qin state routs the army of Zhao, establishing its military superiority over all other Chinese states during the Warring States Period. The battle, in which Zhao forces are led by Lian Po and Zhao Kuo, while Qin is led by Wang He and Bai Qi, takes place near modern-day Gaoping in Shanxi and hundreds of thousands of soldiers from Zhao are executed after the battle.",
       "granularity": "year",
       "id": "",
     },
@@ -199,6 +219,15 @@ Object {
       "granularity": "year",
       "id": "",
     },
+  ],
+}
+`
+
+exports[`tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-3 1`] = `
+Object {
+  "count": 2357,
+  "elapsed": 0n,
+  "hits": Array [
     Object {
       "categories": Object {
         "first": "By place",
@@ -219,15 +248,6 @@ Object {
       "granularity": "year",
       "id": "",
     },
-  ],
-}
-`
-
-exports[`tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-3 1`] = `
-Object {
-  "count": 2240,
-  "elapsed": 0n,
-  "hits": Array [
     Object {
       "categories": Object {
         "first": "By place",
@@ -305,26 +325,6 @@ Object {
       },
       "date": "-240",
       "description": "Two of Carthage's mercenary commanders ampampndash Spendius and Mathos ampampndash convince the Libyan conscripts in the mercenary army, that is currently occupying the Carthaginian city of Tunis, to accept their leadership. They persuade the native Libyans that Carthage will take revenge against them for their part in the conflict once the foreign mercenaries are paid and sent home. They then convince the combined mercenary armies to revolt against Carthage and convince the various native Libyan towns and cities to back the revolt. Spendius and Mathos then take the Carthaginian commander Gesco as a hostage. What has started as an argument over pay owed to soldiers by the Carthaginian Government, explodes into a full-scale revolution, known as the Mercenary War.",
-      "granularity": "year",
-      "id": "",
-    },
-    Object {
-      "categories": Object {
-        "first": "By place",
-        "second": "Carthage",
-      },
-      "date": "-239",
-      "description": "Concerned that Hamilcar Barca's leniency in pardoning those who he has captured who have participated in the Mercenary War will encourage others to defect, Mathos and Spendius order the mutilation and execution of ampquotabout seven hundredampquot Carthaginian prisoners, including Gesco. With the mercenaries jointly guilty of these atrocities, defectors dare not face Carthaginian justice under Hamilcar.",
-      "granularity": "year",
-      "id": "",
-    },
-    Object {
-      "categories": Object {
-        "first": "By place",
-        "second": "Carthage",
-      },
-      "date": "-238",
-      "description": "The Carthaginian armies besiege and capture Utica and Hippacritae. This ends the Carthaginian civil war.",
       "granularity": "year",
       "id": "",
     },
