@@ -2,7 +2,6 @@ import type { Language } from "./languages";
 import type { TokenizerConfig } from "../lyra";
 import { defaultTokenizerConfig } from "../lyra";
 import { replaceDiacritics } from "./diacritics";
-import { stemmers } from "./stemmer";
 
 const splitRegex: Record<Language, RegExp> = {
   dutch: /[^a-z0-9_'-]+/gim,
@@ -14,6 +13,9 @@ const splitRegex: Record<Language, RegExp> = {
   russian: /[^a-zа-яА-ЯёЁ]+/gim,
   spanish: /[^a-zA-Zá-úÁ-ÚñÑüÜ]+/gim,
   swedish: /[^a-z0-9_åÅäÄöÖüÜ-]+/gim,
+  german: /[^a-zA-ZäöüÄÖÜß]+/gim,
+  finnish: /[^a-z0-9äöÄÖ]+/gim,
+  danish: /[^a-z0-9æøåÆØÅ]+/gim,
 };
 
 export const normalizationCache = new Map();

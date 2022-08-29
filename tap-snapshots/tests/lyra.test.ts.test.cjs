@@ -74,6 +74,9 @@ Supported languages are:
  - russian
  - spanish
  - swedish
+ - german
+ - finnish
+ - danish
 `
 
 exports[`tests/lyra.test.ts TAP defaultLanguage should throw an error if the desired language is not supported during insertion > should throw an error if the desired language is not supported during insertion 1`] = `
@@ -88,4 +91,7 @@ Supported languages are:
  - russian
  - spanish
  - swedish
+ - german
+ - finnish
+ - danish
 `
