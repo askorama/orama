@@ -16,10 +16,10 @@ const splitRegex: Record<Language, RegExp> = {
   swedish: /[^a-z0-9_åÅäÄöÖüÜ-]+/gim,
 };
 
-const normalizationCache = new Map();
+export const normalizationCache = new Map();
 
 function normalizeToken(token: string, language: Language, tokenizerConfig: TokenizerConfig): string {
-  const key = `${language}-${token}`;
+  const key = `${language}:${token}`;
 
   if (normalizationCache.has(key)) {
     return normalizationCache.get(key)!;
@@ -38,7 +38,7 @@ function normalizeToken(token: string, language: Language, tokenizerConfig: Toke
     if (tokenizerConfig?.enableStemming) {
       // Stem token when a stemming function is available
       if (typeof tokenizerConfig?.stemmingFn === "function") {
-        token = stemmers[language]!(token);
+        token = tokenizerConfig?.stemmingFn(token);
       }
     }
 
@@ -63,7 +63,8 @@ export function tokenize(
   const tokens = input
     .toLowerCase()
     .split(splitRule)
-    .map(token => normalizeToken(token, language, tokenizerConfig!));
+    .map(token => normalizeToken(token, language, tokenizerConfig!))
+    .filter(Boolean);
 
   const trimTokens = trim(tokens);
 

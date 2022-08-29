@@ -29,7 +29,6 @@ Array [
   "brown",
   "fox",
   "jump",
-  "",
   "lazi",
   "dog",
 ]
@@ -38,7 +37,6 @@ Array [
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in english > Should tokenize and stem correctly in english-O2 1`] = `
 Array [
   "bake",
-  "",
   "cake",
 ]
 `
@@ -47,7 +45,6 @@ exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctl
 Array [
   "a",
   "test",
-  "",
   "duplic",
 ]
 `
@@ -55,7 +52,6 @@ Array [
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in english and allow duplicates > Should tokenize and stem correctly in english and allow duplicates-O2 1`] = `
 Array [
   "aliv",
-  "",
 ]
 `
 

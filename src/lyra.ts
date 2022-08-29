@@ -493,8 +493,8 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
 
   // Enable custom stemming function
   if (tokenizerConfig?.stemmingFn) {
-    if (typeof tokenizerConfig.stemmingFn !== "function") {
-      defaultStemmingFn = tokenizerConfig?.stemmingFn;
+    if (typeof tokenizerConfig.stemmingFn === "function") {
+      defaultStemmingFn = tokenizerConfig.stemmingFn;
     } else {
       throw Error(ERRORS.INVALID_STEMMER_FUNCTION_TYPE());
     }
