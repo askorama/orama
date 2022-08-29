@@ -1,5 +1,5 @@
+import type { Language } from "../languages";
 import { stem as ENStemmer } from "./en";
-import { Language } from "../languages";
 
 type Stemmer = (word: string) => string;
 

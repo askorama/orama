@@ -1,6 +1,7 @@
 import { Language } from "./languages";
 import { replaceDiacritics } from "./diacritics";
 import { availableStemmers, stemmers } from "./stemmer";
+import { availableStopWords, stopWords } from "./stop-words";
 
 const splitRegex: Record<Language, RegExp> = {
   dutch: /[^a-z0-9_'-]+/gim,
@@ -21,6 +22,16 @@ function normalizeToken(token: string, language: Language): string {
   if (normalizationCache.has(key)) {
     return normalizationCache.get(key)!;
   } else {
+    // Remove stop-words
+    if (availableStopWords.includes(language)) {
+      if (stopWords[language]!.includes(token)) {
+        const token = "";
+        normalizationCache.set(key, token);
+        return token;
+      }
+    }
+
+    // Stem token
     if (availableStemmers.includes(language)) {
       token = stemmers[language]!(token);
     }
