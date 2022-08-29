@@ -20,6 +20,16 @@ export type PropertiesSchema = {
   [key: string]: PropertyType | PropertiesSchema;
 };
 
+export interface AfterInsertHook {
+  <S extends PropertiesSchema = PropertiesSchema>(this: Lyra<S>, id: string): Promise<void> | void;
+}
+
+const SUPPORTED_HOOKS = ["afterInsert"];
+
+type Hooks = {
+  afterInsert?: AfterInsertHook | AfterInsertHook[];
+};
+
 export type TokenizerConfig = {
   enableStemming?: boolean;
   enableStopWords?: boolean;
@@ -44,6 +54,7 @@ export type Configuration<S extends PropertiesSchema> = {
    */
   defaultLanguage?: Language;
   edge?: boolean;
+  hooks?: Hooks;
   tokenizer?: TokenizerConfig;
 };
 
@@ -58,6 +69,7 @@ export interface Lyra<S extends PropertiesSchema> extends Data<S> {
   defaultLanguage: Language;
   schema: S;
   edge: boolean;
+  hooks: Hooks;
   tokenizer?: TokenizerConfig;
 }
 
@@ -118,6 +130,31 @@ export type RetrievedDoc<S extends PropertiesSchema> = ResolveSchema<S> & {
    */
   id: string;
 };
+
+function validateHooks(hooks?: Hooks): void | never {
+  if (hooks) {
+    if (typeof hooks !== "object") {
+      throw new Error(ERRORS.INVALID_HOOKS_OBJECT());
+    }
+
+    const invalidHooks = Object.keys(hooks).filter(hook => !SUPPORTED_HOOKS.includes(hook));
+    if (invalidHooks.length) {
+      throw new Error(ERRORS.NON_SUPPORTED_HOOKS(invalidHooks));
+    }
+  }
+}
+
+async function hookRunner<S extends PropertiesSchema>(
+  this: Lyra<S>,
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  funcs: Function | Function[],
+  ...args: unknown[]
+): Promise<void> {
+  const hooks = Array.isArray(funcs) ? funcs : [funcs];
+  for (const hook of hooks) {
+    await hook.apply(this, args);
+  }
+}
 
 function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix = "") {
   for (const prop of Object.keys(schema)) {
@@ -249,6 +286,9 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
  *   schema: {
  *     author: 'string',
  *     quote: 'string'
+ *   },
+ *   hooks: {
+ *     afterInsert: [afterInsertHook],
  *   }
  * });
  */
@@ -259,12 +299,15 @@ export function create<S extends PropertiesSchema>(properties: Configuration<S>)
     throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage));
   }
 
+  validateHooks(properties.hooks);
+
   const instance: Lyra<S> = {
     defaultLanguage,
     schema: properties.schema,
     docs: {},
     nodes: {},
     index: {},
+    hooks: properties.hooks || {},
     edge: properties.edge ?? false,
     tokenizer: defaultTokenizerConfig(defaultLanguage, properties.tokenizer!),
   };
@@ -309,6 +352,44 @@ export function insert<S extends PropertiesSchema>(
 }
 
 /**
+ * Inserts a document into a database.
+ * @param lyra The database to insert document into.
+ * @param doc The document to insert.
+ * @param config Optional parameter for overriding default configuration.
+ * @returns A Promise object containing id of the inserted document.
+ * @example
+ * const { id } = insert(db, {
+ *   quote: 'You miss 100% of the shots you don\'t take',
+ *   author: 'Wayne Gretzky - Michael Scott'
+ * });
+ */
+export async function insertWithHooks<S extends PropertiesSchema>(
+  lyra: Lyra<S>,
+  doc: ResolveSchema<S>,
+  config?: InsertConfig,
+): Promise<{ id: string }> {
+  config = { language: lyra.defaultLanguage, ...config };
+  const id = uniqueId();
+
+  if (!SUPPORTED_LANGUAGES.includes(config.language)) {
+    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(config.language));
+  }
+
+  if (!recursiveCheckDocSchema(doc, lyra.schema)) {
+    throw new Error(ERRORS.INVALID_DOC_SCHEMA(lyra.schema, doc));
+  }
+
+  lyra.docs[id] = doc;
+  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer!);
+  trackInsertion(lyra);
+  if (lyra.hooks.afterInsert) {
+    await hookRunner.call(lyra, lyra.hooks.afterInsert, id);
+  }
+
+  return { id };
+}
+
+/**
  * Inserts a large array of documents into a database without blocking the event loop.
  * @param lyra The database to insert document into.
  * @param docs Array of documents to insert.
@@ -336,7 +417,7 @@ export async function insertBatch<S extends PropertiesSchema>(
 
   return new Promise((resolve, reject) => {
     let i = 0;
-    function insertBatch() {
+    async function insertBatch() {
       const batch = docs.slice(i * batchSize, (i + 1) * batchSize);
       i++;
 
@@ -346,7 +427,7 @@ export async function insertBatch<S extends PropertiesSchema>(
 
       for (const line of batch) {
         try {
-          insert(lyra, line, config);
+          await insertWithHooks(lyra, line, config);
         } catch (err) {
           reject(err);
         }
