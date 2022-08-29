@@ -160,9 +160,8 @@ remove(db, "L1tpqQxc0c2djrSN2a6TJ");
 ## Hooks
 
 When dealing with asynchronous operations, hooks are an excelent mechanism to
-intercept and perform operations during the workflow.
-Lyra supports hooks natively. The `create` function allows you to specific a
-sequence of hooks.
+intercept and perform operations during the workflow. Lyra supports hooks
+natively. The `create` function allows you to specific a sequence of hooks.
 
 ```js
 import { create } from "@lyrasearch/lyra";
@@ -186,7 +185,7 @@ database. The `hook` will be called with the `id` of the inserted document.
 
 Example:
 
-```
+```js
 import { create, insertWithHooks } from "@lyrasearch/lyra";
 
 async function hook1 (id: string): Promise<void> {
