@@ -433,10 +433,10 @@ export async function insertBatch<S extends PropertiesSchema>(
         }
       }
 
-      setImmediate(insertBatch);
+      setTimeout(insertBatch, 0);
     }
 
-    setImmediate(insertBatch);
+    setTimeout(insertBatch, 0);
   });
 }
 
