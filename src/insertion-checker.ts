@@ -1,11 +1,11 @@
 const kInsertions = Symbol("lyra.insertions");
 
+// Web platforms don't have process. React-Native doesn't have process.emitWarning.
 const warn =
-  "process" in globalThis
-    ? process.emitWarning
-    : function emitWarning(message: string, options: { code: string }) {
-        console.warn(`[WARNING] [${options.code}] ${message}`);
-      };
+  globalThis.process?.emitWarning ??
+  function emitWarning(message: string, options: { code: string }) {
+    console.warn(`[WARNING] [${options.code}] ${message}`);
+  };
 
 export function trackInsertion(_lyra: unknown) {
   const lyra = _lyra as object & { [kInsertions]?: number };
