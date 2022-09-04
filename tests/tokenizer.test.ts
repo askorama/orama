@@ -286,9 +286,6 @@ t.test("Custom stop-words rules", t => {
     const O1 = tokenize(I1, "english", false, db.tokenizer);
     const O2 = tokenize(I2, "english", false, db.tokenizer);
 
-    console.log(O1);
-    console.log(O2);
-
     t.same(O1, ["quick-ish", "brown-ish", "fox-ish", "jumps-ish", "lazy-ish", "dog-ish"]);
     t.same(O2, ["baked-ish", "cakes-ish"]);
   });
