@@ -3,6 +3,13 @@ import type { TokenizerConfig } from "../lyra";
 import { defaultTokenizerConfig } from "../lyra";
 import { replaceDiacritics } from "./diacritics";
 
+export type Tokenizer = (
+  text: string,
+  language: Language,
+  allowDuplicates: boolean,
+  tokenizerConfig: TokenizerConfig,
+) => string[];
+
 const splitRegex: Record<Language, RegExp> = {
   dutch: /[^a-z0-9_'-]+/gim,
   english: /[^a-z0-9_'-]+/gim,

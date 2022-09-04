@@ -1,5 +1,5 @@
 import * as ERRORS from "./errors";
-import { tokenize } from "./tokenizer";
+import { Tokenizer, tokenize } from "./tokenizer";
 import { getNanosecondsTime, uniqueId, reservedPropertyNames } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import type { ResolveSchema, SearchProperties } from "./types";
@@ -34,14 +34,16 @@ export type TokenizerConfig = {
   enableStemming?: boolean;
   enableStopWords?: boolean;
   customStopWords?: ((stopWords: string[]) => string[]) | string[];
-  stemmingFn?: (word: string) => string;
+  stemmingFn?: Stemmer;
+  tokenizerFn?: Tokenizer;
 };
 
 export type TokenizerConfigExec = {
   enableStemming: boolean;
   enableStopWords: boolean;
   customStopWords: string[];
-  stemmingFn?: (word: string) => string;
+  stemmingFn?: Stemmer;
+  tokenizerFn: Tokenizer;
 };
 
 export type Configuration<S extends PropertiesSchema> = {
@@ -207,7 +209,7 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
   id: string,
   config: InsertConfig,
   prefix = "",
-  tokenizerConfig: TokenizerConfig,
+  tokenizerConfig: TokenizerConfigExec,
 ) {
   for (const key of Object.keys(doc)) {
     const isNested = typeof doc[key] === "object";
@@ -222,7 +224,7 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
       // Use propName here because if doc is a nested object
       // We will get the wrong index
       const requestedTrie = index[propName];
-      const tokens = tokenize(doc[key] as string, config.language, false, tokenizerConfig);
+      const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language, false, tokenizerConfig);
 
       for (const token of tokens) {
         trieInsert(nodes, requestedTrie, token, id);
@@ -345,7 +347,7 @@ export function insert<S extends PropertiesSchema>(
   }
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer!);
+  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
 
   return { id };
@@ -380,7 +382,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   }
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer!);
+  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
   if (lyra.hooks.afterInsert) {
     await hookRunner.call(lyra, lyra.hooks.afterInsert, id);
@@ -448,6 +450,10 @@ export async function insertBatch<S extends PropertiesSchema>(
  * const isDeleted = remove(db, 'L1tpqQxc0c2djrSN2a6TJ');
  */
 export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string): boolean {
+  if (!lyra.tokenizer) {
+    lyra.tokenizer = defaultTokenizerConfig(lyra.defaultLanguage);
+  }
+
   if (!(docID in lyra.docs)) {
     throw new Error(ERRORS.DOC_ID_DOES_NOT_EXISTS(docID));
   }
@@ -459,7 +465,12 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
 
     if (propertyType === "string") {
       const idx = lyra.index[key];
-      const tokens = tokenize(document[key] as string, lyra.defaultLanguage, false, lyra.tokenizer!);
+      const tokens = lyra.tokenizer.tokenizerFn!(
+        document[key] as string,
+        lyra.defaultLanguage,
+        false,
+        lyra.tokenizer!,
+      )!;
 
       for (const token of tokens) {
         if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
@@ -495,7 +506,11 @@ export function search<S extends PropertiesSchema>(
     language = lyra.defaultLanguage;
   }
 
-  const tokens = tokenize(params.term, language, false, lyra.tokenizer!);
+  if (!lyra.tokenizer) {
+    lyra.tokenizer = defaultTokenizerConfig(language);
+  }
+
+  const tokens = lyra.tokenizer.tokenizerFn!(params.term, language, false, lyra.tokenizer);
   const indices = getIndices(lyra, params.properties);
   const uniqueDocIds = new Set<string>();
   const { limit = 10, offset = 0, exact = false } = params;
@@ -569,59 +584,72 @@ export function load<S extends PropertiesSchema>(lyra: Lyra<S>, { index, docs, n
 }
 
 export function defaultTokenizerConfig(language: Language, tokenizerConfig: TokenizerConfig = {}): TokenizerConfigExec {
-  let defaultStopWords: string[];
-  let defaultStemmingFn: Stemmer | undefined;
-
-  // Enable custom stemming function
-  if (tokenizerConfig?.stemmingFn) {
-    if (typeof tokenizerConfig.stemmingFn === "function") {
-      defaultStemmingFn = tokenizerConfig.stemmingFn;
-    } else {
-      throw Error(ERRORS.INVALID_STEMMER_FUNCTION_TYPE());
-    }
-  } else {
-    if (availableStemmers.includes(language)) {
-      defaultStemmingFn = stemmers[language]!;
-    } else {
-      defaultStemmingFn = undefined;
-    }
-  }
-
-  // Enable default stop-words
-  if (availableStopWords.includes(language)) {
-    defaultStopWords = stopWords[language]!;
-  } else {
-    defaultStopWords = [];
-  }
-
-  // Enable custom stop-words
+  let defaultStopWords: string[] = [];
   let customStopWords: string[] | undefined;
+  let defaultStemmingFn: Stemmer | undefined;
+  let defaultTokenizerFn: Tokenizer | undefined;
 
-  if (tokenizerConfig?.customStopWords) {
-    switch (typeof tokenizerConfig.customStopWords) {
-      // Execute the custom step-words function.
-      // This will pass the default step-words for a given language as a first parameter.
-      case "function":
-        customStopWords = tokenizerConfig.customStopWords(defaultStopWords);
-        break;
+  // Enable custom tokenizer function
+  if (tokenizerConfig?.tokenizerFn) {
+    if (typeof tokenizerConfig.tokenizerFn === "function") {
+      defaultTokenizerFn = tokenizerConfig.tokenizerFn;
+    } else {
+      throw Error(ERRORS.INVALID_TOKENIZER_FUNCTION());
+    }
 
-      // Check if the custom step-words is an array.
-      // If it's an object, throw an exception. If the array contains any non-string value, throw an exception.
-      case "object":
-        if (Array.isArray(tokenizerConfig.customStopWords)) {
-          if ((tokenizerConfig.customStopWords as string[]).some((x: unknown) => typeof x !== "string")) {
-            throw Error(ERRORS.CUSTOM_STOP_WORDS_ARRAY_MUST_BE_STRING_ARRAY());
+    // If there's no custom tokenizer, we can proceed setting custom
+    // stemming functions and stop-words.
+  } else {
+    defaultTokenizerFn = tokenize;
+
+    // Enable custom stemming function
+    if (tokenizerConfig?.stemmingFn) {
+      if (typeof tokenizerConfig.stemmingFn === "function") {
+        defaultStemmingFn = tokenizerConfig.stemmingFn;
+      } else {
+        throw Error(ERRORS.INVALID_STEMMER_FUNCTION_TYPE());
+      }
+    } else {
+      if (availableStemmers.includes(language)) {
+        defaultStemmingFn = stemmers[language]!;
+      } else {
+        defaultStemmingFn = undefined;
+      }
+    }
+
+    // Enable default stop-words
+    if (availableStopWords.includes(language)) {
+      defaultStopWords = stopWords[language]!;
+    } else {
+      defaultStopWords = [];
+    }
+
+    if (tokenizerConfig?.customStopWords) {
+      switch (typeof tokenizerConfig.customStopWords) {
+        // Execute the custom step-words function.
+        // This will pass the default step-words for a given language as a first parameter.
+        case "function":
+          customStopWords = tokenizerConfig.customStopWords(defaultStopWords);
+          break;
+
+        // Check if the custom step-words is an array.
+        // If it's an object, throw an exception. If the array contains any non-string value, throw an exception.
+        case "object":
+          if (Array.isArray(tokenizerConfig.customStopWords)) {
+            if ((tokenizerConfig.customStopWords as string[]).some((x: unknown) => typeof x !== "string")) {
+              throw Error(ERRORS.CUSTOM_STOP_WORDS_ARRAY_MUST_BE_STRING_ARRAY());
+            } else {
+              customStopWords = tokenizerConfig.customStopWords as string[];
+            }
           } else {
-            customStopWords = tokenizerConfig.customStopWords as string[];
+            throw Error(ERRORS.CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY());
           }
-        } else {
-          throw Error(ERRORS.CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY());
-        }
-        break;
+          break;
 
-      // By default, throw an exception, as this is a misconfiguration.
-      default:
-        throw Error(ERRORS.CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY());
+        // By default, throw an exception, as this is a misconfiguration.
+        default:
+          throw Error(ERRORS.CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY());
+      }
     }
   }
 
@@ -630,5 +658,6 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
     enableStemming: tokenizerConfig?.enableStemming ?? true,
     stemmingFn: defaultStemmingFn,
     customStopWords: customStopWords ?? defaultStopWords,
+    tokenizerFn: defaultTokenizerFn,
   };
 }
