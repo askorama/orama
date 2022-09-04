@@ -675,3 +675,36 @@ t.test("lyra - hooks", t => {
     t.same(++callOrder, 2);
   });
 });
+
+t.test("custom tokenizer configuration", t => {
+  t.plan(1);
+
+  t.test("tokenizerFn", t => {
+    t.plan(2);
+    const db = create({
+      schema: {
+        txt: "string",
+      },
+      tokenizer: {
+        tokenizerFn: text => text.split(","),
+      },
+    });
+
+    insert(db, {
+      txt: "hello, world! How are you?",
+    });
+
+    const searchResult = search(db, {
+      term: " world! How are you?",
+      exact: true,
+    });
+
+    const searchResult2 = search(db, {
+      term: "How are you?",
+      exact: true,
+    });
+
+    t.same(searchResult.count, 1);
+    t.same(searchResult2.count, 0);
+  });
+});
