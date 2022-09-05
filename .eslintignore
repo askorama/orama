@@ -20,3 +20,4 @@ get-imdb-dataset.mjs
 *.vue
 src/tokenizer/stemmer/*.js
 src/tokenizer/stemmer/*.d.ts
+*.dic
