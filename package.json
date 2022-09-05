@@ -4,7 +4,7 @@
   "description": "Fast, in-memory, typo-tolerant, full-text search engine written in TypeScript",
   "main": "./dist/cjs/lyra.js",
   "module": "./dist/esm/lyra.js",
-  "browser": "./dist/rn/lyra.js",
+  "browser": "./dist/browser/lyra.js",
   "types": "./dist/esm/lyra.d.ts",
   "files": ["dist"],
   "bugs": {
@@ -23,8 +23,8 @@
     "build:lyra": "cd packages/lyra && pnpm build",
     "build:cjs": "tsc --project tsconfig.cjs.json",
     "build:module": "tsc --project tsconfig.esm.json",
-    "build:webpack": "tsc --project tsconfig.webpack.json",
-    "build": "rimraf ./dist && concurrently 'pnpm:build:module' 'pnpm:build:cjs' 'pnpm:build:webpack'",
+    "build:browser": "tsc --project tsconfig.browser.json",
+    "build": "rimraf ./dist && concurrently 'pnpm:build:module' 'pnpm:build:cjs' 'pnpm:build:browser'",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
     "ci": "npm run build && npm run test:ci"
