@@ -18,7 +18,7 @@
     "commit": "pnpm lint-staged && cz",
     "format": "prettier --write \"**/*.{ts,js}\"",
     "lint": "pnpm run format && eslint . --ext .js,.ts",
-    "prepare": "husky install",
+    "prepare": "husky install && pnpm build",
     "build:cjs": "tsc --project tsconfig.cjs.json",
     "build:module": "tsc --project tsconfig.esm.json",
     "build:browser": "tsc --project tsconfig.browser.json",
