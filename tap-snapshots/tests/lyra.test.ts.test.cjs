@@ -65,10 +65,18 @@ Error: "id" is a reserved property name. Please change it to "__id", "id__", "_i
 exports[`tests/lyra.test.ts TAP defaultLanguage should throw an error if the desired language is not supported > should throw an error if the desired language is not supported 1`] = `
 Error: Language "latin" is not supported.
 Supported languages are:
+ - arabic
+ - armenian
  - dutch
  - english
  - french
+ - greek
+ - indonesian
  - italian
+ - irish
+ - indian
+ - lithuanian
+ - nepali
  - norwegian
  - portuguese
  - russian
@@ -77,15 +85,27 @@ Supported languages are:
  - german
  - finnish
  - danish
+ - hungarian
+ - romanian
+ - serbian
+ - turkish
 `
 
 exports[`tests/lyra.test.ts TAP defaultLanguage should throw an error if the desired language is not supported during insertion > should throw an error if the desired language is not supported during insertion 1`] = `
 Error: Language "latin" is not supported.
 Supported languages are:
+ - arabic
+ - armenian
  - dutch
  - english
  - french
+ - greek
+ - indonesian
  - italian
+ - irish
+ - indian
+ - lithuanian
+ - nepali
  - norwegian
  - portuguese
  - russian
@@ -94,4 +114,8 @@ Supported languages are:
  - german
  - finnish
  - danish
+ - hungarian
+ - romanian
+ - serbian
+ - turkish
 `
