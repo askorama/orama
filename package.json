@@ -23,8 +23,8 @@
     "build:module": "tsc --project tsconfig.esm.json",
     "build:browser": "tsc --project tsconfig.browser.json",
     "build": "rimraf ./dist && concurrently 'pnpm:build:module' 'pnpm:build:cjs' 'pnpm:build:browser'",
-    "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts -Rsilent",
-    "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
+    "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --nyc-arg=\"-x=src/tokenizer/stemmer/*.js\" --no-color tests/*.test.ts",
+    "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml --nyc-arg=\"-x=src/tokenizer/stemmer/*.js\" tests/*.test.ts",
     "ci": "npm run build && npm run test:ci"
   },
   "keywords": [],
@@ -59,6 +59,11 @@
     "tap": "^16.3.0",
     "ts-node": "^10.9.1",
     "typescript": "^4.7.4"
+  },
+  "nyc": {
+    "instrumentation": {
+      "excludes": ["./src/tokenizer/**/*.js"]
+    }
   },
   "pnpm": {
     "peerDependencyRules": {
