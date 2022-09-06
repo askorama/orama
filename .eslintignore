@@ -18,6 +18,6 @@ get-imdb-dataset.mjs
 **/tap-snapshots/**
 **/datasets/*.json
 *.vue
-src/tokenizer/stemmer/*.js
-src/tokenizer/stemmer/*.d.ts
+stemmer/*.js
+stemmer/*.d.ts
 *.dic

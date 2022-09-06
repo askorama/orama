@@ -1,9 +1,9 @@
+import type { ResolveSchema, SearchProperties } from "./types";
 import * as ERRORS from "./errors";
 import { Tokenizer, tokenize } from "./tokenizer";
 import { getNanosecondsTime, uniqueId, reservedPropertyNames } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
-import type { ResolveSchema, SearchProperties } from "./types";
-import { availableStemmers, Stemmer, stemmers } from "./tokenizer/stemmer";
+import { stemmer } from "../stemmer/en";
 import { create as createNode, Node } from "./prefix-tree/node";
 import { find as trieFind, insert as trieInsert, removeDocumentByWord, Nodes } from "./prefix-tree/trie";
 import { trackInsertion } from "./insertion-checker";
@@ -29,6 +29,8 @@ const SUPPORTED_HOOKS = ["afterInsert"];
 type Hooks = {
   afterInsert?: AfterInsertHook | AfterInsertHook[];
 };
+
+export type Stemmer = (word: string) => string;
 
 export type TokenizerConfig = {
   enableStemming?: boolean;
@@ -585,7 +587,7 @@ export function load<S extends PropertiesSchema>(lyra: Lyra<S>, { index, docs, n
 
 export function defaultTokenizerConfig(language: Language, tokenizerConfig: TokenizerConfig = {}): TokenizerConfigExec {
   let defaultStopWords: string[] = [];
-  let customStopWords: string[] | undefined;
+  let customStopWords: string[] = [];
   let defaultStemmingFn: Stemmer | undefined;
   let defaultTokenizerFn: Tokenizer | undefined;
 
@@ -610,16 +612,13 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
         throw Error(ERRORS.INVALID_STEMMER_FUNCTION_TYPE());
       }
     } else {
-      if (availableStemmers.includes(language)) {
-        defaultStemmingFn = stemmers[language]!;
-      } else {
-        defaultStemmingFn = undefined;
-      }
+      defaultStemmingFn = stemmer;
     }
 
     // Enable default stop-words
+
     if (availableStopWords.includes(language)) {
-      defaultStopWords = stopWords[language]!;
+      defaultStopWords = stopWords[language] ?? [];
     } else {
       defaultStopWords = [];
     }

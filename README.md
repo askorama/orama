@@ -172,7 +172,7 @@ shipped with the default Lyra installation.
 
 ```js
 import { create } from "@lyrasearch/lyra";
-import { stemmer } from "@lyrasearch/lyra/stemmer/italian";
+import { stemmer } from "@lyrasearch/lyra/stemmer/it";
 
 const db = create({
   schema: {
@@ -186,7 +186,7 @@ const db = create({
 });
 ```
 
-Right now, Lyra supports 21 languages and stemmers out of the box:
+Right now, Lyra supports 22 languages and stemmers out of the box:
 
 - Armenian
 - Arabic
@@ -196,6 +196,7 @@ Right now, Lyra supports 21 languages and stemmers out of the box:
 - Finnish
 - French
 - German
+- Greek
 - Hindi
 - Hungarian
 - Indonesian
