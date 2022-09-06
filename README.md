@@ -228,6 +228,7 @@ Right now, Lyra supports 22 languages and stemmers out of the box:
 - Portuguese
 - Romanian
 - Russian
+- Serbian
 - Swedish
 - Turkish
 
