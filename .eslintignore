@@ -18,3 +18,6 @@ get-imdb-dataset.mjs
 **/tap-snapshots/**
 **/datasets/*.json
 *.vue
+stemmer/**/*.js
+stemmer/**/*.d.ts
+*.dic

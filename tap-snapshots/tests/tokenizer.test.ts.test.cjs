@@ -10,38 +10,40 @@ Array [
   "sovn",
   "svar",
   "ting",
-  "prover",
-  "mislykkes",
+  "prov",
+  "mislyk",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in danish > Should tokenize and stem correctly in danish-O2 1`] = `
 Array [
-  "bagte",
-  "smakager",
+  "bagt",
+  "smakag",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in dutch > Should tokenize and stem correctly in dutch-O1 1`] = `
 Array [
-  "kleine",
-  "koeien",
+  "klein",
+  "koei",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in dutch > Should tokenize and stem correctly in dutch-O2 1`] = `
 Array [
-  "taarten",
+  "taart",
   "gemaakt",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in english > Should tokenize and stem correctly in english-O1 1`] = `
 Array [
+  "the",
   "quick",
   "brown",
   "fox",
   "jump",
+  "over",
   "lazi",
   "dog",
 ]
@@ -49,14 +51,20 @@ Array [
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in english > Should tokenize and stem correctly in english-O2 1`] = `
 Array [
+  "i",
   "bake",
+  "some",
   "cake",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in english and allow duplicates > Should tokenize and stem correctly in english and allow duplicates-O1 1`] = `
 Array [
+  "thi",
+  "is",
   "a",
+  "test",
+  "with",
   "test",
   "duplic",
 ]
@@ -64,6 +72,9 @@ Array [
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in english and allow duplicates > Should tokenize and stem correctly in english and allow duplicates-O2 1`] = `
 Array [
+  "it'",
+  "aliv",
+  "it'",
   "aliv",
 ]
 `
@@ -71,153 +82,153 @@ Array [
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in finnish > Should tokenize and stem correctly in finnish-O1 1`] = `
 Array [
   "uni",
-  "vaikea",
-  "asia",
-  "testit",
-  "epaonnistuvat",
+  "vaike",
+  "as",
+  "test",
+  "epaonnistuv",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in finnish > Should tokenize and stem correctly in finnish-O2 1`] = `
 Array [
-  "leivoin",
-  "kekseja",
+  "leivo",
+  "keksej",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in french > Should tokenize and stem correctly in french-O1 1`] = `
 Array [
-  "voyons",
-  "temps",
+  "voyon",
+  "temp",
   "fait",
-  "dehors",
+  "dehor",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in french > Should tokenize and stem correctly in french-O2 1`] = `
 Array [
   "fait",
-  "gateaux",
+  "gateau",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in german > Should tokenize and stem correctly in german-O1 1`] = `
 Array [
   "schlaf",
-  "harte",
-  "sache",
-  "tests",
-  "fehlschlagen",
+  "hart",
+  "sach",
+  "test",
+  "fehlschlag",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in german > Should tokenize and stem correctly in german-O2 1`] = `
 Array [
   "paar",
-  "kekse",
-  "gebacken",
+  "keks",
+  "geback",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in italian > Should tokenize and stem correctly in italian-O1 1`] = `
 Array [
-  "cucinato",
-  "torte",
+  "cucin",
+  "tort",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in italian > Should tokenize and stem correctly in italian-O2 1`] = `
 Array [
-  "dormire",
-  "cosa",
-  "difficile",
-  "quando",
+  "dorm",
+  "cos",
+  "difficil",
+  "quand",
   "test",
-  "passano",
+  "pass",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in norwegian > Should tokenize and stem correctly in norwegian-O1 1`] = `
 Array [
-  "kokte",
-  "kaker",
+  "kokt",
+  "kak",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in norwegian > Should tokenize and stem correctly in norwegian-O2 1`] = `
 Array [
-  "sove",
-  "vanskelig",
+  "sov",
+  "vansk",
   "ting",
-  "testene",
-  "mislykkes",
+  "test",
+  "mislykk",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in portuguese > Should tokenize and stem correctly in portuguese-O1 1`] = `
 Array [
-  "cozinhei",
+  "cozinh",
   "alguns",
-  "bolos",
+  "bol",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in portuguese > Should tokenize and stem correctly in portuguese-O2 1`] = `
 Array [
-  "dormir",
+  "dorm",
   "e",
-  "coisa",
+  "cois",
   "dificil",
-  "testes",
-  "falham",
+  "test",
+  "falh",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in russian > Should tokenize and stem correctly in russian-O1 1`] = `
 Array [
-  "приготовила",
-  "пирожные",
+  "приготов",
+  "пирожн",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in russian > Should tokenize and stem correctly in russian-O2 1`] = `
 Array [
-  "спать",
-  "трудно",
-  "тесты",
-  "срабатывают",
+  "спат",
+  "трудн",
+  "тест",
+  "срабатыва",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in spanish > Should tokenize and stem correctly in spanish-O1 1`] = `
 Array [
-  "cocine",
-  "pasteles",
+  "cocin",
+  "pastel",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in spanish > Should tokenize and stem correctly in spanish-O2 1`] = `
 Array [
-  "dormir",
+  "dorm",
   "dificil",
-  "pruebas",
-  "fallan",
+  "prueb",
+  "fall",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in swedish > Should tokenize and stem correctly in swedish-O1 1`] = `
 Array [
-  "lagade",
-  "kakor",
+  "lag",
+  "kak",
 ]
 `
 
 exports[`tests/tokenizer.test.ts TAP Tokenizer Should tokenize and stem correctly in swedish > Should tokenize and stem correctly in swedish-O2 1`] = `
 Array [
-  "sova",
+  "sov",
   "svar",
   "sak",
-  "testerna",
-  "misslyckas",
+  "test",
+  "misslyck",
 ]
 `

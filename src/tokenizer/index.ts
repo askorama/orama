@@ -23,6 +23,18 @@ const splitRegex: Record<Language, RegExp> = {
   german: /[^a-zA-ZäöüÄÖÜß]+/gim,
   finnish: /[^a-z0-9äöÄÖ]+/gim,
   danish: /[^a-z0-9æøåÆØÅ]+/gim,
+  hungarian: /[^a-z0-9áéíóöőúüűÁÉÍÓÖŐÚÜŰ]+/gim,
+  romanian: /[^a-z0-9ăâîșțĂÂÎȘȚ]+/gim,
+  serbian: /[^a-z0-9čćžšđČĆŽŠĐ]+/gim,
+  turkish: /[^a-z0-9çÇğĞıİöÖşŞüÜ]+/gim,
+  lithuanian: /[^a-z0-9ąčęėįšųūžĄČĘĖĮŠŲŪŽ]+/gim,
+  arabic: /[^a-z0-9أ-ي]+/gim,
+  nepali: /[^a-z0-9अ-ह]+/gim,
+  irish: /[^a-z0-9áéíóúÁÉÍÓÚ]+/gim,
+  indian: /[^a-z0-9अ-ह]+/gim,
+  armenian: /[^a-z0-9ա-ֆ]+/gim,
+  greek: /[^a-z0-9α-ωά-ώ]+/gim,
+  indonesian: /[^a-z0-9]+/gim,
 };
 
 export const normalizationCache = new Map();

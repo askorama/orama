@@ -50,13 +50,13 @@ const mgr1 = "^(" + C + ")?" + V + C + V + C;
 // vowel in stem
 const s_v = "^(" + C + ")?" + v;
 
-export function stem(w: string): string {
-  let stem: string;
-  let suffix: string;
-  let re: RegExp;
-  let re2: RegExp;
-  let re3: RegExp;
-  let re4: RegExp;
+module.exports.stemmer = function stemmer(w) {
+  let stem;
+  let suffix;
+  let re;
+  let re2;
+  let re3;
+  let re4;
 
   if (w.length < 3) {
     return w;
@@ -79,14 +79,14 @@ export function stem(w: string): string {
   re = /^(.+?)eed$/;
   re2 = /^(.+?)(ed|ing)$/;
   if (re.test(w)) {
-    const fp = re.exec(w)!;
+    const fp = re.exec(w);
     re = new RegExp(mgr0);
     if (re.test(fp[1])) {
       re = /.$/;
       w = w.replace(re, "");
     }
   } else if (re2.test(w)) {
-    const fp = re2.exec(w)!;
+    const fp = re2.exec(w);
     stem = fp[1];
     re2 = new RegExp(s_v);
     if (re2.test(stem)) {
@@ -107,7 +107,7 @@ export function stem(w: string): string {
 
   re = /^(.+?)y$/;
   if (re.test(w)) {
-    const fp = re.exec(w)!;
+    const fp = re.exec(w);
     stem = fp?.[1];
     re = new RegExp(s_v);
     if (stem && re.test(stem)) {
@@ -118,7 +118,7 @@ export function stem(w: string): string {
   re =
     /^(.+?)(ational|tional|enci|anci|izer|bli|alli|entli|eli|ousli|ization|ation|ator|alism|iveness|fulness|ousness|aliti|iviti|biliti|logi)$/;
   if (re.test(w)) {
-    const fp = re.exec(w)!;
+    const fp = re.exec(w);
     stem = fp?.[1];
     suffix = fp?.[2];
     re = new RegExp(mgr0);
@@ -131,7 +131,7 @@ export function stem(w: string): string {
 
   re = /^(.+?)(icate|ative|alize|iciti|ical|ful|ness)$/;
   if (re.test(w)) {
-    const fp = re.exec(w)!;
+    const fp = re.exec(w);
     stem = fp?.[1];
     suffix = fp?.[2];
     re = new RegExp(mgr0);
@@ -147,14 +147,14 @@ export function stem(w: string): string {
   re = /^(.+?)(al|ance|ence|er|ic|able|ible|ant|ement|ment|ent|ou|ism|ate|iti|ous|ive|ize)$/;
   re2 = /^(.+?)(s|t)(ion)$/;
   if (re.test(w)) {
-    const fp = re.exec(w)!;
+    const fp = re.exec(w);
     stem = fp?.[1];
     re = new RegExp(mgr1);
     if (stem && re.test(stem)) {
       w = stem;
     }
   } else if (re2.test(w)) {
-    const fp = re2.exec(w)!;
+    const fp = re2.exec(w);
     stem = fp?.[1] ?? "" + fp?.[2] ?? "";
     re2 = new RegExp(mgr1);
     if (re2.test(stem)) {
@@ -164,7 +164,7 @@ export function stem(w: string): string {
 
   re = /^(.+?)e$/;
   if (re.test(w)) {
-    const fp = re.exec(w)!;
+    const fp = re.exec(w);
     stem = fp?.[1];
     re = new RegExp(mgr1);
     re2 = new RegExp(meq1);
@@ -186,4 +186,4 @@ export function stem(w: string): string {
   }
 
   return w;
-}
+};

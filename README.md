@@ -157,6 +157,81 @@ If needed, you can also delete a given document by using the `remove` method:
 remove(db, "L1tpqQxc0c2djrSN2a6TJ");
 ```
 
+## Language
+
+Lyra supports multiple languages. By default, it will use the `english`
+language,
+
+You can specify a different language by using the `defaultLanguage` property
+during Lyra initialization.
+
+By default, Lyra will analyze your input using an English
+[Porter Stemmer](https://tartarus.org/martin/PorterStemmer/) function. <br />
+You can replace the default stemmer with the a custom one, or a pre-built one
+shipped with the default Lyra installation.
+
+Example (using ESM):
+
+```js
+import { create } from "@lyrasearch/lyra";
+import { stemmer } from "@lyrasearch/lyra/stemmer/esm/it";
+
+const db = create({
+  schema: {
+    author: "string",
+    quote: "string",
+  },
+  defaultLanguage: "italian",
+  tokenizer: {
+    stemmingFn: stemmer,
+  },
+});
+```
+
+Example (using CJS):
+
+```js
+const { create } = require("@lyrasearch/lyra");
+const { stemmer } = require("@lyrasearch/lyra/stemmer/cjs/it");
+
+const db = create({
+  schema: {
+    author: "string",
+    quote: "string",
+  },
+  defaultLanguage: "italian",
+  tokenizer: {
+    stemmingFn: stemmer,
+  },
+});
+```
+
+Right now, Lyra supports 22 languages and stemmers out of the box:
+
+- Armenian
+- Arabic
+- Danish
+- Spanish
+- English
+- Finnish
+- French
+- German
+- Greek
+- Hindi
+- Hungarian
+- Indonesian
+- Italian
+- Irish
+- Dutch
+- Nepali
+- Norwegian
+- Portuguese
+- Romanian
+- Russian
+- Serbian
+- Swedish
+- Turkish
+
 ## Hooks
 
 When dealing with asynchronous operations, hooks are an excelent mechanism to

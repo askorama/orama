@@ -6,9 +6,7 @@
   "module": "./dist/esm/lyra.js",
   "browser": "./dist/browser/lyra.js",
   "types": "./dist/esm/lyra.d.ts",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist", "stemmer"],
   "bugs": {
     "url": "https://github.com/lyrasearch/lyra"
   },
@@ -27,6 +25,7 @@
     "build": "rimraf ./dist && concurrently 'npm:build:module' 'npm:build:cjs' 'npm:build:browser'",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
+    "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "ci": "npm run build && npm run test:ci"
   },
   "keywords": [],
