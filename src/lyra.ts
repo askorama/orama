@@ -3,7 +3,7 @@ import * as ERRORS from "./errors";
 import { Tokenizer, tokenize } from "./tokenizer";
 import { getNanosecondsTime, uniqueId, reservedPropertyNames } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
-import { stemmer } from "../stemmer/en";
+import { stemmer } from "../stemmer/cjs/en";
 import { create as createNode, Node } from "./prefix-tree/node";
 import { find as trieFind, insert as trieInsert, removeDocumentByWord, Nodes } from "./prefix-tree/trie";
 import { trackInsertion } from "./insertion-checker";

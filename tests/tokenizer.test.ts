@@ -1,17 +1,17 @@
 import t from "tap";
 import { create } from "../src/lyra";
 import { tokenize, normalizationCache } from "../src/tokenizer";
-import { stemmer as FRStemmer } from "../stemmer/fr";
-import { stemmer as NOStemmer } from "../stemmer/no";
-import { stemmer as ITStemmer } from "../stemmer/it";
-import { stemmer as PTStemmer } from "../stemmer/pt";
-import { stemmer as RUStemmer } from "../stemmer/ru";
-import { stemmer as SEStemmer } from "../stemmer/se";
-import { stemmer as ESStemmer } from "../stemmer/es";
-import { stemmer as NLStemmer } from "../stemmer/nl";
-import { stemmer as DEStemmer } from "../stemmer/de";
-import { stemmer as FIStemmer } from "../stemmer/fi";
-import { stemmer as DKStemmer } from "../stemmer/dk";
+import { stemmer as FRStemmer } from "../stemmer/cjs/fr";
+import { stemmer as NOStemmer } from "../stemmer/cjs/no";
+import { stemmer as ITStemmer } from "../stemmer/cjs/it";
+import { stemmer as PTStemmer } from "../stemmer/cjs/pt";
+import { stemmer as RUStemmer } from "../stemmer/cjs/ru";
+import { stemmer as SEStemmer } from "../stemmer/cjs/se";
+import { stemmer as ESStemmer } from "../stemmer/cjs/es";
+import { stemmer as NLStemmer } from "../stemmer/cjs/nl";
+import { stemmer as DEStemmer } from "../stemmer/cjs/de";
+import { stemmer as FIStemmer } from "../stemmer/cjs/fi";
+import { stemmer as DKStemmer } from "../stemmer/cjs/dk";
 import { stopWords } from "../src/tokenizer/stop-words/index";
 
 t.test("Tokenizer", t => {

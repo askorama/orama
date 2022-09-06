@@ -170,9 +170,29 @@ By default, Lyra will analyze your input using an English
 You can replace the default stemmer with the a custom one, or a pre-built one
 shipped with the default Lyra installation.
 
+Example (using ESM):
+
 ```js
 import { create } from "@lyrasearch/lyra";
-import { stemmer } from "@lyrasearch/lyra/stemmer/it";
+import { stemmer } from "@lyrasearch/lyra/stemmer/esm/it";
+
+const db = create({
+  schema: {
+    author: "string",
+    quote: "string",
+  },
+  defaultLanguage: "italian",
+  tokenizer: {
+    stemmingFn: stemmer,
+  },
+});
+```
+
+Example (using CJS):
+
+```js
+const { create } = require("@lyrasearch/lyra");
+const { stemmer } = require("@lyrasearch/lyra/stemmer/cjs/it");
 
 const db = create({
   schema: {
