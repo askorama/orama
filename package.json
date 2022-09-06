@@ -1,6 +1,6 @@
 {
   "name": "@lyrasearch/lyra",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Fast, in-memory, typo-tolerant, full-text search engine written in TypeScript",
   "main": "./dist/cjs/lyra.js",
   "module": "./dist/esm/lyra.js",
@@ -25,7 +25,6 @@
     "build": "rimraf ./dist && concurrently 'npm:build:module' 'npm:build:cjs' 'npm:build:browser'",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
-    "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "ci": "npm run build && npm run test:ci"
   },
   "keywords": [],
