@@ -6,7 +6,9 @@
   "module": "./dist/esm/lyra.js",
   "browser": "./dist/browser/lyra.js",
   "types": "./dist/esm/lyra.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "bugs": {
     "url": "https://github.com/lyrasearch/lyra"
   },
@@ -18,11 +20,11 @@
     "commit": "pnpm lint-staged && cz",
     "format": "prettier --write \"**/*.{ts,js}\"",
     "lint": "pnpm run format && eslint . --ext .js,.ts",
-    "prepare": "husky install && pnpm build",
+    "prepare": "husky install && npm run build",
     "build:cjs": "tsc --project tsconfig.cjs.json",
     "build:module": "tsc --project tsconfig.esm.json",
     "build:browser": "tsc --project tsconfig.browser.json",
-    "build": "rimraf ./dist && concurrently 'pnpm:build:module' 'pnpm:build:cjs' 'pnpm:build:browser'",
+    "build": "rimraf ./dist && concurrently 'npm:build:module' 'npm:build:cjs' 'npm:build:browser'",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
     "ci": "npm run build && npm run test:ci"
