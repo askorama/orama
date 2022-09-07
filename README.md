@@ -174,7 +174,7 @@ Example (using ESM):
 
 ```js
 import { create } from "@lyrasearch/lyra";
-import { stemmer } from "@lyrasearch/lyra/stemmer/esm/it";
+import { stemmer } from "@lyrasearch/lyra/dist/stemmer/esm/it";
 
 const db = create({
   schema: {
@@ -192,7 +192,7 @@ Example (using CJS):
 
 ```js
 const { create } = require("@lyrasearch/lyra");
-const { stemmer } = require("@lyrasearch/lyra/stemmer/cjs/it");
+const { stemmer } = require("@lyrasearch/lyra/dist/stemmer/cjs/it");
 
 const db = create({
   schema: {
