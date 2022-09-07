@@ -1,17 +1,17 @@
 import t from "tap";
 import { create } from "../src/lyra";
 import { tokenize, normalizationCache } from "../src/tokenizer";
-import { stemmer as FRStemmer } from "../stemmer/cjs/fr";
-import { stemmer as NOStemmer } from "../stemmer/cjs/no";
-import { stemmer as ITStemmer } from "../stemmer/cjs/it";
-import { stemmer as PTStemmer } from "../stemmer/cjs/pt";
-import { stemmer as RUStemmer } from "../stemmer/cjs/ru";
-import { stemmer as SEStemmer } from "../stemmer/cjs/se";
-import { stemmer as ESStemmer } from "../stemmer/cjs/es";
-import { stemmer as NLStemmer } from "../stemmer/cjs/nl";
-import { stemmer as DEStemmer } from "../stemmer/cjs/de";
-import { stemmer as FIStemmer } from "../stemmer/cjs/fi";
-import { stemmer as DKStemmer } from "../stemmer/cjs/dk";
+import { stemmer as FRStemmer } from "../stemmer/lib/fr";
+import { stemmer as NOStemmer } from "../stemmer/lib/no";
+import { stemmer as ITStemmer } from "../stemmer/lib/it";
+import { stemmer as PTStemmer } from "../stemmer/lib/pt";
+import { stemmer as RUStemmer } from "../stemmer/lib/ru";
+import { stemmer as SEStemmer } from "../stemmer/lib/se";
+import { stemmer as ESStemmer } from "../stemmer/lib/es";
+import { stemmer as NLStemmer } from "../stemmer/lib/nl";
+import { stemmer as DEStemmer } from "../stemmer/lib/de";
+import { stemmer as FIStemmer } from "../stemmer/lib/fi";
+import { stemmer as DKStemmer } from "../stemmer/lib/dk";
 import { stopWords } from "../src/tokenizer/stop-words/index";
 
 t.test("Tokenizer", t => {
