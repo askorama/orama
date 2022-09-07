@@ -34,4 +34,4 @@ jobs:
           ${{ runner.os }}-pnpm-store-
 
     - name: Install dependencies and run tests
-      run: pnpm install && pnpm run test
+      run: pnpm install && pnpm run test && pnpm run test:smoke
