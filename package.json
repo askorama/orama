@@ -1,6 +1,6 @@
 {
   "name": "@lyrasearch/lyra",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Fast, in-memory, typo-tolerant, full-text search engine written in TypeScript",
   "main": "./dist/cjs/lyra.js",
   "module": "./dist/esm/lyra.js",
@@ -19,10 +19,10 @@
     "format": "prettier --write \"**/*.{ts,js}\"",
     "lint": "pnpm run format && eslint . --ext .js,.ts",
     "prepare": "husky install && npm run build",
-    "build:cjs": "tsc --project tsconfig.cjs.json",
-    "build:module": "tsc --project tsconfig.esm.json",
+    "build:cjs": "tsc --project tsconfig.cjs.json && cp -R stemmer/cjs/en.js dist/stemmer/cjs/en.js && cp -R stemmer/cjs/en.d.ts dist/stemmer/cjs/en.d.ts",
+    "build:module": "tsc --project tsconfig.esm.json && cp -R stemmer/esm/en.js dist/stemmer/esm/en.js && cp -R stemmer/esm/en.d.ts dist/stemmer/esm/en.d.ts",
     "build:browser": "tsc --project tsconfig.browser.json",
-    "build": "rimraf ./dist && concurrently 'npm:build:module' 'npm:build:cjs' 'npm:build:browser'",
+    "build": "rimraf ./dist && mkdir -p dist/stemmer/{cjs,esm} && concurrently 'npm:build:module' 'npm:build:cjs' 'npm:build:browser'",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
     "ci": "npm run build && npm run test:ci"
