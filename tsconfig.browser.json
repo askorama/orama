@@ -1,9 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "include": [
-    "src"
+    "src",
+    "stemmer"
   ],
   "compilerOptions": {
+    "allowJs": true,
     "target": "ES2019",
     "module": "CommonJS",
     "outDir": "./dist/browser",

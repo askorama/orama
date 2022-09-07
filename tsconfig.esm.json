@@ -1,9 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "include": [
-    "src"
+    "src",
+    "stemmer"
   ],
   "compilerOptions": {
+    "allowJs": true,
     "target": "ESNext",
     "module": "ESNext",
     "outDir": "./dist/esm",
