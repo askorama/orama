@@ -1,5 +1,5 @@
 import { create as createNode, removeDocument, updateParent, Node } from "./node";
-import { levenshtein } from "../levenshtein";
+import { boundedLevenshtein } from "../levenshtein";
 
 export type Nodes = Record<string, Node>;
 
@@ -24,9 +24,9 @@ function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string
         // computing the absolute difference of letters between the term and the word
         const difference = Math.abs(term.length - word.length);
 
-        // if the tolerance is set, we need to calculate the distance using levenshtein algorithm
-        // if the distance is greater than the tolerance, we don't need to add the word to the output
-        if (difference <= tolerance && levenshtein(term, word) <= tolerance) {
+        // if the tolerance is set, check whether the edit distance is within tolerance.
+        // In that case, we don't need to add the word to the output
+        if (difference <= tolerance && boundedLevenshtein(term, word, tolerance).isBounded) {
           output[word] = [];
         }
       } else {
