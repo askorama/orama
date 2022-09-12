@@ -1,7 +1,7 @@
 type BoundedMetric = {
   isBounded: boolean;
   distance: number;
-}
+};
 
 /**
  * Computes the Levenshtein distance between two strings (a, b), returning early with -1 if the distance
@@ -28,7 +28,7 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
   }
 
   // a should be the shortest string
-  let swap = a;
+  const swap = a;
   if (a.length > b.length) {
     a = b;
     b = swap;
@@ -39,7 +39,7 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
 
   // ignore common suffix
   // note: `~-` decreases by a unit in a bitwise fashion
-  while (lenA > 0 && (a.charCodeAt(~-lenA) === b.charCodeAt(~-lenB))) {
+  while (lenA > 0 && a.charCodeAt(~-lenA) === b.charCodeAt(~-lenB)) {
     lenA--;
     lenB--;
   }
@@ -51,7 +51,7 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
 
   // ignore common prefix
   let startIdx = 0;
-  while (startIdx < lenA && (a.charCodeAt(startIdx) === b.charCodeAt(startIdx))) {
+  while (startIdx < lenA && a.charCodeAt(startIdx) === b.charCodeAt(startIdx)) {
     startIdx++;
   }
   lenA -= startIdx;
@@ -102,8 +102,8 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
     current = i + 1;
 
     charA = a.charCodeAt(startIdx + i);
-    jStart += (i > offset) ? 1 : 0;
-    jEnd += (jEnd < lenB) ? 1 : 0;
+    jStart += i > offset ? 1 : 0;
+    jEnd += jEnd < lenB ? 1 : 0;
 
     for (j = jStart; j < jEnd; j++) {
       above = current;
@@ -134,7 +134,7 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
   }
 
   return current <= tolerance ? current : -1;
-} 
+}
 
 export function levenshtein(a: string, b: string): number {
   /* c8 ignore next 3 */
@@ -147,7 +147,7 @@ export function levenshtein(a: string, b: string): number {
     return a.length;
   }
 
-  let swap = a;
+  const swap = a;
   if (a.length > b.length) {
     a = b;
     b = swap;
