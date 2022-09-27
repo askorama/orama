@@ -20,6 +20,21 @@ yarn add @lyrasearch/lyra
 pnpm add @lyrasearch/lyra
 ```
 
+Or import it directly in a browser module:
+```html
+<html>
+  <body>
+    <script type="module">
+      import { create, search, insert } from "https://unpkg.com/@lyrasearch/lyra@latest/dist/esm/src/lyra.js";
+
+      // ...
+    </script>
+  </body>
+</html>
+```
+
+See [builds](#builds) for details about the various builds packaged with Lrya.
+
 # Usage
 
 Lyra is quite simple to use. The first thing to do is to create a new database
@@ -170,11 +185,11 @@ By default, Lyra will analyze your input using an English
 You can replace the default stemmer with the a custom one, or a pre-built one
 shipped with the default Lyra installation.
 
-Example (using ESM):
+Example using ESM (see [builds](#builds) below):
 
 ```js
 import { create } from "@lyrasearch/lyra";
-import { stemmer } from "@lyrasearch/lyra/dist/stemmer/esm/it";
+import { stemmer } from "@lyrasearch/lyra/dist/esm/stemmer/lib/it";
 
 const db = create({
   schema: {
@@ -188,11 +203,11 @@ const db = create({
 });
 ```
 
-Example (using CJS):
+Example using CJS (see [builds](#builds) below):
 
 ```js
 const { create } = require("@lyrasearch/lyra");
-const { stemmer } = require("@lyrasearch/lyra/dist/stemmer/cjs/it");
+const { stemmer } = require("@lyrasearch/lyra/dist/cjs/stemmer/lib/it");
 
 const db = create({
   schema: {
@@ -231,6 +246,20 @@ Right now, Lyra supports 22 languages and stemmers out of the box:
 - Serbian
 - Swedish
 - Turkish
+
+## Builds
+
+Lyra is packaged with ES modules, CommonJS, and generic browser builds.
+
+**In most cases, simply `import` or `require` `@lyrasearch/lyra` and your environment will choose the most appropriate build ✨.**
+In some circumstances, you may need to `import` or `require` certain files (such as stemmers).
+The following builds are included in the Lyra package:
+
+| path | build |
+|--|--|
+| `dist/esm` | ESNext build using ES modules. _Use this for most modern applications (node.js, vite.js, browser modules, etc.)_ |
+| `dist/cjs` | ESNext build using CommonJS (`require`). Use this for environments that don't support ES modules. |
+| `dist/browser` | ES2019 build using CommonJS (`require`). Use this for environment that don't support modern ESNext language constructs, such as webpack 4 (used by Expo). Note, this build will be chosen by default in webpack environments such as Next.js. |
 
 ## Hooks
 
