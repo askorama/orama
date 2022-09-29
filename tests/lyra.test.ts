@@ -111,7 +111,7 @@ t.test("checkInsertDocSchema", t => {
 });
 
 t.test("lyra", t => {
-  t.plan(16);
+  t.plan(17);
 
   t.test("should correctly search for data", t => {
     t.plan(6);
@@ -630,6 +630,54 @@ t.test("lyra", t => {
 
     t.rejects(insertBatch(db, wrongSchemaDocs));
   });
+
+  t.test("Should support schema properties types as searched term", t => {
+    t.plan(6);
+
+    const db = create({
+      schema: {
+        author: "string",
+        quote: "string",
+        isFavorite: "boolean",
+        rating: "number",
+      },
+    });
+
+    insert(db, {
+      author: "Oscar Wilde",
+      quote: "Be yourself; everyone else is already taken.",
+      isFavorite: true,
+      rating: 4,
+    });
+
+    insert(db, {
+      author: "Frank Zappa",
+      quote: "So many books, so little time.",
+      isFavorite: false,
+      rating: 3,
+    });
+
+    insert(db, {
+      author: "Albert Einstein",
+      quote: "We cannot solve problems with the kind of thinking we employed when we came up with them.",
+      isFavorite: true,
+      rating: 5,
+    });
+
+    const searchBoolean = search(db, { term: true });
+    const searchBooleanWithProperties = search(db, { term: true, properties: ["isFavorite"] });
+    const searchBooleanWithProperties2 = search(db, { term: true, properties: ["author"] });
+    t.equal(searchBoolean.count, 2);
+    t.equal(searchBooleanWithProperties.count, 2);
+    t.equal(searchBooleanWithProperties2.count, 0);
+
+    const searchNumber = search(db, { term: 3 });
+    const searchNumberWithProperties = search(db, { term: 3, properties: ["rating"] });
+    const searchNumberWithProperties2 = search(db, { term: 3, properties: ["author"] });
+    t.equal(searchNumber.count, 1);
+    t.equal(searchNumberWithProperties.count, 1);
+    t.equal(searchNumberWithProperties2.count, 0);
+  });
 });
 
 t.test("lyra - hooks", t => {
@@ -686,7 +734,7 @@ t.test("custom tokenizer configuration", t => {
         txt: "string",
       },
       tokenizer: {
-        tokenizerFn: text => text.split(","),
+        tokenizerFn: text => text.toString().split(","),
       },
     });
 
