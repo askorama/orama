@@ -20,7 +20,7 @@ function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string
     }
 
     if (!(word in output)) {
-      // With non-string terms, we can't user levenshtein distance
+      // With non-string terms, we can't use levenshtein distance
       if (typeof term !== "string") {
         return;
       }
