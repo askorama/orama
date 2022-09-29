@@ -24,8 +24,8 @@ export function CANT_DELETE_DOC_NOT_FOUND(id: string): string {
   return `Document with ID ${id} does not exist.`;
 }
 
-export function CANT_DELETE_DOCUMENT(docID: string, key: string, token: string): string {
-  return `Unable to delete document "${docID}" from index "${key}" on word "${token}".`;
+export function CANT_DELETE_DOCUMENT(docID: string, key: string, token: string | number | boolean): string {
+  return `Unable to delete document "${docID}" from index "${key}" on word "${token.toString()}".`;
 }
 
 export function UNSUPPORTED_NESTED_PROPERTIES(): string {

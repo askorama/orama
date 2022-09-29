@@ -4,14 +4,14 @@ import { boundedLevenshtein } from "../levenshtein";
 export type Nodes = Record<string, Node>;
 
 export type FindParams = {
-  term: string;
+  term: string | number | boolean;
   exact?: boolean;
   tolerance?: number;
 };
 
 export type FindResult = Record<string, string[]>;
 
-function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
+function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string | number | boolean, exact?: boolean, tolerance?: number) {
   if (node.end) {
     const { word, docs: docIDs } = node;
 
@@ -20,6 +20,11 @@ function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string
     }
 
     if (!(word in output)) {
+      // With non-string terms, we can't user levenshtein distance
+      if (typeof term !== "string") {
+        return;
+      }
+
       if (tolerance) {
         // computing the absolute difference of letters between the term and the word
         const difference = Math.abs(term.length - word.length);
@@ -94,8 +99,15 @@ export function contains(nodes: Nodes, node: Node, word: string): boolean {
 
 export function find(nodes: Nodes, node: Node, { term, exact, tolerance }: FindParams): FindResult {
   const output: FindResult = {};
-  const termLength = term.length;
 
+  if (typeof term !== "string") {
+    if (term.toString() === node.word) {
+      return output;
+    }
+  }
+
+  term = term.toString();
+  const termLength = term.length;
   for (let i = 0; i < termLength; i++) {
     const char = term[i];
     const next = node.children?.[char];
@@ -112,8 +124,9 @@ export function find(nodes: Nodes, node: Node, { term, exact, tolerance }: FindP
   return output;
 }
 
-export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, docID: string, exact = true): boolean {
-  if (!word) {
+export function removeDocumentByWord(nodes: Nodes, node: Node, word: string | number | boolean, docID: string, exact = true): boolean {
+  // This is a special case to handle where we want to remove a document from the trie using a non-string term
+  if (!word || typeof word !== "string") {
     return false;
   }
 

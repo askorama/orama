@@ -4,11 +4,11 @@ import { defaultTokenizerConfig } from "../lyra";
 import { replaceDiacritics } from "./diacritics";
 
 export type Tokenizer = (
-  text: string,
+  text: string | number | boolean,
   language: Language,
   allowDuplicates: boolean,
   tokenizerConfig: TokenizerConfig,
-) => string[];
+) => string[] | number[] | boolean[];
 
 const splitRegex: Record<Language, RegExp> = {
   dutch: /[^a-z0-9_'-]+/gim,
@@ -70,14 +70,14 @@ function normalizeToken(token: string, language: Language, tokenizerConfig: Toke
 }
 
 export function tokenize(
-  input: string,
+  input: string | number | boolean,
   language: Language = "english",
   allowDuplicates = false,
   tokenizerConfig: TokenizerConfig = defaultTokenizerConfig(language),
-) {
+): string[] | number[] | boolean[] {
   /* c8 ignore next 3 */
   if (typeof input !== "string") {
-    return [input];
+    return [input] as number[] | boolean[];
   }
 
   const splitRule = splitRegex[language];

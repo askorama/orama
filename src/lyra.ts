@@ -89,7 +89,7 @@ export type SearchParams<S extends PropertiesSchema> = {
   /**
    * The word to search.
    */
-  term: string;
+  term: string | number | boolean;
   /**
    * The properties of the document to search in.
    */
@@ -216,6 +216,10 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
   for (const key of Object.keys(doc)) {
     const isNested = typeof doc[key] === "object";
     const propName = `${prefix}${key}`;
+    // Use propName here because if doc is a nested object
+    // We will get the wrong index
+    const requestedTrie = index[propName];
+
     if (isNested) {
       recursiveTrieInsertion(index, nodes, doc[key] as ResolveSchema<S>, id, config, propName + ".", tokenizerConfig);
 
@@ -223,14 +227,14 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
     }
 
     if (typeof doc[key] === "string") {
-      // Use propName here because if doc is a nested object
-      // We will get the wrong index
-      const requestedTrie = index[propName];
       const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language, false, tokenizerConfig);
 
       for (const token of tokens) {
-        trieInsert(nodes, requestedTrie, token, id);
+        trieInsert(nodes, requestedTrie, token.toString(), id);
       }
+    } else {
+      // Inserting the non-string values as strings
+      trieInsert(nodes, requestedTrie, doc[key].toString(), id);
     }
   }
 }
