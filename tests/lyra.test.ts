@@ -645,21 +645,21 @@ t.test("lyra", t => {
 
     insert(db, {
       author: "Oscar Wilde",
-      quote: "Be yourself; everyone else is already taken.",
+      quote: "Be yourself; everyone else is already taken. It's true.",
       isFavorite: true,
       rating: 4,
     });
 
     insert(db, {
       author: "Frank Zappa",
-      quote: "So many books, so little time.",
+      quote: "So many books like 3, so little time.",
       isFavorite: false,
       rating: 3,
     });
 
     insert(db, {
       author: "Albert Einstein",
-      quote: "We cannot solve problems with the kind of thinking we employed when we came up with them.",
+      quote: "We cannot solve problems with the kind of thinking we employed when we came up with them. True.",
       isFavorite: true,
       rating: 5,
     });
