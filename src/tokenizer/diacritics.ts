@@ -1,23 +1,24 @@
-const diacritics = [
-  { char: "A", base: /[\300-\306]/g },
-  { char: "a", base: /[\340-\346]/g },
-  { char: "E", base: /[\310-\313]/g },
-  { char: "e", base: /[\350-\353]/g },
-  { char: "I", base: /[\314-\317]/g },
-  { char: "i", base: /[\354-\357]/g },
-  { char: "O", base: /[\322-\330]/g },
-  { char: "o", base: /[\362-\370]/g },
-  { char: "U", base: /[\331-\334]/g },
-  { char: "u", base: /[\371-\374]/g },
-  { char: "N", base: /[\321]/g },
-  { char: "n", base: /[\361]/g },
-  { char: "C", base: /[\307]/g },
-  { char: "c", base: /[\347]/g },
+const DIACRITICS_CHARCODE_START = 192;
+const DIACRITICS_CHARCODE_END = 252;
+
+const CHARCODE_REPLACE_MAPPING = [
+  65, 65, 65, 65, 65, 65, 65, 67, 69, 69, 69,
+  69, 73, 73, 73, 73, null, 78, 79, 79, 79,
+  79, 79, 79, 79, 85, 85, 85, 85, null, null,
+  null, 97, 97, 97, 97, 97, 97, 97, 99, 101,
+  101, 101, 101, 105, 105, 105, 105, null, 110, 111,
+  111, 111, 111, 111, 111, 111, 117, 117, 117, 117
 ];
 
-export function replaceDiacritics(str: string): string {
-  for (const { char, base } of diacritics) {
-    str = str.replace(base, char);
+function replaceChar(charCode: number) : number {
+  if (charCode < DIACRITICS_CHARCODE_START || charCode > DIACRITICS_CHARCODE_END) return charCode;
+  return CHARCODE_REPLACE_MAPPING[charCode - DIACRITICS_CHARCODE_START] || charCode;
+}
+
+export function replaceDiacritics(str: string) : string {
+  const stringCharCode = [];
+  for (let idx = 0; idx < str.length; idx++) {
+    stringCharCode[idx] = replaceChar(str.charCodeAt(idx));
   }
-  return str;
+  return String.fromCharCode(...stringCharCode);
 }
