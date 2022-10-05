@@ -33,7 +33,7 @@ Or import it directly in a browser module:
 </html>
 ```
 
-See [builds](#builds) for details about the various builds packaged with Lrya.
+See [builds](#builds) for details about the various builds packaged with Lyra.
 
 # Usage
 
