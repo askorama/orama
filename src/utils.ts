@@ -52,3 +52,7 @@ export function uniqueId(): string {
 }
 
 export const reservedPropertyNames = ["id"];
+
+export function getOwnProperty<T = unknown>(object: any, property: string): T | undefined {
+  return Object.hasOwn(object, property) ? object[property] : undefined;
+}

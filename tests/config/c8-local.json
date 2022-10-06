@@ -1,3 +1,4 @@
 {
-  "reporter": ["text", "html"]
+  "reporter": ["text", "html"],
+  "exclude": ["stemmer"]
 }
