@@ -1,5 +1,5 @@
 import t from "tap";
-import { create, insert, remove, search, insertBatch, insertWithHooks } from "../src/lyra";
+import { create, insert, remove, search, insertBatch, insertWithHooks, Lyra } from "../src/lyra";
 
 t.test("defaultLanguage", t => {
   t.plan(3);
@@ -707,4 +707,25 @@ t.test("custom tokenizer configuration", t => {
     t.same(searchResult.count, 1);
     t.same(searchResult2.count, 0);
   });
+});
+
+t.test("should access own properties exclusively", t => {
+  t.plan(1);
+
+  const db = create({
+    schema: {
+      txt: "string",
+    },
+  });
+
+  insert(db, {
+    txt: "constructor",
+  });
+
+  search(db, {
+    term: "constructor",
+    tolerance: 1,
+  });
+
+  t.same(1, 1);
 });

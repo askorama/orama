@@ -1,5 +1,6 @@
 import { create as createNode, removeDocument, updateParent, Node } from "./node";
 import { boundedLevenshtein } from "../levenshtein";
+import { getOwnProperty } from "../utils";
 
 export type Nodes = Record<string, Node>;
 
@@ -19,7 +20,9 @@ function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string
       return;
     }
 
-    if (!(word in output)) {
+    // always check in own property to prevent access to inherited properties
+    // fix https://github.com/LyraSearch/lyra/issues/137
+    if (!Object.hasOwn(output, word)) {
       if (tolerance) {
         // computing the absolute difference of letters between the term and the word
         const difference = Math.abs(term.length - word.length);
@@ -36,7 +39,9 @@ function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string
     }
 
     // check if _output[word] exists and then add the doc to it
-    if (output[word] && docIDs.length) {
+    // always check in own property to prevent access to inherited properties
+    // fix https://github.com/LyraSearch/lyra/issues/137
+    if (getOwnProperty(output, word) && docIDs.length) {
       const docs = new Set(output[word]);
 
       for (const doc of docIDs) {
