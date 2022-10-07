@@ -56,3 +56,15 @@ export const reservedPropertyNames = ["id"];
 export function getOwnProperty<T = unknown>(object: any, property: string): T | undefined {
   return Object.hasOwn(object, property) ? object[property] : undefined;
 }
+
+export function getTokenFrequency(token: string, tokens: string[]): number {
+  let count = 0;
+
+  for (const t of tokens) {
+    if (t === token) {
+      count++;
+    }
+  }
+
+  return count;
+}

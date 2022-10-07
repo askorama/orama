@@ -226,10 +226,11 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
       // Use propName here because if doc is a nested object
       // We will get the wrong index
       const requestedTrie = index[propName];
-      const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language, false, tokenizerConfig);
+      const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language, false, tokenizerConfig, true);
 
       for (const token of tokens) {
-        trieInsert(nodes, requestedTrie, token, id);
+        const [t, tf] = token.split(':');
+        trieInsert(nodes, requestedTrie, t, id, parseInt(tf, 10));
       }
     }
   }
