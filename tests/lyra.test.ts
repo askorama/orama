@@ -1,5 +1,5 @@
 import t from "tap";
-import { create, insert, remove, search, insertBatch, insertWithHooks, Lyra } from "../src/lyra";
+import { create, insert, remove, search, insertBatch, insertWithHooks } from "../src/lyra";
 
 t.test("defaultLanguage", t => {
   t.plan(3);

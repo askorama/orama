@@ -56,3 +56,22 @@ export const reservedPropertyNames = ["id"];
 export function getOwnProperty<T = unknown>(object: any, property: string): T | undefined {
   return Object.hasOwn(object, property) ? object[property] : undefined;
 }
+
+export function intersectMany<T>(...arrays: T[][]): T[] {
+  if (arrays.length === 1) {
+    return arrays[0];
+  }
+
+  const set = new Set(arrays[0]);
+
+  for (let i = 1; i < arrays.length; i++) {
+    const tmpSet = new Set(arrays[i]);
+    for (const elem of set) {
+      if (!tmpSet.has(elem)) {
+        set.delete(elem);
+      }
+    }
+  }
+
+  return Array.from(set);
+}
