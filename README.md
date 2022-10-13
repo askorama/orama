@@ -2,7 +2,11 @@
 
 [![Tests](https://github.com/nearform/lyra/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/nearform/lyra/actions/workflows/tests.yml)
 
-Try the [live demo](https://docs.lyrajs.io/demo)
+# Join Lyra's Slack channel
+
+If you need more info, help, or want to provide general feedback on Lyra, join
+the Slack channel at
+[https://lyrasearch.slack.com](https://lyrasearch.slack.com)
 
 # Installation
 
@@ -21,6 +25,7 @@ pnpm add @lyrasearch/lyra
 ```
 
 Or import it directly in a browser module:
+
 ```html
 <html>
   <body>
@@ -251,14 +256,15 @@ Right now, Lyra supports 23 languages and stemmers out of the box:
 
 Lyra is packaged with ES modules, CommonJS, and generic browser builds.
 
-**In most cases, simply `import` or `require` `@lyrasearch/lyra` and your environment will choose the most appropriate build ✨.**
-In some circumstances, you may need to `import` or `require` certain files (such as stemmers).
-The following builds are included in the Lyra package:
+**In most cases, simply `import` or `require` `@lyrasearch/lyra` and your
+environment will choose the most appropriate build ✨.** In some circumstances,
+you may need to `import` or `require` certain files (such as stemmers). The
+following builds are included in the Lyra package:
 
-| path | build |
-|--|--|
-| `dist/esm` | ESNext build using ES modules. _Use this for most modern applications (node.js, vite.js, browser modules, etc.)_ |
-| `dist/cjs` | ESNext build using CommonJS (`require`). Use this for environments that don't support ES modules. |
+| path           | build                                                                                                                                                                                                                                         |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dist/esm`     | ESNext build using ES modules. _Use this for most modern applications (node.js, vite.js, browser modules, etc.)_                                                                                                                              |
+| `dist/cjs`     | ESNext build using CommonJS (`require`). Use this for environments that don't support ES modules.                                                                                                                                             |
 | `dist/browser` | ES2019 build using CommonJS (`require`). Use this for environment that don't support modern ESNext language constructs, such as webpack 4 (used by Expo). Note, this build will be chosen by default in webpack environments such as Next.js. |
 
 ## Hooks
