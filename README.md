@@ -6,7 +6,7 @@
 
 If you need more info, help, or want to provide general feedback on Lyra, join
 the Slack channel at
-[https://lyrasearch.slack.com](https://lyrasearch.slack.com)
+[https://join.slack.com/t/lyrasearch/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q](https://lyrasearch.slack.com)
 
 # Installation
 
