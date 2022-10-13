@@ -54,16 +54,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Install benchmark dependencies
-        run: cd ./packages/benchmarks && pnpm install
-
       - name: Build Lyra
-        run: cd ./packages/lyra && pnpm build
+        run: pnpm build
 
       - name: Run benchmark
         id: benchmark-pr
         run: |
-          node ./packages/benchmarks/benchmark-table/index.mjs > ./bench-result.md
+          pnpm benchmark > ./bench-result.md
           result=$(cat ./bench-result.md)
           # output multiline string
           result="${result//'%'/'%25'}"
@@ -80,16 +77,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Install benchmark dependencies
-        run: cd ./packages/benchmarks && pnpm install
-
       - name: Build Lyra
-        run: cd ./packages/lyra && pnpm build
+        run: pnpm build
 
       - name: Run benchmark
         id: benchmark-main
         run: |
-          node ./packages/benchmarks/benchmark-table/index.mjs > ./bench-result.md
+          pnpm benchmark > ./bench-result.md
           result=$(cat ./bench-result.md)
           # output multiline string
           result="${result//'%'/'%25'}"
