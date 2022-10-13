@@ -568,7 +568,7 @@ export function search<S extends PropertiesSchema>(
 
     const docIds = indexMap[index];
     const vals = Object.values(docIds);
-    docsIntersection[index] = intersectMany(...vals);
+    docsIntersection[index] = intersectMany(vals);
     for (const id of Object.values(docsIntersection[index])) {
       uniqueDocsIDs.add(id);
     }
