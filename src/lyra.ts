@@ -563,10 +563,7 @@ export function search<S extends PropertiesSchema>(
   for (const index of indices) {
     for (const term of tokens) {
       const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
-
-      for (const id of documentIDs) {
-        indexMap[index][term].push(id);
-      }
+      indexMap[index][term].push(...documentIDs);
     }
 
     const docIds = indexMap[index];
