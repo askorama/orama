@@ -523,7 +523,8 @@ export function search<S extends PropertiesSchema>(
   });
 
   const timeStart = getNanosecondsTime();
-
+  // uniqueDocsIDs contains unique document IDs for all the tokens in all the indices.
+  const uniqueDocsIDs: Set<string> = new Set();
   // indexMap is an object containing all the indexes considered for the current search,
   // and an array of doc IDs for each token in all the indices.
   //
@@ -538,17 +539,6 @@ export function search<S extends PropertiesSchema>(
   //   }
   // }
   const indexMap: IndexMap = {};
-  // uniqueDocsIDs contains unique document IDs for all the tokens in all the indices.
-  const uniqueDocsIDs: Set<string> = new Set();
-
-  for (const index of indices) {
-    const tokensMap: TokenMap = {};
-    for (const token of tokens) {
-      tokensMap[token] = [];
-    }
-    indexMap[index] = tokensMap;
-  }
-
   // After we create the indexMap, we need to calculate the intersection
   // between all the postings lists for each token.
   // Given the example above, docsIntersection will look like this:
@@ -558,10 +548,16 @@ export function search<S extends PropertiesSchema>(
   // }
   //
   // as doc2 is the only document present in all the postings lists for the "description" index.
-  const docsIntersection = indices.reduce((acc, index) => {
-    acc[index] = [];
-    return acc;
-  }, {} as TokenMap);
+  const docsIntersection: TokenMap = {};
+
+  for (const index of indices) {
+    const tokensMap: TokenMap = {};
+    for (const token of tokens) {
+      tokensMap[token] = [];
+    }
+    indexMap[index] = tokensMap;
+    docsIntersection[index] = [];
+  }
 
   // Now it's time to loop over all the indices and get the documents IDs for every single term
   for (const index of indices) {
