@@ -56,3 +56,46 @@ export const reservedPropertyNames = ["id"];
 export function getOwnProperty<T = unknown>(object: any, property: string): T | undefined {
   return Object.hasOwn(object, property) ? object[property] : undefined;
 }
+
+// Implemented following https://github.com/lovasoa/fast_array_intersect
+// MIT Licensed (https://github.com/lovasoa/fast_array_intersect/blob/master/LICENSE)
+// while on tag https://github.com/lovasoa/fast_array_intersect/tree/v1.1.0
+export function intersectMany<T>(arrays: T[][]): T[] {
+  if (arrays.length === 0) return [];
+
+  for (let i = 1; i < arrays.length; i++) {
+    if (arrays[i].length < arrays[0].length) {
+      const tmp = arrays[0];
+      arrays[0] = arrays[i];
+      arrays[i] = tmp;
+    }
+  }
+
+  const set = new Map();
+  for (const elem of arrays[0]) {
+    set.set(elem, 1);
+  }
+
+  for (let i = 1; i < arrays.length; i++) {
+    let found = 0;
+    for (const elem of arrays[i]) {
+      const count = set.get(elem);
+      if (count === 1) {
+        set.set(elem, count + 1);
+        found++;
+      }
+    }
+
+    if (found === 0) {
+      return [];
+    }
+  }
+
+  return arrays[0].filter(elem => {
+    const count = set.get(elem);
+    if (count !== undefined) {
+      set.set(elem, 0);
+    }
+    return count === arrays.length;
+  });
+}

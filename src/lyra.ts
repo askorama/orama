@@ -8,8 +8,11 @@ import { create as createNode, Node } from "./prefix-tree/node";
 import { find as trieFind, insert as trieInsert, removeDocumentByWord, Nodes } from "./prefix-tree/trie";
 import { trackInsertion } from "./insertion-checker";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
+import { intersectMany } from "./utils";
 
 type Index = Record<string, Node>;
+type TokenMap = Record<string, string[]>;
+type IndexMap = Record<string, TokenMap>;
 
 export { formatNanoseconds } from "./utils";
 export { tokenize } from "./tokenizer";
@@ -514,45 +517,84 @@ export function search<S extends PropertiesSchema>(
 
   const tokens = lyra.tokenizer.tokenizerFn!(params.term, language, false, lyra.tokenizer);
   const indices = getIndices(lyra, params.properties);
-  const uniqueDocIds = new Set<string>();
   const { limit = 10, offset = 0, exact = false } = params;
   const results: RetrievedDoc<S>[] = Array.from({
     length: limit,
   });
 
   const timeStart = getNanosecondsTime();
+  // uniqueDocsIDs contains unique document IDs for all the tokens in all the indices.
+  const uniqueDocsIDs: Set<string> = new Set();
+  // indexMap is an object containing all the indexes considered for the current search,
+  // and an array of doc IDs for each token in all the indices.
+  //
+  // Give the search term "quick brown fox" on the "description" index,
+  // indexMap will look like this:
+  //
+  // {
+  //   description: {
+  //     quick: [doc1, doc2, doc3],
+  //     brown: [doc2, doc4],
+  //     fox:   [doc2]
+  //   }
+  // }
+  const indexMap: IndexMap = {};
+  // After we create the indexMap, we need to calculate the intersection
+  // between all the postings lists for each token.
+  // Given the example above, docsIntersection will look like this:
+  //
+  // {
+  //   description: [doc2]
+  // }
+  //
+  // as doc2 is the only document present in all the postings lists for the "description" index.
+  const docsIntersection: TokenMap = {};
 
-  let i = 0;
-  let j = 0;
+  for (const index of indices) {
+    const tokensMap: TokenMap = {};
+    for (const token of tokens) {
+      tokensMap[token] = [];
+    }
+    indexMap[index] = tokensMap;
+    docsIntersection[index] = [];
+  }
 
-  for (const term of tokens) {
-    for (const index of indices) {
+  // Now it's time to loop over all the indices and get the documents IDs for every single term
+  for (const index of indices) {
+    for (const term of tokens) {
       const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
+      indexMap[index][term].push(...documentIDs);
+    }
 
-      for (const id of documentIDs) {
-        uniqueDocIds.add(id);
-      }
+    const docIds = indexMap[index];
+    const vals = Object.values(docIds);
+    docsIntersection[index] = intersectMany(vals);
+    for (const id of Object.values(docsIntersection[index])) {
+      uniqueDocsIDs.add(id);
+    }
+  }
 
-      if (i >= limit) {
-        break;
-      }
+  // Convert uniqueDocsIDs to array to access its elements by index
+  const uniqueDocsIDsArray = Array.from(uniqueDocsIDs);
+  const resultIDs: Set<string> = new Set();
 
-      for (const id of uniqueDocIds) {
-        if (j < offset) {
-          j++;
-          continue;
-        }
+  // We already have the list of ALL the document IDs containing the search terms.
+  // We loop over them starting from a positional value "offset" and ending at "offset + limit"
+  // to provide pagination capabilities to the search.
+  for (let i = offset; i < limit + offset; i++) {
+    const id = uniqueDocsIDsArray[i];
 
-        if (i >= limit) {
-          break;
-        }
+    // If there are no more results, just break the loop
+    if (typeof id === "undefined") {
+      break;
+    }
 
-        if (results.findIndex(x => x?.id === id) === -1) {
-          const fullDoc = lyra.docs[id]!;
-          results[i] = { id, ...fullDoc };
-        }
-        i++;
-      }
+    if (!resultIDs.has(id)) {
+      // We retrieve the full document only AFTER making sure that we really want it.
+      // We never retrieve the full document preventively.
+      const fullDoc = lyra.docs[id]!;
+      results[i] = { id, ...fullDoc };
+      resultIDs.add(id);
     }
   }
 
@@ -561,7 +603,7 @@ export function search<S extends PropertiesSchema>(
   return {
     elapsed: getNanosecondsTime() - timeStart,
     hits,
-    count: uniqueDocIds.size,
+    count: uniqueDocsIDs.size,
   };
 }
 

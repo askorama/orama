@@ -1,5 +1,5 @@
 import t from "tap";
-import { create, insert, insertBatch, remove, search } from "../src/lyra";
+import { create, insertBatch, remove, search } from "../src/lyra";
 import type { PropertiesSchema, SearchResult } from "../src/lyra";
 import dataset from "./datasets/events.json";
 
@@ -75,8 +75,8 @@ t.test("lyra.dataset", async t => {
 
     t.equal(Object.keys(db.docs).length, (dataset as any).result.events.length);
     t.equal(s1.count, 1117);
-    t.equal(s2.count, 7314);
-    t.equal(s3.count, 7314);
+    t.equal(s2.count, 1842);
+    t.equal(s3.count, 1842);
   });
 
   t.test("should perform paginate search", t => {
