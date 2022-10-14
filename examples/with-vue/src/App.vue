@@ -18,7 +18,7 @@ export default defineComponent({
   created() {
     this.db = create({
       schema: {
-        id: "number",
+        _id: "number",
         name: "string",
       },
     });
@@ -30,7 +30,7 @@ export default defineComponent({
       .then(pokeList => {
         for (const { id, name } of pokeList.pokemon) {
           insert(this.db, {
-            id,
+            _id,
             name,
           });
         }
@@ -55,7 +55,7 @@ export default defineComponent({
 
         this.elapsedTime = formatNanoseconds(getNanosecondsTime() - timeStart);
 
-        const pokemons = result.hits.map(({ id: hitID }) =>
+        const pokemons = result.hits.map(({ _id: hitID }) =>
           this.pokemon?.find(({ id: pokemonID }) => pokemonID === hitID),
         );
 
