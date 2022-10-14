@@ -232,8 +232,8 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
       const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language, false, tokenizerConfig, true);
 
       for (const token of tokens) {
-        const [t, tf] = token.split(':');
-        trieInsert(nodes, requestedTrie, t, id, parseInt(tf, 10));
+        const [t, tf] = token.split(":");
+        trieInsert(nodes, requestedTrie, t, id, +tf);
       }
     }
   }
