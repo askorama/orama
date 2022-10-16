@@ -111,7 +111,7 @@ t.test("checkInsertDocSchema", t => {
 });
 
 t.test("lyra", t => {
-  t.plan(16);
+  t.plan(17);
 
   t.test("should correctly search for data", t => {
     t.plan(6);
@@ -599,6 +599,76 @@ t.test("lyra", t => {
     t.equal(resultAuthorSurname.count, 1);
     t.equal(resultAuthorName.count, 0);
   });
+
+  t.test("Should support multiple nested properties", t => {
+    t.plan(3);
+
+    const db = create({
+      schema: {
+        quote: "string",
+        author: {
+          name: "string",
+          surname: "string"
+        },
+        tag: {
+          name: "string",
+          description: "string"
+        }
+      }
+    })
+
+    insert(db, {
+      quote: "Be yourself; everyone else is already taken.",
+      author: {
+        name: "Oscar",
+        surname: "Wild"
+      },
+      tag: {
+        name: "inspirational",
+        description: "Inspirational quotes"
+      }
+    })
+
+    insert(db, {
+      quote: "So many books, so little time.",
+      author: {
+        name: "Frank",
+        surname: "Zappa"
+      },
+      tag: {
+        name: "books",
+        description: "Quotes about books"
+      }
+    })
+
+    insert(db, {
+      quote: "A room without books is like a body without a soul.",
+      author: {
+        name: "Marcus",
+        surname: "Tullius Cicero"
+      },
+      tag: {
+        name: "books",
+        description: "Quotes about books"
+      }
+    })
+
+    const resultAuthor = search(db, {
+      term: "Oscar"
+    })
+
+    const resultTag = search(db, {
+      term: "books"
+    })
+
+    const resultQuotes = search(db, {
+      term: "quotes"
+    })
+
+    t.equal(resultAuthor.count, 1)
+    t.equal(resultTag.count, 2)
+    t.equal(resultQuotes.count, 3)
+  })
 
   t.test("should suport batch insert of documents", async t => {
     t.plan(2);
