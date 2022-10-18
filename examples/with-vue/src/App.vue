@@ -30,7 +30,7 @@ export default defineComponent({
       .then(pokeList => {
         for (const { id, name } of pokeList.pokemon) {
           insert(this.db, {
-            _id,
+            _id: id,
             name,
           });
         }
