@@ -2,6 +2,7 @@ import t from "tap";
 import { create, insertBatch, remove, search } from "../src/lyra";
 import type { PropertiesSchema, SearchResult } from "../src/lyra";
 import dataset from "./datasets/events.json";
+import { EventJson } from "./datasets/event-json";
 
 function removeVariadicData<T extends PropertiesSchema>(res: SearchResult<T>): SearchResult<T> {
   const hits = res.hits.map(h => {
@@ -32,13 +33,7 @@ t.test("lyra.dataset", async t => {
   t.plan(4);
 
   t.before(async () => {
-    const events = (
-      dataset as {
-        result: {
-          events: { date: string; description: string; granularity: string; category1: string; category2: string }[];
-        };
-      }
-    ).result.events.map(ev => ({
+    const events = (dataset as EventJson).result.events.map(ev => ({
       date: ev.date,
       description: ev.description,
       granularity: ev.granularity,
@@ -78,16 +73,7 @@ t.test("lyra.dataset", async t => {
       offset: 0,
     });
 
-    t.equal(
-      Object.keys(db.docs).length,
-      (
-        dataset as {
-          result: {
-            events: { date: string; description: string; granularity: string; category1: string; category2: string }[];
-          };
-        }
-      ).result.events.length,
-    );
+    t.equal(Object.keys(db.docs).length, (dataset as EventJson).result.events.length);
     t.equal(s1.count, 1117);
     t.equal(s2.count, 1842);
     t.equal(s3.count, 1842);

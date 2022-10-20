@@ -1,8 +1,21 @@
 import t from "tap";
-import { formatBytes, formatNanoseconds } from "../src/utils";
+import { intersectMany, formatBytes, formatNanoseconds } from "../src/utils";
 
 t.test("utils", t => {
-  t.plan(2);
+  t.plan(3);
+
+  t.test("should correctly intersect 2 or more arrays", t => {
+    t.plan(4);
+
+    const arr1 = [1, 2, 3, 4, 5, 8];
+    const arr2 = [2, 3, 8];
+    const arr3 = [4, 6, 5, 8];
+
+    t.equal(intersectMany([arr1, arr2]).length, 3);
+    t.equal(intersectMany([arr1, arr3]).length, 3);
+    t.equal(intersectMany([arr2, arr3]).length, 1);
+    t.equal(intersectMany([arr1, arr2, arr3]).length, 1);
+  });
 
   t.test("should correctly format bytes", t => {
     t.plan(9);
