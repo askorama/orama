@@ -114,7 +114,7 @@ t.test("lyra", t => {
   t.plan(17);
 
   t.test("should correctly search for data", t => {
-    t.plan(6);
+    t.plan(8);
 
     const db = create({
       schema: {
@@ -148,6 +148,13 @@ t.test("lyra", t => {
 
     t.equal(result5.count, 2);
     t.equal(result6.count, 4);
+
+    // Long string search (Tests for https://github.com/LyraSearch/lyra/issues/159 )
+    const result7 = search(db, { term: "They are the best" });
+    const result8 = search(db, { term: "Foxes are nice animals" });
+
+    t.equal(result7.count, 2);
+    t.equal(result8.count, 1);
   });
 
   t.test("should correctly insert and retrieve data", t => {
@@ -608,67 +615,67 @@ t.test("lyra", t => {
         quote: "string",
         author: {
           name: "string",
-          surname: "string"
+          surname: "string",
         },
         tag: {
           name: "string",
-          description: "string"
-        }
-      }
-    })
+          description: "string",
+        },
+      },
+    });
 
     insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: {
         name: "Oscar",
-        surname: "Wild"
+        surname: "Wild",
       },
       tag: {
         name: "inspirational",
-        description: "Inspirational quotes"
-      }
-    })
+        description: "Inspirational quotes",
+      },
+    });
 
     insert(db, {
       quote: "So many books, so little time.",
       author: {
         name: "Frank",
-        surname: "Zappa"
+        surname: "Zappa",
       },
       tag: {
         name: "books",
-        description: "Quotes about books"
-      }
-    })
+        description: "Quotes about books",
+      },
+    });
 
     insert(db, {
       quote: "A room without books is like a body without a soul.",
       author: {
         name: "Marcus",
-        surname: "Tullius Cicero"
+        surname: "Tullius Cicero",
       },
       tag: {
         name: "books",
-        description: "Quotes about books"
-      }
-    })
+        description: "Quotes about books",
+      },
+    });
 
     const resultAuthor = search(db, {
-      term: "Oscar"
-    })
+      term: "Oscar",
+    });
 
     const resultTag = search(db, {
-      term: "books"
-    })
+      term: "books",
+    });
 
     const resultQuotes = search(db, {
-      term: "quotes"
-    })
+      term: "quotes",
+    });
 
-    t.equal(resultAuthor.count, 1)
-    t.equal(resultTag.count, 2)
-    t.equal(resultQuotes.count, 3)
-  })
+    t.equal(resultAuthor.count, 1);
+    t.equal(resultTag.count, 2);
+    t.equal(resultQuotes.count, 3);
+  });
 
   t.test("should suport batch insert of documents", async t => {
     t.plan(2);
