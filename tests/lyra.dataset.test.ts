@@ -2,7 +2,18 @@ import t from "tap";
 import { create, insertBatch, remove, search } from "../src/lyra";
 import type { PropertiesSchema, SearchResult } from "../src/lyra";
 import dataset from "./datasets/events.json";
-import { EventJson } from "./datasets/event-json";
+
+type EventJson = {
+  result: {
+    events: {
+      date: string;
+      description: string;
+      granularity: string;
+      category1: string;
+      category2: string;
+    }[];
+  };
+};
 
 function removeVariadicData<T extends PropertiesSchema>(res: SearchResult<T>): SearchResult<T> {
   const hits = res.hits.map(h => {

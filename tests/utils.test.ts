@@ -5,16 +5,18 @@ t.test("utils", t => {
   t.plan(3);
 
   t.test("should correctly intersect 2 or more arrays", t => {
-    t.plan(4);
+    t.plan(5);
 
-    const arr1 = [1, 2, 3, 4, 5, 8];
-    const arr2 = [2, 3, 8];
-    const arr3 = [4, 6, 5, 8];
+    const arr1: number[] = [1, 2, 3, 4, 5, 8];
+    const arr2: number[] = [2, 3, 8];
+    const arr3: number[] = [4, 6, 5, 8];
+    const arr4: number[] = [11];
 
-    t.equal(intersectMany([arr1, arr2]).length, 3);
-    t.equal(intersectMany([arr1, arr3]).length, 3);
-    t.equal(intersectMany([arr2, arr3]).length, 1);
-    t.equal(intersectMany([arr1, arr2, arr3]).length, 1);
+    t.same(intersectMany([arr1, arr2]), [2, 3, 8]);
+    t.same(intersectMany([arr1, arr3]), [4, 5, 8]);
+    t.same(intersectMany([arr2, arr3]), [8]);
+    t.same(intersectMany([arr1, arr2, arr3]), [8]);
+    t.same(intersectMany([arr1, arr2, arr3, arr4]), []);
   });
 
   t.test("should correctly format bytes", t => {
