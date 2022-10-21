@@ -80,7 +80,7 @@ export function intersectMany<T>(arrays: T[][]): T[] {
     let found = 0;
     for (const elem of arrays[i]) {
       const count = set.get(elem);
-      if (count === 1) {
+      if (count === i) {
         set.set(elem, count + 1);
         found++;
       }
