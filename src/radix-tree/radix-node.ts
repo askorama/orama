@@ -3,6 +3,7 @@ import { uniqueId } from "../utils";
 
 export interface Node {
   id: string;
+  key: string;
   word: string;
   parent: Nullable<string>;
   children: Record<string, Node>;
@@ -10,10 +11,11 @@ export interface Node {
   end: boolean;
 }
 
-export function create(word = "", end = false): Node {
+export function create(end = false): Node {
   const node = {
     id: uniqueId(),
-    word,
+    key: "",
+    word: "",
     parent: null,
     children: {},
     docs: [],

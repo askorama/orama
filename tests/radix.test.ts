@@ -1,7 +1,6 @@
 import t from "tap";
 import { findAllWords as radixFind, insert as radixInsert } from "../src/radix-tree/radix";
 import { create as createNode } from "../src/radix-tree/radix-node";
-
 const phrases = [
   { id: "1", doc: "the quick, brown fox" },
   { id: "2", doc: "jumps over the lazy dog" },

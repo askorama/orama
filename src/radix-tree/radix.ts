@@ -25,21 +25,28 @@ export async function insert(subtree: Nodes, root: Node, word: string, docId: st
       }
 
       if (commonPrefix.length < edgeLabel.length && commonPrefix.length === word.substring(i).length) {
-        const newNode = createNode(word.substring(i), true);
+        const newNode = createNode(true);
         newNode.docs.push(docId);
+        newNode.word = word.substring(i);
 
         newNode.children[edgeLabel[commonPrefix.length]] = root.children[currentCharacter];
         newNode.children[edgeLabel[commonPrefix.length]].word = edgeLabel.substring(commonPrefix.length);
         newNode.children[edgeLabel[commonPrefix.length]].docs.push(docId);
+
         root.children[currentCharacter] = newNode;
+
+        newNode.key = currentCharacter;
+        newNode.children[edgeLabel[commonPrefix.length]].key = edgeLabel[commonPrefix.length];
 
         updateParent(newNode, root);
         updateParent(newNode.children[edgeLabel[commonPrefix.length]], newNode);
+
         return;
       }
 
       if (commonPrefix.length < edgeLabel.length && commonPrefix.length < word.substring(i).length) {
-        const inbetweenNode = createNode(commonPrefix);
+        const inbetweenNode = createNode();
+        inbetweenNode.word = commonPrefix;
         inbetweenNode.docs.push(docId);
 
         inbetweenNode.children[edgeLabel[commonPrefix.length]] = root.children[currentCharacter];
@@ -47,9 +54,14 @@ export async function insert(subtree: Nodes, root: Node, word: string, docId: st
         inbetweenNode.children[edgeLabel[commonPrefix.length]].word = edgeLabel.substring(commonPrefix.length);
         root.children[currentCharacter] = inbetweenNode;
 
-        const newNode = createNode(word.substring(i + commonPrefix.length), true);
+        const newNode = createNode(true);
+        newNode.word = word.substring(i + commonPrefix.length);
         newNode.docs.push(docId);
         inbetweenNode.children[word.substring(i)[commonPrefix.length]] = newNode;
+
+        inbetweenNode.key = currentCharacter;
+        newNode.key = word.substring(i)[commonPrefix.length];
+        inbetweenNode.children[edgeLabel[commonPrefix.length]].key = edgeLabel[commonPrefix.length];
 
         updateParent(inbetweenNode, root);
         updateParent(newNode, inbetweenNode);
@@ -60,8 +72,10 @@ export async function insert(subtree: Nodes, root: Node, word: string, docId: st
       i += edgeLabel.length - 1;
       root = root.children[currentCharacter];
     } else {
-      const newNode = createNode(word.substring(i), true);
+      const newNode = createNode(true);
+      newNode.word = word.substring(i);
       newNode.docs.push(docId);
+      newNode.key = currentCharacter;
       root.children[currentCharacter] = newNode;
       updateParent(newNode, root);
       return;
