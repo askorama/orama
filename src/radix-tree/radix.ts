@@ -1,5 +1,6 @@
 import { create as createNode, Node, updateParent } from "./radix-node";
-
+import { boundedLevenshtein } from "../levenshtein";
+import { getOwnProperty } from "../utils";
 export type Nodes = Record<string, Node>;
 
 export type FindParams = {
@@ -83,7 +84,7 @@ export async function insert(nodes: Nodes, root: Node, word: string, docId: stri
   }
 }
 
-export async function find(nodes: Nodes, root: Node, { term, exact, tolerance }: FindParams): Promise<FindResult> {
+export async function find(nodes: Nodes, root: Node, { term, exact, tolerance }: FindParams) {
   let word = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
@@ -102,7 +103,13 @@ export async function find(nodes: Nodes, root: Node, { term, exact, tolerance }:
     }
   }
   const output: FindResult = {};
+
   await findAllWords(nodes, root, output, word, exact, tolerance);
+
+  if (exact && !output[term]) {
+    return;
+  }
+
   return output;
 }
 
@@ -115,7 +122,30 @@ async function findAllWords(
   tolerance?: number,
 ) {
   if (node.end) {
-    output[term] = Array.from(new Set(node.docs));
+    const { word, docs: docIDs } = node;
+    // always check in own property to prevent access to inherited properties
+    // fix https://github.com/LyraSearch/lyra/issues/137
+    if (!Object.hasOwn(output, term)) {
+      if (tolerance) {
+        // computing the absolute difference of letters between the term and the word
+        const difference = Math.abs(term.length - word.length);
+
+        // if the tolerance is set, check whether the edit distance is within tolerance.
+        // In that case, we don't need to add the word to the output
+        if (difference <= tolerance && boundedLevenshtein(term, word, tolerance).isBounded) {
+          output[term] = [];
+        }
+      } else {
+        // prevent default tolerance not set
+        output[term] = [];
+      }
+    }
+    // check if _output[word] exists and then add the doc to it
+    // always check in own property to prevent access to inherited properties
+    // fix https://github.com/LyraSearch/lyra/issues/137
+    if (getOwnProperty(output, term) && docIDs.length) {
+      output[term] = Array.from(new Set(docIDs));
+    }
   }
 
   if (Object.keys(node.children).length === 0) {

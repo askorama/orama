@@ -12,7 +12,7 @@ const phrases = [
 ];
 
 t.test("radix tree", t => {
-  t.plan(2);
+  t.plan(3);
 
   t.test("should correctly find an element by prefix", async t => {
     t.plan(1);
@@ -41,5 +41,19 @@ t.test("radix tree", t => {
         [phrase.doc]: [phrase.id],
       });
     }
+  });
+
+  t.test("exact works correctly", async t => {
+    t.plan(2);
+    const root = createNode();
+    const subTree = {};
+    for (const { doc, id } of phrases) {
+      radixInsert(subTree, root, doc, id);
+    }
+    const exactResult = await radixFind(subTree, root, { term: phrases[5].doc.slice(0, 5), exact: true });
+    t.notOk(exactResult);
+
+    const result = await radixFind(subTree, root, { term: phrases[5].doc, exact: true });
+    t.strictSame(result, { [phrases[5].doc]: [phrases[5].id] });
   });
 });
