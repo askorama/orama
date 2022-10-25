@@ -1,6 +1,4 @@
 import { create as createNode, Node, updateParent } from "./radix-node";
-import { boundedLevenshtein } from "../levenshtein";
-import { getOwnProperty } from "../utils";
 
 export type Nodes = Record<string, Node>;
 
@@ -12,8 +10,7 @@ export type FindParams = {
 
 export type FindResult = Record<string, string[]>;
 
-export async function insert(subtree: Nodes, root: Node, word: string, docId: string) {
-  word = word.toLowerCase();
+export async function insert(nodes: Nodes, root: Node, word: string, docId: string) {
   for (let i = 0; i < word.length; i++) {
     const currentCharacter = word[i];
 
@@ -87,7 +84,6 @@ export async function insert(subtree: Nodes, root: Node, word: string, docId: st
 }
 
 export async function find(nodes: Nodes, root: Node, { term, exact, tolerance }: FindParams): Promise<FindResult> {
-  term = term.toLowerCase();
   let word = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
@@ -119,8 +115,9 @@ async function findAllWords(
   tolerance?: number,
 ) {
   if (node.end) {
-    output[term] = node.docs;
+    output[term] = Array.from(new Set(node.docs));
   }
+
   if (Object.keys(node.children).length === 0) {
     return;
   }
