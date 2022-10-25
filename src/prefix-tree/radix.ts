@@ -2,15 +2,15 @@ import { uniqueId } from "../utils";
 
 export type Nodes = Record<string, Node>;
 
-export interface Node {
+export interface RadixNode {
   id: string;
   word: string;
-  children: Record<string, Node>;
+  children: Record<string, RadixNode>;
   docs: string[];
   end: boolean;
 }
 
-export function create(word = "", end = false): Node {
+export function create(word = "", end = false): RadixNode {
   const node = {
     id: uniqueId(),
     word,
@@ -24,106 +24,104 @@ export function create(word = "", end = false): Node {
 }
 
 /* c8 ignore next 5 */
-function serialize(this: Node): object {
+function serialize(this: RadixNode): object {
   const { word, children, docs, end } = this;
   return { word, children, docs, end };
 }
 
-export function insert(nodes: Nodes, word: string) {
+export async function insert(root: RadixNode, word: string) {
   word = word.toLowerCase();
-
   for (let i = 0; i < word.length; i++) {
     const currentCharacter = word[i];
 
-    if (currentCharacter in nodes) {
-      const edgeLabel = nodes[currentCharacter].word;
+    if (currentCharacter in root.children) {
+      const edgeLabel = root.children[currentCharacter].word;
 
       const commonPrefix = getCommonPrefix(edgeLabel, word.substring(i));
 
       if (edgeLabel === word.substring(i)) {
-        nodes[currentCharacter].end = true;
+        root.children[currentCharacter].end = true;
+
         return;
       }
 
       if (commonPrefix.length < edgeLabel.length && commonPrefix.length === word.substring(i).length) {
         const newNode = create(word.substring(i), true);
 
-        newNode.children[edgeLabel[commonPrefix.length]] = nodes[currentCharacter];
+        newNode.children[edgeLabel[commonPrefix.length]] = root.children[currentCharacter];
 
         newNode.children[edgeLabel[commonPrefix.length]].word = edgeLabel.substring(commonPrefix.length);
 
-        nodes[currentCharacter] = newNode;
+        root.children[currentCharacter] = newNode;
+
         return;
       }
 
       if (commonPrefix.length < edgeLabel.length && commonPrefix.length < word.substring(i).length) {
         const inbetweenNode = create(commonPrefix);
 
-        inbetweenNode.children[edgeLabel[commonPrefix.length]] = nodes[currentCharacter];
+        inbetweenNode.children[edgeLabel[commonPrefix.length]] = root.children[currentCharacter];
 
         inbetweenNode.children[edgeLabel[commonPrefix.length]].word = edgeLabel.substring(commonPrefix.length);
 
-        nodes[currentCharacter] = inbetweenNode;
+        root.children[currentCharacter] = inbetweenNode;
 
         inbetweenNode.children[word.substring(i)[commonPrefix.length]] = create(
           word.substring(i + commonPrefix.length),
           true,
         );
-
         return;
       }
       i += edgeLabel.length - 1;
+      root = root.children[currentCharacter];
     } else {
       const newNode = create(word.substring(i), true);
-      nodes[currentCharacter] = newNode;
+      root.children[currentCharacter] = newNode;
 
       return;
     }
   }
 }
 
-export async function findAllWords(nodes: Nodes, sentence: string) {
-  sentence = sentence.toLowerCase();
+export async function findAllWords(root: RadixNode, prefix: string) {
+  prefix = prefix.toLowerCase();
   let word = "";
-  for (let i = 0; i < sentence.length; i++) {
-    const character = sentence[i];
+  for (let i = 0; i < prefix.length; i++) {
+    const character = prefix[i];
 
-    if (character in nodes.children) {
-      const edgeLabel = nodes[character].word;
-      const commonPrefix = getCommonPrefix(edgeLabel, sentence.substring(i));
-      if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== sentence.substring(i).length) {
+    if (character in root.children) {
+      const edgeLabel = root.children[character].word;
+      const commonPrefix = getCommonPrefix(edgeLabel, prefix.substring(i));
+      if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== prefix.substring(i).length) {
         return [];
       }
-
-      word = word.concat(nodes[character].word);
-      i += nodes[character].word.length - 1;
+      word = word.concat(root.children[character].word);
+      i += root.children[character].word.length - 1;
+      root = root.children[character];
     } else {
       return [];
     }
   }
-
-  return find(nodes, word);
+  return find(root, word);
 }
 
-export async function find(nodes: Nodes, word: string) {
-  const words: string[] = [];
-  for (const character of Object.keys(nodes)) {
-    await recursiveFind(word.concat(nodes[character].word), nodes[character], words);
-  }
-  return words;
+async function find(node: RadixNode, word: string) {
+  const result: string[] = [];
+  await recursiveFind(node, word, result);
+  return result;
 }
 
-export async function recursiveFind(word: string, startingNode: Node, words: string[]) {
-  if (startingNode.end) {
-    words.push(word);
+async function recursiveFind(node: RadixNode, word: string, result: string[]) {
+  if (node.end) {
+    result.push(word);
   }
 
-  if (Object.keys(startingNode.children).length === 0) {
+  if (Object.keys(node.children).length === 0) {
     return;
   }
 
-  for (const character of Object.keys(startingNode.children)) {
-    await recursiveFind(word.concat(startingNode.children[character].word), startingNode.children[character], words);
+  for (const character of Object.keys(node.children)) {
+    await recursiveFind(node.children[character], word.concat(node.children[character].word), result);
   }
 }
 

@@ -1,5 +1,5 @@
 import t from "tap";
-import { find as radixFind, insert as radixInsert, Nodes } from "../src/prefix-tree/radix";
+import { findAllWords as radixFind, insert as radixInsert, create as createNode } from "../src/prefix-tree/radix";
 
 const phrases = [
   { id: "1", doc: "the quick, brown fox" },
@@ -12,32 +12,28 @@ const phrases = [
 ];
 
 t.test("radix tree", t => {
-  t.plan(3);
+  t.plan(2);
 
   t.test("should correctly find an element by prefix", async t => {
-    t.plan(2);
-
-    const nodes: Nodes = {};
-
+    t.plan(1);
+    const root = createNode();
     for (const { doc } of phrases) {
-      radixInsert(nodes, doc);
+      radixInsert(root, doc);
     }
-    console.log(JSON.stringify(nodes, null, 2));
-    const result = await radixFind(nodes, phrases[5].doc.slice(0, 5));
-    console.log(JSON.stringify(result, null, 2));
-    console.log(JSON.stringify({ [phrases[5].doc]: [phrases[5].id] }, null, 2));
-    t.strictSame(result, { [phrases[5].doc]: [phrases[5].id] });
+    const result = await radixFind(root, phrases[5].doc.slice(0, 5));
+    t.same(result, [phrases[5].doc]);
   });
 
-  t.test("should correctly delete a word from the trie", async t => {
-    t.plan(2);
-
-    const nodes = {};
-
+  t.test("should correctly find a complete sentence", async t => {
+    t.plan(phrases.length);
+    const root = createNode();
     for (const { doc } of phrases) {
-      radixInsert(nodes, doc);
+      radixInsert(root, doc);
     }
 
-    t.strictSame(await radixFind(nodes, phrases[0].doc), {});
+    for (const phrase of phrases) {
+      const result = await radixFind(root, phrase.doc);
+      t.same(result, [phrase.doc]);
+    }
   });
 });
