@@ -1,5 +1,6 @@
 import t from "tap";
-import { findAllWords as radixFind, insert as radixInsert, create as createNode } from "../src/prefix-tree/radix";
+import { findAllWords as radixFind, insert as radixInsert } from "../src/radix-tree/radix";
+import { create as createNode } from "../src/radix-tree/radix-node";
 
 const phrases = [
   { id: "1", doc: "the quick, brown fox" },
@@ -17,18 +18,20 @@ t.test("radix tree", t => {
   t.test("should correctly find an element by prefix", async t => {
     t.plan(1);
     const root = createNode();
-    for (const { doc } of phrases) {
-      radixInsert(root, doc);
+    const subTree = {};
+    for (const { doc, id } of phrases) {
+      radixInsert(subTree, root, doc, id);
     }
     const result = await radixFind(root, phrases[5].doc.slice(0, 5));
     t.same(result, [phrases[5].doc]);
   });
 
   t.test("should correctly find a complete sentence", async t => {
+    const subTree = {};
     t.plan(phrases.length);
     const root = createNode();
-    for (const { doc } of phrases) {
-      radixInsert(root, doc);
+    for (const { doc, id } of phrases) {
+      radixInsert(subTree, root, doc, id);
     }
 
     for (const phrase of phrases) {
