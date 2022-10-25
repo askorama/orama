@@ -1,6 +1,7 @@
 import { create as createNode, Node, updateParent } from "./radix-node";
 import { boundedLevenshtein } from "../levenshtein";
 import { getOwnProperty } from "../utils";
+
 export type Nodes = Record<string, Node>;
 
 export type FindParams = {
@@ -173,12 +174,28 @@ function getCommonPrefix(a: string, b: string) {
     }
     commonPrefix += a[i];
   }
-
   return commonPrefix;
 }
 
-export function contains(nodes: Nodes, node: Node, word: string): boolean {
-  throw new Error("to be implemented");
+export function contains(nodes: Nodes, root: Node, term: string): boolean {
+  let word = "";
+  for (let i = 0; i < term.length; i++) {
+    const character = term[i];
+
+    if (character in root.children) {
+      const edgeLabel = root.children[character].word;
+      const commonPrefix = getCommonPrefix(edgeLabel, term.substring(i));
+      if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== term.substring(i).length) {
+        return false;
+      }
+      word = word.concat(root.children[character].word);
+      i += root.children[character].word.length - 1;
+      root = root.children[character];
+    } else {
+      return false;
+    }
+  }
+  return true;
 }
 
 export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, docID: string, exact = true): boolean {
