@@ -1,4 +1,6 @@
 import { create as createNode, Node, updateParent } from "./radix-node";
+import { boundedLevenshtein } from "../levenshtein";
+import { getOwnProperty } from "../utils";
 
 export type Nodes = Record<string, Node>;
 
@@ -26,14 +28,15 @@ export async function insert(subtree: Nodes, root: Node, word: string, docId: st
 
       if (commonPrefix.length < edgeLabel.length && commonPrefix.length === word.substring(i).length) {
         const newNode = createNode(true);
-        newNode.docs.push(docId);
         newNode.word = word.substring(i);
 
         newNode.children[edgeLabel[commonPrefix.length]] = root.children[currentCharacter];
         newNode.children[edgeLabel[commonPrefix.length]].word = edgeLabel.substring(commonPrefix.length);
-        newNode.children[edgeLabel[commonPrefix.length]].docs.push(docId);
 
         root.children[currentCharacter] = newNode;
+
+        newNode.docs.push(docId);
+        newNode.children[edgeLabel[commonPrefix.length]].docs.push(docId);
 
         newNode.key = currentCharacter;
         newNode.children[edgeLabel[commonPrefix.length]].key = edgeLabel[commonPrefix.length];
@@ -47,21 +50,21 @@ export async function insert(subtree: Nodes, root: Node, word: string, docId: st
       if (commonPrefix.length < edgeLabel.length && commonPrefix.length < word.substring(i).length) {
         const inbetweenNode = createNode();
         inbetweenNode.word = commonPrefix;
-        inbetweenNode.docs.push(docId);
 
         inbetweenNode.children[edgeLabel[commonPrefix.length]] = root.children[currentCharacter];
-        inbetweenNode.children[edgeLabel[commonPrefix.length]].docs.push(docId);
         inbetweenNode.children[edgeLabel[commonPrefix.length]].word = edgeLabel.substring(commonPrefix.length);
         root.children[currentCharacter] = inbetweenNode;
 
         const newNode = createNode(true);
         newNode.word = word.substring(i + commonPrefix.length);
-        newNode.docs.push(docId);
         inbetweenNode.children[word.substring(i)[commonPrefix.length]] = newNode;
 
         inbetweenNode.key = currentCharacter;
         newNode.key = word.substring(i)[commonPrefix.length];
         inbetweenNode.children[edgeLabel[commonPrefix.length]].key = edgeLabel[commonPrefix.length];
+
+        inbetweenNode.docs.push(docId);
+        newNode.docs.push(docId);
 
         updateParent(inbetweenNode, root);
         updateParent(newNode, inbetweenNode);
@@ -83,46 +86,56 @@ export async function insert(subtree: Nodes, root: Node, word: string, docId: st
   }
 }
 
-export async function findAllWords(root: Node, prefix: string) {
-  prefix = prefix.toLowerCase();
+export async function find(nodes: Nodes, root: Node, { term, exact, tolerance }: FindParams): Promise<FindResult> {
+  term = term.toLowerCase();
   let word = "";
-  for (let i = 0; i < prefix.length; i++) {
-    const character = prefix[i];
+  for (let i = 0; i < term.length; i++) {
+    const character = term[i];
 
     if (character in root.children) {
       const edgeLabel = root.children[character].word;
-      const commonPrefix = getCommonPrefix(edgeLabel, prefix.substring(i));
-      if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== prefix.substring(i).length) {
-        return [];
+      const commonPrefix = getCommonPrefix(edgeLabel, term.substring(i));
+      if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== term.substring(i).length) {
+        return {};
       }
       word = word.concat(root.children[character].word);
       i += root.children[character].word.length - 1;
       root = root.children[character];
     } else {
-      return [];
+      return {};
     }
   }
-  return find(root, word);
+  const output: FindResult = {};
+  await findAllWords(nodes, root, output, word, exact, tolerance);
+  return output;
 }
 
-async function find(node: Node, word: string) {
-  const result: string[] = [];
-  await recursiveFind(node, word, result);
-  return result;
-}
-
-async function recursiveFind(node: Node, word: string, result: string[]) {
+async function findAllWords(
+  nodes: Nodes,
+  node: Node,
+  output: FindResult,
+  term: string,
+  exact?: boolean,
+  tolerance?: number,
+) {
   if (node.end) {
-    result.push(word);
+    output[term] = node.docs;
   }
-
   if (Object.keys(node.children).length === 0) {
     return;
   }
 
   for (const character of Object.keys(node.children)) {
-    await recursiveFind(node.children[character], word.concat(node.children[character].word), result);
+    await findAllWords(
+      nodes,
+      node.children[character],
+      output,
+      term.concat(node.children[character].word),
+      exact,
+      tolerance,
+    );
   }
+  return output;
 }
 
 function getCommonPrefix(a: string, b: string) {
@@ -135,4 +148,16 @@ function getCommonPrefix(a: string, b: string) {
   }
 
   return commonPrefix;
+}
+
+export function contains(nodes: Nodes, node: Node, word: string): boolean {
+  throw new Error("to be implemented");
+}
+
+export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, docID: string, exact = true): boolean {
+  throw new Error("to be implemented");
+}
+
+export function removeWord(nodes: Nodes, node: Node, word: string): boolean {
+  throw new Error("to be implemented");
 }

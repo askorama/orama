@@ -1,5 +1,5 @@
 import t from "tap";
-import { findAllWords as radixFind, insert as radixInsert } from "../src/radix-tree/radix";
+import { find as radixFind, insert as radixInsert } from "../src/radix-tree/radix";
 import { create as createNode } from "../src/radix-tree/radix-node";
 const phrases = [
   { id: "1", doc: "the quick, brown fox" },
@@ -21,8 +21,10 @@ t.test("radix tree", t => {
     for (const { doc, id } of phrases) {
       radixInsert(subTree, root, doc, id);
     }
-    const result = await radixFind(root, phrases[5].doc.slice(0, 5));
-    t.same(result, [phrases[5].doc]);
+    const result = await radixFind(subTree, root, { term: phrases[5].doc.slice(0, 5) });
+    t.strictSame(result, {
+      [phrases[5].doc]: [phrases[5].id],
+    });
   });
 
   t.test("should correctly find a complete sentence", async t => {
@@ -34,8 +36,10 @@ t.test("radix tree", t => {
     }
 
     for (const phrase of phrases) {
-      const result = await radixFind(root, phrase.doc);
-      t.same(result, [phrase.doc]);
+      const result = await radixFind(subTree, root, { term: phrase.doc });
+      t.strictSame(result, {
+        [phrase.doc]: [phrase.id],
+      });
     }
   });
 });
