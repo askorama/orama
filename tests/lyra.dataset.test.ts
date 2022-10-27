@@ -3,6 +3,18 @@ import { create, insertBatch, remove, search } from "../src/lyra";
 import type { PropertiesSchema, SearchResult } from "../src/lyra";
 import dataset from "./datasets/events.json";
 
+type EventJson = {
+  result: {
+    events: {
+      date: string;
+      description: string;
+      granularity: string;
+      category1: string;
+      category2: string;
+    }[];
+  };
+};
+
 function removeVariadicData<T extends PropertiesSchema>(res: SearchResult<T>): SearchResult<T> {
   const hits = res.hits.map(h => {
     h.id = "";
@@ -29,11 +41,10 @@ const db = create({
 });
 
 t.test("lyra.dataset", async t => {
-  t.plan(3);
+  t.plan(4);
 
   t.before(async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const events = (dataset as any).result.events.map((ev: any) => ({
+    const events = (dataset as EventJson).result.events.map(ev => ({
       date: ev.date,
       description: ev.description,
       granularity: ev.granularity,
@@ -73,10 +84,34 @@ t.test("lyra.dataset", async t => {
       offset: 0,
     });
 
-    t.equal(Object.keys(db.docs).length, (dataset as any).result.events.length);
+    t.equal(Object.keys(db.docs).length, (dataset as EventJson).result.events.length);
     t.equal(s1.count, 1117);
     t.equal(s2.count, 1842);
     t.equal(s3.count, 1842);
+  });
+
+  //  Tests for https://github.com/LyraSearch/lyra/issues/159
+  t.test("should correctly search long strings", t => {
+    t.plan(3);
+
+    const s1 = search(db, {
+      term: "e into the",
+      properties: ["description"],
+    });
+
+    const s2 = search(db, {
+      term: "The Roman armies",
+      properties: ["description"],
+    });
+
+    const s3 = search(db, {
+      term: "the King of Epirus, is taken",
+      properties: ["description"],
+    });
+
+    t.equal(s1.count, 500);
+    t.equal(s2.count, 183);
+    t.equal(s3.count, 1);
   });
 
   t.test("should perform paginate search", t => {

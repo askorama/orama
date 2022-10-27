@@ -221,8 +221,6 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
     const propName = `${prefix}${key}`;
     if (isNested) {
       recursiveTrieInsertion(index, nodes, doc[key] as ResolveSchema<S>, id, config, propName + ".", tokenizerConfig);
-
-      return;
     }
 
     if (typeof doc[key] === "string") {
