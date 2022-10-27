@@ -87,11 +87,11 @@ export function contains(nodes: Nodes, node: Node, word: string): boolean {
     const char = word[i];
     const next = node.children?.[char];
 
-    if (next) {
-      node = nodes[next];
-    } else {
-      return false;
+    if(!next) {
+      return false
     }
+
+    node = nodes[next]
   }
 
   return node.end;
@@ -105,7 +105,7 @@ export function find(nodes: Nodes, node: Node, { term, exact, tolerance }: FindP
     const char = term[i];
     const next = node.children?.[char];
 
-    if (node.children?.[char]) {
+    if (next) {
       node = nodes[next];
     } else if (!tolerance) {
       return output;
