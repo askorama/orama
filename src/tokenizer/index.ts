@@ -96,7 +96,7 @@ export function tokenize(
 }
 
 function trim(text: string[]): string[] {
-  while (text.at(-1) === "") {
+  while (text[text.length - 1] === "") {
     text.pop();
   }
   while (text[0] === "") {
