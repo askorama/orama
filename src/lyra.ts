@@ -673,9 +673,8 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
           if (Array.isArray(tokenizerConfig.customStopWords)) {
             if ((tokenizerConfig.customStopWords as string[]).some((x: unknown) => typeof x !== "string")) {
               throw Error(ERRORS.CUSTOM_STOP_WORDS_ARRAY_MUST_BE_STRING_ARRAY());
-            } else {
-              customStopWords = tokenizerConfig.customStopWords as string[];
             }
+            customStopWords = tokenizerConfig.customStopWords as string[];
           } else {
             throw Error(ERRORS.CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY());
           }
