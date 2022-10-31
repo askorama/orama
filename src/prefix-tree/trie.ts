@@ -1,6 +1,6 @@
 import { create as createNode, removeDocument, updateParent, Node } from "./node";
 import { boundedLevenshtein } from "../levenshtein";
-import { getOwnProperty } from "../utils";
+import { getOwnProperty, includes } from "../utils";
 
 export type Nodes = Record<string, Node>;
 
@@ -127,7 +127,7 @@ export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, doc
   if (exact && node.end && nodeWord === word) {
     removeDocument(node, docID);
 
-    if (node.children?.size && docIDs.includes(docID)) {
+    if (node.children?.size && includes(docIDs, docID)) {
       node.end = false;
     }
 

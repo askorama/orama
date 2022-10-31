@@ -1,7 +1,7 @@
 import type { ResolveSchema, SearchProperties } from "./types";
 import * as ERRORS from "./errors";
 import { Tokenizer, tokenize } from "./tokenizer";
-import { getNanosecondsTime, uniqueId, reservedPropertyNames } from "./utils";
+import { getNanosecondsTime, uniqueId, reservedPropertyNames, includes } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import { stemmer } from "../stemmer/lib/en";
 import { create as createNode, Node } from "./prefix-tree/node";
@@ -144,7 +144,7 @@ function validateHooks(hooks?: Hooks): void | never {
       throw new Error(ERRORS.INVALID_HOOKS_OBJECT());
     }
 
-    const invalidHooks = Object.keys(hooks).filter(hook => !SUPPORTED_HOOKS.includes(hook));
+    const invalidHooks = Object.keys(hooks).filter(hook => !includes(SUPPORTED_HOOKS, hook));
     if (invalidHooks.length) {
       throw new Error(ERRORS.NON_SUPPORTED_HOOKS(invalidHooks));
     }
@@ -165,7 +165,7 @@ async function hookRunner<S extends PropertiesSchema>(
 
 function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix = "") {
   for (const prop of Object.keys(schema)) {
-    if (reservedPropertyNames.includes(prop)) {
+    if (includes(reservedPropertyNames, prop)) {
       throw new Error(ERRORS.RESERVED_PROPERTY_NAME(prop));
     }
 
@@ -252,7 +252,7 @@ function getIndices<S extends PropertiesSchema>(lyra: Lyra<S>, indices: SearchPa
   }
 
   for (const index of indices as string[]) {
-    if (!knownIndices.includes(index)) {
+    if (!includes(knownIndices, index)) {
       throw new Error(ERRORS.INVALID_PROPERTY(index, knownIndices));
     }
   }
@@ -300,7 +300,7 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
 export function create<S extends PropertiesSchema>(properties: Configuration<S>): Lyra<S> {
   const defaultLanguage = (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
-  if (!SUPPORTED_LANGUAGES.includes(defaultLanguage)) {
+  if (!includes(SUPPORTED_LANGUAGES, defaultLanguage)) {
     throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage));
   }
 
@@ -341,7 +341,7 @@ export function insert<S extends PropertiesSchema>(
   config = { language: lyra.defaultLanguage, ...config };
   const id = uniqueId();
 
-  if (!SUPPORTED_LANGUAGES.includes(config.language)) {
+  if (!includes(SUPPORTED_LANGUAGES, config.language)) {
     throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(config.language));
   }
 
@@ -376,7 +376,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   config = { language: lyra.defaultLanguage, ...config };
   const id = uniqueId();
 
-  if (!SUPPORTED_LANGUAGES.includes(config.language)) {
+  if (!includes(SUPPORTED_LANGUAGES, config.language)) {
     throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(config.language));
   }
 
@@ -657,7 +657,7 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
 
     // Enable default stop-words
 
-    if (availableStopWords.includes(language)) {
+    if (includes(availableStopWords, language)) {
       defaultStopWords = stopWords[language] ?? [];
     } else {
       defaultStopWords = [];

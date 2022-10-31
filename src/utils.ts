@@ -99,3 +99,12 @@ export function intersectMany<T>(arrays: T[][]): T[] {
     return count === arrays.length;
   });
 }
+
+export const includes = <T>(array: T[] | readonly T[], element: T): boolean => {
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] === element) {
+      return true;
+    }
+  }
+  return false;
+}
