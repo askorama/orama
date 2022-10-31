@@ -242,11 +242,10 @@ function getIndices<S extends PropertiesSchema>(lyra: Lyra<S>, indices: SearchPa
   }
 
   if (typeof indices === "string") {
-    if (indices === "*") {
-      return knownIndices;
-    } else {
+    if (indices !== "*") {
       throw new Error(ERRORS.INVALID_PROPERTY(indices, knownIndices));
     }
+    return knownIndices;
   }
 
   for (const index of indices as string[]) {
