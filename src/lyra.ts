@@ -197,10 +197,8 @@ function recursiveCheckDocSchema<S extends PropertiesSchema>(
 
     if (propType === "object") {
       recursiveCheckDocSchema(newDoc[key] as ResolveSchema<S>, schema);
-    } else {
-      if (typeof newDoc[key] !== schema[key]) {
-        return false;
-      }
+    } else if (typeof newDoc[key] !== schema[key]) {
+      return false;
     }
   }
 
