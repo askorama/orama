@@ -631,7 +631,7 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
   let defaultStopWords: string[] = [];
   let customStopWords: string[] = [];
   let defaultStemmingFn: Stemmer | undefined;
-  let defaultTokenizerFn: Tokenizer | undefined;
+  let defaultTokenizerFn: Tokenizer = tokenize;
 
   // Enable custom tokenizer function
   if (tokenizerConfig?.tokenizerFn) {
@@ -643,8 +643,6 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
     // If there's no custom tokenizer, we can proceed setting custom
     // stemming functions and stop-words.
   } else {
-    defaultTokenizerFn = tokenize;
-
     // Enable custom stemming function
     if (tokenizerConfig?.stemmingFn) {
       if (typeof tokenizerConfig.stemmingFn !== "function") {
