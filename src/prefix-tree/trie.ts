@@ -44,16 +44,18 @@ function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string
     if (getOwnProperty(output, word) && docIDs.length) {
       const docs = new Set(output[word]);
 
-      for (const doc of docIDs) {
-        docs.add(doc);
+      for(let i = 0; i < docIDs.length; i++) {
+        docs.add(docIDs[i])
       }
-
       output[word] = Array.from(docs);
     }
   }
 
-  for (const childNode in node.children) {
-    findAllWords(nodes, nodes[node.children[childNode]], output, term, exact, tolerance);
+  const nodeChildrenKeys = Object.keys(node.children)
+
+  for(let i = 0; i < nodeChildrenKeys.length; i++) {
+    const childNode = node.children[nodeChildrenKeys[i]];
+    findAllWords(nodes, nodes[childNode], output, term, exact, tolerance);
   }
 }
 
