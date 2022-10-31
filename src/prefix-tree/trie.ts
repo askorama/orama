@@ -159,8 +159,11 @@ export function removeWord(nodes: Nodes, node: Node, word: string): boolean {
     return true;
   }
 
-  for (const childNode in node.children) {
-    removeWord(nodes, nodes[node.children[childNode]], word);
+  const nodeChildrenKeys = Object.keys(node.children)
+
+  for(let i = 0; i < nodeChildrenKeys.length; i++) {
+    const childNode = node.children[nodeChildrenKeys[i]];
+    removeWord(nodes, nodes[childNode], word);
   }
 
   return false;
