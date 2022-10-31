@@ -659,8 +659,6 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
 
     if (includes(availableStopWords, language)) {
       defaultStopWords = stopWords[language] ?? [];
-    } else {
-      defaultStopWords = [];
     }
 
     if (tokenizerConfig?.customStopWords) {
