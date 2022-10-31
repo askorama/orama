@@ -158,8 +158,9 @@ async function hookRunner<S extends PropertiesSchema>(
   ...args: unknown[]
 ): Promise<void> {
   const hooks = Array.isArray(funcs) ? funcs : [funcs];
-  for (const hook of hooks) {
-    await hook.apply(this, args);
+  for(let i = 0; i < hooks.length; i++) {
+    await hooks[i].apply(this, args);
+
   }
 }
 
