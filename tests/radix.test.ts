@@ -1,5 +1,10 @@
 import t from "tap";
-import { find as radixFind, insert as radixInsert, contains as radixContains } from "../src/radix-tree/radix";
+import {
+  find as radixFind,
+  insert as radixInsert,
+  contains as radixContains,
+  removeWord as radixRemoveWord,
+} from "../src/radix-tree/radix";
 import { create as createNode } from "../src/radix-tree/radix-node";
 const phrases = [
   { id: "1", doc: "the quick, brown fox" },
@@ -12,7 +17,7 @@ const phrases = [
 ];
 
 t.test("radix tree", t => {
-  t.plan(4);
+  t.plan(5);
 
   t.test("should correctly find an element by prefix", async t => {
     t.plan(1);
@@ -72,5 +77,34 @@ t.test("radix tree", t => {
     }
 
     t.notOk(radixContains(nodes, root, "thought it was saturday"));
+  });
+
+  t.test("should correctly delete a word from the trie", async t => {
+    t.plan(phrases.length + 2);
+
+    const nodes = {};
+    const root = createNode();
+
+    for (const { doc, id } of phrases) {
+      await radixInsert(nodes, root, doc, id);
+    }
+
+    const removedIndex = 0;
+    const removal = radixRemoveWord(nodes, root, phrases[removedIndex].doc);
+    t.ok(removal);
+
+    const invalidRemoval = radixRemoveWord(nodes, root, "xyz");
+    t.notOk(invalidRemoval);
+
+    for (let i = 0; i < phrases.length; i++) {
+      if (i === removedIndex) {
+        t.notOk(radixContains(nodes, root, phrases[removedIndex].doc));
+      } else {
+        const result = await radixFind(nodes, root, { term: phrases[i].doc });
+        t.strictSame(result, {
+          [phrases[i].doc]: [phrases[i].id],
+        });
+      }
+    }
   });
 });

@@ -202,6 +202,19 @@ export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, doc
   throw new Error("to be implemented");
 }
 
-export function removeWord(nodes: Nodes, node: Node, word: string): boolean {
-  throw new Error("to be implemented");
+export function removeWord(nodes: Nodes, root: Node, term: string): boolean {
+  let word = "";
+  for (let i = 0; i < term.length; i++) {
+    const character = term[i];
+    const parent = root;
+    if (character in root.children) {
+      word = word.concat(root.children[character].word);
+      i += root.children[character].word.length - 1;
+      root = root.children[character];
+      if (Object.keys(root.children).length === 0) delete parent.children[root.key];
+    } else {
+      return false;
+    }
+  }
+  return true;
 }
