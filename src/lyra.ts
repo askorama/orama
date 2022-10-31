@@ -288,6 +288,12 @@ function assertSupportedLanguage(language: string) {
   }
 }
 
+function assertDocSchema<S extends PropertiesSchema>(doc: ResolveSchema<S>, lyraSchema: PropertiesSchema) {
+  if (!recursiveCheckDocSchema(doc, lyraSchema)) {
+    throw new Error(ERRORS.INVALID_DOC_SCHEMA(lyraSchema, doc));
+  }
+}
+
 /**
  * Creates a new database.
  * @param properties Options to initialize the database with.
@@ -347,9 +353,7 @@ export function insert<S extends PropertiesSchema>(
 
   assertSupportedLanguage(config.language)
 
-  if (!recursiveCheckDocSchema(doc, lyra.schema)) {
-    throw new Error(ERRORS.INVALID_DOC_SCHEMA(lyra.schema, doc));
-  }
+  assertDocSchema(doc, lyra.schema)
 
   lyra.docs[id] = doc;
   recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
@@ -380,9 +384,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
 
   assertSupportedLanguage(config.language)
 
-  if (!recursiveCheckDocSchema(doc, lyra.schema)) {
-    throw new Error(ERRORS.INVALID_DOC_SCHEMA(lyra.schema, doc));
-  }
+  assertDocSchema(doc, lyra.schema)
 
   lyra.docs[id] = doc;
   recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
