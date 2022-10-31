@@ -134,8 +134,11 @@ export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, doc
     return true;
   }
 
-  for (const childNode in node.children) {
-    removeDocumentByWord(nodes, nodes[node.children[childNode]], word, docID);
+  const nodeChildrenKeys = Object.keys(node.children)
+
+  for(let i = 0; i < nodeChildrenKeys.length; i++) {
+    const childNode = node.children[nodeChildrenKeys[i]];
+    removeDocumentByWord(nodes, nodes[childNode], word, docID);
   }
 
   return false;
