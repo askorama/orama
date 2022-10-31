@@ -520,9 +520,7 @@ export function search<S extends PropertiesSchema>(
   const tokens = lyra.tokenizer.tokenizerFn!(params.term, language, false, lyra.tokenizer);
   const indices = getIndices(lyra, params.properties);
   const { limit = 10, offset = 0, exact = false } = params;
-  const results: RetrievedDoc<S>[] = Array.from({
-    length: limit,
-  });
+  const results: RetrievedDoc<S>[] = new Array(limit);
 
   const timeStart = getNanosecondsTime();
   // uniqueDocsIDs contains unique document IDs for all the tokens in all the indices.
