@@ -635,11 +635,10 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
 
   // Enable custom tokenizer function
   if (tokenizerConfig?.tokenizerFn) {
-    if (typeof tokenizerConfig.tokenizerFn === "function") {
-      defaultTokenizerFn = tokenizerConfig.tokenizerFn;
-    } else {
+    if (typeof tokenizerConfig.tokenizerFn !== "function") {
       throw Error(ERRORS.INVALID_TOKENIZER_FUNCTION());
     }
+    defaultTokenizerFn = tokenizerConfig.tokenizerFn;
 
     // If there's no custom tokenizer, we can proceed setting custom
     // stemming functions and stop-words.
