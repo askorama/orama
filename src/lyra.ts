@@ -460,9 +460,13 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
     throw new Error(ERRORS.DOC_ID_DOES_NOT_EXISTS(docID));
   }
 
-  const document = lyra.docs[docID];
+  const document = lyra.docs[docID] || ({} as Record<string, ResolveSchema<S>>);
 
-  for (const key in document) {
+  const documentKeys = Object.keys(document || {})
+
+  for(let i = 0; i < documentKeys.length; i++) {
+    const key = documentKeys[i];
+
     const propertyType = lyra.schema[key];
 
     if (propertyType === "string") {
@@ -474,7 +478,8 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
         lyra.tokenizer!,
       )!;
 
-      for (const token of tokens) {
+      for(let k = 0; k < tokens.length; k++) {
+        const token = tokens[k]
         if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
           throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
         }
