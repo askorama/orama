@@ -670,13 +670,12 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
         // Check if the custom step-words is an array.
         // If it's an object, throw an exception. If the array contains any non-string value, throw an exception.
         case "object":
-          if (Array.isArray(tokenizerConfig.customStopWords)) {
-            if ((tokenizerConfig.customStopWords as string[]).some((x: unknown) => typeof x !== "string")) {
-              throw Error(ERRORS.CUSTOM_STOP_WORDS_ARRAY_MUST_BE_STRING_ARRAY());
-            }
-            customStopWords = tokenizerConfig.customStopWords as string[];
-          } else {
+          if(!Array.isArray(tokenizerConfig.customStopWords)) {
             throw Error(ERRORS.CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY());
+          }
+          customStopWords = tokenizerConfig.customStopWords as string[];
+          if (customStopWords.some(x => typeof x !== "string")) {
+            throw Error(ERRORS.CUSTOM_STOP_WORDS_ARRAY_MUST_BE_STRING_ARRAY());
           }
           break;
 
