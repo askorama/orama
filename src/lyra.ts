@@ -282,6 +282,12 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
   return Array.from(ids);
 }
 
+function assertSupportedLanguage(language: string) {
+  if (!includes(SUPPORTED_LANGUAGES, language)) {
+    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(language));
+  }
+}
+
 /**
  * Creates a new database.
  * @param properties Options to initialize the database with.
@@ -300,9 +306,7 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
 export function create<S extends PropertiesSchema>(properties: Configuration<S>): Lyra<S> {
   const defaultLanguage = (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
-  if (!includes(SUPPORTED_LANGUAGES, defaultLanguage)) {
-    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage));
-  }
+  assertSupportedLanguage(defaultLanguage)
 
   validateHooks(properties.hooks);
 
@@ -341,9 +345,7 @@ export function insert<S extends PropertiesSchema>(
   config = { language: lyra.defaultLanguage, ...config };
   const id = uniqueId();
 
-  if (!includes(SUPPORTED_LANGUAGES, config.language)) {
-    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(config.language));
-  }
+  assertSupportedLanguage(config.language)
 
   if (!recursiveCheckDocSchema(doc, lyra.schema)) {
     throw new Error(ERRORS.INVALID_DOC_SCHEMA(lyra.schema, doc));
@@ -376,9 +378,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   config = { language: lyra.defaultLanguage, ...config };
   const id = uniqueId();
 
-  if (!includes(SUPPORTED_LANGUAGES, config.language)) {
-    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(config.language));
-  }
+  assertSupportedLanguage(config.language)
 
   if (!recursiveCheckDocSchema(doc, lyra.schema)) {
     throw new Error(ERRORS.INVALID_DOC_SCHEMA(lyra.schema, doc));
