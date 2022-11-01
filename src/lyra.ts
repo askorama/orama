@@ -10,9 +10,14 @@ import { trackInsertion } from "./insertion-checker";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
 import { intersectMany } from "./utils";
 
+// Aliases, let's make typing easier
+type PropertyName = string;
+type DocumentIDStr = string;
+
 type Index = Record<string, Node>;
 type TokenMap = Record<string, string[]>;
 type IndexMap = Record<string, TokenMap>;
+type FrequencyMap = Record<PropertyName, Record<DocumentIDStr, number>>;
 
 export { formatNanoseconds } from "./utils";
 export { tokenize } from "./tokenizer";
@@ -78,6 +83,7 @@ export interface Lyra<S extends PropertiesSchema> extends Data<S> {
   edge: boolean;
   hooks: Hooks;
   tokenizer?: TokenizerConfig;
+  frequencies: FrequencyMap;
 }
 
 export type InsertConfig = {
@@ -208,19 +214,20 @@ function recursiveCheckDocSchema<S extends PropertiesSchema>(
 }
 
 function recursiveTrieInsertion<S extends PropertiesSchema>(
-  index: Index,
-  nodes: Nodes,
+  lyra: Lyra<S>,
   doc: ResolveSchema<S>,
   id: string,
   config: InsertConfig,
   prefix = "",
   tokenizerConfig: TokenizerConfigExec,
 ) {
+  const { index, nodes } = lyra;
+
   for (const key of Object.keys(doc)) {
     const isNested = typeof doc[key] === "object";
     const propName = `${prefix}${key}`;
     if (isNested) {
-      recursiveTrieInsertion(index, nodes, doc[key] as ResolveSchema<S>, id, config, propName + ".", tokenizerConfig);
+      recursiveTrieInsertion(lyra, doc[key] as ResolveSchema<S>, id, config, propName + ".", tokenizerConfig);
     }
 
     if (typeof doc[key] === "string") {
@@ -316,6 +323,7 @@ export function create<S extends PropertiesSchema>(properties: Configuration<S>)
     hooks: properties.hooks || {},
     edge: properties.edge ?? false,
     tokenizer: defaultTokenizerConfig(defaultLanguage, properties.tokenizer!),
+    frequencies: {},
   };
 
   buildIndex(instance, properties.schema);
@@ -351,7 +359,7 @@ export function insert<S extends PropertiesSchema>(
   }
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
+  recursiveTrieInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
 
   return { id };
@@ -386,7 +394,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   }
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
+  recursiveTrieInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
   if (lyra.hooks.afterInsert) {
     await hookRunner.call(lyra, lyra.hooks.afterInsert, id);
