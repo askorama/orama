@@ -1,18 +1,12 @@
 import type { Nullable } from "../types";
 import { uniqueId } from "../utils";
-
-interface DocRef {
-  id: string;
-  tf: number;
-}
-
 export interface Node {
   id: string;
   key: string;
   word: string;
   parent: Nullable<string>;
   children: Record<string, string>;
-  docs: DocRef[];
+  docs: string[];
   end: boolean;
 }
 
@@ -37,7 +31,7 @@ export function updateParent(node: Node, parent: Node): void {
 }
 
 export function removeDocument(node: Node, docID: string): boolean {
-  const index = node.docs.findIndex((doc) => doc.id === docID);
+  const index = node.docs.findIndex(doc => doc === docID);
 
   /* c8 ignore next 3 */
   if (index === -1) {

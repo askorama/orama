@@ -15,7 +15,7 @@ import { stemmer as DKStemmer } from "../stemmer/lib/dk";
 import { stopWords } from "../src/tokenizer/stop-words/index";
 
 t.test("Tokenizer", t => {
-  t.plan(14);
+  t.plan(13);
 
   t.test("Should tokenize and stem correctly in english", t => {
     t.plan(2);
@@ -29,35 +29,6 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
-
-  t.test("should return a token and its frequency in the input text", t => {
-    t.plan(2);
-
-    const I1 = "the quick brown fox jumps over the lazy dog";
-    const I2 = "this duplicates sentence contains some duplicates duplicates";
-    
-    const O1 = tokenize(I1, "english", false, undefined, true);
-    const O2 = tokenize(I2, "english", false, undefined, true);
-
-    t.same(O1, [
-      "the:2",
-      "quick:1",
-      "brown:1",
-      "fox:1",
-      "jump:1",
-      "over:1",
-      "lazi:1",
-      "dog:1",
-    ]);
-
-    t.same(O2, [
-      "thi:1",
-      "duplic:3",
-      "sentenc:1",
-      "contain:1",
-      "some:1",
-    ]);
-  })
 
   t.test("Should tokenize and stem correctly in english and allow duplicates", t => {
     t.plan(2);

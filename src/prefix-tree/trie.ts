@@ -44,8 +44,8 @@ function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string
     if (getOwnProperty(output, word) && docIDs.length) {
       const docs = new Set(output[word]);
 
-      for (const doc of docIDs) {
-        docs.add(doc.id);
+      for (const id of docIDs) {
+        docs.add(id);
       }
 
       output[word] = Array.from(docs);
@@ -57,7 +57,7 @@ function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string
   }
 }
 
-export function insert(nodes: Nodes, node: Node, word: string, docId: string, frequency = 0): void {
+export function insert(nodes: Nodes, node: Node, word: string, docId: string): void {
   const wordLength = word.length;
 
   for (let i = 0; i < wordLength; i++) {
@@ -75,7 +75,7 @@ export function insert(nodes: Nodes, node: Node, word: string, docId: string, fr
 
     if (i === wordLength - 1) {
       node.end = true;
-      node.docs.push({ id: docId, tf: frequency });
+      node.docs.push(docId);
     }
   }
 }
@@ -127,7 +127,7 @@ export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, doc
   if (exact && node.end && nodeWord === word) {
     removeDocument(node, docID);
 
-    if (node.children?.size && docIDs.findIndex((doc) => doc.id === docID) > -1) {
+    if (node.children?.size && docIDs.findIndex(id => id === docID) > -1) {
       node.end = false;
     }
 

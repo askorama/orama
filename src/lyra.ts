@@ -8,16 +8,18 @@ import { create as createNode, Node } from "./prefix-tree/node";
 import { find as trieFind, insert as trieInsert, removeDocumentByWord, Nodes } from "./prefix-tree/trie";
 import { trackInsertion } from "./insertion-checker";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
-import { intersectMany } from "./utils";
-
-// Aliases, let's make typing easier
-type PropertyName = string;
-type DocumentIDStr = string;
+import { intersectMany, deepSet } from "./utils";
 
 type Index = Record<string, Node>;
 type TokenMap = Record<string, string[]>;
 type IndexMap = Record<string, TokenMap>;
-type FrequencyMap = Record<PropertyName, Record<DocumentIDStr, number>>;
+type FrequencyMap = {
+  [property: string]: {
+    [documentID: string]: {
+      [token: string]: number;
+    };
+  };
+};
 
 export { formatNanoseconds } from "./utils";
 export { tokenize } from "./tokenizer";
@@ -221,7 +223,7 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
   prefix = "",
   tokenizerConfig: TokenizerConfigExec,
 ) {
-  const { index, nodes } = lyra;
+  const { index, nodes, frequencies } = lyra;
 
   for (const key of Object.keys(doc)) {
     const isNested = typeof doc[key] === "object";
@@ -234,11 +236,14 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
       // Use propName here because if doc is a nested object
       // We will get the wrong index
       const requestedTrie = index[propName];
-      const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language, false, tokenizerConfig, true);
+      const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language, false, tokenizerConfig);
 
       for (const token of tokens) {
-        const [t, tf] = token.split(":");
-        trieInsert(nodes, requestedTrie, t, id, +tf);
+        // @todo: fix this tokenFrequency calculation
+        const tokenFrequency = tokens.filter(t => t === token).length;
+        const path = `${propName}.${id}.${token}`;
+        deepSet(frequencies, path, tokenFrequency);
+        trieInsert(nodes, requestedTrie, token, id);
       }
     }
   }

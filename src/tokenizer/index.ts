@@ -9,7 +9,7 @@ export type Tokenizer = (
   language: Language,
   allowDuplicates: boolean,
   tokenizerConfig: TokenizerConfig,
-  frequency?: boolean
+  frequency?: boolean,
 ) => string[];
 
 const splitRegex: Record<Language, RegExp> = {
@@ -76,7 +76,6 @@ export function tokenize(
   language: Language = "english",
   allowDuplicates = false,
   tokenizerConfig: TokenizerConfig = defaultTokenizerConfig(language),
-  frequency = false
 ) {
   /* c8 ignore next 3 */
   if (typeof input !== "string") {
@@ -90,25 +89,13 @@ export function tokenize(
     .map(token => normalizeToken(token, language, tokenizerConfig!))
     .filter(Boolean);
 
-  const tokensWithFrequency = [];
   const trimTokens = trim(tokens);
 
-  if (frequency) {
-    for (let i = 0; i < trimTokens.length; i++) {
-      const token = trimTokens[i];
-      const frequency = getTokenFrequency(token, trimTokens);
-      // @todo: replace `${token}:${frequency}` with a better form
-      tokensWithFrequency.push(`${token}:${frequency}`);
-    }
-  }
-
-  const finalTokens = frequency ? tokensWithFrequency : trimTokens;
-
   if (!allowDuplicates) {
-    return Array.from(new Set(finalTokens));
+    return Array.from(new Set(trimTokens));
   }
 
-  return finalTokens;
+  return trimTokens;
 }
 
 function trim(text: string[]): string[] {
