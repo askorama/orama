@@ -16,7 +16,10 @@ type IndexMap = Record<string, TokenMap>;
 type FrequencyMap = {
   [property: string]: {
     [documentID: string]: {
-      [token: string]: number;
+      n: number;
+      tf: {
+        [token: string]: number;
+      };
     };
   };
 };
@@ -238,11 +241,13 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
       // We will get the wrong index
       const requestedTrie = index[propName];
       const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language, false, tokenizerConfig);
+      const tokensNumberPath = `${propName}.${id}.n`;
+      deepSet(frequencies, tokensNumberPath, tokens.length);
 
       for (const token of tokens) {
         // @todo: fix this tokenFrequency calculation
         const tokenFrequency = tokens.filter(t => t === token).length;
-        const path = `${propName}.${id}.${token}`;
+        const path = `${propName}.${id}.tf.${token}`;
         deepSet(frequencies, path, tokenFrequency);
         trieInsert(nodes, requestedTrie, token, id);
       }
