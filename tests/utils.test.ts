@@ -1,8 +1,18 @@
 import t from "tap";
-import { intersectMany, formatBytes, formatNanoseconds } from "../src/utils";
+import { intersectMany, formatBytes, formatNanoseconds, deepSet } from "../src/utils";
 
 t.test("utils", t => {
-  t.plan(3);
+  t.plan(4);
+
+  t.test("should set deep properties", t => {
+    t.plan(1);
+
+    const obj = {};
+    deepSet(obj, "a.b.c", 1);
+
+    // @ts-expect-error - obj is any
+    t.equal(obj.a.b.c, 1);
+  });
 
   t.test("should correctly intersect 2 or more arrays", t => {
     t.plan(6);

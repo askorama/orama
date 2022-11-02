@@ -77,6 +77,7 @@ export type Data<S extends PropertiesSchema> = {
   index: Index;
   nodes: Nodes;
   schema: S;
+  frequencies: FrequencyMap;
 };
 
 export interface Lyra<S extends PropertiesSchema> extends Data<S> {
@@ -284,6 +285,7 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
     exact: params.exact,
     tolerance: params.tolerance,
   });
+
   const ids = new Set<string>();
 
   for (const key in searchResult) {
@@ -527,9 +529,9 @@ export function search<S extends PropertiesSchema>(
     lyra.tokenizer = defaultTokenizerConfig(language);
   }
 
-  const tokens = lyra.tokenizer.tokenizerFn!(params.term, language, false, lyra.tokenizer);
-  const indices = getIndices(lyra, params.properties);
-  const { limit = 10, offset = 0, exact = false } = params;
+  const { limit = 10, offset = 0, exact = false, term, properties } = params;
+  const tokens = lyra.tokenizer.tokenizerFn!(term, language, false, lyra.tokenizer);
+  const indices = getIndices(lyra, properties);
   const results: RetrievedDoc<S>[] = Array.from({
     length: limit,
   });
@@ -540,7 +542,7 @@ export function search<S extends PropertiesSchema>(
   // indexMap is an object containing all the indexes considered for the current search,
   // and an array of doc IDs for each token in all the indices.
   //
-  // Give the search term "quick brown fox" on the "description" index,
+  // Given the search term "quick brown fox" on the "description" index,
   // indexMap will look like this:
   //
   // {
@@ -625,6 +627,7 @@ export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
     docs: lyra.docs,
     nodes: lyra.nodes,
     schema: lyra.schema,
+    frequencies: lyra.frequencies,
   };
 }
 
