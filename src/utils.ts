@@ -100,7 +100,7 @@ export function intersectMany<T>(arrays: T[][]): T[] {
   });
 }
 
-export const includes = <T>(array: T[] | readonly T[], element: T): boolean => {
+export function includes<T>(array: T[] | readonly T[], element: T): boolean {
   for (let i = 0; i < array.length; i++) {
     if (array[i] === element) {
       return true;
