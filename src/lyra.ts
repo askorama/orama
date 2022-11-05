@@ -9,18 +9,20 @@ import { find as trieFind, insert as trieInsert, removeDocumentByWord, Nodes } f
 import { trackInsertion } from "./insertion-checker";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
 import { intersectMany, deepSet } from "./utils";
+import { TOKENS_FREQUENCY_IDX, TOKENS_IN_DOC_NUMBER_IDX } from "./constants";
 
 type Index = Record<string, Node>;
 type TokenMap = Record<string, string[]>;
 type IndexMap = Record<string, TokenMap>;
+
+type TokensInDocument = number;
+type TokenFrequencies = {
+  [token: string]: number;
+};
+
 type FrequencyMap = {
   [property: string]: {
-    [documentID: string]: {
-      n: number;
-      tf: {
-        [token: string]: number;
-      };
-    };
+    [documentID: string]: [TokensInDocument, TokenFrequencies];
   };
 };
 
@@ -241,14 +243,21 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
       // We will get the wrong index
       const requestedTrie = index[propName];
       const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language, false, tokenizerConfig);
-      const tokensNumberPath = `${propName}.${id}.n`;
-      deepSet(frequencies, tokensNumberPath, tokens.length);
+
+      if (!(propName in frequencies)) {
+        frequencies[propName] = {};
+      }
+
+      if (!(id in frequencies[propName])) {
+        // We're using array-based tuples to reduce the amount of data to be serialized/deserialized
+        // when writing on disk. This will also allow Lyra to use less memory when loading large indexes.
+        frequencies[propName][id] = [tokens.length, {}];
+      }
 
       for (const token of tokens) {
         // @todo: fix this tokenFrequency calculation
         const tokenFrequency = tokens.filter(t => t === token).length;
-        const path = `${propName}.${id}.tf.${token}`;
-        deepSet(frequencies, path, tokenFrequency);
+        frequencies[propName][id][TOKENS_FREQUENCY_IDX][token] = tokenFrequency;
         trieInsert(nodes, requestedTrie, token, id);
       }
     }
