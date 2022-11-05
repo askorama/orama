@@ -15,14 +15,13 @@ type Index = Record<string, Node>;
 type TokenMap = Record<string, string[]>;
 type IndexMap = Record<string, TokenMap>;
 
-type TokensInDocument = number;
 type TokenFrequencies = {
   [token: string]: number;
 };
 
 type FrequencyMap = {
   [property: string]: {
-    [documentID: string]: [TokensInDocument, TokenFrequencies];
+    [documentID: string]: TokenFrequencies;
   };
 };
 
@@ -249,15 +248,13 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
       }
 
       if (!(id in frequencies[propName])) {
-        // We're using array-based tuples to reduce the amount of data to be serialized/deserialized
-        // when writing on disk. This will also allow Lyra to use less memory when loading large indexes.
-        frequencies[propName][id] = [tokens.length, {}];
+        frequencies[propName][id] = {};
       }
 
       for (const token of tokens) {
         // @todo: fix this tokenFrequency calculation
         const tokenFrequency = tokens.filter(t => t === token).length;
-        frequencies[propName][id][TOKENS_FREQUENCY_IDX][token] = tokenFrequency;
+        frequencies[propName][id][token] = tokenFrequency;
         trieInsert(nodes, requestedTrie, token, id);
       }
     }
@@ -293,7 +290,6 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
   params: SearchParams<S> & { index: string },
 ): string[] {
   const idx = lyra.index[params.index];
-
   const searchResult = trieFind(lyra.nodes, idx, {
     term: params.term,
     exact: params.exact,
