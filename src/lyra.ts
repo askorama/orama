@@ -8,20 +8,21 @@ import { create as createNode, Node } from "./prefix-tree/node";
 import { find as trieFind, insert as trieInsert, removeDocumentByWord, Nodes } from "./prefix-tree/trie";
 import { trackInsertion } from "./insertion-checker";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
-import { intersectMany, deepSet } from "./utils";
-import { TOKENS_FREQUENCY_IDX, TOKENS_IN_DOC_NUMBER_IDX } from "./constants";
+import { intersectMany } from "./utils";
 
 type Index = Record<string, Node>;
 type TokenMap = Record<string, string[]>;
 type IndexMap = Record<string, TokenMap>;
-
-type TokenFrequencies = {
-  [token: string]: number;
-};
-
 type FrequencyMap = {
   [property: string]: {
-    [documentID: string]: TokenFrequencies;
+    [documentID: string]: {
+      [token: string]: number;
+    };
+  };
+};
+type TokenOccurrency = {
+  [property: string]: {
+    [token: string]: number;
   };
 };
 
@@ -82,6 +83,7 @@ export type Data<S extends PropertiesSchema> = {
   nodes: Nodes;
   schema: S;
   frequencies: FrequencyMap;
+  tokenOccurrencies: TokenOccurrency;
 };
 
 export interface Lyra<S extends PropertiesSchema> extends Data<S> {
@@ -228,7 +230,7 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
   prefix = "",
   tokenizerConfig: TokenizerConfigExec,
 ) {
-  const { index, nodes, frequencies } = lyra;
+  const { index, nodes, frequencies, tokenOccurrencies } = lyra;
 
   for (const key of Object.keys(doc)) {
     const isNested = typeof doc[key] === "object";
@@ -247,14 +249,33 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
         frequencies[propName] = {};
       }
 
+      if (!(propName in tokenOccurrencies)) {
+        tokenOccurrencies[propName] = {};
+      }
+
       if (!(id in frequencies[propName])) {
         frequencies[propName][id] = {};
       }
 
       for (const token of tokens) {
-        // @todo: fix this tokenFrequency calculation
-        const tokenFrequency = tokens.filter(t => t === token).length;
-        frequencies[propName][id][token] = tokenFrequency;
+        let tokenFrequency = 0;
+
+        for (const t of tokens) {
+          if (t === token) {
+            tokenFrequency++;
+          }
+        }
+
+        const tf = tokenFrequency / tokens.length;
+
+        frequencies[propName][id][token] = tf;
+
+        if (!(token in tokenOccurrencies[propName])) {
+          tokenOccurrencies[propName][token] = 0;
+        }
+
+        tokenOccurrencies[propName][token]++;
+
         trieInsert(nodes, requestedTrie, token, id);
       }
     }
@@ -341,6 +362,7 @@ export function create<S extends PropertiesSchema>(properties: Configuration<S>)
     edge: properties.edge ?? false,
     tokenizer: defaultTokenizerConfig(defaultLanguage, properties.tokenizer!),
     frequencies: {},
+    tokenOccurrencies: {},
   };
 
   buildIndex(instance, properties.schema);
@@ -583,16 +605,31 @@ export function search<S extends PropertiesSchema>(
     docsIntersection[index] = [];
   }
 
+  const N = Object.keys(lyra.docs).length;
+
   // Now it's time to loop over all the indices and get the documents IDs for every single term
   for (const index of indices) {
+    const lyraOccurrencies = lyra.tokenOccurrencies[index];
+    const lyraFrequencies = lyra.frequencies[index];
+
     for (const term of tokens) {
       const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
+      const orderedTFIDFList = Array.from({ length: documentIDs.length });
+
       indexMap[index][term].push(...documentIDs);
+
+      const termOccurrencies = lyraOccurrencies[term];
+
+      for (const id of documentIDs) {
+        const idf = Math.log10(N / termOccurrencies);
+        const tfIdf = idf * (lyraFrequencies?.[id]?.[term] ?? 0);
+      }
     }
 
     const docIds = indexMap[index];
     const vals = Object.values(docIds);
     docsIntersection[index] = intersectMany(vals);
+
     for (const id of Object.values(docsIntersection[index])) {
       uniqueDocsIDs.add(id);
     }
@@ -638,6 +675,7 @@ export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
     nodes: lyra.nodes,
     schema: lyra.schema,
     frequencies: lyra.frequencies,
+    tokenOccurrencies: lyra.tokenOccurrencies,
   };
 }
 

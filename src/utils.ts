@@ -1,3 +1,5 @@
+import { Lyra, PropertiesSchema } from "./lyra";
+
 const baseId = Date.now().toString().slice(5);
 let lastId = 0;
 

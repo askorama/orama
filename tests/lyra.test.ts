@@ -426,7 +426,7 @@ t.test("lyra", t => {
     t.equal(searchResult2.hits[0].id, id2);
   });
 
-  t.test("Should be able to insert documens with non-searchable fields", t => {
+  t.skip("Should be able to insert documens with non-searchable fields", t => {
     t.plan(2);
 
     const db = create({
