@@ -113,17 +113,3 @@ export function intersectMany<T>(arrays: T[][]): T[] {
     return count === arrays.length;
   });
 }
-
-// @todo: write a better algo
-export function deepSet(obj: any, path: string, value: any) {
-  const paths = path.split(".");
-
-  while (paths.length - 1) {
-    const path = paths.shift()!;
-    if (!(path in obj)) {
-      obj[path] = {};
-    }
-    obj = obj[path];
-  }
-  obj[paths[0]] = value;
-}
