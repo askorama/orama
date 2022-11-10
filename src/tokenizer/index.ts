@@ -2,7 +2,7 @@ import type { Language } from "./languages";
 import type { TokenizerConfig } from "../lyra";
 import { defaultTokenizerConfig } from "../lyra";
 import { replaceDiacritics } from "./diacritics";
-import { getTokenFrequency } from "../utils";
+import { getTokenFrequency, includes } from "../utils";
 
 export type Tokenizer = (
   text: string,
@@ -46,29 +46,28 @@ function normalizeToken(token: string, language: Language, tokenizerConfig: Toke
 
   if (normalizationCache.has(key)) {
     return normalizationCache.get(key)!;
-  } else {
-    // Check if stop-words removal is enabled
-    if (tokenizerConfig?.enableStopWords) {
-      // Remove stop-words
-      if ((tokenizerConfig?.customStopWords as string[]).includes(token)) {
-        const token = "";
-        normalizationCache.set(key, token);
-        return token;
-      }
-    }
-
-    // Check if stemming is enabled
-    if (tokenizerConfig?.enableStemming) {
-      // Stem token when a stemming function is available
-      if (typeof tokenizerConfig?.stemmingFn === "function") {
-        token = tokenizerConfig?.stemmingFn(token);
-      }
-    }
-
-    token = replaceDiacritics(token);
-    normalizationCache.set(key, token);
-    return token;
   }
+  // Check if stop-words removal is enabled
+  if (tokenizerConfig?.enableStopWords) {
+    // Remove stop-words
+    if (includes(tokenizerConfig?.customStopWords as string[], token)) {
+      const token = "";
+      normalizationCache.set(key, token);
+      return token;
+    }
+  }
+
+  // Check if stemming is enabled
+  if (tokenizerConfig?.enableStemming) {
+    // Stem token when a stemming function is available
+    if (typeof tokenizerConfig?.stemmingFn === "function") {
+      token = tokenizerConfig?.stemmingFn(token);
+    }
+  }
+
+  token = replaceDiacritics(token);
+  normalizationCache.set(key, token);
+  return token;
 }
 
 export function tokenize(

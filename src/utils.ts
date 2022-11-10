@@ -17,7 +17,7 @@ export function formatBytes(bytes: number, decimals = 2): string {
   const dm = decimals < 0 ? 0 : decimals;
   const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
 export function formatNanoseconds(value: number | bigint): string {
@@ -55,7 +55,7 @@ export function uniqueId(): string {
 
 export const reservedPropertyNames = ["id"];
 
-export function getOwnProperty<T = unknown>(object: any, property: string): T | undefined {
+export function getOwnProperty<T = unknown>(object: Record<string, T>, property: string): T | undefined {
   return Object.hasOwn(object, property) ? object[property] : undefined;
 }
 
@@ -142,4 +142,13 @@ export function insertSortedValue<T = any>(arr: T[], el: T, compareFn?: (a: T, b
   arr.splice(low, 0, el);
 
   return arr;
+}
+
+export function includes<T>(array: T[] | readonly T[], element: T): boolean {
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] === element) {
+      return true;
+    }
+  }
+  return false;
 }

@@ -1,6 +1,6 @@
 import { create as createNode, removeDocument, updateParent, Node } from "./node";
 import { boundedLevenshtein } from "../levenshtein";
-import { getOwnProperty } from "../utils";
+import { getOwnProperty, includes } from "../utils";
 
 export type Nodes = Record<string, Node>;
 
@@ -44,16 +44,20 @@ function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string
     if (getOwnProperty(output, word) && docIDs.length) {
       const docs = new Set(output[word]);
 
-      for (const id of docIDs) {
-        docs.add(id);
-      }
+      const docIDsLength = docIDs.length;
+      for(let i = 0; i < docIDsLength; i++) {
+        docs.add(docIDs[i])
 
+      }
       output[word] = Array.from(docs);
     }
   }
 
-  for (const childNode in node.children) {
-    findAllWords(nodes, nodes[node.children[childNode]], output, term, exact, tolerance);
+  const nodeChildrenKeys = Object.keys(node.children)
+
+  for(let i = 0; i < nodeChildrenKeys.length; i++) {
+    const childNode = node.children[nodeChildrenKeys[i]];
+    findAllWords(nodes, nodes[childNode], output, term, exact, tolerance);
   }
 }
 
@@ -87,11 +91,11 @@ export function contains(nodes: Nodes, node: Node, word: string): boolean {
     const char = word[i];
     const next = node.children?.[char];
 
-    if (next) {
-      node = nodes[next];
-    } else {
-      return false;
+    if(!next) {
+      return false
     }
+
+    node = nodes[next]
   }
 
   return node.end;
@@ -105,7 +109,7 @@ export function find(nodes: Nodes, node: Node, { term, exact, tolerance }: FindP
     const char = term[i];
     const next = node.children?.[char];
 
-    if (node.children?.[char]) {
+    if (next) {
       node = nodes[next];
     } else if (!tolerance) {
       return output;
@@ -127,15 +131,18 @@ export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, doc
   if (exact && node.end && nodeWord === word) {
     removeDocument(node, docID);
 
-    if (node.children?.size && docIDs.findIndex(id => id === docID) > -1) {
+    if (node.children?.size && includes(docIDs, docID)) {
       node.end = false;
     }
 
     return true;
   }
 
-  for (const childNode in node.children) {
-    removeDocumentByWord(nodes, nodes[node.children[childNode]], word, docID);
+  const nodeChildrenKeys = Object.keys(node.children)
+
+  for(let i = 0; i < nodeChildrenKeys.length; i++) {
+    const childNode = node.children[nodeChildrenKeys[i]];
+    removeDocumentByWord(nodes, nodes[childNode], word, docID);
   }
 
   return false;
@@ -156,8 +163,11 @@ export function removeWord(nodes: Nodes, node: Node, word: string): boolean {
     return true;
   }
 
-  for (const childNode in node.children) {
-    removeWord(nodes, nodes[node.children[childNode]], word);
+  const nodeChildrenKeys = Object.keys(node.children)
+
+  for(let i = 0; i < nodeChildrenKeys.length; i++) {
+    const childNode = node.children[nodeChildrenKeys[i]];
+    removeWord(nodes, nodes[childNode], word);
   }
 
   return false;
