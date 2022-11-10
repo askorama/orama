@@ -8,7 +8,7 @@ import { create as createNode, Node } from "./prefix-tree/node";
 import { find as trieFind, insert as trieInsert, removeDocumentByWord, Nodes } from "./prefix-tree/trie";
 import { trackInsertion } from "./insertion-checker";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
-import { intersectMany } from "./utils";
+import { intersectMany, insertSortedValue } from "./utils";
 
 type Index = Record<string, Node>;
 type TokenMap = Record<string, string[]>;
@@ -614,16 +614,16 @@ export function search<S extends PropertiesSchema>(
 
     for (const term of tokens) {
       const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
-      const orderedTFIDFList = Array.from({ length: documentIDs.length });
-
-      indexMap[index][term].push(...documentIDs);
-
       const termOccurrencies = lyraOccurrencies[term];
+      const orderedTFIDFList: { id: string; tfIdf: number }[] = [];
 
       for (const id of documentIDs) {
         const idf = Math.log10(N / termOccurrencies);
         const tfIdf = idf * (lyraFrequencies?.[id]?.[term] ?? 0);
+        insertSortedValue(orderedTFIDFList, { id, tfIdf }, (a, b) => b.tfIdf - a.tfIdf);
       }
+
+      indexMap[index][term].push(...orderedTFIDFList.map(({ id }) => id));
     }
 
     const docIds = indexMap[index];

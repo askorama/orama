@@ -113,3 +113,33 @@ export function intersectMany<T>(arrays: T[][]): T[] {
     return count === arrays.length;
   });
 }
+
+export function insertSortedValue<T = any>(arr: T[], el: T, compareFn?: (a: T, b: T) => number): T[] {
+  if (!compareFn) {
+    compareFn = (a, b) => {
+      if (a < b) {
+        return -1;
+      } else if (a > b) {
+        return 1;
+      }
+      return 0;
+    };
+  }
+
+  let low = 0;
+  let high = arr.length;
+  let mid;
+
+  while (low < high) {
+    mid = (low + high) >>> 1;
+    if (compareFn(el, arr[mid]) < 0) {
+      high = mid;
+    } else {
+      low = mid + 1;
+    }
+  }
+
+  arr.splice(low, 0, el);
+
+  return arr;
+}
