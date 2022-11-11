@@ -1,4 +1,4 @@
-import { create as createNode, Node, updateParent } from "./radix-node";
+import { create as createNode, Node, updateParent, removeDocument } from "./radix-node";
 import { boundedLevenshtein } from "../levenshtein";
 import { getOwnProperty } from "../utils";
 
@@ -15,6 +15,7 @@ export type FindResult = Record<string, string[]>;
 export async function insert(nodes: Nodes, root: Node, word: string, docId: string) {
   for (let i = 0; i < word.length; i++) {
     const currentCharacter = word[i];
+    root.docs.push(docId);
 
     if (currentCharacter in root.children) {
       const edgeLabel = root.children[currentCharacter].word;
@@ -31,18 +32,15 @@ export async function insert(nodes: Nodes, root: Node, word: string, docId: stri
 
         newNode.children[edgeLabel[commonPrefix.length]] = root.children[currentCharacter];
         newNode.children[edgeLabel[commonPrefix.length]].word = edgeLabel.substring(commonPrefix.length);
+        newNode.docs.push(docId, ...root.children[currentCharacter].docs);
 
         root.children[currentCharacter] = newNode;
-
-        newNode.docs.push(docId);
-        newNode.children[edgeLabel[commonPrefix.length]].docs.push(docId);
 
         newNode.key = currentCharacter;
         newNode.children[edgeLabel[commonPrefix.length]].key = edgeLabel[commonPrefix.length];
 
         updateParent(newNode, root);
         updateParent(newNode.children[edgeLabel[commonPrefix.length]], newNode);
-
         return;
       }
 
@@ -52,18 +50,17 @@ export async function insert(nodes: Nodes, root: Node, word: string, docId: stri
 
         inbetweenNode.children[edgeLabel[commonPrefix.length]] = root.children[currentCharacter];
         inbetweenNode.children[edgeLabel[commonPrefix.length]].word = edgeLabel.substring(commonPrefix.length);
+        inbetweenNode.docs.push(docId, ...root.children[currentCharacter].docs);
         root.children[currentCharacter] = inbetweenNode;
 
         const newNode = createNode(true);
         newNode.word = word.substring(i + commonPrefix.length);
+        newNode.docs.push(docId);
         inbetweenNode.children[word.substring(i)[commonPrefix.length]] = newNode;
 
         inbetweenNode.key = currentCharacter;
         newNode.key = word.substring(i)[commonPrefix.length];
         inbetweenNode.children[edgeLabel[commonPrefix.length]].key = edgeLabel[commonPrefix.length];
-
-        inbetweenNode.docs.push(docId);
-        newNode.docs.push(docId);
 
         updateParent(inbetweenNode, root);
         updateParent(newNode, inbetweenNode);
@@ -76,9 +73,9 @@ export async function insert(nodes: Nodes, root: Node, word: string, docId: stri
     } else {
       const newNode = createNode(true);
       newNode.word = word.substring(i);
-      newNode.docs.push(docId);
       newNode.key = currentCharacter;
       root.children[currentCharacter] = newNode;
+      newNode.docs.push(docId);
       updateParent(newNode, root);
       return;
     }
@@ -107,8 +104,8 @@ export async function find(nodes: Nodes, root: Node, { term, exact, tolerance }:
 
   await findAllWords(nodes, root, output, word, exact, tolerance);
 
-  if (exact && !output[term]) {
-    return;
+  if (exact && !Object.hasOwn(output, term)) {
+    return {};
   }
 
   return output;
@@ -150,7 +147,7 @@ async function findAllWords(
   }
 
   if (Object.keys(node.children).length === 0) {
-    return;
+    return {};
   }
 
   for (const character of Object.keys(node.children)) {
@@ -198,10 +195,6 @@ export function contains(nodes: Nodes, root: Node, term: string): boolean {
   return true;
 }
 
-export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, docID: string, exact = true): boolean {
-  throw new Error("to be implemented");
-}
-
 export function removeWord(nodes: Nodes, root: Node, term: string): boolean {
   let word = "";
   for (let i = 0; i < term.length; i++) {
@@ -212,6 +205,27 @@ export function removeWord(nodes: Nodes, root: Node, term: string): boolean {
       i += root.children[character].word.length - 1;
       root = root.children[character];
       if (Object.keys(root.children).length === 0) delete parent.children[root.key];
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
+export function removeDocumentByWord(nodes: Nodes, root: Node, term: string, docID: string, exact = true): boolean {
+  let word = "";
+  for (let i = 0; i < term.length; i++) {
+    const character = term[i];
+    if (character in root.children) {
+      word = word.concat(root.children[character].word);
+      i += root.children[character].word.length - 1;
+      root = root.children[character];
+
+      if (exact && word !== term) {
+        continue;
+      }
+
+      removeDocument(root, docID);
     } else {
       return false;
     }

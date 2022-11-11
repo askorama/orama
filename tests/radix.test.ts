@@ -4,6 +4,7 @@ import {
   insert as radixInsert,
   contains as radixContains,
   removeWord as radixRemoveWord,
+  removeDocumentByWord as radixRemoveDocumentByWord,
 } from "../src/radix-tree/radix";
 import { create as createNode } from "../src/radix-tree/radix-node";
 const phrases = [
@@ -17,7 +18,7 @@ const phrases = [
 ];
 
 t.test("radix tree", t => {
-  t.plan(5);
+  t.plan(7);
 
   t.test("should correctly find an element by prefix", async t => {
     t.plan(1);
@@ -56,7 +57,7 @@ t.test("radix tree", t => {
       radixInsert(subTree, root, doc, id);
     }
     const exactResult = await radixFind(subTree, root, { term: phrases[5].doc.slice(0, 5), exact: true });
-    t.notOk(exactResult);
+    t.strictSame(exactResult, {});
 
     const result = await radixFind(subTree, root, { term: phrases[5].doc, exact: true });
     t.strictSame(result, { [phrases[5].doc]: [phrases[5].id] });
@@ -79,7 +80,7 @@ t.test("radix tree", t => {
     t.notOk(radixContains(nodes, root, "thought it was saturday"));
   });
 
-  t.test("should correctly delete a word from the trie", async t => {
+  t.test("should correctly delete a word from the tree", async t => {
     t.plan(phrases.length + 2);
 
     const nodes = {};
@@ -106,5 +107,52 @@ t.test("radix tree", t => {
         });
       }
     }
+  });
+
+  t.test("should correctly delete a id from the tree with exact=true", async t => {
+    t.plan(2);
+
+    const nodes = {};
+    const root = createNode();
+
+    for (const { doc, id } of phrases) {
+      await radixInsert(nodes, root, doc, id);
+    }
+
+    radixRemoveDocumentByWord(nodes, root, phrases[0].doc, phrases[0].id, true);
+
+    const resultFullSearch = await radixFind(nodes, root, { term: phrases[0].doc });
+
+    t.strictSame(resultFullSearch, {
+      [phrases[0].doc]: [],
+    });
+
+    const resultHalfSearch = await radixFind(nodes, root, { term: "the" });
+    t.has(resultHalfSearch, {
+      [phrases[0].doc]: [],
+    });
+  });
+
+  t.test("should correctly delete a id from the tree", async t => {
+    t.plan(2);
+
+    const nodes = {};
+    const root = createNode();
+
+    for (const { doc, id } of phrases) {
+      await radixInsert(nodes, root, doc, id);
+    }
+
+    radixRemoveDocumentByWord(nodes, root, phrases[0].doc, phrases[0].id, false);
+
+    const resultFullSearch = await radixFind(nodes, root, { term: phrases[0].doc });
+    t.strictSame(resultFullSearch, {
+      [phrases[0].doc]: [],
+    });
+
+    const resultHalfSearch = await radixFind(nodes, root, { term: phrases[0].doc.slice(0, 5) });
+    t.strictSame(resultHalfSearch, {
+      [phrases[0].doc]: [],
+    });
   });
 });
