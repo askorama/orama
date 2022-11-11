@@ -520,7 +520,7 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
 
     if (propertyType === "string") {
       const idx = lyra.index[key];
-      const tokens = lyra.tokenizer.tokenizerFn!(
+      const tokens: string[] = lyra.tokenizer.tokenizerFn!(
         document[key] as string,
         lyra.defaultLanguage,
         false,
@@ -530,6 +530,9 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
       const tokensLength = tokens.length;
       for (let k = 0; k < tokensLength; k++) {
         const token = tokens[k];
+        delete lyra.frequencies[key][docID];
+        lyra.tokenOccurrencies[key][token]--;
+
         if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
           throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
         }
