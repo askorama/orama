@@ -2,7 +2,7 @@ import type { Language } from "./languages";
 import type { TokenizerConfig } from "../lyra";
 import { defaultTokenizerConfig } from "../lyra";
 import { replaceDiacritics } from "./diacritics";
-import { getTokenFrequency, includes } from "../utils";
+import { includes } from "../utils";
 
 export type Tokenizer = (
   text: string,

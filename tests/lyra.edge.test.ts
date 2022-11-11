@@ -2,7 +2,7 @@ import t from "tap";
 import { create, insert, save, load, search } from "../src/lyra";
 import { contains as trieContains } from "../src/prefix-tree/trie";
 
-t.skip("Edge getters", t => {
+t.test("Edge getters", t => {
   t.plan(3);
 
   t.test("should correctly enable edge index getter", t => {
@@ -34,7 +34,7 @@ t.skip("Edge getters", t => {
     t.ok(trieContains(db.nodes, nameIndex, "jane"));
   });
 
-  t.test("should correctly enable edge docs getter", t => {
+  t.skip("should correctly enable edge docs getter", t => {
     t.plan(2);
 
     const db = create({

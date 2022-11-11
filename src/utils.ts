@@ -1,4 +1,4 @@
-import { Lyra, PropertiesSchema } from "./lyra";
+import type { TokenScore } from "./lyra";
 
 const baseId = Date.now().toString().slice(5);
 let lastId = 0;
@@ -71,10 +71,10 @@ export function getTokenFrequency(token: string, tokens: string[]): number {
   return count;
 }
 
-// Implemented following https://github.com/lovasoa/fast_array_intersect
+// Adapted from https://github.com/lovasoa/fast_array_intersect
 // MIT Licensed (https://github.com/lovasoa/fast_array_intersect/blob/master/LICENSE)
 // while on tag https://github.com/lovasoa/fast_array_intersect/tree/v1.1.0
-export function intersectMany<T>(arrays: T[][]): T[] {
+export function intersectTokenScores(arrays: TokenScore[][]): TokenScore[] {
   if (arrays.length === 0) return [];
 
   for (let i = 1; i < arrays.length; i++) {
@@ -85,17 +85,18 @@ export function intersectMany<T>(arrays: T[][]): T[] {
     }
   }
 
-  const set = new Map();
+  const set: Map<string, [number, number]> = new Map();
   for (const elem of arrays[0]) {
-    set.set(elem, 1);
+    set.set(elem[0] ?? "", [1, elem[1]]);
   }
 
-  for (let i = 1; i < arrays.length; i++) {
+  const arrLength = arrays.length;
+  for (let i = 1; i < arrLength; i++) {
     let found = 0;
     for (const elem of arrays[i]) {
-      const count = set.get(elem);
+      const [count, score] = set.get(elem[0] ?? "") ?? [0, 0];
       if (count === i) {
-        set.set(elem, count + 1);
+        set.set(elem[0] ?? "", [count + 1, score + elem[1]]);
         found++;
       }
     }
@@ -105,16 +106,18 @@ export function intersectMany<T>(arrays: T[][]): T[] {
     }
   }
 
-  return arrays[0].filter(elem => {
-    const count = set.get(elem);
-    if (count !== undefined) {
-      set.set(elem, 0);
+  const result: TokenScore[] = [];
+
+  for (const [token, [count, score]] of set) {
+    if (count === arrLength) {
+      result.push([token, score]);
     }
-    return count === arrays.length;
-  });
+  }
+
+  return result;
 }
 
-export function insertSortedValue<T = any>(arr: T[], el: T, compareFn?: (a: T, b: T) => number): T[] {
+export function insertSortedValue<T = unknown>(arr: T[], el: T, compareFn?: (a: T, b: T) => number): T[] {
   if (!compareFn) {
     compareFn = (a, b) => {
       if (a < b) {
@@ -151,4 +154,13 @@ export function includes<T>(array: T[] | readonly T[], element: T): boolean {
     }
   }
   return false;
+}
+
+export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
+  if (a[1] > b[1]) {
+    return -1;
+  } else if (a[1] < b[1]) {
+    return 1;
+  }
+  return 0;
 }

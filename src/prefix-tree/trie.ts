@@ -45,17 +45,16 @@ function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string
       const docs = new Set(output[word]);
 
       const docIDsLength = docIDs.length;
-      for(let i = 0; i < docIDsLength; i++) {
-        docs.add(docIDs[i])
-
+      for (let i = 0; i < docIDsLength; i++) {
+        docs.add(docIDs[i]);
       }
       output[word] = Array.from(docs);
     }
   }
 
-  const nodeChildrenKeys = Object.keys(node.children)
+  const nodeChildrenKeys = Object.keys(node.children);
 
-  for(let i = 0; i < nodeChildrenKeys.length; i++) {
+  for (let i = 0; i < nodeChildrenKeys.length; i++) {
     const childNode = node.children[nodeChildrenKeys[i]];
     findAllWords(nodes, nodes[childNode], output, term, exact, tolerance);
   }
@@ -91,11 +90,11 @@ export function contains(nodes: Nodes, node: Node, word: string): boolean {
     const char = word[i];
     const next = node.children?.[char];
 
-    if(!next) {
-      return false
+    if (!next) {
+      return false;
     }
 
-    node = nodes[next]
+    node = nodes[next];
   }
 
   return node.end;
@@ -138,9 +137,9 @@ export function removeDocumentByWord(nodes: Nodes, node: Node, word: string, doc
     return true;
   }
 
-  const nodeChildrenKeys = Object.keys(node.children)
+  const nodeChildrenKeys = Object.keys(node.children);
 
-  for(let i = 0; i < nodeChildrenKeys.length; i++) {
+  for (let i = 0; i < nodeChildrenKeys.length; i++) {
     const childNode = node.children[nodeChildrenKeys[i]];
     removeDocumentByWord(nodes, nodes[childNode], word, docID);
   }
@@ -163,9 +162,9 @@ export function removeWord(nodes: Nodes, node: Node, word: string): boolean {
     return true;
   }
 
-  const nodeChildrenKeys = Object.keys(node.children)
+  const nodeChildrenKeys = Object.keys(node.children);
 
-  for(let i = 0; i < nodeChildrenKeys.length; i++) {
+  for (let i = 0; i < nodeChildrenKeys.length; i++) {
     const childNode = node.children[nodeChildrenKeys[i]];
     removeWord(nodes, nodes[childNode], word);
   }
