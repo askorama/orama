@@ -1,7 +1,7 @@
 import type { ResolveSchema, SearchProperties } from "./types";
 import * as ERRORS from "./errors";
 import { Tokenizer, tokenize } from "./tokenizer";
-import { getNanosecondsTime, uniqueId, reservedPropertyNames } from "./utils";
+import { getNanosecondsTime, uniqueId, reservedPropertyNames, includes } from "./utils";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import { stemmer } from "../stemmer/lib/en";
 import { create as createNode, Node } from "./prefix-tree/node";
@@ -144,7 +144,7 @@ function validateHooks(hooks?: Hooks): void | never {
       throw new Error(ERRORS.INVALID_HOOKS_OBJECT());
     }
 
-    const invalidHooks = Object.keys(hooks).filter(hook => !SUPPORTED_HOOKS.includes(hook));
+    const invalidHooks = Object.keys(hooks).filter(hook => !includes(SUPPORTED_HOOKS, hook));
     if (invalidHooks.length) {
       throw new Error(ERRORS.NON_SUPPORTED_HOOKS(invalidHooks));
     }
@@ -158,14 +158,15 @@ async function hookRunner<S extends PropertiesSchema>(
   ...args: unknown[]
 ): Promise<void> {
   const hooks = Array.isArray(funcs) ? funcs : [funcs];
-  for (const hook of hooks) {
-    await hook.apply(this, args);
+  for(let i = 0; i < hooks.length; i++) {
+    await hooks[i].apply(this, args);
+
   }
 }
 
 function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix = "") {
   for (const prop of Object.keys(schema)) {
-    if (reservedPropertyNames.includes(prop)) {
+    if (includes(reservedPropertyNames, prop)) {
       throw new Error(ERRORS.RESERVED_PROPERTY_NAME(prop));
     }
 
@@ -197,10 +198,8 @@ function recursiveCheckDocSchema<S extends PropertiesSchema>(
 
     if (propType === "object") {
       recursiveCheckDocSchema(newDoc[key] as ResolveSchema<S>, schema);
-    } else {
-      if (typeof newDoc[key] !== schema[key]) {
-        return false;
-      }
+    } else if (typeof newDoc[key] !== schema[key]) {
+      return false;
     }
   }
 
@@ -244,15 +243,14 @@ function getIndices<S extends PropertiesSchema>(lyra: Lyra<S>, indices: SearchPa
   }
 
   if (typeof indices === "string") {
-    if (indices === "*") {
-      return knownIndices;
-    } else {
+    if (indices !== "*") {
       throw new Error(ERRORS.INVALID_PROPERTY(indices, knownIndices));
     }
+    return knownIndices;
   }
 
   for (const index of indices as string[]) {
-    if (!knownIndices.includes(index)) {
+    if (!includes(knownIndices, index)) {
       throw new Error(ERRORS.INVALID_PROPERTY(index, knownIndices));
     }
   }
@@ -282,6 +280,18 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
   return Array.from(ids);
 }
 
+function assertSupportedLanguage(language: string) {
+  if (!includes(SUPPORTED_LANGUAGES, language)) {
+    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(language));
+  }
+}
+
+function assertDocSchema<S extends PropertiesSchema>(doc: ResolveSchema<S>, lyraSchema: PropertiesSchema) {
+  if (!recursiveCheckDocSchema(doc, lyraSchema)) {
+    throw new Error(ERRORS.INVALID_DOC_SCHEMA(lyraSchema, doc));
+  }
+}
+
 /**
  * Creates a new database.
  * @param properties Options to initialize the database with.
@@ -300,9 +310,7 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
 export function create<S extends PropertiesSchema>(properties: Configuration<S>): Lyra<S> {
   const defaultLanguage = (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
-  if (!SUPPORTED_LANGUAGES.includes(defaultLanguage)) {
-    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(defaultLanguage));
-  }
+  assertSupportedLanguage(defaultLanguage)
 
   validateHooks(properties.hooks);
 
@@ -341,13 +349,9 @@ export function insert<S extends PropertiesSchema>(
   config = { language: lyra.defaultLanguage, ...config };
   const id = uniqueId();
 
-  if (!SUPPORTED_LANGUAGES.includes(config.language)) {
-    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(config.language));
-  }
+  assertSupportedLanguage(config.language)
 
-  if (!recursiveCheckDocSchema(doc, lyra.schema)) {
-    throw new Error(ERRORS.INVALID_DOC_SCHEMA(lyra.schema, doc));
-  }
+  assertDocSchema(doc, lyra.schema)
 
   lyra.docs[id] = doc;
   recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
@@ -376,13 +380,9 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   config = { language: lyra.defaultLanguage, ...config };
   const id = uniqueId();
 
-  if (!SUPPORTED_LANGUAGES.includes(config.language)) {
-    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(config.language));
-  }
+  assertSupportedLanguage(config.language)
 
-  if (!recursiveCheckDocSchema(doc, lyra.schema)) {
-    throw new Error(ERRORS.INVALID_DOC_SCHEMA(lyra.schema, doc));
-  }
+  assertDocSchema(doc, lyra.schema)
 
   lyra.docs[id] = doc;
   recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
@@ -461,9 +461,13 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
     throw new Error(ERRORS.DOC_ID_DOES_NOT_EXISTS(docID));
   }
 
-  const document = lyra.docs[docID];
+  const document = lyra.docs[docID] || ({} as Record<string, ResolveSchema<S>>);
 
-  for (const key in document) {
+  const documentKeys = Object.keys(document || {})
+
+  for(let i = 0; i < documentKeys.length; i++) {
+    const key = documentKeys[i];
+
     const propertyType = lyra.schema[key];
 
     if (propertyType === "string") {
@@ -475,7 +479,8 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
         lyra.tokenizer!,
       )!;
 
-      for (const token of tokens) {
+      for(let k = 0; k < tokens.length; k++) {
+        const token = tokens[k]
         if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
           throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
         }
@@ -516,9 +521,7 @@ export function search<S extends PropertiesSchema>(
   const tokens = lyra.tokenizer.tokenizerFn!(params.term, language, false, lyra.tokenizer);
   const indices = getIndices(lyra, params.properties);
   const { limit = 10, offset = 0, exact = false } = params;
-  const results: RetrievedDoc<S>[] = Array.from({
-    length: limit,
-  });
+  const results: RetrievedDoc<S>[] = new Array(limit);
 
   const timeStart = getNanosecondsTime();
   // uniqueDocsIDs contains unique document IDs for all the tokens in all the indices.
@@ -629,38 +632,32 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
   let defaultStopWords: string[] = [];
   let customStopWords: string[] = [];
   let defaultStemmingFn: Stemmer | undefined;
-  let defaultTokenizerFn: Tokenizer | undefined;
+  let defaultTokenizerFn: Tokenizer = tokenize;
 
   // Enable custom tokenizer function
   if (tokenizerConfig?.tokenizerFn) {
-    if (typeof tokenizerConfig.tokenizerFn === "function") {
-      defaultTokenizerFn = tokenizerConfig.tokenizerFn;
-    } else {
+    if (typeof tokenizerConfig.tokenizerFn !== "function") {
       throw Error(ERRORS.INVALID_TOKENIZER_FUNCTION());
     }
+    defaultTokenizerFn = tokenizerConfig.tokenizerFn;
 
     // If there's no custom tokenizer, we can proceed setting custom
     // stemming functions and stop-words.
   } else {
-    defaultTokenizerFn = tokenize;
-
     // Enable custom stemming function
     if (tokenizerConfig?.stemmingFn) {
-      if (typeof tokenizerConfig.stemmingFn === "function") {
-        defaultStemmingFn = tokenizerConfig.stemmingFn;
-      } else {
+      if (typeof tokenizerConfig.stemmingFn !== "function") {
         throw Error(ERRORS.INVALID_STEMMER_FUNCTION_TYPE());
       }
+      defaultStemmingFn = tokenizerConfig.stemmingFn;
     } else {
       defaultStemmingFn = stemmer;
     }
 
     // Enable default stop-words
 
-    if (availableStopWords.includes(language)) {
+    if (includes(availableStopWords, language)) {
       defaultStopWords = stopWords[language] ?? [];
-    } else {
-      defaultStopWords = [];
     }
 
     if (tokenizerConfig?.customStopWords) {
@@ -674,14 +671,12 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
         // Check if the custom step-words is an array.
         // If it's an object, throw an exception. If the array contains any non-string value, throw an exception.
         case "object":
-          if (Array.isArray(tokenizerConfig.customStopWords)) {
-            if ((tokenizerConfig.customStopWords as string[]).some((x: unknown) => typeof x !== "string")) {
-              throw Error(ERRORS.CUSTOM_STOP_WORDS_ARRAY_MUST_BE_STRING_ARRAY());
-            } else {
-              customStopWords = tokenizerConfig.customStopWords as string[];
-            }
-          } else {
+          if(!Array.isArray(tokenizerConfig.customStopWords)) {
             throw Error(ERRORS.CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY());
+          }
+          customStopWords = tokenizerConfig.customStopWords as string[];
+          if (customStopWords.some(x => typeof x !== "string")) {
+            throw Error(ERRORS.CUSTOM_STOP_WORDS_ARRAY_MUST_BE_STRING_ARRAY());
           }
           break;
 

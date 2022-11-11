@@ -2,6 +2,7 @@ import type { Language } from "./languages";
 import type { TokenizerConfig } from "../lyra";
 import { defaultTokenizerConfig } from "../lyra";
 import { replaceDiacritics } from "./diacritics";
+import { includes } from "../utils";
 
 export type Tokenizer = (
   text: string,
@@ -48,7 +49,7 @@ function normalizeToken(token: string, language: Language, tokenizerConfig: Toke
   // Check if stop-words removal is enabled
   if (tokenizerConfig?.enableStopWords) {
     // Remove stop-words
-    if ((tokenizerConfig?.customStopWords as string[]).includes(token)) {
+    if (includes(tokenizerConfig?.customStopWords as string[], token)) {
       const token = "";
       normalizationCache.set(key, token);
       return token;
