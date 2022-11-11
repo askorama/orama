@@ -510,10 +510,10 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
   }
 
   const document = lyra.docs[docID] || ({} as Record<string, ResolveSchema<S>>);
-
   const documentKeys = Object.keys(document || {});
 
-  for (let i = 0; i < documentKeys.length; i++) {
+  const documentKeysLength = documentKeys.length;
+  for (let i = 0; i < documentKeysLength; i++) {
     const key = documentKeys[i];
 
     const propertyType = lyra.schema[key];
@@ -527,7 +527,8 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
         lyra.tokenizer!,
       )!;
 
-      for (let k = 0; k < tokens.length; k++) {
+      const tokensLength = tokens.length;
+      for (let k = 0; k < tokensLength; k++) {
         const token = tokens[k];
         if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
           throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
@@ -707,7 +708,10 @@ export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
   };
 }
 
-export function load<S extends PropertiesSchema>(lyra: Lyra<S>, { index, docs, nodes, schema }: Data<S>) {
+export function load<S extends PropertiesSchema>(
+  lyra: Lyra<S>,
+  { index, docs, nodes, schema, frequencies, tokenOccurrencies }: Data<S>,
+) {
   if (!lyra.edge) {
     throw new Error(ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("load"));
   }
@@ -716,6 +720,8 @@ export function load<S extends PropertiesSchema>(lyra: Lyra<S>, { index, docs, n
   lyra.docs = docs;
   lyra.nodes = nodes;
   lyra.schema = schema;
+  lyra.frequencies = frequencies;
+  lyra.tokenOccurrencies = tokenOccurrencies;
 }
 
 export function defaultTokenizerConfig(language: Language, tokenizerConfig: TokenizerConfig = {}): TokenizerConfigExec {
