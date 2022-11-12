@@ -2,7 +2,8 @@
   "extends": "./tsconfig.json",
   "include": [
     "src",
-    "stemmer"
+    "stemmer",
+    "internals"
   ],
   "compilerOptions": {
     "allowJs": true,

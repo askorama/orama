@@ -158,9 +158,8 @@ async function hookRunner<S extends PropertiesSchema>(
   ...args: unknown[]
 ): Promise<void> {
   const hooks = Array.isArray(funcs) ? funcs : [funcs];
-  for(let i = 0; i < hooks.length; i++) {
+  for (let i = 0; i < hooks.length; i++) {
     await hooks[i].apply(this, args);
-
   }
 }
 
@@ -321,7 +320,7 @@ function assertDocSchema<S extends PropertiesSchema>(doc: ResolveSchema<S>, lyra
 export function create<S extends PropertiesSchema>(properties: Configuration<S>): Lyra<S> {
   const defaultLanguage = (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
-  assertSupportedLanguage(defaultLanguage)
+  assertSupportedLanguage(defaultLanguage);
 
   validateHooks(properties.hooks);
 
@@ -360,9 +359,9 @@ export function insert<S extends PropertiesSchema>(
   config = { language: lyra.defaultLanguage, ...config };
   const id = uniqueId();
 
-  assertSupportedLanguage(config.language)
+  assertSupportedLanguage(config.language);
 
-  assertDocSchema(doc, lyra.schema)
+  assertDocSchema(doc, lyra.schema);
 
   lyra.docs[id] = doc;
   recursiveTrieInsertion(
@@ -400,9 +399,9 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   config = { language: lyra.defaultLanguage, ...config };
   const id = uniqueId();
 
-  assertSupportedLanguage(config.language)
+  assertSupportedLanguage(config.language);
 
-  assertDocSchema(doc, lyra.schema)
+  assertDocSchema(doc, lyra.schema);
 
   lyra.docs[id] = doc;
   recursiveTrieInsertion(
@@ -492,9 +491,9 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
 
   const document = lyra.docs[docID] || ({} as Record<string, ResolveSchema<S>>);
 
-  const documentKeys = Object.keys(document || {})
+  const documentKeys = Object.keys(document || {});
 
-  for(let i = 0; i < documentKeys.length; i++) {
+  for (let i = 0; i < documentKeys.length; i++) {
     const key = documentKeys[i];
 
     const propertyType = lyra.schema[key];
@@ -508,8 +507,8 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
         lyra.tokenizer!,
       )!;
 
-      for(let k = 0; k < tokens.length; k++) {
-        const token = tokens[k]
+      for (let k = 0; k < tokens.length; k++) {
+        const token = tokens[k];
         if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
           throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
         }
@@ -700,7 +699,7 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
         // Check if the custom step-words is an array.
         // If it's an object, throw an exception. If the array contains any non-string value, throw an exception.
         case "object":
-          if(!Array.isArray(tokenizerConfig.customStopWords)) {
+          if (!Array.isArray(tokenizerConfig.customStopWords)) {
             throw Error(ERRORS.CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY());
           }
           customStopWords = tokenizerConfig.customStopWords as string[];
