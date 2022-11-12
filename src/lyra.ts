@@ -191,7 +191,7 @@ function recursiveCheckDocSchema<S extends PropertiesSchema>(
 ): boolean {
   for (const key in newDoc) {
     if (!(key in schema)) {
-      return false;
+      continue;
     }
 
     const propType = typeof newDoc[key];
@@ -209,6 +209,7 @@ function recursiveCheckDocSchema<S extends PropertiesSchema>(
 function recursiveTrieInsertion<S extends PropertiesSchema>(
   index: Index,
   nodes: Nodes,
+  schema: PropertiesSchema,
   doc: ResolveSchema<S>,
   id: string,
   config: InsertConfig,
@@ -217,12 +218,22 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
 ) {
   for (const key of Object.keys(doc)) {
     const isNested = typeof doc[key] === "object";
+    const isSchemaNested = typeof schema[key];
     const propName = `${prefix}${key}`;
-    if (isNested) {
-      recursiveTrieInsertion(index, nodes, doc[key] as ResolveSchema<S>, id, config, propName + ".", tokenizerConfig);
+    if (isNested && isSchemaNested && key in schema) {
+      recursiveTrieInsertion(
+        index,
+        nodes,
+        schema[key] as PropertiesSchema,
+        doc[key] as ResolveSchema<S>,
+        id,
+        config,
+        propName + ".",
+        tokenizerConfig,
+      );
     }
 
-    if (typeof doc[key] === "string") {
+    if (typeof doc[key] === "string" && typeof schema[key] != "object" && key in schema) {
       // Use propName here because if doc is a nested object
       // We will get the wrong index
       const requestedTrie = index[propName];
@@ -354,7 +365,16 @@ export function insert<S extends PropertiesSchema>(
   assertDocSchema(doc, lyra.schema)
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
+  recursiveTrieInsertion(
+    lyra.index,
+    lyra.nodes,
+    lyra.schema,
+    doc,
+    id,
+    config,
+    undefined,
+    lyra.tokenizer as TokenizerConfigExec,
+  );
   trackInsertion(lyra);
 
   return { id };
@@ -385,7 +405,16 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   assertDocSchema(doc, lyra.schema)
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
+  recursiveTrieInsertion(
+    lyra.index,
+    lyra.nodes,
+    lyra.schema,
+    doc,
+    id,
+    config,
+    undefined,
+    lyra.tokenizer as TokenizerConfigExec,
+  );
   trackInsertion(lyra);
   if (lyra.hooks.afterInsert) {
     await hookRunner.call(lyra, lyra.hooks.afterInsert, id);

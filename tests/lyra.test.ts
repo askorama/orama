@@ -56,7 +56,7 @@ t.test("defaultLanguage", t => {
 });
 
 t.test("checkInsertDocSchema", t => {
-  t.plan(2);
+  t.plan(3);
 
   t.test("should not allow insertion of reserved property names", t => {
     t.plan(1);
@@ -73,7 +73,7 @@ t.test("checkInsertDocSchema", t => {
   });
 
   t.test("should compare the inserted doc with the schema definition", t => {
-    t.plan(4);
+    t.plan(2);
 
     const db = create({
       schema: {
@@ -90,23 +90,38 @@ t.test("checkInsertDocSchema", t => {
     } catch (err) {
       t.matchSnapshot(err, `${t.name} - 1`);
     }
+  });
 
-    try {
-      insert(db, {
-        quote: "hello, world!",
-        // @ts-expect-error test error case
-        authors: "author should be singular",
-      });
-    } catch (err) {
-      t.matchSnapshot(err, `${t.name} - 2`);
-    }
+  t.test("should allow doc with missing schema keys to be inserted without indexing those keys", t => {
+    t.plan(6);
+    const db = create({
+      schema: {
+        quote: "string",
+        author: "string",
+      },
+    });
 
-    try {
+    insert(db, {
+      quote: "hello, world!",
       // @ts-expect-error test error case
-      insert(db, { quote: "hello, world!", foo: { bar: 10 } });
-    } catch (err) {
-      t.matchSnapshot(err, `${t.name} - 3`);
-    }
+      authors: "author should be singular",
+    });
+
+    t.ok(Object.keys(db.docs).length === 1);
+
+    const docWithExtraKey = { quote: "hello, world!", foo: { bar: 10 } };
+    // @ts-expect-error test error case
+    const insertedInfo = insert(db, docWithExtraKey);
+    t.ok(insertedInfo.id);
+    t.equal(Object.keys(db.docs).length, 2);
+    t.ok(
+      insertedInfo.id in db.docs &&
+        // @ts-expect-error test error case
+        "foo" in db.docs[insertedInfo.id],
+    );
+    // @ts-expect-error test error case
+    t.same(docWithExtraKey.foo, db.docs[insertedInfo.id].foo);
+    t.notOk(db.index.foo);
   });
 });
 
