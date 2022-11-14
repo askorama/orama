@@ -1,4 +1,4 @@
 {
   "reporter": ["text", "html"],
-  "exclude": ["stemmer"]
+  "exclude": ["stemmer", "tests", "tap-snapshots"]
 }
