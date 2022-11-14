@@ -53,8 +53,6 @@ export function uniqueId(): string {
   return `${baseId}-${lastId++}`;
 }
 
-export const reservedPropertyNames = ["id"];
-
 export function getOwnProperty<T = unknown>(object: Record<string, T>, property: string): T | undefined {
   return Object.hasOwn(object, property) ? object[property] : undefined;
 }
