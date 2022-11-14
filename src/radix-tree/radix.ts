@@ -1,4 +1,4 @@
-import { create as createNode, Node, updateParent, removeDocument } from "./radix-node";
+import { create as createNode, Node, updateParent, removeDocument } from "./node";
 import { boundedLevenshtein } from "../levenshtein";
 import { getOwnProperty } from "../utils";
 
@@ -12,7 +12,7 @@ export type FindParams = {
 
 export type FindResult = Record<string, string[]>;
 
-export async function insert(nodes: Nodes, root: Node, word: string, docId: string) {
+export function insert(root: Node, word: string, docId: string) {
   for (let i = 0; i < word.length; i++) {
     const currentCharacter = word[i];
     root.docs.push(docId);
@@ -82,7 +82,7 @@ export async function insert(nodes: Nodes, root: Node, word: string, docId: stri
   }
 }
 
-export async function find(nodes: Nodes, root: Node, { term, exact, tolerance }: FindParams) {
+export function find(root: Node, { term, exact, tolerance }: FindParams) {
   let word = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
@@ -102,7 +102,7 @@ export async function find(nodes: Nodes, root: Node, { term, exact, tolerance }:
   }
   const output: FindResult = {};
 
-  await findAllWords(nodes, root, output, word, exact, tolerance);
+  findAllWords(root, output, word, exact, tolerance);
 
   if (exact && !Object.hasOwn(output, term)) {
     return {};
@@ -111,14 +111,7 @@ export async function find(nodes: Nodes, root: Node, { term, exact, tolerance }:
   return output;
 }
 
-async function findAllWords(
-  nodes: Nodes,
-  node: Node,
-  output: FindResult,
-  term: string,
-  exact?: boolean,
-  tolerance?: number,
-) {
+async function findAllWords(node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
   if (node.end) {
     const { word, docs: docIDs } = node;
     // always check in own property to prevent access to inherited properties
@@ -151,14 +144,7 @@ async function findAllWords(
   }
 
   for (const character of Object.keys(node.children)) {
-    await findAllWords(
-      nodes,
-      node.children[character],
-      output,
-      term.concat(node.children[character].word),
-      exact,
-      tolerance,
-    );
+    await findAllWords(node.children[character], output, term.concat(node.children[character].word), exact, tolerance);
   }
   return output;
 }
@@ -174,7 +160,7 @@ function getCommonPrefix(a: string, b: string) {
   return commonPrefix;
 }
 
-export function contains(nodes: Nodes, root: Node, term: string): boolean {
+export function contains(root: Node, term: string): boolean {
   let word = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
@@ -195,7 +181,7 @@ export function contains(nodes: Nodes, root: Node, term: string): boolean {
   return true;
 }
 
-export function removeWord(nodes: Nodes, root: Node, term: string): boolean {
+export function removeWord(root: Node, term: string): boolean {
   let word = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
@@ -212,7 +198,7 @@ export function removeWord(nodes: Nodes, root: Node, term: string): boolean {
   return true;
 }
 
-export function removeDocumentByWord(nodes: Nodes, root: Node, term: string, docID: string, exact = true): boolean {
+export function removeDocumentByWord(root: Node, term: string, docID: string, exact = true): boolean {
   let word = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
