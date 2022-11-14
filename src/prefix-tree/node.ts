@@ -1,6 +1,5 @@
 import type { Nullable } from "../types";
 import { uniqueId } from "../utils";
-
 export interface Node {
   id: string;
   key: string;

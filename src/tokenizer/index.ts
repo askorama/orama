@@ -9,6 +9,7 @@ export type Tokenizer = (
   language: Language,
   allowDuplicates: boolean,
   tokenizerConfig: TokenizerConfig,
+  frequency?: boolean,
 ) => string[];
 
 const splitRegex: Record<Language, RegExp> = {
