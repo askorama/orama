@@ -44,7 +44,8 @@ function findAllWords(nodes: Nodes, node: Node, output: FindResult, term: string
     if (getOwnProperty(output, word) && docIDs.length) {
       const docs = new Set(output[word]);
 
-      for (let i = 0; i < docIDs.length; i++) {
+      const docIDsLength = docIDs.length;
+      for (let i = 0; i < docIDsLength; i++) {
         docs.add(docIDs[i]);
       }
       output[word] = Array.from(docs);
