@@ -65,10 +65,10 @@ t.test("defaultLanguage", t => {
 });
 
 t.test("checkInsertDocSchema", t => {
-  t.plan(1);
+  t.plan(3);
 
   t.test("should compare the inserted doc with the schema definition", t => {
-    t.plan(4);
+    t.plan(2);
 
     const db = create({
       schema: {
@@ -85,28 +85,90 @@ t.test("checkInsertDocSchema", t => {
     } catch (err) {
       t.matchSnapshot(err, `${t.name} - 1`);
     }
-
-    try {
-      insert(db, {
-        quote: "hello, world!",
-        // @ts-expect-error test error case
-        authors: "author should be singular",
-      });
-    } catch (err) {
-      t.matchSnapshot(err, `${t.name} - 2`);
-    }
-
-    try {
-      // @ts-expect-error test error case
-      insert(db, { quote: "hello, world!", foo: { bar: 10 } });
-    } catch (err) {
-      t.matchSnapshot(err, `${t.name} - 3`);
-    }
   });
+
+  t.test("should allow doc with missing schema keys to be inserted without indexing those keys", t => {
+    t.plan(6);
+    const db = create({
+      schema: {
+        quote: "string",
+        author: "string",
+      },
+    });
+    insert(db, {
+      quote: "hello, world!",
+      // @ts-expect-error test error case
+      authors: "author should be singular",
+    });
+
+    t.ok(Object.keys(db.docs).length === 1);
+
+    const docWithExtraKey = { quote: "hello, world!", foo: { bar: 10 } };
+    // @ts-expect-error test error case
+    const insertedInfo = insert(db, docWithExtraKey);
+    t.ok(insertedInfo.id);
+    t.equal(Object.keys(db.docs).length, 2);
+    t.ok(
+      insertedInfo.id in db.docs &&
+        // @ts-expect-error test error case
+        "foo" in db.docs[insertedInfo.id],
+    );
+    // @ts-expect-error test error case
+    t.same(docWithExtraKey.foo, db.docs[insertedInfo.id].foo);
+    t.notOk(db.index.foo);
+  });
+
+  t.test(
+    "should allow doc with missing schema keys to be inserted without indexing those keys - nested schema version",
+    t => {
+      t.plan(6);
+      const db = create({
+        schema: {
+          quote: "string",
+          author: {
+            name: "string",
+            surname: "string",
+          },
+          tag: {
+            name: "string",
+            description: "string",
+          },
+          isFavorite: "boolean",
+          rating: "number",
+        },
+      });
+      const nestedExtraKeyDoc = {
+        quote: "So many books, so little time.",
+        author: {
+          name: "Frank",
+          surname: "Zappa",
+        },
+        tag: {
+          name: "books",
+          description: "Quotes about books",
+          unexpectedNestedProperty: "amazing",
+        },
+        isFavorite: false,
+        rating: 5,
+        unexpectedProperty: "wow",
+      };
+      const insertedInfo = insert(db, nestedExtraKeyDoc);
+
+      t.ok(insertedInfo.id);
+      t.equal(Object.keys(db.docs).length, 1);
+
+      // @ts-expect-error test error case
+      t.same(nestedExtraKeyDoc.unexpectedProperty, db.docs[insertedInfo.id].unexpectedProperty);
+      // @ts-expect-error test error case
+      t.same(nestedExtraKeyDoc.tag.unexpectedNestedProperty, db.docs[insertedInfo.id].tag.unexpectedNestedProperty);
+      t.notOk(db.index.unexpectedProperty);
+      t.notOk(db.index["tag.unexpectedProperty"]);
+    },
+  );
 });
 
 t.test("lyra", t => {
-  t.plan(17);
+  t.plan(19);
 
   t.test("should correctly search for data", t => {
     t.plan(8);
@@ -150,6 +212,65 @@ t.test("lyra", t => {
 
     t.equal(result7.count, 2);
     t.equal(result8.count, 1);
+  });
+
+  t.test("should correctly search for data returning doc including with unindexed keys", t => {
+    t.plan(4);
+
+    const db = create({
+      schema: {
+        quote: "string",
+        author: "string",
+      },
+    });
+
+    const documentWithUnindexedField = {
+      quote: "I like cats. They are the best.",
+      author: "Jane Doe",
+      unindexedField: "unindexedValue",
+    };
+    const documentWithNestedUnindexedField = {
+      quote: "Foxes are nice animals. But I prefer having a dog.",
+      author: "John Doe",
+      nested: { unindexedNestedField: "unindexedNestedValue" },
+    };
+
+    insert(db, documentWithNestedUnindexedField);
+    insert(db, documentWithUnindexedField);
+
+    const result1 = search(db, { term: "They are the best" });
+    const result2 = search(db, { term: "Foxes are nice animals" });
+
+    t.equal(result1.count, 1);
+    t.equal(result2.count, 1);
+    t.same(result1.hits[0].document, documentWithUnindexedField);
+    t.same(result2.hits[0].document, documentWithNestedUnindexedField);
+  });
+
+  t.test("should not found any doc if searching by unindexed field value", t => {
+    t.plan(2);
+
+    const db = create({
+      schema: {
+        quote: "string",
+        author: "string",
+      },
+    });
+
+    insert(db, {
+      quote: "I like dogs. They are the best.",
+      author: "Jane Doe",
+      //@ts-expect-error test error case
+      nested: { unindexedNestedField: "unindexedNestedValue" },
+    });
+    //@ts-expect-error test error case
+    insert(db, { quote: "I like cats. They are the best.", author: "Jane Doe", unindexedField: "unindexedValue" });
+
+    const result1 = search(db, { term: "unindexedNestedValue" });
+    const result2 = search(db, { term: "unindexedValue" });
+
+    t.equal(result1.count, 0);
+    t.equal(result2.count, 0);
   });
 
   t.test("should correctly insert and retrieve data", t => {

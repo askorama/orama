@@ -216,7 +216,7 @@ function recursiveCheckDocSchema<S extends PropertiesSchema>(
 ): boolean {
   for (const key in newDoc) {
     if (!(key in schema)) {
-      return false;
+      continue;
     }
 
     const propType = typeof newDoc[key];
@@ -238,17 +238,27 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
   config: InsertConfig,
   prefix = "",
   tokenizerConfig: TokenizerConfigExec,
+  schema: PropertiesSchema = lyra.schema,
 ) {
   const { index, nodes, frequencies, tokenOccurrencies } = lyra;
 
   for (const key of Object.keys(doc)) {
     const isNested = typeof doc[key] === "object";
+    const isSchemaNested = typeof schema[key] == "object";
     const propName = `${prefix}${key}`;
-    if (isNested) {
-      recursiveTrieInsertion(lyra, doc[key] as ResolveSchema<S>, id, config, propName + ".", tokenizerConfig);
+    if (isNested && key in schema && isSchemaNested) {
+      recursiveTrieInsertion(
+        lyra,
+        doc[key] as ResolveSchema<S>,
+        id,
+        config,
+        propName + ".",
+        tokenizerConfig,
+        schema[key] as PropertiesSchema,
+      );
     }
 
-    if (typeof doc[key] === "string") {
+    if (typeof doc[key] === "string" && key in schema && !isSchemaNested) {
       // Use propName here because if doc is a nested object
       // We will get the wrong index
       const requestedTrie = index[propName];
