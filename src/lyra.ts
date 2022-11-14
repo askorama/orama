@@ -12,7 +12,6 @@ import {
   includes,
   insertSortedValue,
   intersectTokenScores,
-  reservedPropertyNames,
   sortTokenScorePredicate,
   uniqueId,
 } from "./utils";
@@ -196,10 +195,6 @@ async function hookRunner<S extends PropertiesSchema>(
 
 function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix = "") {
   for (const prop of Object.keys(schema)) {
-    if (includes(reservedPropertyNames, prop)) {
-      throw new Error(ERRORS.RESERVED_PROPERTY_NAME(prop));
-    }
-
     const propType = typeof prop;
     const isNested = typeof schema[prop] === "object";
 
