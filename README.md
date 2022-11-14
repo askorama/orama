@@ -40,6 +40,9 @@ Or import it directly in a browser module:
 
 See [builds](#builds) for details about the various builds packaged with Lyra.
 
+Read the complete documentation at
+[https://docs.lyrasearch.io/](https://docs.lyrasearch.io/).
+
 # Usage
 
 Lyra is quite simple to use. The first thing to do is to create a new database
@@ -129,17 +132,23 @@ word `if`, looking up in every schema property (AKA index):
 
 ```js
 {
-  elapsed: 99, // elapsed time is in microseconds
+  elapsed: 184541n, // Elapsed time in nanoseconds
   hits: [
     {
-      id: 'ckAOPGTA5qLXx0MgNr1Zy',
-      quote: 'If you really look closely, most overnight successes took a long time.',
-      author: 'Steve Jobs'
+      id: '41013877-56',
+      score: 0.025085832971998432,
+      document: {
+        quote: 'If you really look closely, most overnight successes took a long time.',
+        author: 'Steve Jobs'
+      }
     },
     {
-      id: 'fyl-_1veP78IO-wszP86Z',
-      quote: 'If you are not willing to risk the usual, you will have to settle for the ordinary.',
-      author: 'Jim Rohn'
+      id: '41013877-107',
+      score: 0.02315615351261394,
+      document: {
+        quote: 'If you are not willing to risk the usual, you will have to settle for the ordinary.',
+        author: 'Jim Rohn'
+      }
     }
   ],
   count: 2
@@ -159,12 +168,15 @@ Result:
 
 ```js
 {
-  elapsed: 111,
+  elapsed: 172166n,
   hits: [
     {
-      id: 'L1tpqQxc0c2djrSN2a6TJ',
-      quote: "You miss 100% of the shots you don't take",
-      author: 'Wayne Gretzky - Michael Scott'
+      id: '41045799-144',
+      score: 0.12041199826559248,
+      document: {
+        quote: "You miss 100% of the shots you don't take",
+        author: 'Wayne Gretzky - Michael Scott'
+      }
     }
   ],
   count: 1
@@ -174,7 +186,22 @@ Result:
 If needed, you can also delete a given document by using the `remove` method:
 
 ```js
-remove(db, "L1tpqQxc0c2djrSN2a6TJ");
+remove(db, "41045799-144");
+```
+
+Lyra exposes a built-in `formatNanoseconds` function to format the elapsed time
+in a human-readable format:
+
+```js
+import { formatNanoseconds } from "@lyrasearch/lyra";
+
+const searchResult = search(db, {
+  term: "if",
+  properties: "*",
+});
+
+console.log(`Search took ${formatNanoseconds(searchResult.elapsed)}`);
+// Search took 164μs
 ```
 
 ## Language

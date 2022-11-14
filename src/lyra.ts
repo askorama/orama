@@ -1,21 +1,40 @@
-import type { ResolveSchema, SearchProperties } from "./types";
-import * as ERRORS from "./errors";
-import { Tokenizer, tokenize } from "./tokenizer";
-import { getNanosecondsTime, uniqueId, reservedPropertyNames, includes } from "./utils";
-import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import { stemmer } from "../stemmer/lib/en";
-import { create as createNode, Node } from "./prefix-tree/node";
-import { find as trieFind, insert as trieInsert, removeDocumentByWord, Nodes } from "./prefix-tree/trie";
+import * as ERRORS from "./errors";
 import { trackInsertion } from "./insertion-checker";
+import { create as createNode, Node } from "./prefix-tree/node";
+import { find as trieFind, insert as trieInsert, Nodes, removeDocumentByWord } from "./prefix-tree/trie";
+import { tokenize, Tokenizer } from "./tokenizer";
+import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
-import { intersectMany } from "./utils";
+import type { ResolveSchema, SearchProperties } from "./types";
+import {
+  getNanosecondsTime,
+  includes,
+  insertSortedValue,
+  intersectTokenScores,
+  sortTokenScorePredicate,
+  uniqueId,
+} from "./utils";
 
+export type TokenScore = [string, number];
 type Index = Record<string, Node>;
-type TokenMap = Record<string, string[]>;
+type TokenMap = Record<string, TokenScore[]>;
 type IndexMap = Record<string, TokenMap>;
+type FrequencyMap = {
+  [property: string]: {
+    [documentID: string]: {
+      [token: string]: number;
+    };
+  };
+};
+type TokenOccurrency = {
+  [property: string]: {
+    [token: string]: number;
+  };
+};
 
-export { formatNanoseconds } from "./utils";
 export { tokenize } from "./tokenizer";
+export { formatNanoseconds } from "./utils";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -70,6 +89,8 @@ export type Data<S extends PropertiesSchema> = {
   index: Index;
   nodes: Nodes;
   schema: S;
+  frequencies: FrequencyMap;
+  tokenOccurrencies: TokenOccurrency;
 };
 
 export interface Lyra<S extends PropertiesSchema> extends Data<S> {
@@ -78,6 +99,7 @@ export interface Lyra<S extends PropertiesSchema> extends Data<S> {
   edge: boolean;
   hooks: Hooks;
   tokenizer?: TokenizerConfig;
+  frequencies: FrequencyMap;
 }
 
 export type InsertConfig = {
@@ -131,11 +153,19 @@ export type SearchResult<S extends PropertiesSchema> = {
   elapsed: bigint;
 };
 
-export type RetrievedDoc<S extends PropertiesSchema> = ResolveSchema<S> & {
+export type RetrievedDoc<S extends PropertiesSchema> = {
   /**
    * The id of the document.
    */
   id: string;
+  /**
+   * The score of the document in the search.
+   */
+  score: number;
+  /**
+   * The document
+   */
+  document: ResolveSchema<S>;
 };
 
 function validateHooks(hooks?: Hooks): void | never {
@@ -158,18 +188,13 @@ async function hookRunner<S extends PropertiesSchema>(
   ...args: unknown[]
 ): Promise<void> {
   const hooks = Array.isArray(funcs) ? funcs : [funcs];
-  for(let i = 0; i < hooks.length; i++) {
+  for (let i = 0; i < hooks.length; i++) {
     await hooks[i].apply(this, args);
-
   }
 }
 
 function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix = "") {
   for (const prop of Object.keys(schema)) {
-    if (includes(reservedPropertyNames, prop)) {
-      throw new Error(ERRORS.RESERVED_PROPERTY_NAME(prop));
-    }
-
     const propType = typeof prop;
     const isNested = typeof schema[prop] === "object";
 
@@ -191,7 +216,7 @@ function recursiveCheckDocSchema<S extends PropertiesSchema>(
 ): boolean {
   for (const key in newDoc) {
     if (!(key in schema)) {
-      return false;
+      continue;
     }
 
     const propType = typeof newDoc[key];
@@ -207,28 +232,69 @@ function recursiveCheckDocSchema<S extends PropertiesSchema>(
 }
 
 function recursiveTrieInsertion<S extends PropertiesSchema>(
-  index: Index,
-  nodes: Nodes,
+  lyra: Lyra<S>,
   doc: ResolveSchema<S>,
   id: string,
   config: InsertConfig,
   prefix = "",
   tokenizerConfig: TokenizerConfigExec,
+  schema: PropertiesSchema = lyra.schema,
 ) {
+  const { index, nodes, frequencies, tokenOccurrencies } = lyra;
+
   for (const key of Object.keys(doc)) {
     const isNested = typeof doc[key] === "object";
+    const isSchemaNested = typeof schema[key] == "object";
     const propName = `${prefix}${key}`;
-    if (isNested) {
-      recursiveTrieInsertion(index, nodes, doc[key] as ResolveSchema<S>, id, config, propName + ".", tokenizerConfig);
+    if (isNested && key in schema && isSchemaNested) {
+      recursiveTrieInsertion(
+        lyra,
+        doc[key] as ResolveSchema<S>,
+        id,
+        config,
+        propName + ".",
+        tokenizerConfig,
+        schema[key] as PropertiesSchema,
+      );
     }
 
-    if (typeof doc[key] === "string") {
+    if (typeof doc[key] === "string" && key in schema && !isSchemaNested) {
       // Use propName here because if doc is a nested object
       // We will get the wrong index
       const requestedTrie = index[propName];
       const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language, false, tokenizerConfig);
 
+      if (!(propName in frequencies)) {
+        frequencies[propName] = {};
+      }
+
+      if (!(propName in tokenOccurrencies)) {
+        tokenOccurrencies[propName] = {};
+      }
+
+      if (!(id in frequencies[propName])) {
+        frequencies[propName][id] = {};
+      }
+
       for (const token of tokens) {
+        let tokenFrequency = 0;
+
+        for (const t of tokens) {
+          if (t === token) {
+            tokenFrequency++;
+          }
+        }
+
+        const tf = tokenFrequency / tokens.length;
+
+        frequencies[propName][id][token] = tf;
+
+        if (!(token in tokenOccurrencies[propName])) {
+          tokenOccurrencies[propName][token] = 0;
+        }
+
+        tokenOccurrencies[propName][token]++;
+
         trieInsert(nodes, requestedTrie, token, id);
       }
     }
@@ -263,12 +329,12 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
   params: SearchParams<S> & { index: string },
 ): string[] {
   const idx = lyra.index[params.index];
-
   const searchResult = trieFind(lyra.nodes, idx, {
     term: params.term,
     exact: params.exact,
     tolerance: params.tolerance,
   });
+
   const ids = new Set<string>();
 
   for (const key in searchResult) {
@@ -310,7 +376,7 @@ function assertDocSchema<S extends PropertiesSchema>(doc: ResolveSchema<S>, lyra
 export function create<S extends PropertiesSchema>(properties: Configuration<S>): Lyra<S> {
   const defaultLanguage = (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
-  assertSupportedLanguage(defaultLanguage)
+  assertSupportedLanguage(defaultLanguage);
 
   validateHooks(properties.hooks);
 
@@ -323,6 +389,8 @@ export function create<S extends PropertiesSchema>(properties: Configuration<S>)
     hooks: properties.hooks || {},
     edge: properties.edge ?? false,
     tokenizer: defaultTokenizerConfig(defaultLanguage, properties.tokenizer!),
+    frequencies: {},
+    tokenOccurrencies: {},
   };
 
   buildIndex(instance, properties.schema);
@@ -349,12 +417,12 @@ export function insert<S extends PropertiesSchema>(
   config = { language: lyra.defaultLanguage, ...config };
   const id = uniqueId();
 
-  assertSupportedLanguage(config.language)
+  assertSupportedLanguage(config.language);
 
-  assertDocSchema(doc, lyra.schema)
+  assertDocSchema(doc, lyra.schema);
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
+  recursiveTrieInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
 
   return { id };
@@ -380,12 +448,12 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   config = { language: lyra.defaultLanguage, ...config };
   const id = uniqueId();
 
-  assertSupportedLanguage(config.language)
+  assertSupportedLanguage(config.language);
 
-  assertDocSchema(doc, lyra.schema)
+  assertDocSchema(doc, lyra.schema);
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra.index, lyra.nodes, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
+  recursiveTrieInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
   if (lyra.hooks.afterInsert) {
     await hookRunner.call(lyra, lyra.hooks.afterInsert, id);
@@ -462,25 +530,29 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
   }
 
   const document = lyra.docs[docID] || ({} as Record<string, ResolveSchema<S>>);
+  const documentKeys = Object.keys(document || {});
 
-  const documentKeys = Object.keys(document || {})
-
-  for(let i = 0; i < documentKeys.length; i++) {
+  const documentKeysLength = documentKeys.length;
+  for (let i = 0; i < documentKeysLength; i++) {
     const key = documentKeys[i];
 
     const propertyType = lyra.schema[key];
 
     if (propertyType === "string") {
       const idx = lyra.index[key];
-      const tokens = lyra.tokenizer.tokenizerFn!(
+      const tokens: string[] = lyra.tokenizer.tokenizerFn!(
         document[key] as string,
         lyra.defaultLanguage,
         false,
         lyra.tokenizer!,
       )!;
 
-      for(let k = 0; k < tokens.length; k++) {
-        const token = tokens[k]
+      const tokensLength = tokens.length;
+      for (let k = 0; k < tokensLength; k++) {
+        const token = tokens[k];
+        delete lyra.frequencies[key][docID];
+        lyra.tokenOccurrencies[key][token]--;
+
         if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
           throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
         }
@@ -518,18 +590,21 @@ export function search<S extends PropertiesSchema>(
     lyra.tokenizer = defaultTokenizerConfig(language);
   }
 
-  const tokens = lyra.tokenizer.tokenizerFn!(params.term, language, false, lyra.tokenizer);
-  const indices = getIndices(lyra, params.properties);
-  const { limit = 10, offset = 0, exact = false } = params;
-  const results: RetrievedDoc<S>[] = new Array(limit);
+  const { limit = 10, offset = 0, exact = false, term, properties } = params;
+  const tokens = lyra.tokenizer.tokenizerFn!(term, language, false, lyra.tokenizer);
+  const indices = getIndices(lyra, properties);
+  const results: RetrievedDoc<S>[] = Array.from({
+    length: limit,
+  });
 
   const timeStart = getNanosecondsTime();
   // uniqueDocsIDs contains unique document IDs for all the tokens in all the indices.
-  const uniqueDocsIDs: Set<string> = new Set();
+  const uniqueDocsIDs: Map<string, number> = new Map();
+
   // indexMap is an object containing all the indexes considered for the current search,
   // and an array of doc IDs for each token in all the indices.
   //
-  // Give the search term "quick brown fox" on the "description" index,
+  // Given the search term "quick brown fox" on the "description" index,
   // indexMap will look like this:
   //
   // {
@@ -560,41 +635,78 @@ export function search<S extends PropertiesSchema>(
     docsIntersection[index] = [];
   }
 
+  const N = Object.keys(lyra.docs).length;
+
   // Now it's time to loop over all the indices and get the documents IDs for every single term
-  for (const index of indices) {
-    for (const term of tokens) {
+  const indexesLength = indices.length;
+  for (let i = 0; i < indexesLength; i++) {
+    const index = indices[i];
+    const lyraOccurrencies = lyra.tokenOccurrencies[index];
+    const lyraFrequencies = lyra.frequencies[index];
+
+    const tokensLength = tokens.length;
+    for (let j = 0; j < tokensLength; j++) {
+      const term = tokens[j];
       const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
-      indexMap[index][term].push(...documentIDs);
+      const termOccurrencies = lyraOccurrencies[term];
+      const orderedTFIDFList: TokenScore[] = [];
+
+      // Calculate TF-IDF value for each term, in each document, for each index.
+      // Then insert sorted results into orderedTFIDFList.
+      const documentIDsLength = documentIDs.length;
+      for (let k = 0; k < documentIDsLength; k++) {
+        const id = documentIDs[k];
+        const idf = Math.log10(N / termOccurrencies);
+        const tfIdf = idf * (lyraFrequencies?.[id]?.[term] ?? 0);
+
+        // @todo: we're now using binary search to insert the element in the right position.
+        // Maybe we can switch to sparse array insertion?
+        insertSortedValue(orderedTFIDFList, [id, tfIdf], sortTokenScorePredicate);
+      }
+
+      indexMap[index][term].push(...orderedTFIDFList);
     }
 
     const docIds = indexMap[index];
     const vals = Object.values(docIds);
-    docsIntersection[index] = intersectMany(vals);
-    for (const id of Object.values(docsIntersection[index])) {
-      uniqueDocsIDs.add(id);
+    docsIntersection[index] = intersectTokenScores(vals);
+
+    const uniqueDocs = Object.values(docsIntersection[index]);
+    const uniqueDocsLength = uniqueDocs.length;
+    for (let i = 0; i < uniqueDocsLength; i++) {
+      const [id, tfIdfScore] = uniqueDocs[i];
+
+      if (uniqueDocsIDs.has(id)) {
+        const prevScore = uniqueDocsIDs.get(id)!;
+        uniqueDocsIDs.set(id, prevScore + tfIdfScore);
+      } else {
+        uniqueDocsIDs.set(id, tfIdfScore);
+      }
     }
   }
 
-  // Convert uniqueDocsIDs to array to access its elements by index
-  const uniqueDocsIDsArray = Array.from(uniqueDocsIDs);
+  // Get unique doc IDs from uniqueDocsIDs map, sorted by value.
+  const uniqueDocsArray = Array.from(uniqueDocsIDs.entries()).sort(sortTokenScorePredicate);
   const resultIDs: Set<string> = new Set();
 
   // We already have the list of ALL the document IDs containing the search terms.
   // We loop over them starting from a positional value "offset" and ending at "offset + limit"
   // to provide pagination capabilities to the search.
   for (let i = offset; i < limit + offset; i++) {
-    const id = uniqueDocsIDsArray[i];
+    const idAndScore = uniqueDocsArray[i];
 
     // If there are no more results, just break the loop
-    if (typeof id === "undefined") {
+    if (typeof idAndScore === "undefined") {
       break;
     }
+
+    const [id, score] = idAndScore;
 
     if (!resultIDs.has(id)) {
       // We retrieve the full document only AFTER making sure that we really want it.
       // We never retrieve the full document preventively.
       const fullDoc = lyra.docs[id]!;
-      results[i] = { id, ...fullDoc };
+      results[i] = { id, score, document: fullDoc };
       resultIDs.add(id);
     }
   }
@@ -614,10 +726,15 @@ export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
     docs: lyra.docs,
     nodes: lyra.nodes,
     schema: lyra.schema,
+    frequencies: lyra.frequencies,
+    tokenOccurrencies: lyra.tokenOccurrencies,
   };
 }
 
-export function load<S extends PropertiesSchema>(lyra: Lyra<S>, { index, docs, nodes, schema }: Data<S>) {
+export function load<S extends PropertiesSchema>(
+  lyra: Lyra<S>,
+  { index, docs, nodes, schema, frequencies, tokenOccurrencies }: Data<S>,
+) {
   if (!lyra.edge) {
     throw new Error(ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("load"));
   }
@@ -626,6 +743,8 @@ export function load<S extends PropertiesSchema>(lyra: Lyra<S>, { index, docs, n
   lyra.docs = docs;
   lyra.nodes = nodes;
   lyra.schema = schema;
+  lyra.frequencies = frequencies;
+  lyra.tokenOccurrencies = tokenOccurrencies;
 }
 
 export function defaultTokenizerConfig(language: Language, tokenizerConfig: TokenizerConfig = {}): TokenizerConfigExec {
@@ -671,7 +790,7 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
         // Check if the custom step-words is an array.
         // If it's an object, throw an exception. If the array contains any non-string value, throw an exception.
         case "object":
-          if(!Array.isArray(tokenizerConfig.customStopWords)) {
+          if (!Array.isArray(tokenizerConfig.customStopWords)) {
             throw Error(ERRORS.CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY());
           }
           customStopWords = tokenizerConfig.customStopWords as string[];

@@ -44,10 +44,6 @@ export function GETTER_SETTER_WORKS_ON_EDGE_ONLY(method: string): string {
   return `${method} works on edge only. Use edge: true in Lyra constructor to enable it.`;
 }
 
-export function RESERVED_PROPERTY_NAME(name: string): string {
-  return `"${name}" is a reserved property name. Please change it to "__${name}", "${name}__", "_${name}_", or similar.`;
-}
-
 export function INVALID_HOOKS_OBJECT(): string {
   return "Invalid hooks object";
 }

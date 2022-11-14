@@ -4,8 +4,10 @@
  * Re-generate by setting TAP_SNAPSHOT=1 and running tests.
  * Make sure to inspect the output below.  Do not ignore changes!
  */
-'use strict'
-exports[`tests/trie.test.ts TAP trie should correctly find an element by prefix > should correctly find an element by prefix 1`] = `
+"use strict";
+exports[
+  `tests/trie.test.ts TAP trie should correctly find an element by prefix > should correctly find an element by prefix 1`
+] = `
 Object {
   "the quick, brown fox": Array [
     "1",
@@ -20,4 +22,4 @@ Object {
     "6",
   ],
 }
-`
+`;
