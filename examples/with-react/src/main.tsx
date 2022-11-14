@@ -8,5 +8,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <div className="flex w-full justify-center font-sans">
       <App />
     </div>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

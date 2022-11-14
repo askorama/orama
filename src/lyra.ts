@@ -1,14 +1,21 @@
-import type { ResolveSchema, SearchProperties } from "./types";
-import * as ERRORS from "./errors";
-import { Tokenizer, tokenize } from "./tokenizer";
-import { getNanosecondsTime, uniqueId, reservedPropertyNames, includes } from "./utils";
-import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import { stemmer } from "../stemmer/lib/en";
-import { create as createNode, Node } from "./prefix-tree/node";
-import { find as trieFind, insert as trieInsert, removeDocumentByWord, Nodes } from "./prefix-tree/trie";
+import * as ERRORS from "./errors";
 import { trackInsertion } from "./insertion-checker";
+import { create as createNode, Node } from "./prefix-tree/node";
+import { find as trieFind, insert as trieInsert, Nodes, removeDocumentByWord } from "./prefix-tree/trie";
+import { tokenize, Tokenizer } from "./tokenizer";
+import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
-import { intersectTokenScores, insertSortedValue, sortTokenScorePredicate } from "./utils";
+import type { ResolveSchema, SearchProperties } from "./types";
+import {
+  getNanosecondsTime,
+  includes,
+  insertSortedValue,
+  intersectTokenScores,
+  reservedPropertyNames,
+  sortTokenScorePredicate,
+  uniqueId,
+} from "./utils";
 
 export type TokenScore = [string, number];
 type Index = Record<string, Node>;
@@ -27,8 +34,8 @@ type TokenOccurrency = {
   };
 };
 
-export { formatNanoseconds } from "./utils";
 export { tokenize } from "./tokenizer";
+export { formatNanoseconds } from "./utils";
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -147,11 +154,19 @@ export type SearchResult<S extends PropertiesSchema> = {
   elapsed: bigint;
 };
 
-export type RetrievedDoc<S extends PropertiesSchema> = ResolveSchema<S> & {
+export type RetrievedDoc<S extends PropertiesSchema> = {
   /**
    * The id of the document.
    */
   id: string;
+  /**
+   * The score of the document in the search.
+   */
+  score: number;
+  /**
+   * The document
+   */
+  document: ResolveSchema<S>;
 };
 
 function validateHooks(hooks?: Hooks): void | never {
@@ -666,27 +681,27 @@ export function search<S extends PropertiesSchema>(
   }
 
   // Get unique doc IDs from uniqueDocsIDs map, sorted by value.
-  const uniqueDocsIDsArray = Array.from(uniqueDocsIDs.entries())
-    .sort(sortTokenScorePredicate)
-    .map(([id]) => id);
+  const uniqueDocsArray = Array.from(uniqueDocsIDs.entries()).sort(sortTokenScorePredicate);
   const resultIDs: Set<string> = new Set();
 
   // We already have the list of ALL the document IDs containing the search terms.
   // We loop over them starting from a positional value "offset" and ending at "offset + limit"
   // to provide pagination capabilities to the search.
   for (let i = offset; i < limit + offset; i++) {
-    const id = uniqueDocsIDsArray[i];
+    const idAndScore = uniqueDocsArray[i];
 
     // If there are no more results, just break the loop
-    if (typeof id === "undefined") {
+    if (typeof idAndScore === "undefined") {
       break;
     }
+
+    const [id, score] = idAndScore;
 
     if (!resultIDs.has(id)) {
       // We retrieve the full document only AFTER making sure that we really want it.
       // We never retrieve the full document preventively.
       const fullDoc = lyra.docs[id]!;
-      results[i] = { id, ...fullDoc };
+      results[i] = { id, score, document: fullDoc };
       resultIDs.add(id);
     }
   }

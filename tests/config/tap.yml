@@ -5,3 +5,4 @@ reporter: spec
 coverage: false
 node-arg:
   - --loader=ts-node/esm
+  - --no-warnings=loader
