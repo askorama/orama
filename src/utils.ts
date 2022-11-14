@@ -53,8 +53,6 @@ export function uniqueId(): string {
   return `${baseId}-${lastId++}`;
 }
 
-export const reservedPropertyNames = ["id"];
-
 export function getOwnProperty<T = unknown>(object: Record<string, T>, property: string): T | undefined {
   return Object.hasOwn(object, property) ? object[property] : undefined;
 }
@@ -117,11 +115,11 @@ export function intersectTokenScores(arrays: TokenScore[][]): TokenScore[] {
   return result;
 }
 
-function defaultCompareFn(a: any, b: any) {
-  return a - b;
-}
-
-export function insertSortedValue<T = unknown>(arr: T[], el: T, compareFn = defaultCompareFn): T[] {
+export function insertSortedValue(
+  arr: TokenScore[],
+  el: TokenScore,
+  compareFn = sortTokenScorePredicate,
+): TokenScore[] {
   let low = 0;
   let high = arr.length;
   let mid;
@@ -150,10 +148,5 @@ export function includes<T>(array: T[] | readonly T[], element: T): boolean {
 }
 
 export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
-  if (a[1] > b[1]) {
-    return -1;
-  } else if (a[1] < b[1]) {
-    return 1;
-  }
-  return 0;
+  return b[1] - a[1];
 }

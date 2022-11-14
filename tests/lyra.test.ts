@@ -1,5 +1,14 @@
 import t from "tap";
-import { create, insert, remove, search, insertBatch, insertWithHooks } from "../src/lyra";
+import {
+  create,
+  insert,
+  insertBatch,
+  insertWithHooks,
+  PropertiesSchema,
+  remove,
+  RetrievedDoc,
+  search,
+} from "../src/lyra";
 
 import type { RetrievedDoc, PropertiesSchema } from "../src/lyra";
 
@@ -63,21 +72,7 @@ t.test("defaultLanguage", t => {
 });
 
 t.test("checkInsertDocSchema", t => {
-  t.plan(4);
-
-  t.test("should not allow insertion of reserved property names", t => {
-    t.plan(1);
-
-    try {
-      create({
-        schema: {
-          id: "string",
-        },
-      });
-    } catch (e) {
-      t.matchSnapshot(e, `${t.name}_1`);
-    }
-  });
+  t.plan(1);
 
   t.test("should compare the inserted doc with the schema definition", t => {
     t.plan(2);
@@ -303,7 +298,7 @@ t.test("lyra", t => {
     t.ok(ex1Insert.id);
     t.equal(ex1Search.count, 1);
     t.ok(ex1Search.elapsed);
-    t.equal(ex1Search.hits[0].example, "The quick, brown, fox");
+    t.equal(ex1Search.hits[0].document.example, "The quick, brown, fox");
   });
 
   t.test("should correctly paginate results", t => {
@@ -328,17 +323,17 @@ t.test("lyra", t => {
     const search4 = search(db, { term: "f", limit: 2, offset: 2 });
 
     t.equal(search1.count, 4);
-    t.equal(search1.hits[0].animal, "Quick brown fox");
+    t.equal(search1.hits[0].document.animal, "Quick brown fox");
 
     t.equal(search2.count, 4);
-    t.equal(search2.hits[0].animal, "Fast chicken");
+    t.equal(search2.hits[0].document.animal, "Fast chicken");
 
     t.equal(search3.count, 4);
-    t.equal(search3.hits[0].animal, "Fabolous ducks");
+    t.equal(search3.hits[0].document.animal, "Fabolous ducks");
 
     t.equal(search4.count, 4);
-    t.equal(search4.hits[0].animal, "Fabolous ducks");
-    t.equal(search4.hits[1].animal, "Fantastic horse");
+    t.equal(search4.hits[0].document.animal, "Fabolous ducks");
+    t.equal(search4.hits[1].document.animal, "Fantastic horse");
   });
 
   t.test("Should throw an error when searching in non-existing indices", t => {
@@ -389,8 +384,11 @@ t.test("lyra", t => {
 
     t.ok(res);
     t.equal(searchResult.count, 1);
-    t.equal(searchResult.hits[0].author, "Oscar Wilde");
-    t.equal(searchResult.hits[0].quote, "To live is the rarest thing in the world. Most people exist, that is all.");
+    t.equal(searchResult.hits[0].document.author, "Oscar Wilde");
+    t.equal(
+      searchResult.hits[0].document.quote,
+      "To live is the rarest thing in the world. Most people exist, that is all.",
+    );
     t.equal(searchResult.hits[0].id, id2);
   });
 
@@ -451,7 +449,7 @@ t.test("lyra", t => {
     });
 
     t.ok(testSearch1);
-    t.equal(testSearch1.hits[0].title, "Harry Potter and the Philosopher's Stone");
+    t.equal(testSearch1.hits[0].document.title, "Harry Potter and the Philosopher's Stone");
 
     t.ok(testSearch2);
     t.equal(testSearch2.count, 0);
@@ -544,13 +542,13 @@ t.test("lyra", t => {
 
     t.ok(res);
     t.equal(searchResult.count, 1);
-    t.equal(searchResult.hits[0].author, "Oscar Wilde");
-    t.equal(searchResult.hits[0].quote, "Be yourself; everyone else is already taken.");
+    t.equal(searchResult.hits[0].document.author, "Oscar Wilde");
+    t.equal(searchResult.hits[0].document.quote, "Be yourself; everyone else is already taken.");
     t.equal(searchResult.hits[0].id, id2);
 
     t.equal(searchResult2.count, 1);
-    t.equal(searchResult2.hits[0].author, "Oscar Wilde");
-    t.equal(searchResult2.hits[0].quote, "Be yourself; everyone else is already taken.");
+    t.equal(searchResult2.hits[0].document.author, "Oscar Wilde");
+    t.equal(searchResult2.hits[0].document.quote, "Be yourself; everyone else is already taken.");
     t.equal(searchResult2.hits[0].id, id2);
   });
 
@@ -585,7 +583,7 @@ t.test("lyra", t => {
     });
 
     t.equal(searchResult.count, 1);
-    t.equal(searchResult.hits[0].author, "Frank Zappa");
+    t.equal(searchResult.hits[0].document.author, "Frank Zappa");
   });
 
   t.test("Should exact match", t => {
@@ -616,8 +614,8 @@ t.test("lyra", t => {
     });
 
     t.equal(exactSearch.count, 1);
-    t.equal(exactSearch.hits[0].quote, "Be yourself; everyone else is already taken.");
-    t.equal(exactSearch.hits[0].author, "Oscar Wilde");
+    t.equal(exactSearch.hits[0].document.quote, "Be yourself; everyone else is already taken.");
+    t.equal(exactSearch.hits[0].document.author, "Oscar Wilde");
   });
 
   t.test("Shouldn't tolerate typos", t => {
@@ -821,7 +819,7 @@ t.test("lyra", t => {
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const docs = require("./datasets/events.json").result.events.slice(0, 4000);
-    const wrongSchemaDocs = docs.map((doc: any) => ({
+    const wrongSchemaDocs = docs.map((doc: RetrievedDoc<PropertiesSchema>) => ({
       ...doc,
       date: +new Date(),
     }));
