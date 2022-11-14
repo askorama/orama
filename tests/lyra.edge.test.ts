@@ -34,7 +34,7 @@ t.test("Edge getters", t => {
     t.ok(trieContains(db.nodes, nameIndex, "jane"));
   });
 
-  t.skip("should correctly enable edge docs getter", t => {
+  t.test("should correctly enable edge docs getter", t => {
     t.plan(2);
 
     const db = create({

@@ -87,7 +87,7 @@ export function intersectTokenScores(arrays: TokenScore[][]): TokenScore[] {
 
   const set: Map<string, [number, number]> = new Map();
   for (const elem of arrays[0]) {
-    set.set(elem[0] ?? "", [1, elem[1]]);
+    set.set(elem[0], [1, elem[1]]);
   }
 
   const arrLength = arrays.length;
@@ -117,18 +117,11 @@ export function intersectTokenScores(arrays: TokenScore[][]): TokenScore[] {
   return result;
 }
 
-export function insertSortedValue<T = unknown>(arr: T[], el: T, compareFn?: (a: T, b: T) => number): T[] {
-  if (!compareFn) {
-    compareFn = (a, b) => {
-      if (a < b) {
-        return -1;
-      } else if (a > b) {
-        return 1;
-      }
-      return 0;
-    };
-  }
+function defaultCompareFn(a: any, b: any) {
+  return a - b;
+}
 
+export function insertSortedValue<T = unknown>(arr: T[], el: T, compareFn = defaultCompareFn): T[] {
   let low = 0;
   let high = arr.length;
   let mid;

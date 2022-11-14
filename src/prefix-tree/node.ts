@@ -31,7 +31,7 @@ export function updateParent(node: Node, parent: Node): void {
 }
 
 export function removeDocument(node: Node, docID: string): boolean {
-  const index = node.docs.findIndex(doc => doc === docID);
+  const index = node.docs.indexOf(docID);
 
   /* c8 ignore next 3 */
   if (index === -1) {
