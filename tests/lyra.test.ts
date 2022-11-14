@@ -10,13 +10,6 @@ import {
   search,
 } from "../src/lyra";
 
-import type { RetrievedDoc, PropertiesSchema } from "../src/lyra";
-
-function unwrapDoc<T extends PropertiesSchema>(resultDoc: RetrievedDoc<T>) {
-  const { id: _, ...documentResult } = resultDoc;
-  return documentResult;
-}
-
 t.test("defaultLanguage", t => {
   t.plan(3);
 
@@ -72,7 +65,7 @@ t.test("defaultLanguage", t => {
 });
 
 t.test("checkInsertDocSchema", t => {
-  t.plan(1);
+  t.plan(3);
 
   t.test("should compare the inserted doc with the schema definition", t => {
     t.plan(2);
@@ -250,8 +243,8 @@ t.test("lyra", t => {
 
     t.equal(result1.count, 1);
     t.equal(result2.count, 1);
-    t.same(unwrapDoc(result1.hits[0]), documentWithUnindexedField);
-    t.same(unwrapDoc(result2.hits[0]), documentWithNestedUnindexedField);
+    t.same(result1.hits[0].document, documentWithUnindexedField);
+    t.same(result2.hits[0].document, documentWithNestedUnindexedField);
   });
 
   t.test("should not found any doc if searching by unindexed field value", t => {
