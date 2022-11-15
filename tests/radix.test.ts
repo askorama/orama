@@ -152,3 +152,49 @@ t.test("radix tree", t => {
     });
   });
 });
+
+t.test("test from trie for compatibility", t => {
+  t.plan(3);
+
+  t.test("should correctly index phrases into a prefix tree", t => {
+    t.plan(phrases.length);
+
+    const trie = createNode();
+
+    for (const { doc, id } of phrases) {
+      radixInsert(trie, doc, id);
+    }
+
+    for (const phrase of phrases) {
+      t.ok(radixContains(trie, phrase.doc));
+    }
+  });
+
+  t.test("should correctly find an element by prefix", t => {
+    t.plan(2);
+
+    const trie = createNode();
+
+    for (const { doc, id } of phrases) {
+      radixInsert(trie, doc, id);
+    }
+
+    t.strictSame(radixFind(trie, { term: phrases[5].doc.slice(0, 5) }), { [phrases[5].doc]: [phrases[5].id] });
+    t.matchSnapshot(radixFind(trie, { term: "th" }), t.name);
+  });
+
+  t.test("should correctly delete a word from the trie", t => {
+    t.plan(2);
+
+    const trie = createNode();
+
+    for (const { doc, id } of phrases) {
+      radixInsert(trie, doc, id);
+    }
+
+    radixRemoveWord(trie, phrases[0].doc);
+
+    t.notOk(radixContains(trie, phrases[0].doc));
+    t.strictSame(radixFind(trie, { term: phrases[0].doc }), {});
+  });
+});
