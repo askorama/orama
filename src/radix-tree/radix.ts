@@ -112,31 +112,31 @@ export function find(root: Node, { term, exact, tolerance }: FindParams) {
   return output;
 }
 
-function findAllWords(node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
+function findAllWords(node: Node, output: FindResult, word: string, exact?: boolean, tolerance?: number) {
   if (node.end) {
-    const { word, docs: docIDs } = node;
+    const { word: nodeWord, docs: docIDs } = node;
     // always check in own property to prevent access to inherited properties
     // fix https://github.com/LyraSearch/lyra/issues/137
-    if (!Object.hasOwn(output, term)) {
+    if (!Object.hasOwn(output, word)) {
       if (tolerance) {
         // computing the absolute difference of letters between the term and the word
-        const difference = Math.abs(term.length - word.length);
+        const difference = Math.abs(word.length - nodeWord.length);
 
         // if the tolerance is set, check whether the edit distance is within tolerance.
         // In that case, we don't need to add the word to the output
-        if (difference <= tolerance && boundedLevenshtein(term, word, tolerance).isBounded) {
-          output[term] = [];
+        if (difference <= tolerance && boundedLevenshtein(word, nodeWord, tolerance).isBounded) {
+          output[word] = [];
         }
       } else {
         // prevent default tolerance not set
-        output[term] = [];
+        output[word] = [];
       }
     }
     // check if _output[word] exists and then add the doc to it
     // always check in own property to prevent access to inherited properties
     // fix https://github.com/LyraSearch/lyra/issues/137
-    if (getOwnProperty(output, term) && docIDs.length) {
-      output[term] = Array.from(new Set(docIDs));
+    if (getOwnProperty(output, word) && docIDs.length) {
+      output[word] = Array.from(new Set(docIDs));
     }
   }
 
@@ -145,7 +145,7 @@ function findAllWords(node: Node, output: FindResult, term: string, exact?: bool
   }
 
   for (const character of Object.keys(node.children)) {
-    findAllWords(node.children[character], output, term.concat(node.children[character].word), exact, tolerance);
+    findAllWords(node.children[character], output, word.concat(node.children[character].word), exact, tolerance);
   }
   return output;
 }
