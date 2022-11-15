@@ -641,6 +641,9 @@ export function search<S extends PropertiesSchema>(
   const indexesLength = indices.length;
   for (let i = 0; i < indexesLength; i++) {
     const index = indices[i];
+
+    if (!(index in lyra.tokenOccurrencies)) continue;
+
     const lyraOccurrencies = lyra.tokenOccurrencies[index];
     const lyraFrequencies = lyra.frequencies[index];
 
