@@ -4,10 +4,8 @@
  * Re-generate by setting TAP_SNAPSHOT=1 and running tests.
  * Make sure to inspect the output below.  Do not ignore changes!
  */
-"use strict";
-exports[
-  `tests/lyra.test.ts TAP checkInsertDocSchema should compare the inserted doc with the schema definition > should compare the inserted doc with the schema definition - 1 1`
-] = `
+'use strict'
+exports[`tests/lyra.test.ts TAP checkInsertDocSchema should compare the inserted doc with the schema definition > should compare the inserted doc with the schema definition - 1 1`] = `
 Error: Invalid document structure. 
 Lyra has been initialized with the following schema: 
 
@@ -22,57 +20,9 @@ but found the following doc:
   "quote": "hello, world!",
   "author": true
 }
-`;
+`
 
-exports[
-  `tests/lyra.test.ts TAP checkInsertDocSchema should compare the inserted doc with the schema definition > should compare the inserted doc with the schema definition - 2 1`
-] = `
-Error: Invalid document structure. 
-Lyra has been initialized with the following schema: 
-
-{
-  "quote": "string",
-  "author": "string"
-}
-
-but found the following doc:
-
-{
-  "quote": "hello, world!",
-  "authors": "author should be singular"
-}
-`;
-
-exports[
-  `tests/lyra.test.ts TAP checkInsertDocSchema should compare the inserted doc with the schema definition > should compare the inserted doc with the schema definition - 3 1`
-] = `
-Error: Invalid document structure. 
-Lyra has been initialized with the following schema: 
-
-{
-  "quote": "string",
-  "author": "string"
-}
-
-but found the following doc:
-
-{
-  "quote": "hello, world!",
-  "foo": {
-    "bar": 10
-  }
-}
-`;
-
-exports[
-  `tests/lyra.test.ts TAP checkInsertDocSchema should not allow insertion of reserved property names > should not allow insertion of reserved property names_1 1`
-] = `
-Error: "id" is a reserved property name. Please change it to "__id", "id__", "_id_", or similar.
-`;
-
-exports[
-  `tests/lyra.test.ts TAP defaultLanguage should throw an error if the desired language is not supported > should throw an error if the desired language is not supported 1`
-] = `
+exports[`tests/lyra.test.ts TAP defaultLanguage should throw an error if the desired language is not supported > should throw an error if the desired language is not supported 1`] = `
 Error: Language "latin" is not supported.
 Supported languages are:
  - arabic
@@ -99,11 +49,9 @@ Supported languages are:
  - romanian
  - serbian
  - turkish
-`;
+`
 
-exports[
-  `tests/lyra.test.ts TAP defaultLanguage should throw an error if the desired language is not supported during insertion > should throw an error if the desired language is not supported during insertion 1`
-] = `
+exports[`tests/lyra.test.ts TAP defaultLanguage should throw an error if the desired language is not supported during insertion > should throw an error if the desired language is not supported during insertion 1`] = `
 Error: Language "latin" is not supported.
 Supported languages are:
  - arabic
@@ -130,4 +78,4 @@ Supported languages are:
  - romanian
  - serbian
  - turkish
-`;
+`
