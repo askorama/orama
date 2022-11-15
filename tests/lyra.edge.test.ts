@@ -2,6 +2,10 @@ import t from "tap";
 import { create, insert, save, load, search } from "../src/lyra";
 import { contains as trieContains } from "../src/radix-tree/radix";
 
+function extractOriginalDoc(result: any) {
+  return result.map(({ document }: any) => document);
+}
+
 t.test("Edge getters", t => {
   t.plan(3);
 
@@ -61,7 +65,7 @@ t.test("Edge getters", t => {
     t.strictSame(docs[doc2.id], { name: "Jane", age: 25 });
   });
 
-  t.skip("should correctly enable index setter", t => {
+  t.test("should correctly enable index setter", t => {
     t.plan(6);
 
     const db = create({
@@ -113,7 +117,7 @@ t.test("Edge getters", t => {
     t.equal(search3.count, 1);
     t.equal(search4.count, 1);
 
-    t.strictSame(search3.hits, [{ name: "Paolo", id: id2.id, age: 37 }]);
-    t.strictSame(search4.hits, [{ name: "Michele", id: id1.id, age: 27 }]);
+    t.matchSnapshot(extractOriginalDoc(search3.hits));
+    t.matchSnapshot(extractOriginalDoc(search4.hits));
   });
 });

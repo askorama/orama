@@ -4,10 +4,8 @@
  * Re-generate by setting TAP_SNAPSHOT=1 and running tests.
  * Make sure to inspect the output below.  Do not ignore changes!
  */
-"use strict";
-exports[
-  `tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-1 1`
-] = `
+'use strict'
+exports[`tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-1 1`] = `
 Object {
   "count": 2357,
   "elapsed": 0n,
@@ -144,11 +142,9 @@ Object {
     },
   ],
 }
-`;
+`
 
-exports[
-  `tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-2 1`
-] = `
+exports[`tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-2 1`] = `
 Object {
   "count": 2357,
   "elapsed": 0n,
@@ -285,11 +281,9 @@ Object {
     },
   ],
 }
-`;
+`
 
-exports[
-  `tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-3 1`
-] = `
+exports[`tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-3 1`] = `
 Object {
   "count": 2357,
   "elapsed": 0n,
@@ -426,4 +420,4 @@ Object {
     },
   ],
 }
-`;
+`
