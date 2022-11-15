@@ -1,8 +1,8 @@
 import { stemmer } from "../stemmer/lib/en";
 import * as ERRORS from "./errors";
 import { trackInsertion } from "./insertion-checker";
-import { create as createNode, Node } from "./prefix-tree/node";
-import { find as trieFind, insert as trieInsert, Nodes, removeDocumentByWord } from "./prefix-tree/trie";
+import { create as createNode, Node } from "./radix-tree/node";
+import { find as trieFind, insert as trieInsert, Nodes, removeDocumentByWord } from "./radix-tree/radix";
 import { tokenize, Tokenizer } from "./tokenizer";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
@@ -240,7 +240,7 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
   tokenizerConfig: TokenizerConfigExec,
   schema: PropertiesSchema = lyra.schema,
 ) {
-  const { index, nodes, frequencies, tokenOccurrencies } = lyra;
+  const { index, frequencies, tokenOccurrencies } = lyra;
 
   for (const key of Object.keys(doc)) {
     const isNested = typeof doc[key] === "object";
@@ -295,7 +295,7 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
 
         tokenOccurrencies[propName][token]++;
 
-        trieInsert(nodes, requestedTrie, token, id);
+        trieInsert(requestedTrie, token, id);
       }
     }
   }
@@ -329,7 +329,7 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
   params: SearchParams<S> & { index: string },
 ): string[] {
   const idx = lyra.index[params.index];
-  const searchResult = trieFind(lyra.nodes, idx, {
+  const searchResult = trieFind(idx, {
     term: params.term,
     exact: params.exact,
     tolerance: params.tolerance,
@@ -552,8 +552,7 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
         const token = tokens[k];
         delete lyra.frequencies[key][docID];
         lyra.tokenOccurrencies[key][token]--;
-
-        if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
+        if (token && !removeDocumentByWord(idx, token, docID)) {
           throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
         }
       }

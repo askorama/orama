@@ -1,6 +1,6 @@
 import t from "tap";
 import { create, insert, save, load, search } from "../src/lyra";
-import { contains as trieContains } from "../src/prefix-tree/trie";
+import { contains as trieContains } from "../src/radix-tree/radix";
 
 t.test("Edge getters", t => {
   t.plan(3);
@@ -30,8 +30,8 @@ t.test("Edge getters", t => {
     const nameIndex = index["name"];
 
     // Remember that tokenizers an stemmers sets content to lowercase
-    t.ok(trieContains(db.nodes, nameIndex, "john"));
-    t.ok(trieContains(db.nodes, nameIndex, "jane"));
+    t.ok(trieContains(nameIndex, "john"));
+    t.ok(trieContains(nameIndex, "jane"));
   });
 
   t.test("should correctly enable edge docs getter", t => {

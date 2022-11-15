@@ -166,7 +166,6 @@ t.test("checkInsertDocSchema", t => {
     },
   );
 });
-
 t.test("lyra", t => {
   t.plan(19);
 

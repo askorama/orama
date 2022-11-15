@@ -10,5 +10,14 @@ Object {
   "the quick, brown fox": Array [
     "1",
   ],
+  "there is something wrong in there": Array [
+    "4",
+  ],
+  "this is me": Array [
+    "5",
+  ],
+  "thought it was sunday": Array [
+    "6",
+  ],
 }
 `

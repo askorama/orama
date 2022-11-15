@@ -22,6 +22,7 @@ export function insert(root: Node, word: string, docId: string) {
       const commonPrefix = getCommonPrefix(edgeLabel, word.substring(i));
 
       if (edgeLabel === word.substring(i)) {
+        root.children[currentCharacter].docs.push(docId);
         root.children[currentCharacter].end = true;
         return;
       }
@@ -74,8 +75,8 @@ export function insert(root: Node, word: string, docId: string) {
       const newNode = createNode(true);
       newNode.word = word.substring(i);
       newNode.key = currentCharacter;
-      root.children[currentCharacter] = newNode;
       newNode.docs.push(docId);
+      root.children[currentCharacter] = newNode;
       updateParent(newNode, root);
       return;
     }
@@ -111,7 +112,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams) {
   return output;
 }
 
-async function findAllWords(node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
+function findAllWords(node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
   if (node.end) {
     const { word, docs: docIDs } = node;
     // always check in own property to prevent access to inherited properties
@@ -144,7 +145,7 @@ async function findAllWords(node: Node, output: FindResult, term: string, exact?
   }
 
   for (const character of Object.keys(node.children)) {
-    await findAllWords(node.children[character], output, term.concat(node.children[character].word), exact, tolerance);
+    findAllWords(node.children[character], output, term.concat(node.children[character].word), exact, tolerance);
   }
   return output;
 }
@@ -182,7 +183,12 @@ export function contains(root: Node, term: string): boolean {
 }
 
 export function removeWord(root: Node, term: string): boolean {
+  if (!term) {
+    return false;
+  }
+
   let word = "";
+
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
     const parent = root;
@@ -190,15 +196,24 @@ export function removeWord(root: Node, term: string): boolean {
       word = word.concat(root.children[character].word);
       i += root.children[character].word.length - 1;
       root = root.children[character];
-      if (Object.keys(root.children).length === 0) delete parent.children[root.key];
+
+      if (Object.keys(root.children).length === 0) {
+        delete parent.children[root.key];
+        return true;
+      }
     } else {
       return false;
     }
   }
-  return true;
+
+  return false;
 }
 
 export function removeDocumentByWord(root: Node, term: string, docID: string, exact = true): boolean {
+  if (!term) {
+    return true;
+  }
+
   let word = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
