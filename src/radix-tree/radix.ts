@@ -24,6 +24,7 @@ export function insert(root: Node, word: string, docId: string) {
       const commonPrefix = getCommonPrefix(edgeLabel, wordAtIndex);
       const edgeLabelAtCommonPrefix = edgeLabel[commonPrefix.length];
       const commonPrefixLength = commonPrefix.length;
+      const edgeLabelLength = edgeLabel.length;
 
       if (edgeLabel === wordAtIndex) {
         addDocument(rootChildCurrentChar, docId);
@@ -31,7 +32,7 @@ export function insert(root: Node, word: string, docId: string) {
         return;
       }
 
-      if (commonPrefixLength < edgeLabel.length && commonPrefixLength === wordAtIndex.length) {
+      if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
         const newNode = createNode(true, wordAtIndex);
 
         newNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
@@ -49,7 +50,7 @@ export function insert(root: Node, word: string, docId: string) {
         return;
       }
 
-      if (commonPrefixLength < edgeLabel.length && commonPrefixLength < wordAtIndex.length) {
+      if (commonPrefixLength < edgeLabelLength && commonPrefixLength < wordAtIndex.length) {
         const inbetweenNode = createNode(false, commonPrefix);
 
         inbetweenNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
@@ -74,7 +75,7 @@ export function insert(root: Node, word: string, docId: string) {
         return;
       }
 
-      i += edgeLabel.length - 1;
+      i += edgeLabelLength - 1;
       root = rootChildCurrentChar;
     } else {
       const newNode = createNode(true, wordAtIndex);
@@ -91,16 +92,18 @@ export function find(root: Node, { term, exact, tolerance }: FindParams) {
   let word = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
-
     if (character in root.children) {
-      const edgeLabel = root.children[character].word;
-      const commonPrefix = getCommonPrefix(edgeLabel, term.substring(i));
-      if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== term.substring(i).length) {
+      const rootChildCurrentChar = root.children[character];
+      const edgeLabel = rootChildCurrentChar.word;
+      const termSubstring = term.substring(i);
+      const commonPrefix = getCommonPrefix(edgeLabel, termSubstring);
+
+      if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== termSubstring.length) {
         return {};
       }
-      word = word.concat(root.children[character].word);
-      i += root.children[character].word.length - 1;
-      root = root.children[character];
+      word = word.concat(rootChildCurrentChar.word);
+      i += rootChildCurrentChar.word.length - 1;
+      root = rootChildCurrentChar;
     } else {
       return {};
     }
@@ -222,9 +225,10 @@ export function removeDocumentByWord(root: Node, term: string, docID: string, ex
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
     if (character in root.children) {
-      word = word.concat(root.children[character].word);
-      i += root.children[character].word.length - 1;
-      root = root.children[character];
+      const rootChildCurrentChar = root.children[character];
+      word = word.concat(rootChildCurrentChar.word);
+      i += rootChildCurrentChar.word.length - 1;
+      root = rootChildCurrentChar;
 
       if (exact && word !== term) {
         continue;
