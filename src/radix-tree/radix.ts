@@ -17,62 +17,68 @@ export function insert(root: Node, word: string, docId: string) {
     const currentCharacter = word[i];
     const wordAtIndex = word.substring(i);
     root.docs.push(docId);
+    const rootChildCurrentChar = root.children[currentCharacter];
 
     if (currentCharacter in root.children) {
-      const edgeLabel = root.children[currentCharacter].word;
+      const edgeLabel = rootChildCurrentChar.word;
       const commonPrefix = getCommonPrefix(edgeLabel, wordAtIndex);
       const edgeLabelAtCommonPrefix = edgeLabel[commonPrefix.length];
-      
+      const commonPrefixLength = commonPrefix.length;
+
       if (edgeLabel === wordAtIndex) {
-        root.children[currentCharacter].docs.push(docId);
-        root.children[currentCharacter].end = true;
+        rootChildCurrentChar.docs.push(docId);
+        rootChildCurrentChar.end = true;
         return;
       }
 
-      if (commonPrefix.length < edgeLabel.length && commonPrefix.length === wordAtIndex.length) {
+      if (commonPrefixLength < edgeLabel.length && commonPrefixLength === wordAtIndex.length) {
         const newNode = createNode(true);
         newNode.word = wordAtIndex;
 
-        newNode.children[edgeLabelAtCommonPrefix] = root.children[currentCharacter];
-        newNode.children[edgeLabelAtCommonPrefix].word = edgeLabel.substring(commonPrefix.length);
-        newNode.docs.push(docId, ...root.children[currentCharacter].docs);
+        newNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
+        const newNodeChild = newNode.children[edgeLabelAtCommonPrefix];
+
+        newNodeChild.word = edgeLabel.substring(commonPrefixLength);
+        newNode.docs.push(docId, ...rootChildCurrentChar.docs);
 
         root.children[currentCharacter] = newNode;
 
         newNode.key = currentCharacter;
-        newNode.children[edgeLabelAtCommonPrefix].key = edgeLabelAtCommonPrefix;
+        newNodeChild.key = edgeLabelAtCommonPrefix;
 
         updateParent(newNode, root);
-        updateParent(newNode.children[edgeLabelAtCommonPrefix], newNode);
+        updateParent(newNodeChild, newNode);
         return;
       }
 
-      if (commonPrefix.length < edgeLabel.length && commonPrefix.length < wordAtIndex.length) {
+      if (commonPrefixLength < edgeLabel.length && commonPrefixLength < wordAtIndex.length) {
         const inbetweenNode = createNode();
         inbetweenNode.word = commonPrefix;
 
-        inbetweenNode.children[edgeLabelAtCommonPrefix] = root.children[currentCharacter];
-        inbetweenNode.children[edgeLabelAtCommonPrefix].word = edgeLabel.substring(commonPrefix.length);
-        inbetweenNode.docs.push(docId, ...root.children[currentCharacter].docs);
+        inbetweenNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
+        const inbetweenNodeChild = inbetweenNode.children[edgeLabelAtCommonPrefix];
+
+        inbetweenNodeChild.word = edgeLabel.substring(commonPrefixLength);
+        inbetweenNode.docs.push(docId, ...rootChildCurrentChar.docs);
         root.children[currentCharacter] = inbetweenNode;
 
         const newNode = createNode(true);
-        newNode.word = word.substring(i + commonPrefix.length);
+        newNode.word = word.substring(i + commonPrefixLength);
         newNode.docs.push(docId);
-        inbetweenNode.children[wordAtIndex[commonPrefix.length]] = newNode;
+        inbetweenNode.children[wordAtIndex[commonPrefixLength]] = newNode;
 
         inbetweenNode.key = currentCharacter;
-        newNode.key = wordAtIndex[commonPrefix.length];
-        inbetweenNode.children[edgeLabelAtCommonPrefix].key = edgeLabelAtCommonPrefix;
+        newNode.key = wordAtIndex[commonPrefixLength];
+        inbetweenNodeChild.key = edgeLabelAtCommonPrefix;
 
         updateParent(inbetweenNode, root);
         updateParent(newNode, inbetweenNode);
-        updateParent(inbetweenNode.children[edgeLabelAtCommonPrefix], inbetweenNode);
+        updateParent(inbetweenNodeChild, inbetweenNode);
         return;
       }
 
       i += edgeLabel.length - 1;
-      root = root.children[currentCharacter];
+      root = rootChildCurrentChar;
     } else {
       const newNode = createNode(true);
       newNode.word = wordAtIndex;
