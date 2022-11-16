@@ -12,15 +12,14 @@ export type FindParams = {
 
 export type FindResult = Record<string, string[]>;
 
-export function insert(root: Node, word: string, docId: string) {
-  for (let i = 0; i < word.length; i++) {
-    const currentCharacter = word[i];
-    const wordAtIndex = word.substring(i);
+export function insert(root: Node, subWord: string, docId: string) {
+  for (let i = 0; i < subWord.length; i++) {
+    const currentCharacter = subWord[i];
+    const wordAtIndex = subWord.substring(i);
     const rootChildCurrentChar = root.children[currentCharacter];
-    addDocument(root, docId);
 
     if (currentCharacter in root.children) {
-      const edgeLabel = rootChildCurrentChar.word;
+      const edgeLabel = rootChildCurrentChar.subWord;
       const commonPrefix = getCommonPrefix(edgeLabel, wordAtIndex);
       const commonPrefixLength = commonPrefix.length;
       const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength];
@@ -39,7 +38,7 @@ export function insert(root: Node, word: string, docId: string) {
         addDocument(newNode, docId, rootChildCurrentChar.docs);
 
         const newNodeChild = newNode.children[edgeLabelAtCommonPrefix];
-        newNodeChild.word = edgeLabel.substring(commonPrefixLength);
+        newNodeChild.subWord = edgeLabel.substring(commonPrefixLength);
         newNodeChild.key = edgeLabelAtCommonPrefix;
 
         root.children[currentCharacter] = newNode;
@@ -52,15 +51,14 @@ export function insert(root: Node, word: string, docId: string) {
       if (commonPrefixLength < edgeLabelLength && commonPrefixLength < wordAtIndex.length) {
         const inbetweenNode = createNode(false, commonPrefix, currentCharacter);
         inbetweenNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
-        addDocument(inbetweenNode, docId, rootChildCurrentChar.docs);
         root.children[currentCharacter] = inbetweenNode;
 
         const inbetweenNodeChild = inbetweenNode.children[edgeLabelAtCommonPrefix];
-        inbetweenNodeChild.word = edgeLabel.substring(commonPrefixLength);
+        inbetweenNodeChild.subWord = edgeLabel.substring(commonPrefixLength);
         inbetweenNodeChild.key = edgeLabelAtCommonPrefix;
 
         const wordAtCommonPrefix = wordAtIndex[commonPrefixLength];
-        const newNode = createNode(true, word.substring(i + commonPrefixLength), wordAtCommonPrefix);
+        const newNode = createNode(true, subWord.substring(i + commonPrefixLength), wordAtCommonPrefix);
         addDocument(newNode, docId);
 
         inbetweenNode.children[wordAtCommonPrefix] = newNode;
@@ -85,20 +83,20 @@ export function insert(root: Node, word: string, docId: string) {
 }
 
 export function find(root: Node, { term, exact, tolerance }: FindParams) {
-  let word = "";
+  let subWord = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
     if (character in root.children) {
       const rootChildCurrentChar = root.children[character];
-      const edgeLabel = rootChildCurrentChar.word;
+      const edgeLabel = rootChildCurrentChar.subWord;
       const termSubstring = term.substring(i);
       const commonPrefix = getCommonPrefix(edgeLabel, termSubstring);
 
       if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== termSubstring.length) {
         return {};
       }
-      word = word.concat(rootChildCurrentChar.word);
-      i += rootChildCurrentChar.word.length - 1;
+      subWord = subWord.concat(rootChildCurrentChar.subWord);
+      i += rootChildCurrentChar.subWord.length - 1;
       root = rootChildCurrentChar;
     } else {
       return {};
@@ -106,7 +104,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams) {
   }
   const output: FindResult = {};
 
-  findAllWords(root, output, word, exact, tolerance);
+  findAllWords(root, output, subWord, exact, tolerance);
 
   if (exact && !Object.hasOwn(output, term)) {
     return {};
@@ -115,31 +113,31 @@ export function find(root: Node, { term, exact, tolerance }: FindParams) {
   return output;
 }
 
-function findAllWords(node: Node, output: FindResult, word: string, exact?: boolean, tolerance?: number) {
+function findAllWords(node: Node, output: FindResult, subWord: string, exact?: boolean, tolerance?: number) {
   if (node.end) {
-    const { word: nodeWord, docs: docIDs } = node;
+    const { subWord: nodeWord, docs: docIDs } = node;
     // always check in own property to prevent access to inherited properties
     // fix https://github.com/LyraSearch/lyra/issues/137
-    if (!Object.hasOwn(output, word)) {
+    if (!Object.hasOwn(output, subWord)) {
       if (tolerance) {
-        // computing the absolute difference of letters between the term and the word
-        const difference = Math.abs(word.length - nodeWord.length);
+        // computing the absolute difference of letters between the term and the subWord
+        const difference = Math.abs(subWord.length - nodeWord.length);
 
         // if the tolerance is set, check whether the edit distance is within tolerance.
-        // In that case, we don't need to add the word to the output
-        if (difference <= tolerance && boundedLevenshtein(word, nodeWord, tolerance).isBounded) {
-          output[word] = [];
+        // In that case, we don't need to add the subWord to the output
+        if (difference <= tolerance && boundedLevenshtein(subWord, nodeWord, tolerance).isBounded) {
+          output[subWord] = [];
         }
       } else {
         // prevent default tolerance not set
-        output[word] = [];
+        output[subWord] = [];
       }
     }
-    // check if _output[word] exists and then add the doc to it
+    // check if _output[subWord] exists and then add the doc to it
     // always check in own property to prevent access to inherited properties
     // fix https://github.com/LyraSearch/lyra/issues/137
-    if (getOwnProperty(output, word) && docIDs.length) {
-      output[word] = Array.from(new Set(docIDs));
+    if (getOwnProperty(output, subWord) && docIDs.length) {
+      output[subWord] = Array.from(new Set(docIDs));
     }
   }
 
@@ -148,7 +146,7 @@ function findAllWords(node: Node, output: FindResult, word: string, exact?: bool
   }
 
   for (const character of Object.keys(node.children)) {
-    findAllWords(node.children[character], output, word.concat(node.children[character].word), exact, tolerance);
+    findAllWords(node.children[character], output, subWord.concat(node.children[character].subWord), exact, tolerance);
   }
   return output;
 }
@@ -165,18 +163,18 @@ function getCommonPrefix(a: string, b: string) {
 }
 
 export function contains(root: Node, term: string): boolean {
-  let word = "";
+  let subWord = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
 
     if (character in root.children) {
-      const edgeLabel = root.children[character].word;
+      const edgeLabel = root.children[character].subWord;
       const commonPrefix = getCommonPrefix(edgeLabel, term.substring(i));
       if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== term.substring(i).length) {
         return false;
       }
-      word = word.concat(root.children[character].word);
-      i += root.children[character].word.length - 1;
+      subWord = subWord.concat(root.children[character].subWord);
+      i += root.children[character].subWord.length - 1;
       root = root.children[character];
     } else {
       return false;
@@ -190,14 +188,14 @@ export function removeWord(root: Node, term: string): boolean {
     return false;
   }
 
-  let word = "";
+  let subWord = "";
 
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
     const parent = root;
     if (character in root.children) {
-      word = word.concat(root.children[character].word);
-      i += root.children[character].word.length - 1;
+      subWord = subWord.concat(root.children[character].subWord);
+      i += root.children[character].subWord.length - 1;
       root = root.children[character];
 
       if (Object.keys(root.children).length === 0) {
@@ -217,16 +215,16 @@ export function removeDocumentByWord(root: Node, term: string, docID: string, ex
     return true;
   }
 
-  let word = "";
+  let subWord = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
     if (character in root.children) {
       const rootChildCurrentChar = root.children[character];
-      word = word.concat(rootChildCurrentChar.word);
-      i += rootChildCurrentChar.word.length - 1;
+      subWord = subWord.concat(rootChildCurrentChar.subWord);
+      i += rootChildCurrentChar.subWord.length - 1;
       root = rootChildCurrentChar;
 
-      if (exact && word !== term) {
+      if (exact && subWord !== term) {
         continue;
       }
 

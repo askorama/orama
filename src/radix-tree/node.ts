@@ -4,22 +4,24 @@ import { uniqueId } from "../utils";
 export interface Node {
   id: string;
   key: string;
-  word: string;
+  subWord: string;
   parent: Nullable<string>;
   children: Record<string, Node>;
   docs: string[];
   end: boolean;
+  word: string;
 }
 
-export function create(end = false, word = "", key = ""): Node {
+export function create(end = false, subWord = "", key = ""): Node {
   const node = {
     id: uniqueId(),
     key,
-    word,
+    subWord,
     parent: null,
     children: {},
     docs: [],
     end,
+    word: "",
   };
 
   Object.defineProperty(node, "toJSON", { value: serialize });
@@ -28,6 +30,7 @@ export function create(end = false, word = "", key = ""): Node {
 
 export function updateParent(node: Node, parent: Node): void {
   node.parent = parent.id;
+  node.word = parent.subWord + node.subWord;
 }
 
 export function addDocument(node: Node, docID: string, docs: string[] = []): void {
@@ -49,7 +52,7 @@ export function removeDocument(node: Node, docID: string): boolean {
 
 /* c8 ignore next 5 */
 function serialize(this: Node): object {
-  const { word, children, docs, end } = this;
+  const { word, subWord, children, docs, end } = this;
 
-  return { word, children, docs, end };
+  return { word, subWord, children, docs, end };
 }
