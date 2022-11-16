@@ -30,7 +30,7 @@ export function create(end = false, subWord = "", key = ""): Node {
 
 export function updateParent(node: Node, parent: Node): void {
   node.parent = parent.id;
-  node.word = parent.subWord + node.subWord;
+  node.word = parent.word + node.subWord;
 }
 
 export function addDocument(node: Node, docID: string): void {
