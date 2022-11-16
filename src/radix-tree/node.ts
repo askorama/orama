@@ -11,10 +11,10 @@ export interface Node {
   end: boolean;
 }
 
-export function create(end = false, word = ""): Node {
+export function create(end = false, word = "", key = ""): Node {
   const node = {
     id: uniqueId(),
-    key: "",
+    key,
     word,
     parent: null,
     children: {},
