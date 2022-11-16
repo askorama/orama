@@ -2,7 +2,7 @@ import { stemmer } from "../stemmer/lib/en";
 import * as ERRORS from "./errors";
 import { trackInsertion } from "./insertion-checker";
 import { create as createNode, Node } from "./radix-tree/node";
-import { find as trieFind, insert as trieInsert, Nodes, removeDocumentByWord } from "./radix-tree/radix";
+import { find as radixFind, insert as radixInsert, Nodes, removeDocumentByWord } from "./radix-tree/radix";
 import { tokenize, Tokenizer } from "./tokenizer";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
@@ -231,7 +231,7 @@ function recursiveCheckDocSchema<S extends PropertiesSchema>(
   return true;
 }
 
-function recursiveTrieInsertion<S extends PropertiesSchema>(
+function recursiveradixInsertion<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   doc: ResolveSchema<S>,
   id: string,
@@ -247,7 +247,7 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
     const isSchemaNested = typeof schema[key] == "object";
     const propName = `${prefix}${key}`;
     if (isNested && key in schema && isSchemaNested) {
-      recursiveTrieInsertion(
+      recursiveradixInsertion(
         lyra,
         doc[key] as ResolveSchema<S>,
         id,
@@ -295,7 +295,7 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
 
         tokenOccurrencies[propName][token]++;
 
-        trieInsert(requestedTrie, token, id);
+        radixInsert(requestedTrie, token, id);
       }
     }
   }
@@ -329,7 +329,7 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
   params: SearchParams<S> & { index: string },
 ): string[] {
   const idx = lyra.index[params.index];
-  const searchResult = trieFind(idx, {
+  const searchResult = radixFind(idx, {
     term: params.term,
     exact: params.exact,
     tolerance: params.tolerance,
@@ -422,7 +422,7 @@ export function insert<S extends PropertiesSchema>(
   assertDocSchema(doc, lyra.schema);
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
+  recursiveradixInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
 
   return { id };
@@ -453,7 +453,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   assertDocSchema(doc, lyra.schema);
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
+  recursiveradixInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
   if (lyra.hooks.afterInsert) {
     await hookRunner.call(lyra, lyra.hooks.afterInsert, id);

@@ -20,18 +20,20 @@ export function insert(root: Node, word: string, docId: string) {
 
     if (currentCharacter in root.children) {
       const edgeLabel = rootChildCurrentChar.subWord;
+      const edgeLabelLength = edgeLabel.length;
+
       const commonPrefix = getCommonPrefix(edgeLabel, wordAtIndex);
       const commonPrefixLength = commonPrefix.length;
       const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength];
 
-      const edgeLabelLength = edgeLabel.length;
-
+      // the wordAtIndex matches exactly with an existing child node
       if (edgeLabel === wordAtIndex) {
         addDocument(rootChildCurrentChar, docId);
         rootChildCurrentChar.end = true;
         return;
       }
 
+      // the wordAtIndex is completely contained in the child node subword
       if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
         const newNode = createNode(true, wordAtIndex, currentCharacter);
         newNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
@@ -47,6 +49,7 @@ export function insert(root: Node, word: string, docId: string) {
         return;
       }
 
+      // the wordAtIndex is partially contained in the child node subword
       if (commonPrefixLength < edgeLabelLength && commonPrefixLength < wordAtIndex.length) {
         const inbetweenNode = createNode(false, commonPrefix, currentCharacter);
         inbetweenNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
@@ -68,9 +71,12 @@ export function insert(root: Node, word: string, docId: string) {
         return;
       }
 
+      // skip to the next divergent character
       i += edgeLabelLength - 1;
+      // navigate in the child node
       root = rootChildCurrentChar;
     } else {
+      // if the node for the current character doesn't exist create new node
       const newNode = createNode(true, wordAtIndex, currentCharacter);
       addDocument(newNode, docId);
 
@@ -84,6 +90,7 @@ export function insert(root: Node, word: string, docId: string) {
 export function find(root: Node, { term, exact, tolerance }: FindParams) {
   let subWord = "";
 
+  // find the closest node to the term
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
     if (character in root.children) {
@@ -91,15 +98,21 @@ export function find(root: Node, { term, exact, tolerance }: FindParams) {
       const edgeLabel = rootChildCurrentChar.subWord;
       const termSubstring = term.substring(i);
 
+      // find the common prefix between two words ex: prime and primate = prim
       const commonPrefix = getCommonPrefix(edgeLabel, termSubstring);
 
+      // if the common prefix lenght is equal to edgeLabel lenght (the node subword) it means they are a match
+      // if the common prefix is equal to the term means it is contained in the node
       if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== termSubstring.length) {
+        // if tolerance is set we take the current node as the closest
         if (tolerance) break;
         return {};
       }
 
       subWord = subWord.concat(rootChildCurrentChar.subWord);
+      // skip the subword lenght and check the next divergent character
       i += rootChildCurrentChar.subWord.length - 1;
+      // navigate into the child node
       root = rootChildCurrentChar;
     } else {
       return {};
@@ -107,7 +120,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams) {
   }
 
   const output: FindResult = {};
-
+  // found the closest node we recursively search through children
   findAllWords(root, output, subWord, term, exact, tolerance);
 
   return output;
@@ -128,18 +141,27 @@ function findAllWords(
       return {};
     }
 
+    // always check in own property to prevent access to inherited properties
+    // fix https://github.com/LyraSearch/lyra/issues/137
     if (!Object.hasOwn(output, word)) {
       if (tolerance) {
+        // computing the absolute difference of letters between the term and the word
         const difference = Math.abs(term.length - word.length);
 
+        // if the tolerance is set, check whether the edit distance is within tolerance.
+        // In that case, we don't need to add the word to the output
         if (difference <= tolerance && boundedLevenshtein(term, word, tolerance).isBounded) {
           output[word] = [];
         }
       } else {
+        // prevent default tolerance not set
         output[word] = [];
       }
     }
 
+    // check if _output[word] exists and then add the doc to it
+    // always check in own property to prevent access to inherited properties
+    // fix https://github.com/LyraSearch/lyra/issues/137
     if (getOwnProperty(output, word) && docIDs.length) {
       const docs = new Set(output[word]);
 
@@ -151,6 +173,7 @@ function findAllWords(
     }
   }
 
+  // recursively search the children
   for (const character of Object.keys(node.children)) {
     findAllWords(
       node.children[character],
@@ -166,7 +189,8 @@ function findAllWords(
 
 function getCommonPrefix(a: string, b: string) {
   let commonPrefix = "";
-  for (let i = 0; i < Math.min(a.length, b.length); i++) {
+  const len = Math.min(a.length, b.length);
+  for (let i = 0; i < len; i++) {
     if (a[i] !== b[i]) {
       return commonPrefix;
     }
@@ -196,6 +220,7 @@ export function contains(root: Node, term: string): boolean {
   return true;
 }
 
+// unused
 export function removeWord(root: Node, term: string): boolean {
   if (!term) {
     return false;
