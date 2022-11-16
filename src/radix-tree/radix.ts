@@ -22,8 +22,9 @@ export function insert(root: Node, word: string, docId: string) {
     if (currentCharacter in root.children) {
       const edgeLabel = rootChildCurrentChar.word;
       const commonPrefix = getCommonPrefix(edgeLabel, wordAtIndex);
-      const edgeLabelAtCommonPrefix = edgeLabel[commonPrefix.length];
       const commonPrefixLength = commonPrefix.length;
+      const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength];
+
       const edgeLabelLength = edgeLabel.length;
 
       if (edgeLabel === wordAtIndex) {
@@ -52,15 +53,13 @@ export function insert(root: Node, word: string, docId: string) {
         const inbetweenNode = createNode(false, commonPrefix, currentCharacter);
         inbetweenNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
         addDocument(inbetweenNode, docId, rootChildCurrentChar.docs);
+        root.children[currentCharacter] = inbetweenNode;
 
         const inbetweenNodeChild = inbetweenNode.children[edgeLabelAtCommonPrefix];
         inbetweenNodeChild.word = edgeLabel.substring(commonPrefixLength);
         inbetweenNodeChild.key = edgeLabelAtCommonPrefix;
 
-        root.children[currentCharacter] = inbetweenNode;
-
         const wordAtCommonPrefix = wordAtIndex[commonPrefixLength];
-
         const newNode = createNode(true, word.substring(i + commonPrefixLength), wordAtCommonPrefix);
         addDocument(newNode, docId);
 
