@@ -21,7 +21,8 @@ export function insert(root: Node, word: string, docId: string) {
     if (currentCharacter in root.children) {
       const edgeLabel = root.children[currentCharacter].word;
       const commonPrefix = getCommonPrefix(edgeLabel, wordAtIndex);
-
+      const edgeLabelAtCommonPrefix = edgeLabel[commonPrefix.length];
+      
       if (edgeLabel === wordAtIndex) {
         root.children[currentCharacter].docs.push(docId);
         root.children[currentCharacter].end = true;
@@ -32,17 +33,17 @@ export function insert(root: Node, word: string, docId: string) {
         const newNode = createNode(true);
         newNode.word = wordAtIndex;
 
-        newNode.children[edgeLabel[commonPrefix.length]] = root.children[currentCharacter];
-        newNode.children[edgeLabel[commonPrefix.length]].word = edgeLabel.substring(commonPrefix.length);
+        newNode.children[edgeLabelAtCommonPrefix] = root.children[currentCharacter];
+        newNode.children[edgeLabelAtCommonPrefix].word = edgeLabel.substring(commonPrefix.length);
         newNode.docs.push(docId, ...root.children[currentCharacter].docs);
 
         root.children[currentCharacter] = newNode;
 
         newNode.key = currentCharacter;
-        newNode.children[edgeLabel[commonPrefix.length]].key = edgeLabel[commonPrefix.length];
+        newNode.children[edgeLabelAtCommonPrefix].key = edgeLabelAtCommonPrefix;
 
         updateParent(newNode, root);
-        updateParent(newNode.children[edgeLabel[commonPrefix.length]], newNode);
+        updateParent(newNode.children[edgeLabelAtCommonPrefix], newNode);
         return;
       }
 
@@ -50,8 +51,8 @@ export function insert(root: Node, word: string, docId: string) {
         const inbetweenNode = createNode();
         inbetweenNode.word = commonPrefix;
 
-        inbetweenNode.children[edgeLabel[commonPrefix.length]] = root.children[currentCharacter];
-        inbetweenNode.children[edgeLabel[commonPrefix.length]].word = edgeLabel.substring(commonPrefix.length);
+        inbetweenNode.children[edgeLabelAtCommonPrefix] = root.children[currentCharacter];
+        inbetweenNode.children[edgeLabelAtCommonPrefix].word = edgeLabel.substring(commonPrefix.length);
         inbetweenNode.docs.push(docId, ...root.children[currentCharacter].docs);
         root.children[currentCharacter] = inbetweenNode;
 
@@ -62,11 +63,11 @@ export function insert(root: Node, word: string, docId: string) {
 
         inbetweenNode.key = currentCharacter;
         newNode.key = wordAtIndex[commonPrefix.length];
-        inbetweenNode.children[edgeLabel[commonPrefix.length]].key = edgeLabel[commonPrefix.length];
+        inbetweenNode.children[edgeLabelAtCommonPrefix].key = edgeLabelAtCommonPrefix;
 
         updateParent(inbetweenNode, root);
         updateParent(newNode, inbetweenNode);
-        updateParent(inbetweenNode.children[edgeLabel[commonPrefix.length]], inbetweenNode);
+        updateParent(inbetweenNode.children[edgeLabelAtCommonPrefix], inbetweenNode);
         return;
       }
 
