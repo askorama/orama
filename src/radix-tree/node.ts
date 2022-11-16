@@ -11,11 +11,11 @@ export interface Node {
   end: boolean;
 }
 
-export function create(end = false): Node {
+export function create(end = false, word = ""): Node {
   const node = {
     id: uniqueId(),
     key: "",
-    word: "",
+    word,
     parent: null,
     children: {},
     docs: [],
@@ -28,6 +28,10 @@ export function create(end = false): Node {
 
 export function updateParent(node: Node, parent: Node): void {
   node.parent = parent.id;
+}
+
+export function addDocument(node: Node, docID: string, docs: string[] = []): void {
+  node.docs.push(docID, ...docs);
 }
 
 export function removeDocument(node: Node, docID: string): boolean {

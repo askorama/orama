@@ -1,4 +1,4 @@
-import { create as createNode, Node, updateParent, removeDocument } from "./node";
+import { create as createNode, Node, updateParent, removeDocument, addDocument } from "./node";
 import { boundedLevenshtein } from "../levenshtein";
 import { getOwnProperty } from "../utils";
 
@@ -16,8 +16,8 @@ export function insert(root: Node, word: string, docId: string) {
   for (let i = 0; i < word.length; i++) {
     const currentCharacter = word[i];
     const wordAtIndex = word.substring(i);
-    root.docs.push(docId);
     const rootChildCurrentChar = root.children[currentCharacter];
+    addDocument(root, docId);
 
     if (currentCharacter in root.children) {
       const edgeLabel = rootChildCurrentChar.word;
@@ -26,21 +26,19 @@ export function insert(root: Node, word: string, docId: string) {
       const commonPrefixLength = commonPrefix.length;
 
       if (edgeLabel === wordAtIndex) {
-        rootChildCurrentChar.docs.push(docId);
+        addDocument(rootChildCurrentChar, docId);
         rootChildCurrentChar.end = true;
         return;
       }
 
       if (commonPrefixLength < edgeLabel.length && commonPrefixLength === wordAtIndex.length) {
-        const newNode = createNode(true);
-        newNode.word = wordAtIndex;
+        const newNode = createNode(true, wordAtIndex);
 
         newNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
         const newNodeChild = newNode.children[edgeLabelAtCommonPrefix];
 
         newNodeChild.word = edgeLabel.substring(commonPrefixLength);
-        newNode.docs.push(docId, ...rootChildCurrentChar.docs);
-
+        addDocument(newNode, docId, rootChildCurrentChar.docs);
         root.children[currentCharacter] = newNode;
 
         newNode.key = currentCharacter;
@@ -52,19 +50,18 @@ export function insert(root: Node, word: string, docId: string) {
       }
 
       if (commonPrefixLength < edgeLabel.length && commonPrefixLength < wordAtIndex.length) {
-        const inbetweenNode = createNode();
-        inbetweenNode.word = commonPrefix;
+        const inbetweenNode = createNode(false, commonPrefix);
 
         inbetweenNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
         const inbetweenNodeChild = inbetweenNode.children[edgeLabelAtCommonPrefix];
 
         inbetweenNodeChild.word = edgeLabel.substring(commonPrefixLength);
-        inbetweenNode.docs.push(docId, ...rootChildCurrentChar.docs);
+        addDocument(inbetweenNode, docId, rootChildCurrentChar.docs);
         root.children[currentCharacter] = inbetweenNode;
 
-        const newNode = createNode(true);
-        newNode.word = word.substring(i + commonPrefixLength);
-        newNode.docs.push(docId);
+        const newNode = createNode(true, word.substring(i + commonPrefixLength));
+
+        addDocument(newNode, docId);
         inbetweenNode.children[wordAtIndex[commonPrefixLength]] = newNode;
 
         inbetweenNode.key = currentCharacter;
@@ -80,10 +77,9 @@ export function insert(root: Node, word: string, docId: string) {
       i += edgeLabel.length - 1;
       root = rootChildCurrentChar;
     } else {
-      const newNode = createNode(true);
-      newNode.word = wordAtIndex;
+      const newNode = createNode(true, wordAtIndex);
       newNode.key = currentCharacter;
-      newNode.docs.push(docId);
+      addDocument(newNode, docId);
       root.children[currentCharacter] = newNode;
       updateParent(newNode, root);
       return;
