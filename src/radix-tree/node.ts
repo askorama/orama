@@ -33,8 +33,8 @@ export function updateParent(node: Node, parent: Node): void {
   node.word = parent.subWord + node.subWord;
 }
 
-export function addDocument(node: Node, docID: string, docs: string[] = []): void {
-  node.docs.push(docID, ...docs);
+export function addDocument(node: Node, docID: string): void {
+  node.docs.push(docID);
 }
 
 export function removeDocument(node: Node, docID: string): boolean {

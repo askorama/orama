@@ -12,10 +12,10 @@ export type FindParams = {
 
 export type FindResult = Record<string, string[]>;
 
-export function insert(root: Node, subWord: string, docId: string) {
-  for (let i = 0; i < subWord.length; i++) {
-    const currentCharacter = subWord[i];
-    const wordAtIndex = subWord.substring(i);
+export function insert(root: Node, word: string, docId: string) {
+  for (let i = 0; i < word.length; i++) {
+    const currentCharacter = word[i];
+    const wordAtIndex = word.substring(i);
     const rootChildCurrentChar = root.children[currentCharacter];
 
     if (currentCharacter in root.children) {
@@ -35,7 +35,6 @@ export function insert(root: Node, subWord: string, docId: string) {
       if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
         const newNode = createNode(true, wordAtIndex, currentCharacter);
         newNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
-        addDocument(newNode, docId, rootChildCurrentChar.docs);
 
         const newNodeChild = newNode.children[edgeLabelAtCommonPrefix];
         newNodeChild.subWord = edgeLabel.substring(commonPrefixLength);
@@ -58,7 +57,7 @@ export function insert(root: Node, subWord: string, docId: string) {
         inbetweenNodeChild.key = edgeLabelAtCommonPrefix;
 
         const wordAtCommonPrefix = wordAtIndex[commonPrefixLength];
-        const newNode = createNode(true, subWord.substring(i + commonPrefixLength), wordAtCommonPrefix);
+        const newNode = createNode(true, word.substring(i + commonPrefixLength), wordAtCommonPrefix);
         addDocument(newNode, docId);
 
         inbetweenNode.children[wordAtCommonPrefix] = newNode;
@@ -84,17 +83,21 @@ export function insert(root: Node, subWord: string, docId: string) {
 
 export function find(root: Node, { term, exact, tolerance }: FindParams) {
   let subWord = "";
+
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
     if (character in root.children) {
       const rootChildCurrentChar = root.children[character];
       const edgeLabel = rootChildCurrentChar.subWord;
       const termSubstring = term.substring(i);
+
       const commonPrefix = getCommonPrefix(edgeLabel, termSubstring);
 
       if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== termSubstring.length) {
+        if (tolerance) break;
         return {};
       }
+
       subWord = subWord.concat(rootChildCurrentChar.subWord);
       i += rootChildCurrentChar.subWord.length - 1;
       root = rootChildCurrentChar;
@@ -102,51 +105,61 @@ export function find(root: Node, { term, exact, tolerance }: FindParams) {
       return {};
     }
   }
+
   const output: FindResult = {};
 
-  findAllWords(root, output, subWord, exact, tolerance);
-
-  if (exact && !Object.hasOwn(output, term)) {
-    return {};
-  }
+  findAllWords(root, output, subWord, term, exact, tolerance);
 
   return output;
 }
 
-function findAllWords(node: Node, output: FindResult, subWord: string, exact?: boolean, tolerance?: number) {
+function findAllWords(
+  node: Node,
+  output: FindResult,
+  subWord: string,
+  term: string,
+  exact?: boolean,
+  tolerance?: number,
+) {
   if (node.end) {
-    const { subWord: nodeWord, docs: docIDs } = node;
-    // always check in own property to prevent access to inherited properties
-    // fix https://github.com/LyraSearch/lyra/issues/137
-    if (!Object.hasOwn(output, subWord)) {
-      if (tolerance) {
-        // computing the absolute difference of letters between the term and the subWord
-        const difference = Math.abs(subWord.length - nodeWord.length);
+    const { word, docs: docIDs } = node;
 
-        // if the tolerance is set, check whether the edit distance is within tolerance.
-        // In that case, we don't need to add the subWord to the output
-        if (difference <= tolerance && boundedLevenshtein(subWord, nodeWord, tolerance).isBounded) {
-          output[subWord] = [];
+    if (exact && word !== term) {
+      return {};
+    }
+
+    if (!Object.hasOwn(output, word)) {
+      if (tolerance) {
+        const difference = Math.abs(term.length - word.length);
+
+        if (difference <= tolerance && boundedLevenshtein(term, word, tolerance).isBounded) {
+          output[word] = [];
         }
       } else {
-        // prevent default tolerance not set
-        output[subWord] = [];
+        output[word] = [];
       }
     }
-    // check if _output[subWord] exists and then add the doc to it
-    // always check in own property to prevent access to inherited properties
-    // fix https://github.com/LyraSearch/lyra/issues/137
-    if (getOwnProperty(output, subWord) && docIDs.length) {
-      output[subWord] = Array.from(new Set(docIDs));
-    }
-  }
 
-  if (Object.keys(node.children).length === 0) {
-    return {};
+    if (getOwnProperty(output, word) && docIDs.length) {
+      const docs = new Set(output[word]);
+
+      const docIDsLength = docIDs.length;
+      for (let i = 0; i < docIDsLength; i++) {
+        docs.add(docIDs[i]);
+      }
+      output[word] = Array.from(docs);
+    }
   }
 
   for (const character of Object.keys(node.children)) {
-    findAllWords(node.children[character], output, subWord.concat(node.children[character].subWord), exact, tolerance);
+    findAllWords(
+      node.children[character],
+      output,
+      subWord.concat(node.children[character].subWord),
+      term,
+      exact,
+      tolerance,
+    );
   }
   return output;
 }
