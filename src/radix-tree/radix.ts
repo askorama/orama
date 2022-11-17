@@ -109,7 +109,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams) {
         return {};
       }
 
-      subWord = subWord.concat(rootChildCurrentChar.subWord);
+      subWord += rootChildCurrentChar.subWord;
       // skip the subword lenght and check the next divergent character
       i += rootChildCurrentChar.subWord.length - 1;
       // navigate into the child node
@@ -175,14 +175,7 @@ function findAllWords(
 
   // recursively search the children
   for (const character of Object.keys(node.children)) {
-    findAllWords(
-      node.children[character],
-      output,
-      subWord.concat(node.children[character].subWord),
-      term,
-      exact,
-      tolerance,
-    );
+    findAllWords(node.children[character], output, subWord + node.children[character].subWord, term, exact, tolerance);
   }
   return output;
 }
@@ -200,7 +193,6 @@ function getCommonPrefix(a: string, b: string) {
 }
 
 export function contains(root: Node, term: string): boolean {
-  let subWord = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
 
@@ -210,7 +202,6 @@ export function contains(root: Node, term: string): boolean {
       if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== term.substring(i).length) {
         return false;
       }
-      subWord = subWord.concat(root.children[character].subWord);
       i += root.children[character].subWord.length - 1;
       root = root.children[character];
     } else {
@@ -226,13 +217,10 @@ export function removeWord(root: Node, term: string): boolean {
     return false;
   }
 
-  let subWord = "";
-
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
     const parent = root;
     if (character in root.children) {
-      subWord = subWord.concat(root.children[character].subWord);
       i += root.children[character].subWord.length - 1;
       root = root.children[character];
 
@@ -253,16 +241,14 @@ export function removeDocumentByWord(root: Node, term: string, docID: string, ex
     return true;
   }
 
-  let subWord = "";
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
     if (character in root.children) {
       const rootChildCurrentChar = root.children[character];
-      subWord = subWord.concat(rootChildCurrentChar.subWord);
       i += rootChildCurrentChar.subWord.length - 1;
       root = rootChildCurrentChar;
 
-      if (exact && subWord !== term) {
+      if (exact && root.word !== term) {
         continue;
       }
 
