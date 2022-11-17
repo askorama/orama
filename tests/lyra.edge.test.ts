@@ -104,8 +104,8 @@ t.test("Edge getters", t => {
       age: 37,
     });
 
-    const { index, docs, nodes, schema, frequencies, tokenOccurrencies } = save(db2);
-    load(db, { index, docs, nodes, schema, frequencies, tokenOccurrencies });
+    const { index, docs, schema, frequencies, tokenOccurrencies } = save(db2);
+    load(db, { index, docs, schema, frequencies, tokenOccurrencies });
 
     const search1 = search(db, { term: "Jane" });
     const search2 = search(db, { term: "John" });

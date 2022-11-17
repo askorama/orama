@@ -2,7 +2,7 @@ import { stemmer } from "../stemmer/lib/en";
 import * as ERRORS from "./errors";
 import { trackInsertion } from "./insertion-checker";
 import { create as createNode, Node } from "./radix-tree/node";
-import { find as radixFind, insert as radixInsert, Nodes, removeDocumentByWord } from "./radix-tree/radix";
+import { find as radixFind, insert as radixInsert, removeDocumentByWord } from "./radix-tree/radix";
 import { tokenize, Tokenizer } from "./tokenizer";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
@@ -87,7 +87,6 @@ export type Configuration<S extends PropertiesSchema> = {
 export type Data<S extends PropertiesSchema> = {
   docs: Record<string, ResolveSchema<S> | undefined>;
   index: Index;
-  nodes: Nodes;
   schema: S;
   frequencies: FrequencyMap;
   tokenOccurrencies: TokenOccurrency;
@@ -384,7 +383,6 @@ export function create<S extends PropertiesSchema>(properties: Configuration<S>)
     defaultLanguage,
     schema: properties.schema,
     docs: {},
-    nodes: {},
     index: {},
     hooks: properties.hooks || {},
     edge: properties.edge ?? false,
@@ -726,7 +724,6 @@ export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
   return {
     index: lyra.index,
     docs: lyra.docs,
-    nodes: lyra.nodes,
     schema: lyra.schema,
     frequencies: lyra.frequencies,
     tokenOccurrencies: lyra.tokenOccurrencies,
@@ -735,7 +732,7 @@ export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
 
 export function load<S extends PropertiesSchema>(
   lyra: Lyra<S>,
-  { index, docs, nodes, schema, frequencies, tokenOccurrencies }: Data<S>,
+  { index, docs, schema, frequencies, tokenOccurrencies }: Data<S>,
 ) {
   if (!lyra.edge) {
     throw new Error(ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("load"));
@@ -743,7 +740,6 @@ export function load<S extends PropertiesSchema>(
 
   lyra.index = index;
   lyra.docs = docs;
-  lyra.nodes = nodes;
   lyra.schema = schema;
   lyra.frequencies = frequencies;
   lyra.tokenOccurrencies = tokenOccurrencies;

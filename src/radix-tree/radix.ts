@@ -2,8 +2,6 @@ import { create as createNode, Node, updateParent, removeDocument, addDocument }
 import { boundedLevenshtein } from "../levenshtein";
 import { getOwnProperty } from "../utils";
 
-export type Nodes = Record<string, Node>;
-
 export type FindParams = {
   term: string;
   exact?: boolean;
