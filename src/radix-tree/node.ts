@@ -1,24 +1,27 @@
 import type { Nullable } from "../types";
 import { uniqueId } from "../utils";
+
 export interface Node {
   id: string;
   key: string;
-  word: string;
+  subWord: string;
   parent: Nullable<string>;
-  children: Record<string, string>;
+  children: Record<string, Node>;
   docs: string[];
   end: boolean;
+  word: string;
 }
 
-export function create(key = ""): Node {
+export function create(end = false, subWord = "", key = ""): Node {
   const node = {
     id: uniqueId(),
     key,
-    word: "",
+    subWord,
     parent: null,
     children: {},
     docs: [],
-    end: false,
+    end,
+    word: "",
   };
 
   Object.defineProperty(node, "toJSON", { value: serialize });
@@ -27,7 +30,11 @@ export function create(key = ""): Node {
 
 export function updateParent(node: Node, parent: Node): void {
   node.parent = parent.id;
-  node.word = parent.word + node.key;
+  node.word = parent.word + node.subWord;
+}
+
+export function addDocument(node: Node, docID: string): void {
+  node.docs.push(docID);
 }
 
 export function removeDocument(node: Node, docID: string): boolean {
@@ -45,7 +52,7 @@ export function removeDocument(node: Node, docID: string): boolean {
 
 /* c8 ignore next 5 */
 function serialize(this: Node): object {
-  const { key, word, children, docs, end } = this;
+  const { word, subWord, children, docs, end } = this;
 
-  return { key, word, children, docs, end };
+  return { word, subWord, children, docs, end };
 }

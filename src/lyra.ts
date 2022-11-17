@@ -1,8 +1,8 @@
 import { stemmer } from "../stemmer/lib/en";
 import * as ERRORS from "./errors";
 import { trackInsertion } from "./insertion-checker";
-import { create as createNode, Node } from "./prefix-tree/node";
-import { find as trieFind, insert as trieInsert, Nodes, removeDocumentByWord } from "./prefix-tree/trie";
+import { create as createNode, Node } from "./radix-tree/node";
+import { find as radixFind, insert as radixInsert, removeDocumentByWord } from "./radix-tree/radix";
 import { tokenize, Tokenizer } from "./tokenizer";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
@@ -88,7 +88,6 @@ export type Configuration<S extends PropertiesSchema> = {
 export type Data<S extends PropertiesSchema> = {
   docs: Record<string, ResolveSchema<S> | undefined>;
   index: Index;
-  nodes: Nodes;
   schema: S;
   frequencies: FrequencyMap;
   tokenOccurrencies: TokenOccurrency;
@@ -254,7 +253,7 @@ function recursiveCheckDocSchema<S extends PropertiesSchema>(
   return true;
 }
 
-function recursiveTrieInsertion<S extends PropertiesSchema>(
+function recursiveradixInsertion<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   doc: ResolveSchema<S>,
   id: string,
@@ -263,14 +262,14 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
   tokenizerConfig: TokenizerConfigExec,
   schema: PropertiesSchema = lyra.schema,
 ) {
-  const { index, nodes, frequencies, tokenOccurrencies } = lyra;
+  const { index, frequencies, tokenOccurrencies } = lyra;
 
   for (const key of Object.keys(doc)) {
     const isNested = typeof doc[key] === "object";
     const isSchemaNested = typeof schema[key] == "object";
     const propName = `${prefix}${key}`;
     if (isNested && key in schema && isSchemaNested) {
-      recursiveTrieInsertion(
+      recursiveradixInsertion(
         lyra,
         doc[key] as ResolveSchema<S>,
         id,
@@ -318,7 +317,7 @@ function recursiveTrieInsertion<S extends PropertiesSchema>(
 
         tokenOccurrencies[propName][token]++;
 
-        trieInsert(nodes, requestedTrie, token, id);
+        radixInsert(requestedTrie, token, id);
       }
     }
   }
@@ -352,7 +351,7 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
   params: SearchParams<S> & { index: string },
 ): string[] {
   const idx = lyra.index[params.index];
-  const searchResult = trieFind(lyra.nodes, idx, {
+  const searchResult = radixFind(idx, {
     term: params.term,
     exact: params.exact,
     tolerance: params.tolerance,
@@ -407,7 +406,6 @@ export function create<S extends PropertiesSchema>(properties: Configuration<S>)
     defaultLanguage,
     schema: properties.schema,
     docs: {},
-    nodes: {},
     index: {},
     hooks: properties.hooks || {},
     edge: properties.edge ?? false,
@@ -445,7 +443,7 @@ export function insert<S extends PropertiesSchema>(
   assertDocSchema(doc, lyra.schema);
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
+  recursiveradixInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
 
   return { id };
@@ -476,7 +474,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   assertDocSchema(doc, lyra.schema);
 
   lyra.docs[id] = doc;
-  recursiveTrieInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
+  recursiveradixInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
   if (lyra.hooks.afterInsert) {
     await hookRunner.call(lyra, lyra.hooks.afterInsert, id);
@@ -575,8 +573,7 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
         const token = tokens[k];
         delete lyra.frequencies[key][docID];
         lyra.tokenOccurrencies[key][token]--;
-
-        if (token && removeDocumentByWord(lyra.nodes, idx, token, docID)) {
+        if (token && !removeDocumentByWord(idx, token, docID)) {
           throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
         }
       }
@@ -750,7 +747,6 @@ export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
   return {
     index: lyra.index,
     docs: lyra.docs,
-    nodes: lyra.nodes,
     schema: lyra.schema,
     frequencies: lyra.frequencies,
     tokenOccurrencies: lyra.tokenOccurrencies,
@@ -759,7 +755,7 @@ export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
 
 export function load<S extends PropertiesSchema>(
   lyra: Lyra<S>,
-  { index, docs, nodes, schema, frequencies, tokenOccurrencies }: Data<S>,
+  { index, docs, schema, frequencies, tokenOccurrencies }: Data<S>,
 ) {
   if (!lyra.edge) {
     throw new Error(ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("load"));
@@ -767,7 +763,6 @@ export function load<S extends PropertiesSchema>(
 
   lyra.index = index;
   lyra.docs = docs;
-  lyra.nodes = nodes;
   lyra.schema = schema;
   lyra.frequencies = frequencies;
   lyra.tokenOccurrencies = tokenOccurrencies;
