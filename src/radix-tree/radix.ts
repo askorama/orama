@@ -88,8 +88,6 @@ export function insert(root: Node, word: string, docId: string) {
 }
 
 export function find(root: Node, { term, exact, tolerance }: FindParams) {
-  let subWord = "";
-
   // find the closest node to the term
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
@@ -100,16 +98,15 @@ export function find(root: Node, { term, exact, tolerance }: FindParams) {
 
       // find the common prefix between two words ex: prime and primate = prim
       const commonPrefix = getCommonPrefix(edgeLabel, termSubstring);
-
+      const commonPrefixLength = commonPrefix.length;
       // if the common prefix lenght is equal to edgeLabel lenght (the node subword) it means they are a match
       // if the common prefix is equal to the term means it is contained in the node
-      if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== termSubstring.length) {
+      if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
         // if tolerance is set we take the current node as the closest
         if (tolerance) break;
         return {};
       }
 
-      subWord += rootChildCurrentChar.subWord;
       // skip the subword lenght and check the next divergent character
       i += rootChildCurrentChar.subWord.length - 1;
       // navigate into the child node
@@ -121,19 +118,12 @@ export function find(root: Node, { term, exact, tolerance }: FindParams) {
 
   const output: FindResult = {};
   // found the closest node we recursively search through children
-  findAllWords(root, output, subWord, term, exact, tolerance);
+  findAllWords(root, output, term, exact, tolerance);
 
   return output;
 }
 
-function findAllWords(
-  node: Node,
-  output: FindResult,
-  subWord: string,
-  term: string,
-  exact?: boolean,
-  tolerance?: number,
-) {
+function findAllWords(node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
   if (node.end) {
     const { word, docs: docIDs } = node;
 
@@ -175,7 +165,7 @@ function findAllWords(
 
   // recursively search the children
   for (const character of Object.keys(node.children)) {
-    findAllWords(node.children[character], output, subWord + node.children[character].subWord, term, exact, tolerance);
+    findAllWords(node.children[character], output, term, exact, tolerance);
   }
   return output;
 }
