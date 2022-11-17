@@ -187,13 +187,17 @@ export function contains(root: Node, term: string): boolean {
     const character = term[i];
 
     if (character in root.children) {
-      const edgeLabel = root.children[character].subWord;
-      const commonPrefix = getCommonPrefix(edgeLabel, term.substring(i));
-      if (commonPrefix.length !== edgeLabel.length && commonPrefix.length !== term.substring(i).length) {
+      const rootChildrenChar = root.children[character];
+      const edgeLabel = rootChildrenChar.subWord;
+      const termSubstring = term.substring(i);
+      const commonPrefix = getCommonPrefix(edgeLabel, termSubstring);
+      const commonPrefixLength = commonPrefix.length;
+
+      if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
         return false;
       }
-      i += root.children[character].subWord.length - 1;
-      root = root.children[character];
+      i += rootChildrenChar.subWord.length - 1;
+      root = rootChildrenChar;
     } else {
       return false;
     }
