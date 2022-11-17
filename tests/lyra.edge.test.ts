@@ -7,7 +7,7 @@ function extractOriginalDoc(result: any) {
 }
 
 t.test("Edge getters", t => {
-  t.plan(3);
+  t.plan(4);
 
   t.test("should correctly enable edge index getter", t => {
     t.plan(2);
@@ -94,18 +94,18 @@ t.test("Edge getters", t => {
       edge: true,
     });
 
-    const id1 = insert(db2, {
+    insert(db2, {
       name: "Michele",
       age: 27,
     });
 
-    const id2 = insert(db2, {
+    insert(db2, {
       name: "Paolo",
       age: 37,
     });
 
-    const { index, docs, nodes, schema, frequencies, tokenOccurrencies } = save(db2);
-    load(db, { index, docs, nodes, schema, frequencies, tokenOccurrencies });
+    const dbData = save(db2);
+    load(db, dbData);
 
     const search1 = search(db, { term: "Jane" });
     const search2 = search(db, { term: "John" });
@@ -119,5 +119,49 @@ t.test("Edge getters", t => {
 
     t.matchSnapshot(extractOriginalDoc(search3.hits));
     t.matchSnapshot(extractOriginalDoc(search4.hits));
+  });
+
+  t.test("It should correctly save and load data", t => {
+    t.plan(2);
+
+    const originalDB = create({
+      schema: {
+        name: "string",
+        age: "number",
+      },
+    });
+
+    insert(originalDB, {
+      name: "Michele",
+      age: 27,
+    });
+
+    insert(originalDB, {
+      name: "Paolo",
+      age: 37,
+    });
+
+    const DBData = save(originalDB);
+
+    console.log(DBData);
+
+    const newDB = create({
+      schema: {
+        name: "string",
+        age: "number",
+      },
+      edge: true,
+    });
+
+    load(newDB, DBData);
+
+    const search1 = search(originalDB, { term: "Michele" });
+    const search2 = search(newDB, { term: "Michele" });
+
+    const search3 = search(originalDB, { term: "P" });
+    const search4 = search(newDB, { term: "P" });
+
+    t.strictSame(search1.hits, search2.hits);
+    t.strictSame(search3.hits, search4.hits);
   });
 });
