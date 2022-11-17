@@ -65,7 +65,7 @@ t.test("defaultLanguage", t => {
 });
 
 t.test("checkInsertDocSchema", t => {
-  t.plan(3);
+  t.plan(5);
 
   t.test("should compare the inserted doc with the schema definition", t => {
     t.plan(2);
@@ -84,6 +84,52 @@ t.test("checkInsertDocSchema", t => {
       insert(db, { quote: "hello, world!", author: true });
     } catch (err) {
       t.matchSnapshot(err, `${t.name} - 1`);
+    }
+  });
+
+  t.test("should check for nested wrong schema properties", t => {
+    t.plan(1);
+    const db = create({
+      schema: {
+        quote: "string",
+        author: {
+          name: "string",
+          surname: "string",
+        },
+      },
+    });
+    try {
+      insert(db, {
+        quote:
+          "Nobody ever figures out what life is all about, and it doesn't matter. Explore the world. Nearly everything is really interesting if you go into it deeply enough.",
+        // @ts-expect-error test error case
+        author: "Richard Feynman",
+      });
+    } catch (e) {
+      t.matchSnapshot(e, t.name);
+    }
+  });
+
+  t.test("should check for non serializable document property", t => {
+    t.plan(1);
+
+    const db = create({
+      schema: {
+        quote: "string",
+        author: {
+          name: "string",
+          surname: "string",
+        },
+      },
+    });
+    try {
+      insert(db, {
+        quote: "I'll need some information first, Just the basic facts, Can you show me where it hurts?",
+        // @ts-expect-error test error case
+        author: ["David Jon Gilmour", "Roger Waters"],
+      });
+    } catch (e) {
+      t.matchSnapshot(e, t.name);
     }
   });
 

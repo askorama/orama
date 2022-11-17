@@ -36,7 +36,8 @@ type TokenOccurrency = {
 export { tokenize } from "./tokenizer";
 export { formatNanoseconds } from "./utils";
 
-export type PropertyType = "string" | "number" | "boolean";
+const SUPPORTED_PROPERTY_TYPES = ["string", "number", "boolean"] as const;
+export type PropertyType = typeof SUPPORTED_PROPERTY_TYPES[number];
 
 export type PropertiesSchema = {
   [key: string]: PropertyType | PropertiesSchema;
@@ -210,20 +211,42 @@ function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix
   }
 }
 
+const UNSERIALIZABLE_OBJECTS = ["Array", "Map", "WeakMap", "Set", "WeakSet"] as const;
+
+function isSerializable(docValue: any) {
+  const valueType = typeof docValue;
+  if (valueType == "object") {
+    return !includes(UNSERIALIZABLE_OBJECTS, docValue.constructor.name);
+  } else {
+    return includes(SUPPORTED_PROPERTY_TYPES, valueType);
+  }
+}
+
 function recursiveCheckDocSchema<S extends PropertiesSchema>(
   newDoc: ResolveSchema<S>,
   schema: PropertiesSchema,
 ): boolean {
   for (const key in newDoc) {
-    if (!(key in schema)) {
+    const propType = typeof newDoc[key];
+    if (!(key in schema) || typeof schema[key] == "undefined") {
+      if (!isSerializable(newDoc[key])) {
+        return false;
+      }
+
       continue;
     }
 
-    const propType = typeof newDoc[key];
+    const schemaType = typeof schema[key] == "object" ? "object" : schema[key];
 
-    if (propType === "object") {
-      recursiveCheckDocSchema(newDoc[key] as ResolveSchema<S>, schema);
-    } else if (typeof newDoc[key] !== schema[key]) {
+    if (schemaType == propType) {
+      if (propType === "object") {
+        return isSerializable(newDoc[key])
+          ? recursiveCheckDocSchema(newDoc[key] as ResolveSchema<S>, schema[key] as PropertiesSchema)
+          : false;
+      } else if (!includes(SUPPORTED_PROPERTY_TYPES, propType) || propType !== schema[key]) {
+        return false;
+      }
+    } else {
       return false;
     }
   }

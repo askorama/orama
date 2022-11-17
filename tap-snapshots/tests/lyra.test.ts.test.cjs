@@ -5,6 +5,49 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
+exports[`tests/lyra.test.ts TAP checkInsertDocSchema should check for nested wrong schema properties > should check for nested wrong schema properties 1`] = `
+Error: Invalid document structure. 
+Lyra has been initialized with the following schema: 
+
+{
+  "quote": "string",
+  "author": {
+    "name": "string",
+    "surname": "string"
+  }
+}
+
+but found the following doc:
+
+{
+  "quote": "Nobody ever figures out what life is all about, and it doesn't matter. Explore the world. Nearly everything is really interesting if you go into it deeply enough.",
+  "author": "Richard Feynman"
+}
+`
+
+exports[`tests/lyra.test.ts TAP checkInsertDocSchema should check for non serializable document property > should check for non serializable document property 1`] = `
+Error: Invalid document structure. 
+Lyra has been initialized with the following schema: 
+
+{
+  "quote": "string",
+  "author": {
+    "name": "string",
+    "surname": "string"
+  }
+}
+
+but found the following doc:
+
+{
+  "quote": "I'll need some information first, Just the basic facts, Can you show me where it hurts?",
+  "author": [
+    "David Jon Gilmour",
+    "Roger Waters"
+  ]
+}
+`
+
 exports[`tests/lyra.test.ts TAP checkInsertDocSchema should compare the inserted doc with the schema definition > should compare the inserted doc with the schema definition - 1 1`] = `
 Error: Invalid document structure. 
 Lyra has been initialized with the following schema: 
