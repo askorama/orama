@@ -292,7 +292,8 @@ function recursiveradixInsertion<S extends PropertiesSchema>(
           tokenOccurrencies[propName][token] = 0;
         }
 
-        tokenOccurrencies[propName][token]++;
+        // increase a token counter that may not yet exist
+        tokenOccurrencies[propName][token] = (tokenOccurrencies[propName][token] ?? 0) + 1;
 
         radixInsert(requestedTrie, token, id);
       }
@@ -648,15 +649,22 @@ export function search<S extends PropertiesSchema>(
     for (let j = 0; j < tokensLength; j++) {
       const term = tokens[j];
       const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
-      const termOccurrencies = lyraOccurrencies[term];
+      
+      // lyraOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
+      const termOccurrencies = typeof lyraOccurrencies[term] === "number"
+        ? (lyraOccurrencies[term] ?? 0)
+        : 0;
+
       const orderedTFIDFList: TokenScore[] = [];
 
       // Calculate TF-IDF value for each term, in each document, for each index.
       // Then insert sorted results into orderedTFIDFList.
       const documentIDsLength = documentIDs.length;
       for (let k = 0; k < documentIDsLength; k++) {
+        // idf's denominator is shifted by 1 to avoid division by zero
+        const idf = Math.log10(N / (1 + termOccurrencies));
+        
         const id = documentIDs[k];
-        const idf = Math.log10(N / termOccurrencies);
         const tfIdf = idf * (lyraFrequencies?.[id]?.[term] ?? 0);
 
         // @todo: we're now using binary search to insert the element in the right position.
