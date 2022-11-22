@@ -1,0 +1,28 @@
+name: wasm
+
+on: [ push ]
+
+jobs:
+  build:
+    name: Compile Rust to WebAssembly
+    strategy:
+      matrix:
+        platform: [ ubuntu-latest ]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.enginesHash }}
+      - uses: cachix/install-nix-action@v18
+
+      - name: Clean
+        run: rm -rf ./src/wasm
+
+      - name: Build
+        run: |
+          (cd rust; nix build)
+          chmod -R 777 ./rust/result
+          cp -r ./rust/result/ ./src/
+      
+      - name: Show artifacts
+        run: ls -l ./src/wasm
