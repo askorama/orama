@@ -649,11 +649,9 @@ export function search<S extends PropertiesSchema>(
     for (let j = 0; j < tokensLength; j++) {
       const term = tokens[j];
       const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
-      
+
       // lyraOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
-      const termOccurrencies = typeof lyraOccurrencies[term] === "number"
-        ? (lyraOccurrencies[term] ?? 0)
-        : 0;
+      const termOccurrencies = typeof lyraOccurrencies[term] === "number" ? lyraOccurrencies[term] ?? 0 : 0;
 
       const orderedTFIDFList: TokenScore[] = [];
 
@@ -663,7 +661,7 @@ export function search<S extends PropertiesSchema>(
       for (let k = 0; k < documentIDsLength; k++) {
         // idf's denominator is shifted by 1 to avoid division by zero
         const idf = Math.log10(N / (1 + termOccurrencies));
-        
+
         const id = documentIDs[k];
         const tfIdf = idf * (lyraFrequencies?.[id]?.[term] ?? 0);
 
