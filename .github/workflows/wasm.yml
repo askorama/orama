@@ -55,7 +55,7 @@ jobs:
       - name: Create Wasm artifacts
         run: |
           docker create --name tmp lyrasearch/lyra-wasm
-          docker cp dummy:/opt/app/src/wasm ./src/wasm
+          docker cp tmp:/opt/app/src/wasm ./src/wasm
           docker rm -f tmp
 
       - name: Show Wasm artifacts

@@ -1,7 +1,7 @@
 ########
 # docker buildx build --load -f Dockerfile --build-context rust=rust . -t lyrasearch/lyra-wasm --progress plain
 # docker create --name tmp lyrasearch/lyra-wasm
-# docker cp dummy:/opt/app/src/wasm ./src/wasm
+# docker cp tmp:/opt/app/src/wasm ./src/wasm
 # docker rm -f tmp
 ########
 
