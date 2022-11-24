@@ -4,11 +4,19 @@ on: [ push ]
 
 jobs:
   build:
-    name: Compile Rust to WebAssembly
+    name: Compile Rust to WebAssembly with Docker
     strategy:
+      fail-fast: true
       matrix:
-        platform: [ ubuntu-latest ]
-    runs-on: ${{ matrix.platform }}
+        os: [ubuntu-latest]
+
+    name: "Build WebAssembly artifacts using Docker"
+
+    env:
+      DOCKER_BUILDKIT: 1
+      COMPOSE_DOCKER_CLI_BUILD: 1 
+
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Set git to use LF
         run: |
@@ -18,16 +26,34 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.inputs.enginesHash }}
-      - uses: cachix/install-nix-action@v18
 
-      - name: Clean
-        run: rm -rf ./src/wasm
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1 
 
-      - name: Build
+      - name: Set up cache
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ matrix.os }}-buildx-${{ hashFiles('**/Dockerfile') }}
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v2
+        with:
+          build-contexts: rust=rust
+          context: .
+          file: ./Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          load: true
+          tags: lyrasearch/lyra-wasm
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Create Wasm artifacts
         run: |
-          (cd rust; nix build)
-          chmod -R 777 ./rust/result
-          cp -r ./rust/result/ ./src/
-      
-      - name: Show artifacts
+          docker create --name tmp lyrasearch/lyra-wasm
+          docker cp dummy:/opt/app/src/wasm ./src/wasm
+          docker rm -f tmp
+
+      - name: Show Wasm artifacts
         run: ls -l ./src/wasm
