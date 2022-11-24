@@ -25,7 +25,7 @@
     "build:cjs": "tsc --project tsconfig.cjs.json",
     "build:module": "tsc --project tsconfig.esm.json",
     "build:browser": "tsc --project tsconfig.browser.json",
-    "build": "rimraf ./dist && concurrently 'npm:build:module' 'npm:build:cjs' 'npm:build:browser'",
+    "build": "rimraf ./dist && concurrently 'npm:build:module' 'npm:build:cjs' 'npm:build:browser' && cp -r src/wasm dist/esm/src && cp -r src/wasm dist/cjs/src && cp -r src/wasm dist/browser/src",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
     "test:smoke": "tap --rcfile=tests/config/tap.yml tests/smoke/*.test.ts",

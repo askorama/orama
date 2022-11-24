@@ -143,8 +143,6 @@ t.test("Edge getters", t => {
 
     const DBData = save(originalDB);
 
-    console.log(DBData);
-
     const newDB = create({
       schema: {
         name: "string",
