@@ -1,6 +1,11 @@
 name: wasm
 
-on: [ push ]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
