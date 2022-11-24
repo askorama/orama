@@ -15,8 +15,6 @@ jobs:
       matrix:
         os: [ubuntu-latest]
 
-    name: "Build WebAssembly artifacts using Docker"
-
     env:
       DOCKER_BUILDKIT: 1
       COMPOSE_DOCKER_CLI_BUILD: 1 
