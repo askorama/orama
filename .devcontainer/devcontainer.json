@@ -1,0 +1,22 @@
+{
+    "name": "lyra devcontainer",
+    "extensions": [
+      "esbenp.prettier-vscode",
+      "usernamehw.errorlens",
+      "dbaeumer.vscode-eslint",
+      "yzhang.markdown-all-in-one",
+      "christian-kohler.path-intellisense",
+      "pflannery.vscode-versionlens",
+      "ms-azuretools.vscode-docker"
+    ],
+    "build": {
+      "dockerfile": "Dockerfile"
+    },
+    "waitFor": "onCreateCommand",
+    "updateContentCommand": "pnpm install",
+    "customizations": {
+      "codespaces": {
+        "openFiles": ["CONTRIBUGINT.md", "README.md"]
+      }
+    }
+  }
