@@ -16,7 +16,7 @@
     "updateContentCommand": "pnpm install",
     "customizations": {
       "codespaces": {
-        "openFiles": ["CONTRIBUGINT.md", "README.md"]
+        "openFiles": ["CONTRIBUTING.md", "README.md"]
       }
     }
   }
