@@ -5,7 +5,7 @@ import { create, insert, search } from "../..";
 t.test("lyra", t => {
   t.plan(1);
 
-  t.test("should correctly search for data", t => {
+  t.test("should correctly search for data", async t => {
     t.plan(6);
 
     const db = create({
@@ -21,22 +21,22 @@ t.test("lyra", t => {
     insert(db, { quote: "I like cats. They are the best.", author: "Jane Doe" });
 
     // Exact search
-    const result1 = search(db, { term: "fox", exact: true });
-    const result2 = search(db, { term: "dog", exact: true });
+    const result1 = await search(db, { term: "fox", exact: true });
+    const result2 = await search(db, { term: "dog", exact: true });
 
     t.equal(result1.count, 2);
     t.equal(result2.count, 3);
 
     // Prefix search
-    const result3 = search(db, { term: "fox", exact: false });
-    const result4 = search(db, { term: "dog", exact: false });
+    const result3 = await search(db, { term: "fox", exact: false });
+    const result4 = await search(db, { term: "dog", exact: false });
 
     t.equal(result3.count, 2);
     t.equal(result4.count, 3);
 
     // Typo-tolerant search
-    const result5 = search(db, { term: "fx", tolerance: 1 });
-    const result6 = search(db, { term: "dg", tolerance: 2 });
+    const result5 = await search(db, { term: "fx", tolerance: 1 });
+    const result6 = await search(db, { term: "dg", tolerance: 2 });
 
     t.equal(result5.count, 2);
     t.equal(result6.count, 4);

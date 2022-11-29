@@ -22,3 +22,4 @@ stemmer/**/*.js
 stemmer/**/*.d.ts
 *.dic
 src/wasm
+rust/scripts

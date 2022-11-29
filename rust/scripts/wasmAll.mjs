@@ -1,14 +1,15 @@
-import { argv } from "process";
 import fs from "fs";
 import path from "path";
 import TOML from "@iarna/toml";
 import { wasm } from "./wasm.mjs";
 
-async function main() {
-  const profile = process.env.LYRA_WASM_PROFILE || "release";
-  const target = process.env.LYRA_WASM_TARGET || "nodejs";
+export const targets = ["nodejs", "web", "deno"];
 
-  await wasmAll({ profile, target });  
+async function main() {
+  for (const target of targets) {
+    console.log("Building for target:", target, "\n");
+    await wasmAll({ profile: "release", target });
+  }
 }
 
 async function wasmAll({ profile, target }) {

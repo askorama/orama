@@ -4,7 +4,7 @@ import url from "url";
 import { execa } from "execa";
 
 export async function wasm({ crateFolder, profile, target, shouldOptimize }) {
-  const outDir = path.resolve(path.join("..", "src", "wasm"));
+  const outDir = path.resolve(path.join("..", "src", "wasm", "artifacts", target));
   const crate = crateFolder.replaceAll("-", "_");
   const wasmTarget = "wasm32-unknown-unknown";
 

@@ -57,10 +57,10 @@ t.test("lyra.dataset", async t => {
     await insertBatch(db, events);
   });
 
-  t.test("should correctly populate the database with a large dataset", t => {
+  t.test("should correctly populate the database with a large dataset", async t => {
     t.plan(4);
 
-    const s1 = search(db, {
+    const s1 = await search(db, {
       term: "august",
       exact: true,
       properties: ["categories.first"],
@@ -68,7 +68,7 @@ t.test("lyra.dataset", async t => {
       offset: 0,
     });
 
-    const s2 = search(db, {
+    const s2 = await search(db, {
       term: "january, june",
       exact: true,
       properties: ["categories.first"],
@@ -76,7 +76,7 @@ t.test("lyra.dataset", async t => {
       offset: 0,
     });
 
-    const s3 = search(db, {
+    const s3 = await search(db, {
       term: "january/june",
       exact: true,
       properties: ["categories.first"],
@@ -91,20 +91,20 @@ t.test("lyra.dataset", async t => {
   });
 
   //  Tests for https://github.com/LyraSearch/lyra/issues/159
-  t.test("should correctly search long strings", t => {
+  t.test("should correctly search long strings", async t => {
     t.plan(3);
 
-    const s1 = search(db, {
+    const s1 = await search(db, {
       term: "e into the",
       properties: ["description"],
     });
 
-    const s2 = search(db, {
+    const s2 = await search(db, {
       term: "The Roman armies",
       properties: ["description"],
     });
 
-    const s3 = search(db, {
+    const s3 = await search(db, {
       term: "the King of Epirus, is taken",
       properties: ["description"],
     });
@@ -114,11 +114,11 @@ t.test("lyra.dataset", async t => {
     t.equal(s3.count, 1);
   });
 
-  t.test("should perform paginate search", t => {
+  t.test("should perform paginate search", async t => {
     t.plan(5);
 
     const s1 = removeVariadicData(
-      search(db, {
+      await search(db, {
         term: "war",
         exact: true,
         // eslint-disable-next-line
@@ -130,7 +130,7 @@ t.test("lyra.dataset", async t => {
     );
 
     const s2 = removeVariadicData(
-      search(db, {
+      await search(db, {
         term: "war",
         exact: true,
         properties: ["description"],
@@ -140,7 +140,7 @@ t.test("lyra.dataset", async t => {
     );
 
     const s3 = removeVariadicData(
-      search(db, {
+      await search(db, {
         term: "war",
         exact: true,
         properties: ["description"],
@@ -149,7 +149,7 @@ t.test("lyra.dataset", async t => {
       }),
     );
 
-    const s4 = search(db, {
+    const s4 = await search(db, {
       term: "war",
       exact: true,
       properties: ["description"],
@@ -157,7 +157,7 @@ t.test("lyra.dataset", async t => {
       offset: 0,
     });
 
-    const s5 = search(db, {
+    const s5 = await search(db, {
       term: "war",
       exact: true,
       properties: ["description"],
@@ -173,10 +173,10 @@ t.test("lyra.dataset", async t => {
     t.equal(s5.hits.length, 10);
   });
 
-  t.test("should correctly delete documents", t => {
+  t.test("should correctly delete documents", async t => {
     t.plan(1);
 
-    const documentsToDelete = search(db, {
+    const documentsToDelete = await search(db, {
       term: "war",
       exact: true,
       properties: ["description"],
@@ -188,7 +188,7 @@ t.test("lyra.dataset", async t => {
       remove(db, doc.id);
     }
 
-    const newSearch = search(db, {
+    const newSearch = await search(db, {
       term: "war",
       exact: true,
       properties: ["description"],

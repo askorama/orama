@@ -169,7 +169,7 @@ t.test("checkInsertDocSchema", t => {
 t.test("lyra", t => {
   t.plan(19);
 
-  t.test("should correctly search for data", t => {
+  t.test("should correctly search for data", async t => {
     t.plan(8);
 
     const db = create({
@@ -185,35 +185,35 @@ t.test("lyra", t => {
     insert(db, { quote: "I like cats. They are the best.", author: "Jane Doe" });
 
     // Exact search
-    const result1 = search(db, { term: "fox", exact: true });
-    const result2 = search(db, { term: "dog", exact: true });
+    const result1 = await search(db, { term: "fox", exact: true });
+    const result2 = await search(db, { term: "dog", exact: true });
 
     t.equal(result1.count, 2);
     t.equal(result2.count, 3);
 
     // Prefix search
-    const result3 = search(db, { term: "fox", exact: false });
-    const result4 = search(db, { term: "dog", exact: false });
+    const result3 = await search(db, { term: "fox", exact: false });
+    const result4 = await search(db, { term: "dog", exact: false });
 
     t.equal(result3.count, 2);
     t.equal(result4.count, 3);
 
     // Typo-tolerant search
-    const result5 = search(db, { term: "fx", tolerance: 1 });
-    const result6 = search(db, { term: "dg", tolerance: 2 });
+    const result5 = await search(db, { term: "fx", tolerance: 1 });
+    const result6 = await search(db, { term: "dg", tolerance: 2 });
 
     t.equal(result5.count, 2);
     t.equal(result6.count, 4);
 
     // Long string search (Tests for https://github.com/LyraSearch/lyra/issues/159 )
-    const result7 = search(db, { term: "They are the best" });
-    const result8 = search(db, { term: "Foxes are nice animals" });
+    const result7 = await search(db, { term: "They are the best" });
+    const result8 = await search(db, { term: "Foxes are nice animals" });
 
     t.equal(result7.count, 2);
     t.equal(result8.count, 1);
   });
 
-  t.test("should correctly search for data returning doc including with unindexed keys", t => {
+  t.test("should correctly search for data returning doc including with unindexed keys", async t => {
     t.plan(4);
 
     const db = create({
@@ -237,8 +237,8 @@ t.test("lyra", t => {
     insert(db, documentWithNestedUnindexedField);
     insert(db, documentWithUnindexedField);
 
-    const result1 = search(db, { term: "They are the best" });
-    const result2 = search(db, { term: "Foxes are nice animals" });
+    const result1 = await search(db, { term: "They are the best" });
+    const result2 = await search(db, { term: "Foxes are nice animals" });
 
     t.equal(result1.count, 1);
     t.equal(result2.count, 1);
@@ -246,7 +246,7 @@ t.test("lyra", t => {
     t.same(result2.hits[0].document, documentWithNestedUnindexedField);
   });
 
-  t.test("should not found any doc if searching by unindexed field value", t => {
+  t.test("should not found any doc if searching by unindexed field value", async t => {
     t.plan(2);
 
     const db = create({
@@ -265,14 +265,14 @@ t.test("lyra", t => {
     //@ts-expect-error test error case
     insert(db, { quote: "I like cats. They are the best.", author: "Jane Doe", unindexedField: "unindexedValue" });
 
-    const result1 = search(db, { term: "unindexedNestedValue" });
-    const result2 = search(db, { term: "unindexedValue" });
+    const result1 = await search(db, { term: "unindexedNestedValue" });
+    const result2 = await search(db, { term: "unindexedValue" });
 
     t.equal(result1.count, 0);
     t.equal(result2.count, 0);
   });
 
-  t.test("should correctly insert and retrieve data", t => {
+  t.test("should correctly insert and retrieve data", async t => {
     t.plan(4);
 
     const db = create({
@@ -282,7 +282,7 @@ t.test("lyra", t => {
     });
 
     const ex1Insert = insert(db, { example: "The quick, brown, fox" });
-    const ex1Search = search(db, {
+    const ex1Search = await search(db, {
       term: "quick",
       properties: ["example"],
     });
@@ -293,7 +293,7 @@ t.test("lyra", t => {
     t.equal(ex1Search.hits[0].document.example, "The quick, brown, fox");
   });
 
-  t.test("should correctly paginate results", t => {
+  t.test("should correctly paginate results", async t => {
     t.plan(9);
 
     const db = create({
@@ -309,10 +309,10 @@ t.test("lyra", t => {
     insert(db, { animal: "Fabolous ducks" });
     insert(db, { animal: "Fantastic horse" });
 
-    const search1 = search(db, { term: "f", limit: 1, offset: 0 });
-    const search2 = search(db, { term: "f", limit: 1, offset: 1 });
-    const search3 = search(db, { term: "f", limit: 1, offset: 2 });
-    const search4 = search(db, { term: "f", limit: 2, offset: 2 });
+    const search1 = await search(db, { term: "f", limit: 1, offset: 0 });
+    const search2 = await search(db, { term: "f", limit: 1, offset: 1 });
+    const search3 = await search(db, { term: "f", limit: 1, offset: 2 });
+    const search4 = await search(db, { term: "f", limit: 2, offset: 2 });
 
     t.equal(search1.count, 4);
     t.equal(search1.hits[0].document.animal, "Quick brown fox");
@@ -328,21 +328,28 @@ t.test("lyra", t => {
     t.equal(search4.hits[1].document.animal, "Fantastic horse");
   });
 
-  t.test("Should throw an error when searching in non-existing indices", t => {
+  t.test("Should throw an error when searching in non-existing indices", async t => {
     t.plan(1);
 
     const db = create({ schema: { foo: "string", baz: "string" } });
 
-    t.throws(() => {
-      search(db, {
+    try {
+      await search(db, {
         term: "foo",
         //@ts-expect-error test error case
         properties: ["bar"],
       });
-    }, `"Invalid property name. Expected a wildcard string (\\"*\\") or array containing one of the following properties: foo, baz, but got: bar"`);
+    } catch (e) {
+      t.same(
+        e,
+        Error(
+          `Invalid property name. Expected a wildcard string ("*") or array containing one of the following properties: foo, baz, but got: bar`,
+        ),
+      );
+    }
   });
 
-  t.test("Should correctly remove a document after its insertion", t => {
+  t.test("Should correctly remove a document after its insertion", async t => {
     t.plan(5);
 
     const db = create({
@@ -369,7 +376,7 @@ t.test("lyra", t => {
 
     const res = remove(db, id1);
 
-    const searchResult = search(db, {
+    const searchResult = await search(db, {
       term: "Oscar",
       properties: ["author"],
     });
@@ -385,7 +392,7 @@ t.test("lyra", t => {
   });
 
   // Tests for https://github.com/nearform/lyra/issues/52
-  t.test("Should correctly remove documents via substring search", t => {
+  t.test("Should correctly remove documents via substring search", async t => {
     t.plan(1);
 
     const lyra = create({
@@ -400,14 +407,14 @@ t.test("lyra", t => {
 
     remove(lyra, halo);
 
-    const searchResult = search(lyra, {
+    const searchResult = await search(lyra, {
       term: "Hal",
     });
 
     t.equal(searchResult.count, 2);
   });
 
-  t.test("Should remove a document with a nested schema", t => {
+  t.test("Should remove a document with a nested schema", async t => {
     t.plan(4);
 
     const movieDB = create({
@@ -428,14 +435,14 @@ t.test("lyra", t => {
       isFavorite: false,
     });
 
-    const testSearch1 = search(movieDB, {
+    const testSearch1 = await search(movieDB, {
       term: "Harry Potter",
       properties: ["title", "director", "plot"],
     });
 
     remove(movieDB, harryPotter);
 
-    const testSearch2 = search(movieDB, {
+    const testSearch2 = await search(movieDB, {
       term: "Harry Potter",
       properties: ["title", "director", "plot"],
     });
@@ -447,7 +454,7 @@ t.test("lyra", t => {
     t.equal(testSearch2.count, 0);
   });
 
-  t.test("Shouldn't returns deleted documents", t => {
+  t.test("Shouldn't returns deleted documents", async t => {
     t.plan(1);
 
     const db = create({
@@ -460,18 +467,18 @@ t.test("lyra", t => {
     insert(db, { txt: "stellle" });
     insert(db, { txt: "scelte" });
 
-    const searchResult = search(db, { term: "stelle", exact: true });
+    const searchResult = await search(db, { term: "stelle", exact: true });
 
     const { id } = searchResult.hits[0];
 
     remove(db, id);
 
-    const searchResult2 = search(db, { term: "stelle", exact: true });
+    const searchResult2 = await search(db, { term: "stelle", exact: true });
 
     t.equal(searchResult2.count, 0);
   });
 
-  t.test("Shouldn't affects other document when deleted one", t => {
+  t.test("Shouldn't affects other document when deleted one", async t => {
     t.plan(2);
 
     const db = create({
@@ -484,18 +491,18 @@ t.test("lyra", t => {
     insert(db, { txt: "abc" });
     insert(db, { txt: "abcd" });
 
-    const searchResult = search(db, { term: "abc", exact: true });
+    const searchResult = await search(db, { term: "abc", exact: true });
 
     const id = searchResult.hits[0].id;
     remove(db, id);
 
-    const searchResult2 = search(db, { term: "abc", exact: true });
+    const searchResult2 = await search(db, { term: "abc", exact: true });
 
     t.ok(searchResult2.hits.every(({ id: docID }) => docID !== id));
     t.equal(searchResult2.count, 1);
   });
 
-  t.test("Should preserve identical docs after deletion", t => {
+  t.test("Should preserve identical docs after deletion", async t => {
     t.plan(9);
 
     const db = create({
@@ -522,12 +529,12 @@ t.test("lyra", t => {
 
     const res = remove(db, id1);
 
-    const searchResult = search(db, {
+    const searchResult = await search(db, {
       term: "Oscar",
       properties: ["author"],
     });
 
-    const searchResult2 = search(db, {
+    const searchResult2 = await search(db, {
       term: "already",
       properties: ["quote"],
     });
@@ -544,7 +551,7 @@ t.test("lyra", t => {
     t.equal(searchResult2.hits[0].id, id2);
   });
 
-  t.test("Should be able to insert documens with non-searchable fields", t => {
+  t.test("Should be able to insert documens with non-searchable fields", async t => {
     t.plan(2);
 
     const db = create({
@@ -570,7 +577,7 @@ t.test("lyra", t => {
       rating: 5,
     });
 
-    const searchResult = search(db, {
+    const searchResult = await search(db, {
       term: "frank",
     });
 
@@ -578,7 +585,7 @@ t.test("lyra", t => {
     t.equal(searchResult.hits[0].document.author, "Frank Zappa");
   });
 
-  t.test("Should exact match", t => {
+  t.test("Should exact match", async t => {
     t.plan(4);
 
     const db = create({
@@ -593,14 +600,14 @@ t.test("lyra", t => {
       author: "Oscar Wilde",
     });
 
-    const partialSearch = search(db, {
+    const partialSearch = await search(db, {
       term: "alr",
       exact: true,
     });
 
     t.equal(partialSearch.count, 0);
 
-    const exactSearch = search(db, {
+    const exactSearch = await search(db, {
       term: "already",
       exact: true,
     });
@@ -610,7 +617,7 @@ t.test("lyra", t => {
     t.equal(exactSearch.hits[0].document.author, "Oscar Wilde");
   });
 
-  t.test("Shouldn't tolerate typos", t => {
+  t.test("Shouldn't tolerate typos", async t => {
     t.plan(1);
 
     const db = create({
@@ -626,7 +633,7 @@ t.test("lyra", t => {
       author: "Sara A. Lourie",
     });
 
-    const searchResult = search(db, {
+    const searchResult = await search(db, {
       term: "seahrse",
       tolerance: 0,
     });
@@ -634,7 +641,7 @@ t.test("lyra", t => {
     t.equal(searchResult.count, 0);
   });
 
-  t.test("Should tolerate typos", t => {
+  t.test("Should tolerate typos", async t => {
     t.plan(2);
 
     const db = create({
@@ -655,14 +662,14 @@ t.test("lyra", t => {
       author: "Jennifer Keats Curtis",
     });
 
-    const tolerantSearch = search(db, {
+    const tolerantSearch = await search(db, {
       term: "seahrse",
       tolerance: 2,
     });
 
     t.equal(tolerantSearch.count, 2);
 
-    const moreTolerantSearch = search(db, {
+    const moreTolerantSearch = await search(db, {
       term: "sahrse",
       tolerance: 5,
     });
@@ -670,7 +677,7 @@ t.test("lyra", t => {
     t.equal(moreTolerantSearch.count, 2);
   });
 
-  t.test("Should support nested properties", t => {
+  t.test("Should support nested properties", async t => {
     t.plan(4);
 
     const db = create({
@@ -699,22 +706,22 @@ t.test("lyra", t => {
       },
     });
 
-    const resultAuthorSurname = search(db, {
+    const resultAuthorSurname = await search(db, {
       term: "Riddle",
       properties: ["author.surname"],
     });
 
-    const resultAuthorName = search(db, {
+    const resultAuthorName = await search(db, {
       term: "Riddle",
       properties: ["author.name"],
     });
 
-    const resultSimpsonQuote = search(db, {
+    const resultSimpsonQuote = await search(db, {
       term: "Homer",
       properties: ["quote"],
     });
 
-    const resultSimpsonAuthorName = search(db, {
+    const resultSimpsonAuthorName = await search(db, {
       term: "Homer",
       properties: ["author.name"],
     });
@@ -725,7 +732,7 @@ t.test("lyra", t => {
     t.equal(resultAuthorName.count, 0);
   });
 
-  t.test("Should support multiple nested properties", t => {
+  t.test("Should support multiple nested properties", async t => {
     t.plan(3);
 
     const db = create({
@@ -778,15 +785,15 @@ t.test("lyra", t => {
       },
     });
 
-    const resultAuthor = search(db, {
+    const resultAuthor = await search(db, {
       term: "Oscar",
     });
 
-    const resultTag = search(db, {
+    const resultTag = await search(db, {
       term: "books",
     });
 
-    const resultQuotes = search(db, {
+    const resultQuotes = await search(db, {
       term: "quotes",
     });
 
@@ -874,7 +881,7 @@ t.test("lyra - hooks", t => {
 t.test("custom tokenizer configuration", t => {
   t.plan(1);
 
-  t.test("tokenizerFn", t => {
+  t.test("tokenizerFn", async t => {
     t.plan(2);
     const db = create({
       schema: {
@@ -889,12 +896,12 @@ t.test("custom tokenizer configuration", t => {
       txt: "hello, world! How are you?",
     });
 
-    const searchResult = search(db, {
+    const searchResult = await search(db, {
       term: " world! How are you?",
       exact: true,
     });
 
-    const searchResult2 = search(db, {
+    const searchResult2 = await search(db, {
       term: "How are you?",
       exact: true,
     });
@@ -904,7 +911,7 @@ t.test("custom tokenizer configuration", t => {
   });
 });
 
-t.test("should access own properties exclusively", t => {
+t.test("should access own properties exclusively", async t => {
   t.plan(1);
 
   const db = create({
@@ -917,7 +924,7 @@ t.test("should access own properties exclusively", t => {
     txt: "constructor",
   });
 
-  search(db, {
+  await search(db, {
     term: "constructor",
     tolerance: 1,
   });

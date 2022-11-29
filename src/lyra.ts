@@ -7,14 +7,9 @@ import { tokenize, Tokenizer } from "./tokenizer";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
 import type { ResolveSchema, SearchProperties } from "./types";
-import {
-  getNanosecondsTime,
-  includes,
-  insertSortedValue,
-  intersectTokenScores,
-  sortTokenScorePredicate,
-  uniqueId,
-} from "./utils";
+import { getNanosecondsTime, includes, insertSortedValue, sortTokenScorePredicate, uniqueId } from "./utils";
+
+import { intersectTokenScores } from "./wasm/loader";
 
 export type TokenScore = [string, number];
 type Index = Record<string, Node>;
@@ -575,11 +570,11 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
  *   properties: ['author']
  * });
  */
-export function search<S extends PropertiesSchema>(
+export async function search<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   params: SearchParams<S>,
   language?: Language,
-): SearchResult<S> {
+): Promise<SearchResult<S>> {
   if (!language) {
     language = lyra.defaultLanguage;
   }
@@ -675,7 +670,7 @@ export function search<S extends PropertiesSchema>(
 
     const docIds = indexMap[index];
     const vals = Object.values(docIds);
-    docsIntersection[index] = intersectTokenScores(vals);
+    docsIntersection[index] = await intersectTokenScores(vals);
 
     const uniqueDocs = Object.values(docsIntersection[index]);
     const uniqueDocsLength = uniqueDocs.length;

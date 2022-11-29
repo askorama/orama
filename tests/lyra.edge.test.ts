@@ -65,7 +65,7 @@ t.test("Edge getters", t => {
     t.strictSame(docs[doc2.id], { name: "Jane", age: 25 });
   });
 
-  t.test("should correctly enable index setter", t => {
+  t.test("should correctly enable index setter", async t => {
     t.plan(6);
 
     const db = create({
@@ -107,10 +107,10 @@ t.test("Edge getters", t => {
     const dbData = save(db2);
     load(db, dbData);
 
-    const search1 = search(db, { term: "Jane" });
-    const search2 = search(db, { term: "John" });
-    const search3 = search(db, { term: "Paolo" });
-    const search4 = search(db, { term: "Michele" });
+    const search1 = await search(db, { term: "Jane" });
+    const search2 = await search(db, { term: "John" });
+    const search3 = await search(db, { term: "Paolo" });
+    const search4 = await search(db, { term: "Michele" });
 
     t.equal(search1.count, 0);
     t.equal(search2.count, 0);
@@ -121,7 +121,7 @@ t.test("Edge getters", t => {
     t.matchSnapshot(extractOriginalDoc(search4.hits));
   });
 
-  t.test("It should correctly save and load data", t => {
+  t.test("It should correctly save and load data", async t => {
     t.plan(2);
 
     const originalDB = create({
@@ -153,11 +153,11 @@ t.test("Edge getters", t => {
 
     load(newDB, DBData);
 
-    const search1 = search(originalDB, { term: "Michele" });
-    const search2 = search(newDB, { term: "Michele" });
+    const search1 = await search(originalDB, { term: "Michele" });
+    const search2 = await search(newDB, { term: "Michele" });
 
-    const search3 = search(originalDB, { term: "P" });
-    const search4 = search(newDB, { term: "P" });
+    const search3 = await search(originalDB, { term: "P" });
+    const search4 = await search(newDB, { term: "P" });
 
     t.strictSame(search1.hits, search2.hits);
     t.strictSame(search3.hits, search4.hits);
