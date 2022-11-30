@@ -11,6 +11,7 @@ import { no } from "./no";
 import { de } from "./de";
 import { dk } from "./dk";
 import { fi } from "./fi";
+import { kr } from "./kr";
 
 type StopWordsMap = {
   [key in Language]: string[];
@@ -29,6 +30,7 @@ export const stopWords: Partial<StopWordsMap> = {
   german: de,
   danish: dk,
   finnish: fi,
+  korean: kr
 };
 
 export const availableStopWords = Object.keys(stopWords);
