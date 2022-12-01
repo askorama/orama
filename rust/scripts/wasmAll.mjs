@@ -1,7 +1,9 @@
 import fs from "fs";
+import url from "url";
 import path from "path";
 import TOML from "@iarna/toml";
 import { wasm } from "./wasm.mjs";
+import { __dirname } from "./common.mjs";
 
 export const targets = ["nodejs", "web", "deno"];
 
@@ -13,14 +15,15 @@ async function main() {
 }
 
 async function wasmAll({ profile, target }) {
-  const readStream = fs.createReadStream(path.resolve(path.join("Cargo.toml")));
+  const cargoPath = path.join(__dirname(), "..", "Cargo.toml");
+  const readStream = fs.createReadStream(path.resolve(cargoPath));
   const cargoToml = await TOML.parse.stream(readStream);
   const workspaceMembers = cargoToml?.workspace?.members;
   const wasmCrates = workspaceMembers.filter((member) => member.endsWith("-wasm"));
 
   for (const wasmCrate of wasmCrates) {
     console.log("Processing crate:", wasmCrate);
-    await wasm({ crateFolder: wasmCrate, profile, target });
+    await wasm({ crateFolder: wasmCrate, profile, target, shouldOptimize: false });
   }
 }
 

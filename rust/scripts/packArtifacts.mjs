@@ -4,8 +4,7 @@ import { copyFileSync } from 'node:fs'
 import { buildSync } from 'esbuild'
 import { targets } from './wasmAll.mjs'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const builds = ['cjs', 'esm']
 const wasmUtilName = 'lyra_utils_wasm.js'

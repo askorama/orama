@@ -23,3 +23,4 @@ stemmer/**/*.d.ts
 *.dic
 src/wasm
 rust/scripts
+rust/src/wasm/artifacts/
