@@ -6,7 +6,8 @@ import { __dirname } from "./common.mjs";
 export async function wasm({ crateFolder, profile, target, shouldOptimize }) {
   process.chdir(path.join(__dirname(), '..'));
 
-  const outDir = path.resolve(path.join(__dirname(), "..", "src", "wasm", "artifacts", target));
+  const artifactName = target === "bundler" ? "nodejs" : target;
+  const outDir = path.resolve(path.join(__dirname(), "..", "src", "wasm", "artifacts", artifactName));
   const crate = crateFolder.replaceAll("-", "_");
   const wasmTarget = "wasm32-unknown-unknown";
 

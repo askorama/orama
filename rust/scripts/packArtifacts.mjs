@@ -22,12 +22,25 @@ for (const target of targets) {
       continue
     }
 
+    let platform;
+
+    switch (target) {
+      case 'nodejs':
+        platform = 'node'
+        break
+      case 'web':
+        platform = 'browser'
+        break
+      default:
+        platform = 'neutral'
+    }
+
     buildSync({
       entryPoints: entryPoints,
       outfile: outfile,
       bundle: false,
-      platform: 'neutral',
-      minify: true,
+      platform,
+      minify: false,
       format: build === 'cjs' ? 'cjs' : 'esm',
     })
   }
