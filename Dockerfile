@@ -80,6 +80,7 @@ ENV LYRA_WASM_OPT ${LYRA_WASM_OPT}
 COPY --from=wasm-tools /usr/bin/wasm-opt /usr/bin/wasm-opt
 
 # Install Node.js dependencies
+WORKDIR /opt/app
 RUN npm i
 WORKDIR /opt/app
 RUN (cd rust && node ./scripts/wasmAll.mjs)
