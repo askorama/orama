@@ -1,5 +1,5 @@
 import t from "tap";
-import { create, insert, search } from "../..";
+import { create, insert, search } from "../../src/lyra";
 // 👆 This test assumes the module has been built
 
 t.test("lyra", t => {
