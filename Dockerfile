@@ -82,8 +82,7 @@ COPY --from=wasm-tools /usr/bin/wasm-opt /usr/bin/wasm-opt
 # Install Node.js dependencies
 WORKDIR /opt/app
 RUN npm i
-WORKDIR /opt/app
-RUN (cd rust && node ./scripts/wasmAll.mjs)
+RUN npm run build:wasm_bindings
 
 ################
 #### Wasm output
