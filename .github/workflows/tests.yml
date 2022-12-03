@@ -17,6 +17,6 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: |
-          pnpm install --frozen-lockfile --ignore-scripts
+          pnpm install --frozen-lockfile
           pnpm run test 
           pnpm run test:smoke

@@ -1,11 +1,9 @@
 import fs from "fs";
-import url from "url";
 import path from "path";
 import TOML from "@iarna/toml";
 import { wasm } from "./wasm.mjs";
 import { __dirname } from "./common.mjs";
-
-export const targets = ["nodejs", "web", "deno"];
+import { targets } from "./packArtifacts.mjs";
 
 async function main() {
   for (const target of targets) {
