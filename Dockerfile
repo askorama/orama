@@ -35,6 +35,8 @@ RUN cp ./bin/wasm-opt /usr/bin/wasm-opt
 ########################
 FROM rust:${RUST_VERSION}-slim as builder
 
+COPY . /opt/app
+
 ARG WASM_BINDGEN_VERSION="0.2.83"
 
 # Rust compilation profile
@@ -81,6 +83,7 @@ COPY --from=wasm-tools /usr/bin/wasm-opt /usr/bin/wasm-opt
 
 # Install Node.js dependencies
 WORKDIR /opt/app
+COPY . /opt/app
 RUN npm i
 RUN npm run build:wasm_bindings
 
