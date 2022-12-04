@@ -20,18 +20,8 @@ export type TokenScore = [string, number];
 type Index = Record<string, Node>;
 type TokenMap = Record<string, TokenScore[]>;
 type IndexMap = Record<string, TokenMap>;
-type FrequencyMap = {
-  [property: string]: {
-    [documentID: string]: {
-      [token: string]: number;
-    };
-  };
-};
-type TokenOccurrency = {
-  [property: string]: {
-    [token: string]: number;
-  };
-};
+type FrequencyMap = Map<string, Map<string, Map<string, number>>>;
+type TokenOccurrency = Map<string, Map<string, number>>;
 
 export { tokenize } from "./tokenizer";
 export { formatNanoseconds } from "./utils";
@@ -263,16 +253,16 @@ function recursiveradixInsertion<S extends PropertiesSchema>(
       const requestedTrie = index[propName];
       const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language, false, tokenizerConfig);
 
-      if (!(propName in frequencies)) {
-        frequencies[propName] = {};
+      if (!frequencies.has(propName)) {
+        frequencies.set(propName, new Map());
       }
 
-      if (!(propName in tokenOccurrencies)) {
-        tokenOccurrencies[propName] = {};
+      if (!tokenOccurrencies.has(propName)) {
+        tokenOccurrencies.set(propName, new Map());
       }
 
-      if (!(id in frequencies[propName])) {
-        frequencies[propName][id] = {};
+      if (!frequencies.get(propName)?.has(id)) {
+        frequencies.get(propName)?.set(id, new Map());
       }
 
       for (const token of tokens) {
@@ -286,14 +276,15 @@ function recursiveradixInsertion<S extends PropertiesSchema>(
 
         const tf = tokenFrequency / tokens.length;
 
-        frequencies[propName][id][token] = tf;
+        frequencies.get(propName)?.get(id)?.set(token, tf);
 
-        if (!(token in tokenOccurrencies[propName])) {
-          tokenOccurrencies[propName][token] = 0;
+        if (!tokenOccurrencies.get(propName)?.has(token)) {
+          tokenOccurrencies?.get(propName)?.set(token, 0);
         }
 
         // increase a token counter that may not yet exist
-        tokenOccurrencies[propName][token] = (tokenOccurrencies[propName][token] ?? 0) + 1;
+        const tokenFreq = tokenOccurrencies?.get(propName)?.get(token) ?? 0;
+        tokenOccurrencies?.get(propName)?.set(token, tokenFreq + 1);
 
         radixInsert(requestedTrie, token, id);
       }
@@ -388,8 +379,8 @@ export function create<S extends PropertiesSchema>(properties: Configuration<S>)
     hooks: properties.hooks || {},
     edge: properties.edge ?? false,
     tokenizer: defaultTokenizerConfig(defaultLanguage, properties.tokenizer!),
-    frequencies: {},
-    tokenOccurrencies: {},
+    frequencies: new Map(),
+    tokenOccurrencies: new Map(),
   };
 
   buildIndex(instance, properties.schema);
@@ -549,8 +540,10 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
       const tokensLength = tokens.length;
       for (let k = 0; k < tokensLength; k++) {
         const token = tokens[k];
-        delete lyra.frequencies[key][docID];
-        lyra.tokenOccurrencies[key][token]--;
+        const occurrencies = lyra.tokenOccurrencies.get(key)?.get(token) ?? 0;
+        lyra.tokenOccurrencies.get(key)?.set(token, occurrencies - 1);
+        lyra.frequencies.get(key)?.delete(docID);
+
         if (token && !removeDocumentByWord(idx, token, docID)) {
           throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
         }
@@ -640,20 +633,18 @@ export function search<S extends PropertiesSchema>(
   for (let i = 0; i < indexesLength; i++) {
     const index = indices[i];
 
-    if (!(index in lyra.tokenOccurrencies)) continue;
+    if (!lyra.tokenOccurrencies.has(index)) continue;
 
-    const lyraOccurrencies = lyra.tokenOccurrencies[index];
-    const lyraFrequencies = lyra.frequencies[index];
+    const lyraOccurrencies = lyra.tokenOccurrencies.get(index);
+    const lyraFrequencies = lyra.frequencies.get(index);
 
     const tokensLength = tokens.length;
     for (let j = 0; j < tokensLength; j++) {
       const term = tokens[j];
       const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
-      
+      const occurrencies = lyraOccurrencies?.get(term) ?? 0;
       // lyraOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
-      const termOccurrencies = typeof lyraOccurrencies[term] === "number"
-        ? (lyraOccurrencies[term] ?? 0)
-        : 0;
+      const termOccurrencies = typeof occurrencies === "number" ? occurrencies : 0;
 
       const orderedTFIDFList: TokenScore[] = [];
 
@@ -663,9 +654,9 @@ export function search<S extends PropertiesSchema>(
       for (let k = 0; k < documentIDsLength; k++) {
         // idf's denominator is shifted by 1 to avoid division by zero
         const idf = Math.log10(N / (1 + termOccurrencies));
-        
+
         const id = documentIDs[k];
-        const tfIdf = idf * (lyraFrequencies?.[id]?.[term] ?? 0);
+        const tfIdf = idf * (lyraFrequencies?.get(id)?.get(term) ?? 0);
 
         // @todo: we're now using binary search to insert the element in the right position.
         // Maybe we can switch to sparse array insertion?
