@@ -18,8 +18,8 @@ import {
 
 export type TokenScore = [string, number];
 type Index = Record<string, Node>;
-type TokenMap = Record<string, TokenScore[]>;
-type IndexMap = Record<string, TokenMap>;
+type TokenMap = Map<string, TokenScore[]>;
+type IndexMap = Map<string, TokenMap>;
 type FrequencyMap = Map<string, Map<string, Map<string, number>>>;
 type TokenOccurrency = Map<string, Map<string, number>>;
 
@@ -605,7 +605,7 @@ export function search<S extends PropertiesSchema>(
   //     fox:   [doc2]
   //   }
   // }
-  const indexMap: IndexMap = {};
+  const indexMap: IndexMap = new Map();
   // After we create the indexMap, we need to calculate the intersection
   // between all the postings lists for each token.
   // Given the example above, docsIntersection will look like this:
@@ -615,15 +615,15 @@ export function search<S extends PropertiesSchema>(
   // }
   //
   // as doc2 is the only document present in all the postings lists for the "description" index.
-  const docsIntersection: TokenMap = {};
+  const docsIntersection: TokenMap = new Map();
 
   for (const index of indices) {
-    const tokensMap: TokenMap = {};
+    const tokensMap: TokenMap = new Map();
     for (const token of tokens) {
-      tokensMap[token] = [];
+      tokensMap.set(token, []);
     }
-    indexMap[index] = tokensMap;
-    docsIntersection[index] = [];
+    indexMap.set(index, tokensMap);
+    docsIntersection.set(index, []);
   }
 
   const N = Object.keys(lyra.docs).length;
@@ -663,14 +663,14 @@ export function search<S extends PropertiesSchema>(
         insertSortedValue(orderedTFIDFList, [id, tfIdf], sortTokenScorePredicate);
       }
 
-      indexMap[index][term].push(...orderedTFIDFList);
+      indexMap.get(index)?.set(term, indexMap.get(index)?.get(term)?.concat(orderedTFIDFList) ?? []);
     }
 
-    const docIds = indexMap[index];
-    const vals = Object.values(docIds);
-    docsIntersection[index] = intersectTokenScores(vals);
+    const docIds = indexMap.get(index);
+    const vals = [...(docIds?.values() ?? [])];
+    docsIntersection.set(index, intersectTokenScores(vals));
 
-    const uniqueDocs = Object.values(docsIntersection[index]);
+    const uniqueDocs = [...(docsIntersection.get(index)?.values() ?? [])];
     const uniqueDocsLength = uniqueDocs.length;
     for (let i = 0; i < uniqueDocsLength; i++) {
       const [id, tfIdfScore] = uniqueDocs[i];
