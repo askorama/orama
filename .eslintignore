@@ -25,3 +25,4 @@ src/wasm
 rust/scripts
 rust/src/wasm/artifacts/
 Dockerfile
+rust/src/wasm/artifacts/

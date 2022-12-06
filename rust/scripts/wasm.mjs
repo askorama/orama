@@ -6,7 +6,7 @@ import { __dirname } from "./common.mjs";
 export async function wasm({ crateFolder, profile, target, shouldOptimize }) {
   process.chdir(path.join(__dirname(), '..'));
 
-  const artifactName = target === "bundler" ? "nodejs" : target;
+  const artifactName = target;
   const outDir = path.resolve(path.join(__dirname(), "..", "src", "wasm", "artifacts", artifactName));
   const crate = crateFolder.replaceAll("-", "_");
   const wasmTarget = "wasm32-unknown-unknown";
@@ -19,15 +19,15 @@ export async function wasm({ crateFolder, profile, target, shouldOptimize }) {
 
   const wasmFile = path.join(__dirname(), "../target", wasmTarget, profile, `${crate}.wasm`);
 
+  console.log("Optimizing Wasm artifact...");
+  await execa("wasm-opt", [wasmFile, "-o", wasmFile, "-O2", "--precompute"]);
+
   if (shouldOptimize) {
     const watFile = path.join(outDir, `${crate}.wat`);
     const optimizedWat = path.join(outDir, `${crate}_optimized.wat`);
     
     console.log("Generating textual version of the original Wasm artifact...");
     await execa("wasm-opt", [wasmFile, "-o", watFile, "-O0", "--emit-text"]);
-  
-    console.log("Optimizing Wasm artifact...");
-    await execa("wasm-opt", [wasmFile, "-o", wasmFile, "-O2", "--precompute"]);
   
     console.log("Generating textual version of the optimized Wasm artifact...");
     await execa("wasm-opt", [wasmFile, "-o", optimizedWat, "-O0", "--emit-text"]);

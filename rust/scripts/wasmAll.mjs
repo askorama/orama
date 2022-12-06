@@ -2,14 +2,22 @@ import fs from "fs";
 import path from "path";
 import TOML from "@iarna/toml";
 import { wasm } from "./wasm.mjs";
-import { __dirname } from "./common.mjs";
-import { targets } from "./packArtifacts.mjs";
+import { __dirname, targets, artifactsDir, originalArtifactsDir } from "./common.mjs";
 
 async function main() {
+  if (fs.existsSync(artifactsDir)) {
+    console.log('Removing old artifacts...');
+    fs.rmSync(artifactsDir, { recursive: true });
+  }
+
   for (const target of targets) {
     console.log("Building for target:", target, "\n");
     await wasmAll({ profile: "release", target });
   }
+
+  fs.mkdirSync(artifactsDir, { recursive: true });
+  fs.renameSync(originalArtifactsDir, artifactsDir, { recursive: true });
+  fs.rmSync(path.join(__dirname(), '../src'), { recursive: true });
 }
 
 async function wasmAll({ profile, target }) {

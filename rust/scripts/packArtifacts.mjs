@@ -2,10 +2,9 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { copyFileSync } from 'node:fs'
 import { buildSync } from 'esbuild'
+import { targets } from './common.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
-export const targets = ["nodejs", "web", "deno"];
 
 const builds = ['cjs', 'esm']
 const wasmUtilName = 'lyra_utils_wasm.js'

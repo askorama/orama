@@ -155,7 +155,7 @@ export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
   return b[1] - a[1];
 }
 
-export let currentRuntime: Runtime;
+export let currentRuntime = getCurrentRuntime();
 
 export function getCurrentRuntime(): Runtime {
   if (currentRuntime) {

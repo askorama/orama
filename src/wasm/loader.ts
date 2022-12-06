@@ -5,28 +5,30 @@ let runtimeWasm: any;
 
 export async function intersectTokenScores(arrays: TokenScore[][]): Promise<TokenScore[]> {
   if (runtimeWasm) {
-    return runtimeWasm.intersectTokenScores(arrays) as TokenScore[];
+    return runtimeWasm.intersectTokenScores(arrays);
   }
 
   switch (currentRuntime) {
-    case "node":
+    case "node": {
+      runtimeWasm = await import("./artifacts/nodejs/lyra_utils_wasm");
+      const { data } = runtimeWasm.intersectTokenScores({ data: arrays });
+      return data;
+    }
     case "browser": {
-      const BrowserWasm = await import("../wasm/artifacts/web/lyra_utils_wasm");
-      const wasmInterface1 = await BrowserWasm.default();
-      runtimeWasm = wasmInterface1;
-      const { data: browserData1 } = runtimeWasm.intersectTokenScores({ data: arrays });
-      return browserData1;
+      const wasm = await import("./artifacts/web/lyra_utils_wasm");
+      const wasmInterface = await wasm.default();
+      runtimeWasm = wasmInterface;
+      const { data } = runtimeWasm.intersectTokenScores({ data: arrays });
+      return data;
     }
     case "deno": {
-      const DenoWasm = await import("../wasm/artifacts/deno/lyra_utils_wasm");
-      runtimeWasm = DenoWasm;
-      const { data: denoData } = runtimeWasm.intersectTokenScores({ data: arrays });
-      return denoData;
+      runtimeWasm = await import("./artifacts/deno/lyra_utils_wasm");
+      const { data } = runtimeWasm.intersectTokenScores({ data: arrays });
+      return data;
     }
     default: {
-      const jsFallback = await import("../utils");
-      runtimeWasm = jsFallback;
-      return jsFallback.intersectTokenScores(arrays);
+      runtimeWasm = await import("../utils");
+      return runtimeWasm.intersectTokenScores(arrays);
     }
   }
 }
