@@ -2,6 +2,7 @@
   "name": "@lyrasearch/lyra",
   "version": "0.3.1",
   "description": "Fast, in-memory, typo-tolerant, full-text search engine written in TypeScript",
+  "sideEffects": false,
   "main": "./dist/cjs/src/lyra.js",
   "module": "./dist/esm/src/lyra.js",
   "browser": "./dist/browser/src/lyra.js",
