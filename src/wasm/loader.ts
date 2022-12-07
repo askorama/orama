@@ -1,34 +1,31 @@
 import type { TokenScore } from "../lyra";
-import { currentRuntime } from "../utils";
+import { currentRuntime, IIntersectTokenScores } from "../utils";
 
-let runtimeWasm: any;
+let _intersectTokenScores: IIntersectTokenScores;
 
 export async function intersectTokenScores(arrays: TokenScore[][]): Promise<TokenScore[]> {
-  if (runtimeWasm) {
-    return runtimeWasm.intersectTokenScores(arrays);
+  if (!_intersectTokenScores) {
+    let runtimeWasm: { intersectTokenScores: IIntersectTokenScores };
+
+    switch (currentRuntime) {
+      case "node":
+        runtimeWasm = await import("./artifacts/nodejs/lyra_utils_wasm");
+        break;
+      case "browser": {
+        const wasm = await import("./artifacts/web/lyra_utils_wasm");
+        const wasmInterface = await wasm.default();
+        runtimeWasm = wasmInterface as unknown as { intersectTokenScores: IIntersectTokenScores };
+        break;
+      }
+      case "deno":
+        runtimeWasm = await import("./artifacts/deno/lyra_utils_wasm");
+        break;
+      default:
+        runtimeWasm = await import("../utils");
+    }
+
+    _intersectTokenScores = runtimeWasm.intersectTokenScores;
   }
 
-  switch (currentRuntime) {
-    case "node": {
-      runtimeWasm = await import("./artifacts/nodejs/lyra_utils_wasm");
-      const { data } = runtimeWasm.intersectTokenScores({ data: arrays });
-      return data;
-    }
-    case "browser": {
-      const wasm = await import("./artifacts/web/lyra_utils_wasm");
-      const wasmInterface = await wasm.default();
-      runtimeWasm = wasmInterface;
-      const { data } = runtimeWasm.intersectTokenScores({ data: arrays });
-      return data;
-    }
-    case "deno": {
-      runtimeWasm = await import("./artifacts/deno/lyra_utils_wasm");
-      const { data } = runtimeWasm.intersectTokenScores({ data: arrays });
-      return data;
-    }
-    default: {
-      runtimeWasm = await import("../utils");
-      return runtimeWasm.intersectTokenScores(arrays);
-    }
-  }
+  return _intersectTokenScores({ data: arrays }).data;
 }

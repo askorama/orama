@@ -1,5 +1,5 @@
 import t from "tap";
-import { intersectTokenScores, formatBytes, formatNanoseconds } from "../src/utils";
+import { formatBytes, formatNanoseconds, intersectTokenScores } from "../src/utils";
 
 t.test("utils", t => {
   t.plan(3);
@@ -8,29 +8,33 @@ t.test("utils", t => {
     t.plan(1);
 
     t.same(
-      intersectTokenScores([
-        [
-          ["foo", 1],
-          ["bar", 1],
-          ["baz", 2],
+      intersectTokenScores({
+        data: [
+          [
+            ["foo", 1],
+            ["bar", 1],
+            ["baz", 2],
+          ],
+          [
+            ["foo", 4],
+            ["quick", 10],
+            ["brown", 3],
+            ["bar", 2],
+          ],
+          [
+            ["fox", 12],
+            ["foo", 4],
+            ["jumps", 3],
+            ["bar", 6],
+          ],
         ],
-        [
-          ["foo", 4],
-          ["quick", 10],
-          ["brown", 3],
-          ["bar", 2],
+      }),
+      {
+        data: [
+          ["foo", 9],
+          ["bar", 9],
         ],
-        [
-          ["fox", 12],
-          ["foo", 4],
-          ["jumps", 3],
-          ["bar", 6],
-        ],
-      ]),
-      [
-        ["foo", 9],
-        ["bar", 9],
-      ],
+      },
     );
   });
 

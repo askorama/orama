@@ -2,6 +2,8 @@ import type { TokenScore } from "./lyra";
 
 export type Runtime = typeof knownRuntimes[number];
 
+export type IIntersectTokenScores = (options: { data: TokenScore[][] }) => { data: TokenScore[] };
+
 const baseId = Date.now().toString().slice(5);
 let lastId = 0;
 
@@ -76,8 +78,8 @@ export function getTokenFrequency(token: string, tokens: string[]): number {
 // Adapted from https://github.com/lovasoa/fast_array_intersect
 // MIT Licensed (https://github.com/lovasoa/fast_array_intersect/blob/master/LICENSE)
 // while on tag https://github.com/lovasoa/fast_array_intersect/tree/v1.1.0
-export function intersectTokenScores(arrays: TokenScore[][]): TokenScore[] {
-  if (arrays.length === 0) return [];
+export function intersectTokenScores({ data: arrays }: { data: TokenScore[][] }): { data: TokenScore[] } {
+  if (arrays.length === 0) return { data: [] };
 
   for (let i = 1; i < arrays.length; i++) {
     if (arrays[i].length < arrays[0].length) {
@@ -104,7 +106,7 @@ export function intersectTokenScores(arrays: TokenScore[][]): TokenScore[] {
     }
 
     if (found === 0) {
-      return [];
+      return { data: [] };
     }
   }
 
@@ -116,7 +118,7 @@ export function intersectTokenScores(arrays: TokenScore[][]): TokenScore[] {
     }
   }
 
-  return result;
+  return { data: result };
 }
 
 export function insertSortedValue(
