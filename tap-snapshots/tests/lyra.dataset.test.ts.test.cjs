@@ -13,6 +13,32 @@ Object {
     Object {
       "document": Object {
         "categories": Object {
+          "first": "January/March",
+          "second": "",
+        },
+        "date": "1809/03/13",
+        "description": "Peninsular War",
+        "granularity": "year",
+      },
+      "id": "",
+      "score": 0.6028126688266209,
+    },
+    Object {
+      "document": Object {
+        "categories": Object {
+          "first": "Ongoing",
+          "second": "",
+        },
+        "date": "1867/12/02",
+        "description": "Paraguayan War.",
+        "granularity": "year",
+      },
+      "id": "",
+      "score": 0.6028126688266209,
+    },
+    Object {
+      "document": Object {
+        "categories": Object {
           "first": "By place",
           "second": "Roman Republic",
         },
@@ -114,32 +140,6 @@ Object {
       "id": "",
       "score": 0.6028126688266209,
     },
-    Object {
-      "document": Object {
-        "categories": Object {
-          "first": "By place",
-          "second": "Roman Republic",
-        },
-        "date": "-46",
-        "description": "Civil War:",
-        "granularity": "year",
-      },
-      "id": "",
-      "score": 0.6028126688266209,
-    },
-    Object {
-      "document": Object {
-        "categories": Object {
-          "first": "January/March",
-          "second": "",
-        },
-        "date": "1809/03/13",
-        "description": "Peninsular War",
-        "granularity": "year",
-      },
-      "id": "",
-      "score": 0.6028126688266209,
-    },
   ],
 }
 `
@@ -152,11 +152,11 @@ Object {
     Object {
       "document": Object {
         "categories": Object {
-          "first": "Ongoing",
-          "second": "",
+          "first": "By place",
+          "second": "Roman Republic",
         },
-        "date": "1867/12/02",
-        "description": "Paraguayan War.",
+        "date": "-46",
+        "description": "Civil War:",
         "granularity": "year",
       },
       "id": "",
@@ -174,19 +174,6 @@ Object {
       },
       "id": "",
       "score": 0.6028126688266209,
-    },
-    Object {
-      "document": Object {
-        "categories": Object {
-          "first": "By place",
-          "second": "Roman Republic",
-        },
-        "date": "-86",
-        "description": "First Mithridatic War",
-        "granularity": "year",
-      },
-      "id": "",
-      "score": 0.40187511255108055,
     },
     Object {
       "document": Object {
@@ -243,6 +230,19 @@ Object {
     Object {
       "document": Object {
         "categories": Object {
+          "first": "By place",
+          "second": "Roman Republic",
+        },
+        "date": "-86",
+        "description": "First Mithridatic War",
+        "granularity": "year",
+      },
+      "id": "",
+      "score": 0.40187511255108055,
+    },
+    Object {
+      "document": Object {
+        "categories": Object {
           "first": "December",
           "second": "",
         },
@@ -252,6 +252,19 @@ Object {
       },
       "id": "",
       "score": 0.40187511255108055,
+    },
+    Object {
+      "document": Object {
+        "categories": Object {
+          "first": "February",
+          "second": "",
+        },
+        "date": "2003/02/05",
+        "description": "War in Darfur begins.",
+        "granularity": "year",
+      },
+      "id": "",
+      "score": 0.30140633441331044,
     },
     Object {
       "document": Object {
@@ -266,6 +279,15 @@ Object {
       "id": "",
       "score": 0.30140633441331044,
     },
+  ],
+}
+`
+
+exports[`tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-3 1`] = `
+Object {
+  "count": 2357,
+  "elapsed": 0n,
+  "hits": Array [
     Object {
       "document": Object {
         "categories": Object {
@@ -279,15 +301,6 @@ Object {
       "id": "",
       "score": 0.30140633441331044,
     },
-  ],
-}
-`
-
-exports[`tests/lyra.dataset.test.ts TAP lyra.dataset should perform paginate search > should perform paginate search-page-3 1`] = `
-Object {
-  "count": 2357,
-  "elapsed": 0n,
-  "hits": Array [
     Object {
       "document": Object {
         "categories": Object {
@@ -369,24 +382,11 @@ Object {
     Object {
       "document": Object {
         "categories": Object {
-          "first": "February",
-          "second": "",
-        },
-        "date": "2003/02/05",
-        "description": "War in Darfur begins.",
-        "granularity": "year",
-      },
-      "id": "",
-      "score": 0.30140633441331044,
-    },
-    Object {
-      "document": Object {
-        "categories": Object {
           "first": "By place",
-          "second": "Roman Republic",
+          "second": "Asia",
         },
-        "date": "-156",
-        "description": "The first Dalmatian war begins.",
+        "date": "941",
+        "description": "The Rus'-Byzantine War is fought.",
         "granularity": "year",
       },
       "id": "",
@@ -396,10 +396,10 @@ Object {
       "document": Object {
         "categories": Object {
           "first": "By place",
-          "second": "Roman Republic",
+          "second": "Asia",
         },
-        "date": "-119",
-        "description": "The second Dalmatian war begins.",
+        "date": "1019",
+        "description": "The last Goryeo-Khitan War ends.",
         "granularity": "year",
       },
       "id": "",
@@ -409,10 +409,10 @@ Object {
       "document": Object {
         "categories": Object {
           "first": "By place",
-          "second": "Roman Republic",
+          "second": "Asia",
         },
-        "date": "-78",
-        "description": "The Third Dalmatian war begins.",
+        "date": "1027/08/16",
+        "description": "Civil war begins in Japan.",
         "granularity": "year",
       },
       "id": "",

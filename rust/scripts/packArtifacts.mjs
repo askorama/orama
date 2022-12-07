@@ -16,10 +16,19 @@ for (const target of targets) {
 
     const entryPoints = [join(baseDir, 'src/wasm/artifacts', target, wasmUtilName)]
     const outfile = join(baseDir, 'dist/', build, 'src/wasm/artifacts', target, wasmUtilName)
+    const wasmFile = join(baseDir, 'src/wasm/artifacts', target, 'lyra_utils_wasm_bg.wasm')
+
+    copyFileSync(wasmFile, join(baseDir, 'dist/', build, 'src/wasm/artifacts', target, 'lyra_utils_wasm_bg.wasm'))
 
     if (target === 'deno') {
       copyFileSync(entryPoints[0], outfile)
       continue
+    }
+
+    if (target === 'web' && build === 'cjs') {
+      copyFileSync(wasmFile, join(baseDir, 'dist/browser/src/wasm/artifacts', target, 'lyra_utils_wasm_bg.wasm'))
+      copyFileSync(join(baseDir, 'src/wasm/artifacts/deno/lyra_utils_wasm_bg.wasm'), join(baseDir, 'dist/browser/src/wasm/artifacts/deno/lyra_utils_wasm_bg.wasm'))
+      copyFileSync(join(baseDir, 'src/wasm/artifacts/nodejs/lyra_utils_wasm_bg.wasm'), join(baseDir, 'dist/browser/src/wasm/artifacts/nodejs/lyra_utils_wasm_bg.wasm'))
     }
 
     let platform;
