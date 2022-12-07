@@ -25,6 +25,7 @@
     "build:cjs": "tsc --project tsconfig.cjs.json",
     "build:module": "tsc --project tsconfig.esm.json",
     "build:browser": "tsc --project tsconfig.browser.json",
+    "build:wasm": "node ./rust/scripts/wasmAll.mjs",
     "build:wasm_bindings": "node ./rust/scripts/packArtifacts.mjs",
     "build:all": "rimraf ./dist && concurrently 'npm:build:module' 'npm:build:cjs' 'npm:build:browser'",
     "build": "npm run build:all && npm run build:wasm_bindings",
