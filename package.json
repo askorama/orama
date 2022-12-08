@@ -28,10 +28,11 @@
   "files": [
     "dist"
   ],
-  "bugs": {
+  "repository": {
+    "type": "git",
     "url": "https://github.com/lyrasearch/lyra"
   },
-  "repositoy": {
+  "bugs": {
     "url": "https://github.com/lyrasearch/lyra"
   },
   "scripts": {
@@ -49,7 +50,13 @@
     "test:smoke": "tap --rcfile=tests/config/tap.yml tests/smoke/*.test.ts",
     "ci": "npm run build && npm run test:ci && npm run test:smoke"
   },
-  "keywords": [],
+  "keywords": [
+    "full-text search",
+    "search",
+    "fuzzy search",
+    "typo-tolerant search",
+    "full-text"
+  ],
   "author": {
     "name": "Michele Riva",
     "email": "ciao@micheleriva.it",
