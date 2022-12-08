@@ -7,6 +7,20 @@
   "module": "./dist/esm/src/lyra.js",
   "browser": "./dist/browser/src/lyra.js",
   "types": "./dist/esm/src/lyra.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/src/lyra.js",
+      "import": "./dist/esm/src/lyra.js"
+    },
+    "./promises": {
+      "require": "./dist/cjs/src/promises/index.js",
+      "import": "./dist/esm/src/promises/index.js"
+    },
+    "./stemmer/*": {
+      "require": "./dist/cjs/stemmer/lib/*.js",
+      "import": "./dist/esm/stemmer/lib/*.js"
+    }
+  },
   "files": [
     "dist"
   ],
