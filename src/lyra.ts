@@ -429,7 +429,7 @@ export function insert<S extends PropertiesSchema>(
  * @param config Optional parameter for overriding default configuration.
  * @returns A Promise object containing id of the inserted document.
  * @example
- * const { id } = insert(db, {
+ * const { id } = await insert(db, {
  *   quote: 'You miss 100% of the shots you don\'t take',
  *   author: 'Wayne Gretzky - Michael Scott'
  * });
@@ -474,7 +474,6 @@ export async function insertWithHooks<S extends PropertiesSchema>(
  *   }
  * ]);
  */
-
 export async function insertBatch<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   docs: ResolveSchema<S>[],

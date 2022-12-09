@@ -7,17 +7,44 @@
   "module": "./dist/esm/src/lyra.js",
   "browser": "./dist/browser/src/lyra.js",
   "types": "./dist/esm/src/lyra.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/src/lyra.js",
+      "import": "./dist/esm/src/lyra.js",
+      "types": "./dist/cjs/src/lyra.d.ts"
+    },
+    "./promises": {
+      "require": "./dist/cjs/src/promises/index.js",
+      "import": "./dist/esm/src/promises/index.js",
+      "types": "./dist/cjs/src/promises/index.d.ts"
+    },
+    "./stemmer/*": {
+      "require": "./dist/cjs/stemmer/lib/*.js",
+      "import": "./dist/esm/stemmer/lib/*.js",
+      "types": "./dist/cjs/stemmer/lib/*.d.ts"
+    },
+    "./internals": {
+      "require": "./dist/cjs/internals/index.js",
+      "import": "./dist/esm/internals/index.js",
+      "types": "./dist/cjs/internals/index.d.ts"
+    },
+    "./dist/*": {
+      "require": "./dist/cjs/*",
+      "import": "./dist/esm/*",
+      "types": "./dist/cjs/**/*.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lyrasearch/lyra"
+  },
   "bugs": {
     "url": "https://github.com/lyrasearch/lyra"
   },
-  "repositoy": {
-    "url": "https://github.com/lyrasearch/lyra"
-  },
   "scripts": {
-    "changelog": "auto-changelog -p",
     "commit": "pnpm lint-staged && cz",
     "format": "prettier --write benchmarks examples internals src tests",
     "lint": "pnpm run format && eslint benchmarks examples internals src tests  --ext .js,.ts,.mjs,.jsx,.tsx",
@@ -35,7 +62,13 @@
     "test:smoke": "tap --rcfile=tests/config/tap.yml tests/smoke/*.test.ts",
     "ci": "npm run build && npm run test:ci && npm run test:smoke"
   },
-  "keywords": [],
+  "keywords": [
+    "full-text search",
+    "search",
+    "fuzzy search",
+    "typo-tolerant search",
+    "full-text"
+  ],
   "author": {
     "name": "Michele Riva",
     "email": "ciao@micheleriva.it",
