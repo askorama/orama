@@ -434,7 +434,7 @@ export function insert<S extends PropertiesSchema>(
  * @param config Optional parameter for overriding default configuration.
  * @returns A Promise object containing id of the inserted document.
  * @example
- * const { id } = insert(db, {
+ * const { id } = await insert(db, {
  *   quote: 'You miss 100% of the shots you don\'t take',
  *   author: 'Wayne Gretzky - Michael Scott'
  * });
@@ -479,7 +479,6 @@ export async function insertWithHooks<S extends PropertiesSchema>(
  *   }
  * ]);
  */
-
 export async function insertBatch<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   docs: ResolveSchema<S>[],
@@ -649,11 +648,9 @@ export function search<S extends PropertiesSchema>(
     for (let j = 0; j < tokensLength; j++) {
       const term = tokens[j];
       const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
-      
+
       // lyraOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
-      const termOccurrencies = typeof lyraOccurrencies[term] === "number"
-        ? (lyraOccurrencies[term] ?? 0)
-        : 0;
+      const termOccurrencies = typeof lyraOccurrencies[term] === "number" ? lyraOccurrencies[term] ?? 0 : 0;
 
       const orderedTFIDFList: TokenScore[] = [];
 
@@ -663,7 +660,7 @@ export function search<S extends PropertiesSchema>(
       for (let k = 0; k < documentIDsLength; k++) {
         // idf's denominator is shifted by 1 to avoid division by zero
         const idf = Math.log10(N / (1 + termOccurrencies));
-        
+
         const id = documentIDs[k];
         const tfIdf = idf * (lyraFrequencies?.[id]?.[term] ?? 0);
 
