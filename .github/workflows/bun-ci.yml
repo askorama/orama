@@ -13,8 +13,6 @@ jobs:
         with:
           version: 7
       - uses: antongolub/action-setup-bun@v1
-        with:
-          cache: true
       - run: |
           pnpm install --frozen-lockfile
           pnpm run test 
