@@ -1,0 +1,21 @@
+name: Tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - run: |
+          pnpm install --frozen-lockfile
+          pnpm run test 
+          pnpm run test:smoke
