@@ -21,7 +21,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.6029047779439942,
+      "score": 0.6028126688266209,
     },
     Object {
       "document": Object {
@@ -34,7 +34,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.6029047779439942,
+      "score": 0.6028126688266209,
     },
     Object {
       "document": Object {
@@ -47,7 +47,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.6029047779439942,
+      "score": 0.6028126688266209,
     },
     Object {
       "document": Object {
@@ -60,7 +60,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.6029047779439942,
+      "score": 0.6028126688266209,
     },
     Object {
       "document": Object {
@@ -73,7 +73,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.6029047779439942,
+      "score": 0.6028126688266209,
     },
     Object {
       "document": Object {
@@ -86,7 +86,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.6029047779439942,
+      "score": 0.6028126688266209,
     },
     Object {
       "document": Object {
@@ -99,7 +99,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.6029047779439942,
+      "score": 0.6028126688266209,
     },
     Object {
       "document": Object {
@@ -112,7 +112,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.6029047779439942,
+      "score": 0.6028126688266209,
     },
     Object {
       "document": Object {
@@ -125,7 +125,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.6029047779439942,
+      "score": 0.6028126688266209,
     },
     Object {
       "document": Object {
@@ -138,7 +138,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.6029047779439942,
+      "score": 0.6028126688266209,
     },
   ],
 }
@@ -160,7 +160,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.6029047779439942,
+      "score": 0.6028126688266209,
     },
     Object {
       "document": Object {
@@ -173,7 +173,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.6029047779439942,
+      "score": 0.6028126688266209,
     },
     Object {
       "document": Object {
@@ -186,7 +186,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.40193651862932944,
+      "score": 0.40187511255108055,
     },
     Object {
       "document": Object {
@@ -199,7 +199,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.40193651862932944,
+      "score": 0.40187511255108055,
     },
     Object {
       "document": Object {
@@ -212,7 +212,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.40193651862932944,
+      "score": 0.40187511255108055,
     },
     Object {
       "document": Object {
@@ -225,7 +225,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.40193651862932944,
+      "score": 0.40187511255108055,
     },
     Object {
       "document": Object {
@@ -238,7 +238,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.40193651862932944,
+      "score": 0.40187511255108055,
     },
     Object {
       "document": Object {
@@ -251,7 +251,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.40193651862932944,
+      "score": 0.40187511255108055,
     },
     Object {
       "document": Object {
@@ -264,7 +264,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.3014523889719971,
+      "score": 0.30140633441331044,
     },
     Object {
       "document": Object {
@@ -277,7 +277,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.3014523889719971,
+      "score": 0.30140633441331044,
     },
   ],
 }
@@ -299,7 +299,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.3014523889719971,
+      "score": 0.30140633441331044,
     },
     Object {
       "document": Object {
@@ -312,7 +312,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.3014523889719971,
+      "score": 0.30140633441331044,
     },
     Object {
       "document": Object {
@@ -325,7 +325,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.3014523889719971,
+      "score": 0.30140633441331044,
     },
     Object {
       "document": Object {
@@ -338,7 +338,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.3014523889719971,
+      "score": 0.30140633441331044,
     },
     Object {
       "document": Object {
@@ -351,7 +351,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.3014523889719971,
+      "score": 0.30140633441331044,
     },
     Object {
       "document": Object {
@@ -364,7 +364,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.3014523889719971,
+      "score": 0.30140633441331044,
     },
     Object {
       "document": Object {
@@ -377,7 +377,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.3014523889719971,
+      "score": 0.30140633441331044,
     },
     Object {
       "document": Object {
@@ -390,7 +390,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.2411619111775977,
+      "score": 0.24112506753064836,
     },
     Object {
       "document": Object {
@@ -403,7 +403,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.2411619111775977,
+      "score": 0.24112506753064836,
     },
     Object {
       "document": Object {
@@ -416,7 +416,7 @@ Object {
         "granularity": "year",
       },
       "id": "",
-      "score": 0.2411619111775977,
+      "score": 0.24112506753064836,
     },
   ],
 }
