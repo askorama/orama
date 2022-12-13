@@ -86,6 +86,7 @@ export type Configuration<S extends PropertiesSchema> = {
 
 export type Data<S extends PropertiesSchema> = {
   docs: Record<string, ResolveSchema<S> | undefined>;
+  defaultLanguage: Language;
   index: Index;
   nodes: Nodes;
   schema: S;
@@ -726,6 +727,7 @@ export function search<S extends PropertiesSchema>(
 export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
   return {
     index: lyra.index,
+    defaultLanguage: lyra.defaultLanguage,
     docs: lyra.docs,
     nodes: lyra.nodes,
     schema: lyra.schema,
