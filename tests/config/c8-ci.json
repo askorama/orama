@@ -1,7 +1,7 @@
 {
   "check-coverage": true,
   "reporter": ["text", "json"],
-  "exclude": ["stemmer", "tests", "tap-snapshots"],
+  "exclude": ["stemmer", "tests", "tap-snapshots", "src/wasm"],
   "branches": 80,
   "functions": 80,
   "lines": 80,

@@ -1,0 +1,30 @@
+indent_style = "Block"
+reorder_imports = true
+
+# Maximum width of each line.
+max_width = 100
+
+# Number of spaces per tab.
+tab_spaces = 2
+
+# Brace style for control flow construct.
+# Values: AlwaysSameLine | ClosingNextLine | AlwaysNextLine
+control_brace_style = "AlwaysSameLine"
+
+# This file defines the Rust style for automatic reformatting.
+# See also https://rust-lang.github.io/rustfmt
+# Rust language edition to be used by the parser.
+edition = "2021"
+
+# Version of the formatting rules to use.
+version = "Two"
+
+# Line endings will be converted to \n.
+newline_style = "Unix"
+
+# The "Default" setting has a heuristic which splits lines too aggresively.
+# We are willing to revisit this setting in future versions of rustfmt.
+# Bugs:
+# * https://github.com/rust-lang/rustfmt/issues/3119
+# * https://github.com/rust-lang/rustfmt/issues/3120
+use_small_heuristics = "Max"
