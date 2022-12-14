@@ -70,6 +70,10 @@ export type TokenizerConfigExec = {
   tokenizerFn: Tokenizer;
 };
 
+export type AlgorithmsConfig = {
+  intersectTokenScores: (tokenScores: TokenScore[][]) => TokenScore[];
+};
+
 export type Configuration<S extends PropertiesSchema> = {
   /**
    * The structure of the document to be inserted into the database.
@@ -81,7 +85,10 @@ export type Configuration<S extends PropertiesSchema> = {
   defaultLanguage?: Language;
   edge?: boolean;
   hooks?: Hooks;
-  tokenizer?: TokenizerConfig;
+  components?: {
+    tokenizer?: TokenizerConfig;
+    algorithms?: AlgorithmsConfig;
+  };
 };
 
 export type Data<S extends PropertiesSchema> = {
@@ -387,7 +394,7 @@ export async function create<S extends PropertiesSchema>(properties: Configurati
     index: {},
     hooks: properties.hooks || {},
     edge: properties.edge ?? false,
-    tokenizer: defaultTokenizerConfig(defaultLanguage, properties.tokenizer!),
+    tokenizer: defaultTokenizerConfig(defaultLanguage, properties.components?.tokenizer),
     frequencies: {},
     tokenOccurrencies: {},
   };

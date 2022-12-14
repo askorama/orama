@@ -49,9 +49,11 @@ t.test("Tokenizer", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "french",
-      tokenizer: {
-        stemmingFn: FRStemmer,
-        customStopWords: stopWords.french,
+      components: {
+        tokenizer: {
+          stemmingFn: FRStemmer,
+          customStopWords: stopWords.french,
+        },
       },
     });
 
@@ -71,9 +73,11 @@ t.test("Tokenizer", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "italian",
-      tokenizer: {
-        stemmingFn: ITStemmer,
-        customStopWords: stopWords.italian,
+      components: {
+        tokenizer: {
+          stemmingFn: ITStemmer,
+          customStopWords: stopWords.italian,
+        },
       },
     });
 
@@ -93,9 +97,11 @@ t.test("Tokenizer", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "norwegian",
-      tokenizer: {
-        stemmingFn: NOStemmer,
-        customStopWords: stopWords.norwegian,
+      components: {
+        tokenizer: {
+          stemmingFn: NOStemmer,
+          customStopWords: stopWords.norwegian,
+        },
       },
     });
 
@@ -115,9 +121,11 @@ t.test("Tokenizer", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "portuguese",
-      tokenizer: {
-        stemmingFn: PTStemmer,
-        customStopWords: stopWords.portuguese,
+      components: {
+        tokenizer: {
+          stemmingFn: PTStemmer,
+          customStopWords: stopWords.portuguese,
+        },
       },
     });
 
@@ -137,9 +145,11 @@ t.test("Tokenizer", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "russian",
-      tokenizer: {
-        stemmingFn: RUStemmer,
-        customStopWords: stopWords.russian,
+      components: {
+        tokenizer: {
+          stemmingFn: RUStemmer,
+          customStopWords: stopWords.russian,
+        },
       },
     });
 
@@ -159,9 +169,11 @@ t.test("Tokenizer", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "swedish",
-      tokenizer: {
-        stemmingFn: SEStemmer,
-        customStopWords: stopWords.swedish,
+      components: {
+        tokenizer: {
+          stemmingFn: SEStemmer,
+          customStopWords: stopWords.swedish,
+        },
       },
     });
 
@@ -181,9 +193,11 @@ t.test("Tokenizer", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "spanish",
-      tokenizer: {
-        stemmingFn: ESStemmer,
-        customStopWords: stopWords.spanish,
+      components: {
+        tokenizer: {
+          stemmingFn: ESStemmer,
+          customStopWords: stopWords.spanish,
+        },
       },
     });
 
@@ -203,9 +217,11 @@ t.test("Tokenizer", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "dutch",
-      tokenizer: {
-        stemmingFn: NLStemmer,
-        customStopWords: stopWords.dutch,
+      components: {
+        tokenizer: {
+          stemmingFn: NLStemmer,
+          customStopWords: stopWords.dutch,
+        },
       },
     });
 
@@ -225,9 +241,11 @@ t.test("Tokenizer", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "german",
-      tokenizer: {
-        stemmingFn: DEStemmer,
-        customStopWords: stopWords.german,
+      components: {
+        tokenizer: {
+          stemmingFn: DEStemmer,
+          customStopWords: stopWords.german,
+        },
       },
     });
 
@@ -247,9 +265,11 @@ t.test("Tokenizer", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "finnish",
-      tokenizer: {
-        stemmingFn: FIStemmer,
-        customStopWords: stopWords.finnish,
+      components: {
+        tokenizer: {
+          stemmingFn: FIStemmer,
+          customStopWords: stopWords.finnish,
+        },
       },
     });
 
@@ -269,9 +289,11 @@ t.test("Tokenizer", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "danish",
-      tokenizer: {
-        stemmingFn: DKStemmer,
-        customStopWords: stopWords.danish,
+      components: {
+        tokenizer: {
+          stemmingFn: DKStemmer,
+          customStopWords: stopWords.danish,
+        },
       },
     });
 
@@ -295,8 +317,10 @@ t.test("Custom stop-words rules", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "english",
-      tokenizer: {
-        customStopWords: ["quick", "brown", "fox", "dog"],
+      components: {
+        tokenizer: {
+          customStopWords: ["quick", "brown", "fox", "dog"],
+        },
       },
     });
 
@@ -318,9 +342,11 @@ t.test("Custom stop-words rules", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "english",
-      tokenizer: {
-        customStopWords(words: string[]): string[] {
-          return [...words, "quick", "brown", "fox", "dog"];
+      components: {
+        tokenizer: {
+          customStopWords(words: string[]): string[] {
+            return [...words, "quick", "brown", "fox", "dog"];
+          },
         },
       },
     });
@@ -343,8 +369,10 @@ t.test("Custom stop-words rules", t => {
     const db = await create({
       schema: {},
       defaultLanguage: "english",
-      tokenizer: {
-        enableStopWords: false,
+      components: {
+        tokenizer: {
+          enableStopWords: false,
+        },
       },
     });
 
@@ -366,9 +394,11 @@ t.test("Custom stop-words rules", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "english",
-      tokenizer: {
-        enableStemming: false,
-        customStopWords: stopWords.english,
+      components: {
+        tokenizer: {
+          enableStemming: false,
+          customStopWords: stopWords.english,
+        },
       },
     });
 
@@ -390,9 +420,11 @@ t.test("Custom stop-words rules", t => {
     const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "english",
-      tokenizer: {
-        customStopWords: stopWords.english,
-        stemmingFn: word => `${word}-ish`,
+      components: {
+        tokenizer: {
+          customStopWords: stopWords.english,
+          stemmingFn: word => `${word}-ish`,
+        },
       },
     });
 

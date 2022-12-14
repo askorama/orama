@@ -213,7 +213,7 @@ during Lyra initialization.
 
 By default, Lyra will analyze your input using an English
 [Porter Stemmer](https://tartarus.org/martin/PorterStemmer/) function. <br />
-You can replace the default stemmer with the a custom one, or a pre-built one
+You can replace the default stemmer with a custom one, or a pre-built one
 shipped with the default Lyra installation.
 
 Example using ESM (see [builds](#builds) below):
@@ -228,8 +228,10 @@ const db = await create({
     quote: "string",
   },
   defaultLanguage: "italian",
-  tokenizer: {
-    stemmingFn: stemmer,
+  components: {
+    tokenizer: {
+      stemmingFn: stemmer,
+    },
   },
 });
 ```
@@ -246,8 +248,10 @@ const db = await create({
     quote: "string",
   },
   defaultLanguage: "italian",
-  tokenizer: {
-    stemmingFn: stemmer,
+  components: {
+    tokenizer: {
+      stemmingFn: stemmer,
+    },
   },
 });
 ```

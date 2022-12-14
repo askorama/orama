@@ -890,8 +890,10 @@ t.test("custom tokenizer configuration", t => {
       schema: {
         txt: "string",
       },
-      tokenizer: {
-        tokenizerFn: text => text.split(","),
+      components: {
+        tokenizer: {
+          tokenizerFn: text => text.split(","),
+        },
       },
     });
 
