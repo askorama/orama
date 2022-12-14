@@ -4,11 +4,11 @@ import { formatBytes, formatNanoseconds, intersectTokenScores } from "../src/uti
 t.test("utils", t => {
   t.plan(3);
 
-  t.test("should correctly intersect 2 or more arrays", t => {
+  t.test("should correctly intersect 2 or more arrays", async t => {
     t.plan(1);
 
     t.same(
-      intersectTokenScores({
+      await intersectTokenScores({
         data: [
           [
             ["foo", 1],

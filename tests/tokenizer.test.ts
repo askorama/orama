@@ -46,7 +46,7 @@ t.test("Tokenizer", t => {
   t.test("Should tokenize and stem correctly in french", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "french",
       components: {
@@ -60,8 +60,8 @@ t.test("Tokenizer", t => {
     const I1 = "voyons quel temps il fait dehors";
     const I2 = "j'ai fait des gâteaux";
 
-    const O1 = tokenize(I1, "french", false, tokenizer);
-    const O2 = tokenize(I2, "french", false, tokenizer);
+    const O1 = tokenize(I1, "french", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "french", false, instance.components?.tokenizer);
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
@@ -70,7 +70,7 @@ t.test("Tokenizer", t => {
   t.test("Should tokenize and stem correctly in italian", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "italian",
       components: {
@@ -84,8 +84,8 @@ t.test("Tokenizer", t => {
     const I1 = "ho cucinato delle torte";
     const I2 = "dormire è una cosa difficile quando i test non passano";
 
-    const O1 = tokenize(I1, "italian", false, tokenizer);
-    const O2 = tokenize(I2, "italian", false, tokenizer);
+    const O1 = tokenize(I1, "italian", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "italian", false, instance.components?.tokenizer);
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
@@ -94,7 +94,7 @@ t.test("Tokenizer", t => {
   t.test("Should tokenize and stem correctly in norwegian", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "norwegian",
       components: {
@@ -108,8 +108,8 @@ t.test("Tokenizer", t => {
     const I1 = "Jeg kokte noen kaker";
     const I2 = "å sove er en vanskelig ting når testene mislykkes";
 
-    const O1 = tokenize(I1, "norwegian", false, tokenizer);
-    const O2 = tokenize(I2, "norwegian", false, tokenizer);
+    const O1 = tokenize(I1, "norwegian", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "norwegian", false, instance.components?.tokenizer);
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
@@ -118,7 +118,7 @@ t.test("Tokenizer", t => {
   t.test("Should tokenize and stem correctly in portuguese", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "portuguese",
       components: {
@@ -132,8 +132,8 @@ t.test("Tokenizer", t => {
     const I1 = "Eu cozinhei alguns bolos";
     const I2 = "dormir é uma coisa difícil quando os testes falham";
 
-    const O1 = tokenize(I1, "portuguese", false, tokenizer);
-    const O2 = tokenize(I2, "portuguese", false, tokenizer);
+    const O1 = tokenize(I1, "portuguese", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "portuguese", false, instance.components?.tokenizer);
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
@@ -142,7 +142,7 @@ t.test("Tokenizer", t => {
   t.test("Should tokenize and stem correctly in russian", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "russian",
       components: {
@@ -156,8 +156,8 @@ t.test("Tokenizer", t => {
     const I1 = "я приготовила пирожные";
     const I2 = "спать трудно, когда тесты не срабатывают";
 
-    const O1 = tokenize(I1, "russian", false, tokenizer);
-    const O2 = tokenize(I2, "russian", false, tokenizer);
+    const O1 = tokenize(I1, "russian", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "russian", false, instance.components?.tokenizer);
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
@@ -166,7 +166,7 @@ t.test("Tokenizer", t => {
   t.test("Should tokenize and stem correctly in swedish", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "swedish",
       components: {
@@ -180,8 +180,8 @@ t.test("Tokenizer", t => {
     const I1 = "Jag lagade några kakor";
     const I2 = "att sova är en svår sak när testerna misslyckas";
 
-    const O1 = tokenize(I1, "swedish", false, tokenizer);
-    const O2 = tokenize(I2, "swedish", false, tokenizer);
+    const O1 = tokenize(I1, "swedish", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "swedish", false, instance.components?.tokenizer);
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
@@ -190,7 +190,7 @@ t.test("Tokenizer", t => {
   t.test("Should tokenize and stem correctly in spanish", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "spanish",
       components: {
@@ -204,8 +204,8 @@ t.test("Tokenizer", t => {
     const I1 = "cociné unos pasteles";
     const I2 = "dormir es algo dificil cuando las pruebas fallan";
 
-    const O1 = tokenize(I1, "spanish", false, tokenizer);
-    const O2 = tokenize(I2, "spanish", false, tokenizer);
+    const O1 = tokenize(I1, "spanish", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "spanish", false, instance.components?.tokenizer);
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
@@ -214,7 +214,7 @@ t.test("Tokenizer", t => {
   t.test("Should tokenize and stem correctly in dutch", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "dutch",
       components: {
@@ -228,8 +228,8 @@ t.test("Tokenizer", t => {
     const I1 = "de kleine koeien";
     const I2 = "Ik heb wat taarten gemaakt";
 
-    const O2 = tokenize(I2, "dutch", false, tokenizer);
-    const O1 = tokenize(I1, "dutch", false, tokenizer);
+    const O2 = tokenize(I2, "dutch", false, instance.components?.tokenizer);
+    const O1 = tokenize(I1, "dutch", false, instance.components?.tokenizer);
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
@@ -238,7 +238,7 @@ t.test("Tokenizer", t => {
   t.test("Should tokenize and stem correctly in german", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "german",
       components: {
@@ -252,8 +252,8 @@ t.test("Tokenizer", t => {
     const I1 = "Schlaf ist eine harte Sache, wenn Tests fehlschlagen";
     const I2 = "Ich habe ein paar Kekse gebacken";
 
-    const O1 = tokenize(I1, "german", false, tokenizer);
-    const O2 = tokenize(I2, "german", false, tokenizer);
+    const O1 = tokenize(I1, "german", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "german", false, instance.components?.tokenizer);
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
@@ -262,7 +262,7 @@ t.test("Tokenizer", t => {
   t.test("Should tokenize and stem correctly in finnish", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "finnish",
       components: {
@@ -276,8 +276,8 @@ t.test("Tokenizer", t => {
     const I1 = "Uni on vaikea asia, kun testit epäonnistuvat";
     const I2 = "Leivoin keksejä";
 
-    const O1 = tokenize(I1, "finnish", false, tokenizer);
-    const O2 = tokenize(I2, "finnish", false, tokenizer);
+    const O1 = tokenize(I1, "finnish", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "finnish", false, instance.components?.tokenizer);
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
@@ -286,7 +286,7 @@ t.test("Tokenizer", t => {
   t.test("Should tokenize and stem correctly in danish", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "danish",
       components: {
@@ -300,8 +300,8 @@ t.test("Tokenizer", t => {
     const I1 = "Søvn er en svær ting, når prøver mislykkes";
     const I2 = "Jeg bagte småkager";
 
-    const O1 = tokenize(I1, "danish", false, tokenizer);
-    const O2 = tokenize(I2, "danish", false, tokenizer);
+    const O1 = tokenize(I1, "danish", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "danish", false, instance.components?.tokenizer);
 
     t.matchSnapshot(O1, `${t.name}-O1`);
     t.matchSnapshot(O2, `${t.name}-O2`);
@@ -314,7 +314,7 @@ t.test("Custom stop-words rules", t => {
   t.test("custom array of stop-words", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "english",
       components: {
@@ -329,8 +329,8 @@ t.test("Custom stop-words rules", t => {
     const I1 = "the quick brown fox jumps over the lazy dog";
     const I2 = "I baked some cakes";
 
-    const O1 = tokenize(I1, "english", false, tokenizer);
-    const O2 = tokenize(I2, "english", false, tokenizer);
+    const O1 = tokenize(I1, "english", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "english", false, instance.components?.tokenizer);
 
     t.same(O1, ["the", "jump", "over", "lazi"]);
     t.same(O2, ["i", "bake", "some", "cake"]);
@@ -339,7 +339,7 @@ t.test("Custom stop-words rules", t => {
   t.test("custom stop-words function", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "english",
       components: {
@@ -356,8 +356,8 @@ t.test("Custom stop-words rules", t => {
     const I1 = "the quick brown fox jumps over the lazy dog";
     const I2 = "I baked some cakes";
 
-    const O1 = tokenize(I1, "english", false, tokenizer);
-    const O2 = tokenize(I2, "english", false, tokenizer);
+    const O1 = tokenize(I1, "english", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "english", false, instance.components?.tokenizer);
 
     t.same(O1, ["jump", "lazi"]);
     t.same(O2, ["bake", "cake"]);
@@ -381,8 +381,8 @@ t.test("Custom stop-words rules", t => {
     const I1 = "the quick brown fox jumps over the lazy dog";
     const I2 = "I baked some cakes";
 
-    const O1 = tokenize(I1, "english", false, db.tokenizer);
-    const O2 = tokenize(I2, "english", false, db.tokenizer);
+    const O1 = tokenize(I1, "english", false, db.components?.tokenizer);
+    const O2 = tokenize(I2, "english", false, db.components?.tokenizer);
 
     t.same(O1, ["the", "quick", "brown", "fox", "jump", "over", "lazi", "dog"]);
     t.same(O2, ["i", "bake", "some", "cake"]);
@@ -391,7 +391,7 @@ t.test("Custom stop-words rules", t => {
   t.test("disable stemming", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "english",
       components: {
@@ -407,8 +407,8 @@ t.test("Custom stop-words rules", t => {
     const I1 = "the quick brown fox jumps over the lazy dog";
     const I2 = "I baked some cakes";
 
-    const O1 = tokenize(I1, "english", false, tokenizer);
-    const O2 = tokenize(I2, "english", false, tokenizer);
+    const O1 = tokenize(I1, "english", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "english", false, instance.components?.tokenizer);
 
     t.same(O1, ["quick", "brown", "fox", "jumps", "lazy", "dog"]);
     t.same(O2, ["baked", "cakes"]);
@@ -417,7 +417,7 @@ t.test("Custom stop-words rules", t => {
   t.test("custom stemming function", async t => {
     t.plan(2);
 
-    const { tokenizer } = await create({
+    const instance = await create({
       schema: {},
       defaultLanguage: "english",
       components: {
@@ -433,8 +433,8 @@ t.test("Custom stop-words rules", t => {
     const I1 = "the quick brown fox jumps over the lazy dog";
     const I2 = "I baked some cakes";
 
-    const O1 = tokenize(I1, "english", false, tokenizer);
-    const O2 = tokenize(I2, "english", false, tokenizer);
+    const O1 = tokenize(I1, "english", false, instance.components?.tokenizer);
+    const O2 = tokenize(I2, "english", false, instance.components?.tokenizer);
 
     t.same(O1, ["quick-ish", "brown-ish", "fox-ish", "jumps-ish", "lazy-ish", "dog-ish"]);
     t.same(O2, ["baked-ish", "cakes-ish"]);

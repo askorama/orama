@@ -7,9 +7,15 @@ import { tokenize, Tokenizer } from "./tokenizer";
 import { Language, SUPPORTED_LANGUAGES } from "./tokenizer/languages";
 import { availableStopWords, stopWords } from "./tokenizer/stop-words";
 import type { ResolveSchema, SearchProperties } from "./types";
-import { getNanosecondsTime, includes, insertSortedValue, sortTokenScorePredicate, uniqueId } from "./utils";
-
-import { intersectTokenScores } from "./wasm/loader";
+import {
+  getNanosecondsTime,
+  intersectTokenScores,
+  includes,
+  insertSortedValue,
+  sortTokenScorePredicate,
+  uniqueId,
+  IIntersectTokenScoresPromise,
+} from "./utils";
 
 export type TokenScore = [string, number];
 type Index = Record<string, Node>;
@@ -66,7 +72,12 @@ export type TokenizerConfigExec = {
 };
 
 export type AlgorithmsConfig = {
-  intersectTokenScores: (tokenScores: TokenScore[][]) => TokenScore[];
+  intersectTokenScores: IIntersectTokenScoresPromise;
+};
+
+export type Components = {
+  tokenizer?: TokenizerConfig;
+  algorithms?: AlgorithmsConfig;
 };
 
 export type Configuration<S extends PropertiesSchema> = {
@@ -80,10 +91,7 @@ export type Configuration<S extends PropertiesSchema> = {
   defaultLanguage?: Language;
   edge?: boolean;
   hooks?: Hooks;
-  components?: {
-    tokenizer?: TokenizerConfig;
-    algorithms?: AlgorithmsConfig;
-  };
+  components?: Components;
 };
 
 export type Data<S extends PropertiesSchema> = {
@@ -99,7 +107,7 @@ export interface Lyra<S extends PropertiesSchema> extends Data<S> {
   schema: S;
   edge: boolean;
   hooks: Hooks;
-  tokenizer?: TokenizerConfig;
+  components?: Components;
   frequencies: FrequencyMap;
 }
 
@@ -389,9 +397,14 @@ export async function create<S extends PropertiesSchema>(properties: Configurati
     index: {},
     hooks: properties.hooks || {},
     edge: properties.edge ?? false,
-    tokenizer: defaultTokenizerConfig(defaultLanguage, properties.components?.tokenizer),
     frequencies: {},
     tokenOccurrencies: {},
+    components: {
+      tokenizer: defaultTokenizerConfig(defaultLanguage, properties.components?.tokenizer ?? {}),
+      algorithms: {
+        intersectTokenScores: properties.components?.algorithms?.intersectTokenScores ?? intersectTokenScores,
+      },
+    },
   };
 
   buildIndex(instance, properties.schema);
@@ -423,7 +436,7 @@ export async function insert<S extends PropertiesSchema>(
   assertDocSchema(doc, lyra.schema);
 
   lyra.docs[id] = doc;
-  recursiveradixInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
+  recursiveradixInsertion(lyra, doc, id, config, undefined, lyra.components?.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
 
   return { id };
@@ -454,7 +467,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   assertDocSchema(doc, lyra.schema);
 
   lyra.docs[id] = doc;
-  recursiveradixInsertion(lyra, doc, id, config, undefined, lyra.tokenizer as TokenizerConfigExec);
+  recursiveradixInsertion(lyra, doc, id, config, undefined, lyra.components?.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
   if (lyra.hooks.afterInsert) {
     await hookRunner.call(lyra, lyra.hooks.afterInsert, id);
@@ -521,8 +534,11 @@ export async function insertBatch<S extends PropertiesSchema>(
  * const isDeleted = await remove(db, 'L1tpqQxc0c2djrSN2a6TJ');
  */
 export async function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string): Promise<boolean> {
-  if (!lyra.tokenizer) {
-    lyra.tokenizer = defaultTokenizerConfig(lyra.defaultLanguage);
+  if (!lyra.components?.tokenizer) {
+    lyra.components = {
+      ...(lyra.components ?? {}),
+      tokenizer: defaultTokenizerConfig(lyra.defaultLanguage),
+    };
   }
 
   if (!(docID in lyra.docs)) {
@@ -540,11 +556,11 @@ export async function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: s
 
     if (propertyType === "string") {
       const idx = lyra.index[key];
-      const tokens: string[] = lyra.tokenizer.tokenizerFn!(
+      const tokens: string[] = lyra.components.tokenizer!.tokenizerFn!(
         document[key] as string,
         lyra.defaultLanguage,
         false,
-        lyra.tokenizer!,
+        lyra.components.tokenizer!,
       )!;
 
       const tokensLength = tokens.length;
@@ -585,12 +601,15 @@ export async function search<S extends PropertiesSchema>(
     language = lyra.defaultLanguage;
   }
 
-  if (!lyra.tokenizer) {
-    lyra.tokenizer = defaultTokenizerConfig(language);
+  if (!lyra.components?.tokenizer) {
+    lyra.components = {
+      ...(lyra.components ?? {}),
+      tokenizer: defaultTokenizerConfig(language),
+    };
   }
 
   const { limit = 10, offset = 0, exact = false, term, properties } = params;
-  const tokens = lyra.tokenizer.tokenizerFn!(term, language, false, lyra.tokenizer);
+  const tokens = lyra.components.tokenizer!.tokenizerFn!(term, language, false, lyra.components.tokenizer!);
   const indices = getIndices(lyra, properties);
   const results: RetrievedDoc<S>[] = Array.from({
     length: limit,
@@ -676,7 +695,7 @@ export async function search<S extends PropertiesSchema>(
 
     const docIds = indexMap[index];
     const vals = Object.values(docIds);
-    docsIntersection[index] = await intersectTokenScores(vals);
+    docsIntersection[index] = (await intersectTokenScores({ data: vals })).data;
 
     const uniqueDocs = Object.values(docsIntersection[index]);
     const uniqueDocsLength = uniqueDocs.length;
