@@ -738,13 +738,14 @@ export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
 
 export function load<S extends PropertiesSchema>(
   lyra: Lyra<S>,
-  { index, docs, nodes, schema, frequencies, tokenOccurrencies }: Data<S>,
+  { index, docs, nodes, schema, frequencies, tokenOccurrencies, defaultLanguage }: Data<S>,
 ) {
   if (!lyra.edge) {
     throw new Error(ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("load"));
   }
 
   lyra.index = index;
+  lyra.defaultLanguage = defaultLanguage;
   lyra.docs = docs;
   lyra.nodes = nodes;
   lyra.schema = schema;
