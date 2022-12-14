@@ -28,20 +28,19 @@ function removeVariadicData<T extends PropertiesSchema>(res: SearchResult<T>): S
   };
 }
 
-const db = create({
-  schema: {
-    date: "string",
-    description: "string",
-    granularity: "string",
-    categories: {
-      first: "string",
-      second: "string",
-    },
-  },
-});
-
 t.test("lyra.dataset", async t => {
   t.plan(4);
+  const db = await create({
+    schema: {
+      date: "string",
+      description: "string",
+      granularity: "string",
+      categories: {
+        first: "string",
+        second: "string",
+      },
+    },
+  });
 
   t.before(async () => {
     const events = (dataset as EventJson).result.events.map(ev => ({

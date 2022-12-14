@@ -8,17 +8,17 @@ t.test("lyra", t => {
   t.test("should correctly search for data", async t => {
     t.plan(6);
 
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
 
-    insert(db, { quote: "the quick, brown fox jumps over the lazy dog. What a fox!", author: "John Doe" });
-    insert(db, { quote: "Foxes are nice animals. But I prefer having a dog.", author: "John Doe" });
-    insert(db, { quote: "I like dogs. They are the best.", author: "Jane Doe" });
-    insert(db, { quote: "I like cats. They are the best.", author: "Jane Doe" });
+    await insert(db, { quote: "the quick, brown fox jumps over the lazy dog. What a fox!", author: "John Doe" });
+    await insert(db, { quote: "Foxes are nice animals. But I prefer having a dog.", author: "John Doe" });
+    await insert(db, { quote: "I like dogs. They are the best.", author: "Jane Doe" });
+    await insert(db, { quote: "I like cats. They are the best.", author: "Jane Doe" });
 
     // Exact search
     const result1 = await search(db, { term: "fox", exact: true });

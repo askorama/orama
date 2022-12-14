@@ -65,6 +65,10 @@ export type TokenizerConfigExec = {
   tokenizerFn: Tokenizer;
 };
 
+export type AlgorithmsConfig = {
+  intersectTokenScores: (tokenScores: TokenScore[][]) => TokenScore[];
+};
+
 export type Configuration<S extends PropertiesSchema> = {
   /**
    * The structure of the document to be inserted into the database.
@@ -76,7 +80,10 @@ export type Configuration<S extends PropertiesSchema> = {
   defaultLanguage?: Language;
   edge?: boolean;
   hooks?: Hooks;
-  tokenizer?: TokenizerConfig;
+  components?: {
+    tokenizer?: TokenizerConfig;
+    algorithms?: AlgorithmsConfig;
+  };
 };
 
 export type Data<S extends PropertiesSchema> = {
@@ -358,7 +365,7 @@ function assertDocSchema<S extends PropertiesSchema>(doc: ResolveSchema<S>, lyra
  * @param properties Options to initialize the database with.
  * @example
  * // Create a database that stores documents containing 'author' and 'quote' fields.
- * const db = create({
+ * const db = await create({
  *   schema: {
  *     author: 'string',
  *     quote: 'string'
@@ -368,7 +375,7 @@ function assertDocSchema<S extends PropertiesSchema>(doc: ResolveSchema<S>, lyra
  *   }
  * });
  */
-export function create<S extends PropertiesSchema>(properties: Configuration<S>): Lyra<S> {
+export async function create<S extends PropertiesSchema>(properties: Configuration<S>): Promise<Lyra<S>> {
   const defaultLanguage = (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
   assertSupportedLanguage(defaultLanguage);
@@ -382,7 +389,7 @@ export function create<S extends PropertiesSchema>(properties: Configuration<S>)
     index: {},
     hooks: properties.hooks || {},
     edge: properties.edge ?? false,
-    tokenizer: defaultTokenizerConfig(defaultLanguage, properties.tokenizer!),
+    tokenizer: defaultTokenizerConfig(defaultLanguage, properties.components?.tokenizer),
     frequencies: {},
     tokenOccurrencies: {},
   };
@@ -398,16 +405,16 @@ export function create<S extends PropertiesSchema>(properties: Configuration<S>)
  * @param config Optional parameter for overriding default configuration.
  * @returns An object containing id of the inserted document.
  * @example
- * const { id } = insert(db, {
+ * const { id } = await insert(db, {
  *   quote: 'You miss 100% of the shots you don\'t take',
  *   author: 'Wayne Gretzky - Michael Scott'
  * });
  */
-export function insert<S extends PropertiesSchema>(
+export async function insert<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   doc: ResolveSchema<S>,
   config?: InsertConfig,
-): { id: string } {
+): Promise<{ id: string }> {
   config = { language: lyra.defaultLanguage, ...config };
   const id = uniqueId();
 
@@ -511,9 +518,9 @@ export async function insertBatch<S extends PropertiesSchema>(
  * @param lyra The database to remove the document from.
  * @param docID The id of the document to remove.
  * @example
- * const isDeleted = remove(db, 'L1tpqQxc0c2djrSN2a6TJ');
+ * const isDeleted = await remove(db, 'L1tpqQxc0c2djrSN2a6TJ');
  */
-export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string): boolean {
+export async function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string): Promise<boolean> {
   if (!lyra.tokenizer) {
     lyra.tokenizer = defaultTokenizerConfig(lyra.defaultLanguage);
   }
@@ -564,7 +571,7 @@ export function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string)
  * @param language Optional parameter to override the default language analyzer.
  * @example
  * // Search for documents that contain 'Michael' in the 'author' field.
- * const result = search(db, {
+ * const result = await search(db, {
  *   term: 'Michael',
  *   properties: ['author']
  * });
@@ -720,7 +727,7 @@ export async function search<S extends PropertiesSchema>(
   };
 }
 
-export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
+export async function save<S extends PropertiesSchema>(lyra: Lyra<S>): Promise<Data<S>> {
   return {
     index: lyra.index,
     docs: lyra.docs,
@@ -730,10 +737,10 @@ export function save<S extends PropertiesSchema>(lyra: Lyra<S>): Data<S> {
   };
 }
 
-export function load<S extends PropertiesSchema>(
+export async function load<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   { index, docs, schema, frequencies, tokenOccurrencies }: Data<S>,
-) {
+): Promise<void> {
   if (!lyra.edge) {
     throw new Error(ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("load"));
   }

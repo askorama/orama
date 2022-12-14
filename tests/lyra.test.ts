@@ -13,11 +13,11 @@ import {
 t.test("defaultLanguage", t => {
   t.plan(3);
 
-  t.test("should throw an error if the desired language is not supported", t => {
+  t.test("should throw an error if the desired language is not supported", async t => {
     t.plan(1);
 
     try {
-      create({
+      await create({
         schema: {},
         // @ts-expect-error latin is not supported
         defaultLanguage: "latin",
@@ -27,15 +27,15 @@ t.test("defaultLanguage", t => {
     }
   });
 
-  t.test("should throw an error if the desired language is not supported during insertion", t => {
+  t.test("should throw an error if the desired language is not supported during insertion", async t => {
     t.plan(1);
 
     try {
-      const db = create({
+      const db = await create({
         schema: { foo: "string" },
       });
 
-      insert(
+      await insert(
         db,
         {
           foo: "bar",
@@ -48,11 +48,11 @@ t.test("defaultLanguage", t => {
     }
   });
 
-  t.test("should not throw if if the language is supported", t => {
+  t.test("should not throw if if the language is supported", async t => {
     t.plan(1);
 
     try {
-      create({
+      await create({
         schema: {},
         defaultLanguage: "portuguese",
       });
@@ -67,35 +67,35 @@ t.test("defaultLanguage", t => {
 t.test("checkInsertDocSchema", t => {
   t.plan(3);
 
-  t.test("should compare the inserted doc with the schema definition", t => {
+  t.test("should compare the inserted doc with the schema definition", async t => {
     t.plan(2);
 
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
 
-    t.ok(insert(db, { quote: "hello, world!", author: "me" }).id);
+    t.ok((await insert(db, { quote: "hello, world!", author: "me" })).id);
 
     try {
       // @ts-expect-error test error case
-      insert(db, { quote: "hello, world!", author: true });
+      await insert(db, { quote: "hello, world!", author: true });
     } catch (err) {
       t.matchSnapshot(err, `${t.name} - 1`);
     }
   });
 
-  t.test("should allow doc with missing schema keys to be inserted without indexing those keys", t => {
+  t.test("should allow doc with missing schema keys to be inserted without indexing those keys", async t => {
     t.plan(6);
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
-    insert(db, {
+    await insert(db, {
       quote: "hello, world!",
       // @ts-expect-error test error case
       authors: "author should be singular",
@@ -105,7 +105,7 @@ t.test("checkInsertDocSchema", t => {
 
     const docWithExtraKey = { quote: "hello, world!", foo: { bar: 10 } };
     // @ts-expect-error test error case
-    const insertedInfo = insert(db, docWithExtraKey);
+    const insertedInfo = await insert(db, docWithExtraKey);
     t.ok(insertedInfo.id);
     t.equal(Object.keys(db.docs).length, 2);
     t.ok(
@@ -120,9 +120,9 @@ t.test("checkInsertDocSchema", t => {
 
   t.test(
     "should allow doc with missing schema keys to be inserted without indexing those keys - nested schema version",
-    t => {
+    async t => {
       t.plan(6);
-      const db = create({
+      const db = await create({
         schema: {
           quote: "string",
           author: {
@@ -152,7 +152,7 @@ t.test("checkInsertDocSchema", t => {
         rating: 5,
         unexpectedProperty: "wow",
       };
-      const insertedInfo = insert(db, nestedExtraKeyDoc);
+      const insertedInfo = await insert(db, nestedExtraKeyDoc);
 
       t.ok(insertedInfo.id);
       t.equal(Object.keys(db.docs).length, 1);
@@ -172,17 +172,17 @@ t.test("lyra", t => {
   t.test("should correctly search for data", async t => {
     t.plan(8);
 
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
 
-    insert(db, { quote: "the quick, brown fox jumps over the lazy dog. What a fox!", author: "John Doe" });
-    insert(db, { quote: "Foxes are nice animals. But I prefer having a dog.", author: "John Doe" });
-    insert(db, { quote: "I like dogs. They are the best.", author: "Jane Doe" });
-    insert(db, { quote: "I like cats. They are the best.", author: "Jane Doe" });
+    await insert(db, { quote: "the quick, brown fox jumps over the lazy dog. What a fox!", author: "John Doe" });
+    await insert(db, { quote: "Foxes are nice animals. But I prefer having a dog.", author: "John Doe" });
+    await insert(db, { quote: "I like dogs. They are the best.", author: "Jane Doe" });
+    await insert(db, { quote: "I like cats. They are the best.", author: "Jane Doe" });
 
     // Exact search
     const result1 = await search(db, { term: "fox", exact: true });
@@ -216,7 +216,7 @@ t.test("lyra", t => {
   t.test("should correctly search for data returning doc including with unindexed keys", async t => {
     t.plan(4);
 
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: "string",
@@ -234,8 +234,8 @@ t.test("lyra", t => {
       nested: { unindexedNestedField: "unindexedNestedValue" },
     };
 
-    insert(db, documentWithNestedUnindexedField);
-    insert(db, documentWithUnindexedField);
+    await insert(db, documentWithNestedUnindexedField);
+    await insert(db, documentWithUnindexedField);
 
     const result1 = await search(db, { term: "They are the best" });
     const result2 = await search(db, { term: "Foxes are nice animals" });
@@ -249,21 +249,26 @@ t.test("lyra", t => {
   t.test("should not found any doc if searching by unindexed field value", async t => {
     t.plan(2);
 
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
 
-    insert(db, {
+    await insert(db, {
       quote: "I like dogs. They are the best.",
       author: "Jane Doe",
       //@ts-expect-error test error case
       nested: { unindexedNestedField: "unindexedNestedValue" },
     });
-    //@ts-expect-error test error case
-    insert(db, { quote: "I like cats. They are the best.", author: "Jane Doe", unindexedField: "unindexedValue" });
+
+    await insert(db, {
+      quote: "I like cats. They are the best.",
+      author: "Jane Doe",
+      //@ts-expect-error test error case
+      unindexedField: "unindexedValue",
+    });
 
     const result1 = await search(db, { term: "unindexedNestedValue" });
     const result2 = await search(db, { term: "unindexedValue" });
@@ -275,13 +280,13 @@ t.test("lyra", t => {
   t.test("should correctly insert and retrieve data", async t => {
     t.plan(4);
 
-    const db = create({
+    const db = await create({
       schema: {
         example: "string",
       },
     });
 
-    const ex1Insert = insert(db, { example: "The quick, brown, fox" });
+    const ex1Insert = await insert(db, { example: "The quick, brown, fox" });
     const ex1Search = await search(db, {
       term: "quick",
       properties: ["example"],
@@ -296,18 +301,18 @@ t.test("lyra", t => {
   t.test("should correctly paginate results", async t => {
     t.plan(9);
 
-    const db = create({
+    const db = await create({
       schema: {
         animal: "string",
       },
     });
 
-    insert(db, { animal: "Quick brown fox" });
-    insert(db, { animal: "Lazy dog" });
-    insert(db, { animal: "Jumping penguin" });
-    insert(db, { animal: "Fast chicken" });
-    insert(db, { animal: "Fabolous ducks" });
-    insert(db, { animal: "Fantastic horse" });
+    await insert(db, { animal: "Quick brown fox" });
+    await insert(db, { animal: "Lazy dog" });
+    await insert(db, { animal: "Jumping penguin" });
+    await insert(db, { animal: "Fast chicken" });
+    await insert(db, { animal: "Fabolous ducks" });
+    await insert(db, { animal: "Fantastic horse" });
 
     const search1 = await search(db, { term: "f", limit: 1, offset: 0 });
     const search2 = await search(db, { term: "f", limit: 1, offset: 1 });
@@ -331,7 +336,7 @@ t.test("lyra", t => {
   t.test("Should throw an error when searching in non-existing indices", async t => {
     t.plan(1);
 
-    const db = create({ schema: { foo: "string", baz: "string" } });
+    const db = await create({ schema: { foo: "string", baz: "string" } });
 
     try {
       await search(db, {
@@ -339,37 +344,32 @@ t.test("lyra", t => {
         //@ts-expect-error test error case
         properties: ["bar"],
       });
-    } catch (e) {
-      t.same(
-        e,
-        Error(
-          `Invalid property name. Expected a wildcard string ("*") or array containing one of the following properties: foo, baz, but got: bar`,
-        ),
-      );
+    } catch (err) {
+      t.matchSnapshot(err);
     }
   });
 
   t.test("Should correctly remove a document after its insertion", async t => {
     t.plan(5);
 
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
 
-    const { id: id1 } = insert(db, {
+    const { id: id1 } = await insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
     });
 
-    const { id: id2 } = insert(db, {
+    const { id: id2 } = await insert(db, {
       quote: "To live is the rarest thing in the world. Most people exist, that is all.",
       author: "Oscar Wilde",
     });
 
-    insert(db, {
+    await insert(db, {
       quote: "So many books, so little time.",
       author: "Frank Zappa",
     });
@@ -395,15 +395,15 @@ t.test("lyra", t => {
   t.test("Should correctly remove documents via substring search", async t => {
     t.plan(1);
 
-    const lyra = create({
+    const lyra = await create({
       schema: {
         word: "string",
       },
     });
 
-    const { id: halo } = insert(lyra, { word: "Halo" });
-    insert(lyra, { word: "Halloween" });
-    insert(lyra, { word: "Hal" });
+    const { id: halo } = await insert(lyra, { word: "Halo" });
+    await insert(lyra, { word: "Halloween" });
+    await insert(lyra, { word: "Hal" });
 
     remove(lyra, halo);
 
@@ -417,7 +417,7 @@ t.test("lyra", t => {
   t.test("Should remove a document with a nested schema", async t => {
     t.plan(4);
 
-    const movieDB = create({
+    const movieDB = await create({
       schema: {
         title: "string",
         director: "string",
@@ -427,7 +427,7 @@ t.test("lyra", t => {
       },
     });
 
-    const { id: harryPotter } = insert(movieDB, {
+    const { id: harryPotter } = await insert(movieDB, {
       title: "Harry Potter and the Philosopher's Stone",
       director: "Chris Columbus",
       plot: "Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.",
@@ -457,15 +457,15 @@ t.test("lyra", t => {
   t.test("Shouldn't returns deleted documents", async t => {
     t.plan(1);
 
-    const db = create({
+    const db = await create({
       schema: {
         txt: "string",
       },
     });
 
-    insert(db, { txt: "stelle" });
-    insert(db, { txt: "stellle" });
-    insert(db, { txt: "scelte" });
+    await insert(db, { txt: "stelle" });
+    await insert(db, { txt: "stellle" });
+    await insert(db, { txt: "scelte" });
 
     const searchResult = await search(db, { term: "stelle", exact: true });
 
@@ -481,15 +481,15 @@ t.test("lyra", t => {
   t.test("Shouldn't affects other document when deleted one", async t => {
     t.plan(2);
 
-    const db = create({
+    const db = await create({
       schema: {
         txt: "string",
       },
     });
 
-    insert(db, { txt: "abc" });
-    insert(db, { txt: "abc" });
-    insert(db, { txt: "abcd" });
+    await insert(db, { txt: "abc" });
+    await insert(db, { txt: "abc" });
+    await insert(db, { txt: "abcd" });
 
     const searchResult = await search(db, { term: "abc", exact: true });
 
@@ -505,24 +505,24 @@ t.test("lyra", t => {
   t.test("Should preserve identical docs after deletion", async t => {
     t.plan(9);
 
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
 
-    const { id: id1 } = insert(db, {
+    const { id: id1 } = await insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
     });
 
-    const { id: id2 } = insert(db, {
+    const { id: id2 } = await insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
     });
 
-    insert(db, {
+    await insert(db, {
       quote: "So many books, so little time.",
       author: "Frank Zappa",
     });
@@ -554,7 +554,7 @@ t.test("lyra", t => {
   t.test("Should be able to insert documens with non-searchable fields", async t => {
     t.plan(2);
 
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: "string",
@@ -563,14 +563,14 @@ t.test("lyra", t => {
       },
     });
 
-    insert(db, {
+    await insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
       isFavorite: false,
       rating: 4,
     });
 
-    insert(db, {
+    await insert(db, {
       quote: "So many books, so little time.",
       author: "Frank Zappa",
       isFavorite: true,
@@ -588,14 +588,14 @@ t.test("lyra", t => {
   t.test("Should exact match", async t => {
     t.plan(4);
 
-    const db = create({
+    const db = await create({
       schema: {
         author: "string",
         quote: "string",
       },
     });
 
-    insert(db, {
+    await insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
     });
@@ -620,14 +620,14 @@ t.test("lyra", t => {
   t.test("Shouldn't tolerate typos", async t => {
     t.plan(1);
 
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
 
-    insert(db, {
+    await insert(db, {
       quote:
         "Absolutely captivating creatures, seahorses seem like a product of myth and imagination rather than of nature.",
       author: "Sara A. Lourie",
@@ -644,20 +644,20 @@ t.test("lyra", t => {
   t.test("Should tolerate typos", async t => {
     t.plan(2);
 
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: "string",
       },
     });
 
-    insert(db, {
+    await insert(db, {
       quote:
         "Absolutely captivating creatures, seahorses seem like a product of myth and imagination rather than of nature.",
       author: "Sara A. Lourie",
     });
 
-    insert(db, {
+    await insert(db, {
       quote: "Seahorses look mythical, like dragons, but these magnificent shy creatures are real.",
       author: "Jennifer Keats Curtis",
     });
@@ -680,7 +680,7 @@ t.test("lyra", t => {
   t.test("Should support nested properties", async t => {
     t.plan(4);
 
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: {
@@ -690,7 +690,7 @@ t.test("lyra", t => {
       },
     });
 
-    insert(db, {
+    await insert(db, {
       quote: "Harry Potter, the boy who lived, come to die. Avada kedavra.",
       author: {
         name: "Tom",
@@ -698,7 +698,7 @@ t.test("lyra", t => {
       },
     });
 
-    insert(db, {
+    await insert(db, {
       quote: "I am Homer Simpson.",
       author: {
         name: "Homer",
@@ -735,7 +735,7 @@ t.test("lyra", t => {
   t.test("Should support multiple nested properties", async t => {
     t.plan(3);
 
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: {
@@ -749,7 +749,7 @@ t.test("lyra", t => {
       },
     });
 
-    insert(db, {
+    await insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: {
         name: "Oscar",
@@ -761,7 +761,7 @@ t.test("lyra", t => {
       },
     });
 
-    insert(db, {
+    await insert(db, {
       quote: "So many books, so little time.",
       author: {
         name: "Frank",
@@ -773,7 +773,7 @@ t.test("lyra", t => {
       },
     });
 
-    insert(db, {
+    await insert(db, {
       quote: "A room without books is like a body without a soul.",
       author: {
         name: "Marcus",
@@ -805,7 +805,7 @@ t.test("lyra", t => {
   t.test("should suport batch insert of documents", async t => {
     t.plan(2);
 
-    const db = create({
+    const db = await create({
       schema: {
         date: "string",
         description: "string",
@@ -836,10 +836,11 @@ t.test("lyra", t => {
 
 t.test("lyra - hooks", t => {
   t.plan(2);
-  t.test("should validate on lyra creation", t => {
+  t.test("should validate on lyra creation", async t => {
     t.plan(1);
-    t.throws(() => {
-      create({
+
+    try {
+      await create({
         schema: { date: "string" },
         hooks: {
           ["anotherHookName" as string]: () => {
@@ -847,12 +848,14 @@ t.test("lyra - hooks", t => {
           },
         },
       });
-    });
+    } catch (err) {
+      t.matchSnapshot(err);
+    }
   });
 
   t.test("afterInsert hook", async t => {
     let callOrder = 0;
-    const db = create({
+    const db = await create({
       schema: {
         quote: "string",
         author: {
@@ -883,16 +886,18 @@ t.test("custom tokenizer configuration", t => {
 
   t.test("tokenizerFn", async t => {
     t.plan(2);
-    const db = create({
+    const db = await create({
       schema: {
         txt: "string",
       },
-      tokenizer: {
-        tokenizerFn: text => text.split(","),
+      components: {
+        tokenizer: {
+          tokenizerFn: text => text.split(","),
+        },
       },
     });
 
-    insert(db, {
+    await insert(db, {
       txt: "hello, world! How are you?",
     });
 
@@ -914,13 +919,13 @@ t.test("custom tokenizer configuration", t => {
 t.test("should access own properties exclusively", async t => {
   t.plan(1);
 
-  const db = create({
+  const db = await create({
     schema: {
       txt: "string",
     },
   });
 
-  insert(db, {
+  await insert(db, {
     txt: "constructor",
   });
 
