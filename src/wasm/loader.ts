@@ -8,20 +8,23 @@ export async function intersectTokenScores(arrays: TokenScore[][]): Promise<Toke
     let runtimeWasm: { intersectTokenScores: IIntersectTokenScores };
 
     switch (currentRuntime) {
-      case "node":
+      case "node": {
         runtimeWasm = await import("./artifacts/nodejs/lyra_utils_wasm");
         break;
+      }
       case "browser": {
         const wasm = await import("./artifacts/web/lyra_utils_wasm");
         const wasmInterface = await wasm.default();
         runtimeWasm = wasmInterface as unknown as { intersectTokenScores: IIntersectTokenScores };
         break;
       }
-      case "deno":
+      case "deno": {
         runtimeWasm = await import("./artifacts/deno/lyra_utils_wasm");
         break;
-      default:
+      }
+      default: {
         runtimeWasm = await import("../utils");
+      }
     }
 
     _intersectTokenScores = runtimeWasm.intersectTokenScores;

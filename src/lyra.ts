@@ -14,7 +14,7 @@ import {
   insertSortedValue,
   sortTokenScorePredicate,
   uniqueId,
-  IIntersectTokenScoresPromise,
+  IIntersectTokenScores,
 } from "./utils";
 
 export type TokenScore = [string, number];
@@ -72,7 +72,7 @@ export type TokenizerConfigExec = {
 };
 
 export type AlgorithmsConfig = {
-  intersectTokenScores: IIntersectTokenScoresPromise;
+  intersectTokenScores: IIntersectTokenScores | Promise<IIntersectTokenScores>;
 };
 
 export type Components = {
