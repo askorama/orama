@@ -79,3 +79,11 @@ Supported languages are:
  - serbian
  - turkish
 `
+
+exports[`tests/lyra.test.ts TAP lyra - hooks should validate on lyra creation > must match snapshot 1`] = `
+Error: The following hooks aren't supported. Hooks: anotherHookName
+`
+
+exports[`tests/lyra.test.ts TAP lyra Should throw an error when searching in non-existing indices > must match snapshot 1`] = `
+Error: Invalid property name. Expected a wildcard string ("*") or array containing one of the following properties: foo, baz, but got: bar
+`

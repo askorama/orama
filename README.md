@@ -51,7 +51,7 @@ instance and set an indexing schema:
 ```js
 import { create, insert, remove, search } from "@lyrasearch/lyra";
 
-const db = create({
+const db = await create({
   schema: {
     author: "string",
     quote: "string",
@@ -65,34 +65,33 @@ additional data if needed.
 Once the db instance is created, you can start adding some documents:
 
 ```js
-insert(db, {
+await insert(db, {
   quote:
     "It is during our darkest moments that we must focus to see the light.",
   author: "Aristotle",
 });
 
-insert(db, {
+await insert(db, {
   quote:
     "If you really look closely, most overnight successes took a long time.",
   author: "Steve Jobs",
 });
 
-insert(db, {
+await insert(db, {
   quote:
     "If you are not willing to risk the usual, you will have to settle for the ordinary.",
   author: "Jim Rohn",
 });
 
-insert(db, {
+await insert(db, {
   quote: "You miss 100% of the shots you don't take",
   author: "Wayne Gretzky - Michael Scott",
 });
 ```
 
-Please note that the `insert` function is synchronous. If you have a large
-number of documents, we highly recommend using the `insertBatch` function
-instead, which prevents the event loop from blocking. This operation is
-asynchronous and returns a promise:
+If you have a large number of documents, we highly recommend using the
+`insertBatch` function, which prevents the event loop from blocking. This
+operation is asynchronous and returns a promise:
 
 ```js
 await insertBatch(db, [
@@ -121,7 +120,7 @@ await insertBatch(db, [
 After the data has been inserted, you can finally start to query the database.
 
 ```js
-const searchResult = search(db, {
+const searchResult = await search(db, {
   term: "if",
   properties: "*",
 });
@@ -158,7 +157,7 @@ word `if`, looking up in every schema property (AKA index):
 You can also restrict the lookup to a specific property:
 
 ```js
-const searchResult = search(db, {
+const searchResult = await search(db, {
   term: "Michael",
   properties: ["author"],
 });
@@ -186,7 +185,7 @@ Result:
 If needed, you can also delete a given document by using the `remove` method:
 
 ```js
-remove(db, "41045799-144");
+await remove(db, "41045799-144");
 ```
 
 Lyra exposes a built-in `formatNanoseconds` function to format the elapsed time
@@ -195,7 +194,7 @@ in a human-readable format:
 ```js
 import { formatNanoseconds } from "@lyrasearch/lyra";
 
-const searchResult = search(db, {
+const searchResult = await search(db, {
   term: "if",
   properties: "*",
 });
@@ -221,9 +220,9 @@ Example using ESM (see [builds](#builds) below):
 
 ```js
 import { create } from "@lyrasearch/lyra";
-import { stemmer } from "@lyrasearch/lyra/stemmer/it";
+import { stemmer } from "@lyrasearch/lyra/dist/esm/stemmer/it";
 
-const db = create({
+const db = await create({
   schema: {
     author: "string",
     quote: "string",
@@ -239,9 +238,9 @@ Example using CJS (see [builds](#builds) below):
 
 ```js
 const { create } = require("@lyrasearch/lyra");
-const { stemmer } = require("@lyrasearch/lyra/stemmer/it");
+const { stemmer } = require("@lyrasearch/lyra/dist/esm/stemmer/it");
 
-const db = create({
+const db = await create({
   schema: {
     author: "string",
     quote: "string",
@@ -296,14 +295,14 @@ following builds are included in the Lyra package:
 
 ## Hooks
 
-When dealing with asynchronous operations, hooks are an excelent mechanism to
+When dealing with asynchronous operations, hooks are an excellent mechanism to
 intercept and perform operations during the workflow. Lyra supports hooks
-natively. The `create` function allows you to specific a sequence of hooks.
+natively. The `create` function allows you to specify a sequence of hooks.
 
 ```js
 import { create } from "@lyrasearch/lyra";
 
-const db = create({
+const db = await create({
   schema: {},
   hooks: {
     // HERE
@@ -333,7 +332,7 @@ function hook2 (id: string): void {
   // ...
 }
 
-const db = create({
+const db = await create({
   schema: {
     author: "string",
     quote: "string",

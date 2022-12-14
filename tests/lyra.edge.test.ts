@@ -9,10 +9,10 @@ function extractOriginalDoc(result: any) {
 t.test("Edge getters", t => {
   t.plan(4);
 
-  t.test("should correctly enable edge index getter", t => {
+  t.test("should correctly enable edge index getter", async t => {
     t.plan(2);
 
-    const db = create({
+    const db = await create({
       schema: {
         name: "string",
         age: "number",
@@ -20,17 +20,17 @@ t.test("Edge getters", t => {
       edge: true,
     });
 
-    insert(db, {
+    await insert(db, {
       name: "John",
       age: 30,
     });
 
-    insert(db, {
+    await insert(db, {
       name: "Jane",
       age: 25,
     });
 
-    const index = save(db).index;
+    const { index } = await save(db);
     const nameIndex = index["name"];
 
     // Remember that tokenizers an stemmers sets content to lowercase
@@ -38,10 +38,10 @@ t.test("Edge getters", t => {
     t.ok(trieContains(nameIndex, "jane"));
   });
 
-  t.test("should correctly enable edge docs getter", t => {
+  t.test("should correctly enable edge docs getter", async t => {
     t.plan(2);
 
-    const db = create({
+    const db = await create({
       schema: {
         name: "string",
         age: "number",
@@ -49,26 +49,26 @@ t.test("Edge getters", t => {
       edge: true,
     });
 
-    const doc1 = insert(db, {
+    const doc1 = await insert(db, {
       name: "John",
       age: 30,
     });
 
-    const doc2 = insert(db, {
+    const doc2 = await insert(db, {
       name: "Jane",
       age: 25,
     });
 
-    const docs = save(db).docs;
+    const { docs } = await save(db);
 
     t.strictSame(docs[doc1.id], { name: "John", age: 30 });
     t.strictSame(docs[doc2.id], { name: "Jane", age: 25 });
   });
 
-  t.test("should correctly enable index setter", t => {
+  t.test("should correctly enable index setter", async t => {
     t.plan(6);
 
-    const db = create({
+    const db = await create({
       schema: {
         name: "string",
         age: "number",
@@ -76,17 +76,17 @@ t.test("Edge getters", t => {
       edge: true,
     });
 
-    insert(db, {
+    await insert(db, {
       name: "John",
       age: 30,
     });
 
-    insert(db, {
+    await insert(db, {
       name: "Jane",
       age: 25,
     });
 
-    const db2 = create({
+    const db2 = await create({
       schema: {
         name: "string",
         age: "number",
@@ -94,23 +94,23 @@ t.test("Edge getters", t => {
       edge: true,
     });
 
-    insert(db2, {
+    await insert(db2, {
       name: "Michele",
       age: 27,
     });
 
-    insert(db2, {
+    await insert(db2, {
       name: "Paolo",
       age: 37,
     });
 
-    const dbData = save(db2);
-    load(db, dbData);
+    const dbData = await save(db2);
+    await load(db, dbData);
 
-    const search1 = search(db, { term: "Jane" });
-    const search2 = search(db, { term: "John" });
-    const search3 = search(db, { term: "Paolo" });
-    const search4 = search(db, { term: "Michele" });
+    const search1 = await search(db, { term: "Jane" });
+    const search2 = await search(db, { term: "John" });
+    const search3 = await search(db, { term: "Paolo" });
+    const search4 = await search(db, { term: "Michele" });
 
     t.equal(search1.count, 0);
     t.equal(search2.count, 0);
@@ -121,31 +121,29 @@ t.test("Edge getters", t => {
     t.matchSnapshot(extractOriginalDoc(search4.hits));
   });
 
-  t.test("It should correctly save and load data", t => {
+  t.test("It should correctly save and load data", async t => {
     t.plan(2);
 
-    const originalDB = create({
+    const originalDB = await create({
       schema: {
         name: "string",
         age: "number",
       },
     });
 
-    insert(originalDB, {
+    await insert(originalDB, {
       name: "Michele",
       age: 27,
     });
 
-    insert(originalDB, {
+    await insert(originalDB, {
       name: "Paolo",
       age: 37,
     });
 
-    const DBData = save(originalDB);
+    const DBData = await save(originalDB);
 
-    console.log(DBData);
-
-    const newDB = create({
+    const newDB = await create({
       schema: {
         name: "string",
         age: "number",
@@ -155,11 +153,11 @@ t.test("Edge getters", t => {
 
     load(newDB, DBData);
 
-    const search1 = search(originalDB, { term: "Michele" });
-    const search2 = search(newDB, { term: "Michele" });
+    const search1 = await search(originalDB, { term: "Michele" });
+    const search2 = await search(newDB, { term: "Michele" });
 
-    const search3 = search(originalDB, { term: "P" });
-    const search4 = search(newDB, { term: "P" });
+    const search3 = await search(originalDB, { term: "P" });
+    const search4 = await search(newDB, { term: "P" });
 
     t.strictSame(search1.hits, search2.hits);
     t.strictSame(search3.hits, search4.hits);
