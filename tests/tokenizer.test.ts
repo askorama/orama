@@ -43,10 +43,10 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
 
-  t.test("Should tokenize and stem correctly in french", t => {
+  t.test("Should tokenize and stem correctly in french", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "french",
       tokenizer: {
@@ -65,10 +65,10 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
 
-  t.test("Should tokenize and stem correctly in italian", t => {
+  t.test("Should tokenize and stem correctly in italian", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "italian",
       tokenizer: {
@@ -87,10 +87,10 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
 
-  t.test("Should tokenize and stem correctly in norwegian", t => {
+  t.test("Should tokenize and stem correctly in norwegian", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "norwegian",
       tokenizer: {
@@ -109,10 +109,10 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
 
-  t.test("Should tokenize and stem correctly in portuguese", t => {
+  t.test("Should tokenize and stem correctly in portuguese", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "portuguese",
       tokenizer: {
@@ -131,10 +131,10 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
 
-  t.test("Should tokenize and stem correctly in russian", t => {
+  t.test("Should tokenize and stem correctly in russian", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "russian",
       tokenizer: {
@@ -153,10 +153,10 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
 
-  t.test("Should tokenize and stem correctly in swedish", t => {
+  t.test("Should tokenize and stem correctly in swedish", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "swedish",
       tokenizer: {
@@ -175,10 +175,10 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
 
-  t.test("Should tokenize and stem correctly in spanish", t => {
+  t.test("Should tokenize and stem correctly in spanish", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "spanish",
       tokenizer: {
@@ -197,10 +197,10 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
 
-  t.test("Should tokenize and stem correctly in dutch", t => {
+  t.test("Should tokenize and stem correctly in dutch", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "dutch",
       tokenizer: {
@@ -219,10 +219,10 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
 
-  t.test("Should tokenize and stem correctly in german", t => {
+  t.test("Should tokenize and stem correctly in german", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "german",
       tokenizer: {
@@ -241,10 +241,10 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
 
-  t.test("Should tokenize and stem correctly in finnish", t => {
+  t.test("Should tokenize and stem correctly in finnish", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "finnish",
       tokenizer: {
@@ -263,10 +263,10 @@ t.test("Tokenizer", t => {
     t.matchSnapshot(O2, `${t.name}-O2`);
   });
 
-  t.test("Should tokenize and stem correctly in danish", t => {
+  t.test("Should tokenize and stem correctly in danish", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "danish",
       tokenizer: {
@@ -289,10 +289,10 @@ t.test("Tokenizer", t => {
 t.test("Custom stop-words rules", t => {
   t.plan(5);
 
-  t.test("custom array of stop-words", t => {
+  t.test("custom array of stop-words", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "english",
       tokenizer: {
@@ -312,10 +312,10 @@ t.test("Custom stop-words rules", t => {
     t.same(O2, ["i", "bake", "some", "cake"]);
   });
 
-  t.test("custom stop-words function", t => {
+  t.test("custom stop-words function", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "english",
       tokenizer: {
@@ -337,10 +337,10 @@ t.test("Custom stop-words rules", t => {
     t.same(O2, ["bake", "cake"]);
   });
 
-  t.test("disable stop-words", t => {
+  t.test("disable stop-words", async t => {
     t.plan(2);
 
-    const db = create({
+    const db = await create({
       schema: {},
       defaultLanguage: "english",
       tokenizer: {
@@ -360,10 +360,10 @@ t.test("Custom stop-words rules", t => {
     t.same(O2, ["i", "bake", "some", "cake"]);
   });
 
-  t.test("disable stemming", t => {
+  t.test("disable stemming", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "english",
       tokenizer: {
@@ -384,10 +384,10 @@ t.test("Custom stop-words rules", t => {
     t.same(O2, ["baked", "cakes"]);
   });
 
-  t.test("custom stemming function", t => {
+  t.test("custom stemming function", async t => {
     t.plan(2);
 
-    const { tokenizer } = create({
+    const { tokenizer } = await create({
       schema: {},
       defaultLanguage: "english",
       tokenizer: {
