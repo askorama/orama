@@ -1,4 +1,5 @@
 import t from "tap";
+import type { Node } from "../src/radix-tree/node";
 import { create, insert, save, load, search } from "../src/lyra";
 import { contains as trieContains } from "../src/radix-tree/radix";
 
@@ -34,8 +35,8 @@ t.test("Edge getters", t => {
     const nameIndex = index["name"];
 
     // Remember that tokenizers an stemmers sets content to lowercase
-    t.ok(trieContains(nameIndex, "john"));
-    t.ok(trieContains(nameIndex, "jane"));
+    t.ok(trieContains(nameIndex as unknown as Node, "john"));
+    t.ok(trieContains(nameIndex as unknown as Node, "jane"));
   });
 
   t.test("should correctly enable edge docs getter", async t => {

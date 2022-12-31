@@ -1,4 +1,4 @@
-import type { TokenScore } from "../lyra";
+import type { TokenScore } from "../types";
 import { currentRuntime, IIntersectTokenScores } from "../utils";
 
 let _intersectTokenScores: IIntersectTokenScores;

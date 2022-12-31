@@ -1,8 +1,27 @@
 import type { Language } from "./languages";
-import type { TokenizerConfig } from "../lyra";
-import { defaultTokenizerConfig } from "../lyra";
 import { replaceDiacritics } from "./diacritics";
+import { availableStopWords, stopWords } from "./stop-words";
 import { includes } from "../utils";
+import { stemmer } from "../../stemmer/lib/en";
+import * as ERRORS from "../errors";
+
+export type Stemmer = (word: string) => string;
+
+export type TokenizerConfig = {
+  enableStemming?: boolean;
+  enableStopWords?: boolean;
+  customStopWords?: ((stopWords: string[]) => string[]) | string[];
+  stemmingFn?: Stemmer;
+  tokenizerFn?: Tokenizer;
+};
+
+export type TokenizerConfigExec = {
+  enableStemming: boolean;
+  enableStopWords: boolean;
+  customStopWords: string[];
+  stemmingFn?: Stemmer;
+  tokenizerFn: Tokenizer;
+};
 
 export type Tokenizer = (
   text: string,
@@ -105,4 +124,72 @@ function trim(text: string[]): string[] {
     text.shift();
   }
   return text;
+}
+
+export function defaultTokenizerConfig(language: Language, tokenizerConfig: TokenizerConfig = {}): TokenizerConfigExec {
+  let defaultStopWords: string[] = [];
+  let customStopWords: string[] = [];
+  let defaultStemmingFn: Stemmer | undefined;
+  let defaultTokenizerFn: Tokenizer = tokenize;
+
+  // Enable custom tokenizer function
+  if (tokenizerConfig?.tokenizerFn) {
+    if (typeof tokenizerConfig.tokenizerFn !== "function") {
+      throw Error(ERRORS.INVALID_TOKENIZER_FUNCTION());
+    }
+    defaultTokenizerFn = tokenizerConfig.tokenizerFn;
+
+    // If there's no custom tokenizer, we can proceed setting custom
+    // stemming functions and stop-words.
+  } else {
+    // Enable custom stemming function
+    if (tokenizerConfig?.stemmingFn) {
+      if (typeof tokenizerConfig.stemmingFn !== "function") {
+        throw Error(ERRORS.INVALID_STEMMER_FUNCTION_TYPE());
+      }
+      defaultStemmingFn = tokenizerConfig.stemmingFn;
+    } else {
+      defaultStemmingFn = stemmer;
+    }
+
+    // Enable default stop-words
+
+    if (includes(availableStopWords, language)) {
+      defaultStopWords = stopWords[language] ?? [];
+    }
+
+    if (tokenizerConfig?.customStopWords) {
+      switch (typeof tokenizerConfig.customStopWords) {
+        // Execute the custom step-words function.
+        // This will pass the default step-words for a given language as a first parameter.
+        case "function":
+          customStopWords = tokenizerConfig.customStopWords(defaultStopWords);
+          break;
+
+        // Check if the custom step-words is an array.
+        // If it's an object, throw an exception. If the array contains any non-string value, throw an exception.
+        case "object":
+          if (!Array.isArray(tokenizerConfig.customStopWords)) {
+            throw Error(ERRORS.CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY());
+          }
+          customStopWords = tokenizerConfig.customStopWords as string[];
+          if (customStopWords.some(x => typeof x !== "string")) {
+            throw Error(ERRORS.CUSTOM_STOP_WORDS_ARRAY_MUST_BE_STRING_ARRAY());
+          }
+          break;
+
+        // By default, throw an exception, as this is a misconfiguration.
+        default:
+          throw Error(ERRORS.CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY());
+      }
+    }
+  }
+
+  return {
+    enableStopWords: tokenizerConfig?.enableStopWords ?? true,
+    enableStemming: tokenizerConfig?.enableStemming ?? true,
+    stemmingFn: defaultStemmingFn,
+    customStopWords: customStopWords ?? defaultStopWords,
+    tokenizerFn: defaultTokenizerFn,
+  };
 }

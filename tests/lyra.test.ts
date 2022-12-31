@@ -1,14 +1,7 @@
 import t from "tap";
-import {
-  create,
-  insert,
-  insertBatch,
-  insertWithHooks,
-  PropertiesSchema,
-  remove,
-  RetrievedDoc,
-  search,
-} from "../src/lyra";
+import type { PropertiesSchema } from "../src/types";
+import type { RetrievedDoc } from "../src/methods/search";
+import { create, insert, insertBatch, insertWithHooks, remove, search } from "../src/lyra";
 
 t.test("defaultLanguage", t => {
   t.plan(3);

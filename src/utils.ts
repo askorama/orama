@@ -1,4 +1,4 @@
-import type { TokenScore } from "./lyra";
+import type { TokenScore } from "./types";
 
 export type Runtime = typeof knownRuntimes[number];
 
