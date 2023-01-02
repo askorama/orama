@@ -2,18 +2,19 @@ import type { Lyra, PropertiesSchema } from "../types";
 import type { ResolveSchema } from "../types";
 import type { Language } from "../tokenizer/languages";
 import type { TokenizerConfigExec } from "../tokenizer";
-import type { Node } from "../radix-tree/node";
 import { assertSupportedLanguage, assertDocSchema } from "./common";
 import { trackInsertion } from "../insertion-checker";
 import { hookRunner } from "./hooks";
 import { uniqueId } from "../utils";
 import { insert as radixInsert } from "../radix-tree/radix";
+import * as ERRORS from "../errors";
 
-export type InsertConfig = {
-  language: Language;
+export type InsertConfig<S extends PropertiesSchema> = {
+  language?: Language;
+  id?: (doc: ResolveSchema<S>) => string | Promise<string>;
 };
 
-export type InsertBatchConfig = InsertConfig & {
+export type InsertBatchConfig<S extends PropertiesSchema> = InsertConfig<S> & {
   batchSize?: number;
 };
 
@@ -32,12 +33,16 @@ export type InsertBatchConfig = InsertConfig & {
 export async function insert<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   doc: ResolveSchema<S>,
-  config?: InsertConfig,
+  config?: InsertConfig<S>,
 ): Promise<{ id: string }> {
   config = { language: lyra.defaultLanguage, ...config };
-  const id = uniqueId();
 
-  assertSupportedLanguage(config.language);
+  const id = await getDocumentID(doc, config);
+
+  // If the ID already exists, we throw an error.
+  if (lyra.docs[id]) throw new Error(ERRORS.ID_ALREADY_EXISTS(id));
+
+  assertSupportedLanguage(config.language!);
 
   assertDocSchema(doc, lyra.schema);
 
@@ -63,12 +68,12 @@ export async function insert<S extends PropertiesSchema>(
 export async function insertWithHooks<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   doc: ResolveSchema<S>,
-  config?: InsertConfig,
+  config?: InsertConfig<S>,
 ): Promise<{ id: string }> {
   config = { language: lyra.defaultLanguage, ...config };
-  const id = uniqueId();
+  const id = await getDocumentID(doc, config);
 
-  assertSupportedLanguage(config.language);
+  assertSupportedLanguage(config.language!);
 
   assertDocSchema(doc, lyra.schema);
 
@@ -103,7 +108,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
 export async function insertBatch<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   docs: ResolveSchema<S>[],
-  config?: InsertBatchConfig,
+  config?: InsertBatchConfig<S>,
 ): Promise<void> {
   const batchSize = config?.batchSize ?? 1000;
 
@@ -136,11 +141,12 @@ function recursiveradixInsertion<S extends PropertiesSchema>(
   lyra: Lyra<S>,
   doc: ResolveSchema<S>,
   id: string,
-  config: InsertConfig,
+  config: InsertConfig<S>,
   prefix = "",
   tokenizerConfig: TokenizerConfigExec,
   schema: PropertiesSchema = lyra.schema,
 ) {
+  config = { language: lyra.defaultLanguage, ...config };
   const { index, frequencies, tokenOccurrencies } = lyra;
 
   for (const key of Object.keys(doc)) {
@@ -163,7 +169,7 @@ function recursiveradixInsertion<S extends PropertiesSchema>(
       // Use propName here because if doc is a nested object
       // We will get the wrong index
       const requestedTrie = index[propName];
-      const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language, false, tokenizerConfig);
+      const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language!, false, tokenizerConfig);
 
       if (!(propName in frequencies)) {
         frequencies[propName] = {};
@@ -201,4 +207,31 @@ function recursiveradixInsertion<S extends PropertiesSchema>(
       }
     }
   }
+}
+
+async function getDocumentID<S extends PropertiesSchema>(
+  doc: ResolveSchema<S>,
+  config: InsertConfig<S>,
+): Promise<string> {
+  let id: string;
+
+  // If the user passes a custom ID function, we use it to generate the ID.
+  // This has the maximum priority.
+  if (config?.id) {
+    id = await config.id(doc);
+
+    // If the user passes an ID in the document, we use it.
+  } else if (doc.id && typeof doc.id === "string") {
+    id = doc.id;
+
+    // If the user passes an ID in the document, but it's not a string, we throw a type error.
+  } else if (doc.id && typeof doc.id !== "string") {
+    throw new TypeError(ERRORS.TYPE_ERROR_ID_MUST_BE_STRING(typeof doc.id));
+
+    // If the user doesn't pass an ID, we generate one.
+  } else {
+    id = uniqueId();
+  }
+
+  return id;
 }
