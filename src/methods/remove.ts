@@ -1,6 +1,5 @@
 import type { ResolveSchema } from "../types";
 import type { PropertiesSchema, Lyra } from "../types";
-import type { Node } from "../radix-tree/node";
 import { removeDocumentByWord } from "../radix-tree/radix";
 import { defaultTokenizerConfig } from "../tokenizer";
 import * as ERRORS from "../errors";

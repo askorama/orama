@@ -1,7 +1,6 @@
 import type { Lyra, PropertiesSchema } from "../types";
 import type { SearchProperties, ResolveSchema } from "../types";
 import type { Language } from "../tokenizer/languages";
-import type { Node } from "../radix-tree/node";
 import { defaultTokenizerConfig } from "../tokenizer";
 import { getIndices } from "./common";
 import { find as radixFind } from "../radix-tree/radix";

@@ -67,3 +67,11 @@ export function INVALID_STEMMER_FUNCTION_TYPE(): string {
 export function INVALID_TOKENIZER_FUNCTION(): string {
   return `tokenizer.tokenizerFn must be a function.`;
 }
+
+export function TYPE_ERROR_ID_MUST_BE_STRING(type: string): string {
+  return `"id" must be of type "string". Got "${type}" instead.`;
+}
+
+export function ID_ALREADY_EXISTS(id: string): string {
+  return `Document with ID "${id}" already exists.`;
+}

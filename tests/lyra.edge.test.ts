@@ -1,5 +1,4 @@
 import t from "tap";
-import type { Node } from "../src/radix-tree/node";
 import { create, insert, save, load, search } from "../src/lyra";
 import { contains as trieContains } from "../src/radix-tree/radix";
 

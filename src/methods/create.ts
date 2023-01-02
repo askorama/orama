@@ -1,6 +1,5 @@
 import type { PropertiesSchema, Configuration, Lyra } from "../types";
 import type { Language } from "../tokenizer/languages";
-import type { Node } from "../radix-tree/node";
 import { defaultTokenizerConfig } from "../tokenizer";
 import { intersectTokenScores } from "../utils";
 import { assertSupportedLanguage } from "./common";
