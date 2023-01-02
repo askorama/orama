@@ -2,7 +2,7 @@ import type { ResolveSchema } from "../types";
 import type { PropertiesSchema, Lyra } from "../types";
 import type { SearchParams } from "./search";
 import { includes } from "../utils";
-import { SUPPORTED_LANGUAGES } from "../../dist/browser/src/tokenizer/languages";
+import { SUPPORTED_LANGUAGES } from "../tokenizer/languages";
 import * as ERRORS from "../errors";
 
 export function assertSupportedLanguage(language: string) {
