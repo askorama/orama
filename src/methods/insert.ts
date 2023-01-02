@@ -2,7 +2,6 @@ import type { Lyra, PropertiesSchema } from "../types";
 import type { ResolveSchema } from "../types";
 import type { Language } from "../tokenizer/languages";
 import type { TokenizerConfigExec } from "../tokenizer";
-import type { Node } from "../radix-tree/node";
 import { assertSupportedLanguage, assertDocSchema } from "./common";
 import { trackInsertion } from "../insertion-checker";
 import { hookRunner } from "./hooks";
@@ -38,25 +37,7 @@ export async function insert<S extends PropertiesSchema>(
 ): Promise<{ id: string }> {
   config = { language: lyra.defaultLanguage, ...config };
 
-  let id: string;
-
-  // If the user passes a custom ID function, we use it to generate the ID.
-  // This has the maximum priority.
-  if (config?.id) {
-    id = await config.id(doc);
-
-    // If the user passes an ID in the document, we use it.
-  } else if (doc.id && typeof doc.id === "string") {
-    id = doc.id;
-
-    // If the user passes an ID in the document, but it's not a string, we throw a type error.
-  } else if (doc.id && typeof doc.id !== "string") {
-    throw new TypeError(ERRORS.TYPE_ERROR_ID_MUST_BE_STRING(typeof doc.id));
-
-    // If the user doesn't pass an ID, we generate one.
-  } else {
-    id = uniqueId();
-  }
+  const id = await getDocumentID(doc, config);
 
   // If the ID already exists, we throw an error.
   if (lyra.docs[id]) throw new Error(ERRORS.ID_ALREADY_EXISTS(id));
@@ -90,7 +71,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   config?: InsertConfig<S>,
 ): Promise<{ id: string }> {
   config = { language: lyra.defaultLanguage, ...config };
-  const id = uniqueId();
+  const id = await getDocumentID(doc, config);
 
   assertSupportedLanguage(config.language!);
 
@@ -226,4 +207,31 @@ function recursiveradixInsertion<S extends PropertiesSchema>(
       }
     }
   }
+}
+
+async function getDocumentID<S extends PropertiesSchema>(
+  doc: ResolveSchema<S>,
+  config: InsertConfig<S>,
+): Promise<string> {
+  let id: string;
+
+  // If the user passes a custom ID function, we use it to generate the ID.
+  // This has the maximum priority.
+  if (config?.id) {
+    id = await config.id(doc);
+
+    // If the user passes an ID in the document, we use it.
+  } else if (doc.id && typeof doc.id === "string") {
+    id = doc.id;
+
+    // If the user passes an ID in the document, but it's not a string, we throw a type error.
+  } else if (doc.id && typeof doc.id !== "string") {
+    throw new TypeError(ERRORS.TYPE_ERROR_ID_MUST_BE_STRING(typeof doc.id));
+
+    // If the user doesn't pass an ID, we generate one.
+  } else {
+    id = uniqueId();
+  }
+
+  return id;
 }
