@@ -35,8 +35,8 @@ t.test("Edge getters", t => {
     const nameIndex = index["name"];
 
     // Remember that tokenizers an stemmers sets content to lowercase
-    t.ok(trieContains(nameIndex as unknown as Node, "john"));
-    t.ok(trieContains(nameIndex as unknown as Node, "jane"));
+    t.ok(trieContains(nameIndex, "john"));
+    t.ok(trieContains(nameIndex, "jane"));
   });
 
   t.test("should correctly enable edge docs getter", async t => {

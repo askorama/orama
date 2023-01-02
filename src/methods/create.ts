@@ -63,7 +63,7 @@ function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix
     if (isNested) {
       buildIndex(lyra, schema[prop] as S, `${propName}.`);
     } else {
-      (lyra.index[propName] as unknown as Node) = createNode();
+      lyra.index[propName] = createNode();
     }
   }
 }

@@ -197,7 +197,7 @@ function recursiveradixInsertion<S extends PropertiesSchema>(
         // increase a token counter that may not yet exist
         tokenOccurrencies[propName][token] = (tokenOccurrencies[propName][token] ?? 0) + 1;
 
-        radixInsert(requestedTrie as unknown as Node, token, id);
+        radixInsert(requestedTrie, token, id);
       }
     }
   }

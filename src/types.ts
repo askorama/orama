@@ -2,6 +2,7 @@ import type { Language } from "./tokenizer/languages";
 import type { Hooks } from "./methods/hooks";
 import type { TokenizerConfig } from "./tokenizer";
 import type { IIntersectTokenScores } from "./utils";
+import type { Node } from "./radix-tree/node";
 
 export type Nullable<T> = T | null;
 

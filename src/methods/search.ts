@@ -240,7 +240,7 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
   params: SearchParams<S> & { index: string },
 ): string[] {
   const idx = lyra.index[params.index];
-  const searchResult = radixFind(idx as unknown as Node, {
+  const searchResult = radixFind(idx, {
     term: params.term,
     exact: params.exact,
     tolerance: params.tolerance,
