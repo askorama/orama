@@ -1,6 +1,7 @@
 import t from "tap";
+import type { PropertiesSchema } from "../src/types";
+import type { SearchResult } from "../src/methods/search";
 import { create, insertBatch, remove, search } from "../src/lyra";
-import type { PropertiesSchema, SearchResult } from "../src/lyra";
 import dataset from "./datasets/events.json";
 
 type EventJson = {
