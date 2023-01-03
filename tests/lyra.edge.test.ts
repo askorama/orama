@@ -9,10 +9,10 @@ function extractOriginalDoc<T extends PropertiesSchema>(result: RetrievedDoc<T>[
 }
 
 t.test("Edge getters", t => {
-  t.plan(4);
+  t.plan(5);
 
   t.test("should correctly enable edge index getter", async t => {
-    t.plan(2);
+    t.plan(3);
 
     const db = await create({
       schema: {
@@ -32,12 +32,13 @@ t.test("Edge getters", t => {
       age: 25,
     });
 
-    const { index } = await save(db);
+    const { index, defaultLanguage } = await save(db);
     const nameIndex = index["name"];
 
     // Remember that tokenizers an stemmers sets content to lowercase
     t.ok(trieContains(nameIndex, "john"));
     t.ok(trieContains(nameIndex, "jane"));
+    t.same(defaultLanguage, "english");
   });
 
   t.test("should correctly enable edge docs getter", async t => {
@@ -163,5 +164,43 @@ t.test("Edge getters", t => {
 
     t.strictSame(search1.hits, search2.hits);
     t.strictSame(search3.hits, search4.hits);
+  });
+
+  t.test("It should correctly save and load the defaultLanguage option", async t => {
+    t.plan(2);
+    const db = await create({
+      schema: {
+        name: "string",
+        age: "number",
+      },
+      edge: true,
+      defaultLanguage: "italian",
+    });
+
+    const db2 = await create({
+      schema: {
+        name: "string",
+        age: "number",
+      },
+      edge: true,
+    });
+
+    await insert(db, {
+      name: "Michele",
+      age: 27,
+    });
+
+    await insert(db, {
+      name: "John",
+      age: 25,
+    });
+
+    const originalInstance = await save(db);
+    load(db2, originalInstance);
+
+    const { defaultLanguage } = originalInstance;
+
+    t.same(originalInstance.defaultLanguage, "italian");
+    t.same(defaultLanguage, "italian");
   });
 });

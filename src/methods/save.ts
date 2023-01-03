@@ -7,5 +7,6 @@ export async function save<S extends PropertiesSchema>(lyra: Lyra<S>): Promise<D
     schema: lyra.schema,
     frequencies: lyra.frequencies,
     tokenOccurrencies: lyra.tokenOccurrencies,
+    defaultLanguage: lyra.defaultLanguage,
   };
 }

@@ -46,6 +46,7 @@ export type Configuration<S extends PropertiesSchema> = {
 
 export type Data<S extends PropertiesSchema> = {
   docs: Record<string, ResolveSchema<S> | undefined>;
+  defaultLanguage: Language;
   index: Index;
   schema: S;
   frequencies: FrequencyMap;
