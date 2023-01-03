@@ -1,13 +1,20 @@
-import fs from "fs";
-import path from "path";
+import { transformFile } from "@swc/core";
 import { execa } from "execa";
-import { __dirname } from "./common.mjs";
+import { existsSync } from "node:fs";
+import { mkdir, rm, writeFile, rename } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-export async function wasm({ crateFolder, profile, target, shouldOptimize }) {
-  process.chdir(path.join(__dirname(), '..'));
+const rootDir = dirname(fileURLToPath(import.meta.url));
+const targets = ["nodejs", "web", "deno"];
+const artifactsDir = resolve(rootDir, "../../dist/wasm");
+const wasmCrates = ["lyra-utils-wasm"];
+
+async function wasm({ crateFolder, profile, target, shouldOptimize }) {
+  process.chdir(resolve(rootDir, ".."));
 
   const artifactName = target;
-  const outDir = path.resolve(path.join(__dirname(), "..", "src", "wasm", "artifacts", artifactName));
+  const outDir = resolve(artifactsDir, artifactName);
   const crate = crateFolder.replaceAll("-", "_");
   const wasmTarget = "wasm32-unknown-unknown";
 
@@ -15,20 +22,20 @@ export async function wasm({ crateFolder, profile, target, shouldOptimize }) {
   await execa("cargo", ["build", "-p", crateFolder, "--profile", profile, "--target", wasmTarget]);
 
   console.log(`Creating output directory "${outDir}"...`);
-  await fs.promises.mkdir(outDir, { recursive: true });
+  await mkdir(outDir, { recursive: true });
 
-  const wasmFile = path.join(__dirname(), "../target", wasmTarget, profile, `${crate}.wasm`);
+  const wasmFile = resolve(rootDir, "../target", wasmTarget, profile, `${crate}.wasm`);
 
   console.log("Optimizing Wasm artifact...");
   await execa("wasm-opt", [wasmFile, "-o", wasmFile, "-O2", "--precompute"]);
 
   if (shouldOptimize) {
-    const watFile = path.join(outDir, `${crate}.wat`);
-    const optimizedWat = path.join(outDir, `${crate}_optimized.wat`);
-    
+    const watFile = resolve(outDir, `${crate}.wat`);
+    const optimizedWat = resolve(outDir, `${crate}_optimized.wat`);
+
     console.log("Generating textual version of the original Wasm artifact...");
     await execa("wasm-opt", [wasmFile, "-o", watFile, "-O0", "--emit-text"]);
-  
+
     console.log("Generating textual version of the optimized Wasm artifact...");
     await execa("wasm-opt", [wasmFile, "-o", optimizedWat, "-O0", "--emit-text"]);
   }
@@ -36,3 +43,37 @@ export async function wasm({ crateFolder, profile, target, shouldOptimize }) {
   console.log("Generating node module...");
   await execa("wasm-bindgen", ["--target", target, "--out-dir", outDir, wasmFile]);
 }
+
+async function main() {
+  for (const target of targets) {
+    console.log("Building for target:", target, "\n");
+
+    const currentArtifactsDir = resolve(artifactsDir, target);
+    if (existsSync(currentArtifactsDir)) {
+      console.log("Removing old artifacts...");
+      await rm(currentArtifactsDir, { recursive: true });
+    }
+
+    for (const wasmCrate of wasmCrates) {
+      console.log("Processing crate:", wasmCrate);
+      await wasm({ crateFolder: wasmCrate, profile: "release", target, shouldOptimize: false });
+    }
+
+    const entrypoint = resolve(artifactsDir, target, "lyra_utils_wasm.js");
+    const transformed = await transformFile(entrypoint, { swcrc: false, isModule: true });
+    await writeFile(entrypoint, transformed.code);
+
+    if (target === "nodejs") {
+      await rename(entrypoint, entrypoint.replace(".js", ".cjs"));
+    }
+  }
+}
+
+main()
+  .then(() => {
+    console.log("Build WASM OK!");
+  })
+  .catch(err => {
+    console.error(err);
+    process.exit(1);
+  });

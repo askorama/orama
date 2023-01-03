@@ -1,13 +1,11 @@
-import type { Lyra, PropertiesSchema } from "../types";
-import type { SearchProperties, ResolveSchema } from "../types";
-import type { Language } from "../tokenizer/languages";
-import { defaultTokenizerConfig } from "../tokenizer";
-import { getIndices } from "./common";
-import { find as radixFind } from "../radix-tree/radix";
-import { getNanosecondsTime, insertSortedValue, sortTokenScorePredicate, intersectTokenScores } from "../utils";
+import { find as radixFind } from "../radix-tree/radix.js";
+import { defaultTokenizerConfig } from "../tokenizer/index.js";
+import type { Language } from "../tokenizer/languages.js";
+import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap } from "../types.js";
+import { getNanosecondsTime, insertSortedValue, intersectTokenScores, sortTokenScorePredicate } from "../utils.js";
+import { getIndices } from "./common.js";
 
 export type TokenScore = [string, number];
-type TokenMap = Record<string, TokenScore[]>;
 type IndexMap = Record<string, TokenMap>;
 
 export type RetrievedDoc<S extends PropertiesSchema> = {

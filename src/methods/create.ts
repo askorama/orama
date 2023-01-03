@@ -1,11 +1,11 @@
-import type { PropertiesSchema, Configuration, Lyra } from "../types";
-import type { Language } from "../tokenizer/languages";
-import { defaultTokenizerConfig } from "../tokenizer";
-import { intersectTokenScores } from "../utils";
-import { assertSupportedLanguage } from "./common";
-import { validateHooks } from "./hooks";
-import { create as createNode } from "../radix-tree/node";
-import * as ERRORS from "../errors";
+import * as ERRORS from "../errors.js";
+import { create as createNode } from "../radix-tree/node.js";
+import { defaultTokenizerConfig } from "../tokenizer/index.js";
+import type { Language } from "../tokenizer/languages.js";
+import type { Configuration, Lyra, PropertiesSchema } from "../types.js";
+import { intersectTokenScores } from "../utils.js";
+import { assertSupportedLanguage } from "./common.js";
+import { validateHooks } from "./hooks.js";
 
 /**
  * Creates a new database.

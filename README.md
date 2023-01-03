@@ -30,7 +30,7 @@ Or import it directly in a browser module:
 <html>
   <body>
     <script type="module">
-      import { create, search, insert } from "https://unpkg.com/@lyrasearch/lyra@latest/dist/esm/src/lyra.js";
+      import { create, search, insert } from "https://unpkg.com/@lyrasearch/lyra@latest/dist/index.js";
 
       // ...
     </script>
@@ -59,6 +59,8 @@ const db = await create({
 });
 ```
 
+If you are using Node.js without ESM, please see [build](#builds) section below on how to properly require Lyra.
+
 Lyra will only index string properties, but will allow you to set and store
 additional data if needed.
 
@@ -66,20 +68,17 @@ Once the db instance is created, you can start adding some documents:
 
 ```js
 await insert(db, {
-  quote:
-    "It is during our darkest moments that we must focus to see the light.",
+  quote: "It is during our darkest moments that we must focus to see the light.",
   author: "Aristotle",
 });
 
 await insert(db, {
-  quote:
-    "If you really look closely, most overnight successes took a long time.",
+  quote: "If you really look closely, most overnight successes took a long time.",
   author: "Steve Jobs",
 });
 
 await insert(db, {
-  quote:
-    "If you are not willing to risk the usual, you will have to settle for the ordinary.",
+  quote: "If you are not willing to risk the usual, you will have to settle for the ordinary.",
   author: "Jim Rohn",
 });
 
@@ -96,18 +95,15 @@ operation is asynchronous and returns a promise:
 ```js
 await insertBatch(db, [
   {
-    quote:
-      "It is during our darkest moments that we must focus to see the light.",
+    quote: "It is during our darkest moments that we must focus to see the light.",
     author: "Aristotle",
   },
   {
-    quote:
-      "If you really look closely, most overnight successes took a long time.",
+    quote: "If you really look closely, most overnight successes took a long time.",
     author: "Steve Jobs",
   },
   {
-    quote:
-      "If you are not willing to risk the usual, you will have to settle for the ordinary.",
+    quote: "If you are not willing to risk the usual, you will have to settle for the ordinary.",
     author: "Jim Rohn",
   },
   {
@@ -203,6 +199,103 @@ console.log(`Search took ${formatNanoseconds(searchResult.elapsed)}`);
 // Search took 164μs
 ```
 
+### Using with CommonJS
+
+From version 0.4.0, Lyra is packaged as ES modules, suitable for Node.js, Deno, Bun and modern browsers.
+
+**In most cases, simply `import` or `@lyrasearch/lyra` will suffice ✨.**
+
+In Node.js, when not using ESM (with `"type": "module"` in the `package.json`), you have several ways to properly require Lyra.
+
+#### Use dynamic import (recommended)
+
+As all Lyra methods return a promise anyway, you can simply wrap all your code in an async function and then replace all `require`s with `await import`.
+
+If your Lyra 0.3.0 code was
+
+```js
+const { create, insert } = require("@lyrasearch/lyra");
+
+const db = create(/* ... */);
+insert(db, {
+  /* ... */
+});
+```
+
+then starting with version 0.4.0 it becomes:
+
+```js
+async function main() {
+  const { create, insert } = await import("@lyrasearch/lyra");
+
+  const db = create(/* ... */);
+  insert(db, {
+    /* ... */
+  });
+}
+
+main().catch(console.error);
+```
+
+#### Use CJS requires
+
+As of version 0.4.0, Lyra methods can be required as CommonJS modules by requiring from `@lyrasearch/lyra/cjs`.
+
+If your Lyra 0.3.0 code was
+
+```js
+const { create, insert } = require("@lyrasearch/lyra");
+
+const db = create(/* ... */);
+insert(db, {
+  /* ... */
+});
+```
+
+then starting with version 0.4.0 it becomes:
+
+```js
+const { create, insert } = require("@lyrasearch/lyra/cjs")
+
+create(/* ... */)
+  .then(db => insert(db, { /* ... */ })
+  .catch(console.error)
+```
+
+Note that only main methods are supported so for internals, stemmer and other supported exports you still have to use `await import`.
+
+#### Use requireLyra with callbacks
+
+As of version 0.4.0, a new function called `requireLyra` can be used to require Lyra without using promises.
+
+If your Lyra 0.3.0 code was
+
+```js
+const { create, insert } = require("@lyrasearch/lyra");
+
+const db = create(/* ... */);
+insert(db, {
+  /* ... */
+});
+```
+
+then starting with version 0.4.0 it becomes:
+
+```js
+const { requireLyra } = require("@lyrasearch/lyra/cjs")
+
+requireLyra((err, lyra) => {
+  if(err) {
+    throw new Error(err)
+  }
+
+  const {create, insert} = lyra
+  create(/* ... */)
+    .then(db => insert(db, { /* ... */ })
+    .catch(console.error)
+})
+```
+
 ## Language
 
 Lyra supports multiple languages. By default, it will use the `english`
@@ -216,11 +309,11 @@ By default, Lyra will analyze your input using an English
 You can replace the default stemmer with a custom one, or a pre-built one
 shipped with the default Lyra installation.
 
-Example using ESM (see [builds](#builds) below):
+Example:
 
 ```js
 import { create } from "@lyrasearch/lyra";
-import { stemmer } from "@lyrasearch/lyra/dist/esm/stemmer/it";
+import { stemmer } from "@lyrasearch/lyra/stemmer/it";
 
 const db = await create({
   schema: {
@@ -236,24 +329,28 @@ const db = await create({
 });
 ```
 
-Example using CJS (see [builds](#builds) below):
+Example using CJS (see [using with commonJS](#using-with-commonjs) above):
 
 ```js
-const { create } = require("@lyrasearch/lyra");
-const { stemmer } = require("@lyrasearch/lyra/dist/esm/stemmer/it");
+async function main() {
+  const { create } = await import("@lyrasearch/lyra");
+  const { stemmer } = await import("@lyrasearch/lyra/stemmer/it");
 
-const db = await create({
-  schema: {
-    author: "string",
-    quote: "string",
-  },
-  defaultLanguage: "italian",
-  components: {
-    tokenizer: {
-      stemmingFn: stemmer,
+  const db = await create({
+    schema: {
+      author: "string",
+      quote: "string",
     },
-  },
-});
+    defaultLanguage: "italian",
+    components: {
+      tokenizer: {
+        stemmingFn: stemmer,
+      },
+    },
+  });
+}
+
+main();
 ```
 
 Right now, Lyra supports 23 languages and stemmers out of the box:
@@ -281,21 +378,6 @@ Right now, Lyra supports 23 languages and stemmers out of the box:
 - Serbian
 - Swedish
 - Turkish
-
-## Builds
-
-Lyra is packaged with ES modules, CommonJS, and generic browser builds.
-
-**In most cases, simply `import` or `require` `@lyrasearch/lyra` and your
-environment will choose the most appropriate build ✨.** In some circumstances,
-you may need to `import` or `require` certain files (such as stemmers). The
-following builds are included in the Lyra package:
-
-| path           | build                                                                                                                                                                                                                                         |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `dist/esm`     | ESNext build using ES modules. _Use this for most modern applications (node.js, vite.js, browser modules, etc.)_                                                                                                                              |
-| `dist/cjs`     | ESNext build using CommonJS (`require`). Use this for environments that don't support ES modules.                                                                                                                                             |
-| `dist/browser` | ES2019 build using CommonJS (`require`). Use this for environment that don't support modern ESNext language constructs, such as webpack 4 (used by Expo). Note, this build will be chosen by default in webpack environments such as Next.js. |
 
 ## Hooks
 
@@ -328,11 +410,11 @@ Example:
 ```js
 import { create, insertWithHooks } from "@lyrasearch/lyra";
 
-async function hook1 (id: string): Promise<void> {
+async function hook1(id: string): Promise<void> {
   // called before hook2
 }
 
-function hook2 (id: string): void {
+function hook2(id: string): void {
   // ...
 }
 
@@ -346,7 +428,7 @@ const db = await create({
   },
 });
 
-await insertWithHooks(db, { author: "test", quote: "test" })
+await insertWithHooks(db, { author: "test", quote: "test" });
 ```
 
 # License

@@ -1,8 +1,7 @@
-import type { ResolveSchema } from "../types";
-import type { PropertiesSchema, Lyra } from "../types";
-import { removeDocumentByWord } from "../radix-tree/radix";
-import { defaultTokenizerConfig } from "../tokenizer";
-import * as ERRORS from "../errors";
+import * as ERRORS from "../errors.js";
+import { removeDocumentByWord } from "../radix-tree/radix.js";
+import { defaultTokenizerConfig } from "../tokenizer/index.js";
+import type { Lyra, PropertiesSchema, ResolveSchema } from "../types.js";
 
 /**
  * Removes a document from a database.

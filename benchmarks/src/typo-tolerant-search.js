@@ -1,6 +1,6 @@
 import cronometro from "cronometro";
-import { create, search, insertBatch } from "../../dist/cjs/src/lyra.js";
-import { formattedEvents } from "./utils/dataset.mjs";
+import { create, search, insertBatch } from "../../dist/index.js";
+import { formattedEvents } from "./utils/dataset.js";
 
 const db = create({
   schema: {

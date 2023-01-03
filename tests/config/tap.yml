@@ -4,5 +4,5 @@ timeout: 120
 reporter: spec
 coverage: false
 node-arg:
-  - --loader=ts-node/esm
+  - --loader=tsx
   - --no-warnings=loader

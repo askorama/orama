@@ -1,9 +1,8 @@
-import type { ResolveSchema } from "../types";
-import type { PropertiesSchema, Lyra } from "../types";
+import * as ERRORS from "../errors.js";
+import { SUPPORTED_LANGUAGES } from "../tokenizer/languages.js";
+import type { Lyra, PropertiesSchema, ResolveSchema } from "../types";
+import { includes } from "../utils.js";
 import type { SearchParams } from "./search";
-import { includes } from "../utils";
-import { SUPPORTED_LANGUAGES } from "../tokenizer/languages";
-import * as ERRORS from "../errors";
 
 export function assertSupportedLanguage(language: string) {
   if (!includes(SUPPORTED_LANGUAGES, language)) {

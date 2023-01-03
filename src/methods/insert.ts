@@ -1,13 +1,12 @@
-import type { Lyra, PropertiesSchema } from "../types";
-import type { ResolveSchema } from "../types";
-import type { Language } from "../tokenizer/languages";
-import type { TokenizerConfigExec } from "../tokenizer";
-import { assertSupportedLanguage, assertDocSchema } from "./common";
-import { trackInsertion } from "../insertion-checker";
-import { hookRunner } from "./hooks";
-import { uniqueId } from "../utils";
-import { insert as radixInsert } from "../radix-tree/radix";
-import * as ERRORS from "../errors";
+import * as ERRORS from "../errors.js";
+import { trackInsertion } from "../insertion-checker.js";
+import { insert as radixInsert } from "../radix-tree/radix.js";
+import type { TokenizerConfigExec } from "../tokenizer/index.js";
+import type { Language } from "../tokenizer/languages.js";
+import type { Lyra, PropertiesSchema, ResolveSchema } from "../types.js";
+import { uniqueId } from "../utils.js";
+import { assertDocSchema, assertSupportedLanguage } from "./common.js";
+import { hookRunner } from "./hooks.js";
 
 export type InsertConfig<S extends PropertiesSchema> = {
   language?: Language;

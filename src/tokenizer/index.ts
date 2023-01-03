@@ -1,9 +1,9 @@
+import { stemmer } from "../../stemmer/lib/en.js";
+import * as ERRORS from "../errors.js";
+import { includes } from "../utils.js";
+import { replaceDiacritics } from "./diacritics.js";
 import type { Language } from "./languages";
-import { replaceDiacritics } from "./diacritics";
-import { availableStopWords, stopWords } from "./stop-words";
-import { includes } from "../utils";
-import { stemmer } from "../../stemmer/lib/en";
-import * as ERRORS from "../errors";
+import { availableStopWords, stopWords } from "./stop-words/index.js";
 
 export type Stemmer = (word: string) => string;
 

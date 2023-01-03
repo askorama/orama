@@ -1,4 +1,4 @@
-import { SUPPORTED_LANGUAGES } from "./tokenizer/languages";
+import { SUPPORTED_LANGUAGES } from "./tokenizer/languages.js";
 
 function formatJSON(input: object) {
   return JSON.stringify(input, null, 2);

@@ -1,4 +1,4 @@
-import type { TokenScore } from "./types";
+import type { TokenScore } from "./types.js";
 
 export type Runtime = typeof knownRuntimes[number];
 
@@ -15,6 +15,8 @@ const second = BigInt(1e9);
 export const knownRuntimes = ["deno", "node", "browser", "unknown"] as const;
 
 export const isServer = typeof window === "undefined";
+
+let _currentRuntime: Runtime;
 
 export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) {
@@ -162,32 +164,29 @@ export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
   return b[1] - a[1];
 }
 
-export let currentRuntime = getCurrentRuntime();
-
 export function getCurrentRuntime(): Runtime {
-  if (currentRuntime) {
-    return currentRuntime;
+  if (_currentRuntime) {
+    return _currentRuntime;
   }
 
   if (typeof process !== "undefined" && process.versions !== undefined) {
-    currentRuntime = "node";
-    return currentRuntime;
+    _currentRuntime = "node";
+    // @ts-expect-error "Deno" global variable is defined in Deno only
+  } else if (typeof Deno !== "undefined") {
+    _currentRuntime = "deno";
+    return _currentRuntime;
+  } else if (typeof window !== "undefined") {
+    _currentRuntime = "browser";
+    return _currentRuntime;
+  } else {
+    _currentRuntime = "unknown";
   }
 
-  // @ts-expect-error "Deno" global variable is defined in Deno only
-  if (typeof Deno !== "undefined") {
-    currentRuntime = "deno";
-    return currentRuntime;
-  }
-
-  if (typeof window !== "undefined") {
-    currentRuntime = "browser";
-    return currentRuntime;
-  }
-
-  return "unknown";
+  return _currentRuntime;
 }
 
 export function isRuntime(runtime: Runtime): boolean {
   return getCurrentRuntime() === runtime;
 }
+
+export const currentRuntime = getCurrentRuntime();

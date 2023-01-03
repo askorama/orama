@@ -1,8 +1,8 @@
-import type { Language } from "./tokenizer/languages";
-import type { Hooks } from "./methods/hooks";
-import type { TokenizerConfig } from "./tokenizer";
-import type { IIntersectTokenScores } from "./utils";
-import type { Node } from "./radix-tree/node";
+import type { Hooks } from "./methods/hooks.js";
+import type { Node } from "./radix-tree/node.js";
+import type { TokenizerConfig } from "./tokenizer/index.js";
+import type { Language } from "./tokenizer/languages.js";
+import type { IIntersectTokenScores } from "./utils.js";
 
 export type Nullable<T> = T | null;
 
@@ -79,7 +79,7 @@ type ResolveTypes<TType> = TType extends "string"
 
 type Index = Record<string, Node>;
 
-type TokenMap = Record<string, TokenScore[]>;
+export type TokenMap = Record<string, TokenScore[]>;
 
 type FrequencyMap = {
   [property: string]: {

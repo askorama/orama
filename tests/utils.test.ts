@@ -1,5 +1,5 @@
 import t from "tap";
-import { formatBytes, formatNanoseconds, getOwnProperty, intersectTokenScores } from "../src/utils";
+import { formatBytes, formatNanoseconds, getOwnProperty, intersectTokenScores } from "../src/utils.js";
 
 t.test("utils", t => {
   t.plan(4);

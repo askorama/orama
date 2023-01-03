@@ -1,12 +1,12 @@
 import t from "tap";
+import { create as createNode } from "../src/radix-tree/node.js";
 import {
+  contains as radixContains,
   find as radixFind,
   insert as radixInsert,
-  contains as radixContains,
-  removeWord as radixRemoveWord,
   removeDocumentByWord as radixRemoveDocumentByWord,
-} from "../src/radix-tree/radix";
-import { create as createNode } from "../src/radix-tree/node";
+  removeWord as radixRemoveWord,
+} from "../src/radix-tree/radix.js";
 const phrases = [
   { id: "1", doc: "the quick, brown fox" },
   { id: "2", doc: "jumps over the lazy dog" },

@@ -1,18 +1,18 @@
 import t from "tap";
-import { create } from "../src/lyra";
-import { tokenize, normalizationCache } from "../src/tokenizer";
-import { stemmer as FRStemmer } from "../stemmer/lib/fr";
-import { stemmer as NOStemmer } from "../stemmer/lib/no";
-import { stemmer as ITStemmer } from "../stemmer/lib/it";
-import { stemmer as PTStemmer } from "../stemmer/lib/pt";
-import { stemmer as RUStemmer } from "../stemmer/lib/ru";
-import { stemmer as SEStemmer } from "../stemmer/lib/se";
-import { stemmer as ESStemmer } from "../stemmer/lib/es";
-import { stemmer as NLStemmer } from "../stemmer/lib/nl";
-import { stemmer as DEStemmer } from "../stemmer/lib/de";
-import { stemmer as FIStemmer } from "../stemmer/lib/fi";
-import { stemmer as DKStemmer } from "../stemmer/lib/dk";
-import { stopWords } from "../src/tokenizer/stop-words/index";
+import { create } from "../src/index.js";
+import { normalizationCache, tokenize } from "../src/tokenizer/index.js";
+import { stopWords } from "../src/tokenizer/stop-words/index.js";
+import { stemmer as DEStemmer } from "../stemmer/lib/de.js";
+import { stemmer as DKStemmer } from "../stemmer/lib/dk.js";
+import { stemmer as ESStemmer } from "../stemmer/lib/es.js";
+import { stemmer as FIStemmer } from "../stemmer/lib/fi.js";
+import { stemmer as FRStemmer } from "../stemmer/lib/fr.js";
+import { stemmer as ITStemmer } from "../stemmer/lib/it.js";
+import { stemmer as NLStemmer } from "../stemmer/lib/nl.js";
+import { stemmer as NOStemmer } from "../stemmer/lib/no.js";
+import { stemmer as PTStemmer } from "../stemmer/lib/pt.js";
+import { stemmer as RUStemmer } from "../stemmer/lib/ru.js";
+import { stemmer as SEStemmer } from "../stemmer/lib/se.js";
 
 t.test("Tokenizer", t => {
   t.plan(13);

@@ -1,8 +1,27 @@
 import t from "tap";
-import type { PropertiesSchema } from "../src/types";
-import type { RetrievedDoc } from "../src/methods/search";
-import { create, insert, insertBatch, insertWithHooks, remove, search } from "../src/lyra";
-import { SUPPORTED_LANGUAGES } from "../src/tokenizer/languages";
+import { create, insert, insertBatch, insertWithHooks, remove, search } from "../src/index.js";
+import { SUPPORTED_LANGUAGES } from "../src/tokenizer/languages.js";
+import dataset from "./datasets/events.json" assert { type: "json" };
+
+interface BaseDataEvent {
+  description: string;
+  lang: string;
+  category1: string;
+  category2: string;
+  granularity: string;
+}
+
+interface DataEvent extends BaseDataEvent {
+  date: string;
+}
+
+interface WrongDataEvent extends BaseDataEvent {
+  date: number;
+}
+
+interface DataSet {
+  result: { events: DataEvent[] };
+}
 
 t.test("defaultLanguage", t => {
   t.plan(3);
@@ -811,11 +830,8 @@ t.test("lyra", t => {
     });
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const docs = require("./datasets/events.json").result.events.slice(0, 4000);
-    const wrongSchemaDocs = docs.map((doc: RetrievedDoc<PropertiesSchema>) => ({
-      ...doc,
-      date: +new Date(),
-    }));
+    const docs = (dataset as DataSet).result.events.slice(0, 4000);
+    const wrongSchemaDocs: WrongDataEvent[] = docs.map(doc => ({ ...doc, date: +new Date() }));
 
     try {
       await insertBatch(db, docs);
@@ -824,7 +840,7 @@ t.test("lyra", t => {
       // eslint-disable-next-line no-empty
     } catch (_e) {}
 
-    t.rejects(insertBatch(db, wrongSchemaDocs));
+    t.rejects(insertBatch(db, wrongSchemaDocs as unknown as DataEvent[]));
   });
 });
 
