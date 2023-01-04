@@ -1,4 +1,4 @@
-import { SUPPORTED_LANGUAGES } from "./tokenizer/languages.js";
+import { SUPPORTED_LANGUAGES } from "@lyrasearch/components";
 
 function formatJSON(input: object) {
   return JSON.stringify(input, null, 2);
@@ -50,22 +50,6 @@ export function INVALID_HOOKS_OBJECT(): string {
 
 export function NON_SUPPORTED_HOOKS(invalidHooks: string[]): string {
   return `The following hooks aren't supported. Hooks: ${invalidHooks}`;
-}
-
-export function CUSTOM_STOP_WORDS_ARRAY_MUST_BE_STRING_ARRAY(): string {
-  return `Custom stop words array must only contain strings.`;
-}
-
-export function CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY(): string {
-  return `Custom stop words must be a function or an array of strings.`;
-}
-
-export function INVALID_STEMMER_FUNCTION_TYPE(): string {
-  return `tokenizer.stemmingFn property must be a function.`;
-}
-
-export function INVALID_TOKENIZER_FUNCTION(): string {
-  return `tokenizer.tokenizerFn must be a function.`;
 }
 
 export function TYPE_ERROR_ID_MUST_BE_STRING(type: string): string {

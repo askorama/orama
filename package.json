@@ -21,10 +21,6 @@
       "types": "./dist/wasm.d.ts",
       "import": "./dist/wasm.js"
     },
-    "./stemmer/*": {
-      "types": "./dist/stemmer/*.d.ts",
-      "import": "./dist/stemmer/*.js"
-    },
     "./internals": {
       "types": "./dist/esm/internals/index.d.ts",
       "import": "./dist/esm/internals/index.js"
@@ -42,12 +38,11 @@
     "url": "https://github.com/lyrasearch/lyra"
   },
   "scripts": {
-    "predev": "rm -rf dist && mkdir dist && cp -a stemmer/lib dist/stemmer",
+    "predev": "rm -rf dist && mkdir dist",
     "dev": "swc -s -w --extensions .ts,.cts -d dist src",
     "prebuild": "npm run lint",
     "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",
-    "build:wasm": "node ./rust/scripts/wasm.mjs",
-    "postbuild": "npm run build:wasm && tsc -p . --emitDeclarationOnly && cp -a stemmer/lib dist/stemmer && mv dist/commonjs.js dist/commonjs.cjs",
+    "postbuild": "tsc -p . --emitDeclarationOnly && mv dist/commonjs.js dist/commonjs.cjs",
     "format": "prettier -w benchmarks examples src tests",
     "lint": "eslint benchmarks examples src tests --ext .js,.ts,.cts",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
@@ -86,6 +81,9 @@
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
+  },
+  "dependencies": {
+    "@lyrasearch/components": "^0.0.3"
   },
   "devDependencies": {
     "@swc/cli": "^0.1.57",

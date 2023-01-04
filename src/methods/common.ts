@@ -1,11 +1,10 @@
 import * as ERRORS from "../errors.js";
-import { SUPPORTED_LANGUAGES } from "../tokenizer/languages.js";
+import { SUPPORTED_LANGUAGES } from "@lyrasearch/components";
 import type { Lyra, PropertiesSchema, ResolveSchema } from "../types";
-import { includes } from "../utils.js";
 import type { SearchParams } from "./search";
 
 export function assertSupportedLanguage(language: string) {
-  if (!includes(SUPPORTED_LANGUAGES, language)) {
+  if (!(SUPPORTED_LANGUAGES as unknown as string[]).includes(language)) {
     throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(language));
   }
 }
@@ -55,7 +54,7 @@ export function getIndices<S extends PropertiesSchema>(
   }
 
   for (const index of indices as string[]) {
-    if (!includes(knownIndices, index)) {
+    if (!knownIndices.includes(index)) {
       throw new Error(ERRORS.INVALID_PROPERTY(index, knownIndices));
     }
   }

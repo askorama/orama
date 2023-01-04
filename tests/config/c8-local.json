@@ -1,4 +1,4 @@
 {
   "reporter": ["text", "html"],
-  "exclude": ["stemmer", "tests", "tap-snapshots", "src/tokenizer/stop-words"]
+  "exclude": ["tests", "tap-snapshots", "src/tokenizer/stop-words"]
 }

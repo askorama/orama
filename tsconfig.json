@@ -12,11 +12,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "moduleResolution": "node",
-    "baseUrl": ".",
-    "paths": {
-      "@stemmer/*": ["./stemmer/lib/*"]
-    }
+    "moduleResolution": "node"
   },
   "include": ["src/*.ts", "src/**/*.ts"]
 }

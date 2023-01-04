@@ -1,6 +1,5 @@
 import * as ERRORS from "../errors.js";
 import type { Lyra, PropertiesSchema } from "../types.js";
-import { includes } from "../utils.js";
 
 export interface AfterInsertHook {
   <S extends PropertiesSchema = PropertiesSchema>(this: Lyra<S>, id: string): Promise<void> | void;
@@ -18,7 +17,7 @@ export function validateHooks(hooks?: Hooks): void | never {
       throw new Error(ERRORS.INVALID_HOOKS_OBJECT());
     }
 
-    const invalidHooks = Object.keys(hooks).filter(hook => !includes(SUPPORTED_HOOKS, hook));
+    const invalidHooks = Object.keys(hooks).filter(hook => !SUPPORTED_HOOKS.includes(hook));
     if (invalidHooks.length) {
       throw new Error(ERRORS.NON_SUPPORTED_HOOKS(invalidHooks));
     }

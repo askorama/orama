@@ -262,7 +262,7 @@ create(/* ... */)
   .catch(console.error)
 ```
 
-Note that only main methods are supported so for internals, stemmer and other supported exports you still have to use `await import`.
+Note that only main methods are supported so for internals and other supported exports you still have to use `await import`.
 
 #### Use requireLyra with callbacks
 
@@ -313,7 +313,7 @@ Example:
 
 ```js
 import { create } from "@lyrasearch/lyra";
-import { stemmer } from "@lyrasearch/lyra/stemmer/it";
+import { stemmer } from "@lyrasearch/components/stemmer/it";
 
 const db = await create({
   schema: {
@@ -334,7 +334,7 @@ Example using CJS (see [using with commonJS](#using-with-commonjs) above):
 ```js
 async function main() {
   const { create } = await import("@lyrasearch/lyra");
-  const { stemmer } = await import("@lyrasearch/lyra/stemmer/it");
+  const { stemmer } = await import("@lyrasearch/components/stemmer/it");
 
   const db = await create({
     schema: {

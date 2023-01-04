@@ -1,8 +1,7 @@
+import { Language, TokenizerConfigExec } from "@lyrasearch/components";
 import * as ERRORS from "../errors.js";
 import { trackInsertion } from "../insertion-checker.js";
 import { insert as radixInsert } from "../radix-tree/radix.js";
-import type { TokenizerConfigExec } from "../tokenizer/index.js";
-import type { Language } from "../tokenizer/languages.js";
 import type { Lyra, PropertiesSchema, ResolveSchema } from "../types.js";
 import { uniqueId } from "../utils.js";
 import { assertDocSchema, assertSupportedLanguage } from "./common.js";

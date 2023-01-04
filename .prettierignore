@@ -1,3 +1,2 @@
 dist
-src/stemmer
 tests/datasets/events.json

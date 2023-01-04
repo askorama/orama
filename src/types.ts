@@ -1,8 +1,6 @@
+import { IIntersectTokenScores, Language, TokenizerConfig, TokenScore } from "@lyrasearch/components";
 import type { Hooks } from "./methods/hooks.js";
 import type { Node } from "./radix-tree/node.js";
-import type { TokenizerConfig } from "./tokenizer/index.js";
-import type { Language } from "./tokenizer/languages.js";
-import type { IIntersectTokenScores } from "./utils.js";
 
 export type Nullable<T> = T | null;
 
@@ -18,8 +16,6 @@ export type SearchProperties<
     ? `${TKey}.${SearchProperties<TSchema[TKey]>}`
     : TKey
   : never;
-
-export type TokenScore = [string, number];
 
 export type PropertyType = "string" | "number" | "boolean";
 

@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@lyrasearch/components': ^0.0.3
   '@swc/cli': ^0.1.57
   '@swc/core': ^1.3.22
   '@types/node': ^18.11.15
@@ -24,6 +25,9 @@ specifiers:
   tsx: ^3.12.1
   typescript: ^4.9.4
 
+dependencies:
+  '@lyrasearch/components': 0.0.3
+
 devDependencies:
   '@swc/cli': 0.1.59_@swc+core@1.3.24
   '@swc/core': 1.3.24
@@ -40,7 +44,7 @@ devDependencies:
   eslint-plugin-n: 15.6.0_eslint@8.31.0
   eslint-plugin-promise: 6.1.1_eslint@8.31.0
   execa: 6.1.0
-  husky: 8.0.2
+  husky: 8.0.3
   lint-staged: 13.1.0
   prettier: 2.8.1
   rimraf: 3.0.2
@@ -265,7 +269,7 @@ packages:
     engines: {node: '>=v14'}
     dependencies:
       '@commitlint/types': 17.0.0
-      ajv: 8.11.2
+      ajv: 8.12.0
     dev: true
     optional: true
 
@@ -466,6 +470,11 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
     optional: true
+
+  /@lyrasearch/components/0.0.3:
+    resolution: {integrity: sha512-J3edwLRrxunZlnV5oM05h3CBDyUsxKGsylM5Pk0W4PQB1OPuIYMUmucgLDjH0N8ctXV4MF6KkNOetT2ht+U8UQ==}
+    engines: {node: '>= 16.0.0'}
+    dev: false
 
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -860,8 +869,8 @@ packages:
       uri-js: 4.4.1
     dev: true
 
-  /ajv/8.11.2:
-    resolution: {integrity: sha512-E4bfmKAhGiSTvMfL1Myyycaub+cUEU2/IvpylXkUu7CHBkBj1f/ikdzbD7YQ6FKUbixDxeYvB/xY4fvyroDlQg==}
+  /ajv/8.12.0:
+    resolution: {integrity: sha512-sRu1kpcO9yLtYxBKvqfTeh9KzZEwO3STyX1HT+4CaDzC6HpTGYhIhPIzj9XuKU7KYDwnaeh5hcOwjy1QuJzBPA==}
     dependencies:
       fast-deep-equal: 3.1.3
       json-schema-traverse: 1.0.0
@@ -2852,8 +2861,8 @@ packages:
     engines: {node: '>=12.20.0'}
     dev: true
 
-  /husky/8.0.2:
-    resolution: {integrity: sha512-Tkv80jtvbnkK3mYWxPZePGFpQ/tT3HNSs/sasF9P2YfkMezDl3ON37YN6jUUI4eTg5LcyVynlb6r4eyvOmspvg==}
+  /husky/8.0.3:
+    resolution: {integrity: sha512-+dQSyqPh4x1hlO1swXBiNb2HzTDN1I2IGLQx1GrBuiqFJfoMrnZWwVmatvSiO+Iz8fBUnf+lekwNo4c2LlXItg==}
     engines: {node: '>=14'}
     hasBin: true
     dev: true
@@ -4525,7 +4534,7 @@ packages:
     resolution: {integrity: sha512-Y4X9zqrCftUhMeH2EptSSERdVKt/nEdijTOacGD/97EKjhQ/Qs8RTlEGABSJNNN8lac9kheH+af7yAkEWlgneA==}
     engines: {node: '>=10.0.0'}
     dependencies:
-      ajv: 8.11.2
+      ajv: 8.12.0
       lodash.truncate: 4.4.2
       slice-ansi: 4.0.0
       string-width: 4.2.3

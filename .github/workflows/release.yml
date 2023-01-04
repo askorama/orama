@@ -36,3 +36,4 @@ jobs:
           version-prefix: ""
           build-command: |
             pnpm install --frozen-lockfile
+            npm run build
