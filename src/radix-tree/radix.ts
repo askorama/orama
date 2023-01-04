@@ -131,7 +131,7 @@ function findAllWords(node: Node, output: FindResult, term: string, exact?: bool
 
     // always check in own property to prevent access to inherited properties
     // fix https://github.com/LyraSearch/lyra/issues/137
-    if (!Object.hasOwn(output, word)) {
+    if (!getOwnProperty(output, word)) {
       if (tolerance) {
         // computing the absolute difference of letters between the term and the word
         const difference = Math.abs(term.length - word.length);

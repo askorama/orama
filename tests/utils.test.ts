@@ -1,8 +1,8 @@
 import t from "tap";
-import { formatBytes, formatNanoseconds, intersectTokenScores } from "../src/utils";
+import { formatBytes, formatNanoseconds, getOwnProperty, intersectTokenScores } from "../src/utils";
 
 t.test("utils", t => {
-  t.plan(3);
+  t.plan(4);
 
   t.test("should correctly intersect 2 or more arrays", async t => {
     t.plan(1);
@@ -68,5 +68,16 @@ t.test("utils", t => {
     t.equal(formatNanoseconds(10_000_000_000n), "10s");
     t.equal(formatNanoseconds(100_000_000_000n), "100s");
     t.equal(formatNanoseconds(1000_000_000_000n), "1000s");
+  });
+
+  t.test("should check object properties", t => {
+    t.plan(2);
+
+    const myObject = {
+      foo: "bar",
+    };
+
+    t.equal(getOwnProperty(myObject, "foo"), "bar");
+    t.equal(getOwnProperty(myObject, "bar"), undefined);
   });
 });
