@@ -2,6 +2,7 @@ import t from "tap";
 import type { PropertiesSchema } from "../src/types";
 import type { RetrievedDoc } from "../src/methods/search";
 import { create, insert, insertBatch, insertWithHooks, remove, search } from "../src/lyra";
+import { SUPPORTED_LANGUAGES } from "../src/tokenizer/languages";
 
 t.test("defaultLanguage", t => {
   t.plan(3);
@@ -928,4 +929,27 @@ t.test("should access own properties exclusively", async t => {
   });
 
   t.same(1, 1);
+});
+
+t.test("should search numbers in supported languages", async t => {
+  for (const supportedLanguage of SUPPORTED_LANGUAGES) {
+    const db = await create({
+      schema: {
+        number: "string",
+      },
+      defaultLanguage: supportedLanguage,
+    });
+
+    await insert(db, {
+      number: "123",
+    });
+
+    const searchResult = await search(db, {
+      term: "123",
+    });
+
+    t.same(searchResult.count, 1, `Language: ${supportedLanguage}`);
+  }
+
+  t.end();
 });
