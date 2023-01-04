@@ -9,6 +9,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./cjs": {
+      "types": "./dist/commonjs.d.cts",
+      "require": "./dist/commonjs.cjs"
+    },
     "./commonjs": {
       "types": "./dist/commonjs.d.cts",
       "require": "./dist/commonjs.cjs"
