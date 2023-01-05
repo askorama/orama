@@ -2,7 +2,7 @@ import t from "tap";
 import { formatBytes, formatNanoseconds, getOwnProperty } from "../src/utils.js";
 
 t.test("utils", t => {
-  t.plan(2);
+  t.plan(3);
 
   t.test("should correctly format bytes", t => {
     t.plan(9);

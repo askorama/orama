@@ -1,10 +1,10 @@
-import { Language, TokenizerConfigExec } from "@lyrasearch/components";
+import { Language, TokenizerConfigExec } from "../tokenizer/index.js";
 import * as ERRORS from "../errors.js";
 import { trackInsertion } from "../insertion-checker.js";
 import { insert as radixInsert } from "../radix-tree/radix.js";
 import type { Lyra, PropertiesSchema, ResolveSchema } from "../types.js";
 import { uniqueId } from "../utils.js";
-import { assertDocSchema, assertSupportedLanguage } from "./common.js";
+import { assertDocSchema } from "./common.js";
 import { hookRunner } from "./hooks.js";
 
 export type InsertConfig<S extends PropertiesSchema> = {
@@ -40,7 +40,7 @@ export async function insert<S extends PropertiesSchema>(
   // If the ID already exists, we throw an error.
   if (lyra.docs[id]) throw new Error(ERRORS.ID_ALREADY_EXISTS(id));
 
-  assertSupportedLanguage(config.language!);
+  lyra.components?.tokenizer?.assertSupportedLanguage?.(config.language!);
 
   assertDocSchema(doc, lyra.schema);
 
@@ -71,7 +71,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   config = { language: lyra.defaultLanguage, ...config };
   const id = await getDocumentID(doc, config);
 
-  assertSupportedLanguage(config.language!);
+  lyra.components?.tokenizer?.assertSupportedLanguage?.(config.language!);
 
   assertDocSchema(doc, lyra.schema);
 

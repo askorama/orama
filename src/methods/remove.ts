@@ -1,4 +1,4 @@
-import { defaultTokenizerConfig } from "@lyrasearch/components";
+import { defaultTokenizerConfig } from "../tokenizer/index.js";
 import * as ERRORS from "../errors.js";
 import { removeDocumentByWord } from "../radix-tree/radix.js";
 import type { Lyra, PropertiesSchema, ResolveSchema } from "../types.js";

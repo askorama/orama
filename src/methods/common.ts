@@ -1,13 +1,6 @@
 import * as ERRORS from "../errors.js";
-import { SUPPORTED_LANGUAGES } from "@lyrasearch/components";
 import type { Lyra, PropertiesSchema, ResolveSchema } from "../types";
 import type { SearchParams } from "./search";
-
-export function assertSupportedLanguage(language: string) {
-  if (!(SUPPORTED_LANGUAGES as unknown as string[]).includes(language)) {
-    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(language));
-  }
-}
 
 export function assertDocSchema<S extends PropertiesSchema>(doc: ResolveSchema<S>, lyraSchema: PropertiesSchema) {
   if (!recursiveCheckDocSchema(doc, lyraSchema)) {

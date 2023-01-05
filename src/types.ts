@@ -1,8 +1,11 @@
-import { IIntersectTokenScores, Language, TokenizerConfig, TokenScore } from "@lyrasearch/components";
+import { Language, TokenizerConfig } from "./tokenizer/index.js";
 import type { Hooks } from "./methods/hooks.js";
 import type { Node } from "./radix-tree/node.js";
 
+export type TokenScore = [string, number];
 export type Nullable<T> = T | null;
+
+export type IIntersectTokenScores = (arrays: TokenScore[][]) => TokenScore[];
 
 export type ResolveSchema<T extends PropertiesSchema> = {
   [P in keyof T]: ResolveTypes<T[P]>;
@@ -24,7 +27,7 @@ export type PropertiesSchema = {
 };
 
 export type AlgorithmsConfig = {
-  intersectTokenScores: IIntersectTokenScores | Promise<IIntersectTokenScores>;
+  intersectTokenScores: IIntersectTokenScores;
 };
 
 export type Configuration<S extends PropertiesSchema> = {

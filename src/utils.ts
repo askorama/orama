@@ -1,4 +1,4 @@
-import { TokenScore } from "@lyrasearch/components";
+import type { TokenScore } from "./types.js";
 
 const baseId = Date.now().toString().slice(5);
 let lastId = 0;

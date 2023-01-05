@@ -17,13 +17,13 @@
       "types": "./dist/commonjs.d.cts",
       "require": "./dist/commonjs.cjs"
     },
-    "./promises": {
-      "types": "./dist/promises/index.d.ts",
-      "import": "./dist/promises/index.js"
-    },
     "./wasm": {
       "types": "./dist/wasm.d.ts",
       "import": "./dist/wasm.js"
+    },
+    "./stemmer/*": {
+      "types": "./dist/stemmer/*.d.ts",
+      "import": "./dist/stemmer/*.js"
     },
     "./internals": {
       "types": "./dist/esm/internals/index.d.ts",
@@ -42,11 +42,11 @@
     "url": "https://github.com/lyrasearch/lyra"
   },
   "scripts": {
-    "predev": "rm -rf dist && mkdir dist",
+    "predev": "rm -rf dist && mkdir dist && cp -a stemmer/lib dist/stemmer",
     "dev": "swc -s -w --extensions .ts,.cts -d dist src",
     "prebuild": "npm run lint",
     "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",
-    "postbuild": "tsc -p . --emitDeclarationOnly && mv dist/commonjs.js dist/commonjs.cjs",
+    "postbuild": "tsc -p . --emitDeclarationOnly && mv dist/commonjs.js dist/commonjs.cjs && cp -a stemmer/lib dist/stemmer",
     "format": "prettier -w benchmarks examples src tests",
     "lint": "eslint benchmarks examples src tests --ext .js,.ts,.cts",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
@@ -85,9 +85,6 @@
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
-  },
-  "dependencies": {
-    "@lyrasearch/components": "^0.0.3"
   },
   "devDependencies": {
     "@swc/cli": "^0.1.57",

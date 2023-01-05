@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "pnpm build:lyra && vite",
-    "build": "pnpm build:lyra && vite build",
-    "build:lyra": "cd ../../lyra && pnpm build && cd ../examples/with-vue",
+    "dev": "pnpm run build:lyra && vite",
+    "build": "pnpm run build:lyra && vite build",
+    "build:lyra": "cd ../../lyra && pnpm run build && cd ../examples/with-vue",
     "preview": "vite preview --port 4173"
   },
   "dependencies": {

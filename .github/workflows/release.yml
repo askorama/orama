@@ -1,5 +1,4 @@
-name: release
-
+name: Release
 on:
   workflow_dispatch:
     inputs:
@@ -36,4 +35,4 @@ jobs:
           version-prefix: ""
           build-command: |
             pnpm install --frozen-lockfile
-            npm run build
+            pnpm run build

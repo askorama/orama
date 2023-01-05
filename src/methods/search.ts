@@ -1,6 +1,6 @@
-import { defaultTokenizerConfig, intersectTokenScores, Language, TokenScore } from "@lyrasearch/components";
+import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
 import { find as radixFind } from "../radix-tree/radix.js";
-import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap } from "../types.js";
+import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore } from "../types.js";
 import { getNanosecondsTime, insertSortedValue, sortTokenScorePredicate } from "../utils.js";
 import { getIndices } from "./common.js";
 
@@ -94,6 +94,8 @@ export async function search<S extends PropertiesSchema>(
 
   const { limit = 10, offset = 0, exact = false, term, properties } = params;
   const tokens = lyra.components.tokenizer!.tokenizerFn!(term, language, false, lyra.components.tokenizer!);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+  const intersectTokenScores = lyra.components.algorithms?.intersectTokenScores!;
   const indices = getIndices(lyra, properties);
   const results: RetrievedDoc<S>[] = Array.from({
     length: limit,
@@ -179,7 +181,7 @@ export async function search<S extends PropertiesSchema>(
 
     const docIds = indexMap[index];
     const vals = Object.values(docIds);
-    docsIntersection[index] = (await intersectTokenScores({ data: vals })).data;
+    docsIntersection[index] = intersectTokenScores(vals);
 
     const uniqueDocs = Object.values(docsIntersection[index]);
     const uniqueDocsLength = uniqueDocs.length;

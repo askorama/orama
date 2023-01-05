@@ -1,9 +1,9 @@
-import { defaultTokenizerConfig, Language, intersectTokenScores } from "@lyrasearch/components";
+import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
 import * as ERRORS from "../errors.js";
 import { create as createNode } from "../radix-tree/node.js";
 import type { Configuration, Lyra, PropertiesSchema } from "../types.js";
-import { assertSupportedLanguage } from "./common.js";
 import { validateHooks } from "./hooks.js";
+import { intersectTokenScores } from "../algorithms.js";
 
 /**
  * Creates a new database.
@@ -23,7 +23,8 @@ import { validateHooks } from "./hooks.js";
 export async function create<S extends PropertiesSchema>(properties: Configuration<S>): Promise<Lyra<S>> {
   const defaultLanguage = (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
 
-  assertSupportedLanguage(defaultLanguage);
+  const tokenizer = defaultTokenizerConfig(defaultLanguage, properties.components?.tokenizer ?? {});
+  tokenizer.assertSupportedLanguage(defaultLanguage);
 
   validateHooks(properties.hooks);
 
@@ -37,7 +38,7 @@ export async function create<S extends PropertiesSchema>(properties: Configurati
     frequencies: {},
     tokenOccurrencies: {},
     components: {
-      tokenizer: defaultTokenizerConfig(defaultLanguage, properties.components?.tokenizer ?? {}),
+      tokenizer,
       algorithms: {
         intersectTokenScores: properties.components?.algorithms?.intersectTokenScores ?? intersectTokenScores,
       },

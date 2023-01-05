@@ -1,7 +1,7 @@
 {
   "check-coverage": true,
   "reporter": ["text", "json"],
-  "exclude": ["tests", "tap-snapshots", "src/tokenizer/stop-words"],
+  "exclude": ["dist", "stemmer", "tests", "tap-snapshots", "src/tokenizer/stop-words"],
   "branches": 80,
   "functions": 80,
   "lines": 80,
