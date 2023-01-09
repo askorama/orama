@@ -1,5 +1,5 @@
 import t from "tap";
-import { replaceDiacritics } from "../src/tokenizer/diacritics";
+import { replaceDiacritics } from "../src/tokenizer/diacritics.js";
 
 t.test("Diacritics Replacer", t => {
   t.plan(1);

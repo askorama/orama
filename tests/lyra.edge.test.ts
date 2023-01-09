@@ -1,9 +1,11 @@
 import t from "tap";
-import { create, insert, save, load, search } from "../src/lyra";
-import { contains as trieContains } from "../src/radix-tree/radix";
+import { create, insert, load, save, search } from "../src/index.js";
+import { RetrievedDoc } from "../src/methods/search.js";
+import { contains as trieContains } from "../src/radix-tree/radix.js";
+import { PropertiesSchema, ResolveSchema } from "../src/types.js";
 
-function extractOriginalDoc(result: any) {
-  return result.map(({ document }: any) => document);
+function extractOriginalDoc<T extends PropertiesSchema>(result: RetrievedDoc<T>[]): ResolveSchema<T>[] {
+  return result.map(({ document }: RetrievedDoc<T>) => document);
 }
 
 t.test("Edge getters", t => {

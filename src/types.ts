@@ -1,10 +1,11 @@
-import type { Language } from "./tokenizer/languages";
-import type { Hooks } from "./methods/hooks";
-import type { TokenizerConfig } from "./tokenizer";
-import type { IIntersectTokenScores } from "./utils";
-import type { Node } from "./radix-tree/node";
+import { Language, TokenizerConfig } from "./tokenizer/index.js";
+import type { Hooks } from "./methods/hooks.js";
+import type { Node } from "./radix-tree/node.js";
 
+export type TokenScore = [string, number];
 export type Nullable<T> = T | null;
+
+export type IIntersectTokenScores = (arrays: TokenScore[][]) => TokenScore[];
 
 export type ResolveSchema<T extends PropertiesSchema> = {
   [P in keyof T]: ResolveTypes<T[P]>;
@@ -19,8 +20,6 @@ export type SearchProperties<
     : TKey
   : never;
 
-export type TokenScore = [string, number];
-
 export type PropertyType = "string" | "number" | "boolean";
 
 export type PropertiesSchema = {
@@ -28,7 +27,7 @@ export type PropertiesSchema = {
 };
 
 export type AlgorithmsConfig = {
-  intersectTokenScores: IIntersectTokenScores | Promise<IIntersectTokenScores>;
+  intersectTokenScores: IIntersectTokenScores;
 };
 
 export type Configuration<S extends PropertiesSchema> = {
@@ -79,7 +78,7 @@ type ResolveTypes<TType> = TType extends "string"
 
 type Index = Record<string, Node>;
 
-type TokenMap = Record<string, TokenScore[]>;
+export type TokenMap = Record<string, TokenScore[]>;
 
 type FrequencyMap = {
   [property: string]: {

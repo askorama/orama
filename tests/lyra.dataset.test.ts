@@ -1,8 +1,8 @@
 import t from "tap";
-import type { PropertiesSchema } from "../src/types";
-import type { SearchResult } from "../src/methods/search";
-import { create, insertBatch, remove, search } from "../src/lyra";
-import dataset from "./datasets/events.json";
+import { create, insertBatch, remove, search } from "../src/index.js";
+import type { SearchResult } from "../src/methods/search.js";
+import type { PropertiesSchema } from "../src/types.js";
+import dataset from "./datasets/events.json" assert { type: "json" };
 
 type EventJson = {
   result: {

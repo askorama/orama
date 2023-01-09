@@ -1,0 +1,42 @@
+[
+  {
+    "test": ".*\\.ts$",
+    "env": {
+      "targets": "node >= 16"
+    },
+    "jsc": {
+      "target": "es2022",
+      "parser": {
+        "syntax": "typescript",
+        "tsx": false,
+        "dynamicImport": true
+      },
+      "baseUrl": ".",
+      "paths": {
+        "@stemmer/*": ["./src/stemmer/*"]
+      }
+    },
+    "sourceMaps": true
+  },
+  {
+    "test": ".*\\.cts$",
+    "module": {
+      "type": "commonjs"
+    },
+    "env": {
+      "targets": "node >= 16"
+    },
+    "jsc": {
+      "target": "es2022",
+      "parser": {
+        "syntax": "typescript",
+        "tsx": false,
+        "dynamicImport": true
+      },
+      "baseUrl": ".",
+      "paths": {
+        "@stemmer/*": ["./src/stemmer/*"]
+      }
+    }
+  }
+]

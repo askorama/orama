@@ -1,9 +1,10 @@
-import type { Language } from "./languages";
-import { replaceDiacritics } from "./diacritics";
-import { availableStopWords, stopWords } from "./stop-words";
-import { includes } from "../utils";
-import { stemmer } from "../../stemmer/lib/en";
-import * as ERRORS from "../errors";
+import { stemmer } from "@stemmer/en.js";
+import { replaceDiacritics } from "./diacritics.js";
+import * as ERRORS from "../errors.js";
+import { Language, SUPPORTED_LANGUAGES } from "./languages.js";
+import { availableStopWords, stopWords } from "./stop-words/index.js";
+
+export * from "./languages.js";
 
 export type Stemmer = (word: string) => string;
 
@@ -13,6 +14,7 @@ export type TokenizerConfig = {
   customStopWords?: ((stopWords: string[]) => string[]) | string[];
   stemmingFn?: Stemmer;
   tokenizerFn?: Tokenizer;
+  assertSupportedLanguage?: (language: string) => void;
 };
 
 export type TokenizerConfigExec = {
@@ -21,6 +23,7 @@ export type TokenizerConfigExec = {
   customStopWords: string[];
   stemmingFn?: Stemmer;
   tokenizerFn: Tokenizer;
+  assertSupportedLanguage: (language: string) => void;
 };
 
 export type Tokenizer = (
@@ -69,7 +72,7 @@ function normalizeToken(token: string, language: Language, tokenizerConfig: Toke
   // Check if stop-words removal is enabled
   if (tokenizerConfig?.enableStopWords) {
     // Remove stop-words
-    if (includes(tokenizerConfig?.customStopWords as string[], token)) {
+    if ((tokenizerConfig.customStopWords as string[]).includes(token)) {
       const token = "";
       normalizationCache.set(key, token);
       return token;
@@ -87,6 +90,23 @@ function normalizeToken(token: string, language: Language, tokenizerConfig: Toke
   token = replaceDiacritics(token);
   normalizationCache.set(key, token);
   return token;
+}
+
+/* c8 ignore next 10 */
+function trim(text: string[]): string[] {
+  while (text[text.length - 1] === "") {
+    text.pop();
+  }
+  while (text[0] === "") {
+    text.shift();
+  }
+  return text;
+}
+
+function assertSupportedLanguage(language: string) {
+  if (!SUPPORTED_LANGUAGES.includes(language)) {
+    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(language));
+  }
 }
 
 export function tokenize(
@@ -116,16 +136,6 @@ export function tokenize(
   return trimTokens;
 }
 
-function trim(text: string[]): string[] {
-  while (text[text.length - 1] === "") {
-    text.pop();
-  }
-  while (text[0] === "") {
-    text.shift();
-  }
-  return text;
-}
-
 export function defaultTokenizerConfig(language: Language, tokenizerConfig: TokenizerConfig = {}): TokenizerConfigExec {
   let defaultStopWords: string[] = [];
   let customStopWords: string[] = [];
@@ -137,6 +147,7 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
     if (typeof tokenizerConfig.tokenizerFn !== "function") {
       throw Error(ERRORS.INVALID_TOKENIZER_FUNCTION());
     }
+    /* c8 ignore next 4 */
     defaultTokenizerFn = tokenizerConfig.tokenizerFn;
 
     // If there's no custom tokenizer, we can proceed setting custom
@@ -154,7 +165,8 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
 
     // Enable default stop-words
 
-    if (includes(availableStopWords, language)) {
+    if (availableStopWords.includes(language)) {
+      /* c8 ignore next */
       defaultStopWords = stopWords[language] ?? [];
     }
 
@@ -186,10 +198,12 @@ export function defaultTokenizerConfig(language: Language, tokenizerConfig: Toke
   }
 
   return {
+    /* c8 ignore next 5 */
     enableStopWords: tokenizerConfig?.enableStopWords ?? true,
     enableStemming: tokenizerConfig?.enableStemming ?? true,
     stemmingFn: defaultStemmingFn,
     customStopWords: customStopWords ?? defaultStopWords,
     tokenizerFn: defaultTokenizerFn,
+    assertSupportedLanguage: tokenizerConfig.assertSupportedLanguage ?? assertSupportedLanguage,
   };
 }

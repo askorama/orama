@@ -1,6 +1,6 @@
-import { create as createNode, Node, updateParent, removeDocument, addDocument } from "./node";
-import { boundedLevenshtein } from "../levenshtein";
-import { getOwnProperty } from "../utils";
+import { boundedLevenshtein } from "../levenshtein.js";
+import { getOwnProperty } from "../utils.js";
+import { addDocument, create as createNode, Node, removeDocument, updateParent } from "./node.js";
 
 export type FindParams = {
   term: string;

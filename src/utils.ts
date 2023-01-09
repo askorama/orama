@@ -1,8 +1,4 @@
-import type { TokenScore } from "./types";
-
-export type Runtime = typeof knownRuntimes[number];
-
-export type IIntersectTokenScores = (options: { data: TokenScore[][] }) => { data: TokenScore[] };
+import type { TokenScore } from "./types.js";
 
 const baseId = Date.now().toString().slice(5);
 let lastId = 0;
@@ -11,8 +7,6 @@ const k = 1024;
 const nano = BigInt(1e3);
 const milli = BigInt(1e6);
 const second = BigInt(1e9);
-
-export const knownRuntimes = ["deno", "node", "browser", "unknown"] as const;
 
 export const isServer = typeof window === "undefined";
 
@@ -80,52 +74,6 @@ export function getTokenFrequency(token: string, tokens: string[]): number {
   return count;
 }
 
-// Adapted from https://github.com/lovasoa/fast_array_intersect
-// MIT Licensed (https://github.com/lovasoa/fast_array_intersect/blob/master/LICENSE)
-// while on tag https://github.com/lovasoa/fast_array_intersect/tree/v1.1.0
-export function intersectTokenScores({ data: arrays }: { data: TokenScore[][] }): { data: TokenScore[] } {
-  if (arrays.length === 0) return { data: [] };
-
-  for (let i = 1; i < arrays.length; i++) {
-    if (arrays[i].length < arrays[0].length) {
-      const tmp = arrays[0];
-      arrays[0] = arrays[i];
-      arrays[i] = tmp;
-    }
-  }
-
-  const set: Map<string, [number, number]> = new Map();
-  for (const elem of arrays[0]) {
-    set.set(elem[0], [1, elem[1]]);
-  }
-
-  const arrLength = arrays.length;
-  for (let i = 1; i < arrLength; i++) {
-    let found = 0;
-    for (const elem of arrays[i]) {
-      const [count, score] = set.get(elem[0] ?? "") ?? [0, 0];
-      if (count === i) {
-        set.set(elem[0] ?? "", [count + 1, score + elem[1]]);
-        found++;
-      }
-    }
-
-    if (found === 0) {
-      return { data: [] };
-    }
-  }
-
-  const result: TokenScore[] = [];
-
-  for (const [token, [count, score]] of set) {
-    if (count === arrLength) {
-      result.push([token, score]);
-    }
-  }
-
-  return { data: result };
-}
-
 export function insertSortedValue(
   arr: TokenScore[],
   el: TokenScore,
@@ -149,45 +97,6 @@ export function insertSortedValue(
   return arr;
 }
 
-export function includes<T>(array: T[] | readonly T[], element: T): boolean {
-  for (let i = 0; i < array.length; i++) {
-    if (array[i] === element) {
-      return true;
-    }
-  }
-  return false;
-}
-
 export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
   return b[1] - a[1];
-}
-
-export let currentRuntime = getCurrentRuntime();
-
-export function getCurrentRuntime(): Runtime {
-  if (currentRuntime) {
-    return currentRuntime;
-  }
-
-  if (typeof process !== "undefined" && process.versions !== undefined) {
-    currentRuntime = "node";
-    return currentRuntime;
-  }
-
-  // @ts-expect-error "Deno" global variable is defined in Deno only
-  if (typeof Deno !== "undefined") {
-    currentRuntime = "deno";
-    return currentRuntime;
-  }
-
-  if (typeof window !== "undefined") {
-    currentRuntime = "browser";
-    return currentRuntime;
-  }
-
-  return "unknown";
-}
-
-export function isRuntime(runtime: Runtime): boolean {
-  return getCurrentRuntime() === runtime;
 }

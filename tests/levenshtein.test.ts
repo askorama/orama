@@ -1,5 +1,5 @@
 import t from "tap";
-import { levenshtein, boundedLevenshtein } from "../src/levenshtein";
+import { boundedLevenshtein, levenshtein } from "../src/levenshtein.js";
 
 t.test("levenshtein", t => {
   t.plan(3);

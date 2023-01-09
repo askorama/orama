@@ -1,4 +1,4 @@
-import { SUPPORTED_LANGUAGES } from "./tokenizer/languages";
+import { SUPPORTED_LANGUAGES } from "./tokenizer/languages.js";
 
 function formatJSON(input: object) {
   return JSON.stringify(input, null, 2);
@@ -36,10 +36,6 @@ export function DOC_ID_DOES_NOT_EXISTS(id: string): string {
   return `Document with ID ${id} does not exists`;
 }
 
-export function LANGUAGE_NOT_SUPPORTED(lang: string): string {
-  return `Language "${lang}" is not supported.\nSupported languages are:\n - ${SUPPORTED_LANGUAGES.join("\n - ")}`;
-}
-
 export function GETTER_SETTER_WORKS_ON_EDGE_ONLY(method: string): string {
   return `${method} works on edge only. Use edge: true in Lyra constructor to enable it.`;
 }
@@ -50,6 +46,18 @@ export function INVALID_HOOKS_OBJECT(): string {
 
 export function NON_SUPPORTED_HOOKS(invalidHooks: string[]): string {
   return `The following hooks aren't supported. Hooks: ${invalidHooks}`;
+}
+
+export function TYPE_ERROR_ID_MUST_BE_STRING(type: string): string {
+  return `"id" must be of type "string". Got "${type}" instead.`;
+}
+
+export function ID_ALREADY_EXISTS(id: string): string {
+  return `Document with ID "${id}" already exists.`;
+}
+
+export function LANGUAGE_NOT_SUPPORTED(lang: string): string {
+  return `Language "${lang}" is not supported.\nSupported languages are:\n - ${SUPPORTED_LANGUAGES.join("\n - ")}`;
 }
 
 export function CUSTOM_STOP_WORDS_ARRAY_MUST_BE_STRING_ARRAY(): string {
@@ -66,12 +74,4 @@ export function INVALID_STEMMER_FUNCTION_TYPE(): string {
 
 export function INVALID_TOKENIZER_FUNCTION(): string {
   return `tokenizer.tokenizerFn must be a function.`;
-}
-
-export function TYPE_ERROR_ID_MUST_BE_STRING(type: string): string {
-  return `"id" must be of type "string". Got "${type}" instead.`;
-}
-
-export function ID_ALREADY_EXISTS(id: string): string {
-  return `Document with ID "${id}" already exists.`;
 }

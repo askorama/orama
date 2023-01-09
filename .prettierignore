@@ -1,1 +1,2 @@
-packages/*/dist
+dist
+tests/datasets/events.json

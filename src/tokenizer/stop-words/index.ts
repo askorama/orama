@@ -1,16 +1,16 @@
-import type { Language } from "../languages";
-import { en } from "./en";
-import { it } from "./it";
-import { fr } from "./fr";
-import { es } from "./es";
-import { pt } from "./pt";
-import { nl } from "./nl";
-import { se } from "./se";
-import { ru } from "./ru";
-import { no } from "./no";
-import { de } from "./de";
-import { dk } from "./dk";
-import { fi } from "./fi";
+import type { Language } from "../languages.js";
+import { en } from "./en.js";
+import { it } from "./it.js";
+import { fr } from "./fr.js";
+import { es } from "./es.js";
+import { pt } from "./pt.js";
+import { nl } from "./nl.js";
+import { se } from "./se.js";
+import { ru } from "./ru.js";
+import { no } from "./no.js";
+import { de } from "./de.js";
+import { dk } from "./dk.js";
+import { fi } from "./fi.js";
 
 type StopWordsMap = {
   [key in Language]: string[];

@@ -67,6 +67,8 @@ const CHARCODE_REPLACE_MAPPING = [
 
 function replaceChar(charCode: number): number {
   if (charCode < DIACRITICS_CHARCODE_START || charCode > DIACRITICS_CHARCODE_END) return charCode;
+
+  /* c8 ignore next  */
   return CHARCODE_REPLACE_MAPPING[charCode - DIACRITICS_CHARCODE_START] || charCode;
 }
 

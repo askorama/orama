@@ -1,15 +1,6 @@
-import type { ResolveSchema } from "../types";
-import type { PropertiesSchema, Lyra } from "../types";
+import * as ERRORS from "../errors.js";
+import type { Lyra, PropertiesSchema, ResolveSchema } from "../types";
 import type { SearchParams } from "./search";
-import { includes } from "../utils";
-import { SUPPORTED_LANGUAGES } from "../tokenizer/languages";
-import * as ERRORS from "../errors";
-
-export function assertSupportedLanguage(language: string) {
-  if (!includes(SUPPORTED_LANGUAGES, language)) {
-    throw new Error(ERRORS.LANGUAGE_NOT_SUPPORTED(language));
-  }
-}
 
 export function assertDocSchema<S extends PropertiesSchema>(doc: ResolveSchema<S>, lyraSchema: PropertiesSchema) {
   if (!recursiveCheckDocSchema(doc, lyraSchema)) {
@@ -56,7 +47,7 @@ export function getIndices<S extends PropertiesSchema>(
   }
 
   for (const index of indices as string[]) {
-    if (!includes(knownIndices, index)) {
+    if (!knownIndices.includes(index)) {
       throw new Error(ERRORS.INVALID_PROPERTY(index, knownIndices));
     }
   }

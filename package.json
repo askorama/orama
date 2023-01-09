@@ -1,12 +1,36 @@
 {
   "name": "@lyrasearch/lyra",
   "version": "0.3.2",
+  "type": "module",
   "description": "Fast, in-memory, typo-tolerant, full-text search engine written in TypeScript",
   "sideEffects": false,
-  "main": "./dist/cjs/src/lyra.js",
-  "module": "./dist/esm/src/lyra.js",
-  "browser": "./dist/browser/src/lyra.js",
-  "types": "./dist/esm/src/lyra.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./cjs": {
+      "types": "./dist/commonjs.d.cts",
+      "require": "./dist/commonjs.cjs"
+    },
+    "./commonjs": {
+      "types": "./dist/commonjs.d.cts",
+      "require": "./dist/commonjs.cjs"
+    },
+    "./wasm": {
+      "types": "./dist/wasm.d.ts",
+      "import": "./dist/wasm.js"
+    },
+    "./stemmer/*": {
+      "types": "./dist/stemmer/*.d.ts",
+      "import": "./dist/stemmer/*.js"
+    },
+    "./internals": {
+      "types": "./dist/esm/internals/index.d.ts",
+      "import": "./dist/esm/internals/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -18,22 +42,20 @@
     "url": "https://github.com/lyrasearch/lyra"
   },
   "scripts": {
-    "commit": "pnpm lint-staged && cz",
-    "format": "prettier --write benchmarks examples internals src tests",
-    "lint": "pnpm run format && eslint benchmarks examples internals src tests  --ext .js,.ts,.mjs,.jsx,.tsx",
-    "prepare": "husky install && npm run build",
-    "benchmark": "node --no-warnings benchmarks/src/typo-tolerant-search.mjs",
-    "build:cjs": "tsc --project tsconfig.cjs.json",
-    "build:module": "tsc --project tsconfig.esm.json",
-    "build:browser": "tsc --project tsconfig.browser.json",
-    "build:wasm": "node ./rust/scripts/wasmAll.mjs",
-    "build:wasm_bindings": "node ./rust/scripts/packArtifacts.mjs",
-    "build:all": "rimraf ./dist && concurrently 'npm:build:module' 'npm:build:cjs' 'npm:build:browser'",
-    "build": "npm run build:all && npm run build:wasm_bindings",
+    "predev": "rm -rf dist && mkdir dist && cp -a stemmer/lib dist/stemmer",
+    "dev": "swc -s -w --extensions .ts,.cts -d dist src",
+    "prebuild": "npm run lint",
+    "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",
+    "postbuild": "tsc -p . --emitDeclarationOnly && mv dist/commonjs.js dist/commonjs.cjs && cp -a stemmer/lib dist/stemmer",
+    "format": "prettier -w benchmarks examples src tests",
+    "lint": "eslint benchmarks examples src tests --ext .js,.ts,.cts",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
     "test:smoke": "tap --rcfile=tests/config/tap.yml tests/smoke/*.test.ts",
-    "ci": "npm run build && npm run test:ci && npm run test:smoke"
+    "ci": "npm run build && npm run test:ci && npm run test:smoke",
+    "prepare": "husky install && npm run build",
+    "commit": "pnpm lint-staged && cz",
+    "benchmark": "node --no-warnings benchmarks/src/typo-tolerant-search.mjs"
   },
   "keywords": [
     "full-text search",
@@ -47,6 +69,14 @@
     "email": "ciao@micheleriva.it",
     "url": "https://github.com/MicheleRiva"
   },
+  "contributors": [
+    {
+      "name": "Paolo Insogna",
+      "email": "shogun@cowtech.it",
+      "url": "http://cowtech.it",
+      "author": true
+    }
+  ],
   "license": "Apache-2.0",
   "lint-staged": {
     "*": "pnpm lint"
@@ -57,27 +87,28 @@
     }
   },
   "devDependencies": {
-    "@iarna/toml": "^2.2.5",
-    "@types/iarna__toml": "^2.0.2",
-    "@types/node": "^18.6.2",
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.3.22",
+    "@types/node": "^18.11.15",
     "@types/tap": "^15.0.7",
-    "@typescript-eslint/eslint-plugin": "^5.31.0",
-    "@typescript-eslint/parser": "^5.31.0",
+    "@typescript-eslint/eslint-plugin": "^5.46.1",
+    "@typescript-eslint/parser": "^5.46.1",
     "auto-changelog": "^2.4.0",
     "c8": "^7.12.0",
-    "commitizen": "^4.2.5",
-    "concurrently": "^7.3.0",
-    "cronometro": "^1.1.4",
-    "esbuild": "^0.15.15",
-    "eslint": "^8.20.0",
+    "commitizen": "^4.2.6",
+    "cronometro": "^1.1.5",
+    "eslint": "^8.29.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.6.0",
+    "eslint-plugin-promise": "^6.1.1",
     "execa": "^6.1.0",
-    "husky": "^8.0.1",
-    "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1",
+    "husky": "^8.0.2",
+    "lint-staged": "^13.1.0",
+    "prettier": "^2.8.1",
     "rimraf": "^3.0.2",
-    "tap": "^16.3.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.3"
+    "tap": "^16.3.2",
+    "tsx": "^3.12.1",
+    "typescript": "^4.9.4"
   },
   "pnpm": {
     "peerDependencyRules": {
@@ -85,5 +116,8 @@
         "typescript"
       ]
     }
+  },
+  "engines": {
+    "node": ">= 16.0.0"
   }
 }

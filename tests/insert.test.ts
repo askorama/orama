@@ -1,6 +1,6 @@
 import t from "tap";
-import { insert, insertBatch } from "../src/methods/insert";
-import { create } from "../src/methods/create";
+import { create } from "../src/methods/create.js";
+import { insert, insertBatch } from "../src/methods/insert.js";
 
 t.test("insert", async t => {
   t.plan(6);

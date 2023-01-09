@@ -1,12 +1,10 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "target": "ES2022",
-    "module": "CommonJS",
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
+    "target": "ESNext",
+    "module": "ESNext",
+    "outDir": "dist",
+    "lib": ["ESNext", "DOM"],
     "esModuleInterop": true,
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
@@ -15,9 +13,10 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@stemmer/*": ["./stemmer/lib/*"]
+    }
   },
-  "exclude": [
-    "node_modules",
-    "**/*.test.ts"
-  ]
+  "include": ["src/*.ts", "src/**/*.ts"]
 }

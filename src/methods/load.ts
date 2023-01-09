@@ -1,6 +1,5 @@
-import type { PropertiesSchema, Data } from "../types";
-import type { Lyra } from "../types";
-import * as ERRORS from "../errors";
+import * as ERRORS from "../errors.js";
+import type { Data, Lyra, PropertiesSchema } from "../types.js";
 
 export async function load<S extends PropertiesSchema>(
   lyra: Lyra<S>,
