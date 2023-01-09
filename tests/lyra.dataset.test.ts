@@ -109,7 +109,7 @@ t.test("lyra.dataset", async t => {
       properties: ["description"],
     });
 
-    t.equal(s1.count, 500);
+    t.equal(s1.count, 498);
     t.equal(s2.count, 183);
     t.equal(s3.count, 1);
   });

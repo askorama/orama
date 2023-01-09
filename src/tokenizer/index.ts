@@ -33,7 +33,7 @@ export type Tokenizer = (
 
 const splitRegex: Record<Language, RegExp> = {
   dutch: /[^a-z0-9_'-]+/gim,
-  english: /[^a-z0-9_'-]+/gim,
+  english: /[^a-zÀ-ž0-9_'-]+/gim,
   french: /[^a-z0-9äâàéèëêïîöôùüûœç-]+/gim,
   italian: /[^a-z0-9_'-]+/gim,
   norwegian: /[^a-z0-9_æøåÆØÅäÄöÖüÜ]+/gim,
