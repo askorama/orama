@@ -53,6 +53,7 @@ export async function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: s
   }
 
   lyra.docs[docID] = undefined;
+  lyra.docsCount--;
 
   return true;
 }

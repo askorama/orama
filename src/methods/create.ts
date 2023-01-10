@@ -32,6 +32,7 @@ export async function create<S extends PropertiesSchema>(properties: Configurati
     defaultLanguage,
     schema: properties.schema,
     docs: {},
+    docsCount: 0,
     index: {},
     hooks: properties.hooks || {},
     edge: properties.edge ?? false,
