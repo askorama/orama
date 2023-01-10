@@ -11,6 +11,7 @@ export async function load<S extends PropertiesSchema>(
 
   lyra.index = index;
   lyra.docs = docs;
+  lyra.docsCount = Object.keys(docs).length;
   lyra.schema = schema;
   lyra.frequencies = frequencies;
   lyra.tokenOccurrencies = tokenOccurrencies;

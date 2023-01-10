@@ -64,6 +64,7 @@ export interface Lyra<S extends PropertiesSchema> extends Data<S> {
   hooks: Hooks;
   components?: Components;
   frequencies: FrequencyMap;
+  docsCount: number;
 }
 
 type ResolveTypes<TType> = TType extends "string"

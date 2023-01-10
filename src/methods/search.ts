@@ -100,6 +100,7 @@ export async function search<S extends PropertiesSchema>(
   const results: RetrievedDoc<S>[] = Array.from({
     length: limit,
   });
+  const N = lyra.docsCount;
 
   const timeStart = getNanosecondsTime();
   // uniqueDocsIDs contains unique document IDs for all the tokens in all the indices.
@@ -138,8 +139,6 @@ export async function search<S extends PropertiesSchema>(
     indexMap[index] = tokensMap;
     docsIntersection[index] = [];
   }
-
-  const N = Object.keys(lyra.docs).length;
 
   // Now it's time to loop over all the indices and get the documents IDs for every single term
   const indexesLength = indices.length;
