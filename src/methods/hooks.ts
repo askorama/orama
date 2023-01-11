@@ -5,11 +5,16 @@ export interface AfterInsertHook {
   <S extends PropertiesSchema = PropertiesSchema>(this: Lyra<S>, id: string): Promise<void> | void;
 }
 
+export interface AfterRemoveHook {
+  <S extends PropertiesSchema = PropertiesSchema>(this: Lyra<S>, id: string): Promise<void> | void;
+}
+
 export type Hooks = {
   afterInsert?: AfterInsertHook | AfterInsertHook[];
+  afterRemove?: AfterRemoveHook | AfterRemoveHook[];
 };
 
-const SUPPORTED_HOOKS = ["afterInsert"];
+const SUPPORTED_HOOKS = ["afterInsert", "afterRemove"];
 
 export function validateHooks(hooks?: Hooks): void | never {
   if (hooks) {

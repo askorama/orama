@@ -2,6 +2,7 @@ import { defaultTokenizerConfig } from "../tokenizer/index.js";
 import * as ERRORS from "../errors.js";
 import { removeDocumentByWord } from "../radix-tree/radix.js";
 import type { Lyra, PropertiesSchema, ResolveSchema } from "../types.js";
+import { hookRunner } from "./hooks.js";
 
 /**
  * Removes a document from a database.
@@ -54,6 +55,10 @@ export async function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: s
 
   lyra.docs[docID] = undefined;
   lyra.docsCount--;
+
+  if (lyra.hooks.afterRemove) {
+    await hookRunner.call(lyra, lyra.hooks.afterRemove, docID);
+  }
 
   return true;
 }
