@@ -845,7 +845,8 @@ t.test("lyra", t => {
 });
 
 t.test("lyra - hooks", t => {
-  t.plan(2);
+  t.plan(3);
+
   t.test("should validate on lyra creation", async t => {
     t.plan(1);
 
@@ -888,6 +889,35 @@ t.test("lyra - hooks", t => {
       },
     });
     t.same(++callOrder, 2);
+  });
+
+  t.test("afterRemove hook", async t => {
+    let callOrder = 0;
+    const db = await create({
+      schema: {
+        quote: "string",
+        author: {
+          name: "string",
+          surname: "string",
+        },
+      },
+      hooks: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        afterRemove: function (_id: string): void {
+          t.same(++callOrder, 1);
+        },
+      },
+    });
+
+    const { id } = await insert(db, {
+      quote: "Harry Potter, the boy who lived, come to die. Avada kedavra.",
+        author: {
+          name: "Tom",
+          surname: "Riddle",
+        },
+      });
+
+    await remove(db, id);
   });
 });
 
