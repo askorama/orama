@@ -9,7 +9,11 @@
       "parser": {
         "syntax": "typescript",
         "tsx": false,
-        "dynamicImport": true
+        "dynamicImport": true,
+        "importAssertions": true
+      },
+      "experimental": {
+        "keepImportAssertions": true
       },
       "baseUrl": ".",
       "paths": {
@@ -31,7 +35,11 @@
       "parser": {
         "syntax": "typescript",
         "tsx": false,
-        "dynamicImport": true
+        "dynamicImport": true,
+        "importAssertions": true
+      },
+      "experimental": {
+        "keepImportAssertions": true
       },
       "baseUrl": ".",
       "paths": {

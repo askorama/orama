@@ -1,0 +1,41 @@
+name: CI (Deno)
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  run-tests:
+    name: Run CI
+    env:
+      DENO_DIR: ~/.deno-cache
+      RUNTIME: deno
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Deno
+        uses: denoland/setup-deno@v1
+      - name: Restore cached dependencies (Node.js)
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: node-modules-${{ hashFiles('package.json') }}
+      - name: Restore cached dependencies (Deno)
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: node-modules-${{ hashFiles('package.json') }}
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Prepare for Deno
+        run: |
+          sh tests/ci/build.sh
+          sed -i'' -E -e 's#from "([^.])#from "npm:\1#' tests/ci/non-node-ci-runner.js
+          deno cache --reload --lock=lock.json --lock-write tests/ci/non-node-ci-runner.js
+      - name: Run Tests
+        run: deno run --allow-read --allow-env tests/ci/non-node-ci-runner.js | node_modules/.bin/tap-mocha-reporter spec

@@ -79,15 +79,28 @@ t.test("Edge getters", t => {
       edge: true,
     });
 
-    await insert(db, {
+    const jonh = {
       name: "John",
       age: 30,
-    });
+    };
 
-    await insert(db, {
+    const jane = {
       name: "Jane",
       age: 25,
-    });
+    };
+
+    const michele = {
+      name: "Michele",
+      age: 27,
+    };
+
+    const paolo = {
+      name: "Paolo",
+      age: 37,
+    };
+
+    await insert(db, jonh);
+    await insert(db, jane);
 
     const db2 = await create({
       schema: {
@@ -97,15 +110,8 @@ t.test("Edge getters", t => {
       edge: true,
     });
 
-    await insert(db2, {
-      name: "Michele",
-      age: 27,
-    });
-
-    await insert(db2, {
-      name: "Paolo",
-      age: 37,
-    });
+    await insert(db2, michele);
+    await insert(db2, paolo);
 
     const dbData = await save(db2);
     await load(db, dbData);
@@ -120,8 +126,8 @@ t.test("Edge getters", t => {
     t.equal(search3.count, 1);
     t.equal(search4.count, 1);
 
-    t.matchSnapshot(extractOriginalDoc(search3.hits));
-    t.matchSnapshot(extractOriginalDoc(search4.hits));
+    t.strictSame(extractOriginalDoc(search3.hits), [paolo]);
+    t.strictSame(extractOriginalDoc(search4.hits), [michele]);
   });
 
   t.test("It should correctly save and load data", async t => {
