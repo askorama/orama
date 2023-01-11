@@ -17,6 +17,7 @@ import { intersectTokenScores } from "../algorithms.js";
  *   },
  *   hooks: {
  *     afterInsert: [afterInsertHook],
+ *     afterRemove: [afterRemoveHook],
  *   }
  * });
  */

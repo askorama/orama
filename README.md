@@ -431,6 +431,38 @@ const db = await create({
 await insertWithHooks(db, { author: "test", quote: "test" });
 ```
 
+### afterRemove hook
+
+The `afterRemove` hook is called after the deletion of a document on the
+database. The `hook` will be called with the `id` of the removed document.
+
+Example:
+
+
+```js
+import { create, insert, remove } from "@lyrasearch/lyra";
+
+async function hook1(id: string): Promise<void> {
+  // ...
+}
+
+const db = await create({
+  schema: {
+    author: "string",
+    quote: "string",
+  },
+  hooks: {
+    afterRemove: [hook1],
+  },
+});
+
+const { id } = await insert(db, { author: "test", quote: "test" });
+
+// ...
+
+await remove(db, id); // hook1 will be called
+```
+
 # License
 
 Lyra is licensed under the [Apache 2.0](/LICENSE.md) license.
