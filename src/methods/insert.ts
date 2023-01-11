@@ -77,6 +77,7 @@ export async function insertWithHooks<S extends PropertiesSchema>(
   assertDocSchema(doc, lyra.schema);
 
   lyra.docs[id] = doc;
+  lyra.docsCount++;
   recursiveradixInsertion(lyra, doc, id, config, undefined, lyra.components?.tokenizer as TokenizerConfigExec);
   trackInsertion(lyra);
   if (lyra.hooks.afterInsert) {
