@@ -7,6 +7,7 @@ dist
 *.tsv
 *.dpack
 .dev
+fd-v8.6.0-i686-unknown-linux-musl/
 
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
