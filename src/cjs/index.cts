@@ -83,7 +83,7 @@ export async function remove(...args: Parameters<typeof esmRemove>): ReturnType<
 
 export async function search(...args: Parameters<typeof esmSearch>): ReturnType<typeof esmSearch> {
   if (!_esmSearch) {
-    const imported = await importDynamic("./methods/search.js");
+    const imported = await importDynamic("../methods/search.js");
     _esmSearch = imported.search;
   }
 
@@ -92,7 +92,7 @@ export async function search(...args: Parameters<typeof esmSearch>): ReturnType<
 
 export async function save(...args: Parameters<typeof esmSave>): ReturnType<typeof esmSave> {
   if (!_esmSave) {
-    const imported = await importDynamic("./methods/save.js");
+    const imported = await importDynamic("../methods/save.js");
     _esmSave = imported.save;
   }
 
@@ -101,7 +101,7 @@ export async function save(...args: Parameters<typeof esmSave>): ReturnType<type
 
 export async function load(...args: Parameters<typeof esmLoad>): ReturnType<typeof esmLoad> {
   if (!_esmLoad) {
-    const imported = await importDynamic("./methods/load.js");
+    const imported = await importDynamic("../methods/load.js");
     _esmLoad = imported.load;
   }
 
