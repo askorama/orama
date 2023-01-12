@@ -1,8 +1,9 @@
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
 import { find as radixFind } from "../radix-tree/radix.js";
 import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore } from "../types.js";
-import { getNanosecondsTime, insertSortedValue, sortTokenScorePredicate } from "../utils.js";
+import { getNanosecondsTime, sortTokenScorePredicate } from "../utils.js";
 import { getIndices } from "./common.js";
+import { prioritizeTokenScores } from "../algorithms.js";
 
 type IndexMap = Record<string, TokenMap>;
 
@@ -104,7 +105,7 @@ export async function search<S extends PropertiesSchema>(
 
   const timeStart = getNanosecondsTime();
   // uniqueDocsIDs contains unique document IDs for all the tokens in all the indices.
-  const uniqueDocsIDs: Map<string, number> = new Map();
+  const uniqueDocsIDs: Record<string, number> = {};
 
   // indexMap is an object containing all the indexes considered for the current search,
   // and an array of doc IDs for each token in all the indices.
@@ -172,7 +173,8 @@ export async function search<S extends PropertiesSchema>(
 
         // @todo: we're now using binary search to insert the element in the right position.
         // Maybe we can switch to sparse array insertion?
-        insertSortedValue(orderedTFIDFList, [id, tfIdf], sortTokenScorePredicate);
+        // insertSortedValue(orderedTFIDFList, [id, tfIdf], sortTokenScorePredicate);
+        orderedTFIDFList.push([id, tfIdf]);
       }
 
       indexMap[index][term].push(...orderedTFIDFList);
@@ -180,24 +182,25 @@ export async function search<S extends PropertiesSchema>(
 
     const docIds = indexMap[index];
     const vals = Object.values(docIds);
-    docsIntersection[index] = intersectTokenScores(vals);
+    docsIntersection[index] = prioritizeTokenScores(vals);
+    const uniqueDocs = docsIntersection[index];
+    //const uniqueDocs = Object.values(docsIntersection[index]);
 
-    const uniqueDocs = Object.values(docsIntersection[index]);
     const uniqueDocsLength = uniqueDocs.length;
     for (let i = 0; i < uniqueDocsLength; i++) {
       const [id, tfIdfScore] = uniqueDocs[i];
 
-      if (uniqueDocsIDs.has(id)) {
-        const prevScore = uniqueDocsIDs.get(id)!;
-        uniqueDocsIDs.set(id, prevScore + tfIdfScore);
+      const prevScore = uniqueDocsIDs[id];
+      if (prevScore) {
+        uniqueDocsIDs[id] = prevScore + tfIdfScore + 0.5;
       } else {
-        uniqueDocsIDs.set(id, tfIdfScore);
+        uniqueDocsIDs[id] = tfIdfScore;
       }
     }
   }
 
   // Get unique doc IDs from uniqueDocsIDs map, sorted by value.
-  const uniqueDocsArray = Array.from(uniqueDocsIDs.entries()).sort(sortTokenScorePredicate);
+  const uniqueDocsArray = Object.entries(uniqueDocsIDs).sort(sortTokenScorePredicate);
   const resultIDs: Set<string> = new Set();
 
   // We already have the list of ALL the document IDs containing the search terms.
@@ -227,7 +230,7 @@ export async function search<S extends PropertiesSchema>(
   return {
     elapsed: getNanosecondsTime() - timeStart,
     hits,
-    count: uniqueDocsIDs.size,
+    count: Object.keys(uniqueDocsIDs).length,
   };
 }
 

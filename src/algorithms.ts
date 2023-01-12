@@ -50,3 +50,25 @@ export function intersectTokenScores(arrays: TokenScore[][]): TokenScore[] {
 
   return result;
 }
+
+export function prioritizeTokenScores(arrays: TokenScore[][]): TokenScore[] {
+  const tokenMap: Record<string, number> = {};
+
+  const mapsLength = arrays.length;
+  for (let i = 0; i < mapsLength; i++) {
+    const arr = arrays[i];
+
+    const entriesLength = arr.length;
+    for (let j = 0; j < entriesLength; j++) {
+      const [token, score] = arr[j];
+
+      if (token in tokenMap) {
+        tokenMap[token] += score + 0.5
+      } else {
+        tokenMap[token] = score;
+      }
+    }
+  }
+
+  return Object.entries(tokenMap).sort((a, b) => b[1] - a[1]);
+}
