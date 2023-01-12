@@ -6,6 +6,7 @@ on:
 
 jobs:
   benchmark:
+    name: Run benchmarks
     if: ${{ github.event.label.name == 'benchmark' }}
     runs-on: ubuntu-latest
     permissions:
@@ -21,13 +22,15 @@ jobs:
       matrix:
         node-version: [14, 16, 18]
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           persist-credentials: false
           ref: ${{github.event.pull_request.head.sha}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
 
-      - uses: actions/setup-node@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -57,7 +60,7 @@ jobs:
       - name: Build Lyra
         run: pnpm run build
 
-      - name: Run benchmark
+      - name: Run benchmarks
         id: benchmark-pr
         run: |
           pnpm benchmark > ./bench-result.md
@@ -69,7 +72,8 @@ jobs:
           echo "::set-output name=BENCH_RESULT${{matrix.node-version}}::$result"
 
       # main benchmark
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           persist-credentials: false
           ref: "main"
@@ -80,7 +84,7 @@ jobs:
       - name: Build Lyra
         run: pnpm run build
 
-      - name: Run benchmark
+      - name: Run benchmarks
         id: benchmark-main
         run: |
           pnpm benchmark > ./bench-result.md
@@ -92,12 +96,13 @@ jobs:
           echo "::set-output name=BENCH_RESULT${{matrix.node-version}}::$result"
 
   output-benchmark:
+    name: Add results to PR
     needs: [benchmark]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
-      - name: Comment PR
+      - name: Create comment
         uses: thollander/actions-comment-pull-request@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -118,7 +123,8 @@ jobs:
             **PR**: ${{ needs.benchmark.outputs.PR-BENCH-18 }}
             **MAIN**: ${{ needs.benchmark.outputs.MAIN-BENCH-18 }}
 
-      - uses: actions-ecosystem/action-remove-labels@v1
+      - name: Remove label from PR
+        uses: actions-ecosystem/action-remove-labels@v1
         with:
           labels: |
             benchmark

@@ -27,8 +27,8 @@ t.test("Tokenizer", t => {
     const O1 = tokenize(I1, "english");
     const O2 = tokenize(I2, "english");
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["the", "quick", "brown", "fox", "jump", "over", "lazi", "dog"]);
+    t.strictSame(O2, ["i", "bake", "some", "cake"]);
   });
 
   t.test("Should tokenize and stem correctly in english and allow duplicates", t => {
@@ -40,11 +40,11 @@ t.test("Tokenizer", t => {
     const O1 = tokenize(I1, "english", true);
     const O2 = tokenize(I2, "english", true);
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["thi", "is", "a", "test", "with", "test", "duplic"]);
+    t.strictSame(O2, ["it'", "aliv", "it'", "aliv"]);
   });
 
-  t.test("Should tokenize and stem correctly in french", async t => {
+  t.test("Should tokenize and stem correctly in french", t => {
     t.plan(2);
 
     const I1 = "voyons quel temps il fait dehors";
@@ -69,11 +69,11 @@ t.test("Tokenizer", t => {
       }),
     );
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["voyon", "temp", "fait", "dehor"]);
+    t.strictSame(O2, ["fait", "gateau"]);
   });
 
-  t.test("Should tokenize and stem correctly in italian", async t => {
+  t.test("Should tokenize and stem correctly in italian", t => {
     t.plan(2);
 
     const I1 = "ho cucinato delle torte";
@@ -98,11 +98,11 @@ t.test("Tokenizer", t => {
       }),
     );
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["cucin", "tort"]);
+    t.strictSame(O2, ["dorm", "cos", "difficil", "quand", "test", "pass"]);
   });
 
-  t.test("Should tokenize and stem correctly in norwegian", async t => {
+  t.test("Should tokenize and stem correctly in norwegian", t => {
     t.plan(2);
 
     const I1 = "Jeg kokte noen kaker";
@@ -127,11 +127,11 @@ t.test("Tokenizer", t => {
       }),
     );
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["kokt", "kak"]);
+    t.strictSame(O2, ["sov", "vansk", "ting", "test", "mislykk"]);
   });
 
-  t.test("Should tokenize and stem correctly in portuguese", async t => {
+  t.test("Should tokenize and stem correctly in portuguese", t => {
     t.plan(2);
 
     const I1 = "Eu cozinhei alguns bolos";
@@ -156,11 +156,11 @@ t.test("Tokenizer", t => {
       }),
     );
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["cozinh", "alguns", "bol"]);
+    t.strictSame(O2, ["dorm", "e", "cois", "dificil", "test", "falh"]);
   });
 
-  t.test("Should tokenize and stem correctly in russian", async t => {
+  t.test("Should tokenize and stem correctly in russian", t => {
     t.plan(2);
 
     const I1 = "я приготовила пирожные";
@@ -185,11 +185,11 @@ t.test("Tokenizer", t => {
       }),
     );
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["приготов", "пирожн"]);
+    t.strictSame(O2, ["спат", "трудн", "тест", "срабатыва"]);
   });
 
-  t.test("Should tokenize and stem correctly in swedish", async t => {
+  t.test("Should tokenize and stem correctly in swedish", t => {
     t.plan(2);
 
     const I1 = "Jag lagade några kakor";
@@ -214,11 +214,11 @@ t.test("Tokenizer", t => {
       }),
     );
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["lag", "kak"]);
+    t.strictSame(O2, ["sov", "svar", "sak", "test", "misslyck"]);
   });
 
-  t.test("Should tokenize and stem correctly in spanish", async t => {
+  t.test("Should tokenize and stem correctly in spanish", t => {
     t.plan(2);
 
     const I1 = "cociné unos pasteles";
@@ -243,11 +243,11 @@ t.test("Tokenizer", t => {
       }),
     );
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["cocin", "pastel"]);
+    t.strictSame(O2, ["dorm", "dificil", "prueb", "fall"]);
   });
 
-  t.test("Should tokenize and stem correctly in dutch", async t => {
+  t.test("Should tokenize and stem correctly in dutch", t => {
     t.plan(2);
 
     const I1 = "de kleine koeien";
@@ -272,11 +272,11 @@ t.test("Tokenizer", t => {
       }),
     );
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["klein", "koei"]);
+    t.strictSame(O2, ["taart", "gemaakt"]);
   });
 
-  t.test("Should tokenize and stem correctly in german", async t => {
+  t.test("Should tokenize and stem correctly in german", t => {
     t.plan(2);
 
     const I1 = "Schlaf ist eine harte Sache, wenn Tests fehlschlagen";
@@ -301,11 +301,11 @@ t.test("Tokenizer", t => {
       }),
     );
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["schlaf", "hart", "sach", "test", "fehlschlag"]);
+    t.strictSame(O2, ["paar", "keks", "geback"]);
   });
 
-  t.test("Should tokenize and stem correctly in finnish", async t => {
+  t.test("Should tokenize and stem correctly in finnish", t => {
     t.plan(2);
 
     const I1 = "Uni on vaikea asia, kun testit epäonnistuvat";
@@ -330,11 +330,11 @@ t.test("Tokenizer", t => {
       }),
     );
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["uni", "vaike", "as", "test", "epaonnistuv"]);
+    t.strictSame(O2, ["leivo", "keksej"]);
   });
 
-  t.test("Should tokenize and stem correctly in danish", async t => {
+  t.test("Should tokenize and stem correctly in danish", t => {
     t.plan(2);
 
     const I1 = "Søvn er en svær ting, når prøver mislykkes";
@@ -359,15 +359,15 @@ t.test("Tokenizer", t => {
       }),
     );
 
-    t.matchSnapshot(O1, `${t.name}-O1`);
-    t.matchSnapshot(O2, `${t.name}-O2`);
+    t.strictSame(O1, ["sovn", "svar", "ting", "prov", "mislyk"]);
+    t.strictSame(O2, ["bagt", "smakag"]);
   });
 });
 
 t.test("Custom stop-words rules", t => {
   t.plan(6);
 
-  t.test("custom array of stop-words", async t => {
+  t.test("custom array of stop-words", t => {
     t.plan(2);
 
     normalizationCache.clear();
@@ -399,7 +399,7 @@ t.test("Custom stop-words rules", t => {
     t.same(O2, ["i", "bake", "some", "cake"]);
   });
 
-  t.test("custom stop-words function", async t => {
+  t.test("custom stop-words function", t => {
     t.plan(2);
 
     normalizationCache.clear();
@@ -432,7 +432,7 @@ t.test("Custom stop-words rules", t => {
     t.same(O2, ["bake", "cake"]);
   });
 
-  t.test("disable stop-words", async t => {
+  t.test("disable stop-words", t => {
     t.plan(2);
 
     normalizationCache.clear();
@@ -447,7 +447,7 @@ t.test("Custom stop-words rules", t => {
     t.same(O2, ["i", "bake", "some", "cake"]);
   });
 
-  t.test("disable stemming", async t => {
+  t.test("disable stemming", t => {
     t.plan(2);
 
     normalizationCache.clear();
@@ -478,7 +478,7 @@ t.test("Custom stop-words rules", t => {
     t.same(O2, ["baked", "cakes"]);
   });
 
-  t.test("custom stemming function", async t => {
+  t.test("custom stemming function", t => {
     t.plan(2);
 
     normalizationCache.clear();
@@ -509,7 +509,7 @@ t.test("Custom stop-words rules", t => {
     t.same(O2, ["baked-ish", "cakes-ish"]);
   });
 
-  t.test("should validate options", async t => {
+  t.test("should validate options", t => {
     t.plan(6);
 
     t.throws(() => defaultTokenizerConfig("english").assertSupportedLanguage("weird-language"), {
