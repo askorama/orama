@@ -9,25 +9,29 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./cjs": {
-      "types": "./dist/commonjs.d.cts",
-      "require": "./dist/commonjs.cjs"
-    },
-    "./commonjs": {
-      "types": "./dist/commonjs.d.cts",
-      "require": "./dist/commonjs.cjs"
-    },
     "./wasm": {
       "types": "./dist/wasm.d.ts",
       "import": "./dist/wasm.js"
+    },
+    "./internals": {
+      "types": "./dist/esm/internals/index.d.ts",
+      "import": "./dist/esm/internals/index.js"
     },
     "./stemmer/*": {
       "types": "./dist/stemmer/*.d.ts",
       "import": "./dist/stemmer/*.js"
     },
-    "./internals": {
-      "types": "./dist/esm/internals/index.d.ts",
-      "import": "./dist/esm/internals/index.js"
+    "./cjs": {
+      "types": "./dist/cjs/index.d.cts",
+      "require": "./dist/cjs/index.cjs"
+    },
+    "./cjs/internals": {
+      "types": "./dist/cjs/internals.d.cts",
+      "require": "./dist/cjs/internals.cjs"
+    }, 
+    "./cjs/stemmer/*": {
+      "types": "./dist/cjs/stemmer/*.d.cts",
+      "require": "./dist/cjs/stemmer/*.cjs"
     }
   },
   "types": "./dist/index.d.ts",
@@ -46,7 +50,7 @@
     "dev": "swc -s -w --extensions .ts,.cts -d dist src",
     "prebuild": "npm run lint",
     "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",
-    "postbuild": "tsc -p . --emitDeclarationOnly && mv dist/commonjs.js dist/commonjs.cjs && cp -a stemmer/lib dist/stemmer",
+    "postbuild": "sh scripts/postbuild.sh",
     "format": "prettier -w benchmarks examples src tests",
     "lint": "eslint benchmarks examples src tests --ext .js,.ts,.cts",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
