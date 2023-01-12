@@ -1,4 +1,4 @@
-type BoundedMetric = {
+export type BoundedMetric = {
   isBounded: boolean;
   distance: number;
 };
