@@ -1,6 +1,6 @@
 import * as ERRORS from "../errors.js";
-import type { Lyra, PropertiesSchema, ResolveSchema } from "../types";
-import type { SearchParams } from "./search";
+import type { Lyra, PropertiesSchema, ResolveSchema } from "../types.js";
+import type { SearchParams } from "./search.js";
 
 export function assertDocSchema<S extends PropertiesSchema>(doc: ResolveSchema<S>, lyraSchema: PropertiesSchema) {
   if (!recursiveCheckDocSchema(doc, lyraSchema)) {

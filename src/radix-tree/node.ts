@@ -1,4 +1,4 @@
-import type { Nullable } from "../types";
+import type { Nullable } from "../types.js";
 import { uniqueId } from "../utils.js";
 
 export interface Node {
