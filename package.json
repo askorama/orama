@@ -1,6 +1,6 @@
 {
   "name": "@lyrasearch/lyra",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "type": "module",
   "description": "Fast, in-memory, typo-tolerant, full-text search engine written in TypeScript",
   "sideEffects": false,
@@ -31,7 +31,7 @@
     "./cjs/internals": {
       "types": "./dist/cjs/internals.d.cts",
       "require": "./dist/cjs/internals.cjs"
-    }, 
+    },
     "./cjs/stemmer/*": {
       "types": "./dist/cjs/stemmer/*.d.cts",
       "require": "./dist/cjs/stemmer/*.cjs"
