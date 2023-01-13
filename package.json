@@ -7,19 +7,22 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/cjs/index.cjs"
     },
     "./wasm": {
       "types": "./dist/wasm.d.ts",
       "import": "./dist/wasm.js"
     },
     "./internals": {
-      "types": "./dist/esm/internals/index.d.ts",
-      "import": "./dist/esm/internals/index.js"
+      "types": "./dist/internals.d.ts",
+      "import": "./dist/internals.js",
+      "require": "./dist/cjs/internals.cjs"
     },
     "./stemmer/*": {
       "types": "./dist/stemmer/*.d.ts",
-      "import": "./dist/stemmer/*.js"
+      "import": "./dist/stemmer/*.js",
+      "require": "./dist/cjs/stemmer/*.cjs"
     },
     "./cjs": {
       "types": "./dist/cjs/index.d.cts",

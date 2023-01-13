@@ -12,7 +12,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
       "@stemmer/*": ["./stemmer/lib/*"]
