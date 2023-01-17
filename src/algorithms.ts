@@ -1,3 +1,4 @@
+import type { BM25Params } from "./types.js";
 import { TokenScore } from "./types.js";
 
 // Adapted from https://github.com/lovasoa/fast_array_intersect
@@ -71,4 +72,17 @@ export function prioritizeTokenScores(arrays: TokenScore[][]): TokenScore[] {
   }
 
   return Object.entries(tokenMap).sort((a, b) => b[1] - a[1]);
+}
+
+export function BM25(
+  tf: number,
+  matchingCount: number,
+  docsCount: number,
+  fieldLength: number,
+  averageFieldLength: number,
+  BM25Params: BM25Params
+) {
+  const { k, b, d } = BM25Params;
+  const idf = Math.log((docsCount - matchingCount + 0.5) / (matchingCount + 0.5));
+  return idf * (d + tf * (k + 1)) / (tf + k * (1 - b + b * fieldLength / averageFieldLength));
 }

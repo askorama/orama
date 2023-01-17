@@ -38,6 +38,8 @@ export async function create<S extends PropertiesSchema>(properties: Configurati
     edge: properties.edge ?? false,
     frequencies: {},
     tokenOccurrencies: {},
+    avgFieldLength: {},
+    fieldLengths: {},
     components: {
       tokenizer,
       algorithms: {
@@ -63,6 +65,7 @@ function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix
       buildIndex(lyra, schema[prop] as S, `${propName}.`);
     } else {
       lyra.index[propName] = createNode();
+      lyra.avgFieldLength[propName] = 0;
     }
   }
 }
