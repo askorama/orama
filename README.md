@@ -378,6 +378,7 @@ Right now, Lyra supports 23 languages and stemmers out of the box:
 - Serbian
 - Swedish
 - Turkish
+- Ukrainian
 
 ## Hooks
 

@@ -25,4 +25,5 @@ export const SUPPORTED_LANGUAGES = [
   "romanian",
   "serbian",
   "turkish",
+  "ukrainian"
 ];
