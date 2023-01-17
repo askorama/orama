@@ -192,7 +192,7 @@ export async function search<S extends PropertiesSchema>(
           N,
           fieldLengths[id],
           avgFieldLength,
-          params.relevance,
+          params.relevance as BM25Params,
         );
 
         scoreList.push([id, bm25]);
@@ -205,7 +205,6 @@ export async function search<S extends PropertiesSchema>(
     const vals = Object.values(docIds);
     docsIntersection[index] = prioritizeTokenScores(vals);
     const uniqueDocs = docsIntersection[index];
-    //const uniqueDocs = Object.values(docsIntersection[index]);
 
     const uniqueDocsLength = uniqueDocs.length;
     for (let i = 0; i < uniqueDocsLength; i++) {
