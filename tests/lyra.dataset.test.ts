@@ -3,6 +3,7 @@ import { create, insertBatch, remove, search } from "../src/index.js";
 import type { SearchResult } from "../src/methods/search.js";
 import type { PropertiesSchema } from "../src/types.js";
 import dataset from "./datasets/events.json" assert { type: "json" };
+import snapshots from "./snapshots/events.json" assert { type: "json" };
 
 type EventJson = {
   result: {
@@ -16,15 +17,14 @@ type EventJson = {
   };
 };
 
-function removeVariadicData<T extends PropertiesSchema>(res: SearchResult<T>): SearchResult<T> {
+function removeVariadicData<T extends PropertiesSchema>(res: SearchResult<T>): Omit<SearchResult<T>, "elapsed"> {
   const hits = res.hits.map(h => {
     h.id = "";
     return h;
   });
 
   return {
-    ...res,
-    elapsed: 0n,
+    count: res.count,
     hits,
   };
 }
@@ -43,19 +43,17 @@ t.test("lyra.dataset", async t => {
     },
   });
 
-  t.before(async () => {
-    const events = (dataset as EventJson).result.events.map(ev => ({
-      date: ev.date,
-      description: ev.description,
-      granularity: ev.granularity,
-      categories: {
-        first: ev.category1 ?? "",
-        second: ev.category2 ?? "",
-      },
-    }));
+  const events = (dataset as EventJson).result.events.map(ev => ({
+    date: ev.date,
+    description: ev.description,
+    granularity: ev.granularity,
+    categories: {
+      first: ev.category1 ?? "",
+      second: ev.category2 ?? "",
+    },
+  }));
 
-    await insertBatch(db, events);
-  });
+  await insertBatch(db, events);
 
   t.test("should correctly populate the database with a large dataset", async t => {
     t.plan(4);
@@ -165,9 +163,31 @@ t.test("lyra.dataset", async t => {
       offset: 2239,
     });
 
-    t.matchSnapshot(s1, `${t.name}-page-1`);
-    t.matchSnapshot(s2, `${t.name}-page-2`);
-    t.matchSnapshot(s3, `${t.name}-page-3`);
+    if (typeof process !== "undefined" && process.env.GENERATE_SNAPSHOTS) {
+      const { writeFile } = await import("node:fs/promises");
+      const { fileURLToPath } = await import("node:url");
+      await writeFile(
+        fileURLToPath(new URL("./snapshots/events.json", import.meta.url)),
+        JSON.stringify(
+          {
+            [`${t.name}-page-1`]: s1,
+            [`${t.name}-page-2`]: s2,
+            [`${t.name}-page-3`]: s3,
+          },
+          null,
+          2,
+        ),
+        "utf-8",
+      );
+
+      t.ok(s1);
+      t.ok(s2);
+      t.ok(s3);
+    } else {
+      t.strictSame(s1, snapshots[`${t.name}-page-1`]);
+      t.strictSame(s2, snapshots[`${t.name}-page-2`]);
+      t.strictSame(s3, snapshots[`${t.name}-page-3`]);
+    }
 
     t.equal(s4.count, 2357);
     t.equal(s5.hits.length, 10);

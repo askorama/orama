@@ -20,12 +20,26 @@ on:
 
 jobs:
   release:
+    name: Release
     runs-on: ubuntu-latest
     steps:
-      - uses: pnpm/action-setup@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Node.js LTS
+        uses: actions/setup-node@v3
         with:
-          version: 7
-      - uses: nearform/optic-release-automation-action@v3
+          node-version: lts/*
+      - name: Restore cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: node-modules-${{ hashFiles('package.json') }}
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+      - name: Create release
+        uses: nearform/optic-release-automation-action@v3
         with:
           npm-token: ${{ secrets[format('NPM_TOKEN_{0}', github.actor)] || secrets.NPM_TOKEN }}
           optic-token: ${{ secrets[format('OPTIC_TOKEN_{0}', github.actor)] || secrets.OPTIC_TOKEN }}

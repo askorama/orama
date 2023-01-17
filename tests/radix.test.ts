@@ -180,7 +180,12 @@ t.test("test from trie for compatibility", t => {
     }
 
     t.strictSame(radixFind(trie, { term: phrases[5].doc.slice(0, 5) }), { [phrases[5].doc]: [phrases[5].id] });
-    t.matchSnapshot(radixFind(trie, { term: "th" }), t.name);
+    t.strictSame(radixFind(trie, { term: "th" }), {
+      [phrases[0].doc]: [phrases[0].id],
+      [phrases[3].doc]: [phrases[3].id],
+      [phrases[4].doc]: [phrases[4].id],
+      [phrases[5].doc]: [phrases[5].id],
+    });
   });
 
   t.test("should correctly delete a word from the trie", t => {

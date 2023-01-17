@@ -1,6 +1,7 @@
 import t from "tap";
 import { create, insert, insertBatch, insertWithHooks, remove, search } from "../src/index.js";
 import { SUPPORTED_LANGUAGES } from "../src/tokenizer/languages.js";
+import { INVALID_DOC_SCHEMA, LANGUAGE_NOT_SUPPORTED } from "../src/errors.js";
 import dataset from "./datasets/events.json" assert { type: "json" };
 
 interface BaseDataEvent {
@@ -29,36 +30,34 @@ t.test("defaultLanguage", t => {
   t.test("should throw an error if the desired language is not supported", async t => {
     t.plan(1);
 
-    try {
-      await create({
-        schema: {},
-        // @ts-expect-error latin is not supported
-        defaultLanguage: "latin",
-      });
-    } catch (e) {
-      t.matchSnapshot(e, t.name);
-    }
+    await t.rejects(
+      () =>
+        create({
+          schema: {},
+          defaultLanguage: "latin",
+        }),
+      { message: LANGUAGE_NOT_SUPPORTED("latin") },
+    );
   });
 
   t.test("should throw an error if the desired language is not supported during insertion", async t => {
     t.plan(1);
 
-    try {
-      const db = await create({
-        schema: { foo: "string" },
-      });
+    const db = await create({
+      schema: { foo: "string" },
+    });
 
-      await insert(
-        db,
-        {
-          foo: "bar",
-        },
-        // @ts-expect-error latin is not supported
-        { language: "latin" },
-      );
-    } catch (e) {
-      t.matchSnapshot(e, t.name);
-    }
+    await t.rejects(
+      () =>
+        insert(
+          db,
+          {
+            foo: "bar",
+          },
+          { language: "latin" },
+        ),
+      { message: LANGUAGE_NOT_SUPPORTED("latin") },
+    );
   });
 
   t.test("should not throw if if the language is supported", async t => {
@@ -92,12 +91,10 @@ t.test("checkInsertDocSchema", t => {
 
     t.ok((await insert(db, { quote: "hello, world!", author: "me" })).id);
 
-    try {
-      // @ts-expect-error test error case
-      await insert(db, { quote: "hello, world!", author: true });
-    } catch (err) {
-      t.matchSnapshot(err, `${t.name} - 1`);
-    }
+    // @ts-expect-error test error case
+    await t.rejects(() => insert(db, { quote: "hello, world!", author: true }), {
+      message: INVALID_DOC_SCHEMA({ quote: "string", author: "string" }, { quote: "hello, world!", author: true }),
+    });
   });
 
   t.test("should allow doc with missing schema keys to be inserted without indexing those keys", async t => {
@@ -307,7 +304,7 @@ t.test("lyra", t => {
 
     t.ok(ex1Insert.id);
     t.equal(ex1Search.count, 1);
-    t.ok(ex1Search.elapsed);
+    t.type(ex1Search.elapsed, "bigint");
     t.equal(ex1Search.hits[0].document.example, "The quick, brown, fox");
   });
 
@@ -351,15 +348,18 @@ t.test("lyra", t => {
 
     const db = await create({ schema: { foo: "string", baz: "string" } });
 
-    try {
-      await search(db, {
-        term: "foo",
-        //@ts-expect-error test error case
-        properties: ["bar"],
-      });
-    } catch (err) {
-      t.matchSnapshot(err);
-    }
+    await t.rejects(
+      () =>
+        search(db, {
+          term: "foo",
+          //@ts-expect-error test error case
+          properties: ["bar"],
+        }),
+      {
+        message:
+          'Invalid property name. Expected a wildcard string ("*") or array containing one of the following properties: foo, baz, but got: bar',
+      },
+    );
   });
 
   t.test("Should correctly remove a document after its insertion", async t => {
@@ -840,7 +840,7 @@ t.test("lyra", t => {
       // eslint-disable-next-line no-empty
     } catch (_e) {}
 
-    t.rejects(insertBatch(db, wrongSchemaDocs as unknown as DataEvent[]));
+    await t.rejects(() => insertBatch(db, wrongSchemaDocs as unknown as DataEvent[]));
   });
 });
 
@@ -849,18 +849,18 @@ t.test("lyra - hooks", t => {
   t.test("should validate on lyra creation", async t => {
     t.plan(1);
 
-    try {
-      await create({
-        schema: { date: "string" },
-        hooks: {
-          ["anotherHookName" as string]: () => {
-            t.fail("it shouldn't be called");
+    await t.rejects(
+      () =>
+        create({
+          schema: { date: "string" },
+          hooks: {
+            ["anotherHookName" as string]: () => {
+              t.fail("it shouldn't be called");
+            },
           },
-        },
-      });
-    } catch (err) {
-      t.matchSnapshot(err);
-    }
+        }),
+      { message: "The following hooks aren't supported. Hooks: anotherHookName" },
+    );
   });
 
   t.test("afterInsert hook", async t => {

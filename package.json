@@ -1,33 +1,40 @@
 {
   "name": "@lyrasearch/lyra",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "type": "module",
   "description": "Fast, in-memory, typo-tolerant, full-text search engine written in TypeScript",
   "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./cjs": {
-      "types": "./dist/commonjs.d.cts",
-      "require": "./dist/commonjs.cjs"
-    },
-    "./commonjs": {
-      "types": "./dist/commonjs.d.cts",
-      "require": "./dist/commonjs.cjs"
+      "import": "./dist/index.js",
+      "require": "./dist/cjs/index.cjs"
     },
     "./wasm": {
       "types": "./dist/wasm.d.ts",
       "import": "./dist/wasm.js"
     },
+    "./internals": {
+      "types": "./dist/internals.d.ts",
+      "import": "./dist/internals.js",
+      "require": "./dist/cjs/internals.cjs"
+    },
     "./stemmer/*": {
       "types": "./dist/stemmer/*.d.ts",
-      "import": "./dist/stemmer/*.js"
+      "import": "./dist/stemmer/*.js",
+      "require": "./dist/cjs/stemmer/*.cjs"
     },
-    "./internals": {
-      "types": "./dist/esm/internals/index.d.ts",
-      "import": "./dist/esm/internals/index.js"
+    "./cjs": {
+      "types": "./dist/cjs/index.d.cts",
+      "require": "./dist/cjs/index.cjs"
+    },
+    "./cjs/internals": {
+      "types": "./dist/cjs/internals.d.cts",
+      "require": "./dist/cjs/internals.cjs"
+    },
+    "./cjs/stemmer/*": {
+      "types": "./dist/cjs/stemmer/*.d.cts",
+      "require": "./dist/cjs/stemmer/*.cjs"
     }
   },
   "types": "./dist/index.d.ts",
@@ -46,7 +53,7 @@
     "dev": "swc -s -w --extensions .ts,.cts -d dist src",
     "prebuild": "npm run lint",
     "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",
-    "postbuild": "tsc -p . --emitDeclarationOnly && mv dist/commonjs.js dist/commonjs.cjs && cp -a stemmer/lib dist/stemmer",
+    "postbuild": "sh scripts/postbuild.sh",
     "format": "prettier -w benchmarks examples src tests",
     "lint": "eslint benchmarks examples src tests --ext .js,.ts,.cts",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
@@ -107,6 +114,9 @@
     "prettier": "^2.8.1",
     "rimraf": "^3.0.2",
     "tap": "^16.3.2",
+    "tap-mocha-reporter": "^5.0.3",
+    "tape": "^5.6.1",
+    "tcompare": "^6.0.0",
     "tsx": "^3.12.1",
     "typescript": "^4.9.4"
   },

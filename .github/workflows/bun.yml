@@ -1,0 +1,35 @@
+name: CI (Bun)
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  run-tests:
+    name: Run CI
+    env:
+      RUNTIME: bun
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Bun
+        uses: antongolub/action-setup-bun@v1
+        with:
+          bun-version: 0.3.0
+      - name: Restore cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: node-modules-${{ hashFiles('package.json') }}
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Prepare for Bun
+        run: |
+          tests/ci/build.sh
+      - name: Run Tests
+        run: ~/.bun/bin/bun run tests/ci/non-node-ci-runner.js | node_modules/.bin/tap-mocha-reporter spec

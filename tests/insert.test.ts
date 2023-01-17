@@ -2,7 +2,7 @@ import t from "tap";
 import { create } from "../src/methods/create.js";
 import { insert, insertBatch } from "../src/methods/insert.js";
 
-t.test("insert", async t => {
+t.test("insert", t => {
   t.plan(6);
 
   t.test("should use the 'id' field found in the document", async t => {
@@ -69,15 +69,15 @@ t.test("insert", async t => {
       },
     });
 
-    try {
-      await insert(db, {
-        // @ts-expect-error error case
-        id: 123,
-        name: "John",
-      });
-    } catch (error) {
-      t.matchSnapshot(error);
-    }
+    await t.rejects(
+      () =>
+        insert(db, {
+          // @ts-expect-error error case
+          id: 123,
+          name: "John",
+        }),
+      { message: '"id" must be of type "string". Got "number" instead.' },
+    );
   });
 
   t.test("should throw an error if the 'id' field is already taken", async t => {
@@ -95,14 +95,14 @@ t.test("insert", async t => {
       name: "John",
     });
 
-    try {
-      await insert(db, {
-        id: "john-01",
-        name: "John",
-      });
-    } catch (error) {
-      t.matchSnapshot(error);
-    }
+    await t.rejects(
+      () =>
+        insert(db, {
+          id: "john-01",
+          name: "John",
+        }),
+      { message: 'Document with ID "john-01" already exists.' },
+    );
   });
 
   t.test("should take the ID field even if not specified in the schema", async t => {

@@ -13,8 +13,8 @@
 *.yaml
 *.yml
 **/datasets/*.json
+**/snapshots/*.json
 **/dist/**
-**/tap-snapshots/**
 dist
 Dockerfile
 get-imdb-dataset.mjs

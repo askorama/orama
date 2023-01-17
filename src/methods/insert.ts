@@ -114,7 +114,7 @@ export async function insertBatch<S extends PropertiesSchema>(
 
   return new Promise((resolve, reject) => {
     let i = 0;
-    async function insertBatch() {
+    async function _insertBatch() {
       const batch = docs.slice(i * batchSize, (i + 1) * batchSize);
       i++;
 
@@ -130,10 +130,10 @@ export async function insertBatch<S extends PropertiesSchema>(
         }
       }
 
-      setTimeout(insertBatch, 0);
+      setTimeout(_insertBatch, 0);
     }
 
-    setTimeout(insertBatch, 0);
+    setTimeout(_insertBatch, 0);
   });
 }
 

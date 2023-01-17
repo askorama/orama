@@ -1,6 +1,6 @@
 ![Lyra, the edge search experience](https://raw.githubusercontent.com/LyraSearch/lyra/main/misc/lyra-edge-logo.png)
 
-[![Tests](https://github.com/nearform/lyra/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/nearform/lyra/actions/workflows/tests.yml)
+[![Tests](https://github.com/LyraSearch/lyra/actions/workflows/ci.yml/badge.svg)](https://github.com/LyraSearch/lyra/actions/workflows/ci.yml)
 
 # Join Lyra's Slack channel
 
