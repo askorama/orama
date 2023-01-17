@@ -1,4 +1,4 @@
-import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params } from "../types.js";
+import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams } from "../types.js";
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
 import { find as radixFind } from "../radix-tree/radix.js";
 import { getNanosecondsTime, sortTokenScorePredicate } from "../utils.js";
@@ -52,18 +52,18 @@ export type SearchParams<S extends PropertiesSchema> = {
   /**
    * The BM25 parameters to use.
    * 
-   * k: Term frequency saturation parameter. The higher the value, the more
-   * important the term frequency becomes. The default value is 1.2.
+   * k: Term frequency saturation parameter.
+   * The higher the value, the more important the term frequency becomes.
+   * The default value is 1.2. It should be set to a value between 1.2 and 2.0.
    * 
-   * b: Document length saturation parameter. The higher the value, the more
+   * b: Document length saturation impact. The higher the value, the more
    * important the document length becomes. The default value is 0.75.
    * 
-   * d: The average document length in the collection. The default value is
-   * the average document length in the collection.
+   * d: Frequency normalization lower bound. Default value is 0.5.
    * 
    * @see https://en.wikipedia.org/wiki/Okapi_BM25
    */
-  relevance?: BM25Params;
+  relevance?: BM25OptionalParams;
 };
 
 export type SearchResult<S extends PropertiesSchema> = {
@@ -283,6 +283,6 @@ const defaultBM25Params: BM25Params = {
   d: 0.5
 }
 
-function getBM25Parameters(params: BM25Params = defaultBM25Params): BM25Params {
+function getBM25Parameters(params: BM25OptionalParams = defaultBM25Params): BM25Params {
   return Object.assign({}, defaultBM25Params, params);
 }

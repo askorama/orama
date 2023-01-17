@@ -72,6 +72,12 @@ export interface Lyra<S extends PropertiesSchema> extends Data<S> {
   fieldLengths: Record<string, Record<string, number>>;
 }
 
+export type BM25OptionalParams = {
+  k?: number;
+  b?: number;
+  d?: number;
+};
+
 export type BM25Params = {
   k: number;
   b: number;
