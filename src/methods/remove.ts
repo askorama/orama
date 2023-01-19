@@ -1,7 +1,7 @@
-import { defaultTokenizerConfig } from "../tokenizer/index.js";
-import * as ERRORS from "../errors.js";
-import { removeDocumentByWord } from "../radix-tree/radix.js";
 import type { Lyra, PropertiesSchema, ResolveSchema } from "../types.js";
+import { defaultTokenizerConfig } from "../tokenizer/index.js";
+import { removeDocumentByWord } from "../radix-tree/radix.js";
+import * as ERRORS from "../errors.js";
 
 /**
  * Removes a document from a database.
@@ -39,6 +39,8 @@ export async function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: s
         false,
         lyra.components.tokenizer!,
       )!;
+
+      // @todo remove tokens from average field length
 
       const tokensLength = tokens.length;
       for (let k = 0; k < tokensLength; k++) {
