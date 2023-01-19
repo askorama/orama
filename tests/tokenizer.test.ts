@@ -14,9 +14,10 @@ import { stemmer as NLStemmer } from "../stemmer/lib/nl.js";
 import { stemmer as DEStemmer } from "../stemmer/lib/de.js";
 import { stemmer as FIStemmer } from "../stemmer/lib/fi.js";
 import { stemmer as DKStemmer } from "../stemmer/lib/dk.js";
+import { stemmer as UKStemmer } from "../stemmer/lib/uk.js";
 
 t.test("Tokenizer", t => {
-  t.plan(13);
+  t.plan(14);
 
   t.test("Should tokenize and stem correctly in english", t => {
     t.plan(2);
@@ -362,6 +363,35 @@ t.test("Tokenizer", t => {
     t.strictSame(O1, ["sovn", "svar", "ting", "prov", "mislyk"]);
     t.strictSame(O2, ["bagt", "smakag"]);
   });
+  t.test("Should tokenize and stem correctly in ukrainian", t => {
+    t.plan(2);
+
+    const I1 = "Коли тести не проходять, спати важко";
+    const I2 = "я приготувала тістечка";
+
+    const O1 = tokenize(
+      I1,
+      "ukrainian",
+      false,
+      defaultTokenizerConfig("ukrainian", {
+        stemmingFn: UKStemmer,
+        customStopWords:[]
+
+      }),
+    );
+    const O2 = tokenize(
+      I2,
+      "ukrainian",
+      false,
+      defaultTokenizerConfig("ukrainian", {
+        stemmingFn: UKStemmer,
+        customStopWords:[]
+      }),
+    );
+    t.strictSame(O1, ["кол", "тест", "не", "проход", "спат","важк"]);
+    t.strictSame(O2, ["я", "приготувал","тістечк"]);
+  });
+
 });
 
 t.test("Custom stop-words rules", t => {
