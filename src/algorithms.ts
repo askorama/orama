@@ -83,6 +83,6 @@ export function BM25(
   BM25Params: BM25Params
 ) {
   const { k, b, d } = BM25Params;
-  const idf = Math.log((docsCount - matchingCount + 0.5) / (matchingCount + 0.5));
+  const idf = Math.log(1 + (docsCount - matchingCount + 0.5) / (matchingCount + 0.5));
   return idf * (d + tf * (k + 1)) / (tf + k * (1 - b + b * fieldLength / averageFieldLength));
 }
