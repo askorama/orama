@@ -348,3 +348,6 @@ result/
 *.pdb
 
 #!! ERROR: typescript is undefined. Use list command to see defined gitignore types !!#
+/test-results/
+/playwright-report/
+/playwright/.cache/
