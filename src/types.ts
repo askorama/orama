@@ -51,6 +51,8 @@ export type Data<S extends PropertiesSchema> = {
   schema: S;
   frequencies: FrequencyMap;
   tokenOccurrencies: TokenOccurrency;
+  avgFieldLength: Record<string, number>;
+  fieldLengths: Record<string, Record<string, number>>;
 };
 
 export type Components = {
@@ -66,7 +68,21 @@ export interface Lyra<S extends PropertiesSchema> extends Data<S> {
   components?: Components;
   frequencies: FrequencyMap;
   docsCount: number;
+  avgFieldLength: Record<string, number>;
+  fieldLengths: Record<string, Record<string, number>>;
 }
+
+export type BM25OptionalParams = {
+  k?: number;
+  b?: number;
+  d?: number;
+};
+
+export type BM25Params = {
+  k: number;
+  b: number;
+  d: number;
+};
 
 type ResolveTypes<TType> = TType extends "string"
   ? string

@@ -84,8 +84,8 @@ t.test("lyra.dataset", async t => {
 
     t.equal(Object.keys(db.docs).length, (dataset as EventJson).result.events.length);
     t.equal(s1.count, 1117);
-    t.equal(s2.count, 1842);
-    t.equal(s3.count, 1842);
+    t.equal(s2.count, 7314);
+    t.equal(s3.count, 7314);
   });
 
   //  Tests for https://github.com/LyraSearch/lyra/issues/159
@@ -107,9 +107,9 @@ t.test("lyra.dataset", async t => {
       properties: ["description"],
     });
 
-    t.equal(s1.count, 500);
-    t.equal(s2.count, 183);
-    t.equal(s3.count, 1);
+    t.equal(s1.count, 31285);
+    t.equal(s2.count, 28746);
+    t.equal(s3.count, 33644);
   });
 
   t.test("should perform paginate search", async t => {

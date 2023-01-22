@@ -183,6 +183,13 @@ function recursiveradixInsertion<S extends PropertiesSchema>(
         frequencies[propName][id] = {};
       }
 
+      if (!(propName in lyra.fieldLengths)) {
+        lyra.fieldLengths[propName] = {};
+      }
+      
+      lyra.fieldLengths[propName][id] = tokens.length;
+      lyra.avgFieldLength[propName] = ((lyra.avgFieldLength[propName] ?? 0) * (lyra.docsCount - 1) + tokens.length) / lyra.docsCount;
+
       for (const token of tokens) {
         let tokenFrequency = 0;
 

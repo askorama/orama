@@ -219,8 +219,8 @@ t.test("lyra", t => {
     const result7 = await search(db, { term: "They are the best" });
     const result8 = await search(db, { term: "Foxes are nice animals" });
 
-    t.equal(result7.count, 2);
-    t.equal(result8.count, 1);
+    t.equal(result7.count, 4);
+    t.equal(result8.count, 4);
   });
 
   t.test("should correctly search for data returning doc including with unindexed keys", async t => {
@@ -250,8 +250,8 @@ t.test("lyra", t => {
     const result1 = await search(db, { term: "They are the best" });
     const result2 = await search(db, { term: "Foxes are nice animals" });
 
-    t.equal(result1.count, 1);
-    t.equal(result2.count, 1);
+    t.equal(result1.count, 2);
+    t.equal(result2.count, 2);
     t.same(result1.hits[0].document, documentWithUnindexedField);
     t.same(result2.hits[0].document, documentWithNestedUnindexedField);
   });
@@ -330,17 +330,17 @@ t.test("lyra", t => {
     const search4 = await search(db, { term: "f", limit: 2, offset: 2 });
 
     t.equal(search1.count, 4);
-    t.equal(search1.hits[0].document.animal, "Quick brown fox");
+    t.equal(search1.hits[0].document.animal, "Fast chicken");
 
     t.equal(search2.count, 4);
-    t.equal(search2.hits[0].document.animal, "Fast chicken");
+    t.equal(search2.hits[0].document.animal, "Fabolous ducks");
 
     t.equal(search3.count, 4);
-    t.equal(search3.hits[0].document.animal, "Fabolous ducks");
+    t.equal(search3.hits[0].document.animal, "Fantastic horse");
 
     t.equal(search4.count, 4);
-    t.equal(search4.hits[0].document.animal, "Fabolous ducks");
-    t.equal(search4.hits[1].document.animal, "Fantastic horse");
+    t.equal(search4.hits[0].document.animal, "Fantastic horse");
+    t.equal(search4.hits[1].document.animal, "Quick brown fox");
   });
 
   t.test("Should throw an error when searching in non-existing indices", async t => {

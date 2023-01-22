@@ -1,8 +1,9 @@
+import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams } from "../types.js";
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
 import { find as radixFind } from "../radix-tree/radix.js";
-import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore } from "../types.js";
-import { getNanosecondsTime, insertSortedValue, sortTokenScorePredicate } from "../utils.js";
+import { getNanosecondsTime, sortTokenScorePredicate } from "../utils.js";
 import { getIndices } from "./common.js";
+import { prioritizeTokenScores, BM25 } from "../algorithms.js";
 
 type IndexMap = Record<string, TokenMap>;
 
@@ -47,6 +48,22 @@ export type SearchParams<S extends PropertiesSchema> = {
    * between the term and the searchable property.
    */
   tolerance?: number;
+
+  /**
+   * The BM25 parameters to use.
+   * 
+   * k: Term frequency saturation parameter.
+   * The higher the value, the more important the term frequency becomes.
+   * The default value is 1.2. It should be set to a value between 1.2 and 2.0.
+   * 
+   * b: Document length saturation impact. The higher the value, the more
+   * important the document length becomes. The default value is 0.75.
+   * 
+   * d: Frequency normalization lower bound. Default value is 0.5.
+   * 
+   * @see https://en.wikipedia.org/wiki/Okapi_BM25
+   */
+  relevance?: BM25OptionalParams;
 };
 
 export type SearchResult<S extends PropertiesSchema> = {
@@ -92,10 +109,10 @@ export async function search<S extends PropertiesSchema>(
     };
   }
 
+  params.relevance = getBM25Parameters(params.relevance);
+
   const { limit = 10, offset = 0, exact = false, term, properties } = params;
   const tokens = lyra.components.tokenizer!.tokenizerFn!(term, language, false, lyra.components.tokenizer!);
-  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-  const intersectTokenScores = lyra.components.algorithms?.intersectTokenScores!;
   const indices = getIndices(lyra, properties);
   const results: RetrievedDoc<S>[] = Array.from({
     length: limit,
@@ -104,7 +121,7 @@ export async function search<S extends PropertiesSchema>(
 
   const timeStart = getNanosecondsTime();
   // uniqueDocsIDs contains unique document IDs for all the tokens in all the indices.
-  const uniqueDocsIDs: Map<string, number> = new Map();
+  const uniqueDocsIDs: Record<string, number> = {};
 
   // indexMap is an object containing all the indexes considered for the current search,
   // and an array of doc IDs for each token in all the indices.
@@ -144,6 +161,8 @@ export async function search<S extends PropertiesSchema>(
   const indexesLength = indices.length;
   for (let i = 0; i < indexesLength; i++) {
     const index = indices[i];
+    const avgFieldLength = lyra.avgFieldLength[index];
+    const fieldLengths = lyra.fieldLengths[index];
 
     if (!(index in lyra.tokenOccurrencies)) continue;
 
@@ -158,46 +177,50 @@ export async function search<S extends PropertiesSchema>(
       // lyraOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
       const termOccurrencies = typeof lyraOccurrencies[term] === "number" ? lyraOccurrencies[term] ?? 0 : 0;
 
-      const orderedTFIDFList: TokenScore[] = [];
+      const scoreList: TokenScore[] = [];
 
       // Calculate TF-IDF value for each term, in each document, for each index.
       // Then insert sorted results into orderedTFIDFList.
       const documentIDsLength = documentIDs.length;
       for (let k = 0; k < documentIDsLength; k++) {
-        // idf's denominator is shifted by 1 to avoid division by zero
-        const idf = Math.log10(N / (1 + termOccurrencies));
-
         const id = documentIDs[k];
-        const tfIdf = idf * (lyraFrequencies?.[id]?.[term] ?? 0);
+        const tf = lyraFrequencies?.[id]?.[term] ?? 0;
 
-        // @todo: we're now using binary search to insert the element in the right position.
-        // Maybe we can switch to sparse array insertion?
-        insertSortedValue(orderedTFIDFList, [id, tfIdf], sortTokenScorePredicate);
+        const bm25 = BM25(
+          tf,
+          termOccurrencies,
+          N,
+          fieldLengths[id],
+          avgFieldLength,
+          params.relevance as BM25Params,
+        );
+
+        scoreList.push([id, bm25]);
       }
 
-      indexMap[index][term].push(...orderedTFIDFList);
+      indexMap[index][term].push(...scoreList);
     }
 
     const docIds = indexMap[index];
     const vals = Object.values(docIds);
-    docsIntersection[index] = intersectTokenScores(vals);
+    docsIntersection[index] = prioritizeTokenScores(vals);
+    const uniqueDocs = docsIntersection[index];
 
-    const uniqueDocs = Object.values(docsIntersection[index]);
     const uniqueDocsLength = uniqueDocs.length;
     for (let i = 0; i < uniqueDocsLength; i++) {
       const [id, tfIdfScore] = uniqueDocs[i];
 
-      if (uniqueDocsIDs.has(id)) {
-        const prevScore = uniqueDocsIDs.get(id)!;
-        uniqueDocsIDs.set(id, prevScore + tfIdfScore);
+      const prevScore = uniqueDocsIDs[id];
+      if (prevScore) {
+        uniqueDocsIDs[id] = prevScore + tfIdfScore + 0.5;
       } else {
-        uniqueDocsIDs.set(id, tfIdfScore);
+        uniqueDocsIDs[id] = tfIdfScore;
       }
     }
   }
 
   // Get unique doc IDs from uniqueDocsIDs map, sorted by value.
-  const uniqueDocsArray = Array.from(uniqueDocsIDs.entries()).sort(sortTokenScorePredicate);
+  const uniqueDocsArray = Object.entries(uniqueDocsIDs).sort(sortTokenScorePredicate);
   const resultIDs: Set<string> = new Set();
 
   // We already have the list of ALL the document IDs containing the search terms.
@@ -227,7 +250,7 @@ export async function search<S extends PropertiesSchema>(
   return {
     elapsed: getNanosecondsTime() - timeStart,
     hits,
-    count: uniqueDocsIDs.size,
+    count: Object.keys(uniqueDocsIDs).length,
   };
 }
 
@@ -251,4 +274,14 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
   }
 
   return Array.from(ids);
+}
+
+const defaultBM25Params: BM25Params = {
+  k: 1.2,
+  b: 0.75,
+  d: 0.5
+}
+
+function getBM25Parameters(params: BM25OptionalParams = defaultBM25Params): BM25Params {
+  return Object.assign({}, defaultBM25Params, params);
 }

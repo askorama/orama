@@ -8,5 +8,7 @@ export async function save<S extends PropertiesSchema>(lyra: Lyra<S>): Promise<D
     frequencies: lyra.frequencies,
     tokenOccurrencies: lyra.tokenOccurrencies,
     defaultLanguage: lyra.defaultLanguage,
+    avgFieldLength: lyra.avgFieldLength,
+    fieldLengths: lyra.fieldLengths,
   };
 }
