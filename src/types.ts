@@ -30,6 +30,10 @@ export type AlgorithmsConfig = {
   intersectTokenScores: IIntersectTokenScores;
 };
 
+export type PropertiesBoost<S extends PropertiesSchema> = {
+  [P in keyof S]?: number;
+};
+
 export type Configuration<S extends PropertiesSchema> = {
   /**
    * The structure of the document to be inserted into the database.
@@ -42,6 +46,7 @@ export type Configuration<S extends PropertiesSchema> = {
   edge?: boolean;
   hooks?: Hooks;
   components?: Components;
+  boost?: PropertiesBoost<S>;
 };
 
 export type Data<S extends PropertiesSchema> = {
@@ -69,6 +74,7 @@ export interface Lyra<S extends PropertiesSchema> extends Data<S> {
   frequencies: FrequencyMap;
   docsCount: number;
   avgFieldLength: Record<string, number>;
+  boost: PropertiesBoost<S>;
   fieldLengths: Record<string, Record<string, number>>;
 }
 

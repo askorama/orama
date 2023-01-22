@@ -203,7 +203,7 @@ export async function search<S extends PropertiesSchema>(
 
     const docIds = indexMap[index];
     const vals = Object.values(docIds);
-    docsIntersection[index] = prioritizeTokenScores(vals);
+    docsIntersection[index] = prioritizeTokenScores(vals, lyra.boost[index] ?? 0);
     const uniqueDocs = docsIntersection[index];
 
     const uniqueDocsLength = uniqueDocs.length;
