@@ -40,7 +40,8 @@ export async function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: s
         lyra.components.tokenizer!,
       )!;
 
-      // @todo remove tokens from average field length
+      lyra.avgFieldLength[key] = (lyra.avgFieldLength[key] * lyra.docsCount - lyra.fieldLengths[key][docID]) / (lyra.docsCount - 1);
+      delete lyra.fieldLengths[key][docID];
 
       const tokensLength = tokens.length;
       for (let k = 0; k < tokensLength; k++) {
