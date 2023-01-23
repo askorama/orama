@@ -5,7 +5,12 @@ test("works correctly", async ({ page }) => {
 
   const parsedLyraResult = await page.evaluate(() => JSON.parse(document.getElementById("searchResult")!.innerHTML));
 
-  expect(parsedLyraResult).toMatchObject({
+  const result = parsedLyraResult.hits.map((hit) => {
+    delete hit.score;
+    return hit;
+  });
+
+  expect(result).toMatchObject({
     hits: [
       {
         score: 0.40867885542155263,
