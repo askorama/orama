@@ -38,8 +38,6 @@ Or import it directly in a browser module:
 </html>
 ```
 
-See [builds](#builds) for details about the various builds packaged with Lyra.
-
 Read the complete documentation at
 [https://docs.lyrasearch.io/](https://docs.lyrasearch.io/).
 
@@ -88,37 +86,15 @@ await insert(db, {
 });
 ```
 
-If you have a large number of documents, we highly recommend using the
-`insertBatch` function, which prevents the event loop from blocking. This
-operation is asynchronous and returns a promise:
-
-```js
-await insertBatch(db, [
-  {
-    quote: "It is during our darkest moments that we must focus to see the light.",
-    author: "Aristotle",
-  },
-  {
-    quote: "If you really look closely, most overnight successes took a long time.",
-    author: "Steve Jobs",
-  },
-  {
-    quote: "If you are not willing to risk the usual, you will have to settle for the ordinary.",
-    author: "Jim Rohn",
-  },
-  {
-    quote: "You miss 100% of the shots you don't take",
-    author: "Wayne Gretzky - Michael Scott",
-  },
-]);
-```
-
 After the data has been inserted, you can finally start to query the database.
 
 ```js
 const searchResult = await search(db, {
   term: "if",
   properties: "*",
+  boost: {
+    author: 1.5 // optional: boost author field by x1.5
+  }
 });
 ```
 
@@ -206,23 +182,7 @@ From version 0.4.0, Lyra is packaged as ES modules, suitable for Node.js, Deno, 
 **In most cases, simply `import` or `@lyrasearch/lyra` will suffice ✨.**
 
 In Node.js, when not using ESM (with `"type": "module"` in the `package.json`), you have several ways to properly require Lyra.
-
-#### Use dynamic import (recommended)
-
-As all Lyra methods return a promise anyway, you can simply wrap all your code in an async function and then replace all `require`s with `await import`.
-
-If your Lyra 0.3.0 code was
-
-```js
-const { create, insert } = require("@lyrasearch/lyra");
-
-const db = create(/* ... */);
-insert(db, {
-  /* ... */
-});
-```
-
-then starting with version 0.4.0 it becomes:
+Starting with version 0.4.0 it becomes:
 
 ```js
 async function main() {
@@ -263,38 +223,6 @@ create(/* ... */)
 ```
 
 Note that only main methods are supported so for internals and other supported exports you still have to use `await import`.
-
-#### Use requireLyra with callbacks
-
-As of version 0.4.0, a new function called `requireLyra` can be used to require Lyra without using promises.
-
-If your Lyra 0.3.0 code was
-
-```js
-const { create, insert } = require("@lyrasearch/lyra");
-
-const db = create(/* ... */);
-insert(db, {
-  /* ... */
-});
-```
-
-then starting with version 0.4.0 it becomes:
-
-```js
-const { requireLyra } = require("@lyrasearch/lyra/cjs")
-
-requireLyra((err, lyra) => {
-  if(err) {
-    throw new Error(err)
-  }
-
-  const {create, insert} = lyra
-  create(/* ... */)
-    .then(db => insert(db, { /* ... */ })
-    .catch(console.error)
-})
-```
 
 ## Language
 
@@ -380,57 +308,9 @@ Right now, Lyra supports 24 languages and stemmers out of the box:
 - Turkish
 - Ukrainian
 
-## Hooks
+# Official Docs
 
-When dealing with asynchronous operations, hooks are an excellent mechanism to
-intercept and perform operations during the workflow. Lyra supports hooks
-natively. The `create` function allows you to specify a sequence of hooks.
-
-```js
-import { create } from "@lyrasearch/lyra";
-
-const db = await create({
-  schema: {},
-  hooks: {
-    // HERE
-  },
-});
-```
-
-**Important**: The hooks run in the same context as the main function execution.
-It means, that if your hook takes X milliseconds to resolve, the Lyra function
-will take X + Y (where Y = Lyra operation).
-
-### afterInsert hook
-
-The `afterInsert` hook is called after the insertion of a document into the
-database. The `hook` will be called with the `id` of the inserted document.
-
-Example:
-
-```js
-import { create, insertWithHooks } from "@lyrasearch/lyra";
-
-async function hook1(id: string): Promise<void> {
-  // called before hook2
-}
-
-function hook2(id: string): void {
-  // ...
-}
-
-const db = await create({
-  schema: {
-    author: "string",
-    quote: "string",
-  },
-  hooks: {
-    afterInsert: [hook1, hook2],
-  },
-});
-
-await insertWithHooks(db, { author: "test", quote: "test" });
-```
+Read the complete documentation at [https://docs.lyrasearch.io/](https://docs.lyrasearch.io/).
 
 # License
 
