@@ -1,4 +1,4 @@
-import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams } from "../types.js";
+import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams, PropertiesBoost } from "../types.js";
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
 import { find as radixFind } from "../radix-tree/radix.js";
 import { getNanosecondsTime, sortTokenScorePredicate } from "../utils.js";
@@ -48,7 +48,6 @@ export type SearchParams<S extends PropertiesSchema> = {
    * between the term and the searchable property.
    */
   tolerance?: number;
-
   /**
    * The BM25 parameters to use.
    * 
@@ -64,6 +63,25 @@ export type SearchParams<S extends PropertiesSchema> = {
    * @see https://en.wikipedia.org/wiki/Okapi_BM25
    */
   relevance?: BM25OptionalParams;
+  /**
+   * The boost to apply to the properties.
+   * 
+   * The boost is a number that is multiplied to the score of the property.
+   * It can be used to give more importance to some properties. 
+   * 
+   * @example
+   * // Give more importance to the 'title' property.
+   * const result = await search(db, {
+   *  term: 'Michael',
+   *  properties: ['title', 'author'],
+   *  boost: {
+   *   title: 2
+   *  }
+   * });
+   * 
+   * // In that case, the score of the 'title' property will be multiplied by 2.
+   */
+  boost?: PropertiesBoost<S>;
 };
 
 export type SearchResult<S extends PropertiesSchema> = {
@@ -203,7 +221,7 @@ export async function search<S extends PropertiesSchema>(
 
     const docIds = indexMap[index];
     const vals = Object.values(docIds);
-    docsIntersection[index] = prioritizeTokenScores(vals, lyra.boost[index] ?? 0);
+    docsIntersection[index] = prioritizeTokenScores(vals, params?.boost?.[index] ?? 1);
     const uniqueDocs = docsIntersection[index];
 
     const uniqueDocsLength = uniqueDocs.length;

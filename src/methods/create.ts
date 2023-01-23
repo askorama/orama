@@ -40,7 +40,6 @@ export async function create<S extends PropertiesSchema>(properties: Configurati
     tokenOccurrencies: {},
     avgFieldLength: {},
     fieldLengths: {},
-    boost: properties.boost ?? {},
     components: {
       tokenizer,
       algorithms: {
