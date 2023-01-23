@@ -1,7 +1,7 @@
+import type { Configuration, Lyra, PropertiesSchema } from "../types.js";
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
 import * as ERRORS from "../errors.js";
 import { create as createNode } from "../radix-tree/node.js";
-import type { Configuration, Lyra, PropertiesSchema } from "../types.js";
 import { validateHooks } from "./hooks.js";
 import { intersectTokenScores } from "../algorithms.js";
 

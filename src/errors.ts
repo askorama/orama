@@ -75,3 +75,7 @@ export function INVALID_STEMMER_FUNCTION_TYPE(): string {
 export function INVALID_TOKENIZER_FUNCTION(): string {
   return `tokenizer.tokenizerFn must be a function.`;
 }
+
+export function INVALID_BOOST_VALUE(): string {
+  return `Boost value must be a number greater than, or less than 0.`;
+}
