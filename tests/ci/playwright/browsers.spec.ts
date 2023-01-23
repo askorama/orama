@@ -8,7 +8,7 @@ test("works correctly", async ({ page }) => {
   expect(parsedLyraResult).toMatchObject({
     hits: [
       {
-        score: 0,
+        score: 0.4086788554215527,
         document: {
           title: "The prestige",
           director: "Christopher Nolan",
