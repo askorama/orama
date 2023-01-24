@@ -34,6 +34,8 @@ export type PropertiesBoost<S extends PropertiesSchema> = {
   [P in keyof S]?: number;
 };
 
+export type FacetsConfig<S extends PropertiesSchema> = SearchProperties<S>[];
+
 export type Configuration<S extends PropertiesSchema> = {
   /**
    * The structure of the document to be inserted into the database.
@@ -46,6 +48,7 @@ export type Configuration<S extends PropertiesSchema> = {
   edge?: boolean;
   hooks?: Hooks;
   components?: Components;
+  facets?: FacetsConfig<S>;
 };
 
 export type Data<S extends PropertiesSchema> = {
@@ -69,6 +72,7 @@ export interface Lyra<S extends PropertiesSchema> extends Data<S> {
   schema: S;
   edge: boolean;
   hooks: Hooks;
+  facets: FacetsConfig<S>;
   components?: Components;
   frequencies: FrequencyMap;
   docsCount: number;
