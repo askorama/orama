@@ -1,9 +1,10 @@
-import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams, PropertiesBoost } from "../types.js";
+import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams, PropertiesBoost, FacetsSearch } from "../types.js";
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
 import { find as radixFind } from "../radix-tree/radix.js";
 import { getNanosecondsTime, sortTokenScorePredicate } from "../utils.js";
 import { getIndices } from "./common.js";
 import { prioritizeTokenScores, BM25 } from "../algorithms.js";
+import { populateFacets } from "../facets.js";
 
 type IndexMap = Record<string, TokenMap>;
 
@@ -82,6 +83,27 @@ export type SearchParams<S extends PropertiesSchema> = {
    * // In that case, the score of the 'title' property will be multiplied by 2.
    */
   boost?: PropertiesBoost<S>;
+  /**
+   * Facets configuration
+   * 
+   * A facet is a feature that allows users to narrow down their search results by specific
+   * attributes or characteristics, such as category, price, or location.
+   * This can help users find more relevant and specific results for their search query.
+   * 
+   * @example
+   * 
+   * const results = await search(db, {
+   *  term: 'Personal Computer',
+   *  properties: ['title', 'description', 'category.primary', 'category.secondary'],
+   *  facets: {
+   *    'category.primary': {
+   *      size: 10,
+   *      sort: 'ASC',
+   *    }
+   *  }
+   * });
+   */
+  facets?: FacetsSearch<S>;
 };
 
 export type SearchResult<S extends PropertiesSchema> = {
@@ -97,6 +119,10 @@ export type SearchResult<S extends PropertiesSchema> = {
    * The time taken to search.
    */
   elapsed: bigint;
+  /**
+   * The facets results.
+   */
+  facets?: Record<string, Record<string, number>>;
 };
 
 /**
@@ -129,6 +155,9 @@ export async function search<S extends PropertiesSchema>(
 
   params.relevance = getBM25Parameters(params.relevance);
 
+  const facets = {};
+
+  const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0;
   const { limit = 10, offset = 0, exact = false, term, properties } = params;
   const tokens = lyra.components.tokenizer!.tokenizerFn!(term, language, false, lyra.components.tokenizer!);
   const indices = getIndices(lyra, properties);
@@ -241,6 +270,10 @@ export async function search<S extends PropertiesSchema>(
   const uniqueDocsArray = Object.entries(uniqueDocsIDs).sort(sortTokenScorePredicate);
   const resultIDs: Set<string> = new Set();
 
+  if (shouldCalculateFacets) {
+    await populateFacets(lyra.docs, facets, uniqueDocsArray, params.facets!);
+  }
+
   // We already have the list of ALL the document IDs containing the search terms.
   // We loop over them starting from a positional value "offset" and ending at "offset + limit"
   // to provide pagination capabilities to the search.
@@ -269,6 +302,7 @@ export async function search<S extends PropertiesSchema>(
     elapsed: getNanosecondsTime() - timeStart,
     hits,
     count: Object.keys(uniqueDocsIDs).length,
+    facets
   };
 }
 
