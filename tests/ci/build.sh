@@ -13,7 +13,7 @@ fi
 # Build source code
 /bin/rm -rf dist
 swc  --delete-dir-on-start -d dist/src src -C sourceMaps=false
-swc  --delete-dir-on-start -d dist/tests tests -C sourceMaps=false -C exclude="tests/ci"
+swc  --delete-dir-on-start -d dist/tests tests -C sourceMaps=false -C exclude="tests/(ci|smoke)"
 rg 'from "tap"' dist -l | xargs -I % -- sed -e 's#import t from "tap"#const t = globalThis.t#' -i'' -- %
 
 # Copy stemmer
