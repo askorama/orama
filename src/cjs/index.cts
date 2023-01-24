@@ -22,9 +22,6 @@ export interface LyraExport {
 
 export type RequireCallback = (err: Error | undefined, lyra?: LyraExport) => void;
 
-// This is needed in order not to have transpilation turn this into a require
-const importDynamic = new Function("modulePath", "return import(modulePath)");
-
 let _esmCreate: typeof esmCreate;
 let _esmInsert: typeof esmInsert;
 let _esmInsertWithHooks: typeof esmInsertWithHooks;
@@ -36,7 +33,7 @@ let _esmLoad: typeof esmLoad;
 
 export async function create(...args: Parameters<typeof esmCreate>): ReturnType<typeof esmCreate> {
   if (!_esmCreate) {
-    const imported = await importDynamic("../methods/create.js");
+    const imported = await import("../methods/create.js");
     _esmCreate = imported.create;
   }
 
@@ -45,7 +42,7 @@ export async function create(...args: Parameters<typeof esmCreate>): ReturnType<
 
 export async function insert(...args: Parameters<typeof esmInsert>): ReturnType<typeof esmInsert> {
   if (!_esmInsert) {
-    const imported = await importDynamic("../methods/insert.js");
+    const imported = await import("../methods/insert.js");
     _esmInsert = imported.insert;
   }
 
@@ -56,7 +53,7 @@ export async function insertWithHooks(
   ...args: Parameters<typeof esmInsertWithHooks>
 ): ReturnType<typeof esmInsertWithHooks> {
   if (!_esmInsertWithHooks) {
-    const imported = await importDynamic("../methods/insert.js");
+    const imported = await import("../methods/insert.js");
     _esmInsertWithHooks = imported.insertWithHooks;
   }
 
@@ -65,7 +62,7 @@ export async function insertWithHooks(
 
 export async function insertBatch(...args: Parameters<typeof esmInsertBatch>): ReturnType<typeof esmInsertBatch> {
   if (!_esmInsertBatch) {
-    const imported = await importDynamic("../methods/insert.js");
+    const imported = await import("../methods/insert.js");
     _esmInsertBatch = imported.insertBatch;
   }
 
@@ -74,7 +71,7 @@ export async function insertBatch(...args: Parameters<typeof esmInsertBatch>): R
 
 export async function remove(...args: Parameters<typeof esmRemove>): ReturnType<typeof esmRemove> {
   if (!_esmRemove) {
-    const imported = await importDynamic("../methods/remove.js");
+    const imported = await import("../methods/remove.js");
     _esmRemove = imported.remove;
   }
 
@@ -83,7 +80,7 @@ export async function remove(...args: Parameters<typeof esmRemove>): ReturnType<
 
 export async function search(...args: Parameters<typeof esmSearch>): ReturnType<typeof esmSearch> {
   if (!_esmSearch) {
-    const imported = await importDynamic("../methods/search.js");
+    const imported = await import("../methods/search.js");
     _esmSearch = imported.search;
   }
 
@@ -92,7 +89,7 @@ export async function search(...args: Parameters<typeof esmSearch>): ReturnType<
 
 export async function save(...args: Parameters<typeof esmSave>): ReturnType<typeof esmSave> {
   if (!_esmSave) {
-    const imported = await importDynamic("../methods/save.js");
+    const imported = await import("../methods/save.js");
     _esmSave = imported.save;
   }
 
@@ -101,7 +98,7 @@ export async function save(...args: Parameters<typeof esmSave>): ReturnType<type
 
 export async function load(...args: Parameters<typeof esmLoad>): ReturnType<typeof esmLoad> {
   if (!_esmLoad) {
-    const imported = await importDynamic("../methods/load.js");
+    const imported = await import("../methods/load.js");
     _esmLoad = imported.load;
   }
 
@@ -109,7 +106,7 @@ export async function load(...args: Parameters<typeof esmLoad>): ReturnType<type
 }
 
 export function requireLyra(callback: RequireCallback): void {
-  importDynamic("../lyra.js")
+  import("../index.js")
     .then((loaded: LyraExport) => setTimeout(() => callback(undefined, loaded), 1))
     .catch((error: Error) => setTimeout(() => callback(error), 1));
 }

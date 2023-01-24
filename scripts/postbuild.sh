@@ -16,6 +16,8 @@ cp -a stemmer/lib dist/stemmer
 swc --delete-dir-on-start --extensions .js -d dist/cjs/stemmer/ stemmer/lib --no-swcrc -C module.type="commonjs"
 mv dist/cjs/stemmer/lib/* dist/cjs/stemmer
 rm -rf dist/cjs/stemmer/lib
-cp -a stemmer/lib/*.d.ts dist/cjs/stemmer 
+cp -a stemmer/lib/*.d.ts dist/cjs/stemmer
 fd . -e js dist/cjs/ -x mv {} {.}.cjs
 fd . -e ts dist/cjs/ -x mv {} {.}.cts
+mv dist/cjs/index.js.map dist/cjs/index.cjs.map
+mv dist/cjs/internals.js.map dist/cjs/internals.cjs.map

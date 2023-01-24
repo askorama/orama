@@ -26,6 +26,7 @@
     "test": ".*\\.cts$",
     "module": {
       "type": "commonjs"
+      "ignoreDynamic": true
     },
     "env": {
       "targets": "node >= 16"
@@ -45,6 +46,7 @@
       "paths": {
         "@stemmer/*": ["./src/stemmer/*"]
       }
-    }
+    },
+    "sourceMaps": true
   }
 ]
