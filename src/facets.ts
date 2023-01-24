@@ -26,16 +26,38 @@ export async function populateFacets<S extends PropertiesSchema>(docs: Record<st
     const doc = allDocs[i];
     for (const facet of facetKeys) {
       const facetValue = doc![facet];
+
+      // String based facets
       if (typeof facetValue === "string") {
         if (facets[facet].values[facetValue] === undefined) {
           facets[facet].values[facetValue] = 1;
         } else {
           facets[facet].values[facetValue]++;
         }
+
+      // Boolean facets
+      } else if (typeof facetValue === "boolean") {
+        if (facets[facet].values[facetValue.toString()] === undefined) {
+          facets[facet].values[facetValue.toString()] = 1;
+        } else {
+          facets[facet].values[facetValue.toString()]++;
+        }
+      }
+
+      // Range facets based on numbers
+      else if (typeof facetValue === "number") {
+        for (const range of (facetsConfig as any)[facet].ranges) {
+          if (facetValue >= range.from && facetValue <= range.to) {
+            if (facets[facet].values[`${range.from}-${range.to}`] === undefined) {
+              facets[facet].values[`${range.from}-${range.to}`] = 1;
+            } else {
+              facets[facet].values[`${range.from}-${range.to}`]++;
+            }
+          }
+        }
       }
     }
   }
-
 
   for (const facet of facetKeys) {
     facets[facet].count = Object.keys(facets[facet].values).length;
@@ -49,7 +71,7 @@ export async function populateFacets<S extends PropertiesSchema>(docs: Record<st
   return facets;
 }
 
-function sortingPredicate(order: FacetSorting = "ASC", a: [string, number], b: [string, number]) {
+function sortingPredicate(order: FacetSorting = "asc", a: [string, number], b: [string, number]) {
   if (order.toLowerCase() === "asc") {
     return b[1] - a[1];
   } else {
