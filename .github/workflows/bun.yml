@@ -16,7 +16,7 @@ jobs:
       - name: Use Bun
         uses: antongolub/action-setup-bun@v1
         with:
-          bun-version: 0.3.0
+          bun-version: 0.5.0
       - name: Restore cached dependencies
         uses: actions/cache@v3
         with:
