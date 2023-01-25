@@ -113,7 +113,6 @@
     "husky": "^8.0.2",
     "lint-staged": "^13.1.0",
     "prettier": "^2.8.1",
-    "rimraf": "^3.0.2",
     "tap": "^16.3.2",
     "tap-mocha-reporter": "^5.0.3",
     "tape": "^5.6.1",
