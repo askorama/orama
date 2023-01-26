@@ -268,7 +268,7 @@ export async function search<S extends PropertiesSchema>(
   const uniqueDocsArray = Object.entries(uniqueDocsIDs).sort(sortTokenScorePredicate);
   const resultIDs: Set<string> = new Set();
   // Populate facets if needed
-  const facets = shouldCalculateFacets ? getFacets(lyra.docs, uniqueDocsArray, params.facets!) : {};
+  const facets = shouldCalculateFacets ? getFacets(lyra.schema, lyra.docs, uniqueDocsArray, params.facets!) : {};
 
   // We already have the list of ALL the document IDs containing the search terms.
   // We loop over them starting from a positional value "offset" and ending at "offset + limit"

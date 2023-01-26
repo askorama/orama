@@ -38,12 +38,23 @@ type FacetTypeInterfaces = {
   };
 }
 
+export type NestedValue<
+  S extends PropertiesSchema,
+  T extends SearchProperties<S> = SearchProperties<S>,
+> = T extends keyof S
+  ? S[T] extends PropertyType
+    ? S[T]
+    : never
+  : T extends `${infer K}.${string}`
+  ? K extends keyof S
+    ? S[K] extends PropertiesSchema
+      ? NestedValue<S[K]>
+      : never
+    : never
+  : never;
+
 export type FacetsSearch<S extends PropertiesSchema> = {
-  // This is giving the following error:
-  // Type 'S[P]' cannot be used to index type 'FacetTypeInterfaces'.
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore ignoring just for committing.
-  [P in FacetsConfig<S>[number]]?: FacetTypeInterfaces[S[P]];
+  [P in FacetsConfig<S>[number]]?: FacetTypeInterfaces[NestedValue<S>];
 };
 
 export type FacetsConfig<S extends PropertiesSchema> = SearchProperties<S>[];
