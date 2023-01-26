@@ -22,17 +22,31 @@ export type SearchProperties<
 
 export type FacetSorting = "asc" | "desc" | "ASC" | "DESC";
 
-export type ValuesOf<T extends any[]>= T[number];
-
-
-export type FacetsSearch<S extends PropertiesSchema> = {
-  [K in FacetsConfig<S>[number]]?: {
+type FacetTypeInterfaces = {
+  string: {
     limit?: number;
     offset?: number;
     sort?: FacetSorting;
-    ranges?: {from: number, to: number}[]
-  }
+  };
+  number: {
+    ranges: {from: number, to: number}[]
+    sort?: FacetSorting;
+  };
+  boolean: {
+    true?: boolean;
+    false?: boolean;
+  };
 }
+
+export type FacetsSearch<S extends PropertiesSchema> = {
+  // This is giving the following error:
+  // Type 'S[P]' cannot be used to index type 'FacetTypeInterfaces'.
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore ignoring just for committing.
+  [P in FacetsConfig<S>[number]]?: FacetTypeInterfaces[S[P]];
+};
+
+export type FacetsConfig<S extends PropertiesSchema> = SearchProperties<S>[];
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -47,8 +61,6 @@ export type AlgorithmsConfig = {
 export type PropertiesBoost<S extends PropertiesSchema> = {
   [P in keyof S]?: number;
 };
-
-export type FacetsConfig<S extends PropertiesSchema> = SearchProperties<S>[];
 
 export type Configuration<S extends PropertiesSchema> = {
   /**
