@@ -30,7 +30,6 @@ type FacetTypeInterfaces = {
   };
   number: {
     ranges: {from: number, to: number}[]
-    sort?: FacetSorting;
   };
   boolean: {
     true?: boolean;
