@@ -9,7 +9,8 @@ export type FacetReturningValue = {
   }
 }
 
-export async function populateFacets<S extends PropertiesSchema>(docs: Record<string, ResolveSchema<S> | undefined>, facets: FacetReturningValue, results: TokenScore[], facetsConfig: FacetsSearch<S>): Promise<FacetReturningValue> {
+export function getFacets<S extends PropertiesSchema>(docs: Record<string, ResolveSchema<S> | undefined>, results: TokenScore[], facetsConfig: FacetsSearch<S>): FacetReturningValue {
+  const facets: FacetReturningValue = {};
   const allIDs = results.map(([id]) => id);
   const allDocs = allIDs.map((id) => docs[id]);
   const facetKeys = Object.keys(facetsConfig);
@@ -64,7 +65,7 @@ export async function populateFacets<S extends PropertiesSchema>(docs: Record<st
     facets[facet].values = Object.fromEntries(
       Object.entries(facets[facet].values)
         .sort((a, b) => sortingPredicate((facetsConfig as any)[facet].sort, a, b))
-        .slice(0, (facetsConfig as any)[facet].size ?? 10),
+        .slice((facetsConfig as any)[facet].offset ?? 0, (facetsConfig as any)[facet].limit ?? 10),
     )
   }
 

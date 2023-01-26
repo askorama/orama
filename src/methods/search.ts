@@ -4,7 +4,7 @@ import { find as radixFind } from "../radix-tree/radix.js";
 import { getNanosecondsTime, sortTokenScorePredicate } from "../utils.js";
 import { getIndices } from "./common.js";
 import { prioritizeTokenScores, BM25 } from "../algorithms.js";
-import { populateFacets } from "../facets.js";
+import { FacetReturningValue, getFacets } from "../facets.js";
 
 type IndexMap = Record<string, TokenMap>;
 
@@ -122,7 +122,7 @@ export type SearchResult<S extends PropertiesSchema> = {
   /**
    * The facets results.
    */
-  facets?: Record<string, Record<string, number>>;
+  facets?: FacetReturningValue;
 };
 
 /**
@@ -154,8 +154,6 @@ export async function search<S extends PropertiesSchema>(
   }
 
   params.relevance = getBM25Parameters(params.relevance);
-
-  const facets = {};
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0;
   const { limit = 10, offset = 0, exact = false, term, properties } = params;
@@ -269,10 +267,8 @@ export async function search<S extends PropertiesSchema>(
   // Get unique doc IDs from uniqueDocsIDs map, sorted by value.
   const uniqueDocsArray = Object.entries(uniqueDocsIDs).sort(sortTokenScorePredicate);
   const resultIDs: Set<string> = new Set();
-
-  if (shouldCalculateFacets) {
-    await populateFacets(lyra.docs, facets, uniqueDocsArray, params.facets!);
-  }
+  // Populate facets if needed
+  const facets = shouldCalculateFacets ? getFacets(lyra.docs, uniqueDocsArray, params.facets!) : {};
 
   // We already have the list of ALL the document IDs containing the search terms.
   // We loop over them starting from a positional value "offset" and ending at "offset + limit"
@@ -296,14 +292,17 @@ export async function search<S extends PropertiesSchema>(
     }
   }
 
-  const hits = results.filter(Boolean);
-
-  return {
+  const searchResult: SearchResult<S> = {
     elapsed: getNanosecondsTime() - timeStart,
-    hits,
+    hits: results.filter(Boolean),
     count: Object.keys(uniqueDocsIDs).length,
-    facets
   };
+
+  if (shouldCalculateFacets) {
+    searchResult.facets = facets;
+  }
+
+  return searchResult;
 }
 
 function getDocumentIDsFromSearch<S extends PropertiesSchema>(

@@ -27,7 +27,8 @@ export type ValuesOf<T extends any[]>= T[number];
 
 export type FacetsSearch<S extends PropertiesSchema> = {
   [K in FacetsConfig<S>[number]]?: {
-    size?: number;
+    limit?: number;
+    offset?: number;
     sort?: FacetSorting;
     ranges?: {from: number, to: number}[]
   }
