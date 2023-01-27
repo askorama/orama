@@ -59,6 +59,10 @@ export type PropertiesBoost<S extends PropertiesSchema> = {
   [P in keyof S]?: number;
 };
 
+export type ElaspedConfig = {
+  format?: "human" | "raw",
+}
+
 export type Configuration<S extends PropertiesSchema> = {
   /**
    * The structure of the document to be inserted into the database.
@@ -85,6 +89,7 @@ export type Data<S extends PropertiesSchema> = {
 };
 
 export type Components = {
+  elapsed?: ElaspedConfig;
   tokenizer?: TokenizerConfig;
   algorithms?: AlgorithmsConfig;
 };

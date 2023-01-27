@@ -41,6 +41,7 @@ export async function create<S extends PropertiesSchema>(properties: Configurati
     avgFieldLength: {},
     fieldLengths: {},
     components: {
+      elapsed: properties.components?.elapsed ?? {},
       tokenizer,
       algorithms: {
         intersectTokenScores: properties.components?.algorithms?.intersectTokenScores ?? intersectTokenScores,

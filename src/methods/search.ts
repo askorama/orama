@@ -1,7 +1,7 @@
 import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams, PropertiesBoost, FacetsSearch } from "../types.js";
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
 import { find as radixFind } from "../radix-tree/radix.js";
-import { getNanosecondsTime, sortTokenScorePredicate } from "../utils.js";
+import { formatNanoseconds, getNanosecondsTime, sortTokenScorePredicate } from "../utils.js";
 import { getIndices } from "./common.js";
 import { prioritizeTokenScores, BM25 } from "../algorithms.js";
 import { FacetReturningValue, getFacets } from "../facets.js";
@@ -118,7 +118,7 @@ export type SearchResult<S extends PropertiesSchema> = {
   /**
    * The time taken to search.
    */
-  elapsed: bigint;
+  elapsed: bigint | string;
   /**
    * The facets results.
    */
@@ -297,8 +297,14 @@ export async function search<S extends PropertiesSchema>(
     }
   }
 
+  let elapsed: bigint | string = getNanosecondsTime() - timeStart;
+
+  if (lyra.components.elapsed?.format === "human") {
+    elapsed = formatNanoseconds(elapsed);
+  }
+
   const searchResult: SearchResult<S> = {
-    elapsed: getNanosecondsTime() - timeStart,
+    elapsed,
     hits: results.filter(Boolean),
     count: Object.keys(uniqueDocsIDs).length,
   };
