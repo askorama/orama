@@ -100,3 +100,10 @@ export function insertSortedValue(
 export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
   return b[1] - a[1];
 }
+
+export function getNested<T = unknown>(
+  obj: Record<string, unknown>,
+  path: string
+): T | undefined {
+  return new Function('_', 'return _.' + path)(obj);
+}

@@ -1,9 +1,10 @@
-import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams, PropertiesBoost } from "../types.js";
+import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams, PropertiesBoost, FacetsSearch } from "../types.js";
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
 import { find as radixFind } from "../radix-tree/radix.js";
 import { getNanosecondsTime, sortTokenScorePredicate } from "../utils.js";
 import { getIndices } from "./common.js";
 import { prioritizeTokenScores, BM25 } from "../algorithms.js";
+import { FacetReturningValue, getFacets } from "../facets.js";
 
 type IndexMap = Record<string, TokenMap>;
 
@@ -82,6 +83,27 @@ export type SearchParams<S extends PropertiesSchema> = {
    * // In that case, the score of the 'title' property will be multiplied by 2.
    */
   boost?: PropertiesBoost<S>;
+  /**
+   * Facets configuration
+   * 
+   * A facet is a feature that allows users to narrow down their search results by specific
+   * attributes or characteristics, such as category, price, or location.
+   * This can help users find more relevant and specific results for their search query.
+   * 
+   * @example
+   * 
+   * const results = await search(db, {
+   *  term: 'Personal Computer',
+   *  properties: ['title', 'description', 'category.primary', 'category.secondary'],
+   *  facets: {
+   *    'category.primary': {
+   *      size: 10,
+   *      sort: 'ASC',
+   *    }
+   *  }
+   * });
+   */
+  facets?: FacetsSearch<S>;
 };
 
 export type SearchResult<S extends PropertiesSchema> = {
@@ -97,6 +119,10 @@ export type SearchResult<S extends PropertiesSchema> = {
    * The time taken to search.
    */
   elapsed: bigint;
+  /**
+   * The facets results.
+   */
+  facets?: FacetReturningValue;
 };
 
 /**
@@ -129,6 +155,7 @@ export async function search<S extends PropertiesSchema>(
 
   params.relevance = getBM25Parameters(params.relevance);
 
+  const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0;
   const { limit = 10, offset = 0, exact = false, term, properties } = params;
   const tokens = lyra.components.tokenizer!.tokenizerFn!(term, language, false, lyra.components.tokenizer!);
   const indices = getIndices(lyra, properties);
@@ -190,6 +217,11 @@ export async function search<S extends PropertiesSchema>(
     const tokensLength = tokens.length;
     for (let j = 0; j < tokensLength; j++) {
       const term = tokens[j];
+
+      // Here we get a TypeScript error: Type instantiation is excessively deep and possibly infinite.
+      // Type definition is correct, but TypeScript is not able to infer the type recursively.
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
 
       // lyraOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
@@ -240,6 +272,8 @@ export async function search<S extends PropertiesSchema>(
   // Get unique doc IDs from uniqueDocsIDs map, sorted by value.
   const uniqueDocsArray = Object.entries(uniqueDocsIDs).sort(sortTokenScorePredicate);
   const resultIDs: Set<string> = new Set();
+  // Populate facets if needed
+  const facets = shouldCalculateFacets ? getFacets(lyra.schema, lyra.docs, uniqueDocsArray, params.facets!) : {};
 
   // We already have the list of ALL the document IDs containing the search terms.
   // We loop over them starting from a positional value "offset" and ending at "offset + limit"
@@ -263,13 +297,17 @@ export async function search<S extends PropertiesSchema>(
     }
   }
 
-  const hits = results.filter(Boolean);
-
-  return {
+  const searchResult: SearchResult<S> = {
     elapsed: getNanosecondsTime() - timeStart,
-    hits,
+    hits: results.filter(Boolean),
     count: Object.keys(uniqueDocsIDs).length,
   };
+
+  if (shouldCalculateFacets) {
+    searchResult.facets = facets;
+  }
+
+  return searchResult;
 }
 
 function getDocumentIDsFromSearch<S extends PropertiesSchema>(
