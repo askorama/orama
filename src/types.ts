@@ -37,24 +37,13 @@ type FacetTypeInterfaces = {
   };
 }
 
-export type NestedValue<
-  S extends PropertiesSchema,
-  T extends SearchProperties<S> = SearchProperties<S>,
-> = T extends keyof S
-  ? S[T] extends PropertyType
-    ? S[T]
-    : never
-  : T extends `${infer K}.${string}`
-  ? K extends keyof S
-    ? S[K] extends PropertiesSchema
-      ? NestedValue<S[K]>
+export type FacetsSearch<S extends PropertiesSchema, P extends string = "", K extends keyof S = keyof S> = K extends string
+  ? S[K] extends PropertiesSchema
+    ? FacetsSearch<S[K], `${P}${K}.`>
+    : S[K] extends PropertyType
+      ? { [key in `${P}${K}`]?: FacetTypeInterfaces[S[K]] }
       : never
-    : never
   : never;
-
-export type FacetsSearch<S extends PropertiesSchema> = {
-  [P in SearchProperties<S>[number]]?: FacetTypeInterfaces[NestedValue<S>];
-};
 
 export type PropertyType = "string" | "number" | "boolean";
 

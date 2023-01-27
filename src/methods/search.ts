@@ -217,6 +217,11 @@ export async function search<S extends PropertiesSchema>(
     const tokensLength = tokens.length;
     for (let j = 0; j < tokensLength; j++) {
       const term = tokens[j];
+
+      // Here we get a TypeScript error: Type instantiation is excessively deep and possibly infinite.
+      // Type definition is correct, but TypeScript is not able to infer the type recursively.
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const documentIDs = getDocumentIDsFromSearch(lyra, { ...params, index, term, exact });
 
       // lyraOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
