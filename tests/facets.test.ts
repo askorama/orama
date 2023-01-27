@@ -15,12 +15,7 @@ t.test("facets", (t) => {
           tag: "string",
           isFavorite: "boolean",
         }
-      },
-      facets: [
-        "author",
-        "meta.tag",
-        "meta.isFavorite"
-      ]
+      }
     });
 
     await insert(db, {
@@ -104,11 +99,7 @@ t.test("facets", (t) => {
         name: "string",
         price: "number",
         category: "string"
-      },
-      facets: [
-        "price",
-        "name"
-      ]
+      }
     });
 
     await insert(db, {

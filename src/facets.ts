@@ -1,4 +1,4 @@
-import type { FacetSorting, FacetsSearch, PropertiesSchema, ResolveSchema, TokenScore } from "./types.d.ts";
+import type { FacetSorting, FacetsSearch, PropertiesSchema, ResolveSchema, TokenScore } from "./types.js";
 import { getNested } from './utils.js';
 
 export type FacetReturningValue = {
@@ -20,14 +20,8 @@ export function getFacets<S extends PropertiesSchema>(schema: PropertiesSchema, 
     const facetType = getFacetType(schema, facet);
     let values = {};
 
-    if (facetType === "boolean") {
-      values = {
-        true: 0,
-        false: 0,
-      }
-    
     // Hack to guarantee the same order of ranges as specified by the user
-    } else if (facetType === "number") {
+    if (facetType === "number") {
       const { ranges } = (facetsConfig as any)[facet];
       const tmp = [];
       for (const range of ranges) {

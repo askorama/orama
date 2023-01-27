@@ -53,10 +53,8 @@ export type NestedValue<
   : never;
 
 export type FacetsSearch<S extends PropertiesSchema> = {
-  [P in FacetsConfig<S>[number]]?: FacetTypeInterfaces[NestedValue<S>];
+  [P in SearchProperties<S>[number]]?: FacetTypeInterfaces[NestedValue<S>];
 };
-
-export type FacetsConfig<S extends PropertiesSchema> = SearchProperties<S>[];
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -84,7 +82,6 @@ export type Configuration<S extends PropertiesSchema> = {
   edge?: boolean;
   hooks?: Hooks;
   components?: Components;
-  facets?: FacetsConfig<S>;
 };
 
 export type Data<S extends PropertiesSchema> = {
@@ -108,7 +105,6 @@ export interface Lyra<S extends PropertiesSchema> extends Data<S> {
   schema: S;
   edge: boolean;
   hooks: Hooks;
-  facets: FacetsConfig<S>;
   components?: Components;
   frequencies: FrequencyMap;
   docsCount: number;
