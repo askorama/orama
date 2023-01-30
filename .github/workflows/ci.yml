@@ -25,7 +25,7 @@ jobs:
         with:
           version: latest
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
       - name: Install Playwright Browsers
         run: pnpm dlx playwright install --with-deps
       - name: Run Tests
