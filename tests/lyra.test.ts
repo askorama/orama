@@ -969,3 +969,60 @@ t.test("should search numbers in supported languages", async t => {
 
   t.end();
 });
+
+//  Tests for https://github.com/LyraSearch/lyra/issues/230
+t.test("should correctly search accented words in Italian", async t => {
+  const db = await create({
+    schema: {
+      description: "string",
+    },
+    defaultLanguage: "italian",
+  });
+
+  await insert(db, {
+    description: "Il mio nome è Josè",
+  });
+
+  const searchResult = await search(db, {
+    term: "jose",
+  });
+  t.equal(searchResult.count, 1);
+});
+
+//  Tests for https://github.com/LyraSearch/lyra/issues/230
+t.test("should correctly search accented words in English", async t => {
+  const db = await create({
+    schema: {
+      description: "string",
+    },
+    defaultLanguage: "english",
+  });
+
+  await insert(db, {
+    description: "My name is Josè",
+  });
+
+  const searchResult = await search(db, {
+    term: "jose",
+  });
+  t.equal(searchResult.count, 1);
+});
+
+//  Tests for https://github.com/LyraSearch/lyra/issues/230
+t.test("should correctly search accented words in Dutch", async t => {
+  const db = await create({
+    schema: {
+      description: "string",
+    },
+    defaultLanguage: "dutch",
+  });
+
+  await insert(db, {
+    description: "Mein Name ist Josè",
+  });
+
+  const searchResult = await search(db, {
+    term: "jose",
+  });
+  t.equal(searchResult.count, 1);
+});
