@@ -1,4 +1,5 @@
 name: Release
+
 on:
   workflow_dispatch:
     inputs:
@@ -11,12 +12,32 @@ on:
           - patch
           - minor
           - major
+          - prerelease
+          - prepatch
+          - preminor
+          - premajor
       tag:
         description: "The npm tag"
         required: false
         default: "latest"
+      commit-message:
+        description: "The commit message template"
+        required: false
+        default: "chore: Release {version}"
+      prerelease:
+        description: "The prelease prefix"
+        required: false
+        default: "beta"
+        type: choice
+        options:
+          - alpha
+          - beta
+          - rc
   pull_request:
     types: [closed]
+    branches:
+      - main
+      - "release/**"
 
 jobs:
   release:
@@ -38,15 +59,16 @@ jobs:
         uses: pnpm/action-setup@v2
         with:
           version: latest
-      - name: Create release
-        uses: nearform/optic-release-automation-action@v3
+      - name: Release
+        uses: nearform/optic-release-automation-action@v4
         with:
           npm-token: ${{ secrets[format('NPM_TOKEN_{0}', github.actor)] || secrets.NPM_TOKEN }}
           optic-token: ${{ secrets[format('OPTIC_TOKEN_{0}', github.actor)] || secrets.OPTIC_TOKEN }}
+          commit-message: ${{ github.event.inputs.commit-message }}
           semver: ${{ github.event.inputs.semver }}
           npm-tag: ${{ github.event.inputs.tag }}
-          commit-message: "chore: release {version}"
-          version-prefix: ""
+          prerelease-prefix: ${{ github.event.inputs.prerelease }}
+          version-prefix: "v"
           build-command: |
             pnpm install
             pnpm run build
