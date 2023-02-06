@@ -1,8 +1,8 @@
 import t from "tap";
-import { formatBytes, formatNanoseconds, getOwnProperty } from "../src/utils.js";
+import { formatBytes, formatNanoseconds, getOwnProperty, getNested } from "../src/utils.js";
 
 t.test("utils", t => {
-  t.plan(3);
+  t.plan(4);
 
   t.test("should correctly format bytes", t => {
     t.plan(9);
@@ -45,5 +45,27 @@ t.test("utils", t => {
 
     t.equal(getOwnProperty(myObject, "foo"), "bar");
     t.equal(getOwnProperty(myObject, "bar"), undefined);
+  });
+
+  t.test("should get value from a nested object", t => {
+    t.plan(6);
+
+    const myObject = {
+      foo: "bar",
+      nested: {
+        nested2: {
+          nested3: {
+            bar: "baz"
+          }
+        }
+      }
+    };
+
+    t.equal(getNested(myObject, "foo"), "bar");
+    t.same(getNested(myObject, "nested"), {nested2: {nested3: {bar: "baz"}}});
+    t.same(getNested(myObject, "nested.nested2"), {nested3: {bar: "baz"}});
+    t.same(getNested(myObject, "nested.nested2.nested3"), {bar: "baz"});
+    t.equal(getNested(myObject, "nested.nested2.nested3.bar"), "baz");
+    t.equal(getNested(myObject, "nested1.nested3.bar"), undefined);
   });
 });
