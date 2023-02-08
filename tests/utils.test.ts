@@ -48,7 +48,7 @@ t.test("utils", t => {
   });
 
   t.test("should get value from a nested object", t => {
-    t.plan(6);
+    t.plan(8);
 
     const myObject = {
       foo: "bar",
@@ -57,15 +57,19 @@ t.test("utils", t => {
           nested3: {
             bar: "baz"
           }
-        }
+        },
+        null: null,
+        noop: () => null
       }
     };
 
     t.equal(getNested(myObject, "foo"), "bar");
-    t.same(getNested(myObject, "nested"), {nested2: {nested3: {bar: "baz"}}});
-    t.same(getNested(myObject, "nested.nested2"), {nested3: {bar: "baz"}});
-    t.same(getNested(myObject, "nested.nested2.nested3"), {bar: "baz"});
+    t.same(getNested(myObject, "nested"), myObject.nested);
+    t.same(getNested(myObject, "nested.nested2"), myObject.nested.nested2);
+    t.same(getNested(myObject, "nested.nested2.nested3"), myObject.nested.nested2.nested3);
     t.equal(getNested(myObject, "nested.nested2.nested3.bar"), "baz");
     t.equal(getNested(myObject, "nested1.nested3.bar"), undefined);
+    t.equal(getNested(myObject, "nested.null.bar"), undefined);
+    t.equal(getNested(myObject, "nested.noop.bar"), undefined);
   });
 });

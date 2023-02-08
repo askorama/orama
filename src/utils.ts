@@ -105,5 +105,5 @@ export function getNested<T = unknown>(
   obj: Record<string, any>,
   path: string
 ): T | undefined {
-  return path.split(".").reduce((o, p) => typeof o === "object" ? o[p] : undefined, obj) as T | undefined;
+  return path.split(".").reduce((o, p) => o && typeof o === "object" ? o[p] : undefined, obj) as T | undefined;
 }
