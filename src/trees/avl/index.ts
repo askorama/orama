@@ -132,3 +132,83 @@ export function isBalanced<K, V>(node: AVLNode<K, V> | null): boolean {
   const heightDiff = Math.abs(getHeight(node.left) - getHeight(node.right));
   return heightDiff <= 1 && isBalanced(node.left) && isBalanced(node.right);
 }
+
+export function rangeSearch<K, V>(node: AVLNode<K, V>, min: K, max: K): V[] {
+  if (!node) {
+    return [];
+  }
+
+  const result: V[] = [];
+
+  function traverse(node: AVLNode<K, V>) {
+    if (!node) {
+      return;
+    }
+
+    if (node.key > min) {
+      traverse(node.left as AVLNode<K, V>);
+    }
+
+    if (node.key >= min && node.key <= max) {
+      result.push(...node.value as V[]);
+    }
+
+    if (node.key < max) {
+      traverse(node.right as AVLNode<K, V>);
+    }
+  }
+
+  traverse(node);
+
+  return result;
+}
+
+export function greaterThan<K, V>(node: AVLNode<K, V>, key: K): V[] {
+  if (!node) {
+    return [];
+  }
+
+  const result: V[] = [];
+
+  function traverse(node: AVLNode<K, V>) {
+    if (!node) {
+      return;
+    }
+
+    if (node.key > key) {
+      result.push(...node.value as V[]);
+    }
+
+    traverse(node.left as AVLNode<K, V>);
+    traverse(node.right as AVLNode<K, V>);
+  }
+
+  traverse(node);
+
+  return result;
+}
+
+export function lessThan<K, V>(node: AVLNode<K, V>, key: K): V[] {
+  if (!node) {
+    return [];
+  }
+
+  const result: V[] = [];
+
+  function traverse(node: AVLNode<K, V>) {
+    if (!node) {
+      return;
+    }
+
+    if (node.key < key) {
+      result.push(...node.value as V[]);
+    }
+
+    traverse(node.left as AVLNode<K, V>);
+    traverse(node.right as AVLNode<K, V>);
+  }
+
+  traverse(node);
+
+  return result;
+}

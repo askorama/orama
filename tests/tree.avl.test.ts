@@ -1,8 +1,8 @@
 import t from 'tap'
-import { create, insert, find, getSize, remove, contains, isBalanced } from '../src/trees/avl/index.js'
+import { create, insert, find, getSize, remove, contains, isBalanced, greaterThan, lessThan, rangeSearch } from '../src/trees/avl/index.js'
 
 t.test('AVL Tree', t => {
-  t.plan(5);
+  t.plan(8);
 
   t.test('create', t => {
     t.plan(3);
@@ -83,6 +83,51 @@ t.test('AVL Tree', t => {
     t.equal(getSize(tree), 6);
     t.equal(contains(tree, 20), false);
     t.equal(isBalanced(tree), true);
+  });
+
+  t.test('rangeSearch', t => {
+    t.plan(1);
+
+    const tree = create(1, ['foo']);
+
+    insert(tree, 2, ['bar']);
+    insert(tree, 10, ['baz']);
+    insert(tree, 25, ['qux']);
+    insert(tree, 5, ['quux']);
+    insert(tree, 20, ['quuz']);
+    insert(tree, 12, ['corge']);
+
+    t.same(rangeSearch(tree, 5, 20), ['quux', 'baz', 'corge', 'quuz']);
+  });
+
+  t.test('greaterThan', t => {
+    t.plan(1);
+
+    const tree = create(1, ['foo']);
+
+    insert(tree, 2, ['bar']);
+    insert(tree, 10, ['baz']);
+    insert(tree, 25, ['qux']);
+    insert(tree, 5, ['quux']);
+    insert(tree, 20, ['quuz']);
+    insert(tree, 12, ['corge']);
+
+    t.same(greaterThan(tree, 10), ['qux', 'quuz', 'corge']);
+  });
+
+  t.test('lessThan', t => {
+    t.plan(1);
+
+    const tree = create(1, ['foo']);
+
+    insert(tree, 2, ['bar']);
+    insert(tree, 10, ['baz']);
+    insert(tree, 25, ['qux']);
+    insert(tree, 5, ['quux']);
+    insert(tree, 20, ['quuz']);
+    insert(tree, 12, ['corge']);
+
+    t.same(lessThan(tree, 10), ['foo', 'bar', 'quux']);
   });
 
 });
