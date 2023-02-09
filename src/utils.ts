@@ -102,8 +102,8 @@ export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
 }
 
 export function getNested<T = unknown>(
-  obj: Record<string, unknown>,
+  obj: Record<string, any>,
   path: string
 ): T | undefined {
-  return new Function('_', 'return _.' + path)(obj);
+  return path.split(".").reduce((o, p) => o && typeof o === "object" ? o[p] : undefined, obj) as T | undefined;
 }
