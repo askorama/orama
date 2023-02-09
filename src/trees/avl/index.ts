@@ -3,19 +3,19 @@ import { createAVLNode } from "./node.js";
 import { BALANCE_STATE, getBalanceFactor, rotateLeft, rotateRight, findMin, getHeight } from "./utils.js";
 
 
-export function create<T>(value: T): AVLNode<T> {
-  return createAVLNode(value);
+export function create<K, V>(key: K, value: V): AVLNode<K, V> {
+  return createAVLNode(key, value);
 }
 
-export function insert<T>(node: AVLNode<T>, value: T): AVLNode<T> {
+export function insert<K, V>(node: AVLNode<K, V>, key: K, value: V): AVLNode<K, V> {
   if (!node) {
-    return create(value);
+    return create(key, value);
   }
 
-  if (value < node.value) {
-    node.left = insert(node.left as AVLNode<T>, value);
-  } else if (value > node.value) {
-    node.right = insert(node.right as AVLNode<T>, value);
+  if (key < node.key) {
+    node.left = insert(node.left as AVLNode<K, V>, key, value);
+  } else if (key > node.key) {
+    node.right = insert(node.right as AVLNode<K, V>, key, value);
   } else {
     return node;
   }
@@ -23,19 +23,19 @@ export function insert<T>(node: AVLNode<T>, value: T): AVLNode<T> {
   const balanceFactor = getBalanceFactor(node);
 
   if (balanceFactor === BALANCE_STATE.UNBALANCED_LEFT) {
-    if (value < (node.left as AVLNode<T>).value) {
+    if (key < (node.left as AVLNode<K, V>).key) {
       node = rotateRight(node);
     } else {
-      node.left = rotateLeft(node.left as AVLNode<T>);
+      node.left = rotateLeft(node.left as AVLNode<K, V>);
       node = rotateRight(node);
     }
   }
 
   if (balanceFactor === BALANCE_STATE.UNBALANCED_RIGHT) {
-    if (value > (node.right as AVLNode<T>).value) {
+    if (key > (node.right as AVLNode<K, V>).key) {
       node = rotateLeft(node);
     } else {
-      node.right = rotateRight(node.right as AVLNode<T>);
+      node.right = rotateRight(node.right as AVLNode<K, V>);
       node = rotateLeft(node);
     }
   }
@@ -43,69 +43,69 @@ export function insert<T>(node: AVLNode<T>, value: T): AVLNode<T> {
   return node;
 }
 
-export function find<T>(node: AVLNode<T>, value: T): T | null {
+export function find<K, V>(node: AVLNode<K, V>, key: K): V | null {
   if (!node) {
     return null;
   }
 
-  if (node.value === value) {
+  if (node.key === key) {
     return node.value;
   }
 
-  if (value < node.value) {
-    return node.left ? find(node.left, value) : null;
+  if (key < node.key) {
+    return node.left ? find(node.left, key) : null;
   }
 
-  return node.right ? find(node.right, value) : null;
+  return node.right ? find(node.right, key) : null;
 }
 
-export function remove<T>(node: AVLNode<T>, value: T): AVLNode<T> | null {
+export function remove<K, V>(node: AVLNode<K, V>, key: K): AVLNode<K, V> | null {
   if (!node) {
     return null;
   }
 
-  if (value < node.value) {
-    node.left = remove(node.left as AVLNode<T>, value);
-  } else if (value > node.value) {
-    node.right = remove(node.right as AVLNode<T>, value);
+  if (key < node.key) {
+    node.left = remove(node.left as AVLNode<K, V>, key);
+  } else if (key > node.key) {
+    node.right = remove(node.right as AVLNode<K, V>, key);
   } else {
     if (!node.left && !node.right) {
       return null;
     }
 
     if (!node.left) {
-      return node.right as AVLNode<T>;
+      return node.right as AVLNode<K, V>;
     }
 
     if (!node.right) {
-      return node.left as AVLNode<T>;
+      return node.left as AVLNode<K, V>;
     }
 
-    const temp = findMin(node.right as AVLNode<T>);
-    node.value = temp.value;
-    node.right = remove(node.right as AVLNode<T>, temp.value);
+    const temp = findMin(node.right as AVLNode<K, V>);
+    node.key = temp.key;
+    node.right = remove(node.right as AVLNode<K, V>, temp.key);
   }
 
   const balanceFactor = getBalanceFactor(node);
 
   if (balanceFactor === BALANCE_STATE.UNBALANCED_LEFT) {
-    if (getBalanceFactor(node.left as AVLNode<T>) === BALANCE_STATE.BALANCED || getBalanceFactor(node.left as AVLNode<T>) === BALANCE_STATE.SLIGHTLY_UNBALANCED_LEFT) {
+    if (getBalanceFactor(node.left as AVLNode<K, V>) === BALANCE_STATE.BALANCED || getBalanceFactor(node.left as AVLNode<K, V>) === BALANCE_STATE.SLIGHTLY_UNBALANCED_LEFT) {
       return rotateRight(node);
     }
 
-    if (getBalanceFactor(node.left as AVLNode<T>) === BALANCE_STATE.SLIGHTLY_UNBALANCED_RIGHT) {
-      node.left = rotateLeft(node.left as AVLNode<T>);
+    if (getBalanceFactor(node.left as AVLNode<K, V>) === BALANCE_STATE.SLIGHTLY_UNBALANCED_RIGHT) {
+      node.left = rotateLeft(node.left as AVLNode<K, V>);
       return rotateRight(node);
     }
   }
 
   if (balanceFactor === BALANCE_STATE.UNBALANCED_RIGHT) {
-    if (getBalanceFactor(node.right as AVLNode<T>) === BALANCE_STATE.BALANCED || getBalanceFactor(node.right as AVLNode<T>) === BALANCE_STATE.SLIGHTLY_UNBALANCED_RIGHT) {
+    if (getBalanceFactor(node.right as AVLNode<K, V>) === BALANCE_STATE.BALANCED || getBalanceFactor(node.right as AVLNode<K, V>) === BALANCE_STATE.SLIGHTLY_UNBALANCED_RIGHT) {
       return rotateLeft(node);
     }
 
-    if (getBalanceFactor(node.right as AVLNode<T>) === BALANCE_STATE.SLIGHTLY_UNBALANCED_LEFT) {
-      node.right = rotateRight(node.right as AVLNode<T>);
+    if (getBalanceFactor(node.right as AVLNode<K, V>) === BALANCE_STATE.SLIGHTLY_UNBALANCED_LEFT) {
+      node.right = rotateRight(node.right as AVLNode<K, V>);
       return rotateLeft(node);
     }
   }
@@ -113,11 +113,11 @@ export function remove<T>(node: AVLNode<T>, value: T): AVLNode<T> | null {
   return node;
 }
 
-export function contains<T>(node: AVLNode<T>, value: T): boolean {
-  return !!find(node, value);
+export function contains<K, V>(node: AVLNode<K, V>, key: K): boolean {
+  return !!find(node, key);
 }
 
-export function getSize<T>(node: AVLNode<T> | null): number {
+export function getSize<K, V>(node: AVLNode<K, V> | null): number {
   if (!node) {
     return 0;
   }
@@ -125,7 +125,7 @@ export function getSize<T>(node: AVLNode<T> | null): number {
   return 1 + getSize(node.left) + getSize(node.right);
 }
 
-export function isBalanced<T>(node: AVLNode<T> | null): boolean {
+export function isBalanced<K, V>(node: AVLNode<K, V> | null): boolean {
   if (!node) {
     return true;
   }

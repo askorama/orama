@@ -7,21 +7,21 @@ t.test('AVL Tree', t => {
   t.test('create', t => {
     t.plan(1);
 
-    const tree = create(1);
+    const tree = create(1, 'foo');
     t.equal(getSize(tree), 1);
   });
 
   t.test('insert', t => {
     t.plan(1);
 
-    const tree = create(1);
+    const tree = create(1, 'foo');
 
-    insert(tree, 2);
-    insert(tree, 10);
-    insert(tree, 25);
-    insert(tree, 5);
-    insert(tree, 20);
-    insert(tree, 12);
+    insert(tree, 2, 'bar');
+    insert(tree, 10, 'baz');
+    insert(tree, 25, 'qux');
+    insert(tree, 5, 'quux');
+    insert(tree, 20, 'quuz');
+    insert(tree, 12, 'corge');
 
     t.equal(getSize(tree), 7);
   });
@@ -29,44 +29,45 @@ t.test('AVL Tree', t => {
   t.test('isBalanced', t => {
     t.plan(1);
 
-    const tree = create(1);
+    const tree = create(1, { foo: 'bar' });
 
-    insert(tree, 2);
-    insert(tree, 10);
-    insert(tree, 25);
-    insert(tree, 5);
-    insert(tree, 20);
-    insert(tree, 12);
+    insert(tree, 2, { foo: 'baz' });
+    insert(tree, 10, { foo: 'qux' });
+    insert(tree, 25, { foo: 'quux' });
+    insert(tree, 5, { foo: 'quuz' });
+    insert(tree, 20, { foo: 'corge' });
+    insert(tree, 12, { foo: 'grault' });
 
     t.equal(isBalanced(tree), true);
   });
 
   t.test('find', t => {
-    t.plan(1);
+    t.plan(2);
 
-    const tree = create(1);
+    const tree = create(1, [1, 2, 3]);
 
-    insert(tree, 2);
-    insert(tree, 10);
-    insert(tree, 25);
-    insert(tree, 5);
-    insert(tree, 20);
-    insert(tree, 12);
+    insert(tree, 2, [4, 5, 6]);
+    insert(tree, 10, [7, 8, 9]);
+    insert(tree, 25, [10, 11, 12]);
+    insert(tree, 5, [13, 14, 15]);
+    insert(tree, 20, [16, 17, 18]);
+    insert(tree, 12, [19, 20, 21]);
 
-    t.equal(find(tree, 20), 20);
+    t.same(contains(tree, 20), true);
+    t.same(find(tree, 20), [16, 17, 18]);
   });
 
   t.test('remove', t => {
     t.plan(3);
 
-    const tree = create(1);
+    const tree = create(1, 'foo');
 
-    insert(tree, 2);
-    insert(tree, 10);
-    insert(tree, 25);
-    insert(tree, 5);
-    insert(tree, 20);
-    insert(tree, 12);
+    insert(tree, 2, 'bar');
+    insert(tree, 10, 'baz');
+    insert(tree, 25, 'qux');
+    insert(tree, 5, 'quux');
+    insert(tree, 20, 'quuz');
+    insert(tree, 12, 'corge');
 
     remove(tree, 20);
 

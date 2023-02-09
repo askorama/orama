@@ -8,7 +8,7 @@ export const BALANCE_STATE = {
   UNBALANCED_LEFT: 5,
 };
 
-export function getBalanceFactor<T>(node: AVLNode<T>): number {
+export function getBalanceFactor<K, V>(node: AVLNode<K, V>): number {
   const heightDifference = getHeight(node.left) - getHeight(node.right);
 
   switch (heightDifference) {
@@ -25,12 +25,12 @@ export function getBalanceFactor<T>(node: AVLNode<T>): number {
   }
 }
 
-export function getHeight<T>(node: AVLNode<T> | null): number {
+export function getHeight<K, V>(node: AVLNode<K, V> | null): number {
   return node ? node.height : -1;
 }
 
-export function rotateLeft<T>(node: AVLNode<T>): AVLNode<T> {
-  const right = node.right as AVLNode<T>;
+export function rotateLeft<K, V>(node: AVLNode<K, V>): AVLNode<K, V> {
+  const right = node.right as AVLNode<K, V>;
   node.right = right.left;
   right.left = node;
   node.height = Math.max(getHeight(node.left), getHeight(node.right)) + 1;
@@ -38,8 +38,8 @@ export function rotateLeft<T>(node: AVLNode<T>): AVLNode<T> {
   return right;
 }
 
-export function rotateRight<T>(node: AVLNode<T>): AVLNode<T> {
-  const left = node.left as AVLNode<T>;
+export function rotateRight<K, V>(node: AVLNode<K, V>): AVLNode<K, V> {
+  const left = node.left as AVLNode<K, V>;
   node.left = left.right;
   left.right = node;
   node.height = Math.max(getHeight(node.left), getHeight(node.right)) + 1;
@@ -47,14 +47,14 @@ export function rotateRight<T>(node: AVLNode<T>): AVLNode<T> {
   return left;
 }
 
-export function leftHeight<T>(node: AVLNode<T>): number {
+export function leftHeight<K, V>(node: AVLNode<K, V>): number {
   return getHeight(node.left);
 }
 
-export function rightHeight<T>(node: AVLNode<T>): number {
+export function rightHeight<K, V>(node: AVLNode<K, V>): number {
   return getHeight(node.right);
 }
 
-export function findMin<T>(node: AVLNode<T>): AVLNode<T> {
+export function findMin<K, V>(node: AVLNode<K, V>): AVLNode<K, V> {
   return node.left ? findMin(node.left) : node;
 }
