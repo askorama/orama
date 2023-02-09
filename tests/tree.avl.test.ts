@@ -5,10 +5,12 @@ t.test('AVL Tree', t => {
   t.plan(5);
 
   t.test('create', t => {
-    t.plan(1);
+    t.plan(3);
 
     const tree = create(1, 'foo');
     t.equal(getSize(tree), 1);
+    t.equal(find(tree, 1), 'foo');
+    t.equal(find(tree, 4), null);
   });
 
   t.test('insert', t => {
@@ -37,6 +39,13 @@ t.test('AVL Tree', t => {
     insert(tree, 5, { foo: 'quuz' });
     insert(tree, 20, { foo: 'corge' });
     insert(tree, 12, { foo: 'grault' });
+    insert(tree, 15, { foo: 'garply' });
+    insert(tree, 30, { foo: 'waldo' });
+    insert(tree, 40, { foo: 'fred' });
+    insert(tree, 520, { foo: 'plugh' });
+    insert(tree, 630, { foo: 'xyzzy' });
+    insert(tree, 3, { foo: 'thud' });
+    insert(tree, 480, { foo: 'thuds' });
 
     t.equal(isBalanced(tree), true);
   });

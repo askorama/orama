@@ -47,14 +47,6 @@ export function rotateRight<K, V>(node: AVLNode<K, V>): AVLNode<K, V> {
   return left;
 }
 
-export function leftHeight<K, V>(node: AVLNode<K, V>): number {
-  return getHeight(node.left);
-}
-
-export function rightHeight<K, V>(node: AVLNode<K, V>): number {
-  return getHeight(node.right);
-}
-
 export function findMin<K, V>(node: AVLNode<K, V>): AVLNode<K, V> {
   return node.left ? findMin(node.left) : node;
 }
