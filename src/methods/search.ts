@@ -1,3 +1,4 @@
+import type { RadixNode } from "src/radix-tree/node.js";
 import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams, PropertiesBoost, FacetsSearch } from "../types.js";
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
 import { find as radixFind } from "../radix-tree/radix.js";
@@ -321,7 +322,7 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
   params: SearchParams<S> & { index: string },
 ): string[] {
   const idx = lyra.index[params.index];
-  const searchResult = radixFind(idx, {
+  const searchResult = radixFind(idx as RadixNode, {
     term: params.term,
     exact: params.exact,
     tolerance: params.tolerance,

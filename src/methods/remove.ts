@@ -1,3 +1,4 @@
+import type { RadixNode } from "src/radix-tree/node.js";
 import type { Lyra, PropertiesSchema, ResolveSchema } from "../types.js";
 import { defaultTokenizerConfig } from "../tokenizer/index.js";
 import { removeDocumentByWord } from "../radix-tree/radix.js";
@@ -48,7 +49,7 @@ export async function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: s
         const token = tokens[k];
         delete lyra.frequencies[key][docID];
         lyra.tokenOccurrencies[key][token]--;
-        if (token && !removeDocumentByWord(idx, token, docID)) {
+        if (token && !removeDocumentByWord(idx as RadixNode, token, docID)) {
           throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
         }
       }

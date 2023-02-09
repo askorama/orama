@@ -2,7 +2,6 @@ import type { AVLNode } from "./node.js";
 import { createAVLNode } from "./node.js";
 import { BALANCE_STATE, getBalanceFactor, rotateLeft, rotateRight, findMin, getHeight } from "./utils.js";
 
-
 export function create<K, V>(key: K, value: V): AVLNode<K, V> {
   return createAVLNode(key, value);
 }

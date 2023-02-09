@@ -1,19 +1,19 @@
 import type { Nullable } from "../types.js";
 import { uniqueId } from "../utils.js";
 
-export interface Node {
+export interface RadixNode {
   id: string;
   key: string;
   subWord: string;
   parent: Nullable<string>;
-  children: Record<string, Node>;
+  children: Record<string, RadixNode>;
   docs: string[];
   end: boolean;
   word: string;
 }
 
-export function create(end = false, subWord = "", key = ""): Node {
-  const node = {
+export function create(end = false, subWord = "", key = ""): RadixNode {
+  const RadixNode = {
     id: uniqueId(),
     key,
     subWord,
@@ -24,34 +24,34 @@ export function create(end = false, subWord = "", key = ""): Node {
     word: "",
   };
 
-  Object.defineProperty(node, "toJSON", { value: serialize });
-  return node;
+  Object.defineProperty(RadixNode, "toJSON", { value: serialize });
+  return RadixNode;
 }
 
-export function updateParent(node: Node, parent: Node): void {
-  node.parent = parent.id;
-  node.word = parent.word + node.subWord;
+export function updateParent(RadixNode: RadixNode, parent: RadixNode): void {
+  RadixNode.parent = parent.id;
+  RadixNode.word = parent.word + RadixNode.subWord;
 }
 
-export function addDocument(node: Node, docID: string): void {
-  node.docs.push(docID);
+export function addDocument(RadixNode: RadixNode, docID: string): void {
+  RadixNode.docs.push(docID);
 }
 
-export function removeDocument(node: Node, docID: string): boolean {
-  const index = node.docs.indexOf(docID);
+export function removeDocument(RadixNode: RadixNode, docID: string): boolean {
+  const index = RadixNode.docs.indexOf(docID);
 
   /* c8 ignore next 3 */
   if (index === -1) {
     return false;
   }
 
-  node.docs.splice(index, 1);
+  RadixNode.docs.splice(index, 1);
 
   return true;
 }
 
 /* c8 ignore next 5 */
-function serialize(this: Node): object {
+function serialize(this: RadixNode): object {
   const { word, subWord, children, docs, end } = this;
 
   return { word, subWord, children, docs, end };

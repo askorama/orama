@@ -1,6 +1,7 @@
 import { Language, TokenizerConfig } from "./tokenizer/index.js";
 import type { Hooks } from "./methods/hooks.js";
-import type { Node } from "./radix-tree/node.js";
+import type { RadixNode } from "./radix-tree/node.js";
+import type { AVLNode } from "./trees/avl/node.js";
 
 export type TokenScore = [string, number];
 export type Nullable<T> = T | null;
@@ -128,7 +129,7 @@ type ResolveTypes<TType> = TType extends "string"
   ? { [P in keyof TType]: ResolveTypes<TType[P]> }
   : never;
 
-type Index = Record<string, Node>;
+type Index = Record<string, RadixNode | AVLNode<number, string[]>>;
 
 export type TokenMap = Record<string, TokenScore[]>;
 
