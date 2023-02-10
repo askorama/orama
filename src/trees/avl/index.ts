@@ -87,24 +87,27 @@ export function remove<K, V>(node: AVLNode<K, V>, key: K): AVLNode<K, V> | null 
 
   const balanceFactor = getBalanceFactor(node);
 
+  const leftNode = node.left as AVLNode<K, V>
+  const rightNode = node.right as AVLNode<K, V>
+
   if (balanceFactor === BALANCE_STATE.UNBALANCED_LEFT) {
-    if (getBalanceFactor(node.left as AVLNode<K, V>) === BALANCE_STATE.BALANCED || getBalanceFactor(node.left as AVLNode<K, V>) === BALANCE_STATE.SLIGHTLY_UNBALANCED_LEFT) {
+    if (getBalanceFactor(leftNode) === BALANCE_STATE.BALANCED || getBalanceFactor(leftNode) === BALANCE_STATE.SLIGHTLY_UNBALANCED_LEFT) {
       return rotateRight(node);
     }
 
-    if (getBalanceFactor(node.left as AVLNode<K, V>) === BALANCE_STATE.SLIGHTLY_UNBALANCED_RIGHT) {
-      node.left = rotateLeft(node.left as AVLNode<K, V>);
+    if (getBalanceFactor(leftNode) === BALANCE_STATE.SLIGHTLY_UNBALANCED_RIGHT) {
+      node.left = rotateLeft(leftNode);
       return rotateRight(node);
     }
   }
 
   if (balanceFactor === BALANCE_STATE.UNBALANCED_RIGHT) {
-    if (getBalanceFactor(node.right as AVLNode<K, V>) === BALANCE_STATE.BALANCED || getBalanceFactor(node.right as AVLNode<K, V>) === BALANCE_STATE.SLIGHTLY_UNBALANCED_RIGHT) {
+    if (getBalanceFactor(rightNode) === BALANCE_STATE.BALANCED || getBalanceFactor(rightNode) === BALANCE_STATE.SLIGHTLY_UNBALANCED_RIGHT) {
       return rotateLeft(node);
     }
 
-    if (getBalanceFactor(node.right as AVLNode<K, V>) === BALANCE_STATE.SLIGHTLY_UNBALANCED_LEFT) {
-      node.right = rotateRight(node.right as AVLNode<K, V>);
+    if (getBalanceFactor(rightNode) === BALANCE_STATE.SLIGHTLY_UNBALANCED_LEFT) {
+      node.right = rotateRight(rightNode);
       return rotateLeft(node);
     }
   }
