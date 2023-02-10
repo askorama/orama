@@ -13,7 +13,7 @@ export interface RadixNode {
 }
 
 export function create(end = false, subWord = "", key = ""): RadixNode {
-  const RadixNode = {
+  const node = {
     id: uniqueId(),
     key,
     subWord,
@@ -24,28 +24,28 @@ export function create(end = false, subWord = "", key = ""): RadixNode {
     word: "",
   };
 
-  Object.defineProperty(RadixNode, "toJSON", { value: serialize });
-  return RadixNode;
+  Object.defineProperty(node, "toJSON", { value: serialize });
+  return node;
 }
 
-export function updateParent(RadixNode: RadixNode, parent: RadixNode): void {
-  RadixNode.parent = parent.id;
-  RadixNode.word = parent.word + RadixNode.subWord;
+export function updateParent(node: RadixNode, parent: RadixNode): void {
+  node.parent = parent.id;
+  node.word = parent.word + node.subWord;
 }
 
-export function addDocument(RadixNode: RadixNode, docID: string): void {
-  RadixNode.docs.push(docID);
+export function addDocument(node: RadixNode, docID: string): void {
+  node.docs.push(docID);
 }
 
-export function removeDocument(RadixNode: RadixNode, docID: string): boolean {
-  const index = RadixNode.docs.indexOf(docID);
+export function removeDocument(node: RadixNode, docID: string): boolean {
+  const index = node.docs.indexOf(docID);
 
   /* c8 ignore next 3 */
   if (index === -1) {
     return false;
   }
 
-  RadixNode.docs.splice(index, 1);
+  node.docs.splice(index, 1);
 
   return true;
 }
