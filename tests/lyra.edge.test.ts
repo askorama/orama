@@ -1,8 +1,9 @@
+import type { PropertiesSchema, ResolveSchema } from "../src/types/index.js";
+import type { RadixNode } from "../src/trees/radix/node.js";
+import type { RetrievedDoc } from "../src/methods/search.js";
 import t from "tap";
 import { create, insert, load, save, search } from "../src/index.js";
-import { RetrievedDoc } from "../src/methods/search.js";
-import { contains as trieContains } from "../src/radix-tree/radix.js";
-import { PropertiesSchema, ResolveSchema } from "../src/types.js";
+import { contains as trieContains } from "../src/trees/radix/index.js";
 
 function extractOriginalDoc<T extends PropertiesSchema>(result: RetrievedDoc<T>[]): ResolveSchema<T>[] {
   return result.map(({ document }: RetrievedDoc<T>) => document);
@@ -36,8 +37,8 @@ t.test("Edge getters", t => {
     const nameIndex = index["name"];
 
     // Remember that tokenizers an stemmers sets content to lowercase
-    t.ok(trieContains(nameIndex, "john"));
-    t.ok(trieContains(nameIndex, "jane"));
+    t.ok(trieContains(nameIndex as RadixNode, "john"));
+    t.ok(trieContains(nameIndex as RadixNode, "jane"));
     t.same(defaultLanguage, "english");
   });
 

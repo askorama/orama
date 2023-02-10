@@ -1,6 +1,6 @@
 import { Language, TokenizerConfig } from "../tokenizer/index.js";
 import type { Hooks } from "../methods/hooks.js";
-import type { RadixNode } from "../radix-tree/node.js";
+import type { RadixNode } from "../trees/radix/node.js";
 import type { AVLNode } from "../trees/avl/node.js";
 
 export * from "./filters.js";

@@ -1,5 +1,5 @@
-import { boundedLevenshtein } from "../levenshtein.js";
-import { getOwnProperty } from "../utils.js";
+import { boundedLevenshtein } from "../../levenshtein.js";
+import { getOwnProperty } from "../../utils.js";
 import { addDocument, create as createNode, RadixNode, removeDocument, updateParent } from "./node.js";
 
 export type FindParams = {

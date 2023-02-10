@@ -1,9 +1,9 @@
 import type { Lyra, PropertiesSchema, ResolveSchema } from "../types/index.js";
 import type { Language, TokenizerConfigExec } from "../tokenizer/index.js";
 import type { AVLNode } from "../../src/trees/avl/node.js";
-import type { RadixNode } from "../radix-tree/node.js";
+import type { RadixNode } from "../trees/radix/node.js";
 import { trackInsertion } from "../insertion-checker.js";
-import { insert as radixInsert } from "../radix-tree/radix.js";
+import { insert as radixInsert } from "../trees/radix/index.js";
 import { insert as AVLInsert } from "../trees/avl/index.js";
 import { uniqueId } from "../utils.js";
 import { assertDocSchema } from "./common.js";

@@ -1,7 +1,7 @@
-import type { RadixNode } from "src/radix-tree/node.js";
+import type { RadixNode } from "src/trees/radix/node.js";
 import type { Lyra, PropertiesSchema, ResolveSchema } from "../types/index.js";
 import { defaultTokenizerConfig } from "../tokenizer/index.js";
-import { removeDocumentByWord } from "../radix-tree/radix.js";
+import { removeDocumentByWord } from "../trees/radix/index.js";
 import * as ERRORS from "../errors.js";
 
 /**

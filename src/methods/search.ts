@@ -1,7 +1,7 @@
-import type { RadixNode } from "src/radix-tree/node.js";
+import type { RadixNode } from "src/trees/radix/node.js";
 import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams, PropertiesBoost, FacetsSearch, WhereFilter } from "../types/index.js";
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
-import { find as radixFind } from "../radix-tree/radix.js";
+import { find as radixFind } from "../trees/radix/index.js";
 import { formatNanoseconds, getNanosecondsTime, sortTokenScorePredicate } from "../utils.js";
 import { getIndices } from "./common.js";
 import { prioritizeTokenScores, BM25 } from "../algorithms.js";
