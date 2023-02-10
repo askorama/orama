@@ -1,4 +1,4 @@
-import type { Nullable } from "../types.js";
+import type { Nullable } from "../types/index.js";
 import { uniqueId } from "../utils.js";
 
 export interface RadixNode {

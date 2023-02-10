@@ -1,4 +1,4 @@
-import type { TokenScore } from "./types.js";
+import type { TokenScore } from "./types/index.js";
 
 const baseId = Date.now().toString().slice(5);
 let lastId = 0;

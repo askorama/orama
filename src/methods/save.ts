@@ -1,4 +1,4 @@
-import type { Data, Lyra, PropertiesSchema } from "../types.js";
+import type { Data, Lyra, PropertiesSchema } from "../types/index.js";
 
 export async function save<S extends PropertiesSchema>(lyra: Lyra<S>): Promise<Data<S>> {
   return {

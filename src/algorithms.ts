@@ -1,4 +1,4 @@
-import type { BM25Params, TokenScore } from "./types.js";
+import type { BM25Params, TokenScore } from "./types/index.js";
 import * as ERRORS from "./errors.js";
 
 // Adapted from https://github.com/lovasoa/fast_array_intersect

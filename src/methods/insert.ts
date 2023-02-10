@@ -1,4 +1,4 @@
-import type { Lyra, PropertiesSchema, ResolveSchema } from "../types.js";
+import type { Lyra, PropertiesSchema, ResolveSchema } from "../types/index.js";
 import type { Language, TokenizerConfigExec } from "../tokenizer/index.js";
 import type { AVLNode } from "../../src/trees/avl/node.js";
 import type { RadixNode } from "../radix-tree/node.js";

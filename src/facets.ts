@@ -1,4 +1,4 @@
-import type { FacetSorting, FacetsSearch, PropertiesSchema, ResolveSchema, TokenScore } from "./types.js";
+import type { FacetSorting, FacetsSearch, PropertiesSchema, ResolveSchema, TokenScore } from "./types/index.js";
 import { getNested } from './utils.js';
 
 export type FacetReturningValue = {

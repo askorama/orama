@@ -1,5 +1,5 @@
 import * as ERRORS from "../errors.js";
-import type { Lyra, PropertiesSchema } from "../types.js";
+import type { Lyra, PropertiesSchema } from "../types/index.js";
 
 export interface AfterInsertHook {
   <S extends PropertiesSchema = PropertiesSchema>(this: Lyra<S>, id: string): Promise<void> | void;
