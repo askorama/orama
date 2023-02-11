@@ -6,7 +6,7 @@ export function create<K, V>(key: K, value: V): AVLNode<K, V> {
   return createAVLNode(key, value);
 }
 
-export function insert<K, V>(node: AVLNode<K, V>, key: K, value: V): AVLNode<K, V> {
+export function insert<K, V extends any[]>(node: AVLNode<K, V>, key: K, value: V): AVLNode<K, V> {
   if (!node) {
     return create(key, value);
   }
@@ -16,6 +16,7 @@ export function insert<K, V>(node: AVLNode<K, V>, key: K, value: V): AVLNode<K, 
   } else if (key > node.key) {
     node.right = insert(node.right as AVLNode<K, V>, key, value);
   } else {
+    (node.value as string[]) = node.value.concat(value);
     return node;
   }
 
@@ -136,12 +137,14 @@ export function isBalanced<K, V>(node: AVLNode<K, V> | null): boolean {
   return heightDiff <= 1 && isBalanced(node.left) && isBalanced(node.right);
 }
 
-export function rangeSearch<K, V>(node: AVLNode<K, V>, min: K, max: K): V[] {
+export function rangeSearch<K, V extends any[]>(node: AVLNode<K, V>, min: K, max: K): V {
   if (!node) {
-    return [];
+    return [] as unknown as V;
   }
 
-  const result: V[] = [];
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const result: V = [];
 
   function traverse(node: AVLNode<K, V>) {
     if (!node) {
@@ -166,19 +169,25 @@ export function rangeSearch<K, V>(node: AVLNode<K, V>, min: K, max: K): V[] {
   return result;
 }
 
-export function greaterThan<K, V>(node: AVLNode<K, V>, key: K): V[] {
+export function greaterThan<K, V extends any[]>(node: AVLNode<K, V>, key: K, inclusive = false): V {
   if (!node) {
-    return [];
+    return [] as unknown as V;
   }
 
-  const result: V[] = [];
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const result: V = [];
 
   function traverse(node: AVLNode<K, V>) {
     if (!node) {
       return;
     }
 
-    if (node.key > key) {
+    if (inclusive && node.key >= key) {
+      result.push(...node.value);
+    }
+
+    if (!inclusive && node.key > key) {
       result.push(...node.value as V[]);
     }
 
@@ -191,19 +200,25 @@ export function greaterThan<K, V>(node: AVLNode<K, V>, key: K): V[] {
   return result;
 }
 
-export function lessThan<K, V>(node: AVLNode<K, V>, key: K): V[] {
+export function lessThan<K, V extends any[]>(node: AVLNode<K, V>, key: K, inclusive = false): V {
   if (!node) {
-    return [];
+    return [] as unknown as V;
   }
 
-  const result: V[] = [];
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const result: V = [];
 
   function traverse(node: AVLNode<K, V>) {
     if (!node) {
       return;
     }
 
-    if (node.key < key) {
+    if (inclusive && node.key <= key) {
+      result.push(...node.value as V[]);
+    }
+
+    if (!inclusive && node.key < key) {
       result.push(...node.value as V[]);
     }
 

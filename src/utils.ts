@@ -107,3 +107,54 @@ export function getNested<T = unknown>(
 ): T | undefined {
   return path.split(".").reduce((o, p) => o && typeof o === "object" ? o[p] : undefined, obj) as T | undefined;
 }
+
+export function intersect<T>(...arrays: T[][]): T[] {
+  let smallestArrayIndex = 0;
+  let smallestArrayLength = arrays[0].length;
+
+  for (let i = 1; i < arrays.length; i++) {
+    if (arrays[i].length < smallestArrayLength) {
+      smallestArrayIndex = i;
+      smallestArrayLength = arrays[i].length;
+    }
+  }
+
+  if (smallestArrayIndex !== 0) {
+    [arrays[0], arrays[smallestArrayIndex]] = [arrays[smallestArrayIndex], arrays[0]];
+  }
+
+  const hashTable = new Map<T, number>();
+  arrays[0].forEach((element) => {
+    hashTable.set(element, 1);
+  });
+
+  const result: T[] = [];
+
+  for (let i = 1; i < arrays.length; i++) {
+    const currentArray = arrays[i];
+    let hasCommonElements = false;
+
+    for (let j = 0; j < currentArray.length; j++) {
+      const currentElement = currentArray[j];
+
+      if (hashTable.has(currentElement)) {
+        hasCommonElements = true;
+        const count = hashTable.get(currentElement)! - 1;
+
+        if (count === 0) {
+          hashTable.delete(currentElement);
+        } else {
+          hashTable.set(currentElement, count);
+        }
+
+        result.push(currentElement);
+      }
+    }
+
+    if (!hasCommonElements) {
+      return result;
+    }
+  }
+
+  return result;
+}
