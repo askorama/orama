@@ -71,13 +71,7 @@ export function getWhereFiltersIDs<S extends PropertiesSchema>(filters: WhereFil
   }
 
   // AND operation: calculate the intersection between all the IDs in filterMap
-  //const result = intersect(Object.values(filtersMap));
-  const result = Object.values(filtersMap).reduce((acc, ids) => {
-    if (acc.length === 0) {
-      return ids;
-    }
-    return acc.filter(id => ids.includes(id));
-  }, [] as string[]);
+  const result = intersect(Object.values(filtersMap)) as unknown as string[];
 
   return result;
 }

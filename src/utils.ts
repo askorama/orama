@@ -101,55 +101,40 @@ export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
   return b[1] - a[1];
 }
 
-export function intersect<T>(...arrays: T[][]): T[] {
-  let smallestArrayIndex = 0;
-  let smallestArrayLength = arrays[0].length;
+// Intersection function taken from https://github.com/lovasoa/fast_array_intersect.
+// MIT Licensed at the time of writing.
+export function intersect<T>(arrays: ReadonlyArray<T>[]): T[] {
+  if (arrays.length === 0) return [];
 
-  for (let i = 1; i < arrays.length; i++) {
-    if (arrays[i].length < smallestArrayLength) {
-      smallestArrayIndex = i;
-      smallestArrayLength = arrays[i].length;
+  for (let i=1; i<arrays.length; i++) {
+    if(arrays[i].length < arrays[0].length) {
+      const tmp = arrays[0];
+      arrays[0] = arrays[i];
+      arrays[i] = tmp;
     }
   }
 
-  if (smallestArrayIndex !== 0) {
-    [arrays[0], arrays[smallestArrayIndex]] = [arrays[smallestArrayIndex], arrays[0]];
+  const set = new Map();
+  for(const elem of arrays[0]) {
+    set.set(elem, 1);
   }
-
-  const hashTable = new Map<T, number>();
-  arrays[0].forEach((element) => {
-    hashTable.set(element, 1);
-  });
-
-  const result: T[] = [];
-
-  for (let i = 1; i < arrays.length; i++) {
-    const currentArray = arrays[i];
-    let hasCommonElements = false;
-
-    for (let j = 0; j < currentArray.length; j++) {
-      const currentElement = currentArray[j];
-
-      if (hashTable.has(currentElement)) {
-        hasCommonElements = true;
-        const count = hashTable.get(currentElement)! - 1;
-
-        if (count === 0) {
-          hashTable.delete(currentElement);
-        } else {
-          hashTable.set(currentElement, count);
-        }
-
-        result.push(currentElement);
+  for (let i=1; i<arrays.length; i++) {
+    let found = 0;
+    for(const elem of arrays[i]) {
+      const count = set.get(elem)
+      if (count === i) {
+        set.set(elem,  count + 1);
+        found++;
       }
     }
-
-    if (!hasCommonElements) {
-      return result;
-    }
+    if (found === 0) return []; 
   }
 
-  return result;
+  return arrays[0].filter(e => {
+    const count = set.get(e);
+    if (count !== undefined) set.set(e, 0);
+    return count === arrays.length
+  });
 }
 
 /**
