@@ -25,7 +25,7 @@ interface DataSet {
 }
 
 t.test("defaultLanguage", t => {
-  t.plan(3);
+  t.plan(4);
 
   t.test("should throw an error if the desired language is not supported", async t => {
     t.plan(1);
@@ -67,6 +67,21 @@ t.test("defaultLanguage", t => {
       await create({
         schema: {},
         defaultLanguage: "portuguese",
+      });
+
+      t.pass();
+    } catch (e) {
+      t.fail();
+    }
+  });
+
+  t.test("should not throw if if the language is supported", async t => {
+    t.plan(1);
+
+    try {
+      await create({
+        schema: {},
+        defaultLanguage: "slovenian",
       });
 
       t.pass();
@@ -1025,4 +1040,30 @@ t.test("should correctly search accented words in Dutch", async t => {
     term: "jose",
   });
   t.equal(searchResult.count, 1);
+});
+
+t.test("should correctly search accented words in Slovenian", async t => {
+  const db = await create({
+    schema: {
+      description: "string",
+    },
+    defaultLanguage: "slovenian",
+  });
+
+  await insert(db, {
+    description: "ščisti se pešec čez križišče",
+  });
+
+  await insert(db, {
+    description: "na vrhu hriba je križ",
+  });
+
+  await insert(db, {
+    description: "okroglo križišče je krožišče",
+  });
+
+  const searchResult = await search(db, {
+    term: "križišče",
+  });
+  t.equal(searchResult.count, 2);
 });

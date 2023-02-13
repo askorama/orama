@@ -59,7 +59,8 @@ const splitRegex: Record<Language, RegExp> = {
   armenian: /[^a-z0-9ա-ֆ]+/gim,
   greek: /[^a-z0-9α-ωά-ώ]+/gim,
   indonesian: /[^a-z0-9]+/gim,
-  ukrainian:/[^a-z0-9а-яА-ЯіїєІЇЄ]+/gim
+  ukrainian:/[^a-z0-9а-яА-ЯіїєІЇЄ]+/gim,
+  slovenian: /[^a-z0-9čžšČŽŠ]+/gim
 };
 
 export const normalizationCache = new Map();
