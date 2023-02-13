@@ -1,11 +1,11 @@
-import type { RadixNode } from "src/trees/radix/node.js";
-import type { Lyra, PropertiesSchema, ResolveSchema } from "src/types/index.js";
-import { defaultTokenizerConfig } from "src/tokenizer/index.js";
-import { removeDocumentByWord } from "src/trees/radix/index.js";
-import { flattenObject, getNested } from "src/utils.js";
-import { getNodeByKey as getAVLNodeByKey } from "src/trees/avl/index.js";
-import * as ERRORS from "src/errors.js";
-import { AVLNode } from "src/trees/avl/node";
+import type { RadixNode } from "../trees/radix/node.js";
+import type { Lyra, PropertiesSchema, ResolveSchema } from "../types/index.js";
+import { defaultTokenizerConfig } from "../tokenizer/index.js";
+import { removeDocumentByWord } from "../trees/radix/index.js";
+import { flattenObject, getNested } from "../utils.js";
+import { getNodeByKey as getAVLNodeByKey } from "../trees/avl/index.js";
+import * as ERRORS from "../errors.js";
+import { AVLNode } from "../trees/avl/node.js";
 
 /**
  * Removes a document from a database.
