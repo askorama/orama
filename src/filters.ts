@@ -16,8 +16,6 @@ export function getWhereFiltersIDs<S extends PropertiesSchema>(filters: WhereFil
     const operation = filters[param as keyof WhereFilter<S>]
     const operationKeys = Object.keys(operation as unknown as FilterOperation[])
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - this is a bug in the typescript compiler
     if (operationKeys.length > 1) {
       throw new Error(ERRORS.INVALID_FILTER_OPERATION(Object.keys(operationKeys)))
     }

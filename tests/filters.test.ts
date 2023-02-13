@@ -48,7 +48,7 @@ async function createSimpleDB() {
 } 
 
 t.test("filters", t => {
-  t.plan(6);
+  t.plan(8);
 
   t.test("greater than", async t => {
     t.plan(2);
@@ -153,6 +153,51 @@ t.test("filters", t => {
           between: [1, 4],
         } 
       }
+    });
+
+    t.equal(r1_lte.count, 1);
+    t.equal(r1_lte.hits[0].id, '__2');
+  });
+
+  t.test("multiple filters", async t => {
+    t.plan(2);
+
+    const db = await createSimpleDB();
+
+    const r1_lte = await search(db, {
+      term: 'coffee',
+      where: {
+        rating: {
+          between: [1, 4],
+        },
+        price: {
+          lte: 40,
+        }
+      }
+    });
+
+    t.equal(r1_lte.count, 1);
+    t.equal(r1_lte.hits[0].id, '__2');
+  });
+
+  t.test("multiple filters, and operation", async t => {
+    t.plan(2);
+
+    const db = await createSimpleDB();
+
+    const r1_lte = await search(db, {
+      term: 'coffee',
+      where: {
+        rating: {
+          between: [1, 4],
+        },
+        price: {
+          lte: 40,
+        },
+        'meta.sales': {
+          eq: 25
+        }
+      },
     });
 
     t.equal(r1_lte.count, 1);
