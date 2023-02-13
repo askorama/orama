@@ -1,5 +1,5 @@
 import t from "tap";
-import { create, insert, search } from "../src/index.js";
+import { create, insert, search, remove } from "../src/index.js";
 
 async function createSimpleDB() {
   const db = await create({
@@ -157,5 +157,73 @@ t.test("filters", t => {
 
     t.equal(r1_lte.count, 1);
     t.equal(r1_lte.hits[0].id, '__2');
+  });
+});
+
+t.test("filters after removing docs", t => {
+  t.plan(2);
+
+  t.test("remove doc with simple schema", async t => {
+    t.plan(3);
+  
+    const db = await createSimpleDB();
+  
+    const r1_gt = await search(db, {
+      term: 'coffee',
+      where: {
+        rating: {
+          gt: 4,
+        } 
+      }
+    });
+  
+    t.equal(r1_gt.count, 1);
+    t.equal(r1_gt.hits[0].id, '__3');
+  
+    await remove(db, '__3');
+  
+    const r2_gt = await search(db, {
+      term: 'coffee',
+      where: {
+        rating: {
+          gt: 4,
+        } 
+      }
+    });
+  
+    t.equal(r2_gt.count, 0);
+  });
+
+  t.test("remove doc on nested schema", async t => {
+    t.plan(5);
+  
+    const db = await createSimpleDB();
+  
+    const r1_gt = await search(db, {
+      term: 'coffee',
+      where: {
+        'meta.sales': {
+          eq: 25
+        }
+      }
+    });
+
+    t.equal(r1_gt.count, 2);
+    t.equal(r1_gt.hits[0].id, '__2');
+    t.equal(r1_gt.hits[1].id, '__3');
+  
+    await remove(db, '__3');
+  
+    const r2_gt = await search(db, {
+      term: 'coffee',
+      where: {
+        'meta.sales': {
+          eq: 25
+        } 
+      }
+    });
+  
+    t.equal(r2_gt.count, 1);
+    t.equal(r2_gt.hits[0].id, '__2');
   });
 });

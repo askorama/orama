@@ -59,6 +59,22 @@ export function find<K, V>(node: AVLNode<K, V>, key: K): V | null {
   return node.right ? find(node.right, key) : null;
 }
 
+export function getNodeByKey<K, V>(node: AVLNode<K, V>, key: K): AVLNode<K, V> | null {
+  if (!node) {
+    return null;
+  }
+
+  if (node.key === key) {
+    return node;
+  }
+
+  if (key < node.key) {
+    return node.left ? getNodeByKey(node.left, key) : null;
+  }
+
+  return node.right ? getNodeByKey(node.right, key) : null;
+}
+
 export function remove<K, V>(node: AVLNode<K, V>, key: K): AVLNode<K, V> | null {
   if (!node) {
     return null;

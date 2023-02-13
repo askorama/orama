@@ -101,13 +101,6 @@ export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
   return b[1] - a[1];
 }
 
-export function getNested<T = unknown>(
-  obj: Record<string, any>,
-  path: string
-): T | undefined {
-  return path.split(".").reduce((o, p) => o && typeof o === "object" ? o[p] : undefined, obj) as T | undefined;
-}
-
 export function intersect<T>(...arrays: T[][]): T[] {
   let smallestArrayIndex = 0;
   let smallestArrayLength = arrays[0].length;
@@ -156,5 +149,43 @@ export function intersect<T>(...arrays: T[][]): T[] {
     }
   }
 
+  return result;
+}
+
+/**
+ * Retrieve a deeply nested value from an object using a dot-separated string path.
+ *
+ * @template T - The expected type of the nested value.
+ * @param {Record<string, any>} obj - The object to retrieve the value from.
+ * @param {string} path - The dot-separated string path to the nested value.
+ * @returns {(T | undefined)} - The nested value, or undefined if the path is invalid.
+ */
+
+export function getNested<T = unknown>(
+  obj: Record<string, any>,
+  path: string
+): T | undefined {
+  return path.split(".").reduce((o, p) => o && typeof o === "object" ? o[p] : undefined, obj) as T | undefined;
+}
+
+/**
+ * Flattens an object with deeply nested properties, such that (for example), this:
+ * `{ foo: { bar: { baz: 10 } } }` becomes: `{ 'foo.bar.baz': 10 }`
+ *
+ * @param {object} obj - The object to flatten.
+ * @param {string} [prefix=''] - The prefix to use for each key in the flattened object.
+ * @returns {object} - The flattened object.
+ */
+
+export function flattenObject(obj: object, prefix = ''): object {
+  const result: { [key: string]: any } = {};
+  for (const key in obj) {
+    const objKey = (obj as any)[key];
+    if (typeof objKey === 'object' && objKey !== null) {
+      Object.assign(result, flattenObject(objKey, prefix + key + '.'));
+    } else {
+      result[prefix + key] = objKey;
+    }
+  }
   return result;
 }
