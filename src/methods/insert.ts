@@ -1,11 +1,14 @@
-import { Language, TokenizerConfigExec } from "../tokenizer/index.js";
-import * as ERRORS from "../errors.js";
+import type { Lyra, PropertiesSchema, ResolveSchema } from "../types/index.js";
+import type { Language, TokenizerConfigExec } from "../tokenizer/index.js";
+import type { AVLNode } from "../../src/trees/avl/node.js";
+import type { RadixNode } from "../trees/radix/node.js";
 import { trackInsertion } from "../insertion-checker.js";
-import { insert as radixInsert } from "../radix-tree/radix.js";
-import type { Lyra, PropertiesSchema, ResolveSchema } from "../types.js";
+import { insert as radixInsert } from "../trees/radix/index.js";
+import { insert as AVLInsert } from "../trees/avl/index.js";
 import { uniqueId } from "../utils.js";
 import { assertDocSchema } from "./common.js";
 import { hookRunner } from "./hooks.js";
+import * as ERRORS from "../errors.js";
 
 export type InsertConfig<S extends PropertiesSchema> = {
   language?: Language;
@@ -165,6 +168,11 @@ function recursiveradixInsertion<S extends PropertiesSchema>(
       );
     }
 
+    
+    if (typeof doc[key] === "number" && key in schema && !isSchemaNested) {
+      AVLInsert(lyra.index[propName] as AVLNode<number, string[]>, doc[key] as number, [id]);
+    }
+
     if (typeof doc[key] === "string" && key in schema && !isSchemaNested) {
       // Use propName here because if doc is a nested object
       // We will get the wrong index
@@ -210,7 +218,7 @@ function recursiveradixInsertion<S extends PropertiesSchema>(
         // increase a token counter that may not yet exist
         tokenOccurrencies[propName][token] = (tokenOccurrencies[propName][token] ?? 0) + 1;
 
-        radixInsert(requestedTrie, token, id);
+        radixInsert(requestedTrie as RadixNode, token, id);
       }
     }
   }

@@ -1,6 +1,6 @@
-import { boundedLevenshtein } from "../levenshtein.js";
-import { getOwnProperty } from "../utils.js";
-import { addDocument, create as createNode, Node, removeDocument, updateParent } from "./node.js";
+import { boundedLevenshtein } from "../../levenshtein.js";
+import { getOwnProperty } from "../../utils.js";
+import { addDocument, create as createNode, RadixNode, removeDocument, updateParent } from "./node.js";
 
 export type FindParams = {
   term: string;
@@ -10,7 +10,7 @@ export type FindParams = {
 
 export type FindResult = Record<string, string[]>;
 
-export function insert(root: Node, word: string, docId: string) {
+export function insert(root: RadixNode, word: string, docId: string) {
   for (let i = 0; i < word.length; i++) {
     const currentCharacter = word[i];
     const wordAtIndex = word.substring(i);
@@ -85,7 +85,7 @@ export function insert(root: Node, word: string, docId: string) {
   }
 }
 
-export function find(root: Node, { term, exact, tolerance }: FindParams) {
+export function find(root: RadixNode, { term, exact, tolerance }: FindParams) {
   // find the closest node to the term
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
@@ -121,7 +121,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams) {
   return output;
 }
 
-function findAllWords(node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
+function findAllWords(node: RadixNode, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
   if (node.end) {
     const { word, docs: docIDs } = node;
 
@@ -180,7 +180,7 @@ function getCommonPrefix(a: string, b: string) {
   return commonPrefix;
 }
 
-export function contains(root: Node, term: string): boolean {
+export function contains(root: RadixNode, term: string): boolean {
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
 
@@ -204,7 +204,7 @@ export function contains(root: Node, term: string): boolean {
 }
 
 // unused
-export function removeWord(root: Node, term: string): boolean {
+export function removeWord(root: RadixNode, term: string): boolean {
   if (!term) {
     return false;
   }
@@ -228,7 +228,7 @@ export function removeWord(root: Node, term: string): boolean {
   return false;
 }
 
-export function removeDocumentByWord(root: Node, term: string, docID: string, exact = true): boolean {
+export function removeDocumentByWord(root: RadixNode, term: string, docID: string, exact = true): boolean {
   if (!term) {
     return true;
   }

@@ -1,6 +1,10 @@
-import { Language, TokenizerConfig } from "./tokenizer/index.js";
-import type { Hooks } from "./methods/hooks.js";
-import type { Node } from "./radix-tree/node.js";
+import type { Language, TokenizerConfig } from "../tokenizer/index.js";
+import type { Hooks } from "../methods/hooks.js";
+import type { RadixNode } from "../trees/radix/node.js";
+import type { AVLNode } from "../trees/avl/node.js";
+
+export * from "./filters.js";
+export * from "./facets.js";
 
 export type TokenScore = [string, number];
 export type Nullable<T> = T | null;
@@ -20,30 +24,6 @@ export type SearchProperties<
     : TKey
   : never;
 
-export type FacetSorting = "asc" | "desc" | "ASC" | "DESC";
-
-type FacetTypeInterfaces = {
-  string: {
-    limit?: number;
-    offset?: number;
-    sort?: FacetSorting;
-  };
-  number: {
-    ranges: {from: number, to: number}[]
-  };
-  boolean: {
-    true?: boolean;
-    false?: boolean;
-  };
-}
-
-export type FacetsSearch<S extends PropertiesSchema, P extends string = "", K extends keyof S = keyof S> = K extends string
-  ? S[K] extends PropertiesSchema
-    ? FacetsSearch<S[K], `${P}${K}.`>
-    : S[K] extends PropertyType
-      ? { [key in `${P}${K}`]?: FacetTypeInterfaces[S[K]] }
-      : never
-  : never;
 
 export type PropertyType = "string" | "number" | "boolean";
 
@@ -118,6 +98,8 @@ export type BM25Params = {
   d: number;
 };
 
+export type TokenMap = Record<string, TokenScore[]>;
+
 type ResolveTypes<TType> = TType extends "string"
   ? string
   : TType extends "boolean"
@@ -128,9 +110,7 @@ type ResolveTypes<TType> = TType extends "string"
   ? { [P in keyof TType]: ResolveTypes<TType[P]> }
   : never;
 
-type Index = Record<string, Node>;
-
-export type TokenMap = Record<string, TokenScore[]>;
+type Index = Record<string, RadixNode | AVLNode<number, string[]>>;
 
 type FrequencyMap = {
   [property: string]: {

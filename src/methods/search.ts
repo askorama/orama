@@ -1,10 +1,13 @@
-import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams, PropertiesBoost, FacetsSearch } from "../types.js";
+import type { RadixNode } from "../trees/radix/node.js";
+import type { Lyra, PropertiesSchema, ResolveSchema, SearchProperties, TokenMap, TokenScore, BM25Params, BM25OptionalParams, PropertiesBoost, FacetsSearch } from "../types/index.js";
+import type { WhereFilter } from "../types/filters.js";
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
-import { find as radixFind } from "../radix-tree/radix.js";
+import { find as radixFind } from "../trees/radix/index.js";
 import { formatNanoseconds, getNanosecondsTime, sortTokenScorePredicate } from "../utils.js";
 import { getIndices } from "./common.js";
 import { prioritizeTokenScores, BM25 } from "../algorithms.js";
 import { FacetReturningValue, getFacets } from "../facets.js";
+import { getWhereFiltersIDs, intersectFilteredIDs } from "../filters.js";
 
 type IndexMap = Record<string, TokenMap>;
 
@@ -104,6 +107,25 @@ export type SearchParams<S extends PropertiesSchema> = {
    * });
    */
   facets?: FacetsSearch<S>;
+
+  /**
+   * Filter the search results.
+   * 
+   * @example
+   * // Search for documents that contain 'Headphones' in the 'description' and 'title' fields and
+   * // have a price less than 100.
+   * 
+   * const result = await search(db, {
+   *  term: 'Headphones',
+   *  properties: ['description', 'title'],
+   *  where: {
+   *    price: {
+   *      lt: 100
+   *    }
+   *  }
+   * });
+   */
+  where?: WhereFilter<S>;
 };
 
 export type SearchResult<S extends PropertiesSchema> = {
@@ -165,6 +187,15 @@ export async function search<S extends PropertiesSchema>(
   const N = lyra.docsCount;
 
   const timeStart = getNanosecondsTime();
+
+  // If filters are enabled, we need to get the IDs of the documents that match the filters.
+  const hasFilters = Object.keys(params.where ?? {}).length > 0;
+  let whereFiltersIDs: string[] = [];
+
+  if (hasFilters) {
+    whereFiltersIDs = getWhereFiltersIDs(params.where!, lyra);
+  }
+
   // uniqueDocsIDs contains unique document IDs for all the tokens in all the indices.
   const uniqueDocsIDs: Record<string, number> = {};
 
@@ -270,7 +301,13 @@ export async function search<S extends PropertiesSchema>(
   }
 
   // Get unique doc IDs from uniqueDocsIDs map, sorted by value.
-  const uniqueDocsArray = Object.entries(uniqueDocsIDs).sort(sortTokenScorePredicate);
+  let uniqueDocsArray = Object.entries(uniqueDocsIDs).sort(sortTokenScorePredicate);
+  
+  // If filters are enabled, we need to remove the IDs of the documents that don't match the filters.
+  if (hasFilters) {
+    uniqueDocsArray = intersectFilteredIDs(whereFiltersIDs, uniqueDocsArray);
+  }
+
   const resultIDs: Set<string> = new Set();
   // Populate facets if needed
   const facets = shouldCalculateFacets ? getFacets(lyra.schema, lyra.docs, uniqueDocsArray, params.facets!) : {};
@@ -306,7 +343,7 @@ export async function search<S extends PropertiesSchema>(
   const searchResult: SearchResult<S> = {
     elapsed,
     hits: results.filter(Boolean),
-    count: Object.keys(uniqueDocsIDs).length,
+    count: uniqueDocsArray.length,
   };
 
   if (shouldCalculateFacets) {
@@ -321,7 +358,7 @@ function getDocumentIDsFromSearch<S extends PropertiesSchema>(
   params: SearchParams<S> & { index: string },
 ): string[] {
   const idx = lyra.index[params.index];
-  const searchResult = radixFind(idx, {
+  const searchResult = radixFind(idx as RadixNode, {
     term: params.term,
     exact: params.exact,
     tolerance: params.tolerance,

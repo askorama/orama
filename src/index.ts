@@ -5,7 +5,7 @@ export { remove } from "./methods/remove.js";
 export { save } from "./methods/save.js";
 export { search } from "./methods/search.js";
 
-export * from "./types.js";
+export * from "./types/index.js";
 export type { Language } from "./tokenizer/languages.js";
 export type { InsertConfig, InsertBatchConfig } from "./methods/insert.js";
 export type { RetrievedDoc, SearchParams, SearchResult } from "./methods/search.js";

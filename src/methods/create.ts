@@ -1,7 +1,8 @@
-import type { Configuration, Lyra, PropertiesSchema } from "../types.js";
+import type { Configuration, Lyra, PropertiesSchema } from "../types/index.js";
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
 import * as ERRORS from "../errors.js";
-import { create as createNode } from "../radix-tree/node.js";
+import { create as createNode } from "../trees/radix/node.js";
+import { create as createAVLNode } from "../trees/avl/index.js";
 import { validateHooks } from "./hooks.js";
 import { intersectTokenScores } from "../algorithms.js";
 
@@ -65,8 +66,16 @@ function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix
     if (isNested) {
       buildIndex(lyra, schema[prop] as S, `${propName}.`);
     } else {
-      lyra.index[propName] = createNode();
-      lyra.avgFieldLength[propName] = 0;
+      if (schema[prop] === "string") {
+        lyra.index[propName] = createNode();
+        lyra.avgFieldLength[propName] = 0;
+        continue;
+      }
+      
+      if (schema[prop] === "number") {
+        lyra.index[propName] = createAVLNode<number, string[]>(0, []);
+        continue;
+      }
     }
   }
 }

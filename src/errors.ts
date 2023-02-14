@@ -79,3 +79,7 @@ export function INVALID_TOKENIZER_FUNCTION(): string {
 export function INVALID_BOOST_VALUE(): string {
   return `Boost value must be a number greater than, or less than 0.`;
 }
+
+export function INVALID_FILTER_OPERATION(found: string[]): string {
+  return `You can only use one operation per filter. Found ${found.length}: ${found.join(", ")}`;
+}

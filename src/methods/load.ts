@@ -1,5 +1,5 @@
 import * as ERRORS from "../errors.js";
-import type { Data, Lyra, PropertiesSchema } from "../types.js";
+import type { Data, Lyra, PropertiesSchema } from "../types/index.js";
 
 export async function load<S extends PropertiesSchema>(
   lyra: Lyra<S>,

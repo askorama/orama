@@ -1,8 +1,8 @@
 import t from "tap";
-import { formatBytes, formatNanoseconds, getOwnProperty, getNested } from "../src/utils.js";
+import { formatBytes, formatNanoseconds, getOwnProperty, getNested, flattenObject } from "../src/utils.js";
 
 t.test("utils", t => {
-  t.plan(4);
+  t.plan(5);
 
   t.test("should correctly format bytes", t => {
     t.plan(9);
@@ -71,5 +71,27 @@ t.test("utils", t => {
     t.equal(getNested(myObject, "nested1.nested3.bar"), undefined);
     t.equal(getNested(myObject, "nested.null.bar"), undefined);
     t.equal(getNested(myObject, "nested.noop.bar"), undefined);
+  });
+
+  t.test("should flatten an object", t => {
+    t.plan(2);
+
+    const myObject = {
+      foo: "bar",
+      nested: {
+        nested2: {
+          nested3: {
+            bar: "baz"
+          }
+        },
+        null: null,
+        noop: () => null
+      }
+    };
+
+    const flattened = flattenObject(myObject);
+
+    t.equal((flattened as any).foo, "bar");
+    t.equal(flattened["nested.nested2.nested3.bar"], "baz");
   });
 });

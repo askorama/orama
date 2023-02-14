@@ -1,18 +1,18 @@
-import type { Nullable } from "../types.js";
-import { uniqueId } from "../utils.js";
+import type { Nullable } from "../../types/index.js";
+import { uniqueId } from "../../utils.js";
 
-export interface Node {
+export interface RadixNode {
   id: string;
   key: string;
   subWord: string;
   parent: Nullable<string>;
-  children: Record<string, Node>;
+  children: Record<string, RadixNode>;
   docs: string[];
   end: boolean;
   word: string;
 }
 
-export function create(end = false, subWord = "", key = ""): Node {
+export function create(end = false, subWord = "", key = ""): RadixNode {
   const node = {
     id: uniqueId(),
     key,
@@ -28,16 +28,16 @@ export function create(end = false, subWord = "", key = ""): Node {
   return node;
 }
 
-export function updateParent(node: Node, parent: Node): void {
+export function updateParent(node: RadixNode, parent: RadixNode): void {
   node.parent = parent.id;
   node.word = parent.word + node.subWord;
 }
 
-export function addDocument(node: Node, docID: string): void {
+export function addDocument(node: RadixNode, docID: string): void {
   node.docs.push(docID);
 }
 
-export function removeDocument(node: Node, docID: string): boolean {
+export function removeDocument(node: RadixNode, docID: string): boolean {
   const index = node.docs.indexOf(docID);
 
   /* c8 ignore next 3 */
@@ -51,7 +51,7 @@ export function removeDocument(node: Node, docID: string): boolean {
 }
 
 /* c8 ignore next 5 */
-function serialize(this: Node): object {
+function serialize(this: RadixNode): object {
   const { word, subWord, children, docs, end } = this;
 
   return { word, subWord, children, docs, end };
