@@ -283,8 +283,10 @@ t.test("should throw when using multiple operators", async t => {
       term: 'coffee',
       where: {
         rating: {
+          // @ts-expect-error error case
           gt: 4,
-          lte: 5,
+          // @ts-expect-error error case
+          lte: 10
         } 
       }
     });
