@@ -81,5 +81,5 @@ export function INVALID_BOOST_VALUE(): string {
 }
 
 export function INVALID_FILTER_OPERATION(found: string[]): string {
-  return `You can only use one operation per filter. Found: ${found.join(", ")}`;
+  return `You can only use one operation per filter. Found ${found.length}: ${found.join(", ")}`;
 }

@@ -17,7 +17,7 @@ export function getWhereFiltersIDs<S extends PropertiesSchema>(filters: WhereFil
     const operationKeys = Object.keys(operation as unknown as FilterOperation[])
 
     if (operationKeys.length > 1) {
-      throw new Error(ERRORS.INVALID_FILTER_OPERATION(Object.keys(operationKeys)))
+      throw new Error(ERRORS.INVALID_FILTER_OPERATION(operationKeys))
     }
 
     const operationOpt = operationKeys[0] as FilterOperation

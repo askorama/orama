@@ -272,3 +272,23 @@ t.test("filters after removing docs", t => {
     t.equal(r2_gt.hits[0].id, '__2');
   });
 });
+
+t.test("should throw when using multiple operators", async t => {
+  t.plan(1);
+
+  const db = await createSimpleDB();
+
+  try {
+    await search(db, {
+      term: 'coffee',
+      where: {
+        rating: {
+          gt: 4,
+          lte: 5,
+        } 
+      }
+    });
+  } catch (error) {
+    t.equal(error.message, 'You can only use one operation per filter. Found 2: gt, lte');
+  }
+});
