@@ -1,4 +1,4 @@
-import type { PropertiesSchema } from "src/types/index.js";
+import type { PropertiesSchema } from "./index.js";
 
 export type FilterOperation =
   | "gt"

@@ -1,4 +1,4 @@
-import { PropertiesSchema, PropertyType } from "src/types";
+import { PropertiesSchema, PropertyType } from "./index.js";
 
 export type FacetSorting = "asc" | "desc" | "ASC" | "DESC";
 
