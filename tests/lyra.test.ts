@@ -25,7 +25,7 @@ interface DataSet {
 }
 
 t.test("defaultLanguage", t => {
-  t.plan(4);
+  t.plan(5);
 
   t.test("should throw an error if the desired language is not supported", async t => {
     t.plan(1);
@@ -82,6 +82,21 @@ t.test("defaultLanguage", t => {
       await create({
         schema: {},
         defaultLanguage: "slovenian",
+      });
+
+      t.pass();
+    } catch (e) {
+      t.fail();
+    }
+  });
+
+  t.test("should not throw if if the language is supported", async t => {
+    t.plan(1);
+
+    try {
+      await create({
+        schema: {},
+        defaultLanguage: "bulgarian",
       });
 
       t.pass();
@@ -1066,4 +1081,36 @@ t.test("should correctly search accented words in Slovenian", async t => {
     term: "križišče",
   });
   t.equal(searchResult.count, 2);
+});
+
+t.test("should correctly search words in Bulgarian", async t => {
+  const db = await create({
+    schema: {
+      description: "string",
+    },
+    defaultLanguage: "bulgarian",
+  });
+
+  await insert(db, {
+    // text in the same vain as the quick brown fox, including all cyrillic letters
+    description: "Жълтата дюля беше щастлива, че пухът, който цъфна, замръзна като гьон",
+  });
+
+  await insert(db, {
+    description: "Пингвините са нелетящи птици, обитаващи Южното полукълбо",
+  });
+
+  await insert(db, {
+    description: "Гръдните мускули на пингвините са много по-мощни от тези на летящите им родственици",
+  });
+
+  const firstSearchResult = await search(db, {
+    term: "пингвин",
+  });
+  t.equal(firstSearchResult.count, 2);
+
+  const secondSearchResult = await search(db, {
+    term: "жълта",
+  });
+  t.equal(secondSearchResult.count, 1);
 });
