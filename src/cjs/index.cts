@@ -8,6 +8,7 @@ import type { load as esmLoad } from "../methods/load.js";
 import type { remove as esmRemove } from "../methods/remove.js";
 import type { save as esmSave } from "../methods/save.js";
 import type { search as esmSearch } from "../methods/search.js";
+import type { count as esmCount, getByID as esmGetByID } from "../methods/docs.js";
 
 export interface LyraExport {
   create: typeof esmCreate;
@@ -18,6 +19,8 @@ export interface LyraExport {
   search: typeof esmSearch;
   save: typeof esmSave;
   load: typeof esmLoad;
+  count: typeof esmCount;
+  getByID: typeof esmGetByID;
 }
 
 export type RequireCallback = (err: Error | undefined, lyra?: LyraExport) => void;
@@ -30,6 +33,8 @@ let _esmRemove: typeof esmRemove;
 let _esmSearch: typeof esmSearch;
 let _esmSave: typeof esmSave;
 let _esmLoad: typeof esmLoad;
+let _esmCount: typeof esmCount;
+let _esmGetByID: typeof esmGetByID;
 
 export async function create(...args: Parameters<typeof esmCreate>): ReturnType<typeof esmCreate> {
   if (!_esmCreate) {
@@ -103,6 +108,24 @@ export async function load(...args: Parameters<typeof esmLoad>): ReturnType<type
   }
 
   return _esmLoad(...args);
+}
+
+export async function count(...args: Parameters<typeof esmCount>): ReturnType<typeof esmCount> {
+  if (!_esmCount) {
+    const imported = await import("../methods/docs.js");
+    _esmCount = imported.count;
+  }
+
+  return _esmCount(...args);
+}
+
+export async function getByID(...args: Parameters<typeof esmGetByID>): ReturnType<typeof esmGetByID> {
+  if (!_esmGetByID) {
+    const imported = await import("../methods/docs.js");
+    _esmGetByID = imported.getByID;
+  }
+
+  return _esmGetByID(...args);
 }
 
 export function requireLyra(callback: RequireCallback): void {
