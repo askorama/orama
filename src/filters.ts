@@ -1,4 +1,4 @@
-import type { WhereFilter, FilterOperation, PropertiesSchema, Lyra } from "./types/index.js";
+import type { WhereFilter, FilterOperation, PropertiesSchema, Lyra, BooleanIndex } from "./types/index.js";
 import type { AVLNode } from "./trees/avl/node.js";
 import { greaterThan, lessThan, rangeSearch, find } from "./trees/avl/index.js";
 import { intersect } from './utils.js'
@@ -18,6 +18,14 @@ export function getWhereFiltersIDs<S extends PropertiesSchema>(filters: WhereFil
 
     if (operationKeys.length > 1) {
       throw new Error(ERRORS.INVALID_FILTER_OPERATION(operationKeys))
+    }
+
+    if (typeof operation === 'boolean') {
+      const idx = lyra.index[param] as BooleanIndex;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - this is a bug in the typescript compiler
+      const filteredIDs = idx[operation.toString() as keyof BooleanIndex];
+      filtersMap[param].push(...filteredIDs);
     }
 
     const operationOpt = operationKeys[0] as FilterOperation

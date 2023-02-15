@@ -1,4 +1,4 @@
-import type { Lyra, PropertiesSchema, ResolveSchema } from "../types/index.js";
+import type { BooleanIndex, Lyra, PropertiesSchema, ResolveSchema } from "../types/index.js";
 import type { Language, TokenizerConfigExec } from "../tokenizer/index.js";
 import type { AVLNode } from "../../src/trees/avl/node.js";
 import type { RadixNode } from "../trees/radix/node.js";
@@ -167,10 +167,14 @@ function recursiveradixInsertion<S extends PropertiesSchema>(
         schema[key] as PropertiesSchema,
       );
     }
-
     
     if (typeof doc[key] === "number" && key in schema && !isSchemaNested) {
       AVLInsert(lyra.index[propName] as AVLNode<number, string[]>, doc[key] as number, [id]);
+    }
+
+    if (typeof doc[key] === "boolean" && key in schema && !isSchemaNested) {
+      const docKey = doc[key].toString() as "true" | "false";
+      (lyra.index[propName] as BooleanIndex)[docKey].push(id);
     }
 
     if (typeof doc[key] === "string" && key in schema && !isSchemaNested) {

@@ -287,10 +287,74 @@ t.test("should throw when using multiple operators", async t => {
           gt: 4,
           // @ts-expect-error error case
           lte: 10
-        } 
+        }
       }
     });
   } catch (error) {
     t.equal(error.message, 'You can only use one operation per filter. Found 2: gt, lte');
   }
+});
+
+t.test("boolean filters", async t => {
+  t.plan(7);
+
+  const db = await create({
+    schema: {
+      id: 'string',
+      isAvailable: 'boolean',
+      name: 'string'
+    }
+  });
+
+  await insert(db, {
+    id: '1',
+    isAvailable: true,
+    name: 'coffee'
+  });
+
+  await insert(db, {
+    id: '2',
+    isAvailable: true,
+    name: 'coffee machine'
+  });
+
+  await insert(db, {
+    id: '3',
+    isAvailable: false,
+    name: 'coffee maker'
+  });
+
+  const r1 = await search(db, {
+    term: 'coffee',
+    where: {
+      isAvailable: true,
+    }
+  });
+
+  t.equal(r1.count, 2);
+  t.equal(r1.hits[0].id, '1');
+  t.equal(r1.hits[1].id, '2');
+
+  const r2 = await search(db, {
+    term: 'coffee',
+    where: {
+      isAvailable: false,
+    }
+  });
+
+  t.equal(r2.count, 1);
+  t.equal(r2.hits[0].id, '3');
+
+  await remove(db, '2');
+
+  const r3 = await search(db, {
+    term: 'coffee',
+    where: {
+      isAvailable: true,
+    }
+  });
+
+  t.equal(r3.count, 1);
+  t.equal(r3.hits[0].id, '1');
+
 });
