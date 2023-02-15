@@ -4,6 +4,7 @@ export { load } from "./methods/load.js";
 export { remove } from "./methods/remove.js";
 export { save } from "./methods/save.js";
 export { search } from "./methods/search.js";
+export { getByID, count } from "./methods/docs.js";
 
 export * from "./types/index.js";
 export type { Language } from "./tokenizer/languages.js";
