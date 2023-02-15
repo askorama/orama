@@ -27,5 +27,7 @@ export type WhereFilter<
     ? WhereFilter<S[K], `${P}${K}.`>
     : S[K] extends "number"
       ? { [key in `${P}${K}`]?: PickOne<ComparisonOperator> }
+      : S[K] extends "boolean"
+        ? { [key in `${P}${K}`]?: boolean }
       : never
   : never;

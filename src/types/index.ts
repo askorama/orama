@@ -100,6 +100,11 @@ export type BM25Params = {
 
 export type TokenMap = Record<string, TokenScore[]>;
 
+export type BooleanIndex = {
+  'true': string[];
+  'false': string[];
+}
+
 type ResolveTypes<TType> = TType extends "string"
   ? string
   : TType extends "boolean"
@@ -110,7 +115,7 @@ type ResolveTypes<TType> = TType extends "string"
   ? { [P in keyof TType]: ResolveTypes<TType[P]> }
   : never;
 
-type Index = Record<string, RadixNode | AVLNode<number, string[]>>;
+type Index = Record<string, RadixNode | AVLNode<number, string[]> | BooleanIndex>;
 
 type FrequencyMap = {
   [property: string]: {

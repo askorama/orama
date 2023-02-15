@@ -1,5 +1,5 @@
 import type { RadixNode } from "../trees/radix/node.js";
-import type { Lyra, PropertiesSchema, ResolveSchema } from "../types/index.js";
+import type { Lyra, PropertiesSchema, ResolveSchema, BooleanIndex } from "../types/index.js";
 import { defaultTokenizerConfig } from "../tokenizer/index.js";
 import { removeDocumentByWord } from "../trees/radix/index.js";
 import { flattenObject, getNested } from "../utils.js";
@@ -60,6 +60,7 @@ export async function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: s
   }
 
   removeNumericValue(lyra, docID);
+  removeBooleanValue(lyra, docID);
 
   lyra.docs[docID] = undefined;
   lyra.docsCount--;
@@ -86,3 +87,21 @@ function removeNumericValue<S extends PropertiesSchema>(lyra: Lyra<S>, docID: st
     }
   }
 } 
+
+function removeBooleanValue<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string) {
+  const document = lyra.docs[docID] as Record<string, ResolveSchema<S>>;
+  const flatDocument = flattenObject(document);
+  const documentBooleanOnly = Object.keys(flatDocument).reduce((acc, key) => {
+    if (getNested(lyra.schema, key) === "boolean") {
+      acc[key] = (flatDocument as any)[key];
+    }
+    return acc;
+  }, {} as Record<string, boolean>);
+
+  for (const [property] of Object.entries(documentBooleanOnly)) {
+    const idx = lyra.index[property] as BooleanIndex;
+
+    idx.true.slice(idx.true.indexOf(docID), 1);
+    idx.false.slice(idx.false.indexOf(docID), 1);
+  }
+}

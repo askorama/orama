@@ -76,6 +76,11 @@ function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix
         lyra.index[propName] = createAVLNode<number, string[]>(0, []);
         continue;
       }
+
+      if (schema[prop] === "boolean") {
+        lyra.index[propName] = { 'true': [], 'false': [] };
+        continue;
+      }
     }
   }
 }
