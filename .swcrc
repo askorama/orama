@@ -25,7 +25,7 @@
   {
     "test": ".*\\.cts$",
     "module": {
-      "type": "commonjs"
+      "type": "commonjs",
       "ignoreDynamic": true
     },
     "env": {
