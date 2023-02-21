@@ -55,7 +55,6 @@ class BulgarianStemmer {
     }
 
     return len;
-    // return s.substring(0, s.length - len);
   }
 
   /**
