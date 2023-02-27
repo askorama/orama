@@ -1,5 +1,7 @@
 import t from "tap";
 import { formatBytes, formatNanoseconds, getOwnProperty, getNested, flattenObject } from "../src/utils.js";
+import { BALANCE_STATE, findMin, getBalanceFactor, rotateLeft, rotateRight } from "../src/trees/avl/utils.js";
+import { createAVLNode } from "../src/trees/avl/node.js";
 
 t.test("utils", t => {
   t.plan(5);
@@ -93,5 +95,73 @@ t.test("utils", t => {
 
     t.equal((flattened as any).foo, "bar");
     t.equal(flattened["nested.nested2.nested3.bar"], "baz");
+  });
+});
+
+t.test("avl utils", t => {
+  t.plan(6);
+
+  t.test("should return unbalanced right", t => {
+    t.plan(1);
+
+    const node = createAVLNode('node', [1, 2, 3]);
+    node.left = createAVLNode('left', [1, 2, 3]);
+    node.left.right = createAVLNode('left.right', [1, 2, 3]);
+    const rotated = rotateRight(node);
+
+    t.equal(getBalanceFactor(rotated), BALANCE_STATE.UNBALANCED_RIGHT);
+  });
+
+  t.test("should return sligthly unbalanced right", t => {
+    t.plan(1);
+
+    const node = createAVLNode('node', [1, 2, 3]);
+    node.left = createAVLNode('left', [1, 2, 3]);
+    const rotated = rotateRight(node);
+
+    t.equal(getBalanceFactor(rotated), BALANCE_STATE.SLIGHTLY_UNBALANCED_RIGHT);
+  });
+
+  t.test("should return balanced", t => {
+    t.plan(1);
+
+    const node = createAVLNode('node', [1, 2, 3]);
+    node.left = createAVLNode('left', [1, 2, 3]);
+    node.left.left = createAVLNode('left.left', [1, 2, 3]);
+    const rotated = rotateRight(node);
+
+    t.equal(getBalanceFactor(rotated), BALANCE_STATE.BALANCED);
+  });
+
+  t.test("should return sligthly unbalanced right", t => {
+    t.plan(1);
+
+    const node = createAVLNode('node', [1, 2, 3]);
+    node.right = createAVLNode('right', [1, 2, 3]);
+    const rotated = rotateLeft(node);
+
+    t.equal(getBalanceFactor(rotated), BALANCE_STATE.SLIGHTLY_UNBALANCED_LEFT);
+  });
+
+  t.test("should return unbalanced left", t => {
+    t.plan(1);
+
+    const node = createAVLNode('node', [1, 2, 3]);
+    node.right = createAVLNode('right', [1, 2, 3]);
+    node.right.left = createAVLNode('right.left', [1, 2, 3]);
+    const rotated = rotateLeft(node);
+
+    t.equal(getBalanceFactor(rotated), BALANCE_STATE.UNBALANCED_LEFT);
+  });
+
+  t.test("should find min node", t => {
+    t.plan(1);
+
+    const node = createAVLNode('node', [1, 2, 3]);
+    node.left = createAVLNode('left', [1, 2, 3]);
+    node.left.left = createAVLNode('left.left', [1, 2, 3]);
+    node.left.right = createAVLNode('left.right', [1, 2, 3]);
+
+    t.equal(findMin(node).key, 'left.left');
   });
 });
