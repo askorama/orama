@@ -22,7 +22,7 @@ const phrases = [
 ];
 
 t.test("radix tree", t => {
-  t.plan(7);
+  t.plan(10);
 
   t.test("should correctly find an element by prefix", t => {
     t.plan(1);
@@ -151,6 +151,45 @@ t.test("radix tree", t => {
     t.strictSame(resultHalfSearch, {
       [phrases[0].doc]: [],
     });
+  });
+
+  t.test("should return false if the term is not found when removing a doc by word", t => {
+    t.plan(1);
+
+    const root = createNode();
+
+    for (const { doc, id } of phrases) {
+      radixInsert(root, doc, id);
+    }
+
+    const result = radixRemoveWord(root, "");
+    t.notOk(result);
+  });
+
+  t.test("should return true if the term is not found when removing a doc by word", t => {
+    t.plan(1);
+
+    const root = createNode();
+
+    for (const { doc, id } of phrases) {
+      radixInsert(root, doc, id);
+    }
+
+    const result = radixRemoveDocumentByWord(root, "", "1", false);
+    t.ok(result);
+  });
+
+  t.test("should return false if the char is not found in the tree when removing a doc by word", t => {
+    t.plan(1);
+
+    const root = createNode();
+
+    for (const { doc, id } of phrases) {
+      radixInsert(root, doc, id);
+    }
+
+    const result = radixRemoveDocumentByWord(root, "a", "1", false);
+    t.notOk(result);
   });
 });
 

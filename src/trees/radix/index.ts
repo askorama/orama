@@ -203,7 +203,6 @@ export function contains(root: RadixNode, term: string): boolean {
   return true;
 }
 
-// unused
 export function removeWord(root: RadixNode, term: string): boolean {
   if (!term) {
     return false;
@@ -224,8 +223,6 @@ export function removeWord(root: RadixNode, term: string): boolean {
       return false;
     }
   }
-
-  return false;
 }
 
 export function removeDocumentByWord(root: RadixNode, term: string, docID: string, exact = true): boolean {
