@@ -15,9 +15,10 @@ import { stemmer as DEStemmer } from "../stemmer/lib/de.js";
 import { stemmer as FIStemmer } from "../stemmer/lib/fi.js";
 import { stemmer as DKStemmer } from "../stemmer/lib/dk.js";
 import { stemmer as UKStemmer } from "../stemmer/lib/uk.js";
+import { stemmer as BGStemmer } from "../stemmer/lib/bg.js";
 
 t.test("Tokenizer", t => {
-  t.plan(14);
+  t.plan(15);
 
   t.test("Should tokenize and stem correctly in english", t => {
     t.plan(2);
@@ -363,6 +364,7 @@ t.test("Tokenizer", t => {
     t.strictSame(O1, ["sovn", "svar", "ting", "prov", "mislyk"]);
     t.strictSame(O2, ["bagt", "smakag"]);
   });
+
   t.test("Should tokenize and stem correctly in ukrainian", t => {
     t.plan(2);
 
@@ -375,8 +377,7 @@ t.test("Tokenizer", t => {
       false,
       defaultTokenizerConfig("ukrainian", {
         stemmingFn: UKStemmer,
-        customStopWords:[]
-
+        customStopWords: [],
       }),
     );
     const O2 = tokenize(
@@ -385,13 +386,40 @@ t.test("Tokenizer", t => {
       false,
       defaultTokenizerConfig("ukrainian", {
         stemmingFn: UKStemmer,
-        customStopWords:[]
+        customStopWords: [],
       }),
     );
-    t.strictSame(O1, ["кол", "тест", "не", "проход", "спат","важк"]);
-    t.strictSame(O2, ["я", "приготувал","тістечк"]);
+    t.strictSame(O1, ["кол", "тест", "не", "проход", "спат", "важк"]);
+    t.strictSame(O2, ["я", "приготувал", "тістечк"]);
   });
 
+  t.test("Should tokenize and stem correctly in bulgarian", t => {
+    t.plan(2);
+
+    const I1 = "Кокошката е малка крава която не може да се събере с теста";
+    const I2 = "Има първа вероятност да се случи нещо неочаквано докато се изпълняват тестовете";
+
+    const O1 = tokenize(
+      I1,
+      "bulgarian",
+      false,
+      defaultTokenizerConfig("bulgarian", {
+        stemmingFn: BGStemmer,
+        customStopWords: [],
+      }),
+    );
+    const O2 = tokenize(
+      I2,
+      "bulgarian",
+      true,
+      defaultTokenizerConfig("bulgarian", {
+        stemmingFn: BGStemmer,
+        customStopWords: [],
+      }),
+    );
+    t.strictSame(O1, ["кокошк", "е", "малк", "крав", "коят", "не", "мож", "да", "се", "събер", "с", "тест"]);
+    t.strictSame(O2, ["има", "първ", "вероятност", "да", "се", "случ", "нещ", "неочакван", "док", "се", "изпълняват", "тест"]);
+  });
 });
 
 t.test("Custom stop-words rules", t => {
