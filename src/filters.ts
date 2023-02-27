@@ -65,8 +65,8 @@ export function getWhereFiltersIDs<S extends PropertiesSchema>(filters: WhereFil
       case "eq": {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore - this is a bug in the typescript compiler
-        const filteredIDs = find(AVLNode, operationValue);
-        filtersMap[param].push(...filteredIDs!);
+        const filteredIDs = find(AVLNode, operationValue) ?? [];
+        filtersMap[param].push(...filteredIDs);
         break;
       }
       case "between": {
