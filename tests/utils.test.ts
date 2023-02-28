@@ -1,8 +1,15 @@
 import t from "tap";
-import { formatBytes, formatNanoseconds, getOwnProperty, getNested, flattenObject } from "../src/utils.js";
+import {
+  formatBytes,
+  formatNanoseconds,
+  getOwnProperty,
+  getNested,
+  flattenObject,
+  isSerializable,
+} from "../src/utils.js";
 
 t.test("utils", t => {
-  t.plan(5);
+  t.plan(6);
 
   t.test("should correctly format bytes", t => {
     t.plan(9);
@@ -93,5 +100,34 @@ t.test("utils", t => {
 
     t.equal((flattened as any).foo, "bar");
     t.equal(flattened["nested.nested2.nested3.bar"], "baz");
+  });
+
+  t.test("isSerializable", t => {
+    t.plan(2);
+    t.test("should return true on supported serializable objects", t => {
+      t.plan(1);
+      t.ok(isSerializable({}));
+    });
+    t.test("should return false on supported serializable objects", t => {
+      t.plan(9);
+      // @ts-expect-error error case
+      t.notOk(isSerializable([]));
+      // @ts-expect-error error case
+      t.notOk(isSerializable(new Map()));
+      // @ts-expect-error error case
+      t.notOk(isSerializable(new Set()));
+      // @ts-expect-error error case
+      t.notOk(isSerializable(new WeakMap()));
+      // @ts-expect-error error case
+      t.notOk(isSerializable(new WeakSet()));
+      // @ts-expect-error error case
+      t.notOk(isSerializable(new ArrayBuffer()));
+      // @ts-expect-error error case
+      t.notOk(isSerializable(new Float32Array()));
+      // @ts-expect-error error case
+      t.notOk(isSerializable(new Uint8Array()));
+      // @ts-expect-error error case
+      t.notOk(isSerializable(new SharedArrayBuffer()));
+    });
   });
 });

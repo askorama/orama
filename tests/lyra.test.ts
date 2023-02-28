@@ -107,7 +107,7 @@ t.test("defaultLanguage", t => {
 });
 
 t.test("checkInsertDocSchema", t => {
-  t.plan(3);
+  t.plan(5);
 
   t.test("should compare the inserted doc with the schema definition", async t => {
     t.plan(2);
@@ -125,6 +125,62 @@ t.test("checkInsertDocSchema", t => {
     await t.rejects(() => insert(db, { quote: "hello, world!", author: true }), {
       message: INVALID_DOC_SCHEMA({ quote: "string", author: "string" }, { quote: "hello, world!", author: true }),
     });
+  });
+
+  t.test("should check for nested wrong schema properties", async t => {
+    t.plan(1);
+    const schema = {
+      quote: "string",
+      author: {
+        name: "string",
+        surname: "string",
+      },
+    };
+    const documentWithBadSchema = {
+      quote:
+        "Nobody ever figures out what life is all about, and it doesn't matter. Explore the world. Nearly everything is really interesting if you go into it deeply enough.",
+
+      author: "Richard Feynman",
+    };
+    const db = await create({
+      schema,
+    });
+
+    await t.rejects(
+      () =>
+        // @ts-expect-error test error case
+        insert(db, documentWithBadSchema),
+      {
+        message: INVALID_DOC_SCHEMA(schema, documentWithBadSchema),
+      },
+    );
+  });
+
+  t.test("should check for non serializable document property", async t => {
+    t.plan(1);
+
+    const schema = {
+      quote: "string",
+      author: {
+        name: "string",
+        surname: "string",
+      },
+    };
+    const documentWithNonSerializableProperty = {
+      quote: "I'll need some information first, Just the basic facts, Can you show me where it hurts?",
+      author: ["David Jon Gilmour", "Roger Waters"],
+    };
+    const db = await create({
+      schema,
+    });
+    await t.rejects(
+      () =>
+        // @ts-expect-error test error case
+        insert(db, documentWithNonSerializableProperty),
+      {
+        message: INVALID_DOC_SCHEMA(schema, documentWithNonSerializableProperty),
+      },
+    );
   });
 
   t.test("should allow doc with missing schema keys to be inserted without indexing those keys", async t => {

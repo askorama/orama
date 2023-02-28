@@ -1,4 +1,5 @@
-import type { TokenScore } from "./types/index.js";
+import { SUPPORTED_PROPERTY_TYPES } from "./consts.js";
+import type { PropertiesSchema, ResolveSchema, TokenScore } from "./types/index.js";
 
 const baseId = Date.now().toString().slice(5);
 let lastId = 0;
@@ -173,4 +174,49 @@ export function flattenObject(obj: object, prefix = ''): object {
     }
   }
   return result;
+}
+
+function isArray(t: object) {
+  return Array?.isArray(t) ?? t instanceof Array;
+}
+
+function isArrayBuffer(t: object) {
+  return t.constructor.name == "ArrayBuffer" || (ArrayBuffer && t instanceof ArrayBuffer);
+}
+
+function isArrayBufferView(t: object) {
+  // This also applies on TypedArray subclasses like "Int8Array" etc...
+  return !!ArrayBuffer?.isView(t);
+}
+
+function isMapOrSet(t: object) {
+  return (
+    (Set ? t.constructor.name == "Set" : t instanceof Set) || (Map ? t.constructor.name == "Map" : t instanceof Map)
+  );
+}
+
+function isWeakMapOrSet(t: object) {
+  return (
+    (WeakSet ? t.constructor.name == "WeakSet" : t instanceof WeakSet) ||
+    (WeakMap ? t.constructor.name == "WeakMap" : t instanceof WeakMap)
+  );
+}
+
+function isSharedArrayBuffer(t: object): t is SharedArrayBuffer {
+  return t.constructor.name == "SharedArrayBuffer" || (SharedArrayBuffer && t instanceof SharedArrayBuffer);
+}
+
+export function isSerializable<S extends PropertiesSchema>(docValue: ResolveSchema<S>[Extract<keyof S, string>]) {
+  if (typeof docValue == "object") {
+    return !(
+      isArray(docValue) ||
+      isMapOrSet(docValue) ||
+      isWeakMapOrSet(docValue) ||
+      isArrayBufferView(docValue) ||
+      isArrayBuffer(docValue) ||
+      isSharedArrayBuffer(docValue)
+    );
+  } else {
+    return (SUPPORTED_PROPERTY_TYPES as unknown as string[]).includes(typeof docValue);
+  }
 }

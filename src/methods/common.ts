@@ -1,6 +1,8 @@
+import { isSerializable } from "src/utils.js";
 import * as ERRORS from "../errors.js";
 import type { Lyra, PropertiesSchema, ResolveSchema } from "../types/index.js";
 import type { SearchParams } from "./search.js";
+import { SUPPORTED_PROPERTY_TYPES } from "src/consts.js";
 
 export function assertDocSchema<S extends PropertiesSchema>(doc: ResolveSchema<S>, lyraSchema: PropertiesSchema) {
   if (!recursiveCheckDocSchema(doc, lyraSchema)) {
@@ -13,15 +15,26 @@ export function recursiveCheckDocSchema<S extends PropertiesSchema>(
   schema: PropertiesSchema,
 ): boolean {
   for (const key in newDoc) {
-    if (!(key in schema)) {
+    if (!(key in schema) || typeof schema[key] == "undefined") {
+      if (!isSerializable(newDoc[key])) {
+        return false;
+      }
+
       continue;
     }
 
     const propType = typeof newDoc[key];
+    const schemaType = typeof schema[key] == "object" ? "object" : schema[key];
 
-    if (propType === "object") {
-      recursiveCheckDocSchema(newDoc[key] as ResolveSchema<S>, schema);
-    } else if (typeof newDoc[key] !== schema[key]) {
+    if (schemaType == propType) {
+      if (propType === "object") {
+        return isSerializable(newDoc[key])
+          ? recursiveCheckDocSchema(newDoc[key] as ResolveSchema<S>, schema[key] as PropertiesSchema)
+          : false;
+      } else if (!SUPPORTED_PROPERTY_TYPES.includes(propType) || propType !== schema[key]) {
+        return false;
+      }
+    } else {
       return false;
     }
   }

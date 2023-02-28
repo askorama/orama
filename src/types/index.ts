@@ -2,6 +2,7 @@ import type { Language, TokenizerConfig } from "../tokenizer/index.js";
 import type { Hooks } from "../methods/hooks.js";
 import type { RadixNode } from "../trees/radix/node.js";
 import type { AVLNode } from "../trees/avl/node.js";
+import { SUPPORTED_PROPERTY_TYPES } from "src/consts.js";
 
 export * from "./filters.js";
 export * from "./facets.js";
@@ -24,8 +25,7 @@ export type SearchProperties<
     : TKey
   : never;
 
-
-export type PropertyType = "string" | "number" | "boolean";
+export type PropertyType = typeof SUPPORTED_PROPERTY_TYPES[number];
 
 export type PropertiesSchema = {
   [key: string]: PropertyType | PropertiesSchema;
