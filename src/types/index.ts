@@ -2,7 +2,7 @@ import type { Language, TokenizerConfig } from "../tokenizer/index.js";
 import type { Hooks } from "../methods/hooks.js";
 import type { RadixNode } from "../trees/radix/node.js";
 import type { AVLNode } from "../trees/avl/node.js";
-import { SUPPORTED_PROPERTY_TYPES } from "src/consts.js";
+import { SUPPORTED_PROPERTY_TYPES } from "../consts.js";
 
 export * from "./filters.js";
 export * from "./facets.js";
