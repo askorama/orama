@@ -223,6 +223,8 @@ export function removeWord(root: RadixNode, term: string): boolean {
       return false;
     }
   }
+
+  return false;
 }
 
 export function removeDocumentByWord(root: RadixNode, term: string, docID: string, exact = true): boolean {
