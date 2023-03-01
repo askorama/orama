@@ -2,7 +2,7 @@ import { isSerializable } from "../utils.js";
 import * as ERRORS from "../errors.js";
 import type { Lyra, PropertiesSchema, ResolveSchema } from "../types/index.js";
 import type { SearchParams } from "./search.js";
-import { SUPPORTED_PROPERTY_TYPES } from "../consts.js";
+import { SUPPORTED_PROPERTY_TYPES } from "../constants.js";
 
 export function assertDocSchema<S extends PropertiesSchema>(doc: ResolveSchema<S>, lyraSchema: PropertiesSchema) {
   if (!recursiveCheckDocSchema(doc, lyraSchema)) {

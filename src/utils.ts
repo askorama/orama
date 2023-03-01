@@ -1,4 +1,4 @@
-import { SUPPORTED_PROPERTY_TYPES } from "./consts.js";
+import { SUPPORTED_PROPERTY_TYPES } from "./constants.js";
 import type { PropertiesSchema, ResolveSchema, TokenScore } from "./types/index.js";
 
 const baseId = Date.now().toString().slice(5);
