@@ -74,29 +74,6 @@ export function getTokenFrequency(token: string, tokens: string[]): number {
   return count;
 }
 
-export function insertSortedValue(
-  arr: TokenScore[],
-  el: TokenScore,
-  compareFn = sortTokenScorePredicate,
-): TokenScore[] {
-  let low = 0;
-  let high = arr.length;
-  let mid;
-
-  while (low < high) {
-    mid = (low + high) >>> 1;
-    if (compareFn(el, arr[mid]) < 0) {
-      high = mid;
-    } else {
-      low = mid + 1;
-    }
-  }
-
-  arr.splice(low, 0, el);
-
-  return arr;
-}
-
 export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
   return b[1] - a[1];
 }
