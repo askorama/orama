@@ -4,13 +4,14 @@ import type { RetrievedDoc } from "../src/methods/search.js";
 import t from "tap";
 import { create, insert, load, save, search } from "../src/index.js";
 import { contains as trieContains } from "../src/trees/radix/index.js";
+import * as ERRORS from "../src/errors.js";
 
 function extractOriginalDoc<T extends PropertiesSchema>(result: RetrievedDoc<T>[]): ResolveSchema<T>[] {
   return result.map(({ document }: RetrievedDoc<T>) => document);
 }
 
 t.test("Edge getters", t => {
-  t.plan(5);
+  t.plan(6);
 
   t.test("should correctly enable edge index getter", async t => {
     t.plan(3);
@@ -209,5 +210,39 @@ t.test("Edge getters", t => {
 
     t.same(originalInstance.defaultLanguage, "italian");
     t.same(defaultLanguage, "italian");
+  });
+
+  t.test("should throw an error if edge is not enabled", async t => {
+    t.plan(1);
+
+    const db = await create({
+      schema: {
+        name: "string",
+        age: "number",
+      },
+    });
+
+    await insert(db, {
+      name: "Michele",
+      age: 27,
+    });
+
+    await insert(db, {
+      name: "Paolo",
+      age: 37,
+    });
+
+    const dbData = await save(db);
+
+    const newDB = await create({
+      schema: {
+        name: "string",
+        age: "number",
+      },
+    });
+
+    await t.rejects(() => load(newDB, dbData), {
+      message: ERRORS.GETTER_SETTER_WORKS_ON_EDGE_ONLY("load"),
+    });
   });
 });
