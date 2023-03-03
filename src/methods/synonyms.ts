@@ -7,6 +7,11 @@ export type SynonymConfig = {
   synonyms: string[];
 }
 
+export type ClearSynonymscConfig = {
+  kind: typeof availableKinds[number];
+  word: string;
+}
+
 export const availableKinds = ['oneWay', 'twoWay'] as const;
 
 export async function addSynonyms<T extends PropertiesSchema>(db: Lyra<T>, synonyms: SynonymConfig) {
@@ -32,5 +37,17 @@ export async function removeSynonyms<T extends PropertiesSchema>(db: Lyra<T>, sy
 
   if (db.synonyms[kind][word]) {
     db.synonyms[kind][word] = db.synonyms[kind][word].filter(synonym => !synonymsList.includes(synonym));
+  }
+}
+
+export async function clearSynonyms<T extends PropertiesSchema>(db: Lyra<T>, synonyms: ClearSynonymscConfig) {
+  const { kind, word } = synonyms;
+
+  if (!availableKinds.includes(kind)) {
+    throw new Error(ERRORS.INVALID_SYNONYM_KIND(kind, availableKinds));
+  }
+
+  if (db.synonyms[kind][word]) {
+    db.synonyms[kind][word] = [];
   }
 }
