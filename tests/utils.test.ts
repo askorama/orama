@@ -66,7 +66,7 @@ t.test("utils", t => {
       const myObject = {
         foo: "bar",
       };
-  
+
       t.equal(getOwnProperty(myObject, "foo"), "bar");
       t.equal(getOwnProperty(myObject, "bar"), undefined);
     });
@@ -90,7 +90,6 @@ t.test("utils", t => {
       // @ts-expect-error - we are testing this
       Object.hasOwn = hasOwn;
     });
-
   });
 
   t.test("should get value from a nested object", t => {
@@ -147,8 +146,13 @@ t.test("utils", t => {
     t.test("hrtime not defined", async t => {
       t.plan(1);
 
+      if (typeof globalThis.process === "undefined") {
+        t.skip("This test is only for Node.js");
+        return;
+      }
+
       const performance = globalThis.performance;
-      const hrtime = process.hrtime;
+      const hrtime = globalThis.process.hrtime;
 
       // @ts-expect-error - we are testing this
       globalThis.process.hrtime = undefined;
@@ -168,6 +172,11 @@ t.test("utils", t => {
 
     t.test("hrtime not defined and performance.now not defined", async t => {
       t.plan(1);
+
+      if (typeof globalThis.process === "undefined") {
+        t.skip("This test is only for Node.js");
+        return;
+      }
 
       const performance = globalThis.performance;
       const hrtime = process.hrtime;
@@ -190,18 +199,11 @@ t.test("utils", t => {
   t.test("should get the token frequency", t => {
     t.plan(3);
 
-    const tokens = [
-      'foo',
-      'bar',
-      'kaboom',
-      'foo',
-      'foo',
-      'bar',
-    ];
+    const tokens = ["foo", "bar", "kaboom", "foo", "foo", "bar"];
 
-    t.equal(getTokenFrequency('foo', tokens), 3);
-    t.equal(getTokenFrequency('bar', tokens), 2);
-    t.equal(getTokenFrequency('kaboom', tokens), 1);
+    t.equal(getTokenFrequency("foo", tokens), 3);
+    t.equal(getTokenFrequency("bar", tokens), 2);
+    t.equal(getTokenFrequency("kaboom", tokens), 1);
   });
 
   t.test("should intersects arrays", t => {
@@ -209,14 +211,20 @@ t.test("utils", t => {
 
     t.test("should return 0 if intersect arrays are empty", t => {
       t.plan(1);
-  
+
       t.same(intersect([]), []);
     });
 
     t.test("should return empty array if no intersection", t => {
       t.plan(1);
-  
-      t.same(intersect([[1, 2, 3], [4, 5, 6]]), []);
+
+      t.same(
+        intersect([
+          [1, 2, 3],
+          [4, 5, 6],
+        ]),
+        [],
+      );
     });
   });
 });
