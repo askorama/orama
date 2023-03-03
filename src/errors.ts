@@ -83,3 +83,9 @@ export function INVALID_BOOST_VALUE(): string {
 export function INVALID_FILTER_OPERATION(found: string[]): string {
   return `You can only use one operation per filter. Found ${found.length}: ${found.join(", ")}`;
 }
+
+export function INVALID_SYNONYM_KIND(kind: string, expected: readonly string[]): string {
+  return `Invalid synonym kind. Expected one of the following: ${expected.join(
+    ", ",
+  )}, but got: ${kind}`;
+}

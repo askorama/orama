@@ -29,6 +29,11 @@ export async function create<S extends PropertiesSchema>(properties: Configurati
 
   validateHooks(properties.hooks);
 
+  const defaultSynonyms = {
+    oneWay: {},
+    twoWay: {},
+  }
+
   const instance: Lyra<S> = {
     defaultLanguage,
     schema: properties.schema,
@@ -41,6 +46,7 @@ export async function create<S extends PropertiesSchema>(properties: Configurati
     tokenOccurrencies: {},
     avgFieldLength: {},
     fieldLengths: {},
+    synonyms: properties.synonyms ?? defaultSynonyms,
     components: {
       elapsed: properties.components?.elapsed ?? {},
       tokenizer,

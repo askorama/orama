@@ -31,6 +31,11 @@ export type PropertiesSchema = {
   [key: string]: PropertyType | PropertiesSchema;
 };
 
+export type Synonyms = {
+  oneWay: Record<string, string[]>;
+  twoWay: Record<string, string[]>;
+}
+
 export type AlgorithmsConfig = {
   intersectTokenScores: IIntersectTokenScores;
 };
@@ -55,6 +60,7 @@ export type Configuration<S extends PropertiesSchema> = {
   edge?: boolean;
   hooks?: Hooks;
   components?: Components;
+  synonyms?: Synonyms;
 };
 
 export type Data<S extends PropertiesSchema> = {
@@ -84,6 +90,7 @@ export interface Lyra<S extends PropertiesSchema> extends Data<S> {
   docsCount: number;
   avgFieldLength: Record<string, number>;
   fieldLengths: Record<string, Record<string, number>>;
+  synonyms: Synonyms;
 }
 
 export type BM25OptionalParams = {
