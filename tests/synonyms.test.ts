@@ -120,3 +120,24 @@ t.test("clear synonyms", async t => {
 
   t.end();
 })
+
+t.test("add synonyms with invalid kind", async t => {
+  const db = await create({
+    schema: {
+      name: "string"
+    }
+  });
+
+  try {
+    await addSynonyms(db, {
+      // @ts-expect-error error case
+      kind: "invalidKind",
+      word: "testOneWay",
+      synonyms: ["testOneWay-1", "testOneWay-2"]
+    })
+  } catch (error) {
+    t.equal(error.message, "Invalid synonym kind. Expected one of the following: oneWay, twoWay, but got: invalidKind");
+  }
+
+  t.end();
+})
