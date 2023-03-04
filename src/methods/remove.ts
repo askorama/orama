@@ -52,9 +52,7 @@ export async function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: s
         const token = tokens[k];
         delete lyra.frequencies[key][docID];
         lyra.tokenOccurrencies[key][token]--;
-        if (token && !removeDocumentByWord(idx as RadixNode, token, docID)) {
-          throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
-        }
+        if (token) removeDocumentByWord(idx as RadixNode, token, docID);
       }
     }
   }
