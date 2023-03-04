@@ -1,4 +1,5 @@
 import t from "tap";
+import { kInsertions } from "../src/insertion-checker.js";
 import { create } from "../src/methods/create.js";
 import { insert, insertBatch } from "../src/methods/insert.js";
 
@@ -151,5 +152,63 @@ t.test("insert", t => {
     );
 
     t.same(Object.keys(db.docs), ["john-01", "doe-02"]);
+  });
+});
+
+t.test("insertion checker", async t => {
+  t.plan(2);
+
+  t.test("should warn if more than 1000 insertions are performed in a single operation", async t => {
+    t.plan(1);
+
+    if (typeof globalThis.process === "undefined") {
+      t.skip("This test is only for Node.js");
+      return;
+    }
+
+    const db = await create({
+      schema: {
+        id: "string",
+        name: "string",
+      },
+    });
+
+    let message;
+    for (let i = 0; i <= 1001; i++) {
+      await insert(db, {
+        id: `john-${i}`,
+        name: "John",
+      });
+
+      if (i > 1000) {
+        process.on('warning', (warning) => {
+          message = warning.message;
+        });
+
+        break;
+      }
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 1));
+
+    t.same(message, "Lyra's insert operation is synchronous. Please avoid inserting a large number of document in a single operation in order not to block the main thread.")
+  });
+
+  t.test("should track insertion operations", async t => {
+    t.plan(1);
+
+    const db = await create({
+      schema: {
+        id: "string",
+        name: "string",
+      },
+    });
+
+    await insert(db, {
+      id: "john-01",
+      name: "John",
+    });
+
+    t.equal(db[kInsertions], 1);
   });
 });

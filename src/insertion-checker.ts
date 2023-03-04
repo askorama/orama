@@ -1,4 +1,4 @@
-const kInsertions = Symbol("lyra.insertions");
+export const kInsertions = Symbol("lyra.insertions");
 
 // Web platforms don't have process. React-Native doesn't have process.emitWarning.
 const warn =
@@ -8,15 +8,7 @@ const warn =
   };
 
 export function trackInsertion(_lyra: unknown) {
-  const lyra = _lyra as object & { [kInsertions]?: number };
-
-  if (typeof lyra[kInsertions] !== "number") {
-    queueMicrotask(() => {
-      lyra[kInsertions] = undefined;
-    });
-
-    lyra[kInsertions] = 0;
-  }
+  const lyra = _lyra as object & { [kInsertions]: number };
 
   if (lyra[kInsertions]! > 1000) {
     warn(

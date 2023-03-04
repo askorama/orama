@@ -4,6 +4,7 @@ import { create as createNode } from "../trees/radix/node.js";
 import { create as createAVLNode } from "../trees/avl/index.js";
 import { validateHooks } from "./hooks.js";
 import { intersectTokenScores } from "../algorithms.js";
+import { kInsertions } from "../insertion-checker.js";
 
 /**
  * Creates a new database.
@@ -47,6 +48,7 @@ export async function create<S extends PropertiesSchema>(properties: Configurati
         intersectTokenScores: properties.components?.algorithms?.intersectTokenScores ?? intersectTokenScores,
       },
     },
+    [kInsertions]: 0,
   };
 
   buildIndex(instance, properties.schema);

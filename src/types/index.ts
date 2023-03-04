@@ -2,6 +2,7 @@ import type { Language, TokenizerConfig } from "../tokenizer/index.js";
 import type { Hooks } from "../methods/hooks.js";
 import type { RadixNode } from "../trees/radix/node.js";
 import type { AVLNode } from "../trees/avl/node.js";
+import { kInsertions } from "src/insertion-checker.js";
 
 export * from "./filters.js";
 export * from "./facets.js";
@@ -84,6 +85,7 @@ export interface Lyra<S extends PropertiesSchema> extends Data<S> {
   docsCount: number;
   avgFieldLength: Record<string, number>;
   fieldLengths: Record<string, Record<string, number>>;
+  [kInsertions]: number;
 }
 
 export type BM25OptionalParams = {
