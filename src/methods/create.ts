@@ -1,6 +1,5 @@
 import type { Configuration, Lyra, PropertiesSchema } from "../types/index.js";
 import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
-import * as ERRORS from "../errors.js";
 import { create as createNode } from "../trees/radix/node.js";
 import { create as createAVLNode } from "../trees/avl/index.js";
 import { validateHooks } from "./hooks.js";
@@ -56,10 +55,7 @@ export async function create<S extends PropertiesSchema>(properties: Configurati
 
 function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix = "") {
   for (const prop of Object.keys(schema)) {
-    const propType = typeof prop;
     const isNested = typeof schema[prop] === "object";
-
-    if (propType !== "string") throw new Error(ERRORS.INVALID_SCHEMA_TYPE(propType));
 
     const propName = `${prefix}${prop}`;
 
