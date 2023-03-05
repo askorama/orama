@@ -3,6 +3,7 @@ import { create, insert, insertBatch, insertWithHooks, remove, search } from "..
 import { SUPPORTED_LANGUAGES } from "../src/tokenizer/languages.js";
 import { INVALID_DOC_SCHEMA, LANGUAGE_NOT_SUPPORTED } from "../src/errors.js";
 import dataset from "./datasets/events.json" assert { type: "json" };
+import type { TokenScore } from "../src/index.js";
 
 interface BaseDataEvent {
   description: string;
@@ -1113,4 +1114,43 @@ t.test("should correctly search words in Bulgarian", async t => {
     term: "жълта",
   });
   t.equal(secondSearchResult.count, 1);
+});
+
+t.test("should correctly initialize the instance with components", async t => {
+  t.plan(4);
+
+  const db = await create({
+    schema: {
+      description: "string",
+    },
+    components: {
+      elapsed: {
+        format: "human",
+      },
+      tokenizer: {
+        tokenizerFn: text => text.split(" "),
+      },
+      algorithms: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        intersectTokenScores: (_arrays: TokenScore[][]) => {
+          const result: TokenScore[] = [];
+          return result;
+        }
+      }
+    }
+  })
+
+  await insert(db, {
+    description: "hello world",
+  });
+
+  const searchResult = await search(db, {
+    term: "hello world",
+  });
+
+  t.equal(searchResult.count, 1);
+  t.equal(db.components?.elapsed?.format, "human");
+  // @ts-expect-error - tokenizerFn can be undefined
+  t.same(db.components?.tokenizer?.tokenizerFn("hello world", "english"), "hello world".split(" "));
+  t.same(db.components?.algorithms?.intersectTokenScores([]), []);
 });
