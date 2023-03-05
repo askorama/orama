@@ -1,8 +1,8 @@
 import t from 'tap'
-import { create, insert, find, getSize, remove, contains, isBalanced, greaterThan, lessThan, rangeSearch } from '../src/trees/avl/index.js'
+import { create, insert, find, getSize, remove, contains, isBalanced, greaterThan, lessThan, rangeSearch, getNodeByKey } from '../src/trees/avl/index.js'
 
 t.test('AVL Tree', t => {
-  t.plan(8);
+  t.plan(16);
 
   t.test('create', t => {
     t.plan(3);
@@ -130,4 +130,63 @@ t.test('AVL Tree', t => {
     t.same(lessThan(tree, 10), ['foo', 'bar', 'quux']);
   });
 
+  t.test('should find return null if the node is not defined', t => {
+    t.plan(1);
+
+    // @ts-expect-error - testing null
+    t.equal(find(null, 2), null);
+  });
+
+  t.test('should get node by key return null if the node is not defined', t => {
+    t.plan(1);
+
+    // @ts-expect-error - testing null
+    t.equal(getNodeByKey(null, 1), null);
+  });
+
+  t.test('should remove return null if the node is not defined', t => {
+    t.plan(1);
+
+    // @ts-expect-error - testing null
+    t.equal(remove(null, 1), null);
+  });
+
+  t.test('should remove return null if left and right nodes are not defined', t => {
+    t.plan(1);
+
+    const tree = create(1, 'foo');
+
+    t.equal(remove(tree, 1), null);
+  });
+
+  t.test('should remove return the right node if the left node is not defined', t => {
+    t.plan(1);
+
+    const tree = create(1, 'foo');
+
+    insert(tree, 2, 'bar');
+
+    t.equal(remove(tree, 1), tree.right);
+  });
+
+  t.test('should range search return an epmty array if the node is not defined', t => {
+    t.plan(1);
+
+    // @ts-expect-error - testing null
+    t.same(rangeSearch(null, 1, 2), []);
+  });
+
+  t.test('should greater than return an epmty array if the node is not defined', t => {
+    t.plan(1);
+
+    // @ts-expect-error - testing null
+    t.same(greaterThan(null, 1), []);
+  });
+
+  t.test('should less than return an epmty array if the node is not defined', t => {
+    t.plan(1);
+
+    // @ts-expect-error - testing null
+    t.same(lessThan(null, 1), []);
+  });
 });
