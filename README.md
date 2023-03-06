@@ -1,4 +1,6 @@
-![Lyra, the edge search experience](https://raw.githubusercontent.com/LyraSearch/lyra/main/misc/lyra-edge-logo.png)
+![Orama. Search, everywhere.](/misc/oramasearch.gif)
+
+**Lyra is changing name to Orama**! Introducing [OramaSearch Inc](https://micheleriva.medium.com/ive-founded-a-company-introducing-oramasearch-inc-f69121b6b1c3).
 
 [![Tests](https://github.com/LyraSearch/lyra/actions/workflows/ci.yml/badge.svg)](https://github.com/LyraSearch/lyra/actions/workflows/ci.yml)
 
