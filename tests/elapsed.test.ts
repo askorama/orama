@@ -1,5 +1,6 @@
 import t from "tap";
 import { create, insert, search } from "../src/index.js";
+import { formatNanoseconds } from "../src/utils.js";
 
 t.test("elapsed", t => {
   t.plan(2);
@@ -12,10 +13,8 @@ t.test("elapsed", t => {
         body: "string",
       },
       components: {
-        elapsed: {
-          format: "human"
-        }
-      }
+        formatElapsedTime: formatNanoseconds,
+      },
     });
 
     await insert(db, {
@@ -24,24 +23,19 @@ t.test("elapsed", t => {
     });
 
     const results = await search(db, {
-      term: "test"
+      term: "test",
     });
 
     t.same(typeof results.elapsed, "string");
   });
 
-  t.test("should correctly set elapsed time to a raw, bigInt", async t => {
+  t.test("should correctly set elapsed time to a bigint by default", async t => {
     t.plan(1);
     const db = await create({
       schema: {
         title: "string",
         body: "string",
       },
-      components: {
-        elapsed: {
-          format: "raw"
-        }
-      }
     });
 
     await insert(db, {
@@ -50,7 +44,7 @@ t.test("elapsed", t => {
     });
 
     const results = await search(db, {
-      term: "test"
+      term: "test",
     });
 
     t.same(typeof results.elapsed, "bigint");

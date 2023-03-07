@@ -15,7 +15,7 @@
     "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
-      "@stemmer/*": ["./stemmer/lib/*"]
+      "../stemmer/*": ["./stemmer/lib/*"]
     }
   },
   "include": ["src/*.ts", "src/**/*.ts"]

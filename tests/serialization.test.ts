@@ -1,26 +1,26 @@
-import type { PropertiesSchema, ResolveSchema } from "../src/types/index.js";
-import type { RadixNode } from "../src/trees/radix/node.js";
-import type { RetrievedDoc } from "../src/methods/search.js";
 import t from "tap";
-import { create, insert, load, save, search } from "../src/index.js";
-import { contains as trieContains } from "../src/trees/radix/index.js";
+import type { Document } from "../src/types.js";
+import { Node as RadixNode } from "../src/trees/radix.js";
+import { create, insert, load, Result, save, search } from "../src/index.js";
+import { contains as trieContains } from "../src/trees/radix.js";
+import { Index } from "../src/components/index.js";
+import { DocumentsStore } from "../src/components/documents-store.js";
 
-function extractOriginalDoc<T extends PropertiesSchema>(result: RetrievedDoc<T>[]): ResolveSchema<T>[] {
-  return result.map(({ document }: RetrievedDoc<T>) => document);
+function extractOriginalDoc(result: Result[]): Document[] {
+  return result.map(({ document }: Result) => document);
 }
 
 t.test("Edge getters", t => {
-  t.plan(5);
+  t.plan(4);
 
   t.test("should correctly enable edge index getter", async t => {
-    t.plan(3);
+    t.plan(2);
 
     const db = await create({
       schema: {
         name: "string",
         age: "number",
       },
-      edge: true,
     });
 
     await insert(db, {
@@ -33,13 +33,12 @@ t.test("Edge getters", t => {
       age: 25,
     });
 
-    const { index, defaultLanguage } = await save(db);
-    const nameIndex = index["name"];
+    const { index } = await save(db);
+    const nameIndex = (index as Index).indexes["name"];
 
     // Remember that tokenizers an stemmers sets content to lowercase
     t.ok(trieContains(nameIndex as RadixNode, "john"));
     t.ok(trieContains(nameIndex as RadixNode, "jane"));
-    t.same(defaultLanguage, "english");
   });
 
   t.test("should correctly enable edge docs getter", async t => {
@@ -50,7 +49,6 @@ t.test("Edge getters", t => {
         name: "string",
         age: "number",
       },
-      edge: true,
     });
 
     const doc1 = await insert(db, {
@@ -65,8 +63,8 @@ t.test("Edge getters", t => {
 
     const { docs } = await save(db);
 
-    t.strictSame(docs[doc1.id], { name: "John", age: 30 });
-    t.strictSame(docs[doc2.id], { name: "Jane", age: 25 });
+    t.strictSame((docs as DocumentsStore).docs[doc1], { name: "John", age: 30 });
+    t.strictSame((docs as DocumentsStore).docs[doc2], { name: "Jane", age: 25 });
   });
 
   t.test("should correctly enable index setter", async t => {
@@ -77,7 +75,6 @@ t.test("Edge getters", t => {
         name: "string",
         age: "number",
       },
-      edge: true,
     });
 
     const jonh = {
@@ -108,7 +105,6 @@ t.test("Edge getters", t => {
         name: "string",
         age: "number",
       },
-      edge: true,
     });
 
     await insert(db2, michele);
@@ -131,7 +127,7 @@ t.test("Edge getters", t => {
     t.strictSame(extractOriginalDoc(search4.hits), [michele]);
   });
 
-  t.test("It should correctly save and load data", async t => {
+  t.test("should correctly save and load data", async t => {
     t.plan(2);
 
     const originalDB = await create({
@@ -158,10 +154,9 @@ t.test("Edge getters", t => {
         name: "string",
         age: "number",
       },
-      edge: true,
     });
 
-    load(newDB, DBData);
+    await load(newDB, DBData);
 
     const search1 = await search(originalDB, { term: "Michele" });
     const search2 = await search(newDB, { term: "Michele" });
@@ -171,43 +166,5 @@ t.test("Edge getters", t => {
 
     t.strictSame(search1.hits, search2.hits);
     t.strictSame(search3.hits, search4.hits);
-  });
-
-  t.test("It should correctly save and load the defaultLanguage option", async t => {
-    t.plan(2);
-    const db = await create({
-      schema: {
-        name: "string",
-        age: "number",
-      },
-      edge: true,
-      defaultLanguage: "italian",
-    });
-
-    const db2 = await create({
-      schema: {
-        name: "string",
-        age: "number",
-      },
-      edge: true,
-    });
-
-    await insert(db, {
-      name: "Michele",
-      age: 27,
-    });
-
-    await insert(db, {
-      name: "John",
-      age: 25,
-    });
-
-    const originalInstance = await save(db);
-    load(db2, originalInstance);
-
-    const { defaultLanguage } = originalInstance;
-
-    t.same(originalInstance.defaultLanguage, "italian");
-    t.same(defaultLanguage, "italian");
   });
 });

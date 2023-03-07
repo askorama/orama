@@ -1,3 +1,3 @@
-export { boundedLevenshtein } from "./levenshtein.js";
-export { formatNanoseconds, getNanosecondsTime } from "./utils.js";
-export { tokenize, normalizationCache, defaultTokenizerConfig } from "./tokenizer/index.js";
+export { boundedLevenshtein } from "./components/levenshtein.js";
+export { sprintf, formatBytes, formatNanoseconds, getNanosecondsTime, uniqueId } from "./utils.js";
+export { normalizationCache, createTokenizer } from "./tokenizer/index.js";

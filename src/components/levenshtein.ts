@@ -4,20 +4,6 @@ export type BoundedMetric = {
 };
 
 /**
- * Computes the Levenshtein distance between two strings (a, b), returning early with -1 if the distance
- * is greater than the given tolerance.
- * It assumes that:
- * - tolerance >= ||a| - |b|| >= 0
- */
-export function boundedLevenshtein(a: string, b: string, tolerance: number): BoundedMetric {
-  const distance = _boundedLevenshtein(a, b, tolerance);
-  return {
-    distance,
-    isBounded: distance >= 0,
-  };
-}
-
-/**
  * Inspired by:
  * https://github.com/Yomguithereal/talisman/blob/86ae55cbd040ff021d05e282e0e6c71f2dde21f8/src/metrics/levenshtein.js#L218-L340
  */
@@ -134,6 +120,20 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
   }
 
   return current <= tolerance ? current : -1;
+}
+
+/**
+ * Computes the Levenshtein distance between two strings (a, b), returning early with -1 if the distance
+ * is greater than the given tolerance.
+ * It assumes that:
+ * - tolerance >= ||a| - |b|| >= 0
+ */
+export function boundedLevenshtein(a: string, b: string, tolerance: number): BoundedMetric {
+  const distance = _boundedLevenshtein(a, b, tolerance);
+  return {
+    distance,
+    isBounded: distance >= 0,
+  };
 }
 
 export function levenshtein(a: string, b: string): number {

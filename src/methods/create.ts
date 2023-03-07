@@ -1,86 +1,146 @@
-import type { Configuration, Lyra, PropertiesSchema } from "../types/index.js";
-import { defaultTokenizerConfig, Language } from "../tokenizer/index.js";
-import * as ERRORS from "../errors.js";
-import { create as createNode } from "../trees/radix/node.js";
-import { create as createAVLNode } from "../trees/avl/index.js";
-import { validateHooks } from "./hooks.js";
-import { intersectTokenScores } from "../algorithms.js";
+import { getDefaultComponents } from "../components/defaults.js";
+import { createError } from "../errors.js";
+import { COMPLEX_COMPONENTS, SIMPLE_COMPONENTS, SIMPLE_OR_ARRAY_COMPONENTS } from "../components/hooks.js";
+import { createIndex } from "../components/index.js";
+import { createTokenizer } from "../tokenizer/index.js";
+import {
+  ArrayCallbackComponents,
+  Components,
+  IDocumentsStore,
+  IIndex,
+  Lyra,
+  OpaqueDocumentStore,
+  OpaqueIndex,
+  Schema,
+  SimpleComponents,
+  SimpleOrArrayCallbackComponents,
+} from "../types.js";
+import { createDocumentsStore } from "../components/documents-store.js";
 
-/**
- * Creates a new database.
- * @param properties Options to initialize the database with.
- * @example
- * // Create a database that stores documents containing 'author' and 'quote' fields.
- * const db = await create({
- *   schema: {
- *     author: 'string',
- *     quote: 'string'
- *   },
- *   hooks: {
- *     afterInsert: [afterInsertHook],
- *   }
- * });
- */
-export async function create<S extends PropertiesSchema>(properties: Configuration<S>): Promise<Lyra<S>> {
-  const defaultLanguage = (properties?.defaultLanguage?.toLowerCase() as Language) ?? "english";
-
-  const tokenizer = defaultTokenizerConfig(defaultLanguage, properties.components?.tokenizer ?? {});
-  tokenizer.assertSupportedLanguage(defaultLanguage);
-
-  validateHooks(properties.hooks);
-
-  const instance: Lyra<S> = {
-    defaultLanguage,
-    schema: properties.schema,
-    docs: {},
-    docsCount: 0,
-    index: {},
-    hooks: properties.hooks || {},
-    edge: properties.edge ?? false,
-    frequencies: {},
-    tokenOccurrencies: {},
-    avgFieldLength: {},
-    fieldLengths: {},
-    components: {
-      elapsed: properties.components?.elapsed ?? {},
-      tokenizer,
-      algorithms: {
-        intersectTokenScores: properties.components?.algorithms?.intersectTokenScores ?? intersectTokenScores,
-      },
-    },
-  };
-
-  buildIndex(instance, properties.schema);
-  return instance;
+interface CreateArguments<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
+  schema: Schema;
+  defaultLanguage?: string;
+  components?: Components<S, I, D>;
 }
 
-function buildIndex<S extends PropertiesSchema>(lyra: Lyra<S>, schema: S, prefix = "") {
-  for (const prop of Object.keys(schema)) {
-    const propType = typeof prop;
-    const isNested = typeof schema[prop] === "object";
+function validateComponents<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
+  components: Components<S, I, D>,
+) {
+  const defaultComponents = getDefaultComponents();
 
-    if (propType !== "string") throw new Error(ERRORS.INVALID_SCHEMA_TYPE(propType));
+  for (const rawKey of SIMPLE_COMPONENTS) {
+    const key = rawKey as keyof SimpleComponents;
 
-    const propName = `${prefix}${prop}`;
-
-    if (isNested) {
-      buildIndex(lyra, schema[prop] as S, `${propName}.`);
+    if (components[key]) {
+      if (typeof components[key] !== "function") {
+        throw createError("COMPONENT_MUST_BE_FUNCTION", key);
+      }
     } else {
-      if (schema[prop] === "string") {
-        lyra.index[propName] = createNode();
-        lyra.avgFieldLength[propName] = 0;
-        continue;
-      }
-      
-      if (schema[prop] === "number") {
-        lyra.index[propName] = createAVLNode<number, string[]>(0, []);
-        continue;
-      }
+      // @ts-expect-error TSC is unable to resolve this
+      components[key] = defaultComponents[key];
+    }
+  }
 
-      if (schema[prop] === "boolean") {
-        lyra.index[propName] = { 'true': [], 'false': [] };
-        continue;
+  for (const rawKey of SIMPLE_OR_ARRAY_COMPONENTS) {
+    const key = rawKey as keyof ArrayCallbackComponents<S, I, D>;
+
+    if (!components[key]) {
+      components[key] = [];
+    } else if (!Array.isArray(components[key])) {
+      // @ts-expect-error TSC is unable to resolve this
+      components[key] = [components[key]];
+    }
+
+    for (const fn of components[key] as unknown as SimpleOrArrayCallbackComponents<S, I, D>[]) {
+      if (typeof fn !== "function") {
+        throw createError("COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS", key);
       }
     }
   }
+
+  for (const rawKey of Object.keys(components)) {
+    if (
+      !COMPLEX_COMPONENTS.includes(rawKey) &&
+      !SIMPLE_COMPONENTS.includes(rawKey) &&
+      !SIMPLE_OR_ARRAY_COMPONENTS.includes(rawKey)
+    ) {
+      throw createError("UNSUPPORTED_COMPONENT", rawKey);
+    }
+  }
+}
+
+export async function create<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>({
+  schema,
+  defaultLanguage,
+  components,
+}: CreateArguments<S, I, D>): Promise<Lyra<S, I, D>> {
+  if (!components) {
+    components = {};
+  }
+
+  let tokenizer = components.tokenizer;
+  let index = components.index;
+  let documentsStore = components.documentsStore;
+
+  if (!tokenizer) {
+    // Use the default tokenizer
+    tokenizer = await createTokenizer(defaultLanguage ?? "english");
+  } else if (defaultLanguage) {
+    // Accept defaultLanguage only if a tokenizer is not provided
+    throw createError("NO_DEFAULT_LANGUAGE_WITH_CUSTOM_TOKENIZER");
+  }
+
+  if (!index) {
+    index = createIndex() as unknown as IIndex<S, I, D>;
+  }
+
+  if (!documentsStore) {
+    documentsStore = createDocumentsStore() as unknown as IDocumentsStore<S, I, D>;
+  }
+
+  // Validate all other components
+  validateComponents<S, I, D>(components);
+
+  // Assign only recognized components and hooks
+  const {
+    getDocumentProperties,
+    getDocumentIndexId,
+    validateSchema,
+    beforeInsert,
+    afterInsert,
+    beforeRemove,
+    afterRemove,
+    beforeMultipleInsert,
+    afterMultipleInsert,
+    beforeMultipleRemove,
+    afterMultipleRemove,
+    formatElapsedTime,
+  } = components;
+
+  const lyra = {
+    data: {},
+    schema,
+    tokenizer,
+    index,
+    documentsStore,
+    getDocumentProperties,
+    getDocumentIndexId,
+    validateSchema,
+    beforeInsert,
+    afterInsert,
+    beforeRemove,
+    afterRemove,
+    beforeMultipleInsert,
+    afterMultipleInsert,
+    beforeMultipleRemove,
+    afterMultipleRemove,
+    formatElapsedTime,
+  } as Lyra<S, I, D>;
+
+  lyra.data = {
+    index: await lyra.index.create(lyra, schema),
+    docs: await lyra.documentsStore.create(lyra),
+  };
+
+  return lyra;
 }

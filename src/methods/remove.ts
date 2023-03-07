@@ -1,107 +1,84 @@
-import type { RadixNode } from "../trees/radix/node.js";
-import type { Lyra, PropertiesSchema, ResolveSchema, BooleanIndex } from "../types/index.js";
-import { defaultTokenizerConfig } from "../tokenizer/index.js";
-import { removeDocumentByWord } from "../trees/radix/index.js";
-import { flattenObject, getNested } from "../utils.js";
-import { getNodeByKey as getAVLNodeByKey } from "../trees/avl/index.js";
-import * as ERRORS from "../errors.js";
-import { AVLNode } from "../trees/avl/node.js";
+import { runMultipleHook, runSingleHook } from "../components/hooks.js";
+import { trackRemoval } from "../components/sync-blocking-checker.js";
+import { createError } from "../errors.js";
+import { Lyra, OpaqueDocumentStore, OpaqueIndex, Schema } from "../types.js";
 
-/**
- * Removes a document from a database.
- * @param lyra The database to remove the document from.
- * @param docID The id of the document to remove.
- * @example
- * const isDeleted = await remove(db, 'L1tpqQxc0c2djrSN2a6TJ');
- */
-export async function remove<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string): Promise<boolean> {
-  if (!lyra.components?.tokenizer) {
-    lyra.components = {
-      ...(lyra.components ?? {}),
-      tokenizer: defaultTokenizerConfig(lyra.defaultLanguage),
-    };
+export async function remove<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
+  lyra: Lyra<S, I, D>,
+  id: string,
+  language?: string,
+  skipHooks?: boolean,
+): Promise<void> {
+  const { index, docs } = lyra.data;
+
+  const doc = await lyra.documentsStore.get(docs, id);
+  if (!doc) {
+    throw createError("DOCUMENT_DOES_NOT_EXIST", id);
   }
 
-  if (!(docID in lyra.docs)) {
-    throw new Error(ERRORS.DOC_ID_DOES_NOT_EXISTS(docID));
+  const docsCount = await lyra.documentsStore.count(docs);
+
+  if (!skipHooks) {
+    await runSingleHook(lyra.beforeRemove, lyra, id);
   }
 
-  const document = lyra.docs[docID] || ({} as Record<string, ResolveSchema<S>>);
-  const documentKeys = Object.keys(document || {});
+  const indexableProperties = await lyra.index.getSearchableProperties(index);
+  const values = await lyra.getDocumentProperties(doc, indexableProperties);
 
-  const documentKeysLength = documentKeys.length;
-  for (let i = 0; i < documentKeysLength; i++) {
-    const key = documentKeys[i];
-
-    const propertyType = lyra.schema[key];
-
-    if (propertyType === "string") {
-      const idx = lyra.index[key];
-      const tokens: string[] = lyra.components.tokenizer!.tokenizerFn!(
-        document[key] as string,
-        lyra.defaultLanguage,
-        false,
-        lyra.components.tokenizer!,
-      )!;
-
-      lyra.avgFieldLength[key] = (lyra.avgFieldLength[key] * lyra.docsCount - lyra.fieldLengths[key][docID]) / (lyra.docsCount - 1);
-      delete lyra.fieldLengths[key][docID];
-
-      const tokensLength = tokens.length;
-      for (let k = 0; k < tokensLength; k++) {
-        const token = tokens[k];
-        delete lyra.frequencies[key][docID];
-        lyra.tokenOccurrencies[key][token]--;
-        if (token && !removeDocumentByWord(idx as RadixNode, token, docID)) {
-          throw new Error(ERRORS.CANT_DELETE_DOCUMENT(docID, key, token));
-        }
-      }
-    }
+  for (const prop of indexableProperties) {
+    const value = values[prop];
+    await lyra.index.beforeRemove?.(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount);
+    await lyra.index.remove(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount);
+    await lyra.index.afterRemove?.(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount);
   }
 
-  removeNumericValue(lyra, docID);
-  removeBooleanValue(lyra, docID);
+  if (!skipHooks) {
+    await runSingleHook(lyra.afterRemove, lyra, id);
+  }
 
-  lyra.docs[docID] = undefined;
-  lyra.docsCount--;
-
-  return true;
+  trackRemoval(lyra);
 }
 
-function removeNumericValue<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string) {
-  const document = lyra.docs[docID] as Record<string, ResolveSchema<S>>;
-  const flatDocument = flattenObject(document);
-  const documentNumericOnly = Object.keys(flatDocument).reduce((acc, key) => {
-    if (getNested(lyra.schema, key) === "number") {
-      acc[key] = (flatDocument as any)[key];
-    }
-    return acc;
-  }, {} as Record<string, number>);
-
-  for (const [property, value] of Object.entries(documentNumericOnly)) {
-    const idx = lyra.index[property] as AVLNode<number, string[]>;
-    const node = getAVLNodeByKey(idx, value);
-
-    if (node) {
-      node.value = node.value.filter((id) => id !== docID);
-    }
+export async function removeMultiple<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
+  lyra: Lyra<S, I, D>,
+  ids: string[],
+  batchSize?: number,
+  language?: string,
+  skipHooks?: boolean,
+): Promise<void> {
+  if (!batchSize) {
+    batchSize = 1000;
   }
-} 
 
-function removeBooleanValue<S extends PropertiesSchema>(lyra: Lyra<S>, docID: string) {
-  const document = lyra.docs[docID] as Record<string, ResolveSchema<S>>;
-  const flatDocument = flattenObject(document);
-  const documentBooleanOnly = Object.keys(flatDocument).reduce((acc, key) => {
-    if (getNested(lyra.schema, key) === "boolean") {
-      acc[key] = (flatDocument as any)[key];
+  if (!skipHooks) {
+    await runMultipleHook(lyra.beforeMultipleRemove, lyra, ids);
+  }
+
+  await new Promise<void>((resolve, reject) => {
+    let i = 0;
+    async function _insertMultiple() {
+      const batch = ids.slice(i * batchSize!, (i + 1) * batchSize!);
+      i++;
+
+      if (!batch.length) {
+        return resolve();
+      }
+
+      for (const doc of batch) {
+        try {
+          await remove(lyra, doc, language, skipHooks);
+        } catch (err) {
+          reject(err);
+        }
+      }
+
+      setTimeout(_insertMultiple, 0);
     }
-    return acc;
-  }, {} as Record<string, boolean>);
 
-  for (const [property] of Object.entries(documentBooleanOnly)) {
-    const idx = lyra.index[property] as BooleanIndex;
+    setTimeout(_insertMultiple, 0);
+  });
 
-    idx.true.slice(idx.true.indexOf(docID), 1);
-    idx.false.slice(idx.false.indexOf(docID), 1);
+  if (!skipHooks) {
+    await runMultipleHook(lyra.afterMultipleRemove, lyra, ids);
   }
 }

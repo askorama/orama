@@ -1,85 +1,91 @@
 import { SUPPORTED_LANGUAGES } from "./tokenizer/languages.js";
+import { sprintf } from "./utils.js";
 
-function formatJSON(input: object) {
-  return JSON.stringify(input, null, 2);
+export type ErrorCode =
+  | "NO_DEFAULT_LANGUAGE_WITH_CUSTOM_TOKENIZER"
+  | "LANGUAGE_NOT_SUPPORTED"
+  | "INVALID_STEMMER_FUNCTION_TYPE"
+  | "CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY"
+  | "UNSUPPORTED_COMPONENT"
+  | "COMPONENT_MUST_BE_FUNCTION"
+  | "COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS"
+  | "INVALID_SCHEMA_TYPE"
+  | "TYPE_ERROR_ID_MUST_BE_STRING"
+  | "DOCUMENT_ID_MUST_BE_STRING"
+  | "DOCUMENT_ALREADY_EXISTS"
+  | "DOCUMENT_DOES_NOT_EXIST"
+  | "MISSING_DOCUMENT_PROPERTY"
+  | "INVALID_DOCUMENT_PROPERTY"
+  | "INVALID_BOOST_VALUE"
+  | "UNKNOWN_INDEX"
+  | "INVALID_FILTER_OPERATION";
+
+export interface LyraError extends Error {
+  code: string;
 }
 
-export function INVALID_SCHEMA_TYPE(type: string): string {
-  return `Invalid schema type. Expected string or object, but got ${type}`;
-}
+export function createError(code: ErrorCode, ...args: Array<string | number>): LyraError {
+  let message = "";
 
-export function INVALID_DOC_SCHEMA(expected: object, found: object): string {
-  return `Invalid document structure. \nLyra has been initialized with the following schema: \n\n${formatJSON(
-    expected,
-  )}\n\nbut found the following doc:\n\n${formatJSON(found)}`;
-}
+  switch (code) {
+    case "NO_DEFAULT_LANGUAGE_WITH_CUSTOM_TOKENIZER":
+      message = "Do not pass the defaultLanguage option to create when using a custom tokenizer.";
+      break;
+    case "LANGUAGE_NOT_SUPPORTED":
+      message = `Language "%s" is not supported.\nSupported languages are:\n - ${SUPPORTED_LANGUAGES.join("\n - ")}`;
+      break;
+    case "INVALID_STEMMER_FUNCTION_TYPE":
+      message = `config.stemmer property must be a function.`;
+      break;
+    case "CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY":
+      message = "Custom stop words array must only contain strings.";
+      break;
+    case "UNSUPPORTED_COMPONENT":
+      message = `Unsupported component "%s".`;
+      break;
+    case "COMPONENT_MUST_BE_FUNCTION":
+      message = `The component "%s" must be a function.`;
+      break;
+    case "COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS":
+      message = `The component "%s" must be a function or an array of functions.`;
+      break;
+    case "INVALID_SCHEMA_TYPE":
+      message = `Unsupported schema type "%s". Expected "string", "boolean" or "number".`;
+      break;
+    case "DOCUMENT_ID_MUST_BE_STRING":
+      message = `Document id must be of type "string". Got "%s" instead.`;
+      break;
+    case "DOCUMENT_ALREADY_EXISTS":
+      message = `A document with id "%s" already exists.`;
+      break;
+    case "DOCUMENT_DOES_NOT_EXIST":
+      message = `A document with id "%s" does not exists.`;
+      break;
+    case "MISSING_DOCUMENT_PROPERTY":
+      message = `Missing searchable property "%s".`;
+      break;
+    case "INVALID_DOCUMENT_PROPERTY":
+      message = `Invalid document property "%s": expected "%s", got "%s"`;
+      break;
+    case "UNKNOWN_INDEX":
+      message = `Invalid property name "%s". Expected a wildcard string ("*") or array containing one of the following properties: %s`;
+      break;
+    case "INVALID_BOOST_VALUE":
+      message = `Boost value must be a number greater than, or less than 0.`;
+      break;
+    case "INVALID_FILTER_OPERATION":
+      message = `You can only use one operation per filter, you requested %d.`;
+      break;
+    default:
+      message = `Unsupported Lyra Error code: ${code}`;
+      break;
+  }
 
-export function INVALID_PROPERTY(name: string, expected: string[]): string {
-  return `Invalid property name. Expected a wildcard string ("*") or array containing one of the following properties: ${expected.join(
-    ", ",
-  )}, but got: ${name}`;
-}
+  const error = new Error(sprintf(message, ...args)) as LyraError;
+  error.code = code;
+  if ("captureStackTrace" in Error.prototype) {
+    Error.captureStackTrace(error);
+  }
 
-export function CANT_DELETE_DOC_NOT_FOUND(id: string): string {
-  return `Document with ID ${id} does not exist.`;
-}
-
-export function CANT_DELETE_DOCUMENT(docID: string, key: string, token: string): string {
-  return `Unable to delete document "${docID}" from index "${key}" on word "${token}".`;
-}
-
-export function UNSUPPORTED_NESTED_PROPERTIES(): string {
-  return `Nested properties are not supported in this Lyra version, but will be in the future.`;
-}
-
-export function DOC_ID_DOES_NOT_EXISTS(id: string): string {
-  return `Document with ID ${id} does not exists`;
-}
-
-export function GETTER_SETTER_WORKS_ON_EDGE_ONLY(method: string): string {
-  return `${method} works on edge only. Use edge: true in Lyra constructor to enable it.`;
-}
-
-export function INVALID_HOOKS_OBJECT(): string {
-  return "Invalid hooks object";
-}
-
-export function NON_SUPPORTED_HOOKS(invalidHooks: string[]): string {
-  return `The following hooks aren't supported. Hooks: ${invalidHooks}`;
-}
-
-export function TYPE_ERROR_ID_MUST_BE_STRING(type: string): string {
-  return `"id" must be of type "string". Got "${type}" instead.`;
-}
-
-export function ID_ALREADY_EXISTS(id: string): string {
-  return `Document with ID "${id}" already exists.`;
-}
-
-export function LANGUAGE_NOT_SUPPORTED(lang: string): string {
-  return `Language "${lang}" is not supported.\nSupported languages are:\n - ${SUPPORTED_LANGUAGES.join("\n - ")}`;
-}
-
-export function CUSTOM_STOP_WORDS_ARRAY_MUST_BE_STRING_ARRAY(): string {
-  return `Custom stop words array must only contain strings.`;
-}
-
-export function CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY(): string {
-  return `Custom stop words must be a function or an array of strings.`;
-}
-
-export function INVALID_STEMMER_FUNCTION_TYPE(): string {
-  return `tokenizer.stemmingFn property must be a function.`;
-}
-
-export function INVALID_TOKENIZER_FUNCTION(): string {
-  return `tokenizer.tokenizerFn must be a function.`;
-}
-
-export function INVALID_BOOST_VALUE(): string {
-  return `Boost value must be a number greater than, or less than 0.`;
-}
-
-export function INVALID_FILTER_OPERATION(found: string[]): string {
-  return `You can only use one operation per filter. Found ${found.length}: ${found.join(", ")}`;
+  return error;
 }

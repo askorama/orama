@@ -1,5 +1,7 @@
 import cronometro from "cronometro";
-import { create, insertBatch, search } from "../../dist/index.js";
+import { isMainThread } from "worker_threads";
+import { create, search, insertMultiple } from "../../dist/index.js";
+import { createTokenizer } from "../../dist/internals.js";
 import { formattedEvents } from "./utils/dataset.js";
 
 const db = await create({
@@ -22,15 +24,17 @@ const dbNoStemming = await create({
       second: "string",
     },
   },
-  tokenizer: {
-    enableStemming: false,
+  components: {
+    tokenizer: await createTokenizer("english", { stemming: false }),
   },
 });
 
 const first30000Events = formattedEvents.slice(0, 30_000);
 
-await insertBatch(db, first30000Events);
-await insertBatch(dbNoStemming, first30000Events);
+if (!isMainThread) {
+  await insertMultiple(db, first30000Events);
+  await insertMultiple(dbNoStemming, first30000Events);
+}
 
 await cronometro({
   'search "beauty", default settings': () => {

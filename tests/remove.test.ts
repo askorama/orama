@@ -2,10 +2,11 @@ import t from "tap";
 import { remove } from "../src/methods/remove.js";
 import { create } from "../src/methods/create.js";
 import { insert } from "../src/methods/insert.js";
+import { Index } from "../src/components/index.js";
 
 t.test("remove method", t => {
   t.plan(1);
-  
+
   t.test("should remove a document and update field length", async t => {
     t.plan(2);
 
@@ -15,8 +16,8 @@ t.test("remove method", t => {
         author: "string",
         meta: {
           tags: "string",
-        }
-      }
+        },
+      },
     });
 
     await insert(db, {
@@ -24,7 +25,7 @@ t.test("remove method", t => {
       author: "John Lennon",
       meta: {
         tags: "music, life, music",
-      }
+      },
     });
 
     await insert(db, {
@@ -32,7 +33,7 @@ t.test("remove method", t => {
       author: "Richard Feynman",
       meta: {
         tags: "physics, science, philosophy",
-      }
+      },
     });
 
     await insert(db, {
@@ -40,23 +41,23 @@ t.test("remove method", t => {
       author: "Henry Thoreau",
       meta: {
         tags: "life, philosophy, dreams, imagination",
-      }
+      },
     });
 
-    const fieldLengths = {...db.fieldLengths};
-    const avgFieldLength = {...db.avgFieldLength};
+    const fieldLengths = { ...(db.data.index as Index).fieldLengths };
+    const avgFieldLength = { ...(db.data.index as Index).avgFieldLength };
 
     const d1 = await insert(db, {
       quote: "It is during our darkest moments that we must focus to see the light.",
       author: "Aristotle",
       meta: {
         tags: "philosophy, life, light",
-      }
+      },
     });
 
-    await remove(db, d1.id);
+    await remove(db, d1);
 
-    t.same(db.fieldLengths, fieldLengths);
-    t.same(db.avgFieldLength, avgFieldLength);
+    t.same((db.data.index as Index).fieldLengths, fieldLengths);
+    t.same((db.data.index as Index).avgFieldLength, avgFieldLength);
   });
 });

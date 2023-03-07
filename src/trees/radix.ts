@@ -1,127 +1,56 @@
-import { boundedLevenshtein } from "../../levenshtein.js";
-import { getOwnProperty } from "../../utils.js";
-import { addDocument, create as createNode, RadixNode, removeDocument, updateParent } from "./node.js";
+import { boundedLevenshtein } from "../components/levenshtein.js";
+import { Nullable } from "../types.js";
+import { getOwnProperty, uniqueId } from "../utils.js";
 
-export type FindParams = {
+export interface Node {
+  id: string;
+  key: string;
+  subWord: string;
+  parent: Nullable<string>;
+  children: Record<string, Node>;
+  docs: string[];
+  end: boolean;
+  word: string;
+}
+
+type FindParams = {
   term: string;
   exact?: boolean;
   tolerance?: number;
 };
 
-export type FindResult = Record<string, string[]>;
+type FindResult = Record<string, string[]>;
 
-export function insert(root: RadixNode, word: string, docId: string) {
-  for (let i = 0; i < word.length; i++) {
-    const currentCharacter = word[i];
-    const wordAtIndex = word.substring(i);
-    const rootChildCurrentChar = root.children[currentCharacter];
+/* c8 ignore next 5 */
+function serialize(this: Node): object {
+  const { word, subWord, children, docs, end } = this;
 
-    if (currentCharacter in root.children) {
-      const edgeLabel = rootChildCurrentChar.subWord;
-      const edgeLabelLength = edgeLabel.length;
-
-      const commonPrefix = getCommonPrefix(edgeLabel, wordAtIndex);
-      const commonPrefixLength = commonPrefix.length;
-      const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength];
-
-      // the wordAtIndex matches exactly with an existing child node
-      if (edgeLabel === wordAtIndex) {
-        addDocument(rootChildCurrentChar, docId);
-        rootChildCurrentChar.end = true;
-        return;
-      }
-
-      // the wordAtIndex is completely contained in the child node subword
-      if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
-        const newNode = createNode(true, wordAtIndex, currentCharacter);
-        newNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
-
-        const newNodeChild = newNode.children[edgeLabelAtCommonPrefix];
-        newNodeChild.subWord = edgeLabel.substring(commonPrefixLength);
-        newNodeChild.key = edgeLabelAtCommonPrefix;
-
-        root.children[currentCharacter] = newNode;
-
-        updateParent(newNode, root);
-        updateParent(newNodeChild, newNode);
-        return;
-      }
-
-      // the wordAtIndex is partially contained in the child node subword
-      if (commonPrefixLength < edgeLabelLength && commonPrefixLength < wordAtIndex.length) {
-        const inbetweenNode = createNode(false, commonPrefix, currentCharacter);
-        inbetweenNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
-        root.children[currentCharacter] = inbetweenNode;
-
-        const inbetweenNodeChild = inbetweenNode.children[edgeLabelAtCommonPrefix];
-        inbetweenNodeChild.subWord = edgeLabel.substring(commonPrefixLength);
-        inbetweenNodeChild.key = edgeLabelAtCommonPrefix;
-
-        const wordAtCommonPrefix = wordAtIndex[commonPrefixLength];
-        const newNode = createNode(true, word.substring(i + commonPrefixLength), wordAtCommonPrefix);
-        addDocument(newNode, docId);
-
-        inbetweenNode.children[wordAtCommonPrefix] = newNode;
-
-        updateParent(inbetweenNode, root);
-        updateParent(newNode, inbetweenNode);
-        updateParent(inbetweenNodeChild, inbetweenNode);
-        return;
-      }
-
-      // skip to the next divergent character
-      i += edgeLabelLength - 1;
-      // navigate in the child node
-      root = rootChildCurrentChar;
-    } else {
-      // if the node for the current character doesn't exist create new node
-      const newNode = createNode(true, wordAtIndex, currentCharacter);
-      addDocument(newNode, docId);
-
-      root.children[currentCharacter] = newNode;
-      updateParent(newNode, root);
-      return;
-    }
-  }
+  return { word, subWord, children, docs, end };
 }
 
-export function find(root: RadixNode, { term, exact, tolerance }: FindParams) {
-  // find the closest node to the term
-  for (let i = 0; i < term.length; i++) {
-    const character = term[i];
-    if (character in root.children) {
-      const rootChildCurrentChar = root.children[character];
-      const edgeLabel = rootChildCurrentChar.subWord;
-      const termSubstring = term.substring(i);
-
-      // find the common prefix between two words ex: prime and primate = prim
-      const commonPrefix = getCommonPrefix(edgeLabel, termSubstring);
-      const commonPrefixLength = commonPrefix.length;
-      // if the common prefix lenght is equal to edgeLabel lenght (the node subword) it means they are a match
-      // if the common prefix is equal to the term means it is contained in the node
-      if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
-        // if tolerance is set we take the current node as the closest
-        if (tolerance) break;
-        return {};
-      }
-
-      // skip the subword lenght and check the next divergent character
-      i += rootChildCurrentChar.subWord.length - 1;
-      // navigate into the child node
-      root = rootChildCurrentChar;
-    } else {
-      return {};
-    }
-  }
-
-  const output: FindResult = {};
-  // found the closest node we recursively search through children
-  findAllWords(root, output, term, exact, tolerance);
-
-  return output;
+function updateParent(node: Node, parent: Node): void {
+  node.parent = parent.id;
+  node.word = parent.word + node.subWord;
 }
 
-function findAllWords(node: RadixNode, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
+function addDocument(node: Node, docID: string): void {
+  node.docs.push(docID);
+}
+
+function removeDocument(node: Node, docID: string): boolean {
+  const index = node.docs.indexOf(docID);
+
+  /* c8 ignore next 3 */
+  if (index === -1) {
+    return false;
+  }
+
+  node.docs.splice(index, 1);
+
+  return true;
+}
+
+function findAllWords(node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
   if (node.end) {
     const { word, docs: docIDs } = node;
 
@@ -180,7 +109,134 @@ function getCommonPrefix(a: string, b: string) {
   return commonPrefix;
 }
 
-export function contains(root: RadixNode, term: string): boolean {
+export function create(end = false, subWord = "", key = ""): Node {
+  const node = {
+    id: uniqueId(),
+    key,
+    subWord,
+    parent: null,
+    children: {},
+    docs: [],
+    end,
+    word: "",
+  };
+
+  Object.defineProperty(node, "toJSON", { value: serialize });
+  return node;
+}
+
+export function insert(root: Node, word: string, docId: string) {
+  for (let i = 0; i < word.length; i++) {
+    const currentCharacter = word[i];
+    const wordAtIndex = word.substring(i);
+    const rootChildCurrentChar = root.children[currentCharacter];
+
+    if (currentCharacter in root.children) {
+      const edgeLabel = rootChildCurrentChar.subWord;
+      const edgeLabelLength = edgeLabel.length;
+
+      const commonPrefix = getCommonPrefix(edgeLabel, wordAtIndex);
+      const commonPrefixLength = commonPrefix.length;
+      const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength];
+
+      // the wordAtIndex matches exactly with an existing child node
+      if (edgeLabel === wordAtIndex) {
+        addDocument(rootChildCurrentChar, docId);
+        rootChildCurrentChar.end = true;
+        return;
+      }
+
+      // the wordAtIndex is completely contained in the child node subword
+      if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
+        const newNode = create(true, wordAtIndex, currentCharacter);
+        newNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
+
+        const newNodeChild = newNode.children[edgeLabelAtCommonPrefix];
+        newNodeChild.subWord = edgeLabel.substring(commonPrefixLength);
+        newNodeChild.key = edgeLabelAtCommonPrefix;
+
+        root.children[currentCharacter] = newNode;
+
+        updateParent(newNode, root);
+        updateParent(newNodeChild, newNode);
+        return;
+      }
+
+      // the wordAtIndex is partially contained in the child node subword
+      if (commonPrefixLength < edgeLabelLength && commonPrefixLength < wordAtIndex.length) {
+        const inbetweenNode = create(false, commonPrefix, currentCharacter);
+        inbetweenNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
+        root.children[currentCharacter] = inbetweenNode;
+
+        const inbetweenNodeChild = inbetweenNode.children[edgeLabelAtCommonPrefix];
+        inbetweenNodeChild.subWord = edgeLabel.substring(commonPrefixLength);
+        inbetweenNodeChild.key = edgeLabelAtCommonPrefix;
+
+        const wordAtCommonPrefix = wordAtIndex[commonPrefixLength];
+        const newNode = create(true, word.substring(i + commonPrefixLength), wordAtCommonPrefix);
+        addDocument(newNode, docId);
+
+        inbetweenNode.children[wordAtCommonPrefix] = newNode;
+
+        updateParent(inbetweenNode, root);
+        updateParent(newNode, inbetweenNode);
+        updateParent(inbetweenNodeChild, inbetweenNode);
+        return;
+      }
+
+      // skip to the next divergent character
+      i += edgeLabelLength - 1;
+      // navigate in the child node
+      root = rootChildCurrentChar;
+    } else {
+      // if the node for the current character doesn't exist create new node
+      const newNode = create(true, wordAtIndex, currentCharacter);
+      addDocument(newNode, docId);
+
+      root.children[currentCharacter] = newNode;
+      updateParent(newNode, root);
+      return;
+    }
+  }
+}
+
+export function find(root: Node, { term, exact, tolerance }: FindParams): FindResult {
+  // find the closest node to the term
+  for (let i = 0; i < term.length; i++) {
+    const character = term[i];
+    if (character in root.children) {
+      const rootChildCurrentChar = root.children[character];
+      const edgeLabel = rootChildCurrentChar.subWord;
+      const termSubstring = term.substring(i);
+
+      // find the common prefix between two words ex: prime and primate = prim
+      const commonPrefix = getCommonPrefix(edgeLabel, termSubstring);
+      const commonPrefixLength = commonPrefix.length;
+      // if the common prefix lenght is equal to edgeLabel lenght (the node subword) it means they are a match
+      // if the common prefix is equal to the term means it is contained in the node
+      if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
+        // if tolerance is set we take the current node as the closest
+        if (tolerance) break;
+        return {};
+      }
+
+      // skip the subword lenght and check the next divergent character
+      i += rootChildCurrentChar.subWord.length - 1;
+      // navigate into the child node
+      root = rootChildCurrentChar;
+    } else {
+      return {};
+    }
+  }
+
+  const output: FindResult = {};
+  // found the closest node we recursively search through children
+  findAllWords(root, output, term, exact, tolerance);
+
+  return output;
+}
+
+export function contains(root: Node, term: string): boolean {
   for (let i = 0; i < term.length; i++) {
     const character = term[i];
 
@@ -203,8 +259,7 @@ export function contains(root: RadixNode, term: string): boolean {
   return true;
 }
 
-// unused
-export function removeWord(root: RadixNode, term: string): boolean {
+export function removeWord(root: Node, term: string): boolean {
   if (!term) {
     return false;
   }
@@ -228,7 +283,7 @@ export function removeWord(root: RadixNode, term: string): boolean {
   return false;
 }
 
-export function removeDocumentByWord(root: RadixNode, term: string, docID: string, exact = true): boolean {
+export function removeDocumentByWord(root: Node, term: string, docID: string, exact = true): boolean {
   if (!term) {
     return true;
   }

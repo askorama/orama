@@ -1,10 +1,13 @@
 import t from "tap";
-import { create, insert, insertBatch, insertWithHooks, remove, search } from "../src/index.js";
+import type { Document } from "../src/types";
+import { DocumentsStore } from "../src/components/documents-store.js";
+import { Index } from "../src/components/index.js";
+import { create, insert, insertMultiple, remove, search } from "../src/index.js";
+import { createTokenizer } from "../src/tokenizer/index.js";
 import { SUPPORTED_LANGUAGES } from "../src/tokenizer/languages.js";
-import { INVALID_DOC_SCHEMA, LANGUAGE_NOT_SUPPORTED } from "../src/errors.js";
 import dataset from "./datasets/events.json" assert { type: "json" };
 
-interface BaseDataEvent {
+interface BaseDataEvent extends Document {
   description: string;
   lang: string;
   category1: string;
@@ -36,7 +39,7 @@ t.test("defaultLanguage", t => {
           schema: {},
           defaultLanguage: "latin",
         }),
-      { message: LANGUAGE_NOT_SUPPORTED("latin") },
+      { code: "LANGUAGE_NOT_SUPPORTED" },
     );
   });
 
@@ -54,9 +57,9 @@ t.test("defaultLanguage", t => {
           {
             foo: "bar",
           },
-          { language: "latin" },
+          "latin",
         ),
-      { message: LANGUAGE_NOT_SUPPORTED("latin") },
+      { code: "LANGUAGE_NOT_SUPPORTED" },
     );
   });
 
@@ -106,7 +109,7 @@ t.test("defaultLanguage", t => {
   });
 });
 
-t.test("checkInsertDocSchema", t => {
+t.test("document validation", t => {
   t.plan(3);
 
   t.test("should compare the inserted doc with the schema definition", async t => {
@@ -119,16 +122,16 @@ t.test("checkInsertDocSchema", t => {
       },
     });
 
-    t.ok((await insert(db, { quote: "hello, world!", author: "me" })).id);
+    t.ok(await insert(db, { quote: "hello, world!", author: "me" }));
 
-    // @ts-expect-error test error case
     await t.rejects(() => insert(db, { quote: "hello, world!", author: true }), {
-      message: INVALID_DOC_SCHEMA({ quote: "string", author: "string" }, { quote: "hello, world!", author: true }),
+      code: "INVALID_DOCUMENT_PROPERTY",
     });
   });
 
   t.test("should allow doc with missing schema keys to be inserted without indexing those keys", async t => {
     t.plan(6);
+
     const db = await create({
       schema: {
         quote: "string",
@@ -137,25 +140,21 @@ t.test("checkInsertDocSchema", t => {
     });
     await insert(db, {
       quote: "hello, world!",
-      // @ts-expect-error test error case
       authors: "author should be singular",
     });
 
-    t.ok(Object.keys(db.docs).length === 1);
+    t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 1);
 
     const docWithExtraKey = { quote: "hello, world!", foo: { bar: 10 } };
-    // @ts-expect-error test error case
+
     const insertedInfo = await insert(db, docWithExtraKey);
-    t.ok(insertedInfo.id);
-    t.equal(Object.keys(db.docs).length, 2);
-    t.ok(
-      insertedInfo.id in db.docs &&
-        // @ts-expect-error test error case
-        "foo" in db.docs[insertedInfo.id],
-    );
-    // @ts-expect-error test error case
-    t.same(docWithExtraKey.foo, db.docs[insertedInfo.id].foo);
-    t.notOk(db.index.foo);
+
+    t.ok(insertedInfo);
+    t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 2);
+
+    t.ok("foo" in (db.data.docs as DocumentsStore).docs[insertedInfo]!);
+    t.same(docWithExtraKey.foo, (db.data.docs as DocumentsStore).docs[insertedInfo]!.foo);
+    t.notOk("foo" in (db.data.index as Index).indexes);
   });
 
   t.test(
@@ -194,18 +193,26 @@ t.test("checkInsertDocSchema", t => {
       };
       const insertedInfo = await insert(db, nestedExtraKeyDoc);
 
-      t.ok(insertedInfo.id);
-      t.equal(Object.keys(db.docs).length, 1);
+      t.ok(insertedInfo);
+      t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 1);
 
-      // @ts-expect-error test error case
-      t.same(nestedExtraKeyDoc.unexpectedProperty, db.docs[insertedInfo.id].unexpectedProperty);
-      // @ts-expect-error test error case
-      t.same(nestedExtraKeyDoc.tag.unexpectedNestedProperty, db.docs[insertedInfo.id].tag.unexpectedNestedProperty);
-      t.notOk(db.index.unexpectedProperty);
-      t.notOk(db.index["tag.unexpectedProperty"]);
+      t.same(
+        nestedExtraKeyDoc.unexpectedProperty,
+        (db.data.docs as DocumentsStore).docs[insertedInfo]!.unexpectedProperty,
+      );
+
+      t.same(
+        nestedExtraKeyDoc.tag.unexpectedNestedProperty,
+        ((db.data.docs as DocumentsStore).docs[insertedInfo]!.tag as unknown as Record<string, string>)
+          .unexpectedNestedProperty,
+      );
+
+      t.notOk("unexpectedProperty" in (db.data.index as Index).indexes);
+      t.notOk("tag.unexpectedProperty" in (db.data.index as Index).indexes);
     },
   );
 });
+
 t.test("lyra", t => {
   t.plan(19);
 
@@ -249,8 +256,8 @@ t.test("lyra", t => {
     const result7 = await search(db, { term: "They are the best" });
     const result8 = await search(db, { term: "Foxes are nice animals" });
 
-    t.equal(result7.count, 4);
-    t.equal(result8.count, 4);
+    t.equal(result7.count, 2);
+    t.equal(result8.count, 2);
   });
 
   t.test("should correctly search for data returning doc including with unindexed keys", async t => {
@@ -260,6 +267,9 @@ t.test("lyra", t => {
       schema: {
         quote: "string",
         author: "string",
+      },
+      components: {
+        tokenizer: await createTokenizer("english", { stemming: false, stopWords: false }),
       },
     });
 
@@ -280,8 +290,8 @@ t.test("lyra", t => {
     const result1 = await search(db, { term: "They are the best" });
     const result2 = await search(db, { term: "Foxes are nice animals" });
 
-    t.equal(result1.count, 2);
-    t.equal(result2.count, 2);
+    t.equal(result1.count, 1);
+    t.equal(result2.count, 1);
     t.same(result1.hits[0].document, documentWithUnindexedField);
     t.same(result2.hits[0].document, documentWithNestedUnindexedField);
   });
@@ -299,14 +309,12 @@ t.test("lyra", t => {
     await insert(db, {
       quote: "I like dogs. They are the best.",
       author: "Jane Doe",
-      //@ts-expect-error test error case
       nested: { unindexedNestedField: "unindexedNestedValue" },
     });
 
     await insert(db, {
       quote: "I like cats. They are the best.",
       author: "Jane Doe",
-      //@ts-expect-error test error case
       unindexedField: "unindexedValue",
     });
 
@@ -332,7 +340,7 @@ t.test("lyra", t => {
       properties: ["example"],
     });
 
-    t.ok(ex1Insert.id);
+    t.ok(ex1Insert);
     t.equal(ex1Search.count, 1);
     t.type(ex1Search.elapsed, "bigint");
     t.equal(ex1Search.hits[0].document.example, "The quick, brown, fox");
@@ -382,18 +390,16 @@ t.test("lyra", t => {
       () =>
         search(db, {
           term: "foo",
-          //@ts-expect-error test error case
           properties: ["bar"],
         }),
       {
-        message:
-          'Invalid property name. Expected a wildcard string ("*") or array containing one of the following properties: foo, baz, but got: bar',
+        code: "UNKNOWN_INDEX",
       },
     );
   });
 
   t.test("Should correctly remove a document after its insertion", async t => {
-    t.plan(5);
+    t.plan(4);
 
     const db = await create({
       schema: {
@@ -402,12 +408,12 @@ t.test("lyra", t => {
       },
     });
 
-    const { id: id1 } = await insert(db, {
+    const id1 = await insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
     });
 
-    const { id: id2 } = await insert(db, {
+    const id2 = await insert(db, {
       quote: "To live is the rarest thing in the world. Most people exist, that is all.",
       author: "Oscar Wilde",
     });
@@ -417,14 +423,13 @@ t.test("lyra", t => {
       author: "Frank Zappa",
     });
 
-    const res = remove(db, id1);
+    await remove(db, id1);
 
     const searchResult = await search(db, {
       term: "Oscar",
       properties: ["author"],
     });
 
-    t.ok(res);
     t.equal(searchResult.count, 1);
     t.equal(searchResult.hits[0].document.author, "Oscar Wilde");
     t.equal(
@@ -444,11 +449,11 @@ t.test("lyra", t => {
       },
     });
 
-    const { id: halo } = await insert(lyra, { word: "Halo" });
+    const halo = await insert(lyra, { word: "Halo" });
     await insert(lyra, { word: "Halloween" });
     await insert(lyra, { word: "Hal" });
 
-    remove(lyra, halo);
+    await remove(lyra, halo);
 
     const searchResult = await search(lyra, {
       term: "Hal",
@@ -470,7 +475,7 @@ t.test("lyra", t => {
       },
     });
 
-    const { id: harryPotter } = await insert(movieDB, {
+    const harryPotter = await insert(movieDB, {
       title: "Harry Potter and the Philosopher's Stone",
       director: "Chris Columbus",
       plot: "Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.",
@@ -483,7 +488,7 @@ t.test("lyra", t => {
       properties: ["title", "director", "plot"],
     });
 
-    remove(movieDB, harryPotter);
+    await remove(movieDB, harryPotter);
 
     const testSearch2 = await search(movieDB, {
       term: "Harry Potter",
@@ -514,7 +519,7 @@ t.test("lyra", t => {
 
     const { id } = searchResult.hits[0];
 
-    remove(db, id);
+    await remove(db, id);
 
     const searchResult2 = await search(db, { term: "stelle", exact: true });
 
@@ -537,7 +542,7 @@ t.test("lyra", t => {
     const searchResult = await search(db, { term: "abc", exact: true });
 
     const id = searchResult.hits[0].id;
-    remove(db, id);
+    await remove(db, id);
 
     const searchResult2 = await search(db, { term: "abc", exact: true });
 
@@ -546,7 +551,7 @@ t.test("lyra", t => {
   });
 
   t.test("Should preserve identical docs after deletion", async t => {
-    t.plan(9);
+    t.plan(8);
 
     const db = await create({
       schema: {
@@ -555,12 +560,12 @@ t.test("lyra", t => {
       },
     });
 
-    const { id: id1 } = await insert(db, {
+    const id1 = await insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
     });
 
-    const { id: id2 } = await insert(db, {
+    const id2 = await insert(db, {
       quote: "Be yourself; everyone else is already taken.",
       author: "Oscar Wilde",
     });
@@ -570,7 +575,7 @@ t.test("lyra", t => {
       author: "Frank Zappa",
     });
 
-    const res = remove(db, id1);
+    await remove(db, id1);
 
     const searchResult = await search(db, {
       term: "Oscar",
@@ -582,7 +587,6 @@ t.test("lyra", t => {
       properties: ["quote"],
     });
 
-    t.ok(res);
     t.equal(searchResult.count, 1);
     t.equal(searchResult.hits[0].document.author, "Oscar Wilde");
     t.equal(searchResult.hits[0].document.quote, "Be yourself; everyone else is already taken.");
@@ -864,13 +868,13 @@ t.test("lyra", t => {
     const wrongSchemaDocs: WrongDataEvent[] = docs.map(doc => ({ ...doc, date: +new Date() }));
 
     try {
-      await insertBatch(db, docs);
-      t.equal(Object.keys(db.docs).length, 4000);
+      await insertMultiple(db, docs);
+      t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 4000);
 
       // eslint-disable-next-line no-empty
     } catch (_e) {}
 
-    await t.rejects(() => insertBatch(db, wrongSchemaDocs as unknown as DataEvent[]));
+    await t.rejects(() => insertMultiple(db, wrongSchemaDocs as unknown as DataEvent[]));
   });
 });
 
@@ -883,13 +887,13 @@ t.test("lyra - hooks", t => {
       () =>
         create({
           schema: { date: "string" },
-          hooks: {
+          components: {
             ["anotherHookName" as string]: () => {
               t.fail("it shouldn't be called");
             },
           },
         }),
-      { message: "The following hooks aren't supported. Hooks: anotherHookName" },
+      { code: "UNSUPPORTED_COMPONENT" },
     );
   });
 
@@ -903,14 +907,13 @@ t.test("lyra - hooks", t => {
           surname: "string",
         },
       },
-      hooks: {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        afterInsert: function (_id: string): void {
+      components: {
+        afterInsert(): void {
           t.same(++callOrder, 1);
         },
       },
     });
-    await insertWithHooks(db, {
+    await insert(db, {
       quote: "Harry Potter, the boy who lived, come to die. Avada kedavra.",
       author: {
         name: "Tom",
@@ -932,7 +935,9 @@ t.test("custom tokenizer configuration", t => {
       },
       components: {
         tokenizer: {
-          tokenizerFn: text => text.split(","),
+          tokenize(text: string) {
+            return text.split(",");
+          },
         },
       },
     });
@@ -978,12 +983,14 @@ t.test("should access own properties exclusively", async t => {
 });
 
 t.test("should search numbers in supported languages", async t => {
-  for (const supportedLanguage of SUPPORTED_LANGUAGES) {
+  for (const language of SUPPORTED_LANGUAGES) {
     const db = await create({
       schema: {
         number: "string",
       },
-      defaultLanguage: supportedLanguage,
+      components: {
+        tokenizer: await createTokenizer(language, { stemming: false }),
+      },
     });
 
     await insert(db, {
@@ -994,7 +1001,7 @@ t.test("should search numbers in supported languages", async t => {
       term: "123",
     });
 
-    t.same(searchResult.count, 1, `Language: ${supportedLanguage}`);
+    t.same(searchResult.count, 1, `Language: ${language}`);
   }
 
   t.end();
@@ -1006,7 +1013,9 @@ t.test("should correctly search accented words in Italian", async t => {
     schema: {
       description: "string",
     },
-    defaultLanguage: "italian",
+    components: {
+      tokenizer: await createTokenizer("italian", { stemming: false }),
+    },
   });
 
   await insert(db, {
@@ -1025,7 +1034,9 @@ t.test("should correctly search accented words in English", async t => {
     schema: {
       description: "string",
     },
-    defaultLanguage: "english",
+    components: {
+      tokenizer: await createTokenizer("english", { stemming: false }),
+    },
   });
 
   await insert(db, {
@@ -1044,7 +1055,9 @@ t.test("should correctly search accented words in Dutch", async t => {
     schema: {
       description: "string",
     },
-    defaultLanguage: "dutch",
+    components: {
+      tokenizer: await createTokenizer("dutch", { stemming: false }),
+    },
   });
 
   await insert(db, {
@@ -1062,7 +1075,9 @@ t.test("should correctly search accented words in Slovenian", async t => {
     schema: {
       description: "string",
     },
-    defaultLanguage: "slovenian",
+    components: {
+      tokenizer: await createTokenizer("slovenian", { stemming: false }),
+    },
   });
 
   await insert(db, {
@@ -1088,7 +1103,9 @@ t.test("should correctly search words in Bulgarian", async t => {
     schema: {
       description: "string",
     },
-    defaultLanguage: "bulgarian",
+    components: {
+      tokenizer: await createTokenizer("bulgarian", { stemming: false }),
+    },
   });
 
   await insert(db, {

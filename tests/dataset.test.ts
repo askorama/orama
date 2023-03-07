@@ -1,7 +1,6 @@
 import t from "tap";
-import { create, insertBatch, remove, search } from "../src/index.js";
-import type { SearchResult } from "../src/methods/search.js";
-import type { PropertiesSchema } from "../src/types.js";
+import { DocumentsStore } from "../src/components/documents-store.js";
+import { create, insertMultiple, remove, Results, search } from "../src/index.js";
 import dataset from "./datasets/events.json" assert { type: "json" };
 import snapshots from "./snapshots/events.json" assert { type: "json" };
 
@@ -17,7 +16,7 @@ type EventJson = {
   };
 };
 
-function removeVariadicData<T extends PropertiesSchema>(res: SearchResult<T>): Omit<SearchResult<T>, "elapsed"> {
+function removeVariadicData(res: Results): Omit<Results, "elapsed"> {
   const hits = res.hits.map(h => {
     h.id = "";
     return h;
@@ -53,7 +52,7 @@ t.test("lyra.dataset", async t => {
     },
   }));
 
-  await insertBatch(db, events);
+  await insertMultiple(db, events);
 
   t.test("should correctly populate the database with a large dataset", async t => {
     t.plan(4);
@@ -82,7 +81,7 @@ t.test("lyra.dataset", async t => {
       offset: 0,
     });
 
-    t.equal(Object.keys(db.docs).length, (dataset as EventJson).result.events.length);
+    t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, (dataset as EventJson).result.events.length);
     t.equal(s1.count, 1117);
     t.equal(s2.count, 7314);
     t.equal(s3.count, 7314);
@@ -107,9 +106,9 @@ t.test("lyra.dataset", async t => {
       properties: ["description"],
     });
 
-    t.equal(s1.count, 31294);
-    t.equal(s2.count, 28747);
-    t.equal(s3.count, 33644);
+    t.equal(s1.count, 14931);
+    t.equal(s2.count, 2922);
+    t.equal(s3.count, 3331);
   });
 
   t.test("should perform paginate search", async t => {
@@ -205,7 +204,7 @@ t.test("lyra.dataset", async t => {
     });
 
     for (const doc of documentsToDelete.hits) {
-      remove(db, doc.id);
+      await remove(db, doc.id);
     }
 
     const newSearch = await search(db, {

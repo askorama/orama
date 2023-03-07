@@ -1,7 +1,10 @@
-import type { TokenScore } from "./types/index.js";
+import type { Document, SearchableValue, TokenScore } from "./types.js";
 
 const baseId = Date.now().toString().slice(5);
 let lastId = 0;
+
+// Checks if `hasOwn` method is defined avoiding errors with older Node.js versions
+const hasOwn = Object.hasOwn ?? Object.prototype.hasOwnProperty.call;
 
 const k = 1024;
 const nano = BigInt(1e3);
@@ -9,6 +12,40 @@ const milli = BigInt(1e6);
 const second = BigInt(1e9);
 
 export const isServer = typeof window === "undefined";
+
+export function sprintf(template: string, ...args: (string | number)[]): string {
+  return template.replaceAll(
+    /%(?:(?<position>\d+)\$)?(?<width>-?\d*\.?\d*)(?<type>[dfs])/g,
+    function (...replaceArgs: Array<string | number | Record<string, string>>): string {
+      const { width: rawWidth, type, position } = replaceArgs.at(-1) as Record<string, string>;
+
+      const replacement = position ? args[Number.parseInt(position) - 1]! : args.shift()!;
+      const width = rawWidth === "" ? 0 : Number.parseInt(rawWidth);
+
+      switch (type) {
+        case "d":
+          return replacement.toString().padStart(width, "0");
+        case "f": {
+          let value = replacement;
+          const [padding, precision] = rawWidth.split(".").map(w => Number.parseFloat(w));
+
+          if (typeof precision === "number" && precision >= 0) {
+            value = (value as number).toFixed(precision);
+          }
+
+          return typeof padding === "number" && padding >= 0 ? value.toString().padStart(width, "0") : value.toString();
+        }
+        case "s":
+          return width < 0
+            ? (replacement as string).toString().padEnd(-width, " ")
+            : (replacement as string).toString().padStart(width, " ");
+
+        default:
+          return replacement as string;
+      }
+    },
+  );
+}
 
 export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) {
@@ -54,12 +91,7 @@ export function uniqueId(): string {
 }
 
 export function getOwnProperty<T = unknown>(object: Record<string, T>, property: string): T | undefined {
-  // Checks if `hasOwn` method is defined avoiding errors with older Node.js versions
-  if (Object.hasOwn === undefined) {
-    return Object.prototype.hasOwnProperty.call(object, property) ? object[property] : undefined;
-  }
-
-  return Object.hasOwn(object, property) ? object[property] : undefined;
+  return hasOwn(object, property) ? object[property] : undefined;
 }
 
 export function getTokenFrequency(token: string, tokens: string[]): number {
@@ -104,10 +136,14 @@ export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
 // Intersection function taken from https://github.com/lovasoa/fast_array_intersect.
 // MIT Licensed at the time of writing.
 export function intersect<T>(arrays: ReadonlyArray<T>[]): T[] {
-  if (arrays.length === 0) return [];
+  if (arrays.length === 0) {
+    return [];
+  } else if (arrays.length === 1) {
+    return arrays[0] as T[];
+  }
 
-  for (let i=1; i<arrays.length; i++) {
-    if(arrays[i].length < arrays[0].length) {
+  for (let i = 1; i < arrays.length; i++) {
+    if (arrays[i].length < arrays[0].length) {
       const tmp = arrays[0];
       arrays[0] = arrays[i];
       arrays[i] = tmp;
@@ -115,61 +151,77 @@ export function intersect<T>(arrays: ReadonlyArray<T>[]): T[] {
   }
 
   const set = new Map();
-  for(const elem of arrays[0]) {
+  for (const elem of arrays[0]) {
     set.set(elem, 1);
   }
-  for (let i=1; i<arrays.length; i++) {
+  for (let i = 1; i < arrays.length; i++) {
     let found = 0;
-    for(const elem of arrays[i]) {
-      const count = set.get(elem)
+    for (const elem of arrays[i]) {
+      const count = set.get(elem);
       if (count === i) {
-        set.set(elem,  count + 1);
+        set.set(elem, count + 1);
         found++;
       }
     }
-    if (found === 0) return []; 
+    if (found === 0) return [];
   }
 
   return arrays[0].filter(e => {
     const count = set.get(e);
     if (count !== undefined) set.set(e, 0);
-    return count === arrays.length
+    return count === arrays.length;
   });
 }
 
-/**
- * Retrieve a deeply nested value from an object using a dot-separated string path.
- *
- * @template T - The expected type of the nested value.
- * @param {Record<string, any>} obj - The object to retrieve the value from.
- * @param {string} path - The dot-separated string path to the nested value.
- * @returns {(T | undefined)} - The nested value, or undefined if the path is invalid.
- */
+export function getDocumentProperties(doc: Document, paths: string[]): Record<string, string | number | boolean> {
+  const properties: Record<string, string | number | boolean> = {};
 
-export function getNested<T = unknown>(
-  obj: Record<string, any>,
-  path: string
-): T | undefined {
-  return path.split(".").reduce((o, p) => o && typeof o === "object" ? o[p] : undefined, obj) as T | undefined;
+  const pathsLength = paths.length;
+  for (let i = 0; i < pathsLength; i++) {
+    const path = paths[i];
+    const pathTokens = path.split(".");
+
+    let current: SearchableValue | Document | undefined = doc;
+    const pathTokensLength = pathTokens.length;
+    for (let j = 0; j < pathTokensLength; j++) {
+      current = (current as Document)[pathTokens[j]!];
+
+      // We found an object but we were supposed to be done
+      if (typeof current === "object" && current !== null && j === pathTokensLength - 1) {
+        current = undefined;
+        break;
+      } else if ((current === null || typeof current !== "object") && j < pathTokensLength - 1) {
+        // We can't recurse anymore but we were supposed to
+        current = undefined;
+        break;
+      }
+    }
+
+    if (typeof current !== "undefined") {
+      properties[path] = current as SearchableValue;
+    }
+  }
+
+  return properties;
 }
 
-/**
- * Flattens an object with deeply nested properties, such that (for example), this:
- * `{ foo: { bar: { baz: 10 } } }` becomes: `{ 'foo.bar.baz': 10 }`
- *
- * @param {object} obj - The object to flatten.
- * @param {string} [prefix=''] - The prefix to use for each key in the flattened object.
- * @returns {object} - The flattened object.
- */
+export function getNested<T = "string" | "number" | "boolean">(obj: object, path: string): T | undefined {
+  const props = getDocumentProperties(obj as Document, [path]);
 
-export function flattenObject(obj: object, prefix = ''): object {
-  const result: { [key: string]: any } = {};
+  return props[path] as T | undefined;
+}
+
+export function flattenObject(obj: object, prefix = ""): Document {
+  const result: Document = {};
+
   for (const key in obj) {
-    const objKey = (obj as any)[key];
-    if (typeof objKey === 'object' && objKey !== null) {
-      Object.assign(result, flattenObject(objKey, prefix + key + '.'));
+    const prop = `${prefix}${key}`;
+    const objKey = (obj as Document)[key];
+
+    if (typeof objKey === "object" && objKey !== null) {
+      Object.assign(result, flattenObject(objKey, `${prop}.`));
     } else {
-      result[prefix + key] = objKey;
+      result[prop] = objKey;
     }
   }
   return result;
