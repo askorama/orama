@@ -5,7 +5,7 @@ function formatJSON(input: object) {
 }
 
 export function INVALID_SCHEMA_TYPE(type: string): string {
-  return `Invalid schema type. Expected string or object, but got ${type}`;
+  return `Invalid schema type. Expected string or object, but got ${type}.`;
 }
 
 export function INVALID_DOC_SCHEMA(expected: object, found: object): string {
@@ -17,7 +17,7 @@ export function INVALID_DOC_SCHEMA(expected: object, found: object): string {
 export function INVALID_PROPERTY(name: string, expected: string[]): string {
   return `Invalid property name. Expected a wildcard string ("*") or array containing one of the following properties: ${expected.join(
     ", ",
-  )}, but got: ${name}`;
+  )}, but got: ${name}.`;
 }
 
 export function CANT_DELETE_DOC_NOT_FOUND(id: string): string {
@@ -33,7 +33,7 @@ export function UNSUPPORTED_NESTED_PROPERTIES(): string {
 }
 
 export function DOC_ID_DOES_NOT_EXISTS(id: string): string {
-  return `Document with ID ${id} does not exists`;
+  return `Document with ID ${id} does not exist.`;
 }
 
 export function GETTER_SETTER_WORKS_ON_EDGE_ONLY(method: string): string {
@@ -41,7 +41,7 @@ export function GETTER_SETTER_WORKS_ON_EDGE_ONLY(method: string): string {
 }
 
 export function INVALID_HOOKS_OBJECT(): string {
-  return "Invalid hooks object";
+  return "Invalid hooks object.";
 }
 
 export function NON_SUPPORTED_HOOKS(invalidHooks: string[]): string {
