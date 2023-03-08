@@ -387,7 +387,7 @@ t.test("lyra", t => {
         }),
       {
         message:
-          'Invalid property name. Expected a wildcard string ("*") or array containing one of the following properties: foo, baz, but got: bar',
+          'Invalid property name. Expected a wildcard string ("*") or array containing one of the following properties: foo, baz, but got: bar.',
       },
     );
   });
