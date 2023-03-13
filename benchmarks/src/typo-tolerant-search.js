@@ -1,8 +1,8 @@
 import cronometro from "cronometro";
-import { create, search, insertBatch } from "../../dist/index.js";
+import { create, insertBatch, search } from "../../dist/index.js";
 import { formattedEvents } from "./utils/dataset.js";
 
-const db = create({
+const db = await create({
   schema: {
     date: "string",
     description: "string",
@@ -13,7 +13,7 @@ const db = create({
   },
 });
 
-const dbNoStemming = create({
+const dbNoStemming = await create({
   schema: {
     date: "string",
     description: "string",
@@ -29,23 +29,23 @@ const dbNoStemming = create({
 
 const first30000Events = formattedEvents.slice(0, 30_000);
 
-insertBatch(db, first30000Events);
-insertBatch(dbNoStemming, first30000Events);
+await insertBatch(db, first30000Events);
+await insertBatch(dbNoStemming, first30000Events);
 
 cronometro({
   'search "beauty", default settings': () => {
-    search(db, {
+    return search(db, {
       term: "beauty",
     });
   },
   'search "beauty", tolerance of 1': () => {
-    search(db, {
+    return search(db, {
       term: "beauty",
       tolerance: 1,
     });
   },
   'search "beauty", tolerance of 2': () => {
-    search(db, {
+    return search(db, {
       term: "beauty",
       tolerance: 2,
     });
@@ -54,18 +54,18 @@ cronometro({
 
 cronometro({
   'search "decides to leave", default settings': () => {
-    search(db, {
+    return search(db, {
       term: "decides to leave",
     });
   },
   'search "decides to leave", tolerance of 1': () => {
-    search(db, {
+    return search(db, {
       term: "decides to leave",
       tolerance: 1,
     });
   },
   'search "decides to leave", tolerance of 2': () => {
-    search(db, {
+    return search(db, {
       term: "decides to leave",
       tolerance: 2,
     });
@@ -74,18 +74,18 @@ cronometro({
 
 cronometro({
   'search "beauty", default settings, no stemming': () => {
-    search(dbNoStemming, {
+    return search(dbNoStemming, {
       term: "beauty",
     });
   },
   'search "beauty", tolerance of 1, no stemming': () => {
-    search(dbNoStemming, {
+    return search(dbNoStemming, {
       term: "beauty",
       tolerance: 1,
     });
   },
   'search "beauty", tolerance of 2, no stemming': () => {
-    search(dbNoStemming, {
+    return search(dbNoStemming, {
       term: "beauty",
       tolerance: 2,
     });
@@ -94,18 +94,18 @@ cronometro({
 
 cronometro({
   'search "decides to leave", default settings, no stemming': () => {
-    search(dbNoStemming, {
+    return search(dbNoStemming, {
       term: "decides to leave",
     });
   },
   'search "decides to leave", tolerance of 1, no stemming': () => {
-    search(dbNoStemming, {
+    return search(dbNoStemming, {
       term: "decides to leave",
       tolerance: 1,
     });
   },
   'search "decides to leave", tolerance of 2, no stemming': () => {
-    search(dbNoStemming, {
+    return search(dbNoStemming, {
       term: "decides to leave",
       tolerance: 2,
     });
