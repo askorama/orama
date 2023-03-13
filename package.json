@@ -62,7 +62,7 @@
     "ci": "npm run build && npm run test:ci && npm run test:smoke",
     "prepare": "husky install && npm run build",
     "commit": "pnpm lint-staged && cz",
-    "benchmark": "node --no-warnings benchmarks/src/typo-tolerant-search.mjs"
+    "benchmark": "node --no-warnings benchmarks/src/typo-tolerant-search.js"
   },
   "keywords": [
     "full-text search",
