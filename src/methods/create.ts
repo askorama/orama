@@ -119,6 +119,7 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
 
   const lyra = {
     data: {},
+    caches: {},
     schema,
     tokenizer,
     index,

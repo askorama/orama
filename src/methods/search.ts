@@ -96,9 +96,15 @@ export async function search<S extends Schema, I extends OpaqueIndex, D extends 
   const tokens = lyra.tokenizer.tokenize(term, language);
 
   // Get searchable string properties
-  let propertiesToSearch = await lyra.index.getSearchableProperties(index);
-  const propertiesToSearchWithTypes = await lyra.index.getSearchablePropertiesWithTypes(index);
-  propertiesToSearch = propertiesToSearch.filter((prop: string) => propertiesToSearchWithTypes[prop] === "string");
+  let propertiesToSearch = lyra.caches["propertiesToSearch"] as string[];
+  if (!propertiesToSearch) {
+    const propertiesToSearchWithTypes = await lyra.index.getSearchablePropertiesWithTypes(index);
+
+    propertiesToSearch = await lyra.index.getSearchableProperties(index);
+    propertiesToSearch = propertiesToSearch.filter((prop: string) => propertiesToSearchWithTypes[prop] === "string");
+
+    lyra.caches["propertiesToSearch"] = propertiesToSearch;
+  }
 
   if (properties && properties !== "*") {
     for (const prop of properties) {

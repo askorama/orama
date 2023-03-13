@@ -337,6 +337,7 @@ export type Lyra<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocume
       index: I;
       docs: D;
     };
+    caches: Record<string, unknown>;
     [kInsertions]: number | undefined;
     [kRemovals]: number | undefined;
   };
