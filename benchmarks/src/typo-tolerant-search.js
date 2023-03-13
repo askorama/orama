@@ -1,6 +1,6 @@
 import cronometro from "cronometro";
 import { isMainThread } from "worker_threads";
-import { create, search, insertMultiple } from "../../dist/index.js";
+import { create, insertMultiple, search } from "../../dist/index.js";
 import { createTokenizer } from "../../dist/internals.js";
 import { formattedEvents } from "./utils/dataset.js";
 

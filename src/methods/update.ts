@@ -1,4 +1,4 @@
-import { runMultipleHook, runSingleHook } from "src/components/hooks.js";
+import { runMultipleHook, runSingleHook } from "../components/hooks.js";
 import { Document, Lyra, OpaqueDocumentStore, OpaqueIndex, Schema } from "../types.js";
 import { insert, insertMultiple } from "./insert.js";
 import { remove, removeMultiple } from "./remove.js";
