@@ -32,7 +32,7 @@ const first30000Events = formattedEvents.slice(0, 30_000);
 await insertBatch(db, first30000Events);
 await insertBatch(dbNoStemming, first30000Events);
 
-cronometro({
+await cronometro({
   'search "beauty", default settings': () => {
     return search(db, {
       term: "beauty",
@@ -52,7 +52,7 @@ cronometro({
   },
 });
 
-cronometro({
+await cronometro({
   'search "decides to leave", default settings': () => {
     return search(db, {
       term: "decides to leave",
@@ -72,7 +72,7 @@ cronometro({
   },
 });
 
-cronometro({
+await cronometro({
   'search "beauty", default settings, no stemming': () => {
     return search(dbNoStemming, {
       term: "beauty",
@@ -92,7 +92,7 @@ cronometro({
   },
 });
 
-cronometro({
+await cronometro({
   'search "decides to leave", default settings, no stemming': () => {
     return search(dbNoStemming, {
       term: "decides to leave",
