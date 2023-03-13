@@ -1,12 +1,12 @@
 import t from "tap";
-import { create as createNode } from "../src/trees/radix/node.js";
 import {
   contains as radixContains,
+  create as createNode,
   find as radixFind,
   insert as radixInsert,
   removeDocumentByWord as radixRemoveDocumentByWord,
   removeWord as radixRemoveWord,
-} from "../src/trees/radix/index.js";
+} from "../src/trees/radix.js";
 
 const phrases = [
   { id: "1", doc: "the quick, brown fox" },

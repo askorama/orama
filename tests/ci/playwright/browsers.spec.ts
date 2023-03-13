@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 test("works correctly", async ({ page }) => {
   await page.goto("/");
 
+  await page.waitForSelector("#searchResult");
   const result = await page.evaluate(() => JSON.parse(document.getElementById("searchResult")!.innerHTML));
 
   expect(result).toMatchObject({

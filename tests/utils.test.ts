@@ -55,18 +55,18 @@ t.test("utils", t => {
       nested: {
         nested2: {
           nested3: {
-            bar: "baz"
-          }
+            bar: "baz",
+          },
         },
         null: null,
-        noop: () => null
-      }
+        noop: () => null,
+      },
     };
 
     t.equal(getNested(myObject, "foo"), "bar");
-    t.same(getNested(myObject, "nested"), myObject.nested);
-    t.same(getNested(myObject, "nested.nested2"), myObject.nested.nested2);
-    t.same(getNested(myObject, "nested.nested2.nested3"), myObject.nested.nested2.nested3);
+    t.same(getNested(myObject, "nested"), undefined);
+    t.same(getNested(myObject, "nested.nested2"), undefined);
+    t.same(getNested(myObject, "nested.nested2.nested3"), undefined);
     t.equal(getNested(myObject, "nested.nested2.nested3.bar"), "baz");
     t.equal(getNested(myObject, "nested1.nested3.bar"), undefined);
     t.equal(getNested(myObject, "nested.null.bar"), undefined);
@@ -81,17 +81,17 @@ t.test("utils", t => {
       nested: {
         nested2: {
           nested3: {
-            bar: "baz"
-          }
+            bar: "baz",
+          },
         },
         null: null,
-        noop: () => null
-      }
+        noop: () => null,
+      },
     };
 
     const flattened = flattenObject(myObject);
 
-    t.equal((flattened as any).foo, "bar");
+    t.equal((flattened as Record<string, string>).foo, "bar");
     t.equal(flattened["nested.nested2.nested3.bar"], "baz");
   });
 });

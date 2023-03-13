@@ -1,56 +1,67 @@
-import t from 'tap'
-import { create, insert, find, getSize, remove, contains, isBalanced, greaterThan, lessThan, rangeSearch } from '../src/trees/avl/index.js'
+import t from "tap";
+import {
+  create,
+  insert,
+  find,
+  getSize,
+  remove,
+  contains,
+  isBalanced,
+  greaterThan,
+  lessThan,
+  rangeSearch,
+} from "../src/trees/avl.js";
 
-t.test('AVL Tree', t => {
+t.test("AVL Tree", t => {
   t.plan(8);
 
-  t.test('create', t => {
+  t.test("create", t => {
     t.plan(3);
 
-    const tree = create(1, 'foo');
+    const tree = create(1, "foo");
     t.equal(getSize(tree), 1);
-    t.equal(find(tree, 1), 'foo');
+    t.equal(find(tree, 1), "foo");
     t.equal(find(tree, 4), null);
   });
 
-  t.test('insert', t => {
+  t.test("insert", t => {
     t.plan(1);
 
-    const tree = create(1, 'foo');
+    const tree = create(1, "foo");
 
-    insert(tree, 2, 'bar');
-    insert(tree, 10, 'baz');
-    insert(tree, 25, 'qux');
-    insert(tree, 5, 'quux');
-    insert(tree, 20, 'quuz');
-    insert(tree, 12, 'corge');
+    insert(tree, 2, "bar");
+    insert(tree, 10, "baz");
+    insert(tree, 25, "qux");
+    insert(tree, 5, "quux");
+    insert(tree, 20, "quuz");
+    insert(tree, 12, "corge");
 
     t.equal(getSize(tree), 7);
   });
 
-  t.test('isBalanced', t => {
+  t.test("isBalanced", t => {
     t.plan(1);
 
-    const tree = create(1, { foo: 'bar' });
+    const tree = create(1, { foo: "bar" });
 
-    insert(tree, 2, { foo: 'baz' });
-    insert(tree, 10, { foo: 'qux' });
-    insert(tree, 25, { foo: 'quux' });
-    insert(tree, 5, { foo: 'quuz' });
-    insert(tree, 20, { foo: 'corge' });
-    insert(tree, 12, { foo: 'grault' });
-    insert(tree, 15, { foo: 'garply' });
-    insert(tree, 30, { foo: 'waldo' });
-    insert(tree, 40, { foo: 'fred' });
-    insert(tree, 520, { foo: 'plugh' });
-    insert(tree, 630, { foo: 'xyzzy' });
-    insert(tree, 3, { foo: 'thud' });
-    insert(tree, 480, { foo: 'thuds' });
+    insert(tree, 2, { foo: "baz" });
+    insert(tree, 10, { foo: "qux" });
+    insert(tree, 25, { foo: "quux" });
+    insert(tree, 5, { foo: "quuz" });
+    insert(tree, 20, { foo: "corge" });
+    insert(tree, 12, { foo: "grault" });
+    insert(tree, 15, { foo: "garply" });
+    insert(tree, 30, { foo: "waldo" });
+    insert(tree, 40, { foo: "fred" });
+    insert(tree, 520, { foo: "plugh" });
+    insert(tree, 630, { foo: "xyzzy" });
+    insert(tree, 3, { foo: "thud" });
+    insert(tree, 480, { foo: "thuds" });
 
     t.equal(isBalanced(tree), true);
   });
 
-  t.test('find', t => {
+  t.test("find", t => {
     t.plan(2);
 
     const tree = create(1, [1, 2, 3]);
@@ -66,17 +77,17 @@ t.test('AVL Tree', t => {
     t.same(find(tree, 20), [16, 17, 18]);
   });
 
-  t.test('remove', t => {
+  t.test("remove", t => {
     t.plan(3);
 
-    const tree = create(1, 'foo');
+    const tree = create(1, "foo");
 
-    insert(tree, 2, 'bar');
-    insert(tree, 10, 'baz');
-    insert(tree, 25, 'qux');
-    insert(tree, 5, 'quux');
-    insert(tree, 20, 'quuz');
-    insert(tree, 12, 'corge');
+    insert(tree, 2, "bar");
+    insert(tree, 10, "baz");
+    insert(tree, 25, "qux");
+    insert(tree, 5, "quux");
+    insert(tree, 20, "quuz");
+    insert(tree, 12, "corge");
 
     remove(tree, 20);
 
@@ -85,49 +96,48 @@ t.test('AVL Tree', t => {
     t.equal(isBalanced(tree), true);
   });
 
-  t.test('rangeSearch', t => {
+  t.test("rangeSearch", t => {
     t.plan(1);
 
-    const tree = create(1, ['foo']);
+    const tree = create(1, ["foo"]);
 
-    insert(tree, 2, ['bar']);
-    insert(tree, 10, ['baz']);
-    insert(tree, 25, ['qux']);
-    insert(tree, 5, ['quux']);
-    insert(tree, 20, ['quuz']);
-    insert(tree, 12, ['corge']);
+    insert(tree, 2, ["bar"]);
+    insert(tree, 10, ["baz"]);
+    insert(tree, 25, ["qux"]);
+    insert(tree, 5, ["quux"]);
+    insert(tree, 20, ["quuz"]);
+    insert(tree, 12, ["corge"]);
 
-    t.same(rangeSearch(tree, 5, 20), ['quux', 'baz', 'corge', 'quuz']);
+    t.same(rangeSearch(tree, 5, 20), ["quux", "baz", "corge", "quuz"]);
   });
 
-  t.test('greaterThan', t => {
+  t.test("greaterThan", t => {
     t.plan(1);
 
-    const tree = create(1, ['foo']);
+    const tree = create(1, ["foo"]);
 
-    insert(tree, 2, ['bar']);
-    insert(tree, 10, ['baz']);
-    insert(tree, 25, ['qux']);
-    insert(tree, 5, ['quux']);
-    insert(tree, 20, ['quuz']);
-    insert(tree, 12, ['corge']);
+    insert(tree, 2, ["bar"]);
+    insert(tree, 10, ["baz"]);
+    insert(tree, 25, ["qux"]);
+    insert(tree, 5, ["quux"]);
+    insert(tree, 20, ["quuz"]);
+    insert(tree, 12, ["corge"]);
 
-    t.same(greaterThan(tree, 10), ['qux', 'quuz', 'corge']);
+    t.same(greaterThan(tree, 10), ["qux", "quuz", "corge"]);
   });
 
-  t.test('lessThan', t => {
+  t.test("lessThan", t => {
     t.plan(1);
 
-    const tree = create(1, ['foo']);
+    const tree = create(1, ["foo"]);
 
-    insert(tree, 2, ['bar']);
-    insert(tree, 10, ['baz']);
-    insert(tree, 25, ['qux']);
-    insert(tree, 5, ['quux']);
-    insert(tree, 20, ['quuz']);
-    insert(tree, 12, ['corge']);
+    insert(tree, 2, ["bar"]);
+    insert(tree, 10, ["baz"]);
+    insert(tree, 25, ["qux"]);
+    insert(tree, 5, ["quux"]);
+    insert(tree, 20, ["quuz"]);
+    insert(tree, 12, ["corge"]);
 
-    t.same(lessThan(tree, 10), ['foo', 'bar', 'quux']);
+    t.same(lessThan(tree, 10), ["foo", "bar", "quux"]);
   });
-
 });

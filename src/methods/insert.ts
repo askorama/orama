@@ -1,256 +1,116 @@
-import type { BooleanIndex, Lyra, PropertiesSchema, ResolveSchema } from "../types/index.js";
-import type { Language, TokenizerConfigExec } from "../tokenizer/index.js";
-import type { AVLNode } from "../../src/trees/avl/node.js";
-import type { RadixNode } from "../trees/radix/node.js";
-import { trackInsertion } from "../insertion-checker.js";
-import { insert as radixInsert } from "../trees/radix/index.js";
-import { insert as AVLInsert } from "../trees/avl/index.js";
-import { uniqueId } from "../utils.js";
-import { assertDocSchema } from "./common.js";
-import { hookRunner } from "./hooks.js";
-import * as ERRORS from "../errors.js";
+import { runMultipleHook, runSingleHook } from "../components/hooks.js";
+import { createError } from "../errors.js";
+import { trackInsertion } from "../components/sync-blocking-checker.js";
+import { Document, Schema, OpaqueIndex, OpaqueDocumentStore, Lyra } from "../types.js";
 
-export type InsertConfig<S extends PropertiesSchema> = {
-  language?: Language;
-  id?: (doc: ResolveSchema<S>) => string | Promise<string>;
-};
+export async function insert<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
+  lyra: Lyra<S, I, D>,
+  doc: Document,
+  language?: string,
+  skipHooks?: boolean,
+): Promise<string> {
+  await lyra.validateSchema(doc, lyra.schema);
+  const { index, docs } = lyra.data;
 
-export type InsertBatchConfig<S extends PropertiesSchema> = InsertConfig<S> & {
-  batchSize?: number;
-};
+  const id = await lyra.getDocumentIndexId(doc);
 
-/**
- * Inserts a document into a database.
- * @param lyra The database to insert document into.
- * @param doc The document to insert.
- * @param config Optional parameter for overriding default configuration.
- * @returns An object containing id of the inserted document.
- * @example
- * const { id } = await insert(db, {
- *   quote: 'You miss 100% of the shots you don\'t take',
- *   author: 'Wayne Gretzky - Michael Scott'
- * });
- */
-export async function insert<S extends PropertiesSchema>(
-  lyra: Lyra<S>,
-  doc: ResolveSchema<S>,
-  config?: InsertConfig<S>,
-): Promise<{ id: string }> {
-  config = { language: lyra.defaultLanguage, ...config };
-
-  const id = await getDocumentID(doc, config);
-
-  // If the ID already exists, we throw an error.
-  if (lyra.docs[id]) throw new Error(ERRORS.ID_ALREADY_EXISTS(id));
-
-  lyra.components?.tokenizer?.assertSupportedLanguage?.(config.language!);
-
-  assertDocSchema(doc, lyra.schema);
-
-  lyra.docs[id] = doc;
-  lyra.docsCount++;
-  recursiveradixInsertion(lyra, doc, id, config, undefined, lyra.components?.tokenizer as TokenizerConfigExec);
-  trackInsertion(lyra);
-
-  return { id };
-}
-
-/**
- * Inserts a document into a database.
- * @param lyra The database to insert document into.
- * @param doc The document to insert.
- * @param config Optional parameter for overriding default configuration.
- * @returns A Promise object containing id of the inserted document.
- * @example
- * const { id } = await insert(db, {
- *   quote: 'You miss 100% of the shots you don\'t take',
- *   author: 'Wayne Gretzky - Michael Scott'
- * });
- */
-export async function insertWithHooks<S extends PropertiesSchema>(
-  lyra: Lyra<S>,
-  doc: ResolveSchema<S>,
-  config?: InsertConfig<S>,
-): Promise<{ id: string }> {
-  config = { language: lyra.defaultLanguage, ...config };
-  const id = await getDocumentID(doc, config);
-
-  lyra.components?.tokenizer?.assertSupportedLanguage?.(config.language!);
-
-  assertDocSchema(doc, lyra.schema);
-
-  lyra.docs[id] = doc;
-  lyra.docsCount++;
-  recursiveradixInsertion(lyra, doc, id, config, undefined, lyra.components?.tokenizer as TokenizerConfigExec);
-  trackInsertion(lyra);
-  if (lyra.hooks.afterInsert) {
-    await hookRunner.call(lyra, lyra.hooks.afterInsert, id);
+  if (typeof id !== "string") {
+    throw createError("DOCUMENT_ID_MUST_BE_STRING", typeof id);
   }
 
-  return { id };
+  if (!(await lyra.documentsStore.store(docs, id, doc))) {
+    throw createError("DOCUMENT_ALREADY_EXISTS", id);
+  }
+
+  const docsCount = await lyra.documentsStore.count(docs);
+
+  if (!skipHooks) {
+    await runSingleHook(lyra.beforeInsert, lyra, id, doc);
+  }
+
+  const indexableProperties = await lyra.index.getSearchableProperties(index);
+  const indexablePropertiesWithTypes = await lyra.index.getSearchablePropertiesWithTypes(index);
+  const values = await lyra.getDocumentProperties(doc, indexableProperties);
+
+  for (const [key, value] of Object.entries(values)) {
+    if (typeof value === "undefined") {
+      continue;
+    }
+
+    const actualType = typeof value;
+    const expectedType = indexablePropertiesWithTypes[key];
+
+    if (actualType !== expectedType) {
+      throw createError("INVALID_DOCUMENT_PROPERTY", key, expectedType, actualType);
+    }
+  }
+
+  for (const prop of indexableProperties) {
+    const value = values[prop];
+
+    if (typeof value === "undefined") {
+      continue;
+    }
+
+    await lyra.index.beforeInsert?.(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount);
+    await lyra.index.insert(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount);
+    await lyra.index.afterInsert?.(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount);
+  }
+
+  if (!skipHooks) {
+    await runSingleHook(lyra.afterInsert, lyra, id, doc);
+  }
+
+  trackInsertion(lyra);
+
+  return id;
 }
 
-/**
- * Inserts a large array of documents into a database without blocking the event loop.
- * @param lyra The database to insert document into.
- * @param docs Array of documents to insert.
- * @param config Optional parameter for overriding default configuration.
- * @returns Promise<void>.
- * @example
- * insertBatch(db, [
- *   {
- *     quote: 'You miss 100% of the shots you don\'t take',
- *     author: 'Wayne Gretzky - Michael Scott'
- *   },
- *   {
- *     quote: 'What I cannot createm I do not understand',
- *     author: 'Richard Feynman'
- *   }
- * ]);
- */
-export async function insertBatch<S extends PropertiesSchema>(
-  lyra: Lyra<S>,
-  docs: ResolveSchema<S>[],
-  config?: InsertBatchConfig<S>,
-): Promise<void> {
-  const batchSize = config?.batchSize ?? 1000;
+export async function insertMultiple<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
+  lyra: Lyra<S, I, D>,
+  docs: Document[],
+  batchSize?: number,
+  language?: string,
+  skipHooks?: boolean,
+): Promise<string[]> {
+  if (!batchSize) {
+    batchSize = 1000;
+  }
 
-  return new Promise((resolve, reject) => {
+  if (!skipHooks) {
+    await runMultipleHook(lyra.beforeMultipleInsert, lyra, docs);
+  }
+
+  const ids: string[] = [];
+
+  await new Promise<void>((resolve, reject) => {
     let i = 0;
-    async function _insertBatch() {
-      const batch = docs.slice(i * batchSize, (i + 1) * batchSize);
+    async function _insertMultiple() {
+      const batch = docs.slice(i * batchSize!, (i + 1) * batchSize!);
       i++;
 
       if (!batch.length) {
         return resolve();
       }
 
-      for (const line of batch) {
+      for (const doc of batch) {
         try {
-          await insertWithHooks(lyra, line, config);
+          const id = await insert(lyra, doc, language, skipHooks);
+          ids.push(id);
         } catch (err) {
           reject(err);
         }
       }
 
-      setTimeout(_insertBatch, 0);
+      setTimeout(_insertMultiple, 0);
     }
 
-    setTimeout(_insertBatch, 0);
+    setTimeout(_insertMultiple, 0);
   });
-}
 
-function recursiveradixInsertion<S extends PropertiesSchema>(
-  lyra: Lyra<S>,
-  doc: ResolveSchema<S>,
-  id: string,
-  config: InsertConfig<S>,
-  prefix = "",
-  tokenizerConfig: TokenizerConfigExec,
-  schema: PropertiesSchema = lyra.schema,
-) {
-  config = { language: lyra.defaultLanguage, ...config };
-  const { index, frequencies, tokenOccurrencies } = lyra;
-
-  for (const key of Object.keys(doc)) {
-    const isNested = typeof doc[key] === "object";
-    const isSchemaNested = typeof schema[key] == "object";
-    const propName = `${prefix}${key}`;
-    if (isNested && key in schema && isSchemaNested) {
-      recursiveradixInsertion(
-        lyra,
-        doc[key] as ResolveSchema<S>,
-        id,
-        config,
-        propName + ".",
-        tokenizerConfig,
-        schema[key] as PropertiesSchema,
-      );
-    }
-    
-    if (typeof doc[key] === "number" && key in schema && !isSchemaNested) {
-      AVLInsert(lyra.index[propName] as AVLNode<number, string[]>, doc[key] as number, [id]);
-    }
-
-    if (typeof doc[key] === "boolean" && key in schema && !isSchemaNested) {
-      const docKey = doc[key].toString() as "true" | "false";
-      (lyra.index[propName] as BooleanIndex)[docKey].push(id);
-    }
-
-    if (typeof doc[key] === "string" && key in schema && !isSchemaNested) {
-      // Use propName here because if doc is a nested object
-      // We will get the wrong index
-      const requestedTrie = index[propName];
-      const tokens = tokenizerConfig.tokenizerFn(doc[key] as string, config.language!, false, tokenizerConfig);
-
-      if (!(propName in frequencies)) {
-        frequencies[propName] = {};
-      }
-
-      if (!(propName in tokenOccurrencies)) {
-        tokenOccurrencies[propName] = {};
-      }
-
-      if (!(id in frequencies[propName])) {
-        frequencies[propName][id] = {};
-      }
-
-      if (!(propName in lyra.fieldLengths)) {
-        lyra.fieldLengths[propName] = {};
-      }
-      
-      lyra.fieldLengths[propName][id] = tokens.length;
-      lyra.avgFieldLength[propName] = ((lyra.avgFieldLength[propName] ?? 0) * (lyra.docsCount - 1) + tokens.length) / lyra.docsCount;
-
-      for (const token of tokens) {
-        let tokenFrequency = 0;
-
-        for (const t of tokens) {
-          if (t === token) {
-            tokenFrequency++;
-          }
-        }
-
-        const tf = tokenFrequency / tokens.length;
-
-        frequencies[propName][id][token] = tf;
-
-        if (!(token in tokenOccurrencies[propName])) {
-          tokenOccurrencies[propName][token] = 0;
-        }
-
-        // increase a token counter that may not yet exist
-        tokenOccurrencies[propName][token] = (tokenOccurrencies[propName][token] ?? 0) + 1;
-
-        radixInsert(requestedTrie as RadixNode, token, id);
-      }
-    }
-  }
-}
-
-async function getDocumentID<S extends PropertiesSchema>(
-  doc: ResolveSchema<S>,
-  config: InsertConfig<S>,
-): Promise<string> {
-  let id: string;
-
-  // If the user passes a custom ID function, we use it to generate the ID.
-  // This has the maximum priority.
-  if (config?.id) {
-    id = await config.id(doc);
-
-    // If the user passes an ID in the document, we use it.
-  } else if (doc.id && typeof doc.id === "string") {
-    id = doc.id;
-
-    // If the user passes an ID in the document, but it's not a string, we throw a type error.
-  } else if (doc.id && typeof doc.id !== "string") {
-    throw new TypeError(ERRORS.TYPE_ERROR_ID_MUST_BE_STRING(typeof doc.id));
-
-    // If the user doesn't pass an ID, we generate one.
-  } else {
-    id = uniqueId();
+  if (!skipHooks) {
+    await runMultipleHook(lyra.afterMultipleInsert, lyra, docs);
   }
 
-  return id;
+  return ids;
 }

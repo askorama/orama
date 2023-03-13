@@ -1,85 +1,39 @@
 import { SUPPORTED_LANGUAGES } from "./tokenizer/languages.js";
+import { sprintf } from "./utils.js";
 
-function formatJSON(input: object) {
-  return JSON.stringify(input, null, 2);
+const allLanguages = SUPPORTED_LANGUAGES.join("\n - ");
+
+const errors = {
+  NO_LANGUAGE_WITH_CUSTOM_TOKENIZER: "Do not pass the language option to create when using a custom tokenizer.",
+  LANGUAGE_NOT_SUPPORTED: `Language "%s" is not supported.\nSupported languages are:\n - ${allLanguages}`,
+  INVALID_STEMMER_FUNCTION_TYPE: `config.stemmer property must be a function.`,
+  CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY: "Custom stop words array must only contain strings.",
+  UNSUPPORTED_COMPONENT: `Unsupported component "%s".`,
+  COMPONENT_MUST_BE_FUNCTION: `The component "%s" must be a function.`,
+  COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS: `The component "%s" must be a function or an array of functions.`,
+  INVALID_SCHEMA_TYPE: `Unsupported schema type "%s". Expected "string", "boolean" or "number".`,
+  DOCUMENT_ID_MUST_BE_STRING: `Document id must be of type "string". Got "%s" instead.`,
+  DOCUMENT_ALREADY_EXISTS: `A document with id "%s" already exists.`,
+  DOCUMENT_DOES_NOT_EXIST: `A document with id "%s" does not exists.`,
+  MISSING_DOCUMENT_PROPERTY: `Missing searchable property "%s".`,
+  INVALID_DOCUMENT_PROPERTY: `Invalid document property "%s": expected "%s", got "%s"`,
+  UNKNOWN_INDEX: `Invalid property name "%s". Expected a wildcard string ("*") or array containing one of the following properties: %s`,
+  INVALID_BOOST_VALUE: `Boost value must be a number greater than, or less than 0.`,
+  INVALID_FILTER_OPERATION: `You can only use one operation per filter, you requested %d.`,
+};
+
+export type ErrorCode = keyof typeof errors;
+
+export interface LyraError extends Error {
+  code: string;
 }
 
-export function INVALID_SCHEMA_TYPE(type: string): string {
-  return `Invalid schema type. Expected string or object, but got ${type}`;
-}
+export function createError(code: ErrorCode, ...args: Array<string | number>): LyraError {
+  const error = new Error(sprintf(errors[code] ?? `Unsupported Lyra Error code: ${code}`, ...args)) as LyraError;
+  error.code = code;
+  if ("captureStackTrace" in Error.prototype) {
+    Error.captureStackTrace(error);
+  }
 
-export function INVALID_DOC_SCHEMA(expected: object, found: object): string {
-  return `Invalid document structure. \nLyra has been initialized with the following schema: \n\n${formatJSON(
-    expected,
-  )}\n\nbut found the following doc:\n\n${formatJSON(found)}`;
-}
-
-export function INVALID_PROPERTY(name: string, expected: string[]): string {
-  return `Invalid property name. Expected a wildcard string ("*") or array containing one of the following properties: ${expected.join(
-    ", ",
-  )}, but got: ${name}`;
-}
-
-export function CANT_DELETE_DOC_NOT_FOUND(id: string): string {
-  return `Document with ID ${id} does not exist.`;
-}
-
-export function CANT_DELETE_DOCUMENT(docID: string, key: string, token: string): string {
-  return `Unable to delete document "${docID}" from index "${key}" on word "${token}".`;
-}
-
-export function UNSUPPORTED_NESTED_PROPERTIES(): string {
-  return `Nested properties are not supported in this Lyra version, but will be in the future.`;
-}
-
-export function DOC_ID_DOES_NOT_EXISTS(id: string): string {
-  return `Document with ID ${id} does not exists`;
-}
-
-export function GETTER_SETTER_WORKS_ON_EDGE_ONLY(method: string): string {
-  return `${method} works on edge only. Use edge: true in Lyra constructor to enable it.`;
-}
-
-export function INVALID_HOOKS_OBJECT(): string {
-  return "Invalid hooks object";
-}
-
-export function NON_SUPPORTED_HOOKS(invalidHooks: string[]): string {
-  return `The following hooks aren't supported. Hooks: ${invalidHooks}`;
-}
-
-export function TYPE_ERROR_ID_MUST_BE_STRING(type: string): string {
-  return `"id" must be of type "string". Got "${type}" instead.`;
-}
-
-export function ID_ALREADY_EXISTS(id: string): string {
-  return `Document with ID "${id}" already exists.`;
-}
-
-export function LANGUAGE_NOT_SUPPORTED(lang: string): string {
-  return `Language "${lang}" is not supported.\nSupported languages are:\n - ${SUPPORTED_LANGUAGES.join("\n - ")}`;
-}
-
-export function CUSTOM_STOP_WORDS_ARRAY_MUST_BE_STRING_ARRAY(): string {
-  return `Custom stop words array must only contain strings.`;
-}
-
-export function CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY(): string {
-  return `Custom stop words must be a function or an array of strings.`;
-}
-
-export function INVALID_STEMMER_FUNCTION_TYPE(): string {
-  return `tokenizer.stemmingFn property must be a function.`;
-}
-
-export function INVALID_TOKENIZER_FUNCTION(): string {
-  return `tokenizer.tokenizerFn must be a function.`;
-}
-
-export function INVALID_BOOST_VALUE(): string {
-  return `Boost value must be a number greater than, or less than 0.`;
-}
-
-export function INVALID_FILTER_OPERATION(found: string[]): string {
-  return `You can only use one operation per filter. Found ${found.length}: ${found.join(", ")}`;
+  return error;
 }

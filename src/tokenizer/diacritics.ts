@@ -193,7 +193,7 @@ const CHARCODE_REPLACE_MAPPING = [
   122,
   90,
   122,
-  115
+  115,
 ];
 
 function replaceChar(charCode: number): number {

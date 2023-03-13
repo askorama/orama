@@ -1,4 +1,4 @@
-import type { BoundedMetric } from "../levenshtein.js";
+import type { BoundedMetric } from "../components/levenshtein.js";
 
 export interface LyraInternals {
   boundedLevenshtein(a: string, b: string, tolerance: number): BoundedMetric;
