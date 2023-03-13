@@ -17,10 +17,14 @@ export const SIMPLE_OR_ARRAY_COMPONENTS = [
   "afterInsert",
   "beforeRemove",
   "afterRemove",
+  "beforeUpdate",
+  "afterUpdate",
   "beforeMultipleInsert",
   "afterMultipleInsert",
   "beforeMultipleRemove",
   "afterMultipleRemove",
+  "beforeMultipleUpdate",
+  "afterMultipleUpdate",
 ];
 
 export async function runSingleHook<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(

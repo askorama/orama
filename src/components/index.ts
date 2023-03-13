@@ -172,16 +172,16 @@ function remove(
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number,
-): void {
+): boolean {
   if (typeof value === "number") {
     avlRemoveDocument(index.indexes[prop] as AVLNode<number, string[]>, id, value);
-    return;
+    return true;
   } else if (typeof value === "boolean") {
     const booleanKey = value ? "true" : "false";
     const position = (index.indexes[prop] as BooleanIndex)[booleanKey].indexOf(id);
 
     (index.indexes[prop] as BooleanIndex)[value ? "true" : "false"].splice(position, 1);
-    return;
+    return true;
   }
 
   const tokens = tokenizer.tokenize(value as string, language);
@@ -195,6 +195,8 @@ function remove(
     index.tokenOccurrencies[prop][token]--;
     radixRemoveDocument(index.indexes[prop] as RadixNode, token, id);
   }
+
+  return true;
 }
 
 function search(index: Index, prop: string, term: string, context: SearchContext): TokenScore[] {
@@ -329,7 +331,7 @@ function getSearchablePropertiesWithTypes(index: Index): Record<string, "string"
   return index.searchablePropertiesWithTypes;
 }
 
-function load(raw: unknown): Index {
+function load<R = unknown>(raw: R): Index {
   const {
     indexes,
     searchableProperties,
@@ -351,7 +353,7 @@ function load(raw: unknown): Index {
   };
 }
 
-function save(index: Index): unknown {
+function save<R = unknown>(index: Index): R {
   const {
     indexes,
     searchableProperties,
@@ -370,7 +372,7 @@ function save(index: Index): unknown {
     tokenOccurrencies,
     avgFieldLength,
     fieldLengths,
-  } as unknown;
+  } as R;
 }
 
 export function createIndex<S extends Schema, D extends OpaqueDocumentStore>(): DefaultIndex<S, D> {

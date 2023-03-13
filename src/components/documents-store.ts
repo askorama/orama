@@ -54,7 +54,7 @@ function count(store: DocumentsStore): number {
   return store.count;
 }
 
-function load(raw: unknown): DocumentsStore {
+function load<R = unknown>(raw: R): DocumentsStore {
   const rawDocument = raw as DocumentsStore;
 
   return {
@@ -63,11 +63,11 @@ function load(raw: unknown): DocumentsStore {
   };
 }
 
-function save(docs: DocumentsStore): unknown {
+function save<R = unknown>(docs: DocumentsStore): R {
   return {
     docs: docs.docs,
     count: docs.count,
-  };
+  } as R;
 }
 
 export function createDocumentsStore<S extends Schema, I extends OpaqueIndex>(): DefaultDocumentsStore<S, I> {

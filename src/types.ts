@@ -1,6 +1,8 @@
 export type Nullable<T> = T | null;
 
-export type CallbackComponentReturnValue<T = void> = T | Promise<T>;
+export type SingleOrArray<T> = T | T[];
+
+export type SyncOrAsyncValue<T = void> = T | Promise<T>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface OpaqueIndex {}
@@ -215,14 +217,14 @@ export type SingleCallbackComponent<S extends Schema, I extends OpaqueIndex, D e
   lyra: Lyra<S, I, D>,
   id: string,
   doc?: Document,
-) => CallbackComponentReturnValue;
+) => SyncOrAsyncValue;
 
 export type MultipleCallbackComponent<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = (
   lyra: Lyra<S, I, D>,
   doc: Document[] | string[],
-) => CallbackComponentReturnValue;
+) => SyncOrAsyncValue;
 
-export type IIndexInsertOrRemoveFunction<I> = (
+export type IIndexInsertOrRemoveFunction<I, R = void> = (
   index: I,
   id: string,
   prop: string,
@@ -230,9 +232,9 @@ export type IIndexInsertOrRemoveFunction<I> = (
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number,
-) => CallbackComponentReturnValue;
+) => SyncOrAsyncValue<R>;
 
-export type IIndexRemoveFunction<I> = (index: I, id: string, prop: string) => CallbackComponentReturnValue;
+export type IIndexRemoveFunction<I> = (index: I, id: string, prop: string) => SyncOrAsyncValue;
 
 export interface IIndex<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
   create: (lyra: Lyra<S, I, D>, schema: Schema) => I;
@@ -242,29 +244,29 @@ export interface IIndex<S extends Schema, I extends OpaqueIndex, D extends Opaqu
   afterInsert?: IIndexInsertOrRemoveFunction<I>;
 
   beforeRemove?: IIndexInsertOrRemoveFunction<I>;
-  remove: IIndexInsertOrRemoveFunction<I>;
+  remove: IIndexInsertOrRemoveFunction<I, boolean>;
   afterRemove?: IIndexInsertOrRemoveFunction<I>;
 
-  search(index: I, prop: string, terms: string, context: SearchContext): CallbackComponentReturnValue<TokenScore[]>;
+  search(index: I, prop: string, terms: string, context: SearchContext): SyncOrAsyncValue<TokenScore[]>;
   searchByWhereClause(index: I, filters: Record<string, boolean | ComparisonOperator>): string[];
 
-  getSearchableProperties(index: I): CallbackComponentReturnValue<string[]>;
-  getSearchablePropertiesWithTypes(index: I): CallbackComponentReturnValue<Record<string, SearchableType>>;
+  getSearchableProperties(index: I): SyncOrAsyncValue<string[]>;
+  getSearchablePropertiesWithTypes(index: I): SyncOrAsyncValue<Record<string, SearchableType>>;
 
-  load(raw: unknown): I | Promise<I>;
-  save(index: I): unknown | Promise<object>;
+  load<R = unknown>(raw: R): I | Promise<I>;
+  save<R = unknown>(index: I): R | Promise<R>;
 }
 
 export interface IDocumentsStore<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
   create: (lyra: Lyra<S, I, D>) => D;
-  get(store: D, id: string): CallbackComponentReturnValue<Document | undefined>;
-  getMultiple(store: D, ids: string[]): CallbackComponentReturnValue<(Document | undefined)[]>;
-  store(store: D, id: string, doc: Document): CallbackComponentReturnValue<boolean>;
-  remove(store: D, id: string): CallbackComponentReturnValue<boolean>;
-  count(store: D): CallbackComponentReturnValue<number>;
+  get(store: D, id: string): SyncOrAsyncValue<Document | undefined>;
+  getMultiple(store: D, ids: string[]): SyncOrAsyncValue<(Document | undefined)[]>;
+  store(store: D, id: string, doc: Document): SyncOrAsyncValue<boolean>;
+  remove(store: D, id: string): SyncOrAsyncValue<boolean>;
+  count(store: D): SyncOrAsyncValue<number>;
 
-  load(raw: unknown): D | Promise<D>;
-  save(store: D): unknown | Promise<object>;
+  load<R = unknown>(raw: R): D | Promise<D>;
+  save<R = unknown>(store: D): R | Promise<R>;
 }
 
 export interface Tokenizer {
@@ -278,13 +280,10 @@ export interface ComplexComponent<S extends Schema, I extends OpaqueIndex, D ext
 }
 
 export interface SimpleComponents {
-  validateSchema(doc: Document, schema: Schema): CallbackComponentReturnValue<boolean>;
-  getDocumentIndexId(doc: Document): CallbackComponentReturnValue<string>;
-  getDocumentProperties(
-    doc: Document,
-    paths: string[],
-  ): CallbackComponentReturnValue<Record<string, string | number | boolean>>;
-  formatElapsedTime(number: bigint): CallbackComponentReturnValue<bigint> | CallbackComponentReturnValue<string>;
+  validateSchema(doc: Document, schema: Schema): SyncOrAsyncValue<boolean>;
+  getDocumentIndexId(doc: Document): SyncOrAsyncValue<string>;
+  getDocumentProperties(doc: Document, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>;
+  formatElapsedTime(number: bigint): SyncOrAsyncValue<bigint> | SyncOrAsyncValue<string>;
 }
 
 export interface SimpleOrArrayCallbackComponents<
@@ -292,14 +291,18 @@ export interface SimpleOrArrayCallbackComponents<
   I extends OpaqueIndex,
   D extends OpaqueDocumentStore,
 > {
-  beforeInsert: SingleCallbackComponent<S, I, D> | SingleCallbackComponent<S, I, D>[];
-  afterInsert: SingleCallbackComponent<S, I, D> | SingleCallbackComponent<S, I, D>[];
-  beforeRemove: SingleCallbackComponent<S, I, D> | SingleCallbackComponent<S, I, D>[];
-  afterRemove: SingleCallbackComponent<S, I, D> | SingleCallbackComponent<S, I, D>[];
-  beforeMultipleInsert: MultipleCallbackComponent<S, I, D> | MultipleCallbackComponent<S, I, D>[];
-  afterMultipleInsert: MultipleCallbackComponent<S, I, D> | MultipleCallbackComponent<S, I, D>[];
-  beforeMultipleRemove: MultipleCallbackComponent<S, I, D> | MultipleCallbackComponent<S, I, D>[];
-  afterMultipleRemove: MultipleCallbackComponent<S, I, D> | MultipleCallbackComponent<S, I, D>[];
+  beforeInsert: SingleOrArray<SingleCallbackComponent<S, I, D>>;
+  afterInsert: SingleOrArray<SingleCallbackComponent<S, I, D>>;
+  beforeRemove: SingleOrArray<SingleCallbackComponent<S, I, D>>;
+  afterRemove: SingleOrArray<SingleCallbackComponent<S, I, D>>;
+  beforeUpdate: SingleOrArray<SingleCallbackComponent<S, I, D>>;
+  afterUpdate: SingleOrArray<SingleCallbackComponent<S, I, D>>;
+  beforeMultipleInsert: SingleOrArray<MultipleCallbackComponent<S, I, D>>;
+  afterMultipleInsert: SingleOrArray<MultipleCallbackComponent<S, I, D>>;
+  beforeMultipleRemove: SingleOrArray<MultipleCallbackComponent<S, I, D>>;
+  afterMultipleRemove: SingleOrArray<MultipleCallbackComponent<S, I, D>>;
+  beforeMultipleUpdate: SingleOrArray<MultipleCallbackComponent<S, I, D>>;
+  afterMultipleUpdate: SingleOrArray<MultipleCallbackComponent<S, I, D>>;
 }
 
 export interface ArrayCallbackComponents<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
@@ -307,10 +310,14 @@ export interface ArrayCallbackComponents<S extends Schema, I extends OpaqueIndex
   afterInsert: SingleCallbackComponent<S, I, D>[];
   beforeRemove: SingleCallbackComponent<S, I, D>[];
   afterRemove: SingleCallbackComponent<S, I, D>[];
+  beforeUpdate: SingleCallbackComponent<S, I, D>[];
+  afterUpdate: SingleCallbackComponent<S, I, D>[];
   beforeMultipleInsert: MultipleCallbackComponent<S, I, D>[];
   afterMultipleInsert: MultipleCallbackComponent<S, I, D>[];
   beforeMultipleRemove: MultipleCallbackComponent<S, I, D>[];
   afterMultipleRemove: MultipleCallbackComponent<S, I, D>[];
+  beforeMultipleUpdate: MultipleCallbackComponent<S, I, D>[];
+  afterMultipleUpdate: MultipleCallbackComponent<S, I, D>[];
 }
 
 export type Components<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = Partial<

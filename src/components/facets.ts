@@ -36,6 +36,7 @@ export async function getFacets<S extends Schema, I extends OpaqueIndex, D exten
     let values = {};
 
     // Hack to guarantee the same order of ranges as specified by the user
+    // TODO: Revisit this once components land
     if (properties[facet] === "number") {
       const { ranges } = facetsConfig[facet] as NumberFacetDefinition;
       const tmp = [];

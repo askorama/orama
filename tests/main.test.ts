@@ -1,10 +1,10 @@
 import t from "tap";
-import type { Document } from "../src/types";
 import { DocumentsStore } from "../src/components/documents-store.js";
 import { Index } from "../src/components/index.js";
 import { create, insert, insertMultiple, remove, search } from "../src/index.js";
 import { createTokenizer } from "../src/tokenizer/index.js";
 import { SUPPORTED_LANGUAGES } from "../src/tokenizer/languages.js";
+import type { Document } from "../src/types";
 import dataset from "./datasets/events.json" assert { type: "json" };
 
 interface BaseDataEvent extends Document {
@@ -27,7 +27,7 @@ interface DataSet {
   result: { events: DataEvent[] };
 }
 
-t.test("defaultLanguage", t => {
+t.test("language", t => {
   t.plan(5);
 
   t.test("should throw an error if the desired language is not supported", async t => {
@@ -37,7 +37,7 @@ t.test("defaultLanguage", t => {
       () =>
         create({
           schema: {},
-          defaultLanguage: "latin",
+          language: "latin",
         }),
       { code: "LANGUAGE_NOT_SUPPORTED" },
     );
@@ -69,7 +69,7 @@ t.test("defaultLanguage", t => {
     try {
       await create({
         schema: {},
-        defaultLanguage: "portuguese",
+        language: "portuguese",
       });
 
       t.pass();
@@ -84,7 +84,7 @@ t.test("defaultLanguage", t => {
     try {
       await create({
         schema: {},
-        defaultLanguage: "slovenian",
+        language: "slovenian",
       });
 
       t.pass();
@@ -99,7 +99,7 @@ t.test("defaultLanguage", t => {
     try {
       await create({
         schema: {},
-        defaultLanguage: "bulgarian",
+        language: "bulgarian",
       });
 
       t.pass();

@@ -8,7 +8,8 @@ export async function remove<S extends Schema, I extends OpaqueIndex, D extends 
   id: string,
   language?: string,
   skipHooks?: boolean,
-): Promise<void> {
+): Promise<boolean> {
+  let result = true;
   const { index, docs } = lyra.data;
 
   const doc = await lyra.documentsStore.get(docs, id);
@@ -28,7 +29,9 @@ export async function remove<S extends Schema, I extends OpaqueIndex, D extends 
   for (const prop of indexableProperties) {
     const value = values[prop];
     await lyra.index.beforeRemove?.(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount);
-    await lyra.index.remove(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount);
+    if (!(await lyra.index.remove(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount))) {
+      result = false;
+    }
     await lyra.index.afterRemove?.(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount);
   }
 
@@ -37,6 +40,7 @@ export async function remove<S extends Schema, I extends OpaqueIndex, D extends 
   }
 
   trackRemoval(lyra);
+  return result;
 }
 
 export async function removeMultiple<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
@@ -45,7 +49,9 @@ export async function removeMultiple<S extends Schema, I extends OpaqueIndex, D 
   batchSize?: number,
   language?: string,
   skipHooks?: boolean,
-): Promise<void> {
+): Promise<boolean> {
+  let result = true;
+
   if (!batchSize) {
     batchSize = 1000;
   }
@@ -66,7 +72,9 @@ export async function removeMultiple<S extends Schema, I extends OpaqueIndex, D 
 
       for (const doc of batch) {
         try {
-          await remove(lyra, doc, language, skipHooks);
+          if (!(await remove(lyra, doc, language, skipHooks))) {
+            result = false;
+          }
         } catch (err) {
           reject(err);
         }
@@ -81,4 +89,6 @@ export async function removeMultiple<S extends Schema, I extends OpaqueIndex, D 
   if (!skipHooks) {
     await runMultipleHook(lyra.afterMultipleRemove, lyra, ids);
   }
+
+  return result;
 }

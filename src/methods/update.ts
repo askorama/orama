@@ -1,4 +1,5 @@
-import { Document, Schema, OpaqueIndex, OpaqueDocumentStore, Lyra } from "../types.js";
+import { runMultipleHook, runSingleHook } from "src/components/hooks.js";
+import { Document, Lyra, OpaqueDocumentStore, OpaqueIndex, Schema } from "../types.js";
 import { insert, insertMultiple } from "./insert.js";
 import { remove, removeMultiple } from "./remove.js";
 
@@ -9,8 +10,18 @@ export async function update<S extends Schema, I extends OpaqueIndex, D extends 
   language?: string,
   skipHooks?: boolean,
 ): Promise<string> {
+  if (!skipHooks) {
+    await runSingleHook(lyra.beforeUpdate, lyra, id);
+  }
+
   await remove(lyra, id, language, skipHooks);
-  return insert(lyra, doc, language, skipHooks);
+  const newId = await insert(lyra, doc, language, skipHooks);
+
+  if (!skipHooks) {
+    await runSingleHook(lyra.afterUpdate, lyra, newId);
+  }
+
+  return newId;
 }
 
 export async function updateMultiple<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
@@ -25,6 +36,16 @@ export async function updateMultiple<S extends Schema, I extends OpaqueIndex, D 
     batchSize = 1000;
   }
 
+  if (!skipHooks) {
+    await runMultipleHook(lyra.beforeMultipleUpdate, lyra, ids);
+  }
+
   await removeMultiple(lyra, ids, batchSize, language, skipHooks);
-  return insertMultiple(lyra, docs, batchSize, language, skipHooks);
+  const newIds = await insertMultiple(lyra, docs, batchSize, language, skipHooks);
+
+  if (!skipHooks) {
+    await runMultipleHook(lyra.afterMultipleUpdate, lyra, newIds);
+  }
+
+  return newIds;
 }

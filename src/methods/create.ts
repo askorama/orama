@@ -1,7 +1,8 @@
 import { getDefaultComponents } from "../components/defaults.js";
-import { createError } from "../errors.js";
+import { createDocumentsStore } from "../components/documents-store.js";
 import { COMPLEX_COMPONENTS, SIMPLE_COMPONENTS, SIMPLE_OR_ARRAY_COMPONENTS } from "../components/hooks.js";
 import { createIndex } from "../components/index.js";
+import { createError } from "../errors.js";
 import { createTokenizer } from "../tokenizer/index.js";
 import {
   ArrayCallbackComponents,
@@ -15,11 +16,10 @@ import {
   SimpleComponents,
   SimpleOrArrayCallbackComponents,
 } from "../types.js";
-import { createDocumentsStore } from "../components/documents-store.js";
 
 interface CreateArguments<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
   schema: Schema;
-  defaultLanguage?: string;
+  language?: string;
   components?: Components<S, I, D>;
 }
 
@@ -71,7 +71,7 @@ function validateComponents<S extends Schema, I extends OpaqueIndex, D extends O
 
 export async function create<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>({
   schema,
-  defaultLanguage,
+  language,
   components,
 }: CreateArguments<S, I, D>): Promise<Lyra<S, I, D>> {
   if (!components) {
@@ -84,10 +84,10 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
 
   if (!tokenizer) {
     // Use the default tokenizer
-    tokenizer = await createTokenizer(defaultLanguage ?? "english");
-  } else if (defaultLanguage) {
-    // Accept defaultLanguage only if a tokenizer is not provided
-    throw createError("NO_DEFAULT_LANGUAGE_WITH_CUSTOM_TOKENIZER");
+    tokenizer = await createTokenizer(language ?? "english");
+  } else if (language) {
+    // Accept language only if a tokenizer is not provided
+    throw createError("NO_LANGUAGE_WITH_CUSTOM_TOKENIZER");
   }
 
   if (!index) {
