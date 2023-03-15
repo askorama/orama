@@ -100,7 +100,6 @@ export async function createTokenizer(language: Language, config: TokenizerConfi
       // with vite.
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error This fails when verifying CJS but it's actually correct
       const stemmersPath = import.meta.url.endsWith("ts") ? "../stemmer/lib" : "stemmer";
       const stemmerImport = await import(`../${stemmersPath}/${STEMMERS[language]}.js`);
       stemmer = stemmerImport.stemmer;
