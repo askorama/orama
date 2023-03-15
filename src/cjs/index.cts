@@ -11,7 +11,7 @@ import type {
   clearSynonyms as esmClearSynonyms,
 } from "../methods/synonyms.js";
 
-export interface LyraExport {
+export interface OramaExport {
   count: typeof esmCount;
   create: typeof esmCreate;
   getByID: typeof esmGetByID;
@@ -27,7 +27,7 @@ export interface LyraExport {
   clearSynonyms: typeof esmClearSynonyms;
 }
 
-export type RequireCallback = (err: Error | undefined, lyra?: LyraExport) => void;
+export type RequireCallback = (err: Error | undefined, orama?: OramaExport) => void;
 
 let _esmCount: typeof esmCount;
 let _esmCreate: typeof esmCreate;
@@ -188,8 +188,8 @@ export async function clearSynonyms(...args: Parameters<typeof esmClearSynonyms>
   return _esmClearSynonyms(...args);
 }
 
-export function requireLyra(callback: RequireCallback): void {
+export function requireOrama(callback: RequireCallback): void {
   import("../index.js")
-    .then((loaded: LyraExport) => setTimeout(() => callback(undefined, loaded), 1))
+    .then((loaded: OramaExport) => setTimeout(() => callback(undefined, loaded), 1))
     .catch((error: Error) => setTimeout(() => callback(error), 1));
 }

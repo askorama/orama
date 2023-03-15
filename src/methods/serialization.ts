@@ -1,4 +1,4 @@
-import { Lyra, OpaqueDocumentStore, OpaqueIndex, Schema } from "../types.js";
+import { Orama, OpaqueDocumentStore, OpaqueIndex, Schema } from "../types.js";
 
 export interface RawData {
   index: unknown;
@@ -6,18 +6,18 @@ export interface RawData {
 }
 
 export async function load<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, I, D>,
+  orama: Orama<S, I, D>,
   raw: RawData,
 ): Promise<void> {
-  lyra.data.index = await lyra.index.load(raw.index);
-  lyra.data.docs = await lyra.documentsStore.load(raw.docs);
+  orama.data.index = await orama.index.load(raw.index);
+  orama.data.docs = await orama.documentsStore.load(raw.docs);
 }
 
 export async function save<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, I, D>,
+  orama: Orama<S, I, D>,
 ): Promise<RawData> {
   return {
-    index: await lyra.index.save(lyra.data.index),
-    docs: await lyra.documentsStore.save(lyra.data.docs),
+    index: await orama.index.save(orama.data.index),
+    docs: await orama.documentsStore.save(orama.data.docs),
   };
 }

@@ -1,15 +1,15 @@
 {
-  "name": "@lyrasearch/example-vue-lyra",
+  "name": "@orama/example-vue-orama",
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "pnpm run build:lyra && vite",
-    "build": "pnpm run build:lyra && vite build",
-    "build:lyra": "cd ../../ && pnpm run build && cd ./examples/with-vue",
+    "dev": "pnpm run build:orama && vite",
+    "build": "pnpm run build:orama && vite build",
+    "build:orama": "cd ../../ && pnpm run build && cd ./examples/with-vue",
     "preview": "vite preview --port 4173"
   },
   "dependencies": {
-    "@lyrasearch/lyra": "0.1.1",
+    "@orama/orama": "0.1.1",
     "vue": "^3.2.37"
   },
   "devDependencies": {

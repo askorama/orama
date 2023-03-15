@@ -2,7 +2,7 @@ import t from "tap";
 import { create, insert, search } from "../../src/index.js";
 // 👆 This test assumes the module has been built
 
-t.test("lyra", t => {
+t.test("orama", t => {
   t.plan(1);
 
   t.test("should correctly search for data", async t => {

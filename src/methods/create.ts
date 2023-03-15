@@ -3,7 +3,7 @@ import type {
   Components,
   IDocumentsStore,
   IIndex,
-  Lyra,
+  Orama,
   OpaqueDocumentStore,
   OpaqueIndex,
   Schema,
@@ -75,7 +75,7 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
   schema,
   language,
   components,
-}: CreateArguments<S, I, D>): Promise<Lyra<S, I, D>> {
+}: CreateArguments<S, I, D>): Promise<Orama<S, I, D>> {
   if (!components) {
     components = {};
   }
@@ -124,7 +124,7 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
     formatElapsedTime,
   } = components;
 
-  const lyra = {
+  const orama = {
     data: {},
     caches: {},
     schema,
@@ -144,13 +144,13 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
     beforeMultipleRemove,
     afterMultipleRemove,
     formatElapsedTime,
-  } as Lyra<S, I, D>;
+  } as Orama<S, I, D>;
 
-  lyra.data = {
-    index: await lyra.index.create(lyra, schema),
-    docs: await lyra.documentsStore.create(lyra),
-    synonyms: await lyra.synonyms.create(lyra),
+  orama.data = {
+    index: await orama.index.create(orama, schema),
+    docs: await orama.documentsStore.create(orama),
+    synonyms: await orama.synonyms.create(orama),
   };
 
-  return lyra;
+  return orama;
 }

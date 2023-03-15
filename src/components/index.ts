@@ -20,7 +20,7 @@ import {
   BM25Params,
   ComparisonOperator,
   IIndex,
-  Lyra,
+  Orama,
   OpaqueDocumentStore,
   OpaqueIndex,
   Schema,
@@ -61,7 +61,7 @@ export interface Index extends OpaqueIndex {
 type DefaultIndex<S extends Schema, D extends OpaqueDocumentStore> = IIndex<S, Index, D>;
 
 function create<S extends Schema, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, Index, D>,
+  orama: Orama<S, Index, D>,
   schema: Schema,
   index?: Index,
   prefix = "",
@@ -84,7 +84,7 @@ function create<S extends Schema, D extends OpaqueDocumentStore>(
 
     if (typeActualType === "object" && !Array.isArray(type)) {
       // Nested
-      create(lyra, type as Schema, index, path);
+      create(orama, type as Schema, index, path);
       continue;
     }
 
@@ -207,8 +207,8 @@ function search(index: Index, prop: string, term: string, context: SearchContext
   // Exact fields for TF-IDF
   const avgFieldLength = index.avgFieldLength[prop];
   const fieldLengths = index.fieldLengths[prop];
-  const lyraOccurrencies = index.tokenOccurrencies[prop];
-  const lyraFrequencies = index.frequencies[prop];
+  const oramaOccurrencies = index.tokenOccurrencies[prop];
+  const oramaFrequencies = index.frequencies[prop];
 
   // Performa the search
   const rootNode = index.indexes[prop] as RadixNode;
@@ -225,8 +225,8 @@ function search(index: Index, prop: string, term: string, context: SearchContext
 
   const documentIDs = Array.from(ids);
 
-  // lyraOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
-  const termOccurrencies = typeof lyraOccurrencies[term] === "number" ? lyraOccurrencies[term] ?? 0 : 0;
+  // oramaOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
+  const termOccurrencies = typeof oramaOccurrencies[term] === "number" ? oramaOccurrencies[term] ?? 0 : 0;
 
   const scoreList: TokenScore[] = [];
 
@@ -234,7 +234,7 @@ function search(index: Index, prop: string, term: string, context: SearchContext
   const documentIDsLength = documentIDs.length;
   for (let k = 0; k < documentIDsLength; k++) {
     const id = documentIDs[k];
-    const tf = lyraFrequencies?.[id]?.[term] ?? 0;
+    const tf = oramaFrequencies?.[id]?.[term] ?? 0;
 
     const bm25 = BM25(
       tf,

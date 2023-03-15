@@ -216,13 +216,13 @@ export type Results = {
 };
 
 export type SingleCallbackComponent<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = (
-  lyra: Lyra<S, I, D>,
+  orama: Orama<S, I, D>,
   id: string,
   doc?: Document,
 ) => SyncOrAsyncValue;
 
 export type MultipleCallbackComponent<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = (
-  lyra: Lyra<S, I, D>,
+  orama: Orama<S, I, D>,
   doc: Document[] | string[],
 ) => SyncOrAsyncValue;
 
@@ -239,7 +239,7 @@ export type IIndexInsertOrRemoveFunction<I, R = void> = (
 export type IIndexRemoveFunction<I> = (index: I, id: string, prop: string) => SyncOrAsyncValue;
 
 export interface IIndex<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
-  create: (lyra: Lyra<S, I, D>, schema: Schema) => I;
+  create: (orama: Orama<S, I, D>, schema: Schema) => I;
 
   beforeInsert?: IIndexInsertOrRemoveFunction<I>;
   insert: IIndexInsertOrRemoveFunction<I>;
@@ -260,7 +260,7 @@ export interface IIndex<S extends Schema, I extends OpaqueIndex, D extends Opaqu
 }
 
 export interface IDocumentsStore<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
-  create: (lyra: Lyra<S, I, D>) => D;
+  create: (orama: Orama<S, I, D>) => D;
   get(store: D, id: string): SyncOrAsyncValue<Document | undefined>;
   getMultiple(store: D, ids: string[]): SyncOrAsyncValue<(Document | undefined)[]>;
   store(store: D, id: string, doc: Document): SyncOrAsyncValue<boolean>;
@@ -327,10 +327,10 @@ export type Components<S extends Schema, I extends OpaqueIndex, D extends Opaque
   ComplexComponent<S, I, D> & SimpleComponents & SimpleOrArrayCallbackComponents<S, I, D>
 >;
 
-export const kInsertions = Symbol("lyra.insertions");
-export const kRemovals = Symbol("lyra.removals");
+export const kInsertions = Symbol("orama.insertions");
+export const kRemovals = Symbol("orama.removals");
 
-export type Lyra<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = SimpleComponents &
+export type Orama<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = SimpleComponents &
   ArrayCallbackComponents<S, I, D> & {
     schema: S;
     tokenizer: Tokenizer;

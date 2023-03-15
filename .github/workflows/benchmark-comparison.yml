@@ -57,7 +57,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build Lyra
+      - name: Build Orama
         run: pnpm run build
 
       - name: Run benchmarks
@@ -81,7 +81,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build Lyra
+      - name: Build Orama
         run: pnpm run build
 
       - name: Run benchmarks

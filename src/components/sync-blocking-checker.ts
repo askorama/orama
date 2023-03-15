@@ -1,4 +1,4 @@
-import { kInsertions, kRemovals, Lyra, OpaqueDocumentStore, OpaqueIndex, Schema } from "../types.js";
+import { kInsertions, kRemovals, Orama, OpaqueDocumentStore, OpaqueIndex, Schema } from "../types.js";
 
 // Web platforms don't have process. React-Native doesn't have process.emitWarning.
 const warn =
@@ -8,47 +8,47 @@ const warn =
   };
 
 export function trackInsertion<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, I, D>,
+  orama: Orama<S, I, D>,
 ): void {
-  if (typeof lyra[kInsertions] !== "number") {
+  if (typeof orama[kInsertions] !== "number") {
     queueMicrotask(() => {
-      lyra[kInsertions] = undefined;
+      orama[kInsertions] = undefined;
     });
 
-    lyra[kInsertions] = 0;
+    orama[kInsertions] = 0;
   }
 
-  if (lyra[kInsertions]! > 1000) {
+  if (orama[kInsertions]! > 1000) {
     warn(
-      "Lyra's insert operation is synchronous. Please avoid inserting a large number of document in a single operation in order not to block the main thread or, in alternative, please use insertMultiple.",
-      { code: "LYRA0001" },
+      "Orama's insert operation is synchronous. Please avoid inserting a large number of document in a single operation in order not to block the main thread or, in alternative, please use insertMultiple.",
+      { code: "ORAMA0001" },
     );
 
-    lyra[kInsertions] = -1;
-  } else if (lyra[kInsertions] >= 0) {
-    lyra[kInsertions]++;
+    orama[kInsertions] = -1;
+  } else if (orama[kInsertions] >= 0) {
+    orama[kInsertions]++;
   }
 }
 
 export function trackRemoval<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, I, D>,
+  orama: Orama<S, I, D>,
 ): void {
-  if (typeof lyra[kRemovals] !== "number") {
+  if (typeof orama[kRemovals] !== "number") {
     queueMicrotask(() => {
-      lyra[kRemovals] = undefined;
+      orama[kRemovals] = undefined;
     });
 
-    lyra[kRemovals] = 0;
+    orama[kRemovals] = 0;
   }
 
-  if (lyra[kRemovals]! > 1000) {
+  if (orama[kRemovals]! > 1000) {
     warn(
-      "Lyra's remove operation is synchronous. Please avoid removing a large number of document in a single operation in order not to block the main thread, in alternative, please use updateMultiple.",
-      { code: "LYRA0002" },
+      "Orama's remove operation is synchronous. Please avoid removing a large number of document in a single operation in order not to block the main thread, in alternative, please use updateMultiple.",
+      { code: "ORAMA0002" },
     );
 
-    lyra[kRemovals] = -1;
-  } else if (lyra[kRemovals] >= 0) {
-    lyra[kRemovals]++;
+    orama[kRemovals] = -1;
+  } else if (orama[kRemovals] >= 0) {
+    orama[kRemovals]++;
   }
 }
