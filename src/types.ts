@@ -1,4 +1,4 @@
-import { availableSynonymKinds } from './components/synonyms.js'
+import { availableSynonymKinds } from "./components/synonyms.js";
 
 export type Nullable<T> = T | null;
 
@@ -350,22 +350,22 @@ export type Lyra<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocume
 export type SynonymsData = {
   oneWay: Record<string, string[]>;
   twoWay: Record<string, string[]>;
-}
+};
 
 export type SynonymConfig = {
   kind: typeof availableSynonymKinds[number];
   word: string;
   synonyms: string[];
-}
+};
 
 export type ClearSynonymscConfig = {
   kind: typeof availableSynonymKinds[number];
   word: string;
-}
+};
 
 export type ISynonyms<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
   create: <S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(db: Lyra<S, I, D>) => SynonymsData;
   add: (data: SynonymsData, synonyms: SynonymConfig) => Promise<void> | void;
   remove: (data: SynonymsData, synonyms: SynonymConfig) => Promise<void> | void;
   clear: (data: SynonymsData, synonyms: SynonymConfig) => Promise<void> | void;
-}
+};

@@ -9,7 +9,7 @@ import type {
   Schema,
   SimpleComponents,
   SimpleOrArrayCallbackComponents,
-  ISynonyms
+  ISynonyms,
 } from "../types.js";
 import { getDefaultComponents } from "../components/defaults.js";
 import { createDocumentsStore } from "../components/documents-store.js";

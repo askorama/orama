@@ -5,7 +5,11 @@ import type { remove as esmRemove, removeMultiple as esmRemoveMultiple } from ".
 import type { search as esmSearch } from "../methods/search.js";
 import type { load as esmLoad, save as esmSave } from "../methods/serialization.js";
 import type { update as esmUpdate, updateMultiple as esmUpdateMultiple } from "../methods/update.js";
-import type { addSynonyms as esmAddSynonyms, removeSynonyms as esmRemoveSynonyms, clearSynonyms as esmClearSynonyms } from "../components/synonyms.js";
+import type {
+  addSynonyms as esmAddSynonyms,
+  removeSynonyms as esmRemoveSynonyms,
+  clearSynonyms as esmClearSynonyms,
+} from "../methods/synonyms.js";
 
 export interface LyraExport {
   count: typeof esmCount;
@@ -155,11 +159,9 @@ export async function updateMultiple(
   return _esmUpdateMultiple(...args);
 }
 
-export async function addSynonyms(
-  ...args: Parameters<typeof esmAddSynonyms>
-): ReturnType<typeof esmAddSynonyms> {
+export async function addSynonyms(...args: Parameters<typeof esmAddSynonyms>): ReturnType<typeof esmAddSynonyms> {
   if (!_esmAddSynonyms) {
-    const imported = await import("../components/synonyms.js");
+    const imported = await import("../methods/synonyms.js");
     _esmAddSynonyms = imported.addSynonyms;
   }
 
@@ -170,18 +172,16 @@ export async function removeSynonyms(
   ...args: Parameters<typeof esmRemoveSynonyms>
 ): ReturnType<typeof esmRemoveSynonyms> {
   if (!_esmRemoveSynonyms) {
-    const imported = await import("../components/synonyms.js");
+    const imported = await import("../methods/synonyms.js");
     _esmRemoveSynonyms = imported.removeSynonyms;
   }
 
   return _esmRemoveSynonyms(...args);
 }
 
-export async function clearSynonyms(
-  ...args: Parameters<typeof esmClearSynonyms>
-): ReturnType<typeof esmClearSynonyms> {
+export async function clearSynonyms(...args: Parameters<typeof esmClearSynonyms>): ReturnType<typeof esmClearSynonyms> {
   if (!_esmClearSynonyms) {
-    const imported = await import("../components/synonyms.js");
+    const imported = await import("../methods/synonyms.js");
     _esmClearSynonyms = imported.clearSynonyms;
   }
 
