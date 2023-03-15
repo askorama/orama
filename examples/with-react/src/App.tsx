@@ -1,4 +1,4 @@
-import { create, insertMultiple, search } from "@lyrasearch/lyra";
+import { create, insertMultiple, search } from "@orama/orama";
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import data from "./assets/db.json";
@@ -44,7 +44,7 @@ function App() {
       tolerance: 1, // for typo tolerance
     });
 
-    let result = [];
+    const result = [];
 
     for (let i = 0; i < searchResult.hits.length; i++) {
       result.push(searchResult.hits[i].document);

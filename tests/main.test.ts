@@ -213,7 +213,7 @@ t.test("document validation", t => {
   );
 });
 
-t.test("lyra", t => {
+t.test("orama", t => {
   t.plan(19);
 
   t.test("should correctly search for data", async t => {
@@ -252,7 +252,7 @@ t.test("lyra", t => {
     t.equal(result5.count, 2);
     t.equal(result6.count, 4);
 
-    // Long string search (Tests for https://github.com/LyraSearch/lyra/issues/159 )
+    // Long string search (Tests for https://github.com/OramaSearch/orama/issues/159 )
     const result7 = await search(db, { term: "They are the best" });
     const result8 = await search(db, { term: "Foxes are nice animals" });
 
@@ -439,23 +439,23 @@ t.test("lyra", t => {
     t.equal(searchResult.hits[0].id, id2);
   });
 
-  // Tests for https://github.com/nearform/lyra/issues/52
+  // Tests for https://github.com/nearform/orama/issues/52
   t.test("Should correctly remove documents via substring search", async t => {
     t.plan(1);
 
-    const lyra = await create({
+    const orama = await create({
       schema: {
         word: "string",
       },
     });
 
-    const halo = await insert(lyra, { word: "Halo" });
-    await insert(lyra, { word: "Halloween" });
-    await insert(lyra, { word: "Hal" });
+    const halo = await insert(orama, { word: "Halo" });
+    await insert(orama, { word: "Halloween" });
+    await insert(orama, { word: "Hal" });
 
-    await remove(lyra, halo);
+    await remove(orama, halo);
 
-    const searchResult = await search(lyra, {
+    const searchResult = await search(orama, {
       term: "Hal",
     });
 
@@ -878,9 +878,9 @@ t.test("lyra", t => {
   });
 });
 
-t.test("lyra - hooks", t => {
+t.test("orama - hooks", t => {
   t.plan(2);
-  t.test("should validate on lyra creation", async t => {
+  t.test("should validate on orama creation", async t => {
     t.plan(1);
 
     await t.rejects(
@@ -1007,7 +1007,7 @@ t.test("should search numbers in supported languages", async t => {
   t.end();
 });
 
-//  Tests for https://github.com/LyraSearch/lyra/issues/230
+//  Tests for https://github.com/OramaSearch/orama/issues/230
 t.test("should correctly search accented words in Italian", async t => {
   const db = await create({
     schema: {
@@ -1028,7 +1028,7 @@ t.test("should correctly search accented words in Italian", async t => {
   t.equal(searchResult.count, 1);
 });
 
-//  Tests for https://github.com/LyraSearch/lyra/issues/230
+//  Tests for https://github.com/OramaSearch/orama/issues/230
 t.test("should correctly search accented words in English", async t => {
   const db = await create({
     schema: {
@@ -1049,7 +1049,7 @@ t.test("should correctly search accented words in English", async t => {
   t.equal(searchResult.count, 1);
 });
 
-//  Tests for https://github.com/LyraSearch/lyra/issues/230
+//  Tests for https://github.com/OramaSearch/orama/issues/230
 t.test("should correctly search accented words in Dutch", async t => {
   const db = await create({
     schema: {

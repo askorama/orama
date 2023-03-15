@@ -1,6 +1,6 @@
 ########
-# docker buildx build --load -f Dockerfile --build-context rust=rust . -t lyrasearch/lyra-wasm --progress plain
-# docker create --name tmp lyrasearch/lyra-wasm
+# docker buildx build --load -f Dockerfile --build-context rust=rust . -t oramasearch/orama-wasm --progress plain
+# docker create --name tmp oramasearch/orama-wasm
 # docker cp tmp:/opt/app/src/wasm ./src/wasm
 # docker rm -f tmp
 ########
@@ -40,13 +40,13 @@ COPY . /opt/app
 ARG WASM_BINDGEN_VERSION="0.2.83"
 
 # Rust compilation profile
-ARG LYRA_WASM_PROFILE="release"
+ARG ORAMA_WASM_PROFILE="release"
 
 # Rust+Wasm compilation target (e.g. nodejs, deno, etc.)
-ARG LYRA_WASM_TARGET="nodejs"
+ARG ORAMA_WASM_TARGET="nodejs"
 
 # When set to "1", attempt Wasm optimization via wasm-opt
-ARG LYRA_WASM_OPT="1"
+ARG ORAMA_WASM_OPT="1"
 
 ##
 # Install Rust and Node.js tools
@@ -74,9 +74,9 @@ RUN cargo test
 ##
 WORKDIR /opt/app/rust/scripts
 
-ENV LYRA_WASM_PROFILE ${LYRA_WASM_PROFILE}
-ENV LYRA_WASM_TARGET ${LYRA_WASM_TARGET}
-ENV LYRA_WASM_OPT ${LYRA_WASM_OPT}
+ENV ORAMA_WASM_PROFILE ${ORAMA_WASM_PROFILE}
+ENV ORAMA_WASM_TARGET ${ORAMA_WASM_TARGET}
+ENV ORAMA_WASM_OPT ${ORAMA_WASM_OPT}
 
 # Pull in the wasm-opt optimizer compiled in a previous stage
 COPY --from=wasm-tools /usr/bin/wasm-opt /usr/bin/wasm-opt

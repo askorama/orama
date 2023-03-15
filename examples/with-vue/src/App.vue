@@ -1,6 +1,6 @@
 <script>
-import { create, insert, search as lyraSearch } from "@lyrasearch/lyra/dist/esm/lyra";
-import { formatNanoseconds, getNanosecondsTime } from "@lyrasearch/lyra/dist/esm/utils";
+import { create, insert, search as oramaSearch } from "@orama/orama/dist/esm/orama";
+import { formatNanoseconds, getNanosecondsTime } from "@orama/orama/dist/esm/utils";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -48,7 +48,7 @@ export default defineComponent({
       if (newValue) {
         const timeStart = getNanosecondsTime();
 
-        const result = lyraSearch(this.db, {
+        const result = oramaSearch(this.db, {
           term: newValue,
           properties: "*",
         });
@@ -73,7 +73,7 @@ export default defineComponent({
 <template>
   <div class="flex w-full justify-center font-sans">
     <div class="ma">
-      <h1>Lyra preview in Vue. Search for a Pokemon</h1>
+      <h1>Orama preview in Vue. Search for a Pokemon</h1>
 
       <div v-if="isLoading">Loading pokemons...</div>
 

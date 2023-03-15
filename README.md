@@ -1,4 +1,4 @@
-![Orama. Search, everywhere.](https://raw.githubusercontent.com/OramaSearch/orama/main/misc/lyra-edge-logo.png)
+![Orama. Search, everywhere.](https://raw.githubusercontent.com/OramaSearch/orama/main/misc/orama-edge-logo.png)
 
 [![Tests](https://github.com/OramaSearch/orama/actions/workflows/ci.yml/badge.svg)](https://github.com/OramaSearch/orama/actions/workflows/ci.yml)
 
@@ -6,7 +6,7 @@
 
 If you need more info, help, or want to provide general feedback on Orama, join
 the
-[Orama Slack channel](https://join.slack.com/t/lyrasearch/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q)
+[Orama Slack channel](https://join.slack.com/t/oramasearch/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q)
 
 # Installation
 

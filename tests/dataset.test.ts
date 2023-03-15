@@ -28,7 +28,7 @@ function removeVariadicData(res: Results): Omit<Results, "elapsed"> {
   };
 }
 
-t.test("lyra.dataset", async t => {
+t.test("orama.dataset", async t => {
   t.plan(4);
   const db = await create({
     schema: {
@@ -87,7 +87,7 @@ t.test("lyra.dataset", async t => {
     t.equal(s3.count, 7314);
   });
 
-  //  Tests for https://github.com/LyraSearch/lyra/issues/159
+  //  Tests for https://github.com/OramaSearch/orama/issues/159
   t.test("should correctly search long strings", async t => {
     t.plan(3);
 

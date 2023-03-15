@@ -1,36 +1,36 @@
 import { runMultipleHook, runSingleHook } from "../components/hooks.js";
 import { createError } from "../errors.js";
 import { trackInsertion } from "../components/sync-blocking-checker.js";
-import { Document, Schema, OpaqueIndex, OpaqueDocumentStore, Lyra } from "../types.js";
+import { Document, Schema, OpaqueIndex, OpaqueDocumentStore, Orama } from "../types.js";
 
 export async function insert<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, I, D>,
+  orama: Orama<S, I, D>,
   doc: Document,
   language?: string,
   skipHooks?: boolean,
 ): Promise<string> {
-  await lyra.validateSchema(doc, lyra.schema);
-  const { index, docs } = lyra.data;
+  await orama.validateSchema(doc, orama.schema);
+  const { index, docs } = orama.data;
 
-  const id = await lyra.getDocumentIndexId(doc);
+  const id = await orama.getDocumentIndexId(doc);
 
   if (typeof id !== "string") {
     throw createError("DOCUMENT_ID_MUST_BE_STRING", typeof id);
   }
 
-  if (!(await lyra.documentsStore.store(docs, id, doc))) {
+  if (!(await orama.documentsStore.store(docs, id, doc))) {
     throw createError("DOCUMENT_ALREADY_EXISTS", id);
   }
 
-  const docsCount = await lyra.documentsStore.count(docs);
+  const docsCount = await orama.documentsStore.count(docs);
 
   if (!skipHooks) {
-    await runSingleHook(lyra.beforeInsert, lyra, id, doc);
+    await runSingleHook(orama.beforeInsert, orama, id, doc);
   }
 
-  const indexableProperties = await lyra.index.getSearchableProperties(index);
-  const indexablePropertiesWithTypes = await lyra.index.getSearchablePropertiesWithTypes(index);
-  const values = await lyra.getDocumentProperties(doc, indexableProperties);
+  const indexableProperties = await orama.index.getSearchableProperties(index);
+  const indexablePropertiesWithTypes = await orama.index.getSearchablePropertiesWithTypes(index);
+  const values = await orama.getDocumentProperties(doc, indexableProperties);
 
   for (const [key, value] of Object.entries(values)) {
     if (typeof value === "undefined") {
@@ -52,22 +52,22 @@ export async function insert<S extends Schema, I extends OpaqueIndex, D extends 
       continue;
     }
 
-    await lyra.index.beforeInsert?.(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount);
-    await lyra.index.insert(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount);
-    await lyra.index.afterInsert?.(lyra.data.index, prop, id, value, language, lyra.tokenizer, docsCount);
+    await orama.index.beforeInsert?.(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount);
+    await orama.index.insert(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount);
+    await orama.index.afterInsert?.(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount);
   }
 
   if (!skipHooks) {
-    await runSingleHook(lyra.afterInsert, lyra, id, doc);
+    await runSingleHook(orama.afterInsert, orama, id, doc);
   }
 
-  trackInsertion(lyra);
+  trackInsertion(orama);
 
   return id;
 }
 
 export async function insertMultiple<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, I, D>,
+  orama: Orama<S, I, D>,
   docs: Document[],
   batchSize?: number,
   language?: string,
@@ -78,7 +78,7 @@ export async function insertMultiple<S extends Schema, I extends OpaqueIndex, D 
   }
 
   if (!skipHooks) {
-    await runMultipleHook(lyra.beforeMultipleInsert, lyra, docs);
+    await runMultipleHook(orama.beforeMultipleInsert, orama, docs);
   }
 
   const ids: string[] = [];
@@ -95,7 +95,7 @@ export async function insertMultiple<S extends Schema, I extends OpaqueIndex, D 
 
       for (const doc of batch) {
         try {
-          const id = await insert(lyra, doc, language, skipHooks);
+          const id = await insert(orama, doc, language, skipHooks);
           ids.push(id);
         } catch (err) {
           reject(err);
@@ -109,7 +109,7 @@ export async function insertMultiple<S extends Schema, I extends OpaqueIndex, D 
   });
 
   if (!skipHooks) {
-    await runMultipleHook(lyra.afterMultipleInsert, lyra, docs);
+    await runMultipleHook(orama.afterMultipleInsert, orama, docs);
   }
 
   return ids;

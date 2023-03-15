@@ -6,7 +6,7 @@ import type { search as esmSearch } from "../methods/search.js";
 import type { load as esmLoad, save as esmSave } from "../methods/serialization.js";
 import type { update as esmUpdate, updateMultiple as esmUpdateMultiple } from "../methods/update.js";
 
-export interface LyraExport {
+export interface OramaExport {
   count: typeof esmCount;
   create: typeof esmCreate;
   getByID: typeof esmGetByID;
@@ -19,7 +19,7 @@ export interface LyraExport {
   search: typeof esmSearch;
 }
 
-export type RequireCallback = (err: Error | undefined, lyra?: LyraExport) => void;
+export type RequireCallback = (err: Error | undefined, orama?: OramaExport) => void;
 
 let _esmCount: typeof esmCount;
 let _esmCreate: typeof esmCreate;
@@ -148,8 +148,8 @@ export async function updateMultiple(
   return _esmUpdateMultiple(...args);
 }
 
-export function requireLyra(callback: RequireCallback): void {
+export function requireOrama(callback: RequireCallback): void {
   import("../index.js")
-    .then((loaded: LyraExport) => setTimeout(() => callback(undefined, loaded), 1))
+    .then((loaded: OramaExport) => setTimeout(() => callback(undefined, loaded), 1))
     .catch((error: Error) => setTimeout(() => callback(error), 1));
 }
