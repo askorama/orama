@@ -1,8 +1,8 @@
 {
-  "name": "@lyrasearch/lyra",
-  "version": "0.4.10",
+  "name": "@orama/orama",
+  "version": "1.0.0",
   "type": "module",
-  "description": "Fast, in-memory, typo-tolerant, full-text search engine written in TypeScript",
+  "description": "Next generation full-text search engine, written in TypeScript",
   "sideEffects": false,
   "exports": {
     ".": {
@@ -43,10 +43,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/lyrasearch/lyra"
+    "url": "https://github.com/oramasearch/orama"
   },
   "bugs": {
-    "url": "https://github.com/lyrasearch/lyra"
+    "url": "https://github.com/oramasearch/orama"
   },
   "scripts": {
     "predev": "rm -rf dist && mkdir dist && cp -a stemmer/lib dist/stemmer",
@@ -73,13 +73,14 @@
   ],
   "author": {
     "name": "Michele Riva",
-    "email": "ciao@micheleriva.it",
-    "url": "https://github.com/MicheleRiva"
+    "email": "michele.riva@oramasearch.com",
+    "url": "https://github.com/MicheleRiva",
+    "author": true
   },
   "contributors": [
     {
       "name": "Paolo Insogna",
-      "email": "shogun@cowtech.it",
+      "email": "paolo.insogna@oramasearch.com",
       "url": "http://cowtech.it",
       "author": true
     }

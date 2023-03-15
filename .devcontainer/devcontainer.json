@@ -1,5 +1,5 @@
 {
-    "name": "lyra devcontainer",
+    "name": "orama devcontainer",
     "extensions": [
       "esbenp.prettier-vscode",
       "usernamehw.errorlens",

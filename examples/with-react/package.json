@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@lyrasearch/lyra": "^0.4.9",
+    "@orama/orama": "^0.4.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

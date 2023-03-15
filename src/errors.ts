@@ -24,12 +24,12 @@ const errors = {
 
 export type ErrorCode = keyof typeof errors;
 
-export interface LyraError extends Error {
+export interface OramaError extends Error {
   code: string;
 }
 
-export function createError(code: ErrorCode, ...args: Array<string | number>): LyraError {
-  const error = new Error(sprintf(errors[code] ?? `Unsupported Lyra Error code: ${code}`, ...args)) as LyraError;
+export function createError(code: ErrorCode, ...args: Array<string | number>): OramaError {
+  const error = new Error(sprintf(errors[code] ?? `Unsupported Orama Error code: ${code}`, ...args)) as OramaError;
   error.code = code;
   if ("captureStackTrace" in Error.prototype) {
     Error.captureStackTrace(error);

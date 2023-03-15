@@ -5,7 +5,7 @@ import { createError } from "../errors.js";
 import {
   BM25Params,
   IndexMap,
-  Lyra,
+  Orama,
   OpaqueDocumentStore,
   OpaqueIndex,
   Result,
@@ -34,7 +34,7 @@ function createSearchContext(
   // let whereFiltersIDs: string[] = [];
 
   // if (hasFilters) {
-  //   whereFiltersIDs = getWhereFiltersIDs(params.where!, lyra);
+  //   whereFiltersIDs = getWhereFiltersIDs(params.where!, orama);
   // }
 
   // indexMap is an object containing all the indexes considered for the current search,
@@ -83,7 +83,7 @@ function createSearchContext(
 }
 
 export async function search<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, I, D>,
+  orama: Orama<S, I, D>,
   params: SearchParams,
   language?: string,
 ): Promise<Results> {
@@ -92,18 +92,18 @@ export async function search<S extends Schema, I extends OpaqueIndex, D extends 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0;
   const { limit = 10, offset = 0, term, properties } = params;
 
-  const { index, docs } = lyra.data;
-  const tokens = lyra.tokenizer.tokenize(term, language);
+  const { index, docs } = orama.data;
+  const tokens = orama.tokenizer.tokenize(term, language);
 
   // Get searchable string properties
-  let propertiesToSearch = lyra.caches["propertiesToSearch"] as string[];
+  let propertiesToSearch = orama.caches["propertiesToSearch"] as string[];
   if (!propertiesToSearch) {
-    const propertiesToSearchWithTypes = await lyra.index.getSearchablePropertiesWithTypes(index);
+    const propertiesToSearchWithTypes = await orama.index.getSearchablePropertiesWithTypes(index);
 
-    propertiesToSearch = await lyra.index.getSearchableProperties(index);
+    propertiesToSearch = await orama.index.getSearchableProperties(index);
     propertiesToSearch = propertiesToSearch.filter((prop: string) => propertiesToSearchWithTypes[prop] === "string");
 
-    lyra.caches["propertiesToSearch"] = propertiesToSearch;
+    orama.caches["propertiesToSearch"] = propertiesToSearch;
   }
 
   if (properties && properties !== "*") {
@@ -117,7 +117,7 @@ export async function search<S extends Schema, I extends OpaqueIndex, D extends 
   }
 
   // Create the search context and the results
-  const context = createSearchContext(propertiesToSearch, tokens, params, await lyra.documentsStore.count(docs));
+  const context = createSearchContext(propertiesToSearch, tokens, params, await orama.documentsStore.count(docs));
   const results: Result[] = Array.from({
     length: limit,
   });
@@ -127,7 +127,7 @@ export async function search<S extends Schema, I extends OpaqueIndex, D extends 
   let whereFiltersIDs: string[] = [];
 
   if (hasFilters) {
-    whereFiltersIDs = lyra.index.searchByWhereClause(index, params.where!);
+    whereFiltersIDs = orama.index.searchByWhereClause(index, params.where!);
   }
 
   // Now it's time to loop over all the indices and get the documents IDs for every single term
@@ -140,7 +140,7 @@ export async function search<S extends Schema, I extends OpaqueIndex, D extends 
       const term = tokens[j];
 
       // Lookup
-      const scoreList = await lyra.index.search(index, prop, term, context);
+      const scoreList = await orama.index.search(index, prop, term, context);
 
       context.indexMap[prop][term].push(...scoreList);
     }
@@ -173,7 +173,7 @@ export async function search<S extends Schema, I extends OpaqueIndex, D extends 
 
   const resultIDs: Set<string> = new Set();
   // Populate facets if needed
-  const facets = shouldCalculateFacets ? await getFacets(lyra, uniqueDocsArray, params.facets!) : {};
+  const facets = shouldCalculateFacets ? await getFacets(orama, uniqueDocsArray, params.facets!) : {};
 
   // We already have the list of ALL the document IDs containing the search terms.
   // We loop over them starting from a positional value "offset" and ending at "offset + limit"
@@ -191,14 +191,14 @@ export async function search<S extends Schema, I extends OpaqueIndex, D extends 
     if (!resultIDs.has(id)) {
       // We retrieve the full document only AFTER making sure that we really want it.
       // We never retrieve the full document preventively.
-      const fullDoc = await lyra.documentsStore.get(docs, id);
+      const fullDoc = await orama.documentsStore.get(docs, id);
       results[i] = { id, score, document: fullDoc! };
       resultIDs.add(id);
     }
   }
 
   const searchResult: Results = {
-    elapsed: await lyra.formatElapsedTime(getNanosecondsTime() - context.timeStart),
+    elapsed: await orama.formatElapsedTime(getNanosecondsTime() - context.timeStart),
     hits: results.filter(Boolean),
     count: uniqueDocsArray.length,
   };

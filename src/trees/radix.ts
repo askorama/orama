@@ -59,7 +59,7 @@ function findAllWords(node: Node, output: FindResult, term: string, exact?: bool
     }
 
     // always check in own property to prevent access to inherited properties
-    // fix https://github.com/LyraSearch/lyra/issues/137
+    // fix https://github.com/OramaSearch/orama/issues/137
     if (!getOwnProperty(output, word)) {
       if (tolerance) {
         // computing the absolute difference of letters between the term and the word
@@ -78,7 +78,7 @@ function findAllWords(node: Node, output: FindResult, term: string, exact?: bool
 
     // check if _output[word] exists and then add the doc to it
     // always check in own property to prevent access to inherited properties
-    // fix https://github.com/LyraSearch/lyra/issues/137
+    // fix https://github.com/OramaSearch/orama/issues/137
     if (getOwnProperty(output, word) && docIDs.length) {
       const docs = new Set(output[word]);
 
