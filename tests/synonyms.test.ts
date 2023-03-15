@@ -2,7 +2,7 @@ import t from "tap";
 import { create } from "../src/methods/create.js";
 import { addSynonyms, removeSynonyms, clearSynonyms } from "../src/methods/synonyms.js";
 
-t.skip("create Lyra instance with synonyms", async t => {
+t.skip("create Orama instance with synonyms", async t => {
   t.plan(2);
 
   const db = await create({
