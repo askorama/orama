@@ -21,6 +21,10 @@ function create(): SynonymsData {
 function add(synonyms: SynonymsData, config: SynonymConfig) {
   const { kind, word, synonyms: synonymsList } = config;
 
+  if (!availableSynonymKinds.includes(kind)) {
+    throw createError("INVALID_SYNONYM_KIND", availableSynonymKinds.join(", "), kind);
+  }
+
   if (synonyms[kind][word]) {
     synonyms[kind][word].push(...synonymsList);
   } else {

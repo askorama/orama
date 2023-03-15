@@ -365,7 +365,7 @@ export type ClearSynonymscConfig = {
 
 export type ISynonyms<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
   create: <S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(db: Orama<S, I, D>) => SynonymsData;
-  add: (data: SynonymsData, synonyms: SynonymConfig) => Promise<void> | void;
-  remove: (data: SynonymsData, synonyms: SynonymConfig) => Promise<void> | void;
-  clear: (data: SynonymsData, synonyms: SynonymConfig) => Promise<void> | void;
+  add: (data: SynonymsData, config: SynonymConfig) => Promise<void> | void;
+  remove: (data: SynonymsData, config: SynonymConfig) => Promise<void> | void;
+  clear: (data: SynonymsData, config: ClearSynonymscConfig) => Promise<void> | void;
 };

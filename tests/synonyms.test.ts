@@ -2,7 +2,7 @@ import t from "tap";
 import { create } from "../src/methods/create.js";
 import { addSynonyms, removeSynonyms, clearSynonyms } from "../src/methods/synonyms.js";
 
-t.skip("create Orama instance with synonyms", async t => {
+t.test("add synonyms", async t => {
   t.plan(2);
 
   const db = await create({
@@ -12,21 +12,24 @@ t.skip("create Orama instance with synonyms", async t => {
   });
 
   await addSynonyms(db, {
-    oneWay: {
-      testOneWay: ["testOneWay-1", "testOneWay-2"],
-    },
-    twoWay: {
-      testTwoWay: ["testTwoWay-1", "testTwoWay-2"],
-    },
+    kind: 'oneWay',
+    word: 'testOneWay',
+    synonyms: ["testOneWay-1", "testOneWay-2"]
   });
 
-  t.same(db.data.synonyms.oneWay.testOneWay, ["testOneWay-1", "testOneWay-2"]);
+  await addSynonyms(db, {
+    kind: 'twoWay',
+    word: 'testTwoWay',
+    synonyms: ["testTwoWay-1", "testTwoWay-2"]
+  });
+
+  t.same(db.data.synonyms.oneWay.testOneWay, ['testOneWay-1', 'testOneWay-2']);
   t.same(db.data.synonyms.twoWay.testTwoWay, ["testTwoWay-1", "testTwoWay-2"]);
 
   t.end();
 });
 
-t.skip("add synonyms", async t => {
+t.test("remove synonyms", async t => {
   t.plan(2);
 
   const db = await create({
@@ -36,36 +39,27 @@ t.skip("add synonyms", async t => {
   });
 
   await addSynonyms(db, {
-    oneWay: {
-      testOneWay: ["testOneWay-1", "testOneWay-2"],
-    },
-    twoWay: {
-      testTwoWay: ["testTwoWay-1", "testTwoWay-2"],
-    },
-  });
-
-  t.same(db.data.synonyms.oneWay.testOneWay, ["testOneWay-1", "testOneWay-2"]);
-  t.same(db.data.synonyms.twoWay.testTwoWay, ["testTwoWay-1", "testTwoWay-2"]);
-
-  t.end();
-});
-
-t.skip("remove synonyms", async t => {
-  t.plan(2);
-
-  const db = await create({
-    schema: {
-      name: "string",
-    },
+    kind: 'oneWay',
+    word: 'testOneWay',
+    synonyms: ["testOneWay-1", "testOneWay-2"]
   });
 
   await addSynonyms(db, {
-    oneWay: {
-      testOneWay: ["testOneWay-1", "testOneWay-2"],
-    },
-    twoWay: {
-      testTwoWay: ["testTwoWay-1", "testTwoWay-2"],
-    },
+    kind: 'twoWay',
+    word: 'testTwoWay',
+    synonyms: ["testTwoWay-1", "testTwoWay-2"]
+  });
+
+  await removeSynonyms(db, {
+    kind: "oneWay",
+    word: "testOneWay",
+    synonyms: ["testOneWay-1"],
+  });
+
+  await removeSynonyms(db, {
+    kind: "twoWay",
+    word: "testTwoWay",
+    synonyms: ["testTwoWay-1"],
   });
 
   t.same(db.data.synonyms.oneWay.testOneWay, ["testOneWay-2"]);
@@ -74,7 +68,7 @@ t.skip("remove synonyms", async t => {
   t.end();
 });
 
-t.skip("clear synonyms", async t => {
+t.test("clear synonyms", async t => {
   t.plan(2);
 
   const db = await create({
@@ -84,12 +78,15 @@ t.skip("clear synonyms", async t => {
   });
 
   await addSynonyms(db, {
-    oneWay: {
-      testOneWay: ["testOneWay-1", "testOneWay-2"],
-    },
-    twoWay: {
-      testTwoWay: ["testTwoWay-1", "testTwoWay-2"],
-    },
+    kind: 'oneWay',
+    word: 'testOneWay',
+    synonyms: ["testOneWay-1", "testOneWay-2"]
+  });
+
+  await addSynonyms(db, {
+    kind: 'twoWay',
+    word: 'testTwoWay',
+    synonyms: ["testTwoWay-1", "testTwoWay-2"]
   });
 
   await clearSynonyms(db, {
@@ -108,7 +105,9 @@ t.skip("clear synonyms", async t => {
   t.end();
 });
 
-t.skip("add synonyms with invalid kind", async t => {
+t.test("add synonyms with invalid kind", async t => {
+  t.plan(3);
+  
   const db = await create({
     schema: {
       name: "string",
@@ -117,12 +116,37 @@ t.skip("add synonyms with invalid kind", async t => {
 
   try {
     await addSynonyms(db, {
-      oneWay: {
-        testOneWay: ["testOneWay-1", "testOneWay-2"],
-      },
-      twoWay: {
-        testTwoWay: ["testTwoWay-1", "testTwoWay-2"],
-      },
+      // @ts-expect-error error case
+      kind: 'invalidKind',
+      word: 'testOneWay',
+      synonyms: ["testOneWay-1", "testOneWay-2"]
+    });
+  } catch (error) {
+    t.equal(
+      error.message,
+      "Invalid synonym kind. Expected one of the following: oneWay, twoWay, but got: invalidKind.",
+    );
+  }
+
+  try {
+    await removeSynonyms(db, {
+      // @ts-expect-error error case
+      kind: 'invalidKind',
+      word: 'testOneWay',
+      synonyms: ["testOneWay-1", "testOneWay-2"]
+    });
+  } catch (error) {
+    t.equal(
+      error.message,
+      "Invalid synonym kind. Expected one of the following: oneWay, twoWay, but got: invalidKind.",
+    );
+  }
+
+  try {
+    await clearSynonyms(db, {
+      // @ts-expect-error error case
+      kind: 'invalidKind',
+      word: 'testOneWay',
     });
   } catch (error) {
     t.equal(

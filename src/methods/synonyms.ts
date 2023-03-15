@@ -1,4 +1,4 @@
-import { Orama, Schema, OpaqueDocumentStore, OpaqueIndex, SynonymConfig } from "../types.js";
+import { Orama, Schema, OpaqueDocumentStore, OpaqueIndex, SynonymConfig, ClearSynonymscConfig } from "../types.js";
 
 export async function addSynonyms<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
   db: Orama<S, I, D>,
@@ -16,7 +16,7 @@ export async function removeSynonyms<S extends Schema, I extends OpaqueIndex, D 
 
 export async function clearSynonyms<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
   db: Orama<S, I, D>,
-  config: SynonymConfig,
+  config: ClearSynonymscConfig,
 ) {
   db.synonyms.clear(db.data.synonyms, config);
 }
