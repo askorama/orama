@@ -11,7 +11,7 @@ tape.Test.prototype.strictSame = function _strictSame(a, b, msg, extra) {
     operator: "===",
     expected: b,
     actual: a,
-    extra: extra,
+    extra,
   });
 };
 
@@ -21,7 +21,7 @@ tape.Test.prototype.has = function _has(a, b, msg, extra) {
     operator: "===",
     expected: b,
     actual: a,
-    extra: extra,
+    extra,
   });
 };
 
@@ -31,7 +31,7 @@ tape.Test.prototype.match = function _match(a, b, msg, extra) {
     operator: "===",
     expected: b,
     actual: a,
-    extra: extra,
+    extra,
   });
 };
 
@@ -60,7 +60,7 @@ tape.Test.prototype.type = function _type(a, b, msg, extra) {
     operator: "ok",
     expected: b,
     actual: typeof a,
-    extra: extra,
+    extra,
   });
 };
 

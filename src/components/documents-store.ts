@@ -18,8 +18,8 @@ function get(store: DocumentsStore, id: string): Document | undefined {
   return store.docs[id];
 }
 
-function getMultiple(store: DocumentsStore, ids: string[]): (Document | undefined)[] {
-  const found: (Document | undefined)[] = Array.from({ length: ids.length });
+function getMultiple(store: DocumentsStore, ids: string[]): Array<Document | undefined> {
+  const found: Array<Document | undefined> = Array.from({ length: ids.length });
 
   for (let i = 0; i < ids.length; i++) {
     found[i] = store.docs[ids[i]];

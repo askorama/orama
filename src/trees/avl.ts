@@ -1,10 +1,10 @@
-export type Node<K, V> = {
+export interface Node<K, V> {
   key: K;
   value: V;
   left: Node<K, V> | null;
   right: Node<K, V> | null;
   height: number;
-};
+}
 
 const BALANCE_STATE = {
   UNBALANCED_RIGHT: 1,
@@ -32,7 +32,7 @@ function getBalanceFactor<K, V>(node: Node<K, V>): number {
 }
 
 function getHeight<K, V>(node: Node<K, V> | null): number {
-  return node ? node.height : -1;
+  return node != null ? node.height : -1;
 }
 
 function rotateLeft<K, V>(node: Node<K, V>): Node<K, V> {
@@ -54,7 +54,7 @@ function rotateRight<K, V>(node: Node<K, V>): Node<K, V> {
 }
 
 function findMin<K, V>(node: Node<K, V>): Node<K, V> {
-  return node.left ? findMin(node.left) : node;
+  return node.left != null ? findMin(node.left) : node;
 }
 
 export function contains<K, V>(node: Node<K, V>, key: K): boolean {
@@ -62,7 +62,7 @@ export function contains<K, V>(node: Node<K, V>, key: K): boolean {
 }
 
 export function getSize<K, V>(node: Node<K, V> | null): number {
-  if (!node) {
+  if (node == null) {
     return 0;
   }
 
@@ -70,7 +70,7 @@ export function getSize<K, V>(node: Node<K, V> | null): number {
 }
 
 export function isBalanced<K, V>(node: Node<K, V> | null): boolean {
-  if (!node) {
+  if (node == null) {
     return true;
   }
 
@@ -84,7 +84,7 @@ export function rangeSearch<K, V>(node: Node<K, V>, min: K, max: K): V {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
+  // @ts-expect-error
   const result: V = [];
 
   function traverse(node: Node<K, V>) {
@@ -116,7 +116,7 @@ export function greaterThan<K, V>(node: Node<K, V>, key: K, inclusive = false): 
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
+  // @ts-expect-error
   const result: V = [];
 
   function traverse(node: Node<K, V>) {
@@ -147,7 +147,7 @@ export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
+  // @ts-expect-error
   const result: V = [];
 
   function traverse(node: Node<K, V>) {
@@ -182,10 +182,10 @@ function getNodeByKey<K, V>(node: Node<K, V>, key: K): Node<K, V> | null {
   }
 
   if (key < node.key) {
-    return node.left ? getNodeByKey(node.left, key) : null;
+    return node.left != null ? getNodeByKey(node.left, key) : null;
   }
 
-  return node.right ? getNodeByKey(node.right, key) : null;
+  return node.right != null ? getNodeByKey(node.right, key) : null;
 }
 
 export function create<K, V>(key: K, value: V): Node<K, V> {
@@ -245,10 +245,10 @@ export function find<K, V>(node: Node<K, V>, key: K): V | null {
   }
 
   if (key < node.key) {
-    return node.left ? find(node.left, key) : null;
+    return node.left != null ? find(node.left, key) : null;
   }
 
-  return node.right ? find(node.right, key) : null;
+  return node.right != null ? find(node.right, key) : null;
 }
 
 export function remove<K, V>(node: Node<K, V>, key: K): Node<K, V> | null {
@@ -261,21 +261,21 @@ export function remove<K, V>(node: Node<K, V>, key: K): Node<K, V> | null {
   } else if (key > node.key) {
     node.right = remove(node.right as Node<K, V>, key);
   } else {
-    if (!node.left && !node.right) {
+    if (node.left == null && node.right == null) {
       return null;
     }
 
-    if (!node.left) {
+    if (node.left == null) {
       return node.right as Node<K, V>;
     }
 
-    if (!node.right) {
-      return node.left as Node<K, V>;
+    if (node.right == null) {
+      return node.left;
     }
 
-    const temp = findMin(node.right as Node<K, V>);
+    const temp = findMin(node.right);
     node.key = temp.key;
-    node.right = remove(node.right as Node<K, V>, temp.key);
+    node.right = remove(node.right, temp.key);
   }
 
   const balanceFactor = getBalanceFactor(node);

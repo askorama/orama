@@ -1,7 +1,7 @@
 import type {
   FacetResult,
   FacetSorting,
-  Lyra,
+  Orama,
   NumberFacetDefinition,
   OpaqueDocumentStore,
   OpaqueIndex,
@@ -21,16 +21,16 @@ function sortingPredicate(order: FacetSorting = "desc", a: [string, number], b: 
 }
 
 export async function getFacets<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, I, D>,
+  orama: Orama<S, I, D>,
   results: TokenScore[],
   facetsConfig: Required<SearchParams>["facets"],
 ): Promise<FacetResult> {
   const facets: FacetResult = {};
   const allIDs = results.map(([id]) => id);
-  const allDocs = await lyra.documentsStore.getMultiple(lyra.data.docs, allIDs);
-  const facetKeys = Object.keys(facetsConfig!);
+  const allDocs = await orama.documentsStore.getMultiple(orama.data.docs, allIDs);
+  const facetKeys = Object.keys(facetsConfig);
 
-  const properties = await lyra.index.getSearchablePropertiesWithTypes(lyra.data.index);
+  const properties = await orama.index.getSearchablePropertiesWithTypes(orama.data.index);
 
   for (const facet of facetKeys) {
     let values = {};

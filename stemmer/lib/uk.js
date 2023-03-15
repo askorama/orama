@@ -1,4 +1,4 @@
-/*@
+/* @
 
   Russian stemming algorithm provided by Dr Martin Porter (snowball.tartarus.org):
   http://snowball.tartarus.org/algorithms/russian/stemmer.html
@@ -46,12 +46,11 @@ const alterations = new RegExp('([гджзкстхцчш]|ст|дж|ждж|ьц|
 let thisString
 
 const ukrstemmer = (string, strict = false) => {
-
   thisString = string.toLowerCase()
   let wordStartIndex = string.match(vowel)
   if (wordStartIndex === null) return string
   wordStartIndex = wordStartIndex.index
-  let wordStart = thisString.slice(0, wordStartIndex + 1)
+  const wordStart = thisString.slice(0, wordStartIndex + 1)
   thisString = thisString.slice(wordStartIndex + 1)
   if (thisString === '') return string
 
@@ -89,12 +88,11 @@ const ukrstemmer = (string, strict = false) => {
 }
 
 const replaceAndCheck = (s, from, to) => {
-  let original = s
-  thisString = s.replace(from, to) 
+  const original = s
+  thisString = s.replace(from, to)
   return thisString !== original
 }
 
-export function stemmer(word){
+export function stemmer (word) {
   return ukrstemmer(word)
 }
-

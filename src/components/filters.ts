@@ -1,6 +1,6 @@
-export function intersectFilteredIDs(filtered: string[], lookedUp: [string, number][]): [string, number][] {
+export function intersectFilteredIDs(filtered: string[], lookedUp: Array<[string, number]>): Array<[string, number]> {
   const map = new Map<string, boolean>();
-  const result: [string, number][] = [];
+  const result: Array<[string, number]> = [];
 
   for (const id of filtered) {
     map.set(id, true);

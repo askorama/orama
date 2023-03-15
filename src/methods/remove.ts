@@ -1,10 +1,10 @@
 import { runMultipleHook, runSingleHook } from "../components/hooks.js";
 import { trackRemoval } from "../components/sync-blocking-checker.js";
 import { createError } from "../errors.js";
-import { Lyra, OpaqueDocumentStore, OpaqueIndex, Schema } from "../types.js";
+import { Orama, OpaqueDocumentStore, OpaqueIndex, Schema } from "../types.js";
 
 export async function remove<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, I, D>,
+  lyra: Orama<S, I, D>,
   id: string,
   language?: string,
   skipHooks?: boolean,
@@ -13,7 +13,7 @@ export async function remove<S extends Schema, I extends OpaqueIndex, D extends 
   const { index, docs } = lyra.data;
 
   const doc = await lyra.documentsStore.get(docs, id);
-  if (!doc) {
+  if (doc == null) {
     throw createError("DOCUMENT_DOES_NOT_EXIST", id);
   }
 
@@ -44,7 +44,7 @@ export async function remove<S extends Schema, I extends OpaqueIndex, D extends 
 }
 
 export async function removeMultiple<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, I, D>,
+  lyra: Orama<S, I, D>,
   ids: string[],
   batchSize?: number,
   language?: string,
@@ -66,7 +66,7 @@ export async function removeMultiple<S extends Schema, I extends OpaqueIndex, D 
       const batch = ids.slice(i * batchSize!, (i + 1) * batchSize!);
       i++;
 
-      if (!batch.length) {
+      if (batch.length === 0) {
         return resolve();
       }
 

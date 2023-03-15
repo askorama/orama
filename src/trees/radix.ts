@@ -13,11 +13,11 @@ export interface Node {
   word: string;
 }
 
-type FindParams = {
+interface FindParams {
   term: string;
   exact?: boolean;
   tolerance?: number;
-};
+}
 
 type FindResult = Record<string, string[]>;
 
@@ -59,8 +59,8 @@ function findAllWords(node: Node, output: FindResult, term: string, exact?: bool
     }
 
     // always check in own property to prevent access to inherited properties
-    // fix https://github.com/LyraSearch/lyra/issues/137
-    if (!getOwnProperty(output, word)) {
+    // fix https://github.com/OramaSearch/orama/issues/137
+    if (getOwnProperty(output, word) == null) {
       if (tolerance) {
         // computing the absolute difference of letters between the term and the word
         const difference = Math.abs(term.length - word.length);
@@ -78,8 +78,8 @@ function findAllWords(node: Node, output: FindResult, term: string, exact?: bool
 
     // check if _output[word] exists and then add the doc to it
     // always check in own property to prevent access to inherited properties
-    // fix https://github.com/LyraSearch/lyra/issues/137
-    if (getOwnProperty(output, word) && docIDs.length) {
+    // fix https://github.com/OramaSearch/orama/issues/137
+    if (getOwnProperty(output, word) != null && docIDs.length > 0) {
       const docs = new Set(output[word]);
 
       const docIDsLength = docIDs.length;

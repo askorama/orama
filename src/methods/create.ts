@@ -9,7 +9,7 @@ import {
   Components,
   IDocumentsStore,
   IIndex,
-  Lyra,
+  Orama,
   OpaqueDocumentStore,
   OpaqueIndex,
   Schema,
@@ -31,7 +31,7 @@ function validateComponents<S extends Schema, I extends OpaqueIndex, D extends O
   for (const rawKey of SIMPLE_COMPONENTS) {
     const key = rawKey as keyof SimpleComponents;
 
-    if (components[key]) {
+    if (components[key] != null) {
       if (typeof components[key] !== "function") {
         throw createError("COMPONENT_MUST_BE_FUNCTION", key);
       }
@@ -44,14 +44,14 @@ function validateComponents<S extends Schema, I extends OpaqueIndex, D extends O
   for (const rawKey of SIMPLE_OR_ARRAY_COMPONENTS) {
     const key = rawKey as keyof ArrayCallbackComponents<S, I, D>;
 
-    if (!components[key]) {
+    if (components[key] == null) {
       components[key] = [];
     } else if (!Array.isArray(components[key])) {
       // @ts-expect-error TSC is unable to resolve this
       components[key] = [components[key]];
     }
 
-    for (const fn of components[key] as unknown as SimpleOrArrayCallbackComponents<S, I, D>[]) {
+    for (const fn of components[key] as unknown as Array<SimpleOrArrayCallbackComponents<S, I, D>>) {
       if (typeof fn !== "function") {
         throw createError("COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS", key);
       }
@@ -73,8 +73,8 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
   schema,
   language,
   components,
-}: CreateArguments<S, I, D>): Promise<Lyra<S, I, D>> {
-  if (!components) {
+}: CreateArguments<S, I, D>): Promise<Orama<S, I, D>> {
+  if (components == null) {
     components = {};
   }
 
@@ -82,7 +82,7 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
   let index = components.index;
   let documentsStore = components.documentsStore;
 
-  if (!tokenizer) {
+  if (tokenizer == null) {
     // Use the default tokenizer
     tokenizer = await createTokenizer(language ?? "english");
   } else if (language) {
@@ -90,11 +90,11 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
     throw createError("NO_LANGUAGE_WITH_CUSTOM_TOKENIZER");
   }
 
-  if (!index) {
+  if (index == null) {
     index = createIndex() as unknown as IIndex<S, I, D>;
   }
 
-  if (!documentsStore) {
+  if (documentsStore == null) {
     documentsStore = createDocumentsStore() as unknown as IDocumentsStore<S, I, D>;
   }
 
@@ -117,7 +117,7 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
     formatElapsedTime,
   } = components;
 
-  const lyra = {
+  const orama = {
     data: {},
     caches: {},
     schema,
@@ -136,12 +136,12 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
     beforeMultipleRemove,
     afterMultipleRemove,
     formatElapsedTime,
-  } as Lyra<S, I, D>;
+  } as Orama<S, I, D>;
 
-  lyra.data = {
-    index: await lyra.index.create(lyra, schema),
-    docs: await lyra.documentsStore.create(lyra),
+  orama.data = {
+    index: await orama.index.create(orama, schema),
+    docs: await orama.documentsStore.create(orama),
   };
 
-  return lyra;
+  return orama;
 }

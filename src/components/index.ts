@@ -20,7 +20,7 @@ import {
   BM25Params,
   ComparisonOperator,
   IIndex,
-  Lyra,
+  Orama,
   OpaqueDocumentStore,
   OpaqueIndex,
   Schema,
@@ -33,7 +33,7 @@ import {
 import { intersect } from "../utils.js";
 import { BM25 } from "./algorithms.js";
 
-type FrequencyMap = {
+interface FrequencyMap {
   [property: string]: {
     [documentID: string]:
       | {
@@ -41,12 +41,12 @@ type FrequencyMap = {
         }
       | undefined;
   };
-};
+}
 
-type BooleanIndex = {
+interface BooleanIndex {
   true: string[];
   false: string[];
-};
+}
 
 export interface Index extends OpaqueIndex {
   indexes: Record<string, RadixNode | AVLNode<number, string[]> | BooleanIndex>;
@@ -61,12 +61,12 @@ export interface Index extends OpaqueIndex {
 type DefaultIndex<S extends Schema, D extends OpaqueDocumentStore> = IIndex<S, Index, D>;
 
 function create<S extends Schema, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, Index, D>,
+  orama: Orama<S, Index, D>,
   schema: Schema,
   index?: Index,
   prefix = "",
 ): Index {
-  if (!index) {
+  if (index == null) {
     index = {
       indexes: {},
       searchableProperties: [],
@@ -84,7 +84,7 @@ function create<S extends Schema, D extends OpaqueDocumentStore>(
 
     if (typeActualType === "object" && !Array.isArray(type)) {
       // Nested
-      create(lyra, type as Schema, index, path);
+      create(orama, type as Schema, index, path);
       continue;
     }
 
@@ -124,14 +124,14 @@ function insert(
   docsCount: number,
 ): void {
   if (typeof value === "number") {
-    avlInsert(index.indexes[prop] as AVLNode<number, string[]>, value as number, [id]);
+    avlInsert(index.indexes[prop] as AVLNode<number, string[]>, value, [id]);
     return;
   } else if (typeof value === "boolean") {
     (index.indexes[prop] as BooleanIndex)[value ? "true" : "false"].push(id);
     return;
   }
 
-  const tokens = tokenizer.tokenize(value as string, language);
+  const tokens = tokenizer.tokenize(value, language);
 
   if (!(id in index.frequencies[prop])) {
     index.frequencies[prop][id] = {};
@@ -184,7 +184,7 @@ function remove(
     return true;
   }
 
-  const tokens = tokenizer.tokenize(value as string, language);
+  const tokens = tokenizer.tokenize(value, language);
 
   index.avgFieldLength[prop] =
     (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][id]!) / (docsCount - 1);
@@ -207,8 +207,8 @@ function search(index: Index, prop: string, term: string, context: SearchContext
   // Exact fields for TF-IDF
   const avgFieldLength = index.avgFieldLength[prop];
   const fieldLengths = index.fieldLengths[prop];
-  const lyraOccurrencies = index.tokenOccurrencies[prop];
-  const lyraFrequencies = index.frequencies[prop];
+  const oramaOccurrencies = index.tokenOccurrencies[prop];
+  const oramaFrequencies = index.frequencies[prop];
 
   // Performa the search
   const rootNode = index.indexes[prop] as RadixNode;
@@ -225,8 +225,8 @@ function search(index: Index, prop: string, term: string, context: SearchContext
 
   const documentIDs = Array.from(ids);
 
-  // lyraOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
-  const termOccurrencies = typeof lyraOccurrencies[term] === "number" ? lyraOccurrencies[term] ?? 0 : 0;
+  // oramaOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
+  const termOccurrencies = typeof oramaOccurrencies[term] === "number" ? oramaOccurrencies[term] ?? 0 : 0;
 
   const scoreList: TokenScore[] = [];
 
@@ -234,7 +234,7 @@ function search(index: Index, prop: string, term: string, context: SearchContext
   const documentIDsLength = documentIDs.length;
   for (let k = 0; k < documentIDsLength; k++) {
     const id = documentIDs[k];
-    const tf = lyraFrequencies?.[id]?.[term] ?? 0;
+    const tf = oramaFrequencies?.[id]?.[term] ?? 0;
 
     const bm25 = BM25(
       tf,

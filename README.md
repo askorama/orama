@@ -1,27 +1,27 @@
-![Lyra, the edge search experience](https://raw.githubusercontent.com/LyraSearch/lyra/main/misc/lyra-edge-logo.png)
+![Orama. Search, everywhere.](https://raw.githubusercontent.com/OramaSearch/orama/main/misc/lyra-edge-logo.png)
 
-[![Tests](https://github.com/LyraSearch/lyra/actions/workflows/ci.yml/badge.svg)](https://github.com/LyraSearch/lyra/actions/workflows/ci.yml)
+[![Tests](https://github.com/OramaSearch/orama/actions/workflows/ci.yml/badge.svg)](https://github.com/OramaSearch/orama/actions/workflows/ci.yml)
 
-# Join Lyra's Slack channel
+# Join Orama's Slack channel
 
-If you need more info, help, or want to provide general feedback on Lyra, join
+If you need more info, help, or want to provide general feedback on Orama, join
 the
-[Lyra Slack channel](https://join.slack.com/t/lyrasearch/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q)
+[Orama Slack channel](https://join.slack.com/t/lyrasearch/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q)
 
 # Installation
 
-You can install Lyra using `npm`, `yarn`, `pnpm`:
+You can install Orama using `npm`, `yarn`, `pnpm`:
 
 ```sh
-npm i @lyrasearch/lyra
+npm i @orama/orama
 ```
 
 ```sh
-yarn add @lyrasearch/lyra
+yarn add @orama/orama
 ```
 
 ```sh
-pnpm add @lyrasearch/lyra
+pnpm add @orama/orama
 ```
 
 Or import it directly in a browser module:
@@ -30,7 +30,7 @@ Or import it directly in a browser module:
 <html>
   <body>
     <script type="module">
-      import { create, search, insert } from "https://unpkg.com/@lyrasearch/lyra@latest/dist/index.js";
+      import { create, search, insert } from "https://unpkg.com/@orama/orama@latest/dist/index.js";
 
       // ...
     </script>
@@ -38,16 +38,15 @@ Or import it directly in a browser module:
 </html>
 ```
 
-Read the complete documentation at
-[https://docs.lyrasearch.io/](https://docs.lyrasearch.io/).
+Read the complete documentation at [https://docs.oramasearch.com/](https://docs.oramasearch.com/).
 
 # Usage
 
-Lyra is quite simple to use. The first thing to do is to create a new database
+Orama is quite simple to use. The first thing to do is to create a new database
 instance and set an indexing schema:
 
 ```js
-import { create, insert, remove, search } from "@lyrasearch/lyra";
+import { create, insert, remove, search } from "@orama/orama";
 
 const db = await create({
   schema: {
@@ -57,9 +56,9 @@ const db = await create({
 });
 ```
 
-If you are using Node.js without ESM, please see [build](#builds) section below on how to properly require Lyra.
+If you are using Node.js without ESM, please see [build](#builds) section below on how to properly require Orama.
 
-Lyra will only index string properties, but will allow you to set and store
+Orama will only index string properties, but will allow you to set and store
 additional data if needed.
 
 Once the db instance is created, you can start adding some documents:
@@ -160,11 +159,11 @@ If needed, you can also delete a given document by using the `remove` method:
 await remove(db, "41045799-144");
 ```
 
-Lyra exposes a built-in `formatNanoseconds` function to format the elapsed time
+Orama exposes a built-in `formatNanoseconds` function to format the elapsed time
 in a human-readable format:
 
 ```js
-import { formatNanoseconds } from "@lyrasearch/lyra";
+import { formatNanoseconds } from "@orama/orama";
 
 const searchResult = await search(db, {
   term: "if",
@@ -177,16 +176,16 @@ console.log(`Search took ${formatNanoseconds(searchResult.elapsed)}`);
 
 ### Using with CommonJS
 
-From version 0.4.0, Lyra is packaged as ES modules, suitable for Node.js, Deno, Bun and modern browsers.
+Orama is packaged as ES modules, suitable for Node.js, Deno, Bun and modern browsers.
 
-**In most cases, simply `import` or `@lyrasearch/lyra` will suffice ✨.**
+**In most cases, simply `import` or `@orama/orama` will suffice ✨.**
 
-In Node.js, when not using ESM (with `"type": "module"` in the `package.json`), you have several ways to properly require Lyra.
+In Node.js, when not using ESM (with `"type": "module"` in the `package.json`), you have several ways to properly require Orama.
 Starting with version 0.4.0 it becomes:
 
 ```js
 async function main() {
-  const { create, insert } = await import("@lyrasearch/lyra");
+  const { create, insert } = await import("@orama/orama");
 
   const db = create(/* ... */);
   insert(db, {
@@ -199,23 +198,10 @@ main().catch(console.error);
 
 #### Use CJS requires
 
-As of version 0.4.0, Lyra methods can be required as CommonJS modules by requiring from `@lyrasearch/lyra/cjs`.
-
-If your Lyra 0.3.0 code was
+Orama methods can be required as CommonJS modules by requiring from `@orama/orama/cjs`.
 
 ```js
-const { create, insert } = require("@lyrasearch/lyra");
-
-const db = create(/* ... */);
-insert(db, {
-  /* ... */
-});
-```
-
-then starting with version 0.4.0 it becomes:
-
-```js
-const { create, insert } = require("@lyrasearch/lyra/cjs")
+const { create, insert } = require("@orama/orama/cjs")
 
 create(/* ... */)
   .then(db => insert(db, { /* ... */ })
@@ -226,22 +212,22 @@ Note that only main methods are supported so for internals and other supported e
 
 ## Language
 
-Lyra supports multiple languages. By default, it will use the `english`
+Orama supports multiple languages. By default, it will use the `english`
 language,
 
 You can specify a different language by using the `defaultLanguage` property
-during Lyra initialization.
+during Orama initialization.
 
-By default, Lyra will analyze your input using an English
+By default, Orama will analyze your input using an English
 [Porter Stemmer](https://tartarus.org/martin/PorterStemmer/) function. <br />
 You can replace the default stemmer with a custom one, or a pre-built one
-shipped with the default Lyra installation.
+shipped with the default Orama installation.
 
 Example:
 
 ```js
-import { create } from "@lyrasearch/lyra";
-import { stemmer } from "@lyrasearch/components/stemmer/it";
+import { create } from "@orama/orama";
+import { stemmer } from "@orama/orama/components/stemmer/it";
 
 const db = await create({
   schema: {
@@ -261,8 +247,8 @@ Example using CJS (see [using with commonJS](#using-with-commonjs) above):
 
 ```js
 async function main() {
-  const { create } = await import("@lyrasearch/lyra");
-  const { stemmer } = await import("@lyrasearch/components/stemmer/it");
+  const { create } = await import("@orama/orama");
+  const { stemmer } = await import("@orama/orama/components/stemmer/it");
 
   const db = await create({
     schema: {
@@ -281,7 +267,7 @@ async function main() {
 main();
 ```
 
-Right now, Lyra supports 26 languages and stemmers out of the box:
+Right now, Orama supports 26 languages and stemmers out of the box:
 
 - Arabic
 - Armenian
@@ -312,8 +298,8 @@ Right now, Lyra supports 26 languages and stemmers out of the box:
 
 # Official Docs
 
-Read the complete documentation at [https://docs.lyrasearch.io/](https://docs.lyrasearch.io/).
+Read the complete documentation at [https://docs.oramasearch.com/](https://docs.oramasearch.com/).
 
 # License
 
-Lyra is licensed under the [Apache 2.0](/LICENSE.md) license.
+Orama is licensed under the [Apache 2.0](/LICENSE.md) license.

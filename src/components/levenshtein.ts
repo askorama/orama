@@ -1,7 +1,7 @@
-export type BoundedMetric = {
+export interface BoundedMetric {
   isBounded: boolean;
   distance: number;
-};
+}
 
 /**
  * Inspired by:

@@ -6,19 +6,19 @@ import { stopWords as defaultStopWords } from "./stop-words/index.js";
 
 export type Stemmer = (word: string) => string;
 
-export type TokenizerConfig = {
+export interface TokenizerConfig {
   stemming?: boolean;
   stemmer?: Stemmer;
   stopWords?: boolean | string[] | ((stopWords: string[]) => string[] | Promise<string[]>);
   allowDuplicates?: boolean;
-};
+}
 
 interface DefaultTokenizer extends Tokenizer {
   language: string;
   stemmer?: Stemmer;
   stopWords?: string[];
   allowDuplicates: boolean;
-  normalizeToken(this: DefaultTokenizer, token: string): string;
+  normalizeToken: (this: DefaultTokenizer, token: string) => string;
 }
 
 export const normalizationCache = new Map();
@@ -37,7 +37,7 @@ function normalizeToken(this: DefaultTokenizer, token: string): string {
   }
 
   // Apply stemming if enabled
-  if (this.stemmer) {
+  if (this.stemmer != null) {
     token = this.stemmer(token);
   }
 
@@ -88,11 +88,11 @@ export async function createTokenizer(language: Language, config: TokenizerConfi
   let stemmer: Stemmer | undefined;
 
   if (config.stemming !== false) {
-    if (config.stemmer && typeof config.stemmer !== "function") {
+    if (config.stemmer != null && typeof config.stemmer !== "function") {
       throw createError("INVALID_STEMMER_FUNCTION_TYPE");
     }
 
-    if (config.stemmer) {
+    if (config.stemmer != null) {
       stemmer = config.stemmer;
     } else {
       // Check if we are in a TypeScript or Javascript scenario and determine the stemmers path
@@ -100,7 +100,7 @@ export async function createTokenizer(language: Language, config: TokenizerConfi
       // with vite.
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore This fails when verifying CJS but it's actually correct
+      // @ts-expect-error This fails when verifying CJS but it's actually correct
       const stemmersPath = import.meta.url.endsWith("ts") ? "../stemmer/lib" : "stemmer";
       const stemmerImport = await import(`../${stemmersPath}/${STEMMERS[language]}.js`);
       stemmer = stemmerImport.stemmer;

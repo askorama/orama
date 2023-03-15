@@ -13,7 +13,7 @@ const second = BigInt(1e9);
 
 export const isServer = typeof window === "undefined";
 
-export function sprintf(template: string, ...args: (string | number)[]): string {
+export function sprintf(template: string, ...args: Array<string | number>): string {
   return template.replaceAll(
     /%(?:(?<position>\d+)\$)?(?<width>-?\d*\.?\d*)(?<type>[dfs])/g,
     function (...replaceArgs: Array<string | number | Record<string, string>>): string {
@@ -135,7 +135,7 @@ export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
 
 // Intersection function taken from https://github.com/lovasoa/fast_array_intersect.
 // MIT Licensed at the time of writing.
-export function intersect<T>(arrays: ReadonlyArray<T>[]): T[] {
+export function intersect<T>(arrays: Array<readonly T[]>): T[] {
   if (arrays.length === 0) {
     return [];
   } else if (arrays.length === 1) {

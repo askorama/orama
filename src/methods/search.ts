@@ -5,7 +5,7 @@ import { createError } from "../errors.js";
 import {
   BM25Params,
   IndexMap,
-  Lyra,
+  Orama,
   OpaqueDocumentStore,
   OpaqueIndex,
   Result,
@@ -83,27 +83,27 @@ function createSearchContext(
 }
 
 export async function search<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  lyra: Lyra<S, I, D>,
+  lyra: Orama<S, I, D>,
   params: SearchParams,
   language?: string,
 ): Promise<Results> {
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params);
 
-  const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0;
+  const shouldCalculateFacets = params.facets != null && Object.keys(params.facets).length > 0;
   const { limit = 10, offset = 0, term, properties } = params;
 
   const { index, docs } = lyra.data;
   const tokens = lyra.tokenizer.tokenize(term, language);
 
   // Get searchable string properties
-  let propertiesToSearch = lyra.caches["propertiesToSearch"] as string[];
+  let propertiesToSearch = lyra.caches.propertiesToSearch as string[];
   if (!propertiesToSearch) {
     const propertiesToSearchWithTypes = await lyra.index.getSearchablePropertiesWithTypes(index);
 
     propertiesToSearch = await lyra.index.getSearchableProperties(index);
     propertiesToSearch = propertiesToSearch.filter((prop: string) => propertiesToSearchWithTypes[prop] === "string");
 
-    lyra.caches["propertiesToSearch"] = propertiesToSearch;
+    lyra.caches.propertiesToSearch = propertiesToSearch;
   }
 
   if (properties && properties !== "*") {
