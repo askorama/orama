@@ -7,7 +7,7 @@ import type {
   ClearSynonymscConfig,
   ISynonyms,
 } from "src/types";
-import { createError } from "src/errors";
+import { createError } from "../errors.js";
 
 export const availableSynonymKinds = ["oneWay", "twoWay"] as const;
 

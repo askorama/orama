@@ -1,4 +1,4 @@
-import { Orama, Schema, OpaqueDocumentStore, OpaqueIndex, SynonymConfig } from "src/types";
+import { Orama, Schema, OpaqueDocumentStore, OpaqueIndex, SynonymConfig } from "../types.js";
 
 export async function addSynonyms<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
   db: Orama<S, I, D>,
