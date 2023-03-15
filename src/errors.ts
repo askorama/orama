@@ -20,6 +20,7 @@ const errors = {
   UNKNOWN_INDEX: `Invalid property name "%s". Expected a wildcard string ("*") or array containing one of the following properties: %s`,
   INVALID_BOOST_VALUE: `Boost value must be a number greater than, or less than 0.`,
   INVALID_FILTER_OPERATION: `You can only use one operation per filter, you requested %d.`,
+  INVALID_SYNONYM_KIND: `Invalid synonym kind. Expected one of the following: %s, but got: %s.`,
 };
 
 export type ErrorCode = keyof typeof errors;

@@ -1,10 +1,4 @@
-import { getDefaultComponents } from "../components/defaults.js";
-import { createDocumentsStore } from "../components/documents-store.js";
-import { COMPLEX_COMPONENTS, SIMPLE_COMPONENTS, SIMPLE_OR_ARRAY_COMPONENTS } from "../components/hooks.js";
-import { createIndex } from "../components/index.js";
-import { createError } from "../errors.js";
-import { createTokenizer } from "../tokenizer/index.js";
-import {
+import type {
   ArrayCallbackComponents,
   Components,
   IDocumentsStore,
@@ -15,7 +9,15 @@ import {
   Schema,
   SimpleComponents,
   SimpleOrArrayCallbackComponents,
+  ISynonyms
 } from "../types.js";
+import { getDefaultComponents } from "../components/defaults.js";
+import { createDocumentsStore } from "../components/documents-store.js";
+import { COMPLEX_COMPONENTS, SIMPLE_COMPONENTS, SIMPLE_OR_ARRAY_COMPONENTS } from "../components/hooks.js";
+import { createIndex } from "../components/index.js";
+import { createSynonyms } from "../components/synonyms.js";
+import { createError } from "../errors.js";
+import { createTokenizer } from "../tokenizer/index.js";
 
 interface CreateArguments<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
   schema: Schema;
@@ -81,6 +83,7 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
   let tokenizer = components.tokenizer;
   let index = components.index;
   let documentsStore = components.documentsStore;
+  let synonyms = components.synonyms;
 
   if (!tokenizer) {
     // Use the default tokenizer
@@ -96,6 +99,10 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
 
   if (!documentsStore) {
     documentsStore = createDocumentsStore() as unknown as IDocumentsStore<S, I, D>;
+  }
+
+  if (!synonyms) {
+    synonyms = createSynonyms() as unknown as ISynonyms<S, I, D>;
   }
 
   // Validate all other components
@@ -124,6 +131,7 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
     tokenizer,
     index,
     documentsStore,
+    synonyms,
     getDocumentProperties,
     getDocumentIndexId,
     validateSchema,
@@ -141,6 +149,7 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
   lyra.data = {
     index: await lyra.index.create(lyra, schema),
     docs: await lyra.documentsStore.create(lyra),
+    synonyms: await lyra.synonyms.create(lyra),
   };
 
   return lyra;

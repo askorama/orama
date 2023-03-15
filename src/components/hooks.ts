@@ -8,7 +8,7 @@ import {
   SingleCallbackComponent,
 } from "../types.js";
 
-export const COMPLEX_COMPONENTS = ["tokenizer", "index", "documentsStore"];
+export const COMPLEX_COMPONENTS = ["tokenizer", "index", "documentsStore", "synonyms"];
 
 export const SIMPLE_COMPONENTS = ["validateSchema", "getDocumentIndexId", "getDocumentProperties", "formatElapsedTime"];
 

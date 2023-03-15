@@ -5,6 +5,7 @@ export { remove, removeMultiple } from "./methods/remove.js";
 export { update, updateMultiple } from "./methods/update.js";
 export { search } from "./methods/search.js";
 export { getByID, count } from "./methods/docs.js";
+export { addSynonyms, removeSynonyms, clearSynonyms } from "./components/synonyms.js";
 
 export * from "./types.js";
 export type { Language } from "./tokenizer/languages.js";

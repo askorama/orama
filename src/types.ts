@@ -1,3 +1,5 @@
+import { availableSynonymKinds } from './components/synonyms.js'
+
 export type Nullable<T> = T | null;
 
 export type SingleOrArray<T> = T | T[];
@@ -277,6 +279,7 @@ export interface ComplexComponent<S extends Schema, I extends OpaqueIndex, D ext
   tokenizer: Tokenizer;
   index: IIndex<S, I, D>;
   documentsStore: IDocumentsStore<S, I, D>;
+  synonyms: ISynonyms<S, I, D>;
 }
 
 export interface SimpleComponents {
@@ -333,11 +336,36 @@ export type Lyra<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocume
     tokenizer: Tokenizer;
     index: IIndex<S, I, D>;
     documentsStore: IDocumentsStore<S, I, D>;
+    synonyms: ISynonyms<S, I, D>;
     data: {
       index: I;
       docs: D;
+      synonyms: SynonymsData;
     };
     caches: Record<string, unknown>;
     [kInsertions]: number | undefined;
     [kRemovals]: number | undefined;
   };
+
+export type SynonymsData = {
+  oneWay: Record<string, string[]>;
+  twoWay: Record<string, string[]>;
+}
+
+export type SynonymConfig = {
+  kind: typeof availableSynonymKinds[number];
+  word: string;
+  synonyms: string[];
+}
+
+export type ClearSynonymscConfig = {
+  kind: typeof availableSynonymKinds[number];
+  word: string;
+}
+
+export type ISynonyms<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
+  create: <S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(db: Lyra<S, I, D>) => SynonymsData;
+  add: (data: SynonymsData, synonyms: SynonymConfig) => Promise<void> | void;
+  remove: (data: SynonymsData, synonyms: SynonymConfig) => Promise<void> | void;
+  clear: (data: SynonymsData, synonyms: SynonymConfig) => Promise<void> | void;
+}

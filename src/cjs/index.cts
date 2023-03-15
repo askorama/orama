@@ -5,6 +5,7 @@ import type { remove as esmRemove, removeMultiple as esmRemoveMultiple } from ".
 import type { search as esmSearch } from "../methods/search.js";
 import type { load as esmLoad, save as esmSave } from "../methods/serialization.js";
 import type { update as esmUpdate, updateMultiple as esmUpdateMultiple } from "../methods/update.js";
+import type { addSynonyms as esmAddSynonyms, removeSynonyms as esmRemoveSynonyms, clearSynonyms as esmClearSynonyms } from "../components/synonyms.js";
 
 export interface LyraExport {
   count: typeof esmCount;
@@ -17,6 +18,9 @@ export interface LyraExport {
   removeMultiple: typeof esmRemoveMultiple;
   save: typeof esmSave;
   search: typeof esmSearch;
+  addSynonyms: typeof esmAddSynonyms;
+  removeSynonyms: typeof esmRemoveSynonyms;
+  clearSynonyms: typeof esmClearSynonyms;
 }
 
 export type RequireCallback = (err: Error | undefined, lyra?: LyraExport) => void;
@@ -33,6 +37,9 @@ let _esmSave: typeof esmSave;
 let _esmSearch: typeof esmSearch;
 let _esmUpdate: typeof esmUpdate;
 let _esmUpdateMultiple: typeof esmUpdateMultiple;
+let _esmAddSynonyms: typeof esmAddSynonyms;
+let _esmRemoveSynonyms: typeof esmRemoveSynonyms;
+let _esmClearSynonyms: typeof esmClearSynonyms;
 
 export async function count(...args: Parameters<typeof esmCount>): ReturnType<typeof esmCount> {
   if (!_esmCount) {
@@ -146,6 +153,39 @@ export async function updateMultiple(
   }
 
   return _esmUpdateMultiple(...args);
+}
+
+export async function addSynonyms(
+  ...args: Parameters<typeof esmAddSynonyms>
+): ReturnType<typeof esmAddSynonyms> {
+  if (!_esmAddSynonyms) {
+    const imported = await import("../components/synonyms.js");
+    _esmAddSynonyms = imported.addSynonyms;
+  }
+
+  return _esmAddSynonyms(...args);
+}
+
+export async function removeSynonyms(
+  ...args: Parameters<typeof esmRemoveSynonyms>
+): ReturnType<typeof esmRemoveSynonyms> {
+  if (!_esmRemoveSynonyms) {
+    const imported = await import("../components/synonyms.js");
+    _esmRemoveSynonyms = imported.removeSynonyms;
+  }
+
+  return _esmRemoveSynonyms(...args);
+}
+
+export async function clearSynonyms(
+  ...args: Parameters<typeof esmClearSynonyms>
+): ReturnType<typeof esmClearSynonyms> {
+  if (!_esmClearSynonyms) {
+    const imported = await import("../components/synonyms.js");
+    _esmClearSynonyms = imported.clearSynonyms;
+  }
+
+  return _esmClearSynonyms(...args);
 }
 
 export function requireLyra(callback: RequireCallback): void {
