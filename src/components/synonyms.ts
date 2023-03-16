@@ -5,6 +5,7 @@ import type {
   SynonymsData,
   SynonymConfig,
   ClearSynonymscConfig,
+  GetSynonymsConfig,
   ISynonyms,
 } from "src/types";
 import { createError } from "../errors.js";
@@ -56,7 +57,7 @@ function clear(synonyms: SynonymsData, config: ClearSynonymscConfig) {
   }
 }
 
-export function getSynonyms(synonyms: SynonymsData, config: SynonymConfig) {
+export function get(synonyms: SynonymsData, config: GetSynonymsConfig) {
   const { kind, word } = config;
 
   if (!availableSynonymKinds.includes(kind)) {
@@ -75,6 +76,7 @@ export function createSynonyms<S extends Schema, I extends OpaqueIndex, D extend
     create,
     add,
     remove,
+    get,
     clear,
   };
 }

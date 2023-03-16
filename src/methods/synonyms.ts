@@ -20,3 +20,10 @@ export async function clearSynonyms<S extends Schema, I extends OpaqueIndex, D e
 ) {
   db.synonyms.clear(db.data.synonyms, config);
 }
+
+export async function getSynonyms<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
+  db: Orama<S, I, D>,
+  config: ClearSynonymscConfig,
+) {
+  return db.synonyms.get(db.data.synonyms, config);
+}
