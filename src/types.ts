@@ -216,18 +216,11 @@ export type Results = {
   facets?: FacetResult;
 };
 
-export type SingleCallbackComponent<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = (
-  orama: Orama<S, I, D>,
-  id: string,
-  doc?: Document,
-) => SyncOrAsyncValue;
+export type SingleCallbackComponent = (orama: Orama, id: string, doc?: Document) => SyncOrAsyncValue;
 
-export type MultipleCallbackComponent<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = (
-  orama: Orama<S, I, D>,
-  doc: Document[] | string[],
-) => SyncOrAsyncValue;
+export type MultipleCallbackComponent = (orama: Orama, doc: Document[] | string[]) => SyncOrAsyncValue;
 
-export type IIndexInsertOrRemoveFunction<I, R = void> = (
+export type IIndexInsertOrRemoveFunction<I extends OpaqueIndex = OpaqueIndex, R = void> = (
   index: I,
   id: string,
   prop: string,
@@ -237,10 +230,14 @@ export type IIndexInsertOrRemoveFunction<I, R = void> = (
   docsCount: number,
 ) => SyncOrAsyncValue<R>;
 
-export type IIndexRemoveFunction<I> = (index: I, id: string, prop: string) => SyncOrAsyncValue;
+export type IIndexRemoveFunction<I extends OpaqueIndex = OpaqueIndex> = (
+  index: I,
+  id: string,
+  prop: string,
+) => SyncOrAsyncValue;
 
-export interface IIndex<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
-  create: (orama: Orama<S, I, D>, schema: Schema) => I;
+export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
+  create: (orama: Orama<{ Index: I }>, schema: Schema) => I;
 
   beforeInsert?: IIndexInsertOrRemoveFunction<I>;
   insert: IIndexInsertOrRemoveFunction<I>;
@@ -260,8 +257,8 @@ export interface IIndex<S extends Schema, I extends OpaqueIndex, D extends Opaqu
   save<R = unknown>(index: I): R | Promise<R>;
 }
 
-export interface IDocumentsStore<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
-  create: (orama: Orama<S, I, D>) => D;
+export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentStore> {
+  create: (orama: Orama<{ DocumentStore: D }>) => D;
   get(store: D, id: string): SyncOrAsyncValue<Document | undefined>;
   getMultiple(store: D, ids: string[]): SyncOrAsyncValue<(Document | undefined)[]>;
   store(store: D, id: string, doc: Document): SyncOrAsyncValue<boolean>;
@@ -276,77 +273,54 @@ export interface Tokenizer {
   tokenize: (raw: string, language?: string) => string[];
 }
 
-export interface ComplexComponent<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
+export interface ComplexComponent {
   tokenizer: Tokenizer;
-  index: IIndex<S, I, D>;
-  documentsStore: IDocumentsStore<S, I, D>;
-  synonyms: ISynonyms<S, I, D>;
+  index: IIndex;
+  documentsStore: IDocumentsStore;
+  synonyms: ISynonyms;
 }
 
-export interface SimpleComponents {
-  validateSchema(doc: Document, schema: Schema): SyncOrAsyncValue<boolean>;
+export interface SimpleComponents<S extends Schema = Schema> {
+  validateSchema(doc: Document, schema: S): SyncOrAsyncValue<boolean>;
   getDocumentIndexId(doc: Document): SyncOrAsyncValue<string>;
   getDocumentProperties(doc: Document, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>;
   formatElapsedTime(number: bigint): SyncOrAsyncValue<bigint> | SyncOrAsyncValue<string>;
 }
 
-export interface SimpleOrArrayCallbackComponents<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-> {
-  beforeInsert: SingleOrArray<SingleCallbackComponent<S, I, D>>;
-  afterInsert: SingleOrArray<SingleCallbackComponent<S, I, D>>;
-  beforeRemove: SingleOrArray<SingleCallbackComponent<S, I, D>>;
-  afterRemove: SingleOrArray<SingleCallbackComponent<S, I, D>>;
-  beforeUpdate: SingleOrArray<SingleCallbackComponent<S, I, D>>;
-  afterUpdate: SingleOrArray<SingleCallbackComponent<S, I, D>>;
-  beforeMultipleInsert: SingleOrArray<MultipleCallbackComponent<S, I, D>>;
-  afterMultipleInsert: SingleOrArray<MultipleCallbackComponent<S, I, D>>;
-  beforeMultipleRemove: SingleOrArray<MultipleCallbackComponent<S, I, D>>;
-  afterMultipleRemove: SingleOrArray<MultipleCallbackComponent<S, I, D>>;
-  beforeMultipleUpdate: SingleOrArray<MultipleCallbackComponent<S, I, D>>;
-  afterMultipleUpdate: SingleOrArray<MultipleCallbackComponent<S, I, D>>;
+export interface SimpleOrArrayCallbackComponents {
+  beforeInsert: SingleOrArray<SingleCallbackComponent>;
+  afterInsert: SingleOrArray<SingleCallbackComponent>;
+  beforeRemove: SingleOrArray<SingleCallbackComponent>;
+  afterRemove: SingleOrArray<SingleCallbackComponent>;
+  beforeUpdate: SingleOrArray<SingleCallbackComponent>;
+  afterUpdate: SingleOrArray<SingleCallbackComponent>;
+  beforeMultipleInsert: SingleOrArray<MultipleCallbackComponent>;
+  afterMultipleInsert: SingleOrArray<MultipleCallbackComponent>;
+  beforeMultipleRemove: SingleOrArray<MultipleCallbackComponent>;
+  afterMultipleRemove: SingleOrArray<MultipleCallbackComponent>;
+  beforeMultipleUpdate: SingleOrArray<MultipleCallbackComponent>;
+  afterMultipleUpdate: SingleOrArray<MultipleCallbackComponent>;
 }
 
-export interface ArrayCallbackComponents<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
-  beforeInsert: SingleCallbackComponent<S, I, D>[];
-  afterInsert: SingleCallbackComponent<S, I, D>[];
-  beforeRemove: SingleCallbackComponent<S, I, D>[];
-  afterRemove: SingleCallbackComponent<S, I, D>[];
-  beforeUpdate: SingleCallbackComponent<S, I, D>[];
-  afterUpdate: SingleCallbackComponent<S, I, D>[];
-  beforeMultipleInsert: MultipleCallbackComponent<S, I, D>[];
-  afterMultipleInsert: MultipleCallbackComponent<S, I, D>[];
-  beforeMultipleRemove: MultipleCallbackComponent<S, I, D>[];
-  afterMultipleRemove: MultipleCallbackComponent<S, I, D>[];
-  beforeMultipleUpdate: MultipleCallbackComponent<S, I, D>[];
-  afterMultipleUpdate: MultipleCallbackComponent<S, I, D>[];
+export interface ArrayCallbackComponents {
+  beforeInsert: SingleCallbackComponent[];
+  afterInsert: SingleCallbackComponent[];
+  beforeRemove: SingleCallbackComponent[];
+  afterRemove: SingleCallbackComponent[];
+  beforeUpdate: SingleCallbackComponent[];
+  afterUpdate: SingleCallbackComponent[];
+  beforeMultipleInsert: MultipleCallbackComponent[];
+  afterMultipleInsert: MultipleCallbackComponent[];
+  beforeMultipleRemove: MultipleCallbackComponent[];
+  afterMultipleRemove: MultipleCallbackComponent[];
+  beforeMultipleUpdate: MultipleCallbackComponent[];
+  afterMultipleUpdate: MultipleCallbackComponent[];
 }
 
-export type Components<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = Partial<
-  ComplexComponent<S, I, D> & SimpleComponents & SimpleOrArrayCallbackComponents<S, I, D>
->;
+export type Components = Partial<ComplexComponent & SimpleComponents & SimpleOrArrayCallbackComponents>;
 
 export const kInsertions = Symbol("orama.insertions");
 export const kRemovals = Symbol("orama.removals");
-
-export type Orama<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = SimpleComponents &
-  ArrayCallbackComponents<S, I, D> & {
-    schema: S;
-    tokenizer: Tokenizer;
-    index: IIndex<S, I, D>;
-    documentsStore: IDocumentsStore<S, I, D>;
-    synonyms: ISynonyms<S, I, D>;
-    data: {
-      index: I;
-      docs: D;
-      synonyms: SynonymsData;
-    };
-    caches: Record<string, unknown>;
-    [kInsertions]: number | undefined;
-    [kRemovals]: number | undefined;
-  };
 
 export type SynonymsData = {
   oneWay: Matrix;
@@ -376,3 +350,25 @@ export type ISynonyms<S extends Schema, I extends OpaqueIndex, D extends OpaqueD
   get: (data: SynonymsData, config: GetSynonymsConfig) => Promise<string[]> | string[];
   clear: (data: SynonymsData, config: ClearSynonymscConfig) => Promise<void> | void;
 };
+
+type ProvidedTypes = Partial<{ Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore }>;
+
+type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
+  schema: S;
+  tokenizer: Tokenizer;
+  index: IIndex<I>;
+  documentsStore: IDocumentsStore<D>;
+  data: {
+    index: I;
+    docs: D;
+  };
+  caches: Record<string, unknown>;
+  [kInsertions]: number | undefined;
+  [kRemovals]: number | undefined;
+};
+
+export type Orama<
+  P extends ProvidedTypes = { Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore },
+> = SimpleComponents &
+  ArrayCallbackComponents &
+  Internals<Schema & P["Schema"], OpaqueIndex & P["Index"], OpaqueDocumentStore & P["DocumentStore"]>;

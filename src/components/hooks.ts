@@ -1,12 +1,4 @@
-import {
-  Document,
-  Orama,
-  MultipleCallbackComponent,
-  OpaqueDocumentStore,
-  OpaqueIndex,
-  Schema,
-  SingleCallbackComponent,
-} from "../types.js";
+import { Document, MultipleCallbackComponent, Orama, SingleCallbackComponent } from "../types.js";
 
 export const COMPLEX_COMPONENTS = ["tokenizer", "index", "documentsStore", "synonyms"];
 
@@ -27,9 +19,9 @@ export const SIMPLE_OR_ARRAY_COMPONENTS = [
   "afterMultipleUpdate",
 ];
 
-export async function runSingleHook<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  hooks: SingleCallbackComponent<S, I, D>[],
-  orama: Orama<S, I, D>,
+export async function runSingleHook(
+  hooks: SingleCallbackComponent[],
+  orama: Orama,
   id: string,
   doc?: Document,
 ): Promise<void> {
@@ -38,9 +30,9 @@ export async function runSingleHook<S extends Schema, I extends OpaqueIndex, D e
   }
 }
 
-export async function runMultipleHook<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  hooks: MultipleCallbackComponent<S, I, D>[],
-  orama: Orama<S, I, D>,
+export async function runMultipleHook(
+  hooks: MultipleCallbackComponent[],
+  orama: Orama,
   docsOrIds: Document[] | string[],
 ): Promise<void> {
   for (let i = 0; i < hooks.length; i++) {

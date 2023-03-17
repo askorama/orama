@@ -2,19 +2,7 @@ import { prioritizeTokenScores } from "../components/algorithms.js";
 import { getFacets } from "../components/facets.js";
 import { intersectFilteredIDs } from "../components/filters.js";
 import { createError } from "../errors.js";
-import {
-  BM25Params,
-  IndexMap,
-  Orama,
-  OpaqueDocumentStore,
-  OpaqueIndex,
-  Result,
-  Results,
-  Schema,
-  SearchContext,
-  SearchParams,
-  TokenMap,
-} from "../types.js";
+import { BM25Params, IndexMap, Orama, Result, Results, SearchContext, SearchParams, TokenMap } from "../types.js";
 import { getNanosecondsTime, sortTokenScorePredicate } from "../utils.js";
 
 const defaultBM25Params: BM25Params = {
@@ -82,11 +70,7 @@ function createSearchContext(
   };
 }
 
-export async function search<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  orama: Orama<S, I, D>,
-  params: SearchParams,
-  language?: string,
-): Promise<Results> {
+export async function search(orama: Orama, params: SearchParams, language?: string): Promise<Results> {
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params);
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0;

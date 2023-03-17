@@ -19,6 +19,11 @@
       "import": "./dist/internals.js",
       "require": "./dist/cjs/internals.cjs"
     },
+    "./components": {
+      "types": "./dist/components.d.ts",
+      "import": "./dist/components.js",
+      "require": "./dist/cjs/components.cjs"
+    },
     "./stemmer/*": {
       "types": "./dist/stemmer/*.d.ts",
       "import": "./dist/stemmer/*.js",
@@ -31,6 +36,10 @@
     "./cjs/internals": {
       "types": "./dist/cjs/internals.d.cts",
       "require": "./dist/cjs/internals.cjs"
+    },
+    "./cjs/components": {
+      "types": "./dist/cjs/components.d.cts",
+      "require": "./dist/cjs/components.cjs"
     },
     "./cjs/stemmer/*": {
       "types": "./dist/cjs/stemmer/*.d.cts",
