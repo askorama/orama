@@ -1,24 +1,24 @@
-import { Document, IDocumentsStore, OpaqueDocumentStore, OpaqueIndex, Schema } from "../types.js";
+import { Document, IDocumentsStore, OpaqueDocumentStore } from "../types.js";
 
 export interface DocumentsStore extends OpaqueDocumentStore {
   docs: Record<string, Document | undefined>;
   count: number;
 }
 
-type DefaultDocumentsStore<S extends Schema, I extends OpaqueIndex> = IDocumentsStore<S, I, DocumentsStore>;
+export type DefaultDocumentsStore = IDocumentsStore<DocumentsStore>;
 
-function create(): DocumentsStore {
+export function create(): DocumentsStore {
   return {
     docs: {},
     count: 0,
   };
 }
 
-function get(store: DocumentsStore, id: string): Document | undefined {
+export function get(store: DocumentsStore, id: string): Document | undefined {
   return store.docs[id];
 }
 
-function getMultiple(store: DocumentsStore, ids: string[]): (Document | undefined)[] {
+export function getMultiple(store: DocumentsStore, ids: string[]): (Document | undefined)[] {
   const found: (Document | undefined)[] = Array.from({ length: ids.length });
 
   for (let i = 0; i < ids.length; i++) {
@@ -28,7 +28,7 @@ function getMultiple(store: DocumentsStore, ids: string[]): (Document | undefine
   return found;
 }
 
-function store(store: DocumentsStore, id: string, doc: Document): boolean {
+export function store(store: DocumentsStore, id: string, doc: Document): boolean {
   if (typeof store.docs[id] !== "undefined") {
     return false;
   }
@@ -39,7 +39,7 @@ function store(store: DocumentsStore, id: string, doc: Document): boolean {
   return true;
 }
 
-function remove(store: DocumentsStore, id: string): boolean {
+export function remove(store: DocumentsStore, id: string): boolean {
   if (typeof store.docs[id] === "undefined") {
     return false;
   }
@@ -50,11 +50,11 @@ function remove(store: DocumentsStore, id: string): boolean {
   return true;
 }
 
-function count(store: DocumentsStore): number {
+export function count(store: DocumentsStore): number {
   return store.count;
 }
 
-function load<R = unknown>(raw: R): DocumentsStore {
+export function load<R = unknown>(raw: R): DocumentsStore {
   const rawDocument = raw as DocumentsStore;
 
   return {
@@ -63,14 +63,14 @@ function load<R = unknown>(raw: R): DocumentsStore {
   };
 }
 
-function save<R = unknown>(docs: DocumentsStore): R {
+export function save<R = unknown>(docs: DocumentsStore): R {
   return {
     docs: docs.docs,
     count: docs.count,
   } as R;
 }
 
-export function createDocumentsStore<S extends Schema, I extends OpaqueIndex>(): DefaultDocumentsStore<S, I> {
+export function createDocumentsStore(): DefaultDocumentsStore {
   return {
     create,
     get,
