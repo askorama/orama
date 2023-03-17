@@ -1,6 +1,12 @@
 import t from "tap";
 import { create } from "../src/methods/create.js";
-import { addSynonyms, removeSynonyms, clearSynonyms, getSynonyms, getAlternateQueries } from "../src/methods/synonyms.js";
+import {
+  addSynonyms,
+  removeSynonyms,
+  clearSynonyms,
+  getSynonyms,
+  getAlternateQueries,
+} from "../src/methods/synonyms.js";
 
 t.test("add synonyms", async t => {
   t.plan(2);
@@ -191,7 +197,7 @@ t.test("get alternate queries", async t => {
   const db = await create({
     schema: {
       name: "string",
-    }
+    },
   });
 
   await addSynonyms(db, {
@@ -215,7 +221,6 @@ t.test("get alternate queries", async t => {
     "this iPhone is not low priced",
     "this iPhone is not affordable",
   ]);
-
 });
 
 t.test("get alternate queries - more complex synonyms and query", async t => {
@@ -224,7 +229,7 @@ t.test("get alternate queries - more complex synonyms and query", async t => {
   const db = await create({
     schema: {
       name: "string",
-    }
+    },
   });
 
   await addSynonyms(db, {
@@ -263,9 +268,13 @@ t.test("get alternate queries - more complex synonyms and query", async t => {
     synonyms: ["leaps", "hops", "bounces"],
   });
 
-  const result = await getAlternateQueries(db, ["the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog"], {
-    limit: 20,
-  });
+  const result = await getAlternateQueries(
+    db,
+    ["the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog"],
+    {
+      limit: 20,
+    },
+  );
 
   t.same(result, [
     "the fast brown fox jumps over the lazy dog",
@@ -287,5 +296,4 @@ t.test("get alternate queries - more complex synonyms and query", async t => {
     "the quick brown fox jumps over the lazy pet",
     "the quick brown fox jumps over the lazy puppy",
   ]);
-
 });

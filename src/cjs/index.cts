@@ -9,6 +9,8 @@ import type {
   addSynonyms as esmAddSynonyms,
   removeSynonyms as esmRemoveSynonyms,
   clearSynonyms as esmClearSynonyms,
+  getAlternateQueries as esmGetAlternateQueries,
+  getSynonyms as esmGetSynonyms,
 } from "../methods/synonyms.js";
 
 export interface OramaExport {
@@ -25,6 +27,8 @@ export interface OramaExport {
   addSynonyms: typeof esmAddSynonyms;
   removeSynonyms: typeof esmRemoveSynonyms;
   clearSynonyms: typeof esmClearSynonyms;
+  getAlternateQueries: typeof esmGetAlternateQueries;
+  getSynonyms: typeof esmGetSynonyms;
 }
 
 export type RequireCallback = (err: Error | undefined, orama?: OramaExport) => void;
@@ -44,6 +48,8 @@ let _esmUpdateMultiple: typeof esmUpdateMultiple;
 let _esmAddSynonyms: typeof esmAddSynonyms;
 let _esmRemoveSynonyms: typeof esmRemoveSynonyms;
 let _esmClearSynonyms: typeof esmClearSynonyms;
+let _esmGetAlternateQueries: typeof esmGetAlternateQueries;
+let _esmGetSynonyms: typeof esmGetSynonyms;
 
 export async function count(...args: Parameters<typeof esmCount>): ReturnType<typeof esmCount> {
   if (!_esmCount) {
@@ -186,6 +192,26 @@ export async function clearSynonyms(...args: Parameters<typeof esmClearSynonyms>
   }
 
   return _esmClearSynonyms(...args);
+}
+
+export async function getAlternateQueries(
+  ...args: Parameters<typeof esmGetAlternateQueries>
+): ReturnType<typeof esmGetAlternateQueries> {
+  if (!_esmGetAlternateQueries) {
+    const imported = await import("../methods/synonyms.js");
+    _esmGetAlternateQueries = imported.getAlternateQueries;
+  }
+
+  return _esmGetAlternateQueries(...args);
+}
+
+export async function getSynonyms(...args: Parameters<typeof esmGetSynonyms>): ReturnType<typeof esmGetSynonyms> {
+  if (!_esmGetSynonyms) {
+    const imported = await import("../methods/synonyms.js");
+    _esmGetSynonyms = imported.getSynonyms;
+  }
+
+  return _esmGetSynonyms(...args);
 }
 
 export function requireOrama(callback: RequireCallback): void {

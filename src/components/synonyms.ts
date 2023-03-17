@@ -1,4 +1,11 @@
-import type { SynonymsData, SynonymConfig, ClearSynonymscConfig, GetSynonymsConfig, ISynonyms, AlternateQueriesOptions } from "src/types";
+import type {
+  SynonymsData,
+  SynonymConfig,
+  ClearSynonymscConfig,
+  GetSynonymsConfig,
+  ISynonyms,
+  AlternateQueriesOptions,
+} from "src/types";
 
 import {
   createGraph,
@@ -74,10 +81,14 @@ export function get(synonyms: SynonymsData, config: GetSynonymsConfig) {
 
 const defaultOptions: AlternateQueriesOptions = {
   limit: 10,
-  cache: new Map<string, string[]>()
-}
+  cache: new Map<string, string[]>(),
+};
 
-export function getAlternateQueries(synonyms: SynonymsData, tokens: string[], options?: AlternateQueriesOptions): string[] {
+export function getAlternateQueries(
+  synonyms: SynonymsData,
+  tokens: string[],
+  options?: AlternateQueriesOptions,
+): string[] {
   options = { ...defaultOptions, ...options };
   const { limit, cache } = options;
   const alternateQueries = new Set<string>();
@@ -92,7 +103,7 @@ export function getAlternateQueries(synonyms: SynonymsData, tokens: string[], op
       cache!.set(token, cachedSynonyms);
     }
 
-    for (const synonym of (cachedSynonyms ?? [])) {
+    for (const synonym of cachedSynonyms ?? []) {
       const alternateQueryTerms = [...tokens];
       const termIndex = alternateQueryTerms.indexOf(token);
       alternateQueryTerms[termIndex] = synonym;
@@ -116,6 +127,6 @@ export function createSynonyms(): ISynonyms {
     remove,
     get,
     clear,
-    getAlternateQueries
+    getAlternateQueries,
   };
 }
