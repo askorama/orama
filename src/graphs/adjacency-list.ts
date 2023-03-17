@@ -48,3 +48,16 @@ export function getAllValues(graph: Matrix, word: string): string[] {
 
   return results;
 }
+
+export function removeUndirectedValue(graph: Matrix, value1: string, value2: string): void {
+  if (hasUndirectedValue(graph, value1, value2)) {
+    delete graph[value1][value2];
+    delete graph[value2][value1];
+  }
+}
+
+export function removeDirectedValue(graph: Matrix, value1: string, value2: string): void {
+  if (hasDirectedValue(graph, value1, value2)) {
+    delete graph[value1][value2];
+  }
+}
