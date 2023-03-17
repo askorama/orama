@@ -1,14 +1,9 @@
 import { runMultipleHook, runSingleHook } from "../components/hooks.js";
-import { createError } from "../errors.js";
 import { trackInsertion } from "../components/sync-blocking-checker.js";
-import { Document, Schema, OpaqueIndex, OpaqueDocumentStore, Orama } from "../types.js";
+import { createError } from "../errors.js";
+import { Document, Orama } from "../types.js";
 
-export async function insert<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  orama: Orama<S, I, D>,
-  doc: Document,
-  language?: string,
-  skipHooks?: boolean,
-): Promise<string> {
+export async function insert(orama: Orama, doc: Document, language?: string, skipHooks?: boolean): Promise<string> {
   await orama.validateSchema(doc, orama.schema);
   const { index, docs } = orama.data;
 
@@ -66,8 +61,8 @@ export async function insert<S extends Schema, I extends OpaqueIndex, D extends 
   return id;
 }
 
-export async function insertMultiple<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  orama: Orama<S, I, D>,
+export async function insertMultiple(
+  orama: Orama,
   docs: Document[],
   batchSize?: number,
   language?: string,

@@ -10,22 +10,18 @@ import {
   IDocumentsStore,
   IIndex,
   Orama,
-  OpaqueDocumentStore,
-  OpaqueIndex,
   Schema,
   SimpleComponents,
   SimpleOrArrayCallbackComponents,
 } from "../types.js";
 
-interface CreateArguments<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> {
+interface CreateArguments {
   schema: Schema;
   language?: string;
-  components?: Components<S, I, D>;
+  components?: Components;
 }
 
-function validateComponents<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  components: Components<S, I, D>,
-) {
+function validateComponents(components: Components) {
   const defaultComponents = getDefaultComponents();
 
   for (const rawKey of SIMPLE_COMPONENTS) {
@@ -42,7 +38,7 @@ function validateComponents<S extends Schema, I extends OpaqueIndex, D extends O
   }
 
   for (const rawKey of SIMPLE_OR_ARRAY_COMPONENTS) {
-    const key = rawKey as keyof ArrayCallbackComponents<S, I, D>;
+    const key = rawKey as keyof ArrayCallbackComponents;
 
     if (!components[key]) {
       components[key] = [];
@@ -51,7 +47,7 @@ function validateComponents<S extends Schema, I extends OpaqueIndex, D extends O
       components[key] = [components[key]];
     }
 
-    for (const fn of components[key] as unknown as SimpleOrArrayCallbackComponents<S, I, D>[]) {
+    for (const fn of components[key] as unknown as SimpleOrArrayCallbackComponents[]) {
       if (typeof fn !== "function") {
         throw createError("COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS", key);
       }
@@ -69,11 +65,7 @@ function validateComponents<S extends Schema, I extends OpaqueIndex, D extends O
   }
 }
 
-export async function create<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>({
-  schema,
-  language,
-  components,
-}: CreateArguments<S, I, D>): Promise<Orama<S, I, D>> {
+export async function create({ schema, language, components }: CreateArguments): Promise<Orama> {
   if (!components) {
     components = {};
   }
@@ -91,15 +83,15 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
   }
 
   if (!index) {
-    index = createIndex() as unknown as IIndex<S, I, D>;
+    index = createIndex() as unknown as IIndex;
   }
 
   if (!documentsStore) {
-    documentsStore = createDocumentsStore() as unknown as IDocumentsStore<S, I, D>;
+    documentsStore = createDocumentsStore() as unknown as IDocumentsStore;
   }
 
   // Validate all other components
-  validateComponents<S, I, D>(components);
+  validateComponents(components);
 
   // Assign only recognized components and hooks
   const {
@@ -136,7 +128,7 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
     beforeMultipleRemove,
     afterMultipleRemove,
     formatElapsedTime,
-  } as Orama<S, I, D>;
+  } as Orama;
 
   orama.data = {
     index: await orama.index.create(orama, schema),

@@ -20,9 +20,8 @@ import {
   BM25Params,
   ComparisonOperator,
   IIndex,
-  Orama,
-  OpaqueDocumentStore,
   OpaqueIndex,
+  Orama,
   Schema,
   SearchableType,
   SearchableValue,
@@ -33,7 +32,7 @@ import {
 import { intersect } from "../utils.js";
 import { BM25 } from "./algorithms.js";
 
-type FrequencyMap = {
+export type FrequencyMap = {
   [property: string]: {
     [documentID: string]:
       | {
@@ -43,7 +42,7 @@ type FrequencyMap = {
   };
 };
 
-type BooleanIndex = {
+export type BooleanIndex = {
   true: string[];
   false: string[];
 };
@@ -58,14 +57,9 @@ export interface Index extends OpaqueIndex {
   fieldLengths: Record<string, Record<string, number | undefined>>;
 }
 
-type DefaultIndex<S extends Schema, D extends OpaqueDocumentStore> = IIndex<S, Index, D>;
+export type DefaultIndex = IIndex<Index>;
 
-function create<S extends Schema, D extends OpaqueDocumentStore>(
-  orama: Orama<S, Index, D>,
-  schema: Schema,
-  index?: Index,
-  prefix = "",
-): Index {
+export function create(orama: Orama<{ Index: Index }>, schema: Schema, index?: Index, prefix = ""): Index {
   if (!index) {
     index = {
       indexes: {},
@@ -114,7 +108,7 @@ function create<S extends Schema, D extends OpaqueDocumentStore>(
   return index;
 }
 
-function insert(
+export function insert(
   index: Index,
   prop: string,
   id: string,
@@ -164,7 +158,7 @@ function insert(
   }
 }
 
-function remove(
+export function remove(
   index: Index,
   prop: string,
   id: string,
@@ -199,7 +193,7 @@ function remove(
   return true;
 }
 
-function search(index: Index, prop: string, term: string, context: SearchContext): TokenScore[] {
+export function search(index: Index, prop: string, term: string, context: SearchContext): TokenScore[] {
   if (!(prop in index.tokenOccurrencies)) {
     return [];
   }
@@ -251,7 +245,7 @@ function search(index: Index, prop: string, term: string, context: SearchContext
   return scoreList;
 }
 
-function searchByWhereClause(index: Index, filters: Record<string, boolean | ComparisonOperator>): string[] {
+export function searchByWhereClause(index: Index, filters: Record<string, boolean | ComparisonOperator>): string[] {
   const filterKeys = Object.keys(filters);
 
   const filtersMap: Record<string, string[]> = filterKeys.reduce(
@@ -323,15 +317,15 @@ function searchByWhereClause(index: Index, filters: Record<string, boolean | Com
   return result;
 }
 
-function getSearchableProperties(index: Index): string[] {
+export function getSearchableProperties(index: Index): string[] {
   return index.searchableProperties;
 }
 
-function getSearchablePropertiesWithTypes(index: Index): Record<string, "string" | "number" | "boolean"> {
+export function getSearchablePropertiesWithTypes(index: Index): Record<string, "string" | "number" | "boolean"> {
   return index.searchablePropertiesWithTypes;
 }
 
-function load<R = unknown>(raw: R): Index {
+export function load<R = unknown>(raw: R): Index {
   const {
     indexes,
     searchableProperties,
@@ -353,7 +347,7 @@ function load<R = unknown>(raw: R): Index {
   };
 }
 
-function save<R = unknown>(index: Index): R {
+export function save<R = unknown>(index: Index): R {
   const {
     indexes,
     searchableProperties,
@@ -375,7 +369,7 @@ function save<R = unknown>(index: Index): R {
   } as R;
 }
 
-export function createIndex<S extends Schema, D extends OpaqueDocumentStore>(): DefaultIndex<S, D> {
+export function createIndex(): DefaultIndex {
   return {
     create,
     insert,
