@@ -343,8 +343,8 @@ export type GetSynonymsConfig = {
   word: string;
 };
 
-export type ISynonyms<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
-  create: <S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(db: Orama<S, I, D>) => SynonymsData;
+export type ISynonyms = {
+  create: (db: Orama) => SynonymsData;
   add: (data: SynonymsData, config: SynonymConfig) => Promise<void> | void;
   remove: (data: SynonymsData, config: SynonymConfig) => Promise<void> | void;
   get: (data: SynonymsData, config: GetSynonymsConfig) => Promise<string[]> | string[];
@@ -358,9 +358,11 @@ type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocument
   tokenizer: Tokenizer;
   index: IIndex<I>;
   documentsStore: IDocumentsStore<D>;
+  synonyms: ISynonyms;
   data: {
     index: I;
     docs: D;
+    synonyms: SynonymsData;
   };
   caches: Record<string, unknown>;
   [kInsertions]: number | undefined;

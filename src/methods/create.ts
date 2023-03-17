@@ -94,7 +94,7 @@ export async function create({ schema, language, components }: CreateArguments):
   }
 
   if (!synonyms) {
-    synonyms = createSynonyms() as unknown as ISynonyms<S, I, D>;
+    synonyms = createSynonyms() as unknown as ISynonyms;
   }
 
   // Validate all other components
