@@ -21,3 +21,4 @@ fd . -e js dist/cjs/ -x mv {} {.}.cjs
 fd . -e ts dist/cjs/ -x mv {} {.}.cts
 mv dist/cjs/index.js.map dist/cjs/index.cjs.map
 mv dist/cjs/internals.js.map dist/cjs/internals.cjs.map
+mv dist/cjs/components.js.map dist/cjs/components.cjs.map
