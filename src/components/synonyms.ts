@@ -1,7 +1,4 @@
 import type {
-  Schema,
-  OpaqueIndex,
-  OpaqueDocumentStore,
   SynonymsData,
   SynonymConfig,
   ClearSynonymscConfig,
