@@ -366,7 +366,7 @@ export type ClearSynonymscConfig = {
 export type GetSynonymsConfig = {
   kind: typeof availableSynonymKinds[number];
   word: string;
-}
+};
 
 export type ISynonyms<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
   create: <S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(db: Orama<S, I, D>) => SynonymsData;
