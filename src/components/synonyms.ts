@@ -1,10 +1,4 @@
-import type {
-  SynonymsData,
-  SynonymConfig,
-  ClearSynonymscConfig,
-  GetSynonymsConfig,
-  ISynonyms,
-} from "src/types";
+import type { SynonymsData, SynonymConfig, ClearSynonymscConfig, GetSynonymsConfig, ISynonyms, AlternateQueriesOptions } from "src/types";
 
 import {
   createGraph,
@@ -78,6 +72,43 @@ export function get(synonyms: SynonymsData, config: GetSynonymsConfig) {
   return getAllValues(synonyms[kind], word);
 }
 
+const defaultOptions: AlternateQueriesOptions = {
+  limit: 10,
+  cache: new Map<string, string[]>()
+}
+
+export function getAlternateQueries(synonyms: SynonymsData, tokens: string[], options?: AlternateQueriesOptions): string[] {
+  options = { ...defaultOptions, ...options };
+  const { limit, cache } = options;
+  const alternateQueries = new Set<string>();
+
+  for (const token of tokens) {
+    let cachedSynonyms = cache!.get(token);
+
+    if (!cachedSynonyms) {
+      const oneWay = get(synonyms, { kind: "oneWay", word: token });
+      const twoWay = get(synonyms, { kind: "twoWay", word: token });
+      cachedSynonyms = [...oneWay, ...twoWay];
+      cache!.set(token, cachedSynonyms);
+    }
+
+    for (const synonym of (cachedSynonyms ?? [])) {
+      const alternateQueryTerms = [...tokens];
+      const termIndex = alternateQueryTerms.indexOf(token);
+      alternateQueryTerms[termIndex] = synonym;
+
+      const alternateQuery = alternateQueryTerms.join(" ");
+      alternateQueries.add(alternateQuery);
+
+      if (alternateQueries.size >= limit!) {
+        return [...alternateQueries];
+      }
+    }
+  }
+
+  return [...alternateQueries];
+}
+
 export function createSynonyms(): ISynonyms {
   return {
     create,
@@ -85,5 +116,6 @@ export function createSynonyms(): ISynonyms {
     remove,
     get,
     clear,
+    getAlternateQueries
   };
 }

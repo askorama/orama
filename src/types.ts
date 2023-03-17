@@ -349,7 +349,13 @@ export type ISynonyms = {
   remove: (data: SynonymsData, config: SynonymConfig) => Promise<void> | void;
   get: (data: SynonymsData, config: GetSynonymsConfig) => Promise<string[]> | string[];
   clear: (data: SynonymsData, config: ClearSynonymscConfig) => Promise<void> | void;
+  getAlternateQueries: (data: SynonymsData, tokens: string[], options?: AlternateQueriesOptions) => Promise<string[]> | string[];
 };
+
+export type AlternateQueriesOptions = {
+  limit?: number;
+  cache?: Map<string, string[]>
+}
 
 type ProvidedTypes = Partial<{ Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore }>;
 
