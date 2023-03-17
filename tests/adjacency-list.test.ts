@@ -58,7 +58,6 @@ t.test("addUndirectedValue", t => {
 
   addUndirectedValue(graph, "a", "b");
 
-
   t.equal(hasUndirectedValue(graph, "a", "b"), true);
   t.equal(hasUndirectedValue(graph, "b", "a"), true);
 
@@ -105,7 +104,7 @@ t.test("removeUndirectedValue", t => {
   const graph = createGraph();
 
   addUndirectedValue(graph, "a", "b");
-  addUndirectedValue(graph, "a", "c")
+  addUndirectedValue(graph, "a", "c");
 
   t.equal(hasUndirectedValue(graph, "a", "b"), true);
 

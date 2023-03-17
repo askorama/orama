@@ -1,3 +1,4 @@
+import type { Matrix } from "./graphs/adjacency-matrix.js";
 import { availableSynonymKinds } from "./components/synonyms.js";
 
 export type Nullable<T> = T | null;
@@ -348,8 +349,8 @@ export type Orama<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocum
   };
 
 export type SynonymsData = {
-  oneWay: Record<string, string[]>;
-  twoWay: Record<string, string[]>;
+  oneWay: Matrix;
+  twoWay: Matrix;
 };
 
 export type SynonymConfig = {

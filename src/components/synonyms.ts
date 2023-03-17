@@ -8,14 +8,16 @@ import type {
   GetSynonymsConfig,
   ISynonyms,
 } from "src/types";
+
+import { createGraph, addDirectedValue, addUndirectedValue, removeDirectedValue, removeUndirectedValue, getAllValues } from "src/graphs/adjacency-matrix.js";
 import { createError } from "../errors.js";
 
 export const availableSynonymKinds = ["oneWay", "twoWay"] as const;
 
 function create(): SynonymsData {
   return {
-    oneWay: {},
-    twoWay: {},
+    oneWay: createGraph(),
+    twoWay: createGraph(),
   };
 }
 
@@ -26,11 +28,14 @@ function add(synonyms: SynonymsData, config: SynonymConfig) {
     throw createError("INVALID_SYNONYM_KIND", availableSynonymKinds.join(", "), kind);
   }
 
-  if (synonyms[kind][word]) {
-    synonyms[kind][word].push(...synonymsList);
-  } else {
-    synonyms[kind][word] = synonymsList;
+  if (kind === "oneWay") {
+    synonymsList.forEach(synonym => addDirectedValue(synonyms.oneWay, word, synonym));
   }
+
+  if (kind === "twoWay") {
+    synonymsList.forEach(synonym => addUndirectedValue(synonyms.twoWay, word, synonym));
+  }
+
 }
 
 function remove(synonyms: SynonymsData, config: SynonymConfig) {
@@ -40,9 +45,14 @@ function remove(synonyms: SynonymsData, config: SynonymConfig) {
     throw createError("INVALID_SYNONYM_KIND", availableSynonymKinds.join(", "), kind);
   }
 
-  if (synonyms[kind][word]) {
-    synonyms[kind][word] = synonyms[kind][word].filter(synonym => !synonymsList.includes(synonym));
+  if (kind === "oneWay") {
+    synonymsList.forEach(synonym => removeDirectedValue(synonyms.oneWay, word, synonym));
   }
+
+  if (kind === "twoWay") {
+    synonymsList.forEach(synonym => removeUndirectedValue(synonyms.twoWay, word, synonym));
+  }
+
 }
 
 function clear(synonyms: SynonymsData, config: ClearSynonymscConfig) {
@@ -52,9 +62,7 @@ function clear(synonyms: SynonymsData, config: ClearSynonymscConfig) {
     throw createError("INVALID_SYNONYM_KIND", availableSynonymKinds.join(", "), kind);
   }
 
-  if (synonyms[kind][word]) {
-    synonyms[kind][word] = [];
-  }
+  synonyms[kind][word] = {};
 }
 
 export function get(synonyms: SynonymsData, config: GetSynonymsConfig) {
@@ -64,7 +72,7 @@ export function get(synonyms: SynonymsData, config: GetSynonymsConfig) {
     throw createError("INVALID_SYNONYM_KIND", availableSynonymKinds.join(", "), kind);
   }
 
-  return synonyms[kind][word] || [];
+  return getAllValues(synonyms[kind], word); 
 }
 
 export function createSynonyms<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(): ISynonyms<

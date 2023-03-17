@@ -23,8 +23,8 @@ t.test("add synonyms", async t => {
     synonyms: ["testTwoWay-1", "testTwoWay-2"],
   });
 
-  t.same(db.data.synonyms.oneWay.testOneWay, ["testOneWay-1", "testOneWay-2"]);
-  t.same(db.data.synonyms.twoWay.testTwoWay, ["testTwoWay-1", "testTwoWay-2"]);
+  t.same(db.data.synonyms.oneWay.testOneWay, { 'testOneWay-1': 1, 'testOneWay-2': 1 });
+  t.same(db.data.synonyms.twoWay.testTwoWay, { 'testTwoWay-1': 1, 'testTwoWay-2': 1 });
 
   t.end();
 });
@@ -62,8 +62,8 @@ t.test("remove synonyms", async t => {
     synonyms: ["testTwoWay-1"],
   });
 
-  t.same(db.data.synonyms.oneWay.testOneWay, ["testOneWay-2"]);
-  t.same(db.data.synonyms.twoWay.testTwoWay, ["testTwoWay-2"]);
+  t.same(db.data.synonyms.oneWay.testOneWay, { "testOneWay-2": 1});
+  t.same(db.data.synonyms.twoWay.testTwoWay, { "testTwoWay-2": 1});
 
   t.end();
 });
