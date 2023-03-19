@@ -1,6 +1,6 @@
 import type { InsertConfig, Orama, PropertiesSchema, SearchParams } from '@orama/orama'
-import { create as createOramaDB, insert as insertIntoOramaDB, save as saveOramaDB } from '@orama/orama'
 import type { AstroConfig, AstroIntegration, RouteData } from 'astro'
+import { create as createOramaDB, insert as insertIntoOramaDB, save as saveOramaDB } from '@orama/orama'
 import { compile } from 'html-to-text'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join as joinPath } from 'node:path'

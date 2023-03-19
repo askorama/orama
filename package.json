@@ -9,9 +9,24 @@
     "commit": "pnpm run format && pnpm lint-staged && cz",
     "format": "prettier -w packages --ignore-path ",
     "prepare": "husky install .husky",
+    "==========================================================+": "Builds",
+    "build:orama": "cd packages/orama && npm run build",
+    "build:plugin-astro": "cd packages/plugin-astro && npm run build",
+    "build:plugin-data-persistence": "cd packages/plugin-data-persistence && npm run build",
+    "build:plugin-docusaurus": "cd packages/plugin-docusaurus && npm run build",
+    "build:plugin-match-highlight": "cd packages/plugin-match-highlight && npm run build",
+    "build:plugin-parsedoc": "cd packages/plugin-parsedoc && npm run build",
+    "--build": "npm run build:orama && npm run build:plugin-astro && npm run build:plugin-data-persistence && npm run build:plugin-docusaurus && npm run build:plugin-match-highlight && npm run build:plugin-parsedoc",
+    "build": "npm run build:orama",
+    "=========================================================++": "Tests",
     "test:orama": "cd packages/orama && npm test",
     "test:plugin-astro": "cd packages/plugin-astro && npm test",
-    "test": "npm run test:orama"
+    "test:plugin-data-persistence": "cd packages/plugin-data-persistence && npm test",
+    "test:plugin-docusaurus": "cd packages/plugin-docusaurus && npm test",
+    "test:plugin-match-highlight": "cd packages/plugin-match-highlight && npm test",
+    "test:plugin-parsedoc": "cd packages/plugin-parsedoc && npm test",
+    "test": "npm run test:orama",
+    "--test": "npm run test:orama && npm run test:plugin-astro && npm run test:plugin-data-persistence && npm run test:plugin-docusaurus && npm run test:plugin-match-highlight && npm run test:plugin-parsedoc"
   },
   "devDependencies": {
     "@swc/cli": "^0.1.59",
@@ -35,7 +50,9 @@
     "tape": "^5.6.1",
     "tcompare": "^6.0.0",
     "tsx": "^3.12.1",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "nx": "15.8.7",
+    "@nrwl/nx-cloud": "latest"
   },
   "author": {
     "name": "Michele Riva",
