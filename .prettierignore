@@ -1,2 +1,8 @@
 dist
 tests/datasets/events.json
+*.svg
+*.sh
+.eslintignore
+.prettierignore
+.gitignore
+Dockerfile

@@ -1,85 +1,41 @@
 {
-  "name": "@orama/orama",
+  "name": "orama-monorepo",
   "version": "1.0.0",
-  "type": "module",
   "description": "Next generation full-text search engine, written in TypeScript",
-  "sideEffects": false,
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/cjs/index.cjs"
-    },
-    "./wasm": {
-      "types": "./dist/wasm.d.ts",
-      "import": "./dist/wasm.js"
-    },
-    "./internals": {
-      "types": "./dist/internals.d.ts",
-      "import": "./dist/internals.js",
-      "require": "./dist/cjs/internals.cjs"
-    },
-    "./components": {
-      "types": "./dist/components.d.ts",
-      "import": "./dist/components.js",
-      "require": "./dist/cjs/components.cjs"
-    },
-    "./stemmer/*": {
-      "types": "./dist/stemmer/*.d.ts",
-      "import": "./dist/stemmer/*.js",
-      "require": "./dist/cjs/stemmer/*.cjs"
-    },
-    "./cjs": {
-      "types": "./dist/cjs/index.d.cts",
-      "require": "./dist/cjs/index.cjs"
-    },
-    "./cjs/internals": {
-      "types": "./dist/cjs/internals.d.cts",
-      "require": "./dist/cjs/internals.cjs"
-    },
-    "./cjs/components": {
-      "types": "./dist/cjs/components.d.cts",
-      "require": "./dist/cjs/components.cjs"
-    },
-    "./cjs/stemmer/*": {
-      "types": "./dist/cjs/stemmer/*.d.cts",
-      "require": "./dist/cjs/stemmer/*.cjs"
-    }
-  },
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
+  "workspaces": [
+    "packages/*"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/oramasearch/orama"
-  },
-  "bugs": {
-    "url": "https://github.com/oramasearch/orama"
-  },
   "scripts": {
-    "predev": "rm -rf dist && mkdir dist && cp -a stemmer/lib dist/stemmer",
-    "dev": "swc -s -w --extensions .ts,.cts -d dist src",
-    "prebuild": "npm run lint",
-    "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",
-    "postbuild": "sh scripts/postbuild.sh",
-    "format": "prettier -w benchmarks examples src tests",
-    "lint": "eslint benchmarks examples src tests --ext .js,.ts,.cts",
-    "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
-    "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
-    "test:smoke": "tap --rcfile=tests/config/tap.yml tests/smoke/*.test.ts",
-    "ci": "npm run build && npm run test:ci && npm run test:smoke",
-    "prepare": "husky install && npm run build",
     "commit": "pnpm run format && pnpm lint-staged && cz",
-    "benchmark": "node --no-warnings benchmarks/src/typo-tolerant-search.js"
+    "format": "prettier -w packages --ignore-path ",
+    "prepare": "husky install .husky",
+    "test:orama": "cd packages/orama && npm test",
+    "test": "npm run test:orama"
   },
-  "keywords": [
-    "full-text search",
-    "search",
-    "fuzzy search",
-    "typo-tolerant search",
-    "full-text"
-  ],
+  "devDependencies": {
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.3.22",
+    "@types/node": "^18.11.15",
+    "@types/tap": "^15.0.7",
+    "@typescript-eslint/eslint-plugin": "^5.46.1",
+    "@typescript-eslint/parser": "^5.46.1",
+    "c8": "^7.12.0",
+    "commitizen": "^4.2.6",
+    "eslint": "^8.29.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.6.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "execa": "^6.1.0",
+    "husky": "^8.0.2",
+    "lint-staged": "^13.1.0",
+    "prettier": "^2.8.1",
+    "tap": "^16.3.2",
+    "tap-mocha-reporter": "^5.0.3",
+    "tape": "^5.6.1",
+    "tcompare": "^6.0.0",
+    "tsx": "^3.12.1",
+    "typescript": "^4.9.4"
+  },
   "author": {
     "name": "Michele Riva",
     "email": "michele.riva@oramasearch.com",
@@ -96,40 +52,14 @@
   ],
   "license": "Apache-2.0",
   "lint-staged": {
-    "*": "pnpm lint"
+    "*": [
+      "prettier packages/**/*.{js,ts,mjs,cjs,cts,json} --write"
+    ]
   },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.29.2",
-    "@swc/cli": "^0.1.57",
-    "@swc/core": "^1.3.22",
-    "@types/node": "^18.11.15",
-    "@types/tap": "^15.0.7",
-    "@typescript-eslint/eslint-plugin": "^5.46.1",
-    "@typescript-eslint/parser": "^5.46.1",
-    "auto-changelog": "^2.4.0",
-    "c8": "^7.12.0",
-    "commitizen": "^4.2.6",
-    "cronometro": "^1.1.5",
-    "eslint": "^8.29.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-n": "^15.6.0",
-    "eslint-plugin-promise": "^6.1.1",
-    "execa": "^6.1.0",
-    "husky": "^8.0.2",
-    "lint-staged": "^13.1.0",
-    "prettier": "^2.8.1",
-    "tap": "^16.3.2",
-    "tap-mocha-reporter": "^5.0.3",
-    "tape": "^5.6.1",
-    "tcompare": "^6.0.0",
-    "tsx": "^3.12.1",
-    "typescript": "^4.9.4",
-    "vite": "^4.1.4"
   },
   "pnpm": {
     "peerDependencyRules": {
