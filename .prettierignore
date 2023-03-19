@@ -10,3 +10,4 @@ tests/datasets/events.json
 .nvmrc
 .husky
 Dockerfile
+packages/**/coverage/

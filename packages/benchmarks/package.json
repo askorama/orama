@@ -3,5 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "run": "node ./typo-tolerant-search.js"
+  },
+  "dependencies": {
+    "@orama/orama": "workspace:*"
   }
 }

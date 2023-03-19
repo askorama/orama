@@ -10,12 +10,13 @@
     "format": "prettier -w packages --ignore-path ",
     "prepare": "husky install .husky",
     "test:orama": "cd packages/orama && npm test",
+    "test:plugin-astro": "cd packages/plugin-astro && npm test",
     "test": "npm run test:orama"
   },
   "devDependencies": {
-    "@swc/cli": "^0.1.57",
-    "@swc/core": "^1.3.22",
-    "@types/node": "^18.11.15",
+    "@swc/cli": "^0.1.59",
+    "@swc/core": "^1.3.27",
+    "@types/node": "^18.11.18",
     "@types/tap": "^15.0.7",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
     "@typescript-eslint/parser": "^5.46.1",

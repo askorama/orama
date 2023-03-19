@@ -15,8 +15,8 @@
     "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
-      "../stemmer/*": ["packages/orama/stemmer/lib/*"]
+      "../stemmer/*": ["stemmer/lib/*"]
     }
   },
-  "include": ["packages/orama/src/*.ts", "packages/orama/src/**/*.ts"]
+  "include": ["src/*.ts", "src/**/*.ts"]
 }

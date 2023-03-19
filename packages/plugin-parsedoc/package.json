@@ -32,12 +32,11 @@
   ],
   "scripts": {
     "dev": "swc --delete-dir-on-start -s -w --extensions .ts,.cts -d dist src",
-    "prebuild": "npm run lint",
     "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",
     "postbuild": "tsc -p . --emitDeclarationOnly && tsc -p tsconfig.cjs.json --emitDeclarationOnly && mv dist/commonjs.js dist/commonjs.cjs && mv dist/commonjs.js.map dist/commonjs.cjs.map",
     "test": "c8 -c test/config/c8.json tap --rcfile=test/config/tap.yml test/*.test.ts",
     "format": "prettier -w src test",
-    "prepare": "husky install && npm run build"
+    "prepare": "npm run build"
   },
   "dependencies": {
     "@orama/orama": "workspace:*",
@@ -61,16 +60,7 @@
     "@types/hast": "^2.3.4",
     "@types/node": "^18.11.18",
     "@types/tap": "^15.0.7",
-    "@typescript-eslint/eslint-plugin": "^5.48.2",
-    "@typescript-eslint/parser": "^5.48.2",
     "c8": "^7.12.0",
-    "eslint": "^8.32.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-config-standard-with-typescript": "^31.0.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-n": "^15.6.1",
-    "eslint-plugin-promise": "^6.1.1",
-    "husky": "^8.0.3",
     "tap": "^16.3.4",
     "tsx": "^3.12.2",
     "typescript": "^4.9.4"
