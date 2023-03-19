@@ -439,7 +439,7 @@ t.test('orama', t => {
     t.equal(searchResult.hits[0].id, id2)
   })
 
-  // Tests for https://github.com/nearform/orama/issues/52
+  // Tests for https://github.com/oramasearch/orama/issues/52
   t.test('Should correctly remove documents via substring search', async t => {
     t.plan(1)
 

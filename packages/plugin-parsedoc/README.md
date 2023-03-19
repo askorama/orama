@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/OramaSearch/plugin-parsedoc/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/OramaSearch/plugin-parsedoc/actions/workflows/tests.yml)
 
-This plugin aims to generate an index for orama from html files
+This plugin aims to generate an index for Orama from HTML files
 
 # Usage
 

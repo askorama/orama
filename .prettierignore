@@ -2,6 +2,7 @@ dist
 tests/datasets/events.json
 *.svg
 *.sh
+*.astro
 .eslintignore
 .prettierignore
 .gitignore
