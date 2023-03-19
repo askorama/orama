@@ -5,4 +5,7 @@ tests/datasets/events.json
 .eslintignore
 .prettierignore
 .gitignore
+.npmrc
+.nvmrc
+.husky
 Dockerfile
