@@ -1,91 +1,85 @@
-import { Language, Orama, PropertiesSchema, ResolveSchema, RetrievedDoc, search, SearchParams } from '@orama/orama'
-import { normalizationCache, tokenize } from '@orama/orama/internals'
+import { Document, Language, Orama, Result, Schema, search, SearchParams } from '@orama/orama'
+import { normalizationCache } from '@orama/orama/internals'
 
 export interface Position {
   start: number
   length: number
 }
 
-export type OramaWithHighlight<S extends PropertiesSchema> = Orama<S> & {
-  positions: Record<string, Record<string, Record<string, Position[]>>>
+export type OramaWithHighlight<S extends Schema> = Orama<{ Schema: S }> & {
+  data: { positions: Record<string, Record<string, Record<string, Position[]>>> }
 }
 
-export type SearchResultWithHighlight<S extends PropertiesSchema> = RetrievedDoc<S> & {
+export type SearchResultWithHighlight = Result & {
   positions: Record<string, Record<string, Position[]>>
 }
 
-export async function afterInsert<S extends PropertiesSchema>(
-  this: Orama<S> | OramaWithHighlight<S>,
+export async function afterInsert<S extends Schema>(
+  orama: Orama<{ Schema: S }> | OramaWithHighlight<S>,
   id: string
 ): Promise<void> {
-  if (!('positions' in this)) {
-    Object.assign(this, { positions: {} })
+  if (!('positions' in orama.data)) {
+    Object.assign(orama.data, { positions: {} })
   }
 
-  recursivePositionInsertion(this as OramaWithHighlight<S>, this.docs[id]!, id)
+  recursivePositionInsertion(orama as OramaWithHighlight<S>, (await orama.documentsStore.get(orama.data.docs, id))!, id)
 }
 
 const wordRegEx = /[\p{L}0-9_'-]+/gimu
 
-function recursivePositionInsertion<S extends PropertiesSchema>(
+function recursivePositionInsertion<S extends Schema>(
   orama: OramaWithHighlight<S>,
-  doc: ResolveSchema<S>,
+  doc: Document,
   id: string,
   prefix = '',
-  schema: PropertiesSchema = orama.schema
+  schema: Schema = orama.schema
 ): void {
-  orama.positions[id] = Object.create(null)
+  orama.data.positions[id] = Object.create(null)
   for (const key of Object.keys(doc)) {
     const isNested = typeof doc[key] === 'object'
     const isSchemaNested = typeof schema[key] === 'object'
     const propName = `${prefix}${key}`
     if (isNested && key in schema && isSchemaNested) {
-      recursivePositionInsertion(
-        orama,
-        doc[key] as ResolveSchema<S>,
-        id,
-        propName + '.',
-        schema[key] as PropertiesSchema
-      )
+      recursivePositionInsertion(orama, doc[key] as Document, id, propName + '.', schema[key] as Schema)
     }
     if (!(typeof doc[key] === 'string' && key in schema && !isSchemaNested)) {
       continue
     }
-    orama.positions[id][propName] = Object.create(null)
+    orama.data.positions[id][propName] = Object.create(null)
     const text = doc[key] as string
     let regExResult
     while ((regExResult = wordRegEx.exec(text)) !== null) {
       const word = regExResult[0].toLowerCase()
-      const key = `${orama.defaultLanguage}:${word}`
+      const key = `${orama.tokenizer.language}:${word}`
       let token: string
       if (normalizationCache.has(key)) {
         token = normalizationCache.get(key)
         /* c8 ignore next 4 */
       } else {
-        ;[token] = tokenize(word)
+        ;[token] = orama.tokenizer.tokenize(word)
         normalizationCache.set(key, token)
       }
-      if (!Array.isArray(orama.positions[id][propName][token])) {
-        orama.positions[id][propName][token] = []
+      if (!Array.isArray(orama.data.positions[id][propName][token])) {
+        orama.data.positions[id][propName][token] = []
       }
       const start = regExResult.index
       const length = regExResult[0].length
-      orama.positions[id][propName][token].push({ start, length })
+      orama.data.positions[id][propName][token].push({ start, length })
     }
   }
 }
 
-export async function searchWithHighlight<S extends PropertiesSchema>(
+export async function searchWithHighlight<S extends Schema>(
   orama: OramaWithHighlight<S>,
-  params: SearchParams<S>,
+  params: SearchParams,
   language?: Language
-): Promise<Array<SearchResultWithHighlight<S>>> {
+): Promise<Array<SearchResultWithHighlight>> {
   const result = await search(orama, params, language)
-  const queryTokens: string[] = tokenize(params.term)
+  const queryTokens: string[] = orama.tokenizer.tokenize(params.term)
   return result.hits.map(hit =>
     Object.assign(hit, {
       positions: Object.fromEntries(
-        Object.entries(orama.positions[hit.id]).map(([propName, tokens]) => [
+        Object.entries(orama.data.positions[hit.id]).map(([propName, tokens]) => [
           propName,
           Object.fromEntries(
             Object.entries(tokens).filter(([token]) => queryTokens.find(queryToken => token.startsWith(queryToken)))

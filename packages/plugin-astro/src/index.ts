@@ -1,6 +1,6 @@
-import type { InsertConfig, Orama, PropertiesSchema, SearchParams } from '@orama/orama'
-import type { AstroConfig, AstroIntegration, RouteData } from 'astro'
+import type { Orama, Schema, SearchParams } from '@orama/orama'
 import { create as createOramaDB, insert as insertIntoOramaDB, save as saveOramaDB } from '@orama/orama'
+import type { AstroConfig, AstroIntegration, RouteData } from 'astro'
 import { compile } from 'html-to-text'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join as joinPath } from 'node:path'
@@ -18,7 +18,7 @@ interface AstroBuildDoneArgs {
   routes: RouteData[]
 }
 
-export const defaultSchema: PropertiesSchema = {
+export const defaultSchema: Schema = {
   path: 'string',
   title: 'string',
   h1: 'string',
@@ -27,7 +27,8 @@ export const defaultSchema: PropertiesSchema = {
 
 export type PageIndexSchema = typeof defaultSchema
 
-export type OramaOptions = Partial<InsertConfig<PageIndexSchema>> & {
+export interface OramaOptions {
+  language: string
   /**
    * Controls whether generatedFilePath is filter
    * using case sensitive or case insensitive comparison
@@ -37,7 +38,7 @@ export type OramaOptions = Partial<InsertConfig<PageIndexSchema>> & {
   caseSensitive?: boolean
   pathMatcher: RegExp
   contentSelectors?: string[]
-  searchOptions?: Omit<SearchParams<PageIndexSchema>, 'term'> | undefined
+  searchOptions?: Omit<SearchParams, 'term'> | undefined
 }
 
 const PKG_NAME = '@orama/plugin-astro'
@@ -53,7 +54,7 @@ async function prepareOramaDb(
   dbConfig: OramaOptions,
   pages: AstroPage[],
   routes: RouteData[]
-): Promise<Orama<PageIndexSchema>> {
+): Promise<Orama<{ Schema: PageIndexSchema }>> {
   const contentConverter = compile({
     baseElements: {
       selectors: dbConfig.contentSelectors?.length ? dbConfig.contentSelectors : ['body']
@@ -99,7 +100,7 @@ async function prepareOramaDb(
         h1,
         content
       },
-      dbConfig.language ? { language: dbConfig.language } : undefined
+      dbConfig.language
     )
   }
 

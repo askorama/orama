@@ -7,5 +7,6 @@ export { search } from './methods/search.js'
 export { getByID, count } from './methods/docs.js'
 
 export * from './types.js'
+export type { RawData } from './methods/serialization.js'
 export type { Language } from './tokenizer/languages.js'
 export type { Stemmer, TokenizerConfig } from './tokenizer/index.js'

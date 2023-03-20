@@ -14,7 +14,7 @@ export interface OpaqueDocumentStore {}
 export interface Schema extends Record<string, SearchableType | Schema> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Document extends Record<string, SearchableValue | Document> {}
+export interface Document extends Record<string, SearchableValue | Document | unknown> {}
 
 export type SearchableType = 'string' | 'number' | 'boolean'
 
@@ -267,6 +267,7 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
 }
 
 export interface Tokenizer {
+  language: string
   tokenize: (raw: string, language?: string) => string[]
 }
 

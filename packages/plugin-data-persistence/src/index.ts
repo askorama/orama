@@ -1,5 +1,5 @@
-import { create, load, Orama, PropertiesSchema, save } from '@orama/orama'
 import { decode, encode } from '@msgpack/msgpack'
+import { create, load, Orama, save, Schema } from '@orama/orama'
 // @ts-expect-error dpack does not expose types
 import * as dpack from 'dpack'
 import { FILESYSTEM_NOT_SUPPORTED_ON_RUNTIME, UNSUPPORTED_FORMAT } from './errors.js'
@@ -152,8 +152,8 @@ export async function getDefaultFileName(format: PersistenceFormat, runtime?: Ru
   return `${dbName}.${extension}`
 }
 
-export async function persist<T extends PropertiesSchema>(
-  db: Orama<T>,
+export async function persist<T extends Schema>(
+  db: Orama<{ Schema: T }>,
   format: PersistenceFormat = 'binary',
   runtime?: Runtime
 ): Promise<string | Buffer> {
@@ -190,7 +190,7 @@ export async function persist<T extends PropertiesSchema>(
   return serialized
 }
 
-export async function restore<T extends PropertiesSchema>(
+export async function restore<T extends Schema>(
   format: PersistenceFormat,
   data: string | Buffer,
   runtime?: Runtime
@@ -200,7 +200,6 @@ export async function restore<T extends PropertiesSchema>(
   }
 
   const db = await create({
-    edge: true,
     schema: {
       __placeholder: 'string'
     }
@@ -232,8 +231,8 @@ export async function restore<T extends PropertiesSchema>(
   return db as unknown as Orama<T>
 }
 
-export async function persistToFile<T extends PropertiesSchema>(
-  db: Orama<T>,
+export async function persistToFile<T extends Schema>(
+  db: Orama<{ Schema: T }>,
   format: PersistenceFormat = 'binary',
   path?: string,
   runtime?: Runtime
@@ -257,7 +256,7 @@ export async function persistToFile<T extends PropertiesSchema>(
   return path
 }
 
-export async function restoreFromFile<T extends PropertiesSchema>(
+export async function restoreFromFile<T extends Schema>(
   format: PersistenceFormat = 'binary',
   path?: string,
   runtime?: Runtime

@@ -1,17 +1,17 @@
-import type { Data, Orama, PropertiesSchema } from '@orama/orama'
+import type { Orama, RawData } from '@orama/orama'
 import { create as createOramaDB, load as loadOramaDB } from '@orama/orama'
 
-const dbs: Record<string, Orama<PropertiesSchema>> = {}
+const dbs: Record<string, Orama> = {}
 
-export async function getOramaDB(dbName: string): Promise<Orama<PropertiesSchema>> {
+export async function getOramaDB(dbName: string): Promise<Orama> {
   if (dbName in dbs) {
     return dbs[dbName]
   }
 
-  const db = await createOramaDB({ schema: { _: 'string' }, edge: true })
+  const db = await createOramaDB({ schema: { _: 'string' } })
 
   const dbResponse = await fetch(`/assets/oramaDB_${dbName}.json`)
-  const dbData = (await dbResponse.json()) as Data<{ _: 'string' }>
+  const dbData = (await dbResponse.json()) as RawData
 
   await loadOramaDB(db, dbData)
   dbs[dbName] = db

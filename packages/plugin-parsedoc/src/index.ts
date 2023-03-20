@@ -1,5 +1,4 @@
-import { insertBatch } from '@orama/orama'
-import { Orama, ResolveSchema } from '@orama/orama/dist/types'
+import { Document, insertMultiple, Orama } from '@orama/orama'
 import glob from 'glob'
 import { Content, Element, Parent, Properties, Root } from 'hast'
 import { fromHtml } from 'hast-util-from-html'
@@ -21,13 +20,14 @@ export const defaultHtmlSchema = {
   type: 'string',
   content: 'string',
   path: 'string'
-} as const
-
-type Writable<T> = {
-  -readonly [K in keyof T]: T[K]
 }
 
-export type DefaultSchemaElement = ResolveSchema<Writable<typeof defaultHtmlSchema>>
+export interface DefaultSchemaElement extends Document {
+  type: string
+  content: string
+  path: string
+  properties?: Properties
+}
 
 interface PopulateFromGlobOptions {
   transformFn?: TransformFn
@@ -40,7 +40,7 @@ type FileType = 'html' | 'md'
 const asyncGlob = promisify(glob)
 
 export const populateFromGlob = async (
-  db: Orama<typeof defaultHtmlSchema>,
+  db: Orama,
   pattern: string,
   options?: PopulateFromGlobOptions
 ): Promise<void> => {
@@ -48,24 +48,18 @@ export const populateFromGlob = async (
   await Promise.all(files.map(async filename => populateFromFile(db, filename, options)))
 }
 
-const populateFromFile = async (
-  db: OramaInstance,
-  filename: string,
-  options?: PopulateFromGlobOptions
-): Promise<void> => {
+const populateFromFile = async (db: Orama, filename: string, options?: PopulateFromGlobOptions): Promise<string[]> => {
   const data = await readFile(filename)
   const fileType = filename.slice(filename.lastIndexOf('.') + 1) as FileType
   return populate(db, data, fileType, { ...options, basePath: `${filename}/` })
 }
 
-type OramaInstance = Orama<typeof defaultHtmlSchema>
-
 export const populate = async (
-  db: OramaInstance,
+  db: Orama,
   data: Buffer | string,
   fileType: FileType,
   options?: PopulateOptions
-): Promise<void> => {
+): Promise<string[]> => {
   const records: DefaultSchemaElement[] = []
   switch (fileType) {
     case 'md':
@@ -86,7 +80,7 @@ export const populate = async (
       return fileType
     /* c8 ignore stop */
   }
-  return insertBatch(db, records)
+  return insertMultiple(db, records)
 }
 
 function rehypeOrama(records: DefaultSchemaElement[], options?: PopulateOptions): (tree: Root) => void {

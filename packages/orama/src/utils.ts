@@ -184,7 +184,7 @@ export function getDocumentProperties(doc: Document, paths: string[]): Record<st
     let current: SearchableValue | Document | undefined = doc
     const pathTokensLength = pathTokens.length
     for (let j = 0; j < pathTokensLength; j++) {
-      current = (current as Document)[pathTokens[j]!]
+      current = (current as Document)[pathTokens[j]!] as Document | SearchableValue
 
       // We found an object but we were supposed to be done
       if (typeof current === 'object' && current !== null && j === pathTokensLength - 1) {
