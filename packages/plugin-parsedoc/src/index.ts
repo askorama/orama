@@ -20,7 +20,7 @@ export const defaultHtmlSchema = {
   type: 'string',
   content: 'string',
   path: 'string'
-}
+} as const
 
 export interface DefaultSchemaElement extends Document {
   type: string

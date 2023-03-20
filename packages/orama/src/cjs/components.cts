@@ -3,7 +3,7 @@ import type {
   getDocumentIndexId as esmGetDocumentIndexId,
   validateSchema as esmValidateSchema,
   getDefaultComponents as esmGetDefaultComponents,
-  documentStore as esmDocumentStore,
+  documentsStore as esmdocumentsStore,
   index as esmIndex,
 } from '../components.js'
 
@@ -12,7 +12,7 @@ export interface OramaComponents {
   getDocumentIndexId: typeof esmGetDocumentIndexId
   validateSchema: typeof esmValidateSchema
   getDefaultComponents: typeof esmGetDefaultComponents
-  documentStore: typeof esmDocumentStore
+  documentsStore: typeof esmdocumentsStore
   index: typeof esmIndex
 }
 

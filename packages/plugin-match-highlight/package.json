@@ -58,12 +58,5 @@
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
-  },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "typescript"
-      ]
-    }
   }
 }

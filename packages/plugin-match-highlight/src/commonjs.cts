@@ -1,5 +1,5 @@
 // @ts-expect-error Ignore broken resolution - This errors when using tsconfig.cjs.json
-import type { Orama, PropertiesSchema } from '@orama/orama'
+import type { Orama } from '@orama/orama'
 
 import type {
   afterInsert as esmAfterInsert,
@@ -18,8 +18,8 @@ export type RequireCallback = (err: Error | undefined, orama?: OramaPluginMatchH
 let _esmAfterInsert: typeof esmAfterInsert
 let _esmSearchWithHighlight: typeof esmSearchWithHighlight
 
-export async function afterInsert<S extends PropertiesSchema>(
-  this: Orama<S> | OramaWithHighlight<S>,
+export async function afterInsert(
+  this: Orama | OramaWithHighlight,
   ...args: Parameters<typeof esmAfterInsert>
 ): ReturnType<typeof esmAfterInsert> {
   if (!_esmAfterInsert) {

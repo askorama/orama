@@ -6,7 +6,7 @@ export interface Position {
   length: number
 }
 
-export type OramaWithHighlight<S extends Schema> = Orama<{ Schema: S }> & {
+export type OramaWithHighlight = Orama & {
   data: { positions: Record<string, Record<string, Record<string, Position[]>>> }
 }
 
@@ -14,21 +14,18 @@ export type SearchResultWithHighlight = Result & {
   positions: Record<string, Record<string, Position[]>>
 }
 
-export async function afterInsert<S extends Schema>(
-  orama: Orama<{ Schema: S }> | OramaWithHighlight<S>,
-  id: string
-): Promise<void> {
+export async function afterInsert(orama: Orama | OramaWithHighlight, id: string): Promise<void> {
   if (!('positions' in orama.data)) {
     Object.assign(orama.data, { positions: {} })
   }
 
-  recursivePositionInsertion(orama as OramaWithHighlight<S>, (await orama.documentsStore.get(orama.data.docs, id))!, id)
+  recursivePositionInsertion(orama as OramaWithHighlight, (await orama.documentsStore.get(orama.data.docs, id))!, id)
 }
 
 const wordRegEx = /[\p{L}0-9_'-]+/gimu
 
-function recursivePositionInsertion<S extends Schema>(
-  orama: OramaWithHighlight<S>,
+function recursivePositionInsertion(
+  orama: OramaWithHighlight,
   doc: Document,
   id: string,
   prefix = '',
@@ -69,8 +66,8 @@ function recursivePositionInsertion<S extends Schema>(
   }
 }
 
-export async function searchWithHighlight<S extends Schema>(
-  orama: OramaWithHighlight<S>,
+export async function searchWithHighlight(
+  orama: OramaWithHighlight,
   params: SearchParams,
   language?: Language
 ): Promise<Array<SearchResultWithHighlight>> {

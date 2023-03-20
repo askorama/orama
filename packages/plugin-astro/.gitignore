@@ -1,6 +1,0 @@
-dist/
-node_modules/
-test/sandbox/dist
-test/sandbox/node_modules
-pnpm-lock.yaml
-yarn.lock

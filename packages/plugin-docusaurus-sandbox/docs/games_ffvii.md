@@ -1,0 +1,10 @@
+# Final Fantasy VII
+
+Final Fantasy VII is a 1997 role-playing video game developed by Square for the PlayStation console. It is the
+seventh main installment in the Final Fantasy series. Published in Japan by Square, it was released in other
+regions by Sony Computer Entertainment and is the first in the main series with a PAL release. The game's story
+follows Cloud Strife, a mercenary who joins an eco-terrorist organization to stop a world-controlling
+megacorporation from using the planet's life essence as an energy source. Events send Cloud and his allies in
+pursuit of Sephiroth, a former member of the corporation who seeks to destroy the planet. During the journey,
+Cloud builds close friendships with his party members, including Aerith Gainsborough, who holds the secret to
+saving their world.
