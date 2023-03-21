@@ -7,7 +7,7 @@ The schema represents **the structure** of the document to be inserted.
 
 A database can be as simple as:
 
-```javascript
+```javascript copy
 import { create } from '@orama/orama'
 
 const db = await create({
@@ -19,7 +19,7 @@ const db = await create({
 
 or more variegated:
 
-```javascript
+```javascript copy
 import { create } from '@orama/orama'
 
 const movieDB = await create({
@@ -37,7 +37,7 @@ const movieDB = await create({
 
 Orama supports nested properties natively. Just add them as you would typically do in any JavaScript object:
 
-```javascript
+```javascript copy
 const movieDB = await create({
   schema: {
     title: 'string',

@@ -13,7 +13,7 @@ Read more: [_Wikipedia_](https://en.wikipedia.org/wiki/Stemming)
 
 By default, Orama uses **the English language analyzer**, but we can override this behavior by setting the property `defaultLanguage` at database initialization, and importing a custom stemmer:
 
-```javascript
+```javascript copy
 import { create } from '@orama/orama'
 import { stemmer } from '@orama/orama/stemmer/it'
 
@@ -64,7 +64,7 @@ Right now, Orama supports 26 languages and stemmers out of the box:
 
 You can disable stemming by setting `enableStemming: false` while initializing a new Orama instance:
 
-```javascript
+```javascript copy
 import { create } from '@orama/orama'
 
 const db = create({

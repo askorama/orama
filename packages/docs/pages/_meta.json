@@ -5,47 +5,17 @@
     "href": "https://join.slack.com/t/lyrasearch/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q",
     "newWindow": true
   },
-  "--- usage": {
-    "title": "Usage",
-    "type": "separator",
-    "theme": {
-      "sidebar": true
-    }
+  "--- Getting Started": {
+    "title": "Getting Started",
+    "type": "separator"
   },
   "index": "Introduction",
-  "docs": {
-    "title": "Docs",
-    "type": "page",
-    "theme": {
-      "sidebar": true
-    }
+  "usage": "Usage",
+  "--- Advanced": {
+    "title": "Advanced",
+    "type": "separator"
   },
-  "--- internals": {
-    "title": "Internals",
-    "type": "separator",
-    "theme": {
-      "sidebar": true
-    }
-  },
-  "internals": {
-    "title": "Internals",
-    "type": "page",
-    "theme": {
-      "sidebar": true
-    }
-  },
-  "--- text analysis": {
-    "title": "Text Analysis",
-    "type": "separator",
-    "theme": {
-      "sidebar": true
-    }
-  },
-  "--- Plugins": {
-    "title": "Plugins",
-    "type": "separator",
-    "theme": {
-      "sidebar": true
-    }
-  }
+  "internals": "Internals",
+  "plugins": "Plugins",
+  "text-analysis": "Text Analysis"
 }

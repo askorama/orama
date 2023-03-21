@@ -39,6 +39,7 @@
     "test": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
     "posttest": "rm -f test/sandbox/src/env.d.ts",
     "prepare": "npm run build",
+    "lint": "eslint src --ext .js,.ts,.tsx,.cts",
     "prepublishOnly": "npm run lint && npm run test"
   },
   "dependencies": {

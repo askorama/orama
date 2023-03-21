@@ -9,7 +9,7 @@ Orama exposes a few utility functions that can be useful when working with the s
 
 `getByID` is a function that allows you to retrieve a document from a Orama database by its ID.
 
-```javascript
+```javascript copy
 import { getByID } from '@orama/orama'
 
 const thePrestige = await getByID(movieDB, 'tt0482571')
@@ -21,7 +21,7 @@ const thePrestige = await getByID(movieDB, 'tt0482571')
 
 `count` is a function that allows you to retrieve the number of documents in a Orama database.
 
-```javascript
+```javascript copy
 import { count } from '@orama/orama'
 
 const docNumber = await count(movieDB)

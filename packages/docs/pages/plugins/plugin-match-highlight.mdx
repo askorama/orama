@@ -9,9 +9,9 @@ The plugin-match-highlight plugin allows Orama to keep track of all token positi
 You can install the plugin using any major Node.js package manager:
 
 <Tabs items={['npm', 'yarn', 'pnpm']}>
-  <Tab>```bash npm install @orama/plugin-match-highlight ```</Tab>
-  <Tab>```bash yarn add @orama/plugin-match-highlight ```</Tab>
-  <Tab>```bash pnpm add @orama/plugin-match-highlight ```</Tab>
+  <Tab>```bash copy npm install @orama/plugin-match-highlight ```</Tab>
+  <Tab>```bash copy yarn add @orama/plugin-match-highlight ```</Tab>
+  <Tab>```bash copy pnpm add @orama/plugin-match-highlight ```</Tab>
 </Tabs>
 
 ## Usage
@@ -20,7 +20,7 @@ Plugin usage depends on the runtime that you are using, even though the goal is 
 
 The plugin exports `afterInsertHook`, which will be the hook used by Orama to add positions, and `searchWithHighlight` which wraps the original Orama's `search` function to return positions alongside docs.
 
-```typescript
+```typescript copy
 import { afterInsert, OramaWithHighlight, searchWithHighlight } from '../src'
 
 const schema = {
@@ -45,7 +45,7 @@ A function that takes the same arguments as the original `search` function, and
 returns the document with positions for each token on each property matching the
 query.
 
-```typescript
+```typescript copy
 [
   {
     positions: {

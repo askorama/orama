@@ -7,7 +7,7 @@ represents the entry we are going to insert.
 
 Let's say our database and schema look like this:
 
-```javascript
+```javascript copy
 import { create, insert } from '@orama/orama'
 
 const movieDB = await create({
@@ -27,7 +27,7 @@ const movieDB = await create({
 
 Data insertion in Orama is quick and intuitive:
 
-```javascript
+```javascript copy
 const { id: thePrestige } = await insert(movieDB, {
   title: 'The prestige',
   director: 'Christopher Nolan',
@@ -64,7 +64,7 @@ You can pass a third, optional, parameter to change the batch size (default:
 the event loop. The `batchSize` refers to the maximum number of `insert`
 operations to perform before yielding the event loop.
 
-```javascript
+```javascript copy
 const docs = [
   {
     title: 'The prestige',
@@ -100,7 +100,7 @@ search purpose.
 
 With that being said, let's consider the following schema:
 
-```javascript
+```javascript copy
 import { create } from '@orama/orama'
 
 const db = await create({
@@ -122,7 +122,7 @@ etc.
 
 It is possible to rewrite the schema definition above as follows:
 
-```javascript
+```javascript copy
 import { create } from '@orama/orama'
 
 const db = await create({
@@ -135,7 +135,7 @@ const db = await create({
 
 and still, be able to insert documents like:
 
-```javascript
+```javascript copy
 {
   'author': 'Rumi',
   'quote': 'Patience is the key to joy',
@@ -146,7 +146,7 @@ and still, be able to insert documents like:
 
 or even documents with different shapes:
 
-```javascript
+```javascript copy
 ;[
   {
     author: 'Rumi',

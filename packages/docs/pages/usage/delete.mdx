@@ -5,7 +5,7 @@ import { Callout } from 'nextra-theme-docs'
 Deletion is one of the easiest things to do in Orama. Let's say we have the
 following database with the following inserted documents:
 
-```javascript
+```javascript copy
 import { create, insert, remove, search } from '@orama/orama'
 
 const movieDB = await create({
@@ -45,7 +45,7 @@ const { id: harryPotter } = await insert(movieDB, {
 
 To delete a single document from the database we use the:
 
-```javascript
+```javascript copy
 await remove(movieDB, harryPotter)
 ```
 

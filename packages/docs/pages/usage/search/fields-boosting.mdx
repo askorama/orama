@@ -2,7 +2,7 @@
 
 You can use the `boost` interface to boost the importance of a field in the search results.
 
-```javascript
+```javascript copy
 const searchResult = await search(movieDB, {
   term: 'Harry',
   properties: '*',
@@ -18,7 +18,7 @@ That means that any match of `'Harry'` in the `title` field will be considered t
 
 You can boost multiple fields:
 
-```javascript
+```javascript copy
 const searchResult = await search(movieDB, {
   term: 'Harry',
   properties: '*',

@@ -15,14 +15,14 @@ A JavaScript runtime is the **only** requirement. Orama has been designed to wor
 You can install Orama using npm, yarn, pnpm:
 
 <Tabs items={['npm', 'yarn', 'pnpm']}>
-  <Tab>```bash npm install @orama/orama ```</Tab>
-  <Tab>```bash yarn add @orama/orama ```</Tab>
-  <Tab>```bash pnpm add @orama/orama ```</Tab>
+  <Tab>```bash copy npm install @orama/orama ```</Tab>
+  <Tab>```bash copy yarn add @orama/orama ```</Tab>
+  <Tab>```bash copy pnpm add @orama/orama ```</Tab>
 </Tabs>
 
 Or import it directly in a browser module:
 
-```html
+```html copy
 <html>
   <body>
     <script type="module">
@@ -40,7 +40,7 @@ Orama ships **ESM** modules by default. This allows us to move faster when provi
 
 CommonJS imports are still supported, but you'll need to import Orama from `@orama/orama/cjs` instead of `@orama/orama`:
 
-```diff
+```diff copy
 - const { search, insert, create } = require("@orama/orama");
 + const { search, insert, create } = require("@orama/orama/cjs");
 ```
@@ -51,6 +51,6 @@ Set `moduleResolution` in the `compilerOptions` in your `tsconfig.json` to be ei
 
 When importing types, always refer to the standard lyra import:
 
-```ts
+```ts copy
 import type { Language } from '@orama/orama'
 ```

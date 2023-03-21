@@ -8,7 +8,7 @@ Orama provides a simple search interface that allows you to search through your 
 
 Let's say we have a database that contains some elements:
 
-```javascript
+```javascript copy
 import { create, insert, search } from '@orama/orama';
 
 const movieDB = await create({
@@ -48,7 +48,7 @@ await insert(movieDB, {
 
 We can now search for one (or multiple) documents as easily as:
 
-```javascript
+```javascript copy
 const searchResult = await search(movieDB, {
   term: 'Harry',
   properties: '*',
@@ -59,7 +59,7 @@ const searchResult = await search(movieDB, {
 
 The `properties` property defines in which property to run our query.
 
-```javascript
+```javascript copy
 const searchResult = await search(movieDB, {
   term: 'Chris',
   properties: ['director'],
@@ -71,7 +71,7 @@ We are now searching for all the documents that contain the word `Chris` in the
 
 We can also search through nested properties:
 
-```javascript
+```javascript copy
 const searchResult = await search(movieDB, {
   term: 'Chris',
   properties: ['cast.director'],
@@ -85,7 +85,7 @@ By default, Orama searches in **all** searchable properties.
 The `exact` property finds all the document with an exact match of the `term`
 property.
 
-```javascript
+```javascript copy
 const searchResult = search(movieDB, {
   term: 'Chris',
   properties: ['director'],
@@ -109,7 +109,7 @@ Levenshtein algorithm) between the term and the searchable property.
 > is the minimum number of single-character edits (insertions, deletions or
 > substitutions) required to change one word into the other._
 
-```javascript
+```javascript copy
 const searchResult = await search(movieDB, {
   term: 'Cris',
   properties: ['director'],
@@ -128,7 +128,7 @@ of `1` (e.g. `Chris`) in the `director` property.
 
 The `limit` property limits the result at the specified number.
 
-```javascript
+```javascript copy
 const searchResult = await search(movieDB, {
   term: 'Chris',
   properties: ['director'],
@@ -143,7 +143,7 @@ We are searching for the `first` document that contains the term `Chris` in the
 
 The `offset` property skips the first `X` results.
 
-```javascript
+```javascript copy
 const searchResult = await search(movieDB, {
   term: 'Chris',
   properties: ['director'],
@@ -165,7 +165,7 @@ briefly analyze the response that Orama gives us back.
 
 Let's say we have run the following query:
 
-```javascript
+```javascript copy
 const searchResult = await search(movieDB, {
   term: 'Cris',
   properties: ['director'],
@@ -176,7 +176,7 @@ const searchResult = await search(movieDB, {
 Whether the document was found or not, Orama gives back an `object` with the
 following properties:
 
-```javascript
+```javascript copy
 {
   elapsed: 181208n,
   count: 2,

@@ -9,9 +9,9 @@ The plugin-astro plugin allows you to index the content of your Astro websites a
 You can install the plugin using any major Node.js package manager:
 
 <Tabs items={['npm', 'yarn', 'pnpm']}>
-  <Tab>```bash npm install @orama/plugin-astro ```</Tab>
-  <Tab>```bash yarn add @orama/plugin-astro ```</Tab>
-  <Tab>```bash pnpm add @orama/plugin-astro ```</Tab>
+  <Tab>```bash copy npm install @orama/plugin-astro ```</Tab>
+  <Tab>```bash copy yarn add @orama/plugin-astro ```</Tab>
+  <Tab>```bash copy pnpm add @orama/plugin-astro ```</Tab>
 </Tabs>
 
 ## Usage
@@ -21,7 +21,7 @@ There are two main aspects to consider when using this plugin:
 - DB generation
 - Loading DBs & performing searches
 
-```javascript
+```javascript copy
 // In `astro.config.mjs`
 import orama from '@orama/plugin-astro'
 
@@ -52,7 +52,7 @@ When running the `astro build` command, a new DB file will be persisted in the `
 
 To use the generated DBs in your pages, you can include a script in your `<head>` section, as the following one:
 
-```html
+```html copy
 <head>
   <!-- Other stuff -->
   <script>

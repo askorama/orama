@@ -9,9 +9,9 @@ The plugin-parsedoc plugin allows Orama to parse and create indexes from HTML an
 You can install the plugin using any major Node.js package manager:
 
 <Tabs items={['npm', 'yarn', 'pnpm']}>
-  <Tab>```bash npm install @orama/plugin-parsedoc ```</Tab>
-  <Tab>```bash yarn add @orama/plugin-parsedoc ```</Tab>
-  <Tab>```bash pnpm add @orama/plugin-parsedoc ```</Tab>
+  <Tab>```bash copy npm install @orama/plugin-parsedoc ```</Tab>
+  <Tab>```bash copy yarn add @orama/plugin-parsedoc ```</Tab>
+  <Tab>```bash copy pnpm add @orama/plugin-parsedoc ```</Tab>
 </Tabs>
 
 ## Usage
@@ -20,7 +20,7 @@ Plugin usage depends on the runtime that you are using, even though the goal is 
 
 The plugin exports `defaultHtmlSchema` which will be the schema used in the index. Providing a glob pattern to the files containing the documents will index them.
 
-```javascript
+```javascript copy
 import { create, insert } from '@orama/orama'
 import { populateFromGlob, defaultHtmlSchema } from '@orama/plugin-parsedoc'
 

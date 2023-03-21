@@ -2,7 +2,7 @@
 
 Orama exposes some of its internal functions:
 
-```javascript
+```javascript copy
 import {
   formatNanoseconds,
   getNanosecondsTime,
@@ -21,7 +21,7 @@ Let's break them down:
 
 Takes a `BigInt` as input and returns a human-readable `string`.
 
-```javascript
+```javascript copy
 import { formatNanoseconds } from '@orama/orama/internals'
 
 formatNanoseconds(30000n) // '30μs'
@@ -31,7 +31,7 @@ formatNanoseconds(30000n) // '30μs'
 
 Gets the current time with nanoseconds-precision. Returns a `BigInt`.
 
-```javascript
+```javascript copy
 import { getNanosecondsTime } from '@orama/orama/internals'
 
 getNanosecondsTime() // 1363500821581208n
@@ -41,7 +41,7 @@ getNanosecondsTime() // 1363500821581208n
 
 Returns the intersection of `N` arrays.
 
-```javascript
+```javascript copy
 import { intersectTokenScores } from '@orama/orama/internals'
 
 intersectTokenScores([
@@ -71,7 +71,7 @@ intersectTokenScores([
 
 faster alternative to `Array.prototype.includes`.
 
-```javascript
+```javascript copy
 import { includes } from '@orama/orama/internals'
 
 includes([10, 20, 30], 10) // true
@@ -81,7 +81,7 @@ includes([10, 20, 30], 10) // true
 
 Computes the Levenshtein distance between two strings `(a, b)`, returning early with -1 if the distance is greater than the given tolerance. It assumes that `tolerance >= ||a| - |b|| >= 0`.
 
-```javascript
+```javascript copy
 import { boundedLevenshtein } from '@orama/orama/internals'
 
 boundedLevenshtein('moon', 'lions', 3) // { isBounded: true, distance: 3 }
