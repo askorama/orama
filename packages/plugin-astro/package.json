@@ -1,7 +1,7 @@
 {
   "name": "@orama/plugin-astro",
   "description": "An Astro integration for Orama",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "keywords": [
     "astro",
     "astro-component",
@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@orama/orama": "workspace:*",
+    "astro": "^2.0.2",
     "html-to-text": "^9.0.3"
   },
   "devDependencies": {
