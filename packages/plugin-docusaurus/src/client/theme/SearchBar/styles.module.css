@@ -1,0 +1,42 @@
+/* logo styling */
+.oramaLogo {
+  --logo-color-intense: #08041a;
+  --logo-color-mid: #160b47;
+  --logo-color-soft: #6a4fe3;
+}
+
+[data-theme='dark'] .oramaLogo {
+  --logo-color-intense: white;
+  --logo-color-mid: #f3f3f3;
+  --logo-color-soft: #707070;
+}
+
+.oramaLogo #logoUpperDef stop {
+  stop-color: var(--logo-color-soft);
+}
+
+.oramaLogo #logoUpperDef stop:nth-of-type(2) {
+  stop-color: var(--logo-color-intense);
+}
+
+.oramaLogo #logoLowerDef stop:nth-of-type(1) {
+  stop-color: var(--logo-color-intense);
+}
+
+.oramaLogo #logoLowerDef stop:nth-of-type(2) {
+  stop-color: var(--logo-color-mid);
+}
+
+.oramaLogo #logoTypeLDef stop:nth-of-type(1),
+.oramaLogo #logoTypeYDef stop:nth-of-type(1),
+.oramaLogo #logoTypeRDef stop:nth-of-type(1),
+.oramaLogo #logoTypeADef stop:nth-of-type(1) {
+  stop-color: var(--logo-color-mid);
+}
+
+.oramaLogo #logoTypeLDef stop:nth-of-type(2),
+.oramaLogo #logoTypeYDef stop:nth-of-type(2),
+.oramaLogo #logoTypeRDef stop:nth-of-type(2),
+.oramaLogo #logoTypeADef stop:nth-of-type(2) {
+  stop-color: var(--logo-color-intense);
+}

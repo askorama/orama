@@ -15,8 +15,9 @@
 *.gif
 **/datasets/*.json
 **/snapshots/*.json
+stemmer
 **/dist/**
-dist
+**/dist
 Dockerfile
-get-imdb-dataset.mjs
+**/get-imdb-dataset.mjs
 node_modules

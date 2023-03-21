@@ -1,0 +1,105 @@
+import { Tab, Tabs, Card, Cards } from 'nextra-theme-docs'
+import { BsDatabaseFillAdd, BsCodeSlash, BsPlugin } from 'react-icons/bs'
+import { AiFillFileAdd, AiOutlineSearch, AiFillDelete } from 'react-icons/ai'
+
+# Getting Started with Orama
+
+Orama is an **immutable, runtime-agnostic, edge, and in-memory full-text search engine** that works both on client and server.
+
+Through implementing an optimized prefix tree and some clever tweaks, Orama can perform searches through millions of entries in **microseconds**.
+
+Get started in just a few lines of code:
+
+<Cards>
+  <Card
+    icon={<BsDatabaseFillAdd style={{ width: 22, height: 22 }} />}
+    title="Create a new database"
+    href="/usage/create"
+  />
+  <Card
+    icon={<AiFillFileAdd style={{ width: 22, height: 22 }} />}
+    title="Insert data"
+    href="/usage/insert"
+  />
+  <Card
+    icon={<AiOutlineSearch style={{ width: 22, height: 22 }} />}
+    title="Search"
+    href="/usage/search/introduction"
+  />
+  <Card
+    icon={<AiFillDelete style={{ width: 22, height: 22 }} />}
+    title="Delete data"
+    href="/usage/delete"
+  />
+  <Card
+    icon={<BsCodeSlash style={{ width: 22, height: 22 }} />}
+    title="Extend Orama"
+    href="/internals/extending-orama"
+  />
+  <Card
+    icon={<BsPlugin style={{ width: 22, height: 22 }} />}
+    title="Use Plugins"
+    href="/plugins"
+  />
+</Cards>
+
+## Requirements
+
+A JavaScript runtime is the **only** requirement. Orama has been designed to work on any runtime and has no dependencies.
+
+## Installation
+
+You can install Orama using npm, yarn, pnpm:
+
+<Tabs items={['npm', 'yarn', 'pnpm']}>
+  <Tab>
+    ```bash copy 
+    npm install @orama/orama 
+    ```
+  </Tab>
+  <Tab>
+    ```bash copy 
+    yarn add @orama/orama 
+    ```
+  </Tab>
+  <Tab>
+    ```bash copy 
+    pnpm add @orama/orama 
+    ```
+  </Tab>
+</Tabs>
+
+Or import it directly in a browser module:
+
+```html copy
+<html>
+  <body>
+    <script type="module">
+      import { create, search, insert } from 'https://unpkg.com/@oramasearch/orama@latest/dist/index.js'
+
+      // ...
+    </script>
+  </body>
+</html>
+```
+
+# CommonJS Imports
+
+Orama ships **ESM** modules by default. This allows us to move faster when providing new features and bug fixes, as well as using the `"exports"` field in `package.json` to provide a better developer experience.
+
+CommonJS imports are still supported, but you'll need to import Orama from `@orama/orama/cjs` instead of `@orama/orama`:
+
+```diff copy
+- const { search, insert, create } = require("@orama/orama");
++ const { search, insert, create } = require("@orama/orama/cjs");
+```
+
+## TypeScript
+
+Set `moduleResolution` in the `compilerOptions` in your `tsconfig.json` to be either `Node16` or `NodeNext`.
+
+When importing types, always refer to the standard orama import:
+
+```ts copy
+import type { Language } from '@orama/orama'
+```
