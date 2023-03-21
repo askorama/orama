@@ -1,0 +1,30 @@
+# Utility functions for Orama
+
+Orama exposes a few utility functions that can be useful when working with the search results.
+
+- [getByID](#getbyid)
+- [count](#count)
+
+## `getByID`
+
+`getByID` is a function that allows you to retrieve a document from a Orama database by its ID.
+
+```javascript
+import { getByID } from '@orama/orama'
+
+const thePrestige = await getByID(movieDB, 'tt0482571')
+
+// Returns the original, full document
+```
+
+## `count`
+
+`count` is a function that allows you to retrieve the number of documents in a Orama database.
+
+```javascript
+import { count } from '@orama/orama'
+
+const docNumber = await count(movieDB)
+
+// Returns the number of documents in the database
+```

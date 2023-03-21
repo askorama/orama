@@ -1,0 +1,73 @@
+import { Tab, Tabs } from 'nextra-theme-docs'
+
+# Match highlight plugin
+
+The plugin-match-highlight plugin allows Orama to keep track of all token positions on each property of each document.
+
+## Installation
+
+You can install the plugin using any major Node.js package manager:
+
+<Tabs items={['npm', 'yarn', 'pnpm']}>
+  <Tab>```bash npm install @orama/plugin-match-highlight ```</Tab>
+  <Tab>```bash yarn add @orama/plugin-match-highlight ```</Tab>
+  <Tab>```bash pnpm add @orama/plugin-match-highlight ```</Tab>
+</Tabs>
+
+## Usage
+
+Plugin usage depends on the runtime that you are using, even though the goal is to expose the exact same APIs for browsers, Deno, and all the other JavaScript engines.
+
+The plugin exports `afterInsertHook`, which will be the hook used by Orama to add positions, and `searchWithHighlight` which wraps the original Orama's `search` function to return positions alongside docs.
+
+```typescript
+import { afterInsert, OramaWithHighlight, searchWithHighlight } from '../src'
+
+const schema = {
+  text: 'string',
+} as const
+
+const db = (await create({
+  schema,
+  hooks: { afterInsert },
+})) as OramaWithHighlight<typeof schema>
+
+await insertWithHooks(db, { text: 'hello world' })
+
+const results = await searchWithHighlight(db, 'hello')
+```
+
+## API Reference
+
+### `searchWithHighlight`
+
+A function that takes the same arguments as the original `search` function, and
+returns the document with positions for each token on each property matching the
+query.
+
+```typescript
+[
+  {
+    positions: {
+      text: {
+        hello: [{
+          start: 0,
+          length: 5
+        }]
+      }
+    }
+  },
+  ...
+]
+```
+
+## CommonJS Imports
+
+Orama plugins ships **ESM** modules by default. This allows us to move faster when providing new features and bug fixes, as well as using the `"exports"` field in `package.json` to provide a better developer experience.
+
+CommonJS imports are still supported, but you'll need to import the plugin from `@orama.plugin-match-highlight/cjs` instead of `@orama.plugin-match-highlight`:
+
+```diff
+- const { searchWithHighlight } = require("@orama.plugin-match-highlight");
++ const { searchWithHighlight } = require("@orama.plugin-match-highlight/cjs");
+```

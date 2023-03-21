@@ -1,0 +1,82 @@
+import { Tab, Tabs } from 'nextra-theme-docs'
+
+# Data Persistence
+
+The `plugin-data-persistence` plugin allows you to persist your Orama database to disk or in-memory
+and restore it later.
+
+## Installation
+
+You can install the plugin using any major Node.js/Bun package manager:
+
+<Tabs items={['npm', 'yarn', 'pnpm']}>
+  <Tab>```bash npm install @orama/plugin-data-persistence ```</Tab>
+  <Tab>```bash yarn add @orama/plugin-data-persistence ```</Tab>
+  <Tab>```bash pnpm add @orama/plugin-data-persistence ```</Tab>
+</Tabs>
+
+## Usage
+
+Plugin usage depends on the runtime that you are using, even though the goal is
+to expose the exact same APIs for browsers, Deno, and all the other JavaScript
+engines.
+
+Let's consider the following Orama instance as a common database source for both
+browsers and JavaScript engines:
+
+```javascript
+import { create, insert } from '@orama/orama'
+
+const originalInstance = await create({
+  schema: {
+    author: 'string',
+    quote: 'string',
+  },
+})
+
+await insert(originalInstance, {
+  quote: 'He who is brave is free',
+  author: 'Seneca',
+})
+
+await insert(originalInstance, {
+  quote: 'Make each day your masterpiece',
+  author: 'John Wooden',
+})
+
+await insert(originalInstance, {
+  quote: 'You must be the change you wish to see in the world',
+  author: 'Mahatma Gandhi',
+})
+```
+
+## Persisting the database to disk
+
+Now we have a Orama instance containing three quotes. We can use the
+`plugin-data-persistence` plugin to save the database to a file:
+
+```javascript
+import { persistToFile } from '@orama/plugin-data-persistence'
+
+const filePath = await persistToFile(originalInstance, 'binary', './quotes.msp')
+```
+
+## Restore the database from disk
+
+To restore the database from the disk:
+
+```javascript
+import { restoreFromFile } from '@orama/plugin-data-persistence'
+const db = await restoreFromFile('binary', filePath)
+```
+
+## CommonJS Imports
+
+Orama plugins ships **ESM** modules by default. This allows us to move faster when providing new features and bug fixes, as well as using the `"exports"` field in `package.json` to provide a better developer experience.
+
+CommonJS imports are still supported, but you'll need to import the plugin from `@orama/plugin-data-persistence/cjs` instead of `@orama/plugin-data-persistence`:
+
+```diff
+- const { persistToFile } = require("@orama/plugin-data-persistence");
++ const { persistToFile } = require("@orama/plugin-data-persistence/cjs");
+```
