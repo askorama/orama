@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orama e2e</title>
+  </head>
+
+  <body>
+    <div id="searchResult1"></div>
+    <div id="searchResult2"></div>
+    <div id="searchResult3"></div>
+    <div id="searchResult4"></div>
+    <div id="searchResult5"></div>
+    <div id="searchResult6"></div>
+    <div id="searchResult7"></div>
+    <div id="searchResult8"></div>
+    <div id="searchResult9"></div>
+    <div id="searchResult10"></div>
+    <div id="searchResult11"></div>
+    <div id="searchResult12"></div>
+    <div id="searchResult13"></div>
+    <div id="searchResult14"></div>
+
+    <script type="module">
+      import { create, insert, search } from '../../../node_modules/@orama/orama/dist/index.js'
+      import { persist, restore, persistToFile, restoreFromFile } from '../../../src/index.ts'
+
+      // fixme: workaround to stringify a BigInt
+      BigInt.prototype.toJSON = function () {
+        return this.toString()
+      }
+
+      const db = await create({
+        schema: {
+          quote: 'string',
+          author: 'string'
+        }
+      })
+
+      await insert(db, {
+        quote: 'I am a great programmer',
+        author: 'Bill Gates'
+      })
+
+      await insert(db, {
+        quote: 'Be yourself; everyone else is already taken.',
+        author: 'Oscar Wilde'
+      })
+
+      await insert(db, {
+        quote: "I have not failed. I've just found 10,000 ways that won't work.",
+        author: 'Thomas A. Edison'
+      })
+
+      await insert(db, {
+        quote: 'The only way to do great work is to love what you do.',
+        author: 'Steve Jobs'
+      })
+
+      // Binary persistence
+      {
+        const q1 = await search(db, {
+          term: 'way'
+        })
+
+        const q2 = await search(db, {
+          term: 'i'
+        })
+
+        // Persist database in-memory in binary format
+        const data = await persist(db, 'binary')
+        // Load database from disk in binary format
+        const db2 = await restore('binary', data)
+
+        const qp1 = await search(db2, {
+          term: 'way'
+        })
+
+        const qp2 = await search(db2, {
+          term: 'i'
+        })
+
+        q1.elapsed = 0
+        q2.elapsed = 0
+        qp1.elapsed = 0
+        qp2.elapsed = 0
+
+        document.getElementById('searchResult1').innerHTML = JSON.stringify(q1)
+        document.getElementById('searchResult2').innerHTML = JSON.stringify(qp1)
+        document.getElementById('searchResult3').innerHTML = JSON.stringify(q2)
+        document.getElementById('searchResult4').innerHTML = JSON.stringify(qp2)
+      }
+
+      // JSON persistence
+      {
+        const q1 = await search(db, {
+          term: 'way'
+        })
+
+        const q2 = await search(db, {
+          term: 'i'
+        })
+
+        // Persist database in-memory in binary format
+        const data = await persist(db, 'json')
+
+        // Load database from disk in binary format
+        const db2 = await restore('json', data)
+
+        const qp1 = await search(db2, {
+          term: 'way'
+        })
+
+        const qp2 = await search(db2, {
+          term: 'i'
+        })
+
+        q1.elapsed = 0
+        q2.elapsed = 0
+        qp1.elapsed = 0
+        qp2.elapsed = 0
+
+        document.getElementById('searchResult5').innerHTML = JSON.stringify(q1)
+        document.getElementById('searchResult6').innerHTML = JSON.stringify(qp1)
+        document.getElementById('searchResult7').innerHTML = JSON.stringify(q2)
+        document.getElementById('searchResult8').innerHTML = JSON.stringify(qp2)
+      }
+
+      // dpack persistence
+      {
+        const q1 = await search(db, {
+          term: 'way'
+        })
+
+        const q2 = await search(db, {
+          term: 'i'
+        })
+
+        // Persist database in-memory in binary format
+        const data = await persist(db, 'dpack')
+
+        // Load database from disk in binary format
+        const db2 = await restore('dpack', data)
+
+        const qp1 = await search(db2, {
+          term: 'way'
+        })
+
+        const qp2 = await search(db2, {
+          term: 'i'
+        })
+
+        q1.elapsed = 0
+        q2.elapsed = 0
+        qp1.elapsed = 0
+        qp2.elapsed = 0
+
+        document.getElementById('searchResult9').innerHTML = JSON.stringify(q1)
+        document.getElementById('searchResult10').innerHTML = JSON.stringify(qp1)
+        document.getElementById('searchResult11').innerHTML = JSON.stringify(q2)
+        document.getElementById('searchResult12').innerHTML = JSON.stringify(qp2)
+      }
+
+      // no fs access
+      {
+        try {
+          await persistToFile(db, 'json', '/tmp/foo.json', 'browser')
+        } catch (e) {
+          document.getElementById('searchResult13').innerHTML = JSON.stringify(e.message)
+        }
+
+        try {
+          await restoreFromFile('json', '/tmp/foo.json', 'browser')
+        } catch (e) {
+          document.getElementById('searchResult14').innerHTML = JSON.stringify(e.message)
+        }
+      }
+    </script>
+  </body>
+</html>

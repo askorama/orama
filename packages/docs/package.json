@@ -1,0 +1,21 @@
+{
+  "name": "@orama/docs",
+  "version": "1.0.0-beta.0",
+  "description": "Documentation for Orama",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "next": "^13.2.4",
+    "nextra": "^2.2.19",
+    "nextra-theme-blog": "^2.2.19",
+    "nextra-theme-docs": "^2.2.19",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.8.0"
+  }
+}

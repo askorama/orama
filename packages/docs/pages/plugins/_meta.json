@@ -1,0 +1,8 @@
+{
+  "index": "Introduction",
+  "plugin-astro": "Plugin Astro",
+  "plugin-data-persistence": "Plugin Data Persistence",
+  "plugin-docusaurus": "Plugins Docusaurus",
+  "plugin-match-highlight": "Plugin Match Highlight",
+  "plugin-parsedoc": "Plugin Parsedoc"
+}

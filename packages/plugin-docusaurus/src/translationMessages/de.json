@@ -1,0 +1,7 @@
+{
+  "plugin-docusaurus.searchBar.placeholder": "Suchen...",
+  "plugin-docusaurus.searchBar.noResults": "Keine Suchergebnissse gefunden.",
+  "plugin-docusaurus.searchBar.clearButtonTitle": "Leeren",
+  "plugin-docusaurus.searchBar.detachedCancelButtonText": "Abbrechen",
+  "plugin-docusaurus.searchBar.submitButtonTitle": "Suchen"
+}

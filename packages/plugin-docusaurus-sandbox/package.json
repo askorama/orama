@@ -1,0 +1,18 @@
+{
+  "name": "@orama/plugin-docusaurus-sandbox",
+  "version": "1.0.0-beta.0",
+  "private": true,
+  "scripts": {
+    "build": "exit 0",
+    "test": "exit 0"
+  },
+  "dependencies": {
+    "@docusaurus/core": "^2.3.1",
+    "@docusaurus/preset-classic": "^2.3.1",
+    "@docusaurus/theme-common": "^2.2.0",
+    "@mdx-js/react": "^1.6.22",
+    "@orama/plugin-docusaurus": "workspace:*",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  }
+}
