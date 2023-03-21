@@ -9,14 +9,5 @@ export default {
     return {
       titleTemplate: '%s – Orama',
     }
-  },
-  readMore: 'Read More →',
-  postFooter: true,
-  darkMode: false,
-  navs: [
-    {
-      url: 'https://github.com/oramasearch/orama',
-      name: 'Orama',
-    },
-  ],
+  }
 }

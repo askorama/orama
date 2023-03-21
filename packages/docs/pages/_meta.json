@@ -1,0 +1,51 @@
+{
+  "nextra_link": {
+    "type": "page",
+    "title": "Slack Support ↗",
+    "href": "https://join.slack.com/t/lyrasearch/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q",
+    "newWindow": true
+  },
+  "--- usage": {
+    "title": "Usage",
+    "type": "separator",
+    "theme": {
+      "sidebar": true
+    }
+  },
+  "index": "Introduction",
+  "docs": {
+    "title": "Docs",
+    "type": "page",
+    "theme": {
+      "sidebar": true
+    }
+  },
+  "--- internals": {
+    "title": "Internals",
+    "type": "separator",
+    "theme": {
+      "sidebar": true
+    }
+  },
+  "internals": {
+    "title": "Internals",
+    "type": "page",
+    "theme": {
+      "sidebar": true
+    }
+  },
+  "--- text analysis": {
+    "title": "Text Analysis",
+    "type": "separator",
+    "theme": {
+      "sidebar": true
+    }
+  },
+  "--- Plugins": {
+    "title": "Plugins",
+    "type": "separator",
+    "theme": {
+      "sidebar": true
+    }
+  }
+}
