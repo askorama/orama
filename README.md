@@ -8,7 +8,7 @@ If you need more info, help, or want to provide general feedback on Orama, join
 the
 [Orama Slack channel](https://join.slack.com/t/oramasearch/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q)
 
-# Installation
+# Installation - install via @orama/orama!
 
 You can install Orama using `npm`, `yarn`, `pnpm`:
 
