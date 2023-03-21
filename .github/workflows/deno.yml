@@ -34,7 +34,7 @@ jobs:
         run: pnpm install
       - name: Prepare for Deno
         run: |
-          sh tests/ci/build.sh
-          sed -i'' -E -e 's#from "([^.])#from "npm:\1#' tests/ci/non-node-ci-runner.js
+          sh ./packages/orama/tests/ci/build.sh
+          sed -i'' -E -e 's#from "([^.])#from "npm:\1#' ./packages/orama/tests/ci/non-node-ci-runner.js
       - name: Run Tests
-        run: deno run --allow-read --allow-env tests/ci/non-node-ci-runner.js | node_modules/.bin/tap-mocha-reporter spec
+        run: deno run --allow-read --allow-env ./packages/orama/tests/ci/non-node-ci-runner.js | ./packages/orama/node_modules/.bin/tap-mocha-reporter spec
