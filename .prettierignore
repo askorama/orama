@@ -7,3 +7,7 @@
 packages/plugin-docusaurus-sandbox/build
 packages/orama/tests/datasets/events.json
 playwright-report
+packages/docs/.next/**/*
+pnpm-lock.yaml
+.gitignore
+.prettierignore
