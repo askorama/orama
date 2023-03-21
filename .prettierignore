@@ -11,3 +11,4 @@ packages/docs/.next/**/*
 pnpm-lock.yaml
 .gitignore
 .prettierignore
+**/*.mdx

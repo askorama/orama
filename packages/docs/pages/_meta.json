@@ -1,4 +1,30 @@
 {
+  "search-reference": {
+    "type": "menu",
+    "title": "Search Features",
+    "items": {
+      "typo-tolerance": {
+        "title": "Typo Tolerance",
+        "href": "/usage/search/introduction#typo-tolerance"
+      },
+      "exact-match": {
+        "title": "Exact Match",
+        "href": "/usage/search/introduction#exact-match"
+      },
+      "fields-boosting": {
+        "title": "Fields Boosting",
+        "href": "/usage/search/fields-boosting"
+      },
+      "facets": {
+        "title": "Facets",
+        "href": "/usage/search/facets"
+      },
+      "filters": {
+        "title": "Filters",
+        "href": "/usage/search/filters"
+      }
+    }
+  },
   "nextra_link": {
     "type": "page",
     "title": "Slack Support ↗",
