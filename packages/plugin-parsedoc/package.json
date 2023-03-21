@@ -35,7 +35,6 @@
     "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",
     "postbuild": "tsc -p . --emitDeclarationOnly && tsc -p tsconfig.cjs.json --emitDeclarationOnly && mv dist/commonjs.js dist/commonjs.cjs && mv dist/commonjs.js.map dist/commonjs.cjs.map",
     "test": "c8 -c test/config/c8.json tap --rcfile=test/config/tap.yml test/*.test.ts",
-    "lint": "eslint src test --ext .js,.ts,.cts",
     "prepare": "npm run build"
   },
   "dependencies": {

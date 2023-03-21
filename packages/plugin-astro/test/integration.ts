@@ -1,4 +1,4 @@
-import { create as createOramaDB, Data, load as loadOramaDB, PropertiesSchema, search } from '@orama/orama'
+import { create as createOramaDB, load as loadOramaDB, Schema, search } from '@orama/orama'
 import assert from 'node:assert'
 import { exec, ExecException } from 'node:child_process'
 import { existsSync } from 'node:fs'
@@ -59,15 +59,15 @@ await test('plugin is able to generate orama DB at build time', async () => {
 await test('generated DBs have indexed pages content', async () => {
   // Loading "animals DB"
   const rawAnimalsData = await readFile(resolve(sandbox, 'dist/assets/oramaDB_animals.json'), 'utf8')
-  const animalsData = JSON.parse(rawAnimalsData) as Data<PropertiesSchema>
+  const animalsData = JSON.parse(rawAnimalsData) as Schema
   const animalsDB = await createOramaDB({ schema: { _: 'string' } })
-  await loadOramaDB(animalsDB, animalsData)
+  await loadOramaDB(animalsDB, animalsData as any)
 
   // Loading "games DB"
   const rawGamesData = await readFile(resolve(sandbox, 'dist/assets/oramaDB_games.json'), 'utf8')
-  const gamesData = JSON.parse(rawGamesData) as Data<PropertiesSchema>
+  const gamesData = JSON.parse(rawGamesData) as Schema
   const gamesDB = await createOramaDB({ schema: { _: 'string' } })
-  await loadOramaDB(gamesDB, gamesData)
+  await loadOramaDB(gamesDB, gamesData as any)
 
   // Search results seem reasonable
   const catSearchResult = await search(animalsDB, { term: 'cat' })
