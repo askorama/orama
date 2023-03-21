@@ -12,6 +12,7 @@
 *.vue
 *.yaml
 *.yml
+*.gif
 **/datasets/*.json
 **/snapshots/*.json
 stemmer
