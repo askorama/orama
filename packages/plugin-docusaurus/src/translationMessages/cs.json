@@ -1,0 +1,7 @@
+{
+  "plugin-docusaurus.searchBar.placeholder": "Vyhledat...",
+  "plugin-docusaurus.searchBar.noResults": "Nenalezeny žádné výsledky.",
+  "plugin-docusaurus.searchBar.clearButtonTitle": "Vymazat",
+  "plugin-docusaurus.searchBar.detachedCancelButtonText": "Zrušit",
+  "plugin-docusaurus.searchBar.submitButtonTitle": "Potvrdit"
+}

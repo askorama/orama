@@ -1,0 +1,88 @@
+:root {
+  /* TODO  relate this to docusarus css vars (which are hex values) */
+  --aa-primary-color-rgb: var(--aa-text-color-rgb);
+  --aa-footer-height: 3.5rem;
+}
+
+.aa-DetachedSearchButton {
+  border-radius: 9999px;
+  height: 36px;
+  background: var(--ifm-color-emphasis-200);
+  border: none;
+  color: initial;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1.5rem;
+}
+
+.aa-DetachedSearchButtonIcon {
+  color: inherit;
+  width: unset;
+}
+
+.aa-DetachedContainer .aa-PanelLayout {
+  bottom: var(--aa-footer-height);
+}
+
+.aa-Footer {
+  --key-shadow: inset 0 -2px 0 0 #cdcde6, inset 0 0 1px 1px #fff, 0 1px 2px 1px rgba(30, 35, 90, 0.4);
+  --key-gradient: linear-gradient(-225deg, #d5dbe4, #f8f8f8);
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid rgba(var(--aa-panel-border-color-rgb), var(--aa-panel-border-color-alpha));
+  color: var(--ifm-color-emphasis-600);
+  -webkit-user-select: none;
+  user-select: none;
+  padding: 1rem;
+  width: 100%;
+  font-size: 0.8rem;
+  height: var(--aa-footer-height);
+  position: absolute;
+  background-color: rgba(var(--aa-background-color-rgb), var(--aa-background-color-alpha));
+  bottom: 0;
+}
+
+.aa-DetachedContainer.aa-DetachedContainer--modal .aa-Footer {
+  position: static;
+}
+
+/* shadow and gradient are taken from docsearch */
+[data-theme='dark'] .aa-Footer {
+  --key-shadow: inset 0 -2px 0 0 #282d55, inset 0 0 1px 1px #51577d, 0 2px 2px 0 rgba(3, 4, 9, 0.3);
+  --key-gradient: linear-gradient(-26.5deg, #565872, #31355b);
+}
+
+ul.aa-FooterCommands {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 1rem;
+}
+
+ul.aa-FooterCommands li {
+  display: inherit;
+}
+
+.aa-FooterCommands kbd {
+  align-items: center;
+  background: var(--key-gradient);
+  border-radius: 2px;
+  box-shadow: var(--key-shadow);
+  display: flex;
+  height: 18px;
+  justify-content: center;
+  margin-right: 0.4em;
+  padding: 0 0 1px;
+  border: 0;
+  width: 20px;
+}
+
+a.aa-FooterSearchCredit {
+  color: inherit;
+  --ifm-link-hover-color: inherit;
+  --ifm-link-hover-decoration: none;
+}
