@@ -1,0 +1,7 @@
+{
+  "plugin-docusaurus.searchBar.placeholder": "Sök...",
+  "plugin-docusaurus.searchBar.noResults": "Hittade inga resultat.",
+  "plugin-docusaurus.searchBar.clearButtonTitle": "Ta bort",
+  "plugin-docusaurus.searchBar.detachedCancelButtonText": "Avbryt",
+  "plugin-docusaurus.searchBar.submitButtonTitle": "Skicka"
+}
