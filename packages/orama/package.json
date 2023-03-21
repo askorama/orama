@@ -60,8 +60,10 @@
   "scripts": {
     "predev": "rm -rf dist && mkdir dist && cp -a stemmer/lib dist/stemmer",
     "dev": "swc -s -w --extensions .ts,.cts -d dist src",
+    "prebuild": "npm run lint",
     "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",
     "postbuild": "sh scripts/postbuild.sh",
+    "lint": "eslint src tests --ext .js,.ts,.cts",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
     "test:smoke": "tap --rcfile=tests/config/tap.yml tests/smoke/*.test.ts",

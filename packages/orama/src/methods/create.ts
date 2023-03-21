@@ -3,7 +3,7 @@ import { createDocumentsStore } from '../components/documents-store.js'
 import { COMPLEX_COMPONENTS, SIMPLE_COMPONENTS, SIMPLE_OR_ARRAY_COMPONENTS } from '../components/hooks.js'
 import { createIndex } from '../components/index.js'
 import { createError } from '../errors.js'
-import { createTokenizer } from '../tokenizer/index.js'
+import { createTokenizer } from '../components/tokenizer/index.js'
 import {
   ArrayCallbackComponents,
   Components,

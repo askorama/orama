@@ -1,4 +1,4 @@
-import { SUPPORTED_LANGUAGES } from './tokenizer/languages.js'
+import { SUPPORTED_LANGUAGES } from './components/tokenizer/languages.js'
 import { sprintf } from './utils.js'
 
 const allLanguages = SUPPORTED_LANGUAGES.join('\n - ')

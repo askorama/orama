@@ -268,6 +268,7 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
 
 export interface Tokenizer {
   language: string
+  normalizationCache: Map<string, string>
   tokenize: (raw: string, language?: string) => string[]
 }
 

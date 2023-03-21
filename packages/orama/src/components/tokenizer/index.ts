@@ -1,5 +1,5 @@
-import { createError } from '../errors.js'
-import { Tokenizer } from '../types.js'
+import { createError } from '../../errors.js'
+import { Tokenizer } from '../../types.js'
 import { replaceDiacritics } from './diacritics.js'
 import { Language, SPLITTERS, STEMMERS, SUPPORTED_LANGUAGES } from './languages.js'
 import { stopWords as defaultStopWords } from './stop-words/index.js'
@@ -18,21 +18,20 @@ interface DefaultTokenizer extends Tokenizer {
   stemmer?: Stemmer
   stopWords?: string[]
   allowDuplicates: boolean
+  normalizationCache: Map<string, string>
   normalizeToken(this: DefaultTokenizer, token: string): string
 }
-
-export const normalizationCache = new Map()
 
 function normalizeToken(this: DefaultTokenizer, token: string): string {
   const key = `${this.language}:${token}`
 
-  if (normalizationCache.has(key)) {
-    return normalizationCache.get(key)!
+  if (this.normalizationCache.has(key)) {
+    return this.normalizationCache.get(key)!
   }
 
   // Remove stopwords if enabled
   if (this.stopWords?.includes(token)) {
-    normalizationCache.set(key, '')
+    this.normalizationCache.set(key, '')
     return ''
   }
 
@@ -42,7 +41,7 @@ function normalizeToken(this: DefaultTokenizer, token: string): string {
   }
 
   token = replaceDiacritics(token)
-  normalizationCache.set(key, token)
+  this.normalizationCache.set(key, token)
   return token
 }
 
@@ -101,7 +100,7 @@ export async function createTokenizer(language: Language, config: TokenizerConfi
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore This fails when verifying CJS but it's actually correct
-      const stemmersPath = import.meta.url.endsWith('ts') ? '../stemmer/lib' : 'stemmer'
+      const stemmersPath = import.meta.url.endsWith('ts') ? '../../stemmer/lib' : '../stemmer'
       const stemmerImport = await import(`../${stemmersPath}/${STEMMERS[language]}.js`)
       stemmer = stemmerImport.stemmer
     }
@@ -141,6 +140,7 @@ export async function createTokenizer(language: Language, config: TokenizerConfi
     stopWords,
     allowDuplicates: Boolean(config.allowDuplicates),
     normalizeToken,
+    normalizationCache: new Map(),
   }
 
   tokenizer.tokenize = tokenize.bind(tokenizer)

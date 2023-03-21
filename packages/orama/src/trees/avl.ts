@@ -85,7 +85,7 @@ export function rangeSearch<K, V>(node: Node<K, V>, min: K, max: K): V {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const result: V = []
+  const result: V[] = []
 
   function traverse(node: Node<K, V>) {
     if (!node) {
@@ -97,7 +97,7 @@ export function rangeSearch<K, V>(node: Node<K, V>, min: K, max: K): V {
     }
 
     if (node.key >= min && node.key <= max) {
-      ;(result as V[]).push(...(node.value as V[]))
+      result.push(...(node.value as V[]))
     }
 
     if (node.key < max) {
@@ -107,7 +107,7 @@ export function rangeSearch<K, V>(node: Node<K, V>, min: K, max: K): V {
 
   traverse(node)
 
-  return result
+  return result as V
 }
 
 export function greaterThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
@@ -117,7 +117,7 @@ export function greaterThan<K, V>(node: Node<K, V>, key: K, inclusive = false): 
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const result: V = []
+  const result: V[] = []
 
   function traverse(node: Node<K, V>) {
     if (!node) {
@@ -125,11 +125,11 @@ export function greaterThan<K, V>(node: Node<K, V>, key: K, inclusive = false): 
     }
 
     if (inclusive && node.key >= key) {
-      ;(result as V[]).push(...(node.value as V[]))
+      result.push(...(node.value as V[]))
     }
 
     if (!inclusive && node.key > key) {
-      ;(result as V[]).push(...(node.value as V[]))
+      result.push(...(node.value as V[]))
     }
 
     traverse(node.left as Node<K, V>)
@@ -138,7 +138,7 @@ export function greaterThan<K, V>(node: Node<K, V>, key: K, inclusive = false): 
 
   traverse(node)
 
-  return result
+  return result as V
 }
 
 export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
@@ -148,7 +148,7 @@ export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const result: V = []
+  const result: V[] = []
 
   function traverse(node: Node<K, V>) {
     if (!node) {
@@ -156,11 +156,11 @@ export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
     }
 
     if (inclusive && node.key <= key) {
-      ;(result as V[]).push(...(node.value as V[]))
+      result.push(...(node.value as V[]))
     }
 
     if (!inclusive && node.key < key) {
-      ;(result as V[]).push(...(node.value as V[]))
+      result.push(...(node.value as V[]))
     }
 
     traverse(node.left as Node<K, V>)
@@ -169,7 +169,7 @@ export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
 
   traverse(node)
 
-  return result
+  return result as V
 }
 
 function getNodeByKey<K, V>(node: Node<K, V>, key: K): Node<K, V> | null {
@@ -208,6 +208,7 @@ export function insert<K, V>(node: Node<K, V>, key: K, value: V): Node<K, V> {
   } else if (key > node.key) {
     node.right = insert(node.right as Node<K, V>, key, value)
   } else {
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;(node.value as string[]) = (node.value as string[]).concat(value as string)
     return node
   }

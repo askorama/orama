@@ -5,6 +5,7 @@ import type {
   getDefaultComponents as esmGetDefaultComponents,
   documentsStore as esmdocumentsStore,
   index as esmIndex,
+  tokenizer as esmTokenizer,
 } from '../components.js'
 
 export interface OramaComponents {
@@ -14,6 +15,7 @@ export interface OramaComponents {
   getDefaultComponents: typeof esmGetDefaultComponents
   documentsStore: typeof esmdocumentsStore
   index: typeof esmIndex
+  tokenizer: typeof esmTokenizer
 }
 
 export type RequireCallback = (err: Error | undefined, components?: OramaComponents) => void
