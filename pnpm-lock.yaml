@@ -69,6 +69,7 @@ importers:
       nextra-theme-docs: ^2.2.19
       react: ^18.2.0
       react-dom: ^18.2.0
+      react-icons: ^4.8.0
     dependencies:
       next: 13.2.4_biqbaboplfbrettd7655fr4n2y
       nextra: 2.2.19_ld2jel3hspngo3u5lti2kgl2sq
@@ -76,6 +77,7 @@ importers:
       nextra-theme-docs: 2.2.19_i765vautotixoofbdi6dinfkwe
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+      react-icons: 4.8.0_react@18.2.0
 
   packages/orama:
     specifiers:
@@ -13626,6 +13628,14 @@ packages:
       react-dom: 17.0.2_react@17.0.2
       react-fast-compare: 3.2.1
       shallowequal: 1.1.0
+
+  /react-icons/4.8.0_react@18.2.0:
+    resolution: {integrity: sha512-N6+kOLcihDiAnj5Czu637waJqSnwlMNROzVZMhfX68V/9bu9qHaMIJC4UdozWoOk57gahFCNHwVvWzm0MTzRjg==}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}

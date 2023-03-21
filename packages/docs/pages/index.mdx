@@ -1,10 +1,47 @@
-import { Tab, Tabs } from 'nextra-theme-docs'
+import { Tab, Tabs, Card, Cards } from 'nextra-theme-docs'
+import { BsDatabaseFillAdd, BsCodeSlash, BsPlugin } from 'react-icons/bs'
+import { AiFillFileAdd, AiOutlineSearch, AiFillDelete } from 'react-icons/ai'
 
 # Getting Started with Orama
 
 Orama is an **immutable, runtime-agnostic, edge, and in-memory full-text search engine** that works both on client and server.
 
 Through implementing an optimized prefix tree and some clever tweaks, Orama can perform searches through millions of entries in **microseconds**.
+
+Get started in just a few lines of code:
+
+<Cards>
+  <Card
+    icon={<BsDatabaseFillAdd style={{ width: 22, height: 22 }} />}
+    title="Create a new database"
+    href="/usage/create"
+  />
+  <Card
+    icon={<AiFillFileAdd style={{ width: 22, height: 22 }} />}
+    title="Insert data"
+    href="/usage/insert"
+  />
+  <Card
+    icon={<AiOutlineSearch style={{ width: 22, height: 22 }} />}
+    title="Search"
+    href="/usage/search/introduction"
+  />
+  <Card
+    icon={<AiFillDelete style={{ width: 22, height: 22 }} />}
+    title="Delete data"
+    href="/usage/delete"
+  />
+  <Card
+    icon={<BsCodeSlash style={{ width: 22, height: 22 }} />}
+    title="Extend Orama"
+    href="/internals/extending-orama"
+  />
+  <Card
+    icon={<BsPlugin style={{ width: 22, height: 22 }} />}
+    title="Use Plugins"
+    href="/plugins"
+  />
+</Cards>
 
 ## Requirements
 

@@ -12,3 +12,8 @@ pnpm-lock.yaml
 .gitignore
 .prettierignore
 **/*.mdx
+*.webmanifest
+*.png
+*.svg
+*.xml
+*.ico
