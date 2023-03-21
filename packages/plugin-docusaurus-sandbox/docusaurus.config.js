@@ -4,7 +4,7 @@ module.exports = {
   favicon: 'img/favicon.ico',
   url: 'http://localhost:3000/',
   baseUrl: '/',
-  organizationName: 'lyrasearch',
+  organizationName: 'oramasearch',
   projectName: 'plugin-docusaurus',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',

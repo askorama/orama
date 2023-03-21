@@ -97,12 +97,12 @@ When using CommonJS, internals can be imported in two ways:
    const { tokenize } = await import('@orama/orama/internals')
    ```
 
-2. Use the `requireLyraInternals`:
+2. Use the `requireOramaInternals`:
 
    ```js
-   const { requireLyraInternals } = require('@orama/orama/cjs/internals')
+   const { requireOramaInternals } = require('@orama/orama/cjs/internals')
 
-   requireLyraInternals((err, { tokenize }) => {
+   requireOramaInternals((err, { tokenize }) => {
      // ...
    })
    ```
