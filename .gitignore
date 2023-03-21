@@ -6,3 +6,6 @@ node_modules/
 pnpm-lock.yaml
 packages/plugin-docusaurus-sandbox/build
 playwright-report
+.dev
+.DS_Store
+.turbo

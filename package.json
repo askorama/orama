@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "commit": "pnpm run format && pnpm lint-staged && cz",
+    "commit": "turbo lint && pnpm lint-staged && cz",
     "format": "prettier -w packages --ignore-path ",
     "prepare": "husky install .husky",
     "build:orama": "cd packages/orama && npm run build",
@@ -22,10 +22,10 @@
     "test:plugin-docusaurus": "cd packages/plugin-docusaurus && npm test",
     "test:plugin-match-highlight": "cd packages/plugin-match-highlight && npm test",
     "test:plugin-parsedoc": "cd packages/plugin-parsedoc && npm test",
-    "test": "pnpm run -r test"
+    "test": "pnpm run -r test",
+    "publish-packages": "turbo run lint build test && changeset version && changeset publish"
   },
   "devDependencies": {
-    "@nrwl/nx-cloud": "latest",
     "@swc/cli": "^0.1.59",
     "@swc/core": "^1.3.27",
     "@types/node": "^18.11.18",
@@ -41,7 +41,6 @@
     "execa": "^6.1.0",
     "husky": "^8.0.2",
     "lint-staged": "^13.1.0",
-    "nx": "15.8.7",
     "prettier": "^2.8.1",
     "tap": "^16.3.2",
     "tap-mocha-reporter": "^5.0.3",
@@ -82,12 +81,15 @@
         "@babel/plugin-syntax-flow",
         "@babel/plugin-transform-react-jsx",
         "algoliasearch",
-        "eslint",        
+        "eslint",
         "typescript"
       ]
     }
   },
   "engines": {
     "node": ">= 16.0.0"
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.26.0"
   }
 }
