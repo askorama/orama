@@ -6,12 +6,31 @@
       "outputs": ["dist/**"]
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["build"],
       "inputs": ["packages/**/*.test.js", "packages/**/*.test.jsx", "packages/**/*.test.ts", "packages/**/*.test.tsx"]
     },
     "lint": {},
     "deploy": {
       "dependsOn": ["^lint", "^build", "^test"]
+    },
+    "@orama/plugin-match-highlight#build": {
+      "dependsOn": ["@orama/orama#build", "^build"],
+      "outputs": ["dist/**"]
+    },
+    "@orama/plugin-parsedoc#build": {
+      "dependsOn": ["@orama/orama#build", "^build"],
+      "outputs": ["dist/**"]
+    },
+    "@orama/plugin-astro#build": {
+      "dependsOn": ["@orama/orama#build", "^build"],
+      "outputs": ["dist/**"]
+    },
+    "@orama/plugin-docusaurus#build": {
+      "dependsOn": ["@orama/orama#build", "@orama/plugin-match-highlight#build", "@orama/plugin-parsedoc#build", "^build"],
+      "outputs": ["dist/**"]
+    },
+    "@orama/plugin-docusaurus#test": {
+      "dependsOn": ["@orama/plugin-astro#test"]
     }
   }
 }

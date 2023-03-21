@@ -121,6 +121,7 @@ export function insert(
     avlInsert(index.indexes[prop] as AVLNode<number, string[]>, value as number, [id])
     return
   } else if (typeof value === 'boolean') {
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;(index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].push(id)
     return
   }

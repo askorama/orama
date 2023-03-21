@@ -1,9 +1,19 @@
-import type { BoundedMetric } from '../components/levenshtein.js'
+import type {
+  boundedLevenshtein as esmBoundedLevenshtein,
+  sprintf as esmSprintf,
+  formatBytes as esmFormatBytes,
+  formatNanoseconds as esmFormatNanoseconds,
+  getNanosecondsTime as esmGetNanosecondsTime,
+  uniqueId as esmUniqueId,
+} from '../internals.js'
 
 export interface OramaInternals {
-  boundedLevenshtein(a: string, b: string, tolerance: number): BoundedMetric
-  formatNanoseconds(value: number | bigint): string
-  getNanosecondsTime(): bigint
+  boundedLevenshtein: typeof esmBoundedLevenshtein
+  sprintf: typeof esmSprintf
+  formatBytes: typeof esmFormatBytes
+  formatNanoseconds: typeof esmFormatNanoseconds
+  getNanosecondsTime: typeof esmGetNanosecondsTime
+  uniqueId: typeof esmUniqueId
 }
 
 export type RequireCallback = (err: Error | undefined, orama?: OramaInternals) => void

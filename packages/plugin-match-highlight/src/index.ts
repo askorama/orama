@@ -1,5 +1,4 @@
 import { Document, Language, Orama, Result, Schema, search, SearchParams } from '@orama/orama'
-import { normalizationCache } from '@orama/orama/internals'
 
 export interface Position {
   start: number
@@ -49,12 +48,12 @@ function recursivePositionInsertion(
       const word = regExResult[0].toLowerCase()
       const key = `${orama.tokenizer.language}:${word}`
       let token: string
-      if (normalizationCache.has(key)) {
-        token = normalizationCache.get(key)
+      if (orama.tokenizer.normalizationCache.has(key)) {
+        token = orama.tokenizer.normalizationCache.get(key)!
         /* c8 ignore next 4 */
       } else {
         ;[token] = orama.tokenizer.tokenize(word)
-        normalizationCache.set(key, token)
+        orama.tokenizer.normalizationCache.set(key, token)
       }
       if (!Array.isArray(orama.data.positions[id][propName][token])) {
         orama.data.positions[id][propName][token] = []
@@ -70,7 +69,7 @@ export async function searchWithHighlight(
   orama: OramaWithHighlight,
   params: SearchParams,
   language?: Language
-): Promise<Array<SearchResultWithHighlight>> {
+): Promise<SearchResultWithHighlight[]> {
   const result = await search(orama, params, language)
   const queryTokens: string[] = orama.tokenizer.tokenize(params.term)
   return result.hits.map(hit =>

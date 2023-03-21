@@ -1,0 +1,14 @@
+{
+  "name": "@orama/plugin-astro-sandbox",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "exit 0",
+    "test": "exit 0"
+  },
+  "dependencies": {
+    "@orama/plugin-astro": "workspace:*",
+    "astro": "^2.0.2"
+  }
+}

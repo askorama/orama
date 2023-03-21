@@ -2,8 +2,8 @@ import t from 'tap'
 import { DocumentsStore } from '../src/components/documents-store.js'
 import { Index } from '../src/components/index.js'
 import { create, insert, insertMultiple, remove, search } from '../src/index.js'
-import { createTokenizer } from '../src/tokenizer/index.js'
-import { SUPPORTED_LANGUAGES } from '../src/tokenizer/languages.js'
+import { createTokenizer } from '../src/components/tokenizer/index.js'
+import { SUPPORTED_LANGUAGES } from '../src/components/tokenizer/languages.js'
 import type { Document } from '../src/types'
 import dataset from './datasets/events.json' assert { type: 'json' }
 
@@ -269,7 +269,7 @@ t.test('orama', t => {
         author: 'string',
       },
       components: {
-        tokenizer: await createTokenizer('english', { stemming: false, stopWords: false }),
+        tokenizer: await createTokenizer('english', { stemming: false }),
       },
     })
 

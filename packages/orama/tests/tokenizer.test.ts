@@ -1,6 +1,6 @@
 import t from 'tap'
 
-import { createTokenizer, normalizationCache } from '../src/tokenizer/index.js'
+import { createTokenizer } from '../src/components/tokenizer/index.js'
 import { stemmer as BGStemmer } from '../stemmer/lib/bg.js'
 import { stemmer as DEStemmer } from '../stemmer/lib/de.js'
 import { stemmer as DKStemmer } from '../stemmer/lib/dk.js'
@@ -247,8 +247,6 @@ t.test('Custom stop-words rules', async t => {
   t.test('custom array of stop-words', async t => {
     t.plan(2)
 
-    normalizationCache.clear()
-
     const tokenizer = await createTokenizer('english', { stopWords: ['quick', 'brown', 'fox', 'dog'] })
 
     const I1 = 'the quick brown fox jumps over the lazy dog'
@@ -264,8 +262,6 @@ t.test('Custom stop-words rules', async t => {
 
   t.test('custom stop-words function', async t => {
     t.plan(2)
-
-    normalizationCache.clear()
 
     const tokenizer = await createTokenizer('english', {
       stopWords(words: string[]): string[] {
@@ -286,8 +282,6 @@ t.test('Custom stop-words rules', async t => {
   t.test('disable stop-words', async t => {
     t.plan(2)
 
-    normalizationCache.clear()
-
     const tokenizer = await createTokenizer('english', { stopWords: false })
 
     const I1 = 'the quick brown fox jumps over the lazy dog'
@@ -303,8 +297,6 @@ t.test('Custom stop-words rules', async t => {
   t.test('disable stemming', async t => {
     t.plan(2)
 
-    normalizationCache.clear()
-
     const tokenizer = await createTokenizer('english', { stemming: false })
 
     const I1 = 'the quick brown fox jumps over the lazy dog'
@@ -319,8 +311,6 @@ t.test('Custom stop-words rules', async t => {
 
   t.test('custom stemming function', async t => {
     t.plan(2)
-
-    normalizationCache.clear()
 
     const tokenizer = await createTokenizer('english', { stemmer: word => `${word}-ish` })
 
