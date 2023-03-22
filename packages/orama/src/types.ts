@@ -232,12 +232,6 @@ export type IIndexInsertOrRemoveFunction<I extends OpaqueIndex = OpaqueIndex, R 
   docsCount: number,
 ) => SyncOrAsyncValue<R>
 
-export type IIndexRemoveFunction<I extends OpaqueIndex = OpaqueIndex> = (
-  index: I,
-  id: string,
-  prop: string,
-) => SyncOrAsyncValue
-
 export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   create: (orama: Orama<{ Index: I }>, schema: Schema) => I
 
@@ -249,7 +243,7 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   remove: IIndexInsertOrRemoveFunction<I, boolean>
   afterRemove?: IIndexInsertOrRemoveFunction<I>
 
-  search(index: I, prop: string, terms: string, context: SearchContext): SyncOrAsyncValue<TokenScore[]>
+  search(index: I, prop: string, term: string, context: SearchContext): SyncOrAsyncValue<TokenScore[]>
   searchByWhereClause(index: I, filters: Record<string, boolean | ComparisonOperator>): string[]
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
