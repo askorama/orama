@@ -13,7 +13,7 @@ import {
   TokenMap,
   ElapsedTime,
 } from '../types.js'
-import { formatNanoseconds, getNanosecondsTime, sortTokenScorePredicate } from '../utils.js'
+import { getNanosecondsTime, sortTokenScorePredicate } from '../utils.js'
 
 const defaultBM25Params: BM25Params = {
   k: 1.2,
@@ -192,7 +192,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   }
 
   const searchResult: Results = {
-    elapsed: await orama.formatElapsedTime(getNanosecondsTime() - context.timeStart),
+    elapsed: (await orama.formatElapsedTime(getNanosecondsTime() - context.timeStart)) as ElapsedTime,
     hits: results.filter(Boolean),
     count: uniqueDocsArray.length,
   }

@@ -102,7 +102,10 @@ word `if`, looking up in every schema property (AKA index):
 
 ```js
 {
-  elapsed: 184541n, // Elapsed time in nanoseconds
+  elapsed: {
+    raw: 184541,
+    formatted: '184μs',
+  },
   hits: [
     {
       id: '41013877-56',
@@ -138,7 +141,10 @@ Result:
 
 ```js
 {
-  elapsed: 172166n,
+  elapsed: {
+    raw: 172166,
+    formatted: '172μs',
+  },
   hits: [
     {
       id: '41045799-144',

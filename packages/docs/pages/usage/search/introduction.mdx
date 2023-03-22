@@ -215,3 +215,29 @@ following properties:
 | `elapsed` | `object` | Time taken to execute the query. <br /> Returns an object with the following shape: <br />` { raw: number, formatted: string } ` |
 | `hits`    | `object` | Array of results containing result score (from `0` to `1` based on relevance), Orama's ID, and original document.   |
 | `count`   | `number` | Number of total results.                                                                                            |
+
+You can always customize the behavior of the `elapsed` property by using the `formatElapsedTime` component when creating a new Orama instance:
+
+```javascript copy
+const db = await create({
+  schema: {
+    title: 'string',
+    body: 'string',
+  },
+  components: {
+    formatElapsedTime: (n: bigint) => {
+      return `custom value: ${n}`
+    }
+  }
+})
+```
+
+When performing a search operation, the `elapsed` property will now return the following value:
+
+```javascript copy
+{
+  elapsed: 'custom value: 181208', // instead of { raw: 181208, formatted: '181μs' }
+  count: 2,
+  hits: [...]
+}
+```
