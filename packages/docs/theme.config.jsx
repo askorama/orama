@@ -1,6 +1,15 @@
 import { FaSlack } from 'react-icons/fa'
 import { Logo } from './components/Logo'
 
+const css = `
+li > ul.nx-mt-6 {
+  margin-top: 0;
+}
+
+li > ul.nx-mt-6 > li:first-child {
+  margin-top: 0;
+}
+`
 export default {
   project: {
     link: 'https://github.com/oramasearch/orama',
@@ -33,6 +42,8 @@ export default {
       <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#000000" />
       <meta name="msapplication-TileColor" content="#000000" />
       <meta name="theme-color" content="#000000"></meta>
+
+      <style dangerouslySetInnerHTML={{ __html: css }} />
     </>
   ),
 }

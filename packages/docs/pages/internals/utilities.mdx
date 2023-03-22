@@ -1,0 +1,98 @@
+# Utilities
+
+Orama exposes some of its internal utility functions:
+
+```javascript copy
+import {
+  boundedLevenshtein,
+  sprintf,
+  formatBytes,
+  formatNanoseconds,
+  getNanosecondsTime,
+  uniqueId
+} from '@orama/orama/internals'
+```
+
+Every exposed method comes with its own type definition.
+
+Let's break them down:
+
+### `boundedLevenshtein`
+
+Computes the Levenshtein distance between two strings `(a, b)`, returning early with -1 if the distance is greater than the given tolerance. It assumes that `tolerance >= ||a| - |b|| >= 0`.
+
+```javascript copy
+import { boundedLevenshtein } from '@orama/orama/internals'
+
+boundedLevenshtein('moon', 'lions', 3) // { isBounded: true, distance: 3 }
+```
+
+### `sprintf`
+
+A naive implementation of the sprintf function which supports the `%s`, `%d` and `%f` placeholders.
+
+```javascript copy
+import { sprintf } from '@orama/orama/internals'
+
+sprintf('Hello %s!', 'world') // Hello world!
+```
+
+### `formatBytes`
+
+Takes a `BigInt` as input and returns a human-readable `string`.
+
+```javascript copy
+import { formatBytes } from '@orama/orama/internals'
+
+formatBytes(1024) // '1 KB'
+```
+
+### `formatNanoseconds`
+
+Takes a `BigInt` as input and returns a human-readable `string`.
+
+```javascript copy
+import { formatNanoseconds } from '@orama/orama/internals'
+
+formatNanoseconds(30000n) // '30μs'
+```
+
+### `getNanosecondsTime`
+
+Gets the current time with nanoseconds-precision. Returns a `BigInt`.
+
+```javascript copy
+import { getNanosecondsTime } from '@orama/orama/internals'
+
+getNanosecondsTime() // 1363500821581208n
+```
+
+### `uniqueId`
+
+Returns a uniqueId for a document as a `string`.
+
+```javascript copy
+import { uniqueId } from '@orama/orama/internals'
+
+uniqueId() // 37149225-243
+```
+
+# CommonJS Imports
+
+When using CommonJS, internals can be imported in two ways:
+
+1. Use `await import` inside an async function:
+
+   ```js
+   const { boundedLevenshtein } = await import('@orama/orama/internals')
+   ```
+
+2. Use the `requireOramaInternals`:
+
+   ```js
+   const { requireOramaInternals } = require('@orama/orama/cjs/internals')
+
+   requireOramaInternals((err, { boundedLevenshtein }) => {
+     // ...
+   })
+   ```
