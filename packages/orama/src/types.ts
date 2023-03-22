@@ -194,6 +194,11 @@ export type SearchContext = {
   docsIntersection: TokenMap
 }
 
+export type ElapsedTime = {
+  raw: number
+  formatted: string
+}
+
 export type Results = {
   /**
    * The number of all the matched documents.
@@ -206,7 +211,7 @@ export type Results = {
   /**
    * The time taken to search.
    */
-  elapsed: bigint | string
+  elapsed: ElapsedTime
   /**
    * The facets results.
    */
@@ -282,7 +287,7 @@ export interface SimpleComponents<S extends Schema = Schema> {
   validateSchema(doc: Document, schema: S): SyncOrAsyncValue<boolean>
   getDocumentIndexId(doc: Document): SyncOrAsyncValue<string>
   getDocumentProperties(doc: Document, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>
-  formatElapsedTime(number: bigint): SyncOrAsyncValue<bigint> | SyncOrAsyncValue<string>
+  formatElapsedTime(number: bigint): SyncOrAsyncValue<ElapsedTime> | SyncOrAsyncValue<ElapsedTime>
 }
 
 export interface SimpleOrArrayCallbackComponents {

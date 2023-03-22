@@ -1,11 +1,14 @@
 import { createError } from '../errors.js'
-import { Document, Schema, SimpleComponents } from '../types.js'
-import { getDocumentProperties, uniqueId } from '../utils.js'
+import { Document, ElapsedTime, Schema, SimpleComponents } from '../types.js'
+import { getDocumentProperties, uniqueId, formatNanoseconds } from '../utils.js'
 
 export { getDocumentProperties } from '../utils.js'
 
-export function formatElapsedTime(n: bigint): bigint {
-  return n
+export function formatElapsedTime(n: bigint): ElapsedTime {
+  return {
+    raw: Number(n),
+    formatted: formatNanoseconds(n),
+  }
 }
 
 export function getDocumentIndexId(doc: Document): string {

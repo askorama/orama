@@ -178,7 +178,10 @@ following properties:
 
 ```javascript copy
 {
-  elapsed: 181208n,
+  elapsed: {
+    raw: 181208,
+    formatted: '181μs',
+  },
   count: 2,
   hits: [
     {
@@ -207,34 +210,8 @@ following properties:
 }
 ```
 
-| Property  | Type     | Description                                                                                                       |
-| --------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
-| `elapsed` | `BigInt` | Time taken to execute the query.                                                                                  |
-| `hits`    | `object` | Array of results containing result score (from `0` to `1` based on relevance), Orama's ID, and original document. |
-| `count`   | `number` | Number of total results.                                                                                          |
-
-You can customize the `elapsed` property into a more readable format by using
-the `components.elapsed.format` property during the database initialization:
-
-```js
-import { create } from '@orama/orama'
-
-const db = await create({
-  schema: { ... },
-  components: {
-    elapsed: {
-      format: 'human' // defaults to 'raw'
-    }
-  }
-})
-```
-
-By setting this configuration, the `elapsed` property will be returned as a human-readable string:
-
-```js
-{
-  elapsed: '1ms',
-  count: 2,
-  hits: { ... }
-}
-```
+| Property  | Type     | Description                                                                                                         |
+| --------- | -------- | ------------------------------------------------------------------------------------------------------------------- |
+| `elapsed` | `object` | Time taken to execute the query. <br /> Returns an object with the following shape: <br />` { raw: number, formatted: string } ` |
+| `hits`    | `object` | Array of results containing result score (from `0` to `1` based on relevance), Orama's ID, and original document.   |
+| `count`   | `number` | Number of total results.                                                                                            |

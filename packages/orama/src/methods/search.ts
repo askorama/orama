@@ -2,8 +2,18 @@ import { prioritizeTokenScores } from '../components/algorithms.js'
 import { getFacets } from '../components/facets.js'
 import { intersectFilteredIDs } from '../components/filters.js'
 import { createError } from '../errors.js'
-import { BM25Params, IndexMap, Orama, Result, Results, SearchContext, SearchParams, TokenMap } from '../types.js'
-import { getNanosecondsTime, sortTokenScorePredicate } from '../utils.js'
+import {
+  BM25Params,
+  IndexMap,
+  Orama,
+  Result,
+  Results,
+  SearchContext,
+  SearchParams,
+  TokenMap,
+  ElapsedTime,
+} from '../types.js'
+import { formatNanoseconds, getNanosecondsTime, sortTokenScorePredicate } from '../utils.js'
 
 const defaultBM25Params: BM25Params = {
   k: 1.2,
