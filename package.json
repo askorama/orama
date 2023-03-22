@@ -1,6 +1,6 @@
 {
   "name": "orama-monorepo",
-  "version": "1.0.1",
+  "version": "1.0.0-beta.3",
   "description": "Next generation full-text search engine, written in TypeScript",
   "workspaces": [
     "packages/*"
@@ -24,7 +24,7 @@
     "test:plugin-parsedoc": "cd packages/plugin-parsedoc && npm test",
     "commit": "turbo lint && pnpm lint-staged && cz",
     "prepare": "husky install .husky",
-    "publish-packages": "turbo run lint build test && changeset version && changeset publish"
+    "publish-packages": "zx ./release.mjs"
   },
   "devDependencies": {
     "@swc/cli": "^0.1.59",
