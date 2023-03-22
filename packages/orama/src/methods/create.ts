@@ -2,8 +2,8 @@ import { getDefaultComponents } from '../components/defaults.js'
 import { createDocumentsStore } from '../components/documents-store.js'
 import { COMPLEX_COMPONENTS, SIMPLE_COMPONENTS, SIMPLE_OR_ARRAY_COMPONENTS } from '../components/hooks.js'
 import { createIndex } from '../components/index.js'
-import { createError } from '../errors.js'
 import { createTokenizer } from '../components/tokenizer/index.js'
+import { createError } from '../errors.js'
 import {
   ArrayCallbackComponents,
   Components,
@@ -13,6 +13,7 @@ import {
   Schema,
   SimpleComponents,
   SimpleOrArrayCallbackComponents,
+  Tokenizer,
 } from '../types.js'
 
 interface CreateArguments {
@@ -70,14 +71,19 @@ export async function create({ schema, language, components }: CreateArguments):
     components = {}
   }
 
-  let tokenizer = components.tokenizer
+  let tokenizer = components.tokenizer as Tokenizer
   let index = components.index
   let documentsStore = components.documentsStore
 
   if (!tokenizer) {
     // Use the default tokenizer
-    tokenizer = await createTokenizer(language ?? 'english')
-  } else if (language) {
+    tokenizer = await createTokenizer({ language: language ?? 'english' })
+  } else if (!tokenizer.tokenize) {
+    // If there is no tokenizer function, we assume this is a TokenizerConfig
+    tokenizer = await createTokenizer(tokenizer)
+  }
+
+  if (components.tokenizer && language) {
     // Accept language only if a tokenizer is not provided
     throw createError('NO_LANGUAGE_WITH_CUSTOM_TOKENIZER')
   }

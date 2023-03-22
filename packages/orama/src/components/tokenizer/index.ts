@@ -1,17 +1,8 @@
 import { createError } from '../../errors.js'
-import { Tokenizer } from '../../types.js'
+import { Stemmer, Tokenizer, TokenizerConfig } from '../../types.js'
 import { replaceDiacritics } from './diacritics.js'
-import { Language, SPLITTERS, STEMMERS, SUPPORTED_LANGUAGES } from './languages.js'
+import { SPLITTERS, STEMMERS, SUPPORTED_LANGUAGES } from './languages.js'
 import { stopWords as defaultStopWords } from './stop-words/index.js'
-
-export type Stemmer = (word: string) => string
-
-export type TokenizerConfig = {
-  stemming?: boolean
-  stemmer?: Stemmer
-  stopWords?: boolean | string[] | ((stopWords: string[]) => string[] | Promise<string[]>)
-  allowDuplicates?: boolean
-}
 
 interface DefaultTokenizer extends Tokenizer {
   language: string
@@ -78,9 +69,11 @@ function tokenize(this: DefaultTokenizer, input: string, language?: string): str
   return trimTokens
 }
 
-export async function createTokenizer(language: Language, config: TokenizerConfig = {}): Promise<DefaultTokenizer> {
-  if (!SUPPORTED_LANGUAGES.includes(language)) {
-    throw createError('LANGUAGE_NOT_SUPPORTED', language)
+export async function createTokenizer(config: TokenizerConfig = {}): Promise<DefaultTokenizer> {
+  if (!config.language) {
+    config.language = 'english'
+  } else if (!SUPPORTED_LANGUAGES.includes(config.language)) {
+    throw createError('LANGUAGE_NOT_SUPPORTED', config.language)
   }
 
   // Handle stemming
@@ -101,7 +94,7 @@ export async function createTokenizer(language: Language, config: TokenizerConfi
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore This fails when verifying CJS but it's actually correct
       const stemmersPath = import.meta.url.endsWith('ts') ? '../../stemmer/lib' : '../stemmer'
-      const stemmerImport = await import(`../${stemmersPath}/${STEMMERS[language]}.js`)
+      const stemmerImport = await import(`../${stemmersPath}/${STEMMERS[config.language]}.js`)
       stemmer = stemmerImport.stemmer
     }
   }
@@ -110,7 +103,7 @@ export async function createTokenizer(language: Language, config: TokenizerConfi
   let stopWords: string[] | undefined
 
   if (config.stopWords !== false) {
-    stopWords = defaultStopWords[language] ?? []
+    stopWords = defaultStopWords[config.language] ?? []
 
     if (Array.isArray(config.stopWords)) {
       stopWords = config.stopWords
@@ -135,7 +128,7 @@ export async function createTokenizer(language: Language, config: TokenizerConfi
   // Create the tokenizer
   const tokenizer: DefaultTokenizer = {
     tokenize,
-    language,
+    language: config.language,
     stemmer,
     stopWords,
     allowDuplicates: Boolean(config.allowDuplicates),

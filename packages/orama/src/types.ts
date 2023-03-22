@@ -1,3 +1,5 @@
+import { Language } from './components/tokenizer/languages.js'
+
 export type Nullable<T> = T | null
 
 export type SingleOrArray<T> = T | T[]
@@ -265,6 +267,16 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
   save<R = unknown>(store: D): R | Promise<R>
 }
 
+export type Stemmer = (word: string) => string
+
+export type TokenizerConfig = {
+  language?: Language
+  stemming?: boolean
+  stemmer?: Stemmer
+  stopWords?: boolean | string[] | ((stopWords: string[]) => string[] | Promise<string[]>)
+  allowDuplicates?: boolean
+}
+
 export interface Tokenizer {
   language: string
   normalizationCache: Map<string, string>
@@ -272,7 +284,7 @@ export interface Tokenizer {
 }
 
 export interface ComplexComponent {
-  tokenizer: Tokenizer
+  tokenizer: Tokenizer | TokenizerConfig
   index: IIndex
   documentsStore: IDocumentsStore
 }
