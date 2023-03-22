@@ -342,7 +342,7 @@ t.test('orama', t => {
 
     t.ok(ex1Insert)
     t.equal(ex1Search.count, 1)
-    t.type(ex1Search.elapsed, 'bigint')
+    t.type(ex1Search.elapsed.raw, 'number')
     t.equal(ex1Search.hits[0].document.example, 'The quick, brown, fox')
   })
 

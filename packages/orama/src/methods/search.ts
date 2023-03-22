@@ -2,7 +2,17 @@ import { prioritizeTokenScores } from '../components/algorithms.js'
 import { getFacets } from '../components/facets.js'
 import { intersectFilteredIDs } from '../components/filters.js'
 import { createError } from '../errors.js'
-import { BM25Params, IndexMap, Orama, Result, Results, SearchContext, SearchParams, TokenMap } from '../types.js'
+import {
+  BM25Params,
+  IndexMap,
+  Orama,
+  Result,
+  Results,
+  SearchContext,
+  SearchParams,
+  TokenMap,
+  ElapsedTime,
+} from '../types.js'
 import { getNanosecondsTime, sortTokenScorePredicate } from '../utils.js'
 
 const defaultBM25Params: BM25Params = {
@@ -182,7 +192,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   }
 
   const searchResult: Results = {
-    elapsed: await orama.formatElapsedTime(getNanosecondsTime() - context.timeStart),
+    elapsed: (await orama.formatElapsedTime(getNanosecondsTime() - context.timeStart)) as ElapsedTime,
     hits: results.filter(Boolean),
     count: uniqueDocsArray.length,
   }

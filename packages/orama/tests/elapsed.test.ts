@@ -1,19 +1,21 @@
 import t from 'tap'
 import { create, insert, search } from '../src/index.js'
-import { formatNanoseconds } from '../src/utils.js'
 
 t.test('elapsed', t => {
   t.plan(2)
 
-  t.test('should correctly set elapsed time to a human-readable form', async t => {
-    t.plan(1)
+  t.test('should correctly set elapsed time to a custom format', async t => {
+    t.plan(2)
+
     const db = await create({
       schema: {
         title: 'string',
         body: 'string',
       },
       components: {
-        formatElapsedTime: formatNanoseconds,
+        formatElapsedTime: (n: bigint) => {
+          return `${Number(n)}n`
+        },
       },
     })
 
@@ -27,6 +29,7 @@ t.test('elapsed', t => {
     })
 
     t.same(typeof results.elapsed, 'string')
+    t.same(/(\d)n$/.test(results.elapsed as unknown as string), true)
   })
 
   t.test('should correctly set elapsed time to a bigint by default', async t => {
@@ -47,6 +50,6 @@ t.test('elapsed', t => {
       term: 'test',
     })
 
-    t.same(typeof results.elapsed, 'bigint')
+    t.same(typeof results.elapsed, 'object')
   })
 })
