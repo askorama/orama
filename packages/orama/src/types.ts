@@ -1,3 +1,5 @@
+import { Language } from './components/tokenizer/languages.js'
+
 export type Nullable<T> = T | null
 
 export type SingleOrArray<T> = T | T[]
@@ -232,12 +234,6 @@ export type IIndexInsertOrRemoveFunction<I extends OpaqueIndex = OpaqueIndex, R 
   docsCount: number,
 ) => SyncOrAsyncValue<R>
 
-export type IIndexRemoveFunction<I extends OpaqueIndex = OpaqueIndex> = (
-  index: I,
-  id: string,
-  prop: string,
-) => SyncOrAsyncValue
-
 export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   create: (orama: Orama<{ Index: I }>, schema: Schema) => I
 
@@ -249,7 +245,7 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   remove: IIndexInsertOrRemoveFunction<I, boolean>
   afterRemove?: IIndexInsertOrRemoveFunction<I>
 
-  search(index: I, prop: string, terms: string, context: SearchContext): SyncOrAsyncValue<TokenScore[]>
+  search(index: I, prop: string, term: string, context: SearchContext): SyncOrAsyncValue<TokenScore[]>
   searchByWhereClause(index: I, filters: Record<string, boolean | ComparisonOperator>): string[]
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
@@ -271,6 +267,16 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
   save<R = unknown>(store: D): R | Promise<R>
 }
 
+export type Stemmer = (word: string) => string
+
+export type TokenizerConfig = {
+  language?: Language
+  stemming?: boolean
+  stemmer?: Stemmer
+  stopWords?: boolean | string[] | ((stopWords: string[]) => string[] | Promise<string[]>)
+  allowDuplicates?: boolean
+}
+
 export interface Tokenizer {
   language: string
   normalizationCache: Map<string, string>
@@ -278,7 +284,7 @@ export interface Tokenizer {
 }
 
 export interface ComplexComponent {
-  tokenizer: Tokenizer
+  tokenizer: Tokenizer | TokenizerConfig
   index: IIndex
   documentsStore: IDocumentsStore
 }

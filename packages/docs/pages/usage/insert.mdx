@@ -28,7 +28,7 @@ const movieDB = await create({
 Data insertion in Orama is quick and intuitive:
 
 ```javascript copy
-const { id: thePrestige } = await insert(movieDB, {
+const thePrestigeId = await insert(movieDB, {
   title: 'The prestige',
   director: 'Christopher Nolan',
   plot: 'Two friends and fellow magicians become bitter enemies after a sudden tragedy. As they devote themselves to this rivalry, they make sacrifices that bring them fame but with terrible consequences.',
@@ -36,7 +36,7 @@ const { id: thePrestige } = await insert(movieDB, {
   isFavorite: true,
 });
 
-const { id: bigFish } = await insert(movieDB, {
+const bigFishId = await insert(movieDB, {
   title: 'Big Fish',
   director: 'Tim Burton',
   plot: 'Will Bloom returns home to care for his dying father, who had a penchant for telling unbelievable stories. After he passes away, Will tries to find out if his tales were really true.',
@@ -44,7 +44,7 @@ const { id: bigFish } = await insert(movieDB, {
   isFavorite: true,
 });
 
-const { id: harryPotter } = await insert(movieDB, {
+const harryPotterId = await insert(movieDB, {
   title: 'Harry Potter and the Philosopher's Stone',
   director: 'Chris Columbus',
   plot: 'Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.',
@@ -57,7 +57,7 @@ const { id: harryPotter } = await insert(movieDB, {
 
 Most of the `insert` function internals are synchronous, so inserting a large
 number of documents in a loop could potentially block the event loop. If you
-have a lot of records, we suggest using the `insertBatch` function.
+have a lot of records, we suggest using the `insertMultiple` function.
 
 You can pass a third, optional, parameter to change the batch size (default:
 `1000`). We recommend keeping this number as low as possible to avoid blocking
@@ -89,7 +89,7 @@ const docs = [
   },
 ];
 
-await insertBatch(movieDB, docs, { batchSize: 500 });
+await insertMultiple(movieDB, docs, { batchSize: 500 });
 ```
 
 ## Unsearchable fields
@@ -147,7 +147,7 @@ and still, be able to insert documents like:
 or even documents with different shapes:
 
 ```javascript copy
-;[
+[
   {
     author: 'Rumi',
     quote: 'Patience is the key to joy',
@@ -168,7 +168,7 @@ of type `string` (as stated during the schema definition).
 
 ## Custom document IDs
 
-Orama automatically uses the `id` field of the document ad `id`, if found.
+Orama automatically uses the `id` field of the document, if found.
 
 That means that given the following document and schema:
 
@@ -194,24 +194,6 @@ the document will be indexed with the following `id`: `73cbcc79-2203-49b8-bb52-6
 
 <Callout type="info">If the `id` field is not found, Orama will generate a random `id` for the document.</Callout>
 
-You can always set a custom ID programmatically by using the `insert` configuration object:
-
-```js
-const myDocument = {
-  id: '73cbcc79-2203-49b8-bb52-60d8e9a66c5f',
-  author: 'Fernando Pessoa',
-  quote: 'I wasn't meant for reality, but life came and found me'
-}
-
-const insertConfig = {
-  id: (doc /* the full document */) => {
-    return author.toLowerCase().replace(/\s/g, '-');
-  }
-}
-
-await insert(db, myDocument, insertConfig);
-```
-
-in that case, the document will be indexed with the following `id`: `fernando-pessoa`.
+To provide a custom ID for a document, see the [components](/internals/components) page.
 
 <Callout type="warning">If you try to insert two documents with the same ID, Orama will throw an error.</Callout>

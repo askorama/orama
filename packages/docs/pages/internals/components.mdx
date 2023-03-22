@@ -1,0 +1,507 @@
+import { Callout } from 'nextra-theme-docs'
+
+# Components
+
+Orama can be completely customized and extended by using its components architecture.
+
+Depending on the case, a component can be a simple as function or a slightly more complex interface. All components can be
+synchronous or return a promise and Orama will make sure everything is handled correctly.
+
+When no components are specified, an Orama database is created with some defaults components which satisfies most common use cases:
+
+* English tokenizer with stemming enabled.
+* BM25 and Radix-Tree based index.
+* In memory documents store.
+
+## Providing your own components
+
+It's very easy to provide a custom component when creating a database: simply pass the `components` option when calling `create`.
+
+For instance, this code:
+
+```javascript
+import { create, insert, search } from '@orama/orama'
+
+const movieDB = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+    plot: 'string',
+    year: 'number',
+    isFavorite: 'boolean',
+  },
+  components: {
+    afterInsert() {
+      console.log('INSERTED')
+    }
+  }
+})
+
+await insert(movieDB, {
+  title: 'Harry Potter and the Philosopher's Stone',
+  director: 'Chris Columbus',
+  plot: 'Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.',
+  year: 2001,
+  isFavorite: false,
+});
+
+const results = await search(movieDB, { term: 'Harry' })
+console.log(results.count)
+```
+
+Will lead to this output:
+
+```
+INSERTED
+2
+```
+
+## Supported components
+
+### `tokenizer`
+
+The tokenizer is used to tokenize documents fields and search terms. To customize the tokenizer used by Orama, provide an object which has at least the following properties:
+
+* `tokenize`: A function that accepts a string and language and returns a list of tokens.
+* `language` (string): The language supported by the tokenizer.
+* `normalizationCache` (Map): It can used to cache tokens normalization.
+
+<Callout type="warning">The `tokenize` function **CANNOT** be async.</Callout>
+
+In other words, a tokenizer must satisfy the following interface:
+
+```typescript
+interface Tokenizer {
+  language: string
+  normalizationCache: Map<string, string>
+  tokenize: (raw: string, language?: string) => string[]
+}
+```
+
+For instance, with the following configuration only the first character of each string will be indexed and only the first character of a term will be searched:
+
+```javascript
+import { create } from '@orama/orama'
+
+const movieDB = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+  },
+  components: {
+    tokenizer: {
+      language: 'english',
+      normalizationCache: new Map(),
+      tokenize(raw) {
+        return raw[0]
+      }
+    }
+  }
+})
+```
+
+The Orama's default tokenizer is exported via `@orama/orama/components` and can be customized:
+
+```javascript
+import { create } from '@orama/orama'
+import { tokenizer as defaultTokenizer } from '@orama/orama/components'
+
+const movieDB = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+  },
+  components: {
+    tokenizer: await defaultTokenizer.createTokenizer({language: 'english', stemming: false })
+  }
+})
+```
+
+Optionally you can pass the customization options without using `createTokenizer`:
+
+```javascript
+import { create } from '@orama/orama'
+
+const movieDB = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+  },
+  components: {
+    tokenizer: {language: 'english', stemming: false }
+  }
+})
+```
+
+### `index`
+
+The index component is used to perform the indexing and searching of documents in Orama.
+
+To customize the index used by Orama, provide an object which has at least the following properties:
+
+* `create`: A function that receives an Orama instance and a schema and returns an index.
+* `insert`: A function that inserts a new document in the index. It receives the following arguments:
+  * `index`: The index.
+  * `id`: The ID of the document being inserted.
+  * `prop`: The property that it is currently considered.
+  * `value`: The value of the property in the document. 
+  * `language`: The language of the document.
+  * `tokenizer`: The tokenizer associated with the current database.
+  * `docsCount`: The number of documents in the documents store before the action is performed.
+* `remove`: A function that removes a document from the index. It receives the same arguments as `insert`.
+* `search`: A function that search documents int index data and returns matching IDs with scores. It receives the following arguments:
+  * `index`: The index.
+  * `prop`: The property to search. 
+  * `term`: The term to search.
+  * `searchContext`: A search context with various useful informations about the search.
+* `searchByWhereClause`: A function that searchs in boolean and numeric indexes and returns a list of matching IDs. It receives the following arguments:
+  * `index`: The index.
+  * `filters`: An object where keys are the properties to match and the values are search operators as described in the [filters](usage/search/filters) page.
+* `getSearchableProperties`: A function that returns a list of all searchable properties in the index. It receives the index as the only argument.
+* `getSearchablePropertiesWithTypes`: A function that returns an object where keys are the searchable properties in the index and the values are the type of the index for a property. It receives the index as the only argument.
+* `load`: A function that deserializes an index from a JavaScript object. It receives a JavaScript object as its only argument and must return an index.
+* `save`: A function that serializes the index into a JavaScript object. It receives the index as the only argument and must return a JavaScript object.
+
+The following functions are optional:
+
+* `beforeInsert` or `afterInsert`: A function invoked before or after `insert`. They accept the same arguments as `insert`.
+* `beforeRemove` or `afterRemove`: A function invoked before or after `remove`. They accept the same arguments as `remove`.
+
+For the more formal interface information, look for the `IIndex` interface in `src/types.ts` in Orama's source code.
+
+The Orama's default index is based on BM25, Radix Trees and AVL trees. All its functions are exported via `@orama/orama/components` and can be composed to create a custom index:
+
+```javascript
+import { create } from '@orama/orama'
+import { index as defaultIndex } from '@orama/orama/components'
+
+const movieDB = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+  },
+  components: {
+    // This index will only customize the deserialization
+    index: {
+      ...defaultIndex,
+      load(raw) {
+        // Do something here
+      }
+    }
+  }
+})
+```
+
+### `documentsStore`
+
+The index component is used to store the documents in Orama.
+
+To customize the documents store used by Orama, provide an object which has at least the following properties:
+
+* `create`: A function that receives an Orama instance and a schema and returns a documents store.
+* `get`: A function that returns a document from the store. It receives the following arguments:
+  * The documents store.
+  * The ID of the document to get.
+* `getMultiple`: A function that returns multiple documents from the store. It receives the following arguments:
+  * The documents store.
+  * A list of IDs of the documents to get.
+* `store`: A function that stores a new document in the documents store. It receives the following arguments:
+  * The documents store.
+  * The ID of the new document to store.
+  * The document to store.
+* `remove`: A function that removes a document from the documents store. It receives the following arguments:
+  * The documents store.
+  * The ID of the new document to remove.
+* `count`: A function that returns the count of the documents currently stored. It receives the current documents store as the only argument.
+* `load`: A function that deserializes a documents store from a JavaScript object. It receives a JavaScript object as its only argument and must return a documents store.
+* `save`: A function that serializes the documents store into a JavaScript object. It receives the current documents store as the only argument and must return a JavaScript object.
+
+For the more formal interface information, look for the `IDocumentsStore` interface in `src/types.ts` in Orama's source code.
+
+The Orama's default documents store is based on simple JavaScript object. All its functions are exported via `@orama/orama/components` and can be composed to create a custom documents store:
+
+```javascript
+import { create } from '@orama/orama'
+import { documentsStore as defaultDocumentsStore } from '@orama/orama/components'
+
+const movieDB = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+  },
+  components: {
+    // This index will only customize the deserialization
+    documentsStore: {
+      ...defaultDocumentsStore,
+      load(raw) {
+        // Do something here
+      }
+    }
+  }
+})
+```
+
+### General purpose components
+
+The components in this category are simple functions which are internally used by Orama.
+Depending on the use case the component must return a value. Orama will await if a Promise is returned.
+
+### `validateSchema`
+
+The component is used to validate a document against the schema. The function should return `true` if the document is valid according to the schema, `false` otherwise.
+
+The function will receive two arguments:
+
+* The document that is being validated.
+* The schema provided to `create`.
+
+```javascript
+import { create, insert } from '@orama/orama'
+
+const movieDB = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+  },
+  components: {
+    validateSchema(doc) {
+      return typeof doc.name === 'string && typeof doc.director === 'string'
+    }
+  }
+})
+
+// This will throw
+await insert(movieDB, {
+  title: 'Harry Potter and the Philosopher's Stone',
+  director: 42,
+});
+```
+
+### `getDocumentIndexId`
+
+The component is used to extract or generate a unique ID for a document. The returned value must be string.
+
+The function will receive one argument:
+
+* The document for which an ID is being generated.
+
+```javascript
+import { create, insert } from '@orama/orama'
+
+const movieDB = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+  },
+  components: {
+    getDocumentIndexId(doc) {
+      return doc.id ?? Date.now().toString()
+    },
+    afterInsert(_orama, _doc, id) {
+      console.log(id)
+    }
+  }
+})
+
+// This will print something like "1679476550629"
+await insert(movieDB, {
+  title: 'Harry Potter and the Philosopher's Stone',
+  director: 'Chris Columbus',
+});
+```
+
+### `getDocumentProperties`
+
+The component is used to extract indexable properties from a document.
+
+The function receives two arguments:
+
+* The document that is being read.
+* A list of properties paths (using dotted syntax) to extract.
+
+The function must return an object where the keys are the paths received as argument.
+
+```javascript
+import { create } from '@orama/orama'
+import { get } from 'lodash/get'
+
+const movieDB = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+  },
+  components: {
+    getDocumentProperties(doc, paths) {
+      return Object.fromEntries(paths.map(path => {
+        return [path, get(doc, path)]
+      }))
+    },
+  }
+})
+```
+
+### `formatElapsedTime`
+
+The component is used to format the `elapsed` property in the search results. The return value can be a `number`, a `string` or an `object`.
+
+The function received a single argument: the search elapsed time as BigInt.
+
+```javascript
+import { create, insert, search } from '@orama/orama'
+
+const movieDB = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+    plot: 'string',
+    year: 'number',
+    isFavorite: 'boolean',
+  },
+  components: {
+    formatElapsedTime(n) {
+      return `${Number(n)} - custom`
+    }
+  }
+})
+
+await insert(movieDB, {
+  title: 'Harry Potter and the Philosopher's Stone',
+  director: 'Chris Columbus',
+  plot: 'Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.',
+  year: 2001,
+  isFavorite: false,
+});
+
+const results = await search(movieDB, { term: 'Harry' })
+
+// This will something like: 100 - custom
+console.log(results.elapsed)
+```
+
+### Document manipulation components
+
+Orama supports several components invoked while inserting, removing or updating documents. 
+Each component can be a function or an array of function. If a function is async it will be awaited.
+
+### `beforeInsert`
+
+Invoked before inserting a document in the index and in the document store.
+
+The function will receive the following arguments:
+
+* The current Orama database.
+* The ID that will be assigned to the document.
+* The document that is being inserted.
+
+### `afterInsert`
+
+Invoked after a document has been inserted in the index and in the document store.
+
+The function will receive the following arguments:
+
+* The current Orama database.
+* The ID that has been assigned to the document.
+* The document that has been inserted.
+
+### `beforeRemove`
+
+Invoked before removing a document from the index and from the document store.
+
+The function will receive the following arguments:
+
+* The current Orama database.
+* The ID that was assigned to the document.
+
+### `afterRemove`
+
+Invoked after a document has been remove from the index and from the document store.
+
+The function will receive the following arguments:
+
+* The current Orama database.
+* The ID that was assigned to the document.
+
+### `beforeUpdate`
+
+Invoked before updating a document in the index and in the document store.
+
+The function will receive the following arguments:
+
+* The current Orama database.
+* The ID that it is currently assigned to the document.
+
+### `afterUpdate`
+
+Invoked after a document has been updated in the index and in the document store.
+
+The function will receive the following arguments:
+
+* The current Orama database.
+* The new ID that has been assigned to the document.
+* The document that has been updated.
+
+### `beforeMultipleInsert`
+
+Invoked before inserting multiple documents in the index and in the document store.
+
+The function will receive the following arguments:
+
+* The current Orama database.
+* The list of document that are being inserted.
+
+<Callout type="warning">`beforeInsert` will still be invoked for each document.</Callout>
+
+### `afterMultipleInsert`
+
+Invoked after inserting multiple documents in the index and in the document store.
+
+The function will receive the following arguments:
+
+* The current Orama database.
+* The list of documents that have been inserted.
+
+<Callout type="warning">`afterInsert` will still be invoked for each document.</Callout>
+
+### `beforeMultipleRemove`
+
+Invoked before removing multiple documents from the index and from the document store.
+
+The function will receive the following arguments:
+
+* The current Orama database.
+* The list of document IDs that are being removed.
+
+<Callout type="warning">`beforeRemove` will still be invoked for each document.</Callout>
+
+### `afterMultipleRemove`
+
+Invoked after removing multiple documents from the index and from the document store.
+
+The function will receive the following arguments:
+
+* The current Orama database.
+* The list of document IDs that have been removed.
+
+<Callout type="warning">`afterRemove` will still be invoked for each document.</Callout>
+
+### `beforeMultipleUpdate`
+
+Invoked before updating multiple documents in the index and in the document store.
+
+The function will receive the following arguments:
+
+* The current Orama database.
+* The list of document IDs that are being updated.
+
+<Callout type="warning">`beforeUpdate` will still be invoked for each document.</Callout>
+
+### `afterMultipleUpdate`
+
+Invoked after updating multiple documents in the index and in the document store.
+
+The function will receive the following arguments:
+
+* The current Orama database.
+* The list of new document IDs that have been updated.
+
+<Callout type="warning">`afterUpdate` will still be invoked for each document.</Callout>

@@ -2,7 +2,6 @@ import t from 'tap'
 import { DocumentsStore } from '../src/components/documents-store.js'
 import { Index } from '../src/components/index.js'
 import { create, insert, insertMultiple, remove, search } from '../src/index.js'
-import { createTokenizer } from '../src/components/tokenizer/index.js'
 import { SUPPORTED_LANGUAGES } from '../src/components/tokenizer/languages.js'
 import type { Document } from '../src/types'
 import dataset from './datasets/events.json' assert { type: 'json' }
@@ -269,7 +268,7 @@ t.test('orama', t => {
         author: 'string',
       },
       components: {
-        tokenizer: await createTokenizer('english', { stemming: false }),
+        tokenizer: { language: 'english', stemming: false },
       },
     })
 
@@ -938,6 +937,8 @@ t.test('custom tokenizer configuration', t => {
           tokenize(text: string) {
             return text.split(',')
           },
+          language: 'english',
+          normalizationCache: new Map(),
         },
       },
     })
@@ -989,7 +990,7 @@ t.test('should search numbers in supported languages', async t => {
         number: 'string',
       },
       components: {
-        tokenizer: await createTokenizer(language, { stemming: false }),
+        tokenizer: { language: language, stemming: false },
       },
     })
 
@@ -1014,7 +1015,7 @@ t.test('should correctly search accented words in Italian', async t => {
       description: 'string',
     },
     components: {
-      tokenizer: await createTokenizer('italian', { stemming: false }),
+      tokenizer: { language: 'italian', stemming: false },
     },
   })
 
@@ -1035,7 +1036,7 @@ t.test('should correctly search accented words in English', async t => {
       description: 'string',
     },
     components: {
-      tokenizer: await createTokenizer('english', { stemming: false }),
+      tokenizer: { language: 'english', stemming: false },
     },
   })
 
@@ -1056,7 +1057,7 @@ t.test('should correctly search accented words in Dutch', async t => {
       description: 'string',
     },
     components: {
-      tokenizer: await createTokenizer('dutch', { stemming: false }),
+      tokenizer: { language: 'dutch', stemming: false },
     },
   })
 
@@ -1076,7 +1077,7 @@ t.test('should correctly search accented words in Slovenian', async t => {
       description: 'string',
     },
     components: {
-      tokenizer: await createTokenizer('slovenian', { stemming: false }),
+      tokenizer: { language: 'slovenian', stemming: false },
     },
   })
 
@@ -1104,7 +1105,7 @@ t.test('should correctly search words in Bulgarian', async t => {
       description: 'string',
     },
     components: {
-      tokenizer: await createTokenizer('bulgarian', { stemming: false }),
+      tokenizer: { language: 'bulgarian', stemming: false },
     },
   })
 
