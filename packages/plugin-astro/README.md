@@ -1,5 +1,7 @@
 # Orama's Astro Plugin
 
+[![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
+
 This package is a (still experimental) [Orama](https://oramasearch.com) integration for
 [Astro](https://astro.build).
 

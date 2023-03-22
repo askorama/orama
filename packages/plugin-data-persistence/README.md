@@ -1,6 +1,6 @@
 # Data Persistence Plugin
 
-[![Tests](https://github.com/OramaSearch/plugin-data-persistence/actions/workflows/tests.yml/badge.svg)](https://github.com/OramaSearch/plugin-disk-persistence/actions/workflows/tests.yml)
+[![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
 
 This plugin aims to provide data persistence capabilities to Orama.
 
@@ -14,7 +14,7 @@ This plugin aims to provide data persistence capabilities to Orama.
 
 # Usage
 
-For the complete usage guide, please refer to the [official plugin documentation](https://docs.oramasearch.com/plugins/data-persistence-plugin).
+For the complete usage guide, please refer to the [official plugin documentation](https://docs.oramasearch.com/plugins/plugin-data-persistence).
 
 # License
 

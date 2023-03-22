@@ -1,6 +1,6 @@
-![CI](https://github.com/orama/plugin-docusaurus/actions/workflows/ci.yml/badge.svg?event=push)
+# Docusaurus Orama Search Plugin
 
-# Docusaurus orama Search Plugin
+[![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
 
 ## Usage
 
