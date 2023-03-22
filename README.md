@@ -165,21 +165,6 @@ If needed, you can also delete a given document by using the `remove` method:
 await remove(db, '41045799-144')
 ```
 
-Orama exposes a built-in `formatNanoseconds` function to format the elapsed time
-in a human-readable format:
-
-```js
-import { formatNanoseconds } from '@orama/orama'
-
-const searchResult = await search(db, {
-  term: 'if',
-  properties: '*',
-})
-
-console.log(`Search took ${formatNanoseconds(searchResult.elapsed)}`)
-// Search took 164μs
-```
-
 ### Using with CommonJS
 
 Orama is packaged as ES modules, suitable for Node.js, Deno, Bun and modern browsers.
