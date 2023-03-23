@@ -153,3 +153,5 @@ export function requireOrama(callback: RequireCallback): void {
     .then((loaded: OramaExport) => setTimeout(() => callback(undefined, loaded), 1))
     .catch((error: Error) => setTimeout(() => callback(error), 1))
 }
+
+export * from './stemmers.cjs'

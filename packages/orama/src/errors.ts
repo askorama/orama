@@ -5,6 +5,8 @@ const allLanguages = SUPPORTED_LANGUAGES.join('\n - ')
 
 const errors = {
   NO_LANGUAGE_WITH_CUSTOM_TOKENIZER: 'Do not pass the language option to create when using a custom tokenizer.',
+  BUNDLED_ORAMA:
+    'Cannot find the stemmer for the locale "%s". This can happen if you are using Orama within a bundler like webpack. To solve this issue please look at https://docs.oramasearch.com/usage/bundlers.',
   LANGUAGE_NOT_SUPPORTED: `Language "%s" is not supported.\nSupported languages are:\n - ${allLanguages}`,
   INVALID_STEMMER_FUNCTION_TYPE: `config.stemmer property must be a function.`,
   CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY: 'Custom stop words array must only contain strings.',

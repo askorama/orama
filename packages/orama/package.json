@@ -24,10 +24,10 @@
       "import": "./dist/components.js",
       "require": "./dist/cjs/components.cjs"
     },
-    "./stemmer/*": {
-      "types": "./dist/stemmer/*.d.ts",
-      "import": "./dist/stemmer/*.js",
-      "require": "./dist/cjs/stemmer/*.cjs"
+    "./stemmers/*": {
+      "types": "./dist/stemmers/*.d.ts",
+      "import": "./dist/stemmers/*.js",
+      "require": "./dist/cjs/stemmers/*.cjs"
     },
     "./cjs": {
       "types": "./dist/cjs/index.d.cts",
@@ -41,9 +41,9 @@
       "types": "./dist/cjs/components.d.cts",
       "require": "./dist/cjs/components.cjs"
     },
-    "./cjs/stemmer/*": {
-      "types": "./dist/cjs/stemmer/*.d.cts",
-      "require": "./dist/cjs/stemmer/*.cjs"
+    "./cjs/stemmers/*": {
+      "types": "./dist/cjs/stemmers/*.d.cts",
+      "require": "./dist/cjs/stemmers/*.cjs"
     }
   },
   "types": "./dist/index.d.ts",
@@ -58,7 +58,7 @@
     "url": "https://github.com/oramasearch/orama"
   },
   "scripts": {
-    "predev": "rm -rf dist && mkdir dist && cp -a stemmer/lib dist/stemmer",
+    "predev": "rm -rf dist && mkdir dist && cp -a stemmers/lib dist/stemmers",
     "dev": "swc -s -w --extensions .ts,.cts -d dist src",
     "prebuild": "npm run lint",
     "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",

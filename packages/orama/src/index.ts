@@ -10,3 +10,4 @@ export * from './types.js'
 
 export type { RawData } from './methods/serialization.js'
 export type { Language } from './components/tokenizer/languages.js'
+export { stemmers } from './components/tokenizer/stemmers.js'

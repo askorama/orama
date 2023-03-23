@@ -12,13 +12,16 @@ fi
 
 tsc -p . --emitDeclarationOnly
 tsc -p tsconfig.cjs.json --emitDeclarationOnly
-cp -a stemmer/lib dist/stemmer
-swc --delete-dir-on-start --extensions .js -d dist/cjs/stemmer/ stemmer/lib --no-swcrc -C module.type="commonjs"
-mv dist/cjs/stemmer/lib/* dist/cjs/stemmer
-rm -rf dist/cjs/stemmer/lib
-cp -a stemmer/lib/*.d.ts dist/cjs/stemmer
+cp -a stemmers/lib dist/stemmers
+swc --delete-dir-on-start --extensions .js -d dist/cjs/stemmers/ stemmers/lib --no-swcrc -C module.type="commonjs"
+mv dist/cjs/stemmers/lib/* dist/cjs/stemmers
+rm -rf dist/cjs/stemmers/lib
+cp -a stemmers/lib/*.d.ts dist/cjs/stemmers
+sed -i '' -E -re 's#@stemmers#../../stemmers#' dist/components/tokenizer/stemmers.d.ts
 fd . -e js dist/cjs/ -x mv {} {.}.cjs
 fd . -e ts dist/cjs/ -x mv {} {.}.cts
 mv dist/cjs/index.js.map dist/cjs/index.cjs.map
 mv dist/cjs/internals.js.map dist/cjs/internals.cjs.map
 mv dist/cjs/components.js.map dist/cjs/components.cjs.map
+sed -i '' -E -re 's#\.\./stemmers#./stemmers#' dist/cjs/stemmers.cjs
+sed -i '' -E -re 's#@stemmers#./stemmers#' dist/cjs/stemmers.d.cts
