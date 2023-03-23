@@ -235,7 +235,7 @@ export type IIndexInsertOrRemoveFunction<I extends OpaqueIndex = OpaqueIndex, R 
 ) => SyncOrAsyncValue<R>
 
 export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
-  create: (orama: Orama<{ Index: I }>, schema: Schema) => I
+  create: (orama: Orama<{ Index: I }>, schema: Schema) => SyncOrAsyncValue<I>
 
   beforeInsert?: IIndexInsertOrRemoveFunction<I>
   insert: IIndexInsertOrRemoveFunction<I>
@@ -251,20 +251,20 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
   getSearchablePropertiesWithTypes(index: I): SyncOrAsyncValue<Record<string, SearchableType>>
 
-  load<R = unknown>(raw: R): I | Promise<I>
-  save<R = unknown>(index: I): R | Promise<R>
+  load<R = unknown>(raw: R): SyncOrAsyncValue<I>
+  save<R = unknown>(index: I): SyncOrAsyncValue<R>
 }
 
 export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentStore> {
-  create: (orama: Orama<{ DocumentStore: D }>) => D
+  create: (orama: Orama<{ DocumentStore: D }>) => SyncOrAsyncValue<D>
   get(store: D, id: string): SyncOrAsyncValue<Document | undefined>
   getMultiple(store: D, ids: string[]): SyncOrAsyncValue<(Document | undefined)[]>
   store(store: D, id: string, doc: Document): SyncOrAsyncValue<boolean>
   remove(store: D, id: string): SyncOrAsyncValue<boolean>
   count(store: D): SyncOrAsyncValue<number>
 
-  load<R = unknown>(raw: R): D | Promise<D>
-  save<R = unknown>(store: D): R | Promise<R>
+  load<R = unknown>(raw: R): SyncOrAsyncValue<D>
+  save<R = unknown>(store: D): SyncOrAsyncValue<R>
 }
 
 export type Stemmer = (word: string) => string
@@ -280,7 +280,7 @@ export type TokenizerConfig = {
 export interface Tokenizer {
   language: string
   normalizationCache: Map<string, string>
-  tokenize: (raw: string, language?: string) => string[]
+  tokenize: (raw: string, language?: string) => SyncOrAsyncValue<string[]>
 }
 
 export interface ComplexComponent {

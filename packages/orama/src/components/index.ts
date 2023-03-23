@@ -108,7 +108,7 @@ export function create(orama: Orama<{ Index: Index }>, schema: Schema, index?: I
   return index
 }
 
-export function insert(
+export async function insert(
   index: Index,
   prop: string,
   id: string,
@@ -116,7 +116,7 @@ export function insert(
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number,
-): void {
+): Promise<void> {
   if (typeof value === 'number') {
     avlInsert(index.indexes[prop] as AVLNode<number, string[]>, value as number, [id])
     return
@@ -126,7 +126,7 @@ export function insert(
     return
   }
 
-  const tokens = tokenizer.tokenize(value as string, language)
+  const tokens = await tokenizer.tokenize(value as string, language)
 
   if (!(id in index.frequencies[prop])) {
     index.frequencies[prop][id] = {}
@@ -159,7 +159,7 @@ export function insert(
   }
 }
 
-export function remove(
+export async function remove(
   index: Index,
   prop: string,
   id: string,
@@ -167,7 +167,7 @@ export function remove(
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number,
-): boolean {
+): Promise<boolean> {
   if (typeof value === 'number') {
     avlRemoveDocument(index.indexes[prop] as AVLNode<number, string[]>, id, value)
     return true
@@ -179,7 +179,7 @@ export function remove(
     return true
   }
 
-  const tokens = tokenizer.tokenize(value as string, language)
+  const tokens = await tokenizer.tokenize(value as string, language)
 
   index.avgFieldLength[prop] =
     (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][id]!) / (docsCount - 1)

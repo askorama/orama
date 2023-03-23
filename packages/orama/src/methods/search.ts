@@ -21,12 +21,12 @@ const defaultBM25Params: BM25Params = {
   d: 0.5,
 }
 
-function createSearchContext(
+async function createSearchContext(
   properties: string[],
   tokens: string[],
   params: SearchParams,
   docsCount: number,
-): SearchContext {
+): Promise<SearchContext> {
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
   // const hasFilters = Object.keys(params.where ?? {}).length > 0;
   // let whereFiltersIDs: string[] = [];
@@ -71,7 +71,7 @@ function createSearchContext(
   }
 
   return {
-    timeStart: getNanosecondsTime(),
+    timeStart: await getNanosecondsTime(),
     params,
     docsCount,
     uniqueDocsIDs: {},
@@ -87,7 +87,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   const { limit = 10, offset = 0, term, properties } = params
 
   const { index, docs } = orama.data
-  const tokens = orama.tokenizer.tokenize(term, language)
+  const tokens = await orama.tokenizer.tokenize(term, language)
 
   // Get searchable string properties
   let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
@@ -111,7 +111,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   }
 
   // Create the search context and the results
-  const context = createSearchContext(propertiesToSearch, tokens, params, await orama.documentsStore.count(docs))
+  const context = await createSearchContext(propertiesToSearch, tokens, params, await orama.documentsStore.count(docs))
   const results: Result[] = Array.from({
     length: limit,
   })
@@ -192,7 +192,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   }
 
   const searchResult: Results = {
-    elapsed: (await orama.formatElapsedTime(getNanosecondsTime() - context.timeStart)) as ElapsedTime,
+    elapsed: (await orama.formatElapsedTime((await getNanosecondsTime()) - context.timeStart)) as ElapsedTime,
     hits: results.filter(Boolean),
     count: uniqueDocsArray.length,
   }

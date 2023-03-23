@@ -23,5 +23,6 @@ fd . -e ts dist/cjs/ -x mv {} {.}.cts
 mv dist/cjs/index.js.map dist/cjs/index.cjs.map
 mv dist/cjs/internals.js.map dist/cjs/internals.cjs.map
 mv dist/cjs/components.js.map dist/cjs/components.cjs.map
+sed -i '' -E -re 's#require\("\./(.+)\.cts")#require("./\1.cjs")#' dist/cjs/index.cjs
 sed -i '' -E -re 's#\.\./stemmers#./stemmers#' dist/cjs/stemmers.cjs
 sed -i '' -E -re 's#@stemmers#./stemmers#' dist/cjs/stemmers.d.cts

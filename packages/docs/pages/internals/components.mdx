@@ -74,7 +74,7 @@ In other words, a tokenizer must satisfy the following interface:
 interface Tokenizer {
   language: string
   normalizationCache: Map<string, string>
-  tokenize: (raw: string, language?: string) => string[]
+  tokenize: (raw: string, language?: string) => string[] | Promise<string[]>
 }
 ```
 

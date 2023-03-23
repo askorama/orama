@@ -199,16 +199,6 @@ create(/* ... */)
   .catch(console.error)
 ```
 
-Note that only main methods are supported, for internals and components you will have to use `requireOramaInternals` or `requireOramaComponents`:
-
-```js
-const { requireOramaInternals } = require('@orama/orama')
-
-requireOramaInternals((err, { boundedLevenshtein }) => {
-  // ...
-})
-```
-
 ## Language
 
 Orama supports multiple languages. By default, it will use the `english`

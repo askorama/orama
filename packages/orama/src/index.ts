@@ -7,7 +7,8 @@ export { load, save } from './methods/serialization.js'
 export { update, updateMultiple } from './methods/update.js'
 
 export * from './types.js'
+export * as components from './components.js'
+export * as internals from './internals.js'
 
 export type { RawData } from './methods/serialization.js'
 export type { Language } from './components/tokenizer/languages.js'
-export { stemmers } from './components/tokenizer/stemmers.js'
