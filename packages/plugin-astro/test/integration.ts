@@ -2,8 +2,10 @@ import { create as createOramaDB, load as loadOramaDB, Schema, search } from '@o
 import assert from 'node:assert'
 import { exec, ExecException } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import { readFile, rm } from 'node:fs/promises'
-import { resolve } from 'node:path'
+import { cp, readFile, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { dirname, resolve } from 'node:path'
+import { chdir } from 'node:process'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 
@@ -14,25 +16,31 @@ interface Execution {
   error?: Error
 }
 
-const sandbox = fileURLToPath(new URL('../../plugin-astro-sandbox', import.meta.url))
+const sandboxSource = fileURLToPath(new URL('./sandbox', import.meta.url))
+const sandbox = resolve(tmpdir(), `orama-plugin-astro-${Date.now()}`)
 
 async function cleanup(): Promise<void> {
-  for (const path of ['dist', 'node_modules', 'pnpm-lock.yaml']) {
-    await rm(resolve(sandbox, path), { force: true, recursive: true })
-  }
+  await rm(sandbox, { force: true, recursive: true })
 }
 
-async function execute(command: string): Promise<Execution> {
+async function execute(command: string, cwd?: string): Promise<Execution> {
+  const env = cwd ? { PATH: dirname(process.argv[0]) } : process.env
+
   return new Promise((resolve: (execution: Execution) => void, reject: (error: Error) => void) => {
-    exec(command, (error: ExecException | null, stdout: string, stderr: string) => {
+    exec(command, { cwd, env }, (error: ExecException | null, stdout: string, stderr: string) => {
       if (error) {
-        console.error('COMMAND ERRORED', error)
+        if (process.env.NODE_DEBUG?.includes('test')) {
+          console.error('COMMAND ERRORED', error)
+        }
+
         reject(error)
         return
       }
 
-      console.error(`--- STDOUT[${command}] ---\n${stdout.trim()}\n\n`)
-      console.error(`--- STDERR[${command}] ---\n${stderr.trim()}\n\n`)
+      if (process.env.NODE_DEBUG?.includes('test')) {
+        console.error(`--- STDOUT [${command}] ---\n${stdout.trim()}\n\n`)
+        console.error(`--- STDERR [${command}] ---\n${stderr.trim()}\n\n`)
+      }
       resolve({ code: 0, stdout, stderr })
     })
   })
@@ -41,14 +49,27 @@ async function execute(command: string): Promise<Execution> {
 await cleanup()
 
 await test('plugin is able to generate orama DB at build time', async () => {
-  process.chdir(sandbox)
+  // Prepare the plugin
+  const pluginInfo: Record<string, string> = JSON.parse(
+    await readFile(fileURLToPath(new URL(`../package.json`, import.meta.url)), 'utf-8')
+  )
+  const pluginPath = fileURLToPath(new URL(`../orama-plugin-astro-${pluginInfo.version}.tgz`, import.meta.url))
+  const pnpmPackResult = await execute('pnpm pack')
+  assert.equal(pnpmPackResult.code, 0)
 
-  // install dependencies
-  const pnpmInstallResult = await execute('pnpm install')
+  // Prepare the sandbox
+  await cp(sandboxSource, sandbox, { recursive: true })
+  await cp(pluginPath, resolve(sandbox, 'plugin.tgz'))
+  await rm(pluginPath)
+
+  chdir(sandbox)
+
+  // Install dependencies
+  const pnpmInstallResult = await execute('pnpm install', sandbox)
   assert.equal(pnpmInstallResult.code, 0)
 
   // astro build is successful
-  const astroBuildResult = await execute('astro build')
+  const astroBuildResult = await execute('./node_modules/.bin/astro build', sandbox)
   assert.equal(astroBuildResult.code, 0)
 
   // The Orama DBs have been generated
