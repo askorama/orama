@@ -154,4 +154,6 @@ export function requireOrama(callback: RequireCallback): void {
     .catch((error: Error) => setTimeout(() => callback(error), 1))
 }
 
+export * from './components.cjs'
+export * from './internals.cjs'
 export * from './stemmers.cjs'

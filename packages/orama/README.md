@@ -189,17 +189,25 @@ main().catch(console.error)
 
 #### Use CJS requires
 
-Orama methods can be required as CommonJS modules by requiring from `@orama/orama/cjs`.
+Orama methods can be required as CommonJS modules by requiring from `@orama/orama`.
 
 ```js
-const { create, insert } = require("@orama/orama/cjs")
+const { create, insert } = require("@orama/orama")
 
 create(/* ... */)
   .then(db => insert(db, { /* ... */ })
   .catch(console.error)
 ```
 
-Note that only main methods are supported so for internals and other supported exports you still have to use `await import`.
+Note that only main methods are supported, for internals and components you will have to use `requireOramaInternals` or `requireOramaComponents`:
+
+```js
+const { requireOramaInternals } = require('@orama/orama')
+
+requireOramaInternals((err, { boundedLevenshtein }) => {
+  // ...
+})
+```
 
 ## Language
 

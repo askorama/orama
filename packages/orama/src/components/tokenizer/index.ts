@@ -94,7 +94,7 @@ export async function createTokenizer(config: TokenizerConfig = {}): Promise<Def
       try {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore This fails when verifying CJS but it's actually correct
-        const stemmersPath = import.meta.url.endsWith('ts') ? '../../stemmer/lib' : '../stemmer'
+        const stemmersPath = import.meta.url.endsWith('ts') ? '../../stemmers/lib' : '../stemmers'
         const stemmerImport = await import(`../${stemmersPath}/${STEMMERS[config.language]}.js`)
         stemmer = stemmerImport.stemmer
       } catch (e) {

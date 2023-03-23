@@ -90,9 +90,12 @@ When using CommonJS, internals can be imported in two ways:
 2. Use the `requireOramaInternals`:
 
    ```js
-   const { requireOramaInternals } = require('@orama/orama/cjs/internals')
+   const { requireOramaInternals } = require('@orama/orama')
 
    requireOramaInternals((err, { boundedLevenshtein }) => {
      // ...
    })
    ```
+   
+
+If you cannot use set `moduleResolution` to `nodenext` or `node16` in the `tsconfig.json` and you

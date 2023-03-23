@@ -11,21 +11,21 @@ Read more: [_Wikipedia_](https://en.wikipedia.org/wiki/Stemming)
 
 </Callout>
 
-By default, Orama uses **the English language analyzer**, but we can override this behavior by setting the property `defaultLanguage` at database initialization, and importing a custom stemmer:
+By default, Orama uses **the English language analyzer**, but we can override this behavior by setting the property `language` at database initialization, and importing a custom stemmer:
 
 ```javascript copy
 import { create } from '@orama/orama'
-import { stemmer } from '@orama/orama/stemmer/it'
+import { stemmer } from '@orama/orama/stemmers/it'
 
 const db = create({
   schema: {
     author: 'string',
     quote: 'string',
   },
-  defaultLanguage: 'italian',
+  language: 'italian',
   components: {
     tokenizer: {
-      stemmingFn: stemmer,
+      stemmer: stemmer,
     },
   },
 })
@@ -62,7 +62,7 @@ Right now, Orama supports 26 languages and stemmers out of the box:
 
 ## Disabling stemming
 
-You can disable stemming by setting `enableStemming: false` while initializing a new Orama instance:
+You can disable stemming by setting `stemming: false` while initializing a new Orama instance:
 
 ```javascript copy
 import { create } from '@orama/orama'
@@ -72,10 +72,35 @@ const db = create({
     author: 'string',
     quote: 'string',
   },
-  defaultLanguage: 'italian',
+  language: 'italian',
   components: {
     tokenizer: {
-      enableStemming: false,
+      stemming: false,
+    },
+  },
+})
+```
+
+## Using stemming with bundlers
+
+Orama tries to only load the actual stemmer needed for the current configuration.
+
+If you bundle Orama inside your application with tools like webpack, the regular loading will fail and cannot be used.
+
+In this case you have to import the stemmer manually and pass it to Orama.
+
+```javascript copy
+import { create, stemmers } from '@orama/orama'
+
+const db = create({
+  schema: {
+    author: 'string',
+    quote: 'string',
+  },
+  language: 'italian',
+  components: {
+    tokenizer: {
+      stemmer: stemmers.italian
     },
   },
 })

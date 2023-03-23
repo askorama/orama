@@ -4,15 +4,12 @@
   "type": "module",
   "description": "Next generation full-text search engine, written in TypeScript",
   "sideEffects": false,
+  "main": "./dist/cjs/index.cjs",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/cjs/index.cjs"
-    },
-    "./wasm": {
-      "types": "./dist/wasm.d.ts",
-      "import": "./dist/wasm.js"
     },
     "./internals": {
       "types": "./dist/internals.d.ts",
@@ -27,22 +24,6 @@
     "./stemmers/*": {
       "types": "./dist/stemmers/*.d.ts",
       "import": "./dist/stemmers/*.js",
-      "require": "./dist/cjs/stemmers/*.cjs"
-    },
-    "./cjs": {
-      "types": "./dist/cjs/index.d.cts",
-      "require": "./dist/cjs/index.cjs"
-    },
-    "./cjs/internals": {
-      "types": "./dist/cjs/internals.d.cts",
-      "require": "./dist/cjs/internals.cjs"
-    },
-    "./cjs/components": {
-      "types": "./dist/cjs/components.d.cts",
-      "require": "./dist/cjs/components.cjs"
-    },
-    "./cjs/stemmers/*": {
-      "types": "./dist/cjs/stemmers/*.d.cts",
       "require": "./dist/cjs/stemmers/*.cjs"
     }
   },

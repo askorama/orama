@@ -189,10 +189,10 @@ main().catch(console.error)
 
 #### Use CJS requires
 
-Orama methods can be required as CommonJS modules by requiring from `@orama/orama/cjs`.
+Orama methods can be required as CommonJS modules by requiring from `@orama/orama`.
 
 ```js
-const { create, insert } = require("@orama/orama/cjs")
+const { create, insert } = require("@orama/orama")
 
 create(/* ... */)
   .then(db => insert(db, { /* ... */ })
