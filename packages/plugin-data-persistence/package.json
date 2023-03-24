@@ -1,6 +1,6 @@
 {
   "name": "@orama/plugin-data-persistence",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "description": "Data persistence plugin for Orama",
   "type": "module",
   "sideEffects": false,
