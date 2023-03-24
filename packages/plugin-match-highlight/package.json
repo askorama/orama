@@ -19,14 +19,11 @@
   },
   "type": "module",
   "sideEffects": false,
+  "main": "./dist/commonjs.cjs",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/commonjs.cjs"
-    },
-    "./cjs": {
-      "types": "./dist/commonjs.d.cts",
       "require": "./dist/commonjs.cjs"
     }
   },

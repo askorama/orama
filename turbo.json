@@ -6,7 +6,7 @@
       "outputs": ["dist/**"]
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["build"],
       "inputs": ["packages/**/*.test.js", "packages/**/*.test.jsx", "packages/**/*.test.ts", "packages/**/*.test.tsx"]
     },
     "lint": {},
@@ -33,9 +33,6 @@
         "^build"
       ],
       "outputs": ["dist/**"]
-    },
-    "@orama/plugin-docusaurus#test": {
-      "dependsOn": ["@orama/orama#build"]
     }
   }
 }

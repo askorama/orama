@@ -73,13 +73,18 @@ query.
 ]
 ```
 
-## CommonJS Imports
+# CommonJS Imports
 
-Orama plugins ships **ESM** modules by default. This allows us to move faster when providing new features and bug fixes, as well as using the `"exports"` field in `package.json` to provide a better developer experience.
+Orama plugins ship **ESM** modules by default. This allows us to move faster when providing new features and bug fixes, as well as using the `"exports"` field in `package.json` to provide a better developer experience.
 
-CommonJS imports are still supported, but you'll need to import the plugin from `@orama.plugin-match-highlight/cjs` instead of `@orama.plugin-match-highlight`:
+CommonJS imports are still supported, but we suggest you to migrate to ESM.
 
-```diff
-- const { searchWithHighlight } = require("@orama.plugin-match-highlight");
-+ const { searchWithHighlight } = require("@orama.plugin-match-highlight/cjs");
+## TypeScript
+
+Set `moduleResolution` in the `compilerOptions` in your `tsconfig.json` to be either `Node16` or `NodeNext`.
+
+When importing types, always refer to the standard import:
+
+```ts copy
+import type { searchWithHighlight } from '@orama/plugin-match-highlight'
 ```

@@ -7,18 +7,18 @@ export interface DocumentsStore extends OpaqueDocumentStore {
 
 export type DefaultDocumentsStore = IDocumentsStore<DocumentsStore>
 
-export function create(): DocumentsStore {
+export async function create(): Promise<DocumentsStore> {
   return {
     docs: {},
     count: 0,
   }
 }
 
-export function get(store: DocumentsStore, id: string): Document | undefined {
+export async function get(store: DocumentsStore, id: string): Promise<Document | undefined> {
   return store.docs[id]
 }
 
-export function getMultiple(store: DocumentsStore, ids: string[]): (Document | undefined)[] {
+export async function getMultiple(store: DocumentsStore, ids: string[]): Promise<(Document | undefined)[]> {
   const found: (Document | undefined)[] = Array.from({ length: ids.length })
 
   for (let i = 0; i < ids.length; i++) {
@@ -28,7 +28,7 @@ export function getMultiple(store: DocumentsStore, ids: string[]): (Document | u
   return found
 }
 
-export function store(store: DocumentsStore, id: string, doc: Document): boolean {
+export async function store(store: DocumentsStore, id: string, doc: Document): Promise<boolean> {
   if (typeof store.docs[id] !== 'undefined') {
     return false
   }
@@ -39,7 +39,7 @@ export function store(store: DocumentsStore, id: string, doc: Document): boolean
   return true
 }
 
-export function remove(store: DocumentsStore, id: string): boolean {
+export async function remove(store: DocumentsStore, id: string): Promise<boolean> {
   if (typeof store.docs[id] === 'undefined') {
     return false
   }
@@ -50,11 +50,11 @@ export function remove(store: DocumentsStore, id: string): boolean {
   return true
 }
 
-export function count(store: DocumentsStore): number {
+export async function count(store: DocumentsStore): Promise<number> {
   return store.count
 }
 
-export function load<R = unknown>(raw: R): DocumentsStore {
+export async function load<R = unknown>(raw: R): Promise<DocumentsStore> {
   const rawDocument = raw as DocumentsStore
 
   return {
@@ -63,14 +63,14 @@ export function load<R = unknown>(raw: R): DocumentsStore {
   }
 }
 
-export function save<R = unknown>(docs: DocumentsStore): R {
+export async function save<R = unknown>(docs: DocumentsStore): Promise<R> {
   return {
     docs: docs.docs,
     count: docs.count,
   } as R
 }
 
-export function createDocumentsStore(): DefaultDocumentsStore {
+export async function createDocumentsStore(): Promise<DefaultDocumentsStore> {
   return {
     create,
     get,

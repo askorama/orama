@@ -235,7 +235,7 @@ export type IIndexInsertOrRemoveFunction<I extends OpaqueIndex = OpaqueIndex, R 
 ) => SyncOrAsyncValue<R>
 
 export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
-  create: (orama: Orama<{ Index: I }>, schema: Schema) => I
+  create: (orama: Orama<{ Index: I }>, schema: Schema) => SyncOrAsyncValue<I>
 
   beforeInsert?: IIndexInsertOrRemoveFunction<I>
   insert: IIndexInsertOrRemoveFunction<I>
@@ -246,25 +246,25 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   afterRemove?: IIndexInsertOrRemoveFunction<I>
 
   search(index: I, prop: string, term: string, context: SearchContext): SyncOrAsyncValue<TokenScore[]>
-  searchByWhereClause(index: I, filters: Record<string, boolean | ComparisonOperator>): string[]
+  searchByWhereClause(index: I, filters: Record<string, boolean | ComparisonOperator>): SyncOrAsyncValue<string[]>
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
   getSearchablePropertiesWithTypes(index: I): SyncOrAsyncValue<Record<string, SearchableType>>
 
-  load<R = unknown>(raw: R): I | Promise<I>
-  save<R = unknown>(index: I): R | Promise<R>
+  load<R = unknown>(raw: R): SyncOrAsyncValue<I>
+  save<R = unknown>(index: I): SyncOrAsyncValue<R>
 }
 
 export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentStore> {
-  create: (orama: Orama<{ DocumentStore: D }>) => D
+  create: (orama: Orama<{ DocumentStore: D }>) => SyncOrAsyncValue<D>
   get(store: D, id: string): SyncOrAsyncValue<Document | undefined>
   getMultiple(store: D, ids: string[]): SyncOrAsyncValue<(Document | undefined)[]>
   store(store: D, id: string, doc: Document): SyncOrAsyncValue<boolean>
   remove(store: D, id: string): SyncOrAsyncValue<boolean>
   count(store: D): SyncOrAsyncValue<number>
 
-  load<R = unknown>(raw: R): D | Promise<D>
-  save<R = unknown>(store: D): R | Promise<R>
+  load<R = unknown>(raw: R): SyncOrAsyncValue<D>
+  save<R = unknown>(store: D): SyncOrAsyncValue<R>
 }
 
 export type Stemmer = (word: string) => string
@@ -280,23 +280,23 @@ export type TokenizerConfig = {
 export interface Tokenizer {
   language: string
   normalizationCache: Map<string, string>
-  tokenize: (raw: string, language?: string) => string[]
+  tokenize: (raw: string, language?: string) => SyncOrAsyncValue<string[]>
 }
 
-export interface ComplexComponent {
+export interface ObjectComponents {
   tokenizer: Tokenizer | TokenizerConfig
   index: IIndex
   documentsStore: IDocumentsStore
 }
 
-export interface SimpleComponents<S extends Schema = Schema> {
+export interface FunctionComponents<S extends Schema = Schema> {
   validateSchema(doc: Document, schema: S): SyncOrAsyncValue<boolean>
   getDocumentIndexId(doc: Document): SyncOrAsyncValue<string>
   getDocumentProperties(doc: Document, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>
   formatElapsedTime(number: bigint): SyncOrAsyncValue<number | string | object | ElapsedTime>
 }
 
-export interface SimpleOrArrayCallbackComponents {
+export interface SingleOrArrayCallbackComponents {
   beforeInsert: SingleOrArray<SingleCallbackComponent>
   afterInsert: SingleOrArray<SingleCallbackComponent>
   beforeRemove: SingleOrArray<SingleCallbackComponent>
@@ -326,22 +326,24 @@ export interface ArrayCallbackComponents {
   afterMultipleUpdate: MultipleCallbackComponent[]
 }
 
-export type Components = Partial<ComplexComponent & SimpleComponents & SimpleOrArrayCallbackComponents>
+export type Components = Partial<ObjectComponents & FunctionComponents & SingleOrArrayCallbackComponents>
 
 export const kInsertions = Symbol('orama.insertions')
 export const kRemovals = Symbol('orama.removals')
 
 type ProvidedTypes = Partial<{ Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore }>
 
+interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore> {
+  index: I
+  docs: D
+}
+
 type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
   schema: S
   tokenizer: Tokenizer
   index: IIndex<I>
   documentsStore: IDocumentsStore<D>
-  data: {
-    index: I
-    docs: D
-  }
+  data: Data<I, D>
   caches: Record<string, unknown>
   [kInsertions]: number | undefined
   [kRemovals]: number | undefined
@@ -349,6 +351,6 @@ type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocument
 
 export type Orama<
   P extends ProvidedTypes = { Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore },
-> = SimpleComponents &
+> = FunctionComponents &
   ArrayCallbackComponents &
   Internals<Schema & P['Schema'], OpaqueIndex & P['Index'], OpaqueDocumentStore & P['DocumentStore']>
