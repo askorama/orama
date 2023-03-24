@@ -283,20 +283,20 @@ export interface Tokenizer {
   tokenize: (raw: string, language?: string) => SyncOrAsyncValue<string[]>
 }
 
-export interface ComplexComponent {
+export interface ObjectComponents {
   tokenizer: Tokenizer | TokenizerConfig
   index: IIndex
   documentsStore: IDocumentsStore
 }
 
-export interface SimpleComponents<S extends Schema = Schema> {
+export interface FunctionComponents<S extends Schema = Schema> {
   validateSchema(doc: Document, schema: S): SyncOrAsyncValue<boolean>
   getDocumentIndexId(doc: Document): SyncOrAsyncValue<string>
   getDocumentProperties(doc: Document, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>
   formatElapsedTime(number: bigint): SyncOrAsyncValue<number | string | object | ElapsedTime>
 }
 
-export interface SimpleOrArrayCallbackComponents {
+export interface SingleOrArrayCallbackComponents {
   beforeInsert: SingleOrArray<SingleCallbackComponent>
   afterInsert: SingleOrArray<SingleCallbackComponent>
   beforeRemove: SingleOrArray<SingleCallbackComponent>
@@ -326,22 +326,24 @@ export interface ArrayCallbackComponents {
   afterMultipleUpdate: MultipleCallbackComponent[]
 }
 
-export type Components = Partial<ComplexComponent & SimpleComponents & SimpleOrArrayCallbackComponents>
+export type Components = Partial<ObjectComponents & FunctionComponents & SingleOrArrayCallbackComponents>
 
 export const kInsertions = Symbol('orama.insertions')
 export const kRemovals = Symbol('orama.removals')
 
 type ProvidedTypes = Partial<{ Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore }>
 
+interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore> {
+  index: I
+  docs: D
+}
+
 type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
   schema: S
   tokenizer: Tokenizer
   index: IIndex<I>
   documentsStore: IDocumentsStore<D>
-  data: {
-    index: I
-    docs: D
-  }
+  data: Data<I, D>
   caches: Record<string, unknown>
   [kInsertions]: number | undefined
   [kRemovals]: number | undefined
@@ -349,6 +351,6 @@ type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocument
 
 export type Orama<
   P extends ProvidedTypes = { Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore },
-> = SimpleComponents &
+> = FunctionComponents &
   ArrayCallbackComponents &
   Internals<Schema & P['Schema'], OpaqueIndex & P['Index'], OpaqueDocumentStore & P['DocumentStore']>

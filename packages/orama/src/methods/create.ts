@@ -1,6 +1,6 @@
-import { getDefaultComponents } from '../components/defaults.js'
+import { formatElapsedTime, getDocumentIndexId, getDocumentProperties, validateSchema } from '../components/defaults.js'
 import { createDocumentsStore } from '../components/documents-store.js'
-import { COMPLEX_COMPONENTS, SIMPLE_COMPONENTS, SIMPLE_OR_ARRAY_COMPONENTS } from '../components/hooks.js'
+import { OBJECT_COMPONENTS, FUNCTION_COMPONENTS, SINGLE_OR_ARRAY_COMPONENTS } from '../components/hooks.js'
 import { createIndex } from '../components/index.js'
 import { createTokenizer } from '../components/tokenizer/index.js'
 import { createError } from '../errors.js'
@@ -11,8 +11,8 @@ import {
   IIndex,
   Orama,
   Schema,
-  SimpleComponents,
-  SimpleOrArrayCallbackComponents,
+  FunctionComponents,
+  SingleOrArrayCallbackComponents,
   Tokenizer,
 } from '../types.js'
 
@@ -23,10 +23,15 @@ interface CreateArguments {
 }
 
 function validateComponents(components: Components) {
-  const defaultComponents = getDefaultComponents()
+  const defaultComponents = {
+    formatElapsedTime,
+    getDocumentIndexId,
+    getDocumentProperties,
+    validateSchema,
+  }
 
-  for (const rawKey of SIMPLE_COMPONENTS) {
-    const key = rawKey as keyof SimpleComponents
+  for (const rawKey of FUNCTION_COMPONENTS) {
+    const key = rawKey as keyof FunctionComponents
 
     if (components[key]) {
       if (typeof components[key] !== 'function') {
@@ -38,7 +43,7 @@ function validateComponents(components: Components) {
     }
   }
 
-  for (const rawKey of SIMPLE_OR_ARRAY_COMPONENTS) {
+  for (const rawKey of SINGLE_OR_ARRAY_COMPONENTS) {
     const key = rawKey as keyof ArrayCallbackComponents
 
     if (!components[key]) {
@@ -48,7 +53,7 @@ function validateComponents(components: Components) {
       components[key] = [components[key]]
     }
 
-    for (const fn of components[key] as unknown as SimpleOrArrayCallbackComponents[]) {
+    for (const fn of components[key] as unknown as SingleOrArrayCallbackComponents[]) {
       if (typeof fn !== 'function') {
         throw createError('COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS', key)
       }
@@ -57,9 +62,9 @@ function validateComponents(components: Components) {
 
   for (const rawKey of Object.keys(components)) {
     if (
-      !COMPLEX_COMPONENTS.includes(rawKey) &&
-      !SIMPLE_COMPONENTS.includes(rawKey) &&
-      !SIMPLE_OR_ARRAY_COMPONENTS.includes(rawKey)
+      !OBJECT_COMPONENTS.includes(rawKey) &&
+      !FUNCTION_COMPONENTS.includes(rawKey) &&
+      !SINGLE_OR_ARRAY_COMPONENTS.includes(rawKey)
     ) {
       throw createError('UNSUPPORTED_COMPONENT', rawKey)
     }

@@ -178,7 +178,10 @@ export function intersect<T>(arrays: ReadonlyArray<T>[]): T[] {
   })
 }
 
-export function getDocumentProperties(doc: Document, paths: string[]): Record<string, string | number | boolean> {
+export async function getDocumentProperties(
+  doc: Document,
+  paths: string[],
+): Promise<Record<string, string | number | boolean>> {
   const properties: Record<string, string | number | boolean> = {}
 
   const pathsLength = paths.length
@@ -210,8 +213,11 @@ export function getDocumentProperties(doc: Document, paths: string[]): Record<st
   return properties
 }
 
-export function getNested<T = 'string' | 'number' | 'boolean'>(obj: object, path: string): T | undefined {
-  const props = getDocumentProperties(obj as Document, [path])
+export async function getNested<T = 'string' | 'number' | 'boolean'>(
+  obj: object,
+  path: string,
+): Promise<T | undefined> {
+  const props = await getDocumentProperties(obj as Document, [path])
 
   return props[path] as T | undefined
 }

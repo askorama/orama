@@ -1,6 +1,6 @@
 import { createError } from '../errors.js'
-import { Document, ElapsedTime, Schema, SimpleComponents } from '../types.js'
-import { getDocumentProperties, uniqueId, formatNanoseconds } from '../utils.js'
+import { Document, ElapsedTime, Schema } from '../types.js'
+import { uniqueId, formatNanoseconds } from '../utils.js'
 
 export { getDocumentProperties } from '../utils.js'
 
@@ -41,13 +41,4 @@ export async function validateSchema<S extends Schema = Schema>(doc: Document, s
   }
 
   return true
-}
-
-export function getDefaultComponents(): SimpleComponents {
-  return {
-    formatElapsedTime,
-    getDocumentIndexId,
-    getDocumentProperties,
-    validateSchema,
-  }
 }

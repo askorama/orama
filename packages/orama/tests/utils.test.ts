@@ -47,7 +47,7 @@ t.test('utils', t => {
     t.equal(getOwnProperty(myObject, 'bar'), undefined)
   })
 
-  t.test('should get value from a nested object', t => {
+  t.test('should get value from a nested object', async t => {
     t.plan(8)
 
     const myObject = {
@@ -63,14 +63,14 @@ t.test('utils', t => {
       },
     }
 
-    t.equal(getNested(myObject, 'foo'), 'bar')
-    t.same(getNested(myObject, 'nested'), undefined)
-    t.same(getNested(myObject, 'nested.nested2'), undefined)
-    t.same(getNested(myObject, 'nested.nested2.nested3'), undefined)
-    t.equal(getNested(myObject, 'nested.nested2.nested3.bar'), 'baz')
-    t.equal(getNested(myObject, 'nested1.nested3.bar'), undefined)
-    t.equal(getNested(myObject, 'nested.null.bar'), undefined)
-    t.equal(getNested(myObject, 'nested.noop.bar'), undefined)
+    t.equal(await getNested(myObject, 'foo'), 'bar')
+    t.same(await getNested(myObject, 'nested'), undefined)
+    t.same(await getNested(myObject, 'nested.nested2'), undefined)
+    t.same(await getNested(myObject, 'nested.nested2.nested3'), undefined)
+    t.equal(await getNested(myObject, 'nested.nested2.nested3.bar'), 'baz')
+    t.equal(await getNested(myObject, 'nested1.nested3.bar'), undefined)
+    t.equal(await getNested(myObject, 'nested.null.bar'), undefined)
+    t.equal(await getNested(myObject, 'nested.noop.bar'), undefined)
   })
 
   t.test('should flatten an object', t => {
