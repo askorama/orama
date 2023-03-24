@@ -505,3 +505,130 @@ The function will receive the following arguments:
 * The list of new document IDs that have been updated.
 
 <Callout type="warning">`afterUpdate` will still be invoked for each document.</Callout>
+
+## Extending Orama
+
+As Orama is an Open Source Software, we gladly accept proposal for new functionalities.
+
+This obviously include the definition of new components which are used internally by Orama and that can be customized by the users.
+
+### Step 1: Define a new interface
+
+If you want to create a new component, you first have to define your component in the `ObjectComponents` or `FunctionComponents` interfaces in `src/types.ts`.
+
+In case of object components, the definition should be a new interface defined in the same file. As convention, start the interface with the letter `I`.
+
+Example:
+
+```diff
++ interface IShiningDetector {
++   isShining(): SyncOrAsyncValue<boolean>
++ }
+
+export interface ObjectComponents {
+  tokenizer: Tokenizer | TokenizerConfig
+  index: IIndex
+  documentsStore: IDocumentsStore
++ shiningDetector: IShiningDetector
+}
+```
+
+Remember that all functions used in Orama's components can be async, so we advise to use the `SyncOrAsyncValue` for their return value. 
+This also implies that when you invoke this function you should always use `await` to make sure the function is correctly handled whether it is async or not.
+
+### Step 2: Define and store data in the database
+
+If your component needs to store some data in the orama database, you have to add a new field in the `Data` interface in `src/types.ts`. 
+
+<Callout type="warning">
+To avoid compatibility problems, only modify the data in the new field you define.
+Any component functions should accept the data as first argument instead of the full database if possible.
+</Callout>
+
+Example:
+
+```diff
++ export interface IShiningDetector {
++   isShining(shining: Record<string, number>): SyncOrAsyncValue<number>
++ }
+
+export interface ObjectComponents {
+  tokenizer: Tokenizer | TokenizerConfig
+  index: IIndex
+  documentsStore: IDocumentsStore
++ shiningDetector: IShiningDetector
+}
+
+interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore> {
+  index: I
+  docs: D
++ shining: Record<string, number>
+}
+```
+
+### Step 4: Define your component default implementation
+
+Create a file (or folder if appropriate) under the `src/components` folder with appropriate exports.
+
+<Callout type="warning">Remember to export both individual functions and the default object (or creation factory function) to allow users to compose different components.</Callout>
+
+Example (`../components/shiningDetector.js`):
+
+```diff
++ import { IShiningDetector } from '../src/types.js'
++
++ export function isShining(shining: Record<string, number>, subject: string): number {
++   return shining[subject] ?? 0
++ }
++
++ export function createShiningDetector(): IShiningDetector {
++   return { isShining }
++ }
++
+```
+
+Note that exporting a `create*` factory function is not strictly needed but it helps to isolate initialization tasks.
+
+### Step 5: Update the `create` method
+
+Update the `create` method in `src/methods/create.ts` to use the component provided in the options, or create a new one using the object or factory function defined in the previous step.
+
+If you added a field to the `Data` interface, also provide the initial value.
+
+Example: 
+```diff
+
+import { createShiningDetector } from '../components/shiningDetector.js'
+
+export async function create({ schema, language, components }: CreateArguments): Promise<Orama> {
+
+  // ...
+
+  const orama = {
+    data: {},
+    caches: {},
+    // ...
++   shiningDetector: components.shiningDetector ?? await createShiningDetector()
+  } as Orama
+
+  orama.data = {
+    index: await orama.index.create(orama, schema),
+    docs: await orama.documentsStore.create(orama),
+    shining: { Paolo: 10 }
+  }
+```
+
+### Step 5: Have fun!
+
+Call your component's functions where appropriate!
+
+<Callout type="info">Yes, we know the example below is completely useless and silly. 😁</Callout>
+
+Example:
+
+```diff
+export async function search(orama: Orama, params: SearchParams, language?: string): Promise<Results> {
++   console.log('Shining level', await orama.shiningDetector.isShining(params.term))
+
+  // ...
+```
