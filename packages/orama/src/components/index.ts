@@ -59,7 +59,12 @@ export interface Index extends OpaqueIndex {
 
 export type DefaultIndex = IIndex<Index>
 
-export function create(orama: Orama<{ Index: Index }>, schema: Schema, index?: Index, prefix = ''): Index {
+export async function create(
+  orama: Orama<{ Index: Index }>,
+  schema: Schema,
+  index?: Index,
+  prefix = '',
+): Promise<Index> {
   if (!index) {
     index = {
       indexes: {},
@@ -194,7 +199,7 @@ export async function remove(
   return true
 }
 
-export function search(index: Index, prop: string, term: string, context: SearchContext): TokenScore[] {
+export async function search(index: Index, prop: string, term: string, context: SearchContext): Promise<TokenScore[]> {
   if (!(prop in index.tokenOccurrencies)) {
     return []
   }
@@ -246,7 +251,10 @@ export function search(index: Index, prop: string, term: string, context: Search
   return scoreList
 }
 
-export function searchByWhereClause(index: Index, filters: Record<string, boolean | ComparisonOperator>): string[] {
+export async function searchByWhereClause(
+  index: Index,
+  filters: Record<string, boolean | ComparisonOperator>,
+): Promise<string[]> {
   const filterKeys = Object.keys(filters)
 
   const filtersMap: Record<string, string[]> = filterKeys.reduce(
@@ -318,15 +326,17 @@ export function searchByWhereClause(index: Index, filters: Record<string, boolea
   return result
 }
 
-export function getSearchableProperties(index: Index): string[] {
+export async function getSearchableProperties(index: Index): Promise<string[]> {
   return index.searchableProperties
 }
 
-export function getSearchablePropertiesWithTypes(index: Index): Record<string, 'string' | 'number' | 'boolean'> {
+export async function getSearchablePropertiesWithTypes(
+  index: Index,
+): Promise<Record<string, 'string' | 'number' | 'boolean'>> {
   return index.searchablePropertiesWithTypes
 }
 
-export function load<R = unknown>(raw: R): Index {
+export async function load<R = unknown>(raw: R): Promise<Index> {
   const {
     indexes,
     searchableProperties,
@@ -348,7 +358,7 @@ export function load<R = unknown>(raw: R): Index {
   }
 }
 
-export function save<R = unknown>(index: Index): R {
+export async function save<R = unknown>(index: Index): Promise<R> {
   const {
     indexes,
     searchableProperties,
@@ -370,7 +380,7 @@ export function save<R = unknown>(index: Index): R {
   } as R
 }
 
-export function createIndex(): DefaultIndex {
+export async function createIndex(): Promise<DefaultIndex> {
   return {
     create,
     insert,

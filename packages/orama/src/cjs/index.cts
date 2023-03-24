@@ -133,6 +133,6 @@ export async function updateMultiple(
   return _esmUpdateMultiple(...args)
 }
 
-export * as components from './components.cjs'
+export * as components from './components/defaults.cjs'
 export * as internals from './internals.cjs'
 export * from './stemmers.cjs'

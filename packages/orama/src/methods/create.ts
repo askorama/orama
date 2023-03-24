@@ -94,11 +94,11 @@ export async function create({ schema, language, components }: CreateArguments):
   }
 
   if (!index) {
-    index = createIndex() as unknown as IIndex
+    index = (await createIndex()) as unknown as IIndex
   }
 
   if (!documentsStore) {
-    documentsStore = createDocumentsStore() as unknown as IDocumentsStore
+    documentsStore = (await createDocumentsStore()) as unknown as IDocumentsStore
   }
 
   // Validate all other components

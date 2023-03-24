@@ -121,7 +121,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   let whereFiltersIDs: string[] = []
 
   if (hasFilters) {
-    whereFiltersIDs = orama.index.searchByWhereClause(index, params.where!)
+    whereFiltersIDs = await orama.index.searchByWhereClause(index, params.where!)
   }
 
   // Now it's time to loop over all the indices and get the documents IDs for every single term

@@ -246,7 +246,7 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   afterRemove?: IIndexInsertOrRemoveFunction<I>
 
   search(index: I, prop: string, term: string, context: SearchContext): SyncOrAsyncValue<TokenScore[]>
-  searchByWhereClause(index: I, filters: Record<string, boolean | ComparisonOperator>): string[]
+  searchByWhereClause(index: I, filters: Record<string, boolean | ComparisonOperator>): SyncOrAsyncValue<string[]>
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
   getSearchablePropertiesWithTypes(index: I): SyncOrAsyncValue<Record<string, SearchableType>>
