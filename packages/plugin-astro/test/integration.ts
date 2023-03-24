@@ -24,7 +24,8 @@ async function cleanup(): Promise<void> {
 }
 
 async function execute(command: string, cwd?: string): Promise<Execution> {
-  const env = cwd ? { PATH: dirname(process.argv[0]) } : process.env
+  const { HOME, PATH } = process.env
+  const env = cwd ? { HOME, PATH } : process.env
 
   return new Promise((resolve: (execution: Execution) => void, reject: (error: Error) => void) => {
     exec(command, { cwd, env }, (error: ExecException | null, stdout: string, stderr: string) => {
@@ -54,8 +55,8 @@ await test('plugin is able to generate orama DB at build time', async () => {
     await readFile(fileURLToPath(new URL(`../package.json`, import.meta.url)), 'utf-8')
   )
   const pluginPath = fileURLToPath(new URL(`../orama-plugin-astro-${pluginInfo.version}.tgz`, import.meta.url))
-  const pnpmPackResult = await execute('pnpm pack')
-  assert.equal(pnpmPackResult.code, 0)
+  const packResult = await execute('pnpm pack')
+  assert.equal(packResult.code, 0)
 
   // Prepare the sandbox
   await cp(sandboxSource, sandbox, { recursive: true })
@@ -65,12 +66,12 @@ await test('plugin is able to generate orama DB at build time', async () => {
   chdir(sandbox)
 
   // Install dependencies
-  const pnpmInstallResult = await execute('pnpm install', sandbox)
-  assert.equal(pnpmInstallResult.code, 0)
+  const installResult = await execute('pnpm install', sandbox)
+  assert.equal(installResult.code, 0)
 
   // astro build is successful
-  const astroBuildResult = await execute('./node_modules/.bin/astro build', sandbox)
-  assert.equal(astroBuildResult.code, 0)
+  const buildResult = await execute('./node_modules/.bin/astro build', sandbox)
+  assert.equal(buildResult.code, 0)
 
   // The Orama DBs have been generated
   assert.ok(existsSync(resolve(sandbox, 'dist', 'assets', 'oramaDB_animals.json')))
@@ -106,3 +107,5 @@ await test('generated DBs have indexed pages content', async () => {
   const turtleSearchResult = await search(animalsDB, { term: 'turtle' })
   assert.ok(turtleSearchResult.count === 0)
 })
+
+await cleanup()

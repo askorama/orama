@@ -5,9 +5,15 @@ set -x -e
 PATH=$PATH:$PWD/node_modules/.bin
 
 # Install fd
-if [ -z "$(command -v fd)" ]; then
-  curl -S -L -o /tmp/fd.tar.gz https://github.com/sharkdp/fd/releases/download/v8.6.0/fd-v8.6.0-i686-unknown-linux-musl.tar.gz
-  tar -zxvf /tmp/fd.tar.gz fd-v8.6.0-i686-unknown-linux-musl/fd -O > node_modules/.bin/fd && chmod a+x node_modules/.bin/fd
+if [ -z "$(command -v rnr)" ]; then
+  curl -S -L -o /tmp/rnr.tar.gz https://github.com/ismaelgv/rnr/releases/download/v0.4.2/rnr-v0.4.2-x86_64-unknown-linux-musl.tar.gz
+  tar -zxvf /tmp/rnr.tar.gz rnr-v0.4.2-x86_64-unknown-linux-musl/rnr -O > node_modules/.bin/rnr && chmod a+x node_modules/.bin/rnr
+fi
+
+# Install sd
+if [ -z "$(command -v sd)" ]; then
+  curl -S -L -o node_modules/.bin/sd https://github.com/chmln/sd/releases/download/v0.7.6/sd-v0.7.6-x86_64-unknown-linux-musl
+  chmod a+x node_modules/.bin/sd
 fi
 
 # Compile using TSC
@@ -24,22 +30,14 @@ rm -rf dist/cjs/stemmers/lib
 cp -a stemmers/lib/*.d.ts dist/cjs/stemmers
 
 # Fix stemmers resolution
-sed -i '' -E -re 's#@stemmers#../../stemmers#' dist/components/tokenizer/stemmers.d.ts
-sed -i '' -E -re 's#@stemmers#./stemmers#' dist/cjs/stemmers.d.cts
-sed -i '' -E -re 's#\.\./stemmers#./stemmers#' dist/cjs/stemmers.js
-sed -i '' -E -re 's#\.js"\);#.cjs"\);#' dist/cjs/stemmers.js
+sd '@stemmers' '../../stemmers' dist/components/tokenizer/stemmers.d.ts
+sd '\.\./stemmers' './stemmers' dist/cjs/stemmers.js
+sd '\.js"\);' '.cjs");' dist/cjs/stemmers.js
+sd '@stemmers' './stemmers' dist/cjs/stemmers.d.cts
+sd "\.js';" ".cjs';" dist/cjs/stemmers.d.cts
 
 # Use right extensions for files
-fd . -e js dist/cjs/ -x mv {} {.}.cjs
-fd . -e ts dist/cjs/ -x mv {} {.}.cts
-sed -i '' -E -re 's#require\("\./(.+)\.cts")#require("./\1.cjs")#' dist/cjs/index.cjs
-sed -i '' -E -re 's#require\("\./(.+)\.cts")#require("./\1.cjs")#' dist/cjs/components.cjs
-
-# Use right extensions for source maps
-for i in dist/cjs/*.js.map; do
-  mv $i ${i/.js/.cjs};
-done;
-
-for i in dist/cjs/components/*.js.map; do
-  mv $i ${i/.js/.cjs};
-done;
+sd 'require\("\./(.+)\.cts"\)' 'require("./$1.cjs")' dist/cjs/index.js
+sd 'require\("\./(.+)\.cts"\)' 'require("./$1.cjs")' dist/cjs/components.js
+rnr --no-dump -s -f -r -D "\.js" ".cjs" dist/cjs 
+rnr --no-dump -s -f -r -D "\.ts" ".cts" dist/cjs 

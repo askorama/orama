@@ -48,8 +48,7 @@
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
     "test:smoke": "tap --rcfile=tests/config/tap.yml tests/smoke/*.test.ts",
-    "ci": "npm run build && npm run test:ci && npm run test:smoke",
-    "prepare": "npm run build"
+    "ci": "npm run build && npm run test:ci && npm run test:smoke"
   },
   "keywords": [
     "full-text search",
