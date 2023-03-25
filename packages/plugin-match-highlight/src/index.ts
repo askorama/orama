@@ -18,18 +18,22 @@ export async function afterInsert(orama: Orama | OramaWithHighlight, id: string)
     Object.assign(orama.data, { positions: {} })
   }
 
-  recursivePositionInsertion(orama as OramaWithHighlight, (await orama.documentsStore.get(orama.data.docs, id))!, id)
+  await recursivePositionInsertion(
+    orama as OramaWithHighlight,
+    (await orama.documentsStore.get(orama.data.docs, id))!,
+    id
+  )
 }
 
 const wordRegEx = /[\p{L}0-9_'-]+/gimu
 
-function recursivePositionInsertion(
+async function recursivePositionInsertion(
   orama: OramaWithHighlight,
   doc: Document,
   id: string,
   prefix = '',
   schema: Schema = orama.schema
-): void {
+): Promise<void> {
   orama.data.positions[id] = Object.create(null)
   for (const key of Object.keys(doc)) {
     const isNested = typeof doc[key] === 'object'
@@ -52,7 +56,7 @@ function recursivePositionInsertion(
         token = orama.tokenizer.normalizationCache.get(key)!
         /* c8 ignore next 4 */
       } else {
-        ;[token] = orama.tokenizer.tokenize(word)
+        ;[token] = await orama.tokenizer.tokenize(word)
         orama.tokenizer.normalizationCache.set(key, token)
       }
       if (!Array.isArray(orama.data.positions[id][propName][token])) {
@@ -71,7 +75,7 @@ export async function searchWithHighlight(
   language?: Language
 ): Promise<SearchResultWithHighlight[]> {
   const result = await search(orama, params, language)
-  const queryTokens: string[] = orama.tokenizer.tokenize(params.term)
+  const queryTokens: string[] = await orama.tokenizer.tokenize(params.term)
   return result.hits.map(hit =>
     Object.assign(hit, {
       positions: Object.fromEntries(

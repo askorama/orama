@@ -73,13 +73,18 @@ A asynchronous function that takes three arguments. Should be used internally by
     - `both`: consecutive chunks with the same tag will be split into separate documents for the index, and also merged into one document for the index.
   - `basePath` (optional): a string representing the base path of the file. This is used to generate the `id` field in the index
 
-## CommonJS Imports
+# CommonJS Imports
 
-Orama plugins ships **ESM** modules by default. This allows us to move faster when providing new features and bug fixes, as well as using the `"exports"` field in `package.json` to provide a better developer experience.
+Orama plugins ship **ESM** modules by default. This allows us to move faster when providing new features and bug fixes, as well as using the `"exports"` field in `package.json` to provide a better developer experience.
 
-CommonJS imports are still supported, but you'll need to import the plugin from `@orama/plugin-parsedoc/cjs` instead of `@orama/plugin-parsedoc`:
+CommonJS imports are still supported, but we suggest you to migrate to ESM.
 
-```diff
-- const { populateFromGlob } = require("@orama/plugin-parsedoc");
-+ const { populateFromGlob } = require("@orama/plugin-parsedoc/cjs");
+## TypeScript
+
+Set `moduleResolution` in the `compilerOptions` in your `tsconfig.json` to be either `Node16` or `NodeNext`.
+
+When importing types, always refer to the standard import:
+
+```ts copy
+import type { populateFromGlob } from '@orama/plugin-data-parsedoc'
 ```

@@ -1,4 +1,4 @@
 {
   "reporter": ["text", "html"],
-  "exclude": ["dist", "stemmer", "tests", "src/cjs", "src/tokenizer/stop-words"]
+  "exclude": ["dist", "stemmers", "tests", "src/cjs", "src/tokenizer/stop-words"]
 }

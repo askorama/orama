@@ -87,12 +87,7 @@ Or import it directly in a browser module:
 
 Orama ships **ESM** modules by default. This allows us to move faster when providing new features and bug fixes, as well as using the `"exports"` field in `package.json` to provide a better developer experience.
 
-CommonJS imports are still supported, but you'll need to import Orama from `@orama/orama/cjs` instead of `@orama/orama`:
-
-```diff copy
-- const { search, insert, create } = require("@orama/orama");
-+ const { search, insert, create } = require("@orama/orama/cjs");
-```
+CommonJS imports are still supported, but we suggest you to migrate to ESM.
 
 ## TypeScript
 

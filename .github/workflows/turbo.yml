@@ -22,12 +22,12 @@ jobs:
 
       - uses: pnpm/action-setup@v2.0.1
         with:
-          version: 6.32.2
+          version: latest
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: 'pnpm'
 
       - name: Install dependencies

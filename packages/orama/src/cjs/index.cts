@@ -6,21 +6,6 @@ import type { search as esmSearch } from '../methods/search.js'
 import type { load as esmLoad, save as esmSave } from '../methods/serialization.js'
 import type { update as esmUpdate, updateMultiple as esmUpdateMultiple } from '../methods/update.js'
 
-export interface OramaExport {
-  count: typeof esmCount
-  create: typeof esmCreate
-  getByID: typeof esmGetByID
-  insert: typeof esmInsert
-  insertMultiple: typeof esminsertMultiple
-  load: typeof esmLoad
-  remove: typeof esmRemove
-  removeMultiple: typeof esmRemoveMultiple
-  save: typeof esmSave
-  search: typeof esmSearch
-}
-
-export type RequireCallback = (err: Error | undefined, orama?: OramaExport) => void
-
 let _esmCount: typeof esmCount
 let _esmCreate: typeof esmCreate
 let _esmGetByID: typeof esmGetByID
@@ -148,8 +133,6 @@ export async function updateMultiple(
   return _esmUpdateMultiple(...args)
 }
 
-export function requireOrama(callback: RequireCallback): void {
-  import('../index.js')
-    .then((loaded: OramaExport) => setTimeout(() => callback(undefined, loaded), 1))
-    .catch((error: Error) => setTimeout(() => callback(error), 1))
-}
+export * as components from './components/defaults.cjs'
+export * as internals from './internals.cjs'
+export * from './stemmers.cjs'

@@ -1,6 +1,6 @@
-import { boundedLevenshtein } from '../components/levenshtein.js'
+import { syncBoundedLevenshtein } from '../components/levenshtein.js'
 import { Nullable } from '../types.js'
-import { getOwnProperty, uniqueId } from '../utils.js'
+import { getOwnProperty, syncUniqueId } from '../utils.js'
 
 export interface Node {
   id: string
@@ -67,7 +67,7 @@ function findAllWords(node: Node, output: FindResult, term: string, exact?: bool
 
         // if the tolerance is set, check whether the edit distance is within tolerance.
         // In that case, we don't need to add the word to the output
-        if (difference <= tolerance && boundedLevenshtein(term, word, tolerance).isBounded) {
+        if (difference <= tolerance && syncBoundedLevenshtein(term, word, tolerance).isBounded) {
           output[word] = []
         }
       } else {
@@ -111,7 +111,7 @@ function getCommonPrefix(a: string, b: string) {
 
 export function create(end = false, subWord = '', key = ''): Node {
   const node = {
-    id: uniqueId(),
+    id: syncUniqueId(),
     key,
     subWord,
     parent: null,

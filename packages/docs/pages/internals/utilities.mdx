@@ -13,7 +13,7 @@ import {
 } from '@orama/orama/internals'
 ```
 
-Every exposed method comes with its own type definition.
+Every exposed method comes with its own type definition. Each method is an async function.
 
 Let's break them down:
 
@@ -24,17 +24,7 @@ Computes the Levenshtein distance between two strings `(a, b)`, returning early 
 ```javascript copy
 import { boundedLevenshtein } from '@orama/orama/internals'
 
-boundedLevenshtein('moon', 'lions', 3) // { isBounded: true, distance: 3 }
-```
-
-### `sprintf`
-
-A naive implementation of the sprintf function which supports the `%s`, `%d` and `%f` placeholders.
-
-```javascript copy
-import { sprintf } from '@orama/orama/internals'
-
-sprintf('Hello %s!', 'world') // Hello world!
+await boundedLevenshtein('moon', 'lions', 3) // { isBounded: true, distance: 3 }
 ```
 
 ### `formatBytes`
@@ -44,7 +34,7 @@ Takes a `BigInt` as input and returns a human-readable `string`.
 ```javascript copy
 import { formatBytes } from '@orama/orama/internals'
 
-formatBytes(1024) // '1 KB'
+await formatBytes(1024) // '1 KB'
 ```
 
 ### `formatNanoseconds`
@@ -54,7 +44,7 @@ Takes a `BigInt` as input and returns a human-readable `string`.
 ```javascript copy
 import { formatNanoseconds } from '@orama/orama/internals'
 
-formatNanoseconds(30000n) // '30μs'
+await formatNanoseconds(30000n) // '30μs'
 ```
 
 ### `getNanosecondsTime`
@@ -64,7 +54,7 @@ Gets the current time with nanoseconds-precision. Returns a `BigInt`.
 ```javascript copy
 import { getNanosecondsTime } from '@orama/orama/internals'
 
-getNanosecondsTime() // 1363500821581208n
+await getNanosecondsTime() // 1363500821581208n
 ```
 
 ### `uniqueId`
@@ -74,25 +64,14 @@ Returns a uniqueId for a document as a `string`.
 ```javascript copy
 import { uniqueId } from '@orama/orama/internals'
 
-uniqueId() // 37149225-243
+await uniqueId() // 37149225-243
 ```
 
-# CommonJS Imports
+# TypeScript
 
-When using CommonJS, internals can be imported in two ways:
+If you cannot use set `moduleResolution` to `nodenext` or `node16` in the `tsconfig.json`, you can import internals directly from the main entrypoint:
 
-1. Use `await import` inside an async function:
+```
+import { internals } from '@orama/orama'
 
-   ```js
-   const { boundedLevenshtein } = await import('@orama/orama/internals')
-   ```
-
-2. Use the `requireOramaInternals`:
-
-   ```js
-   const { requireOramaInternals } = require('@orama/orama/cjs/internals')
-
-   requireOramaInternals((err, { boundedLevenshtein }) => {
-     // ...
-   })
-   ```
+await internals.boundedLevenshtein()

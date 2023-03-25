@@ -1,10 +1,15 @@
 import { Document, MultipleCallbackComponent, Orama, SingleCallbackComponent } from '../types.js'
 
-export const COMPLEX_COMPONENTS = ['tokenizer', 'index', 'documentsStore']
+export const OBJECT_COMPONENTS = ['tokenizer', 'index', 'documentsStore']
 
-export const SIMPLE_COMPONENTS = ['validateSchema', 'getDocumentIndexId', 'getDocumentProperties', 'formatElapsedTime']
+export const FUNCTION_COMPONENTS = [
+  'validateSchema',
+  'getDocumentIndexId',
+  'getDocumentProperties',
+  'formatElapsedTime',
+]
 
-export const SIMPLE_OR_ARRAY_COMPONENTS = [
+export const SINGLE_OR_ARRAY_COMPONENTS = [
   'beforeInsert',
   'afterInsert',
   'beforeRemove',

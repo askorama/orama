@@ -54,7 +54,9 @@ export async function getFacets(
     const doc = allDocs[i]
 
     for (const facet of facetKeys) {
-      const facetValue = facet.includes('.') ? getNested<string>(doc!, facet)! : (doc![facet] as number | boolean)
+      const facetValue = facet.includes('.')
+        ? (await getNested<string>(doc!, facet))!
+        : (doc![facet] as number | boolean)
 
       // Range facets based on numbers
       if (properties[facet] === 'number') {

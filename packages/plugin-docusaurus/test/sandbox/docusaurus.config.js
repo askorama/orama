@@ -10,7 +10,7 @@ module.exports = {
   onBrokenMarkdownLinks: 'warn',
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en']
   },
   presets: [
     [
@@ -18,12 +18,12 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          routeBasePath: '/',
+          routeBasePath: '/'
         },
         blog: false,
-        theme: {},
-      },
-    ],
+        theme: {}
+      }
+    ]
   ],
-  plugins: ['@orama/plugin-docusaurus'],
+  plugins: ['@orama/plugin-docusaurus']
 }

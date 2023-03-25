@@ -128,7 +128,16 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
  * It assumes that:
  * - tolerance >= ||a| - |b|| >= 0
  */
-export function boundedLevenshtein(a: string, b: string, tolerance: number): BoundedMetric {
+export async function boundedLevenshtein(a: string, b: string, tolerance: number): Promise<BoundedMetric> {
+  const distance = _boundedLevenshtein(a, b, tolerance)
+  return {
+    distance,
+    isBounded: distance >= 0,
+  }
+}
+
+// This is only used internally, keep in sync with the previous one
+export function syncBoundedLevenshtein(a: string, b: string, tolerance: number): BoundedMetric {
   const distance = _boundedLevenshtein(a, b, tolerance)
   return {
     distance,

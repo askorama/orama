@@ -8,7 +8,7 @@
     "test": "exit 0"
   },
   "dependencies": {
-    "@orama/plugin-astro": "workspace:*",
+    "@orama/plugin-astro": "./plugin.tgz",
     "astro": "^2.0.2"
   }
 }

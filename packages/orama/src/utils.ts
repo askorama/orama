@@ -47,7 +47,7 @@ export function sprintf(template: string, ...args: (string | number)[]): string 
   )
 }
 
-export function formatBytes(bytes: number, decimals = 2): string {
+export async function formatBytes(bytes: number, decimals = 2): Promise<string> {
   if (bytes === 0) {
     return '0 Bytes'
   }
@@ -57,7 +57,7 @@ export function formatBytes(bytes: number, decimals = 2): string {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
-export function formatNanoseconds(value: number | bigint): string {
+export async function formatNanoseconds(value: number | bigint): Promise<string> {
   if (typeof value === 'number') {
     value = BigInt(value)
   }
@@ -73,7 +73,7 @@ export function formatNanoseconds(value: number | bigint): string {
   return `${value / second}s`
 }
 
-export function getNanosecondsTime(): bigint {
+export async function getNanosecondsTime(): Promise<bigint> {
   if (typeof process !== 'undefined' && process.hrtime !== undefined) {
     return process.hrtime.bigint()
   }
@@ -86,7 +86,12 @@ export function getNanosecondsTime(): bigint {
   return BigInt(0)
 }
 
-export function uniqueId(): string {
+export async function uniqueId(): Promise<string> {
+  return `${baseId}-${lastId++}`
+}
+
+// This is only used internally, keep in sync with the previous one
+export function syncUniqueId(): string {
   return `${baseId}-${lastId++}`
 }
 
@@ -173,7 +178,10 @@ export function intersect<T>(arrays: ReadonlyArray<T>[]): T[] {
   })
 }
 
-export function getDocumentProperties(doc: Document, paths: string[]): Record<string, string | number | boolean> {
+export async function getDocumentProperties(
+  doc: Document,
+  paths: string[],
+): Promise<Record<string, string | number | boolean>> {
   const properties: Record<string, string | number | boolean> = {}
 
   const pathsLength = paths.length
@@ -205,8 +213,11 @@ export function getDocumentProperties(doc: Document, paths: string[]): Record<st
   return properties
 }
 
-export function getNested<T = 'string' | 'number' | 'boolean'>(obj: object, path: string): T | undefined {
-  const props = getDocumentProperties(obj as Document, [path])
+export async function getNested<T = 'string' | 'number' | 'boolean'>(
+  obj: object,
+  path: string,
+): Promise<T | undefined> {
+  const props = await getDocumentProperties(obj as Document, [path])
 
   return props[path] as T | undefined
 }

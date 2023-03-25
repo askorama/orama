@@ -82,13 +82,18 @@ import { restoreFromFile } from '@orama/plugin-data-persistence'
 const db = await restoreFromFile('binary', filePath)
 ```
 
-## CommonJS Imports
+# CommonJS Imports
 
-Orama plugins ships **ESM** modules by default. This allows us to move faster when providing new features and bug fixes, as well as using the `"exports"` field in `package.json` to provide a better developer experience.
+Orama plugins ship **ESM** modules by default. This allows us to move faster when providing new features and bug fixes, as well as using the `"exports"` field in `package.json` to provide a better developer experience.
 
-CommonJS imports are still supported, but you'll need to import the plugin from `@orama/plugin-data-persistence/cjs` instead of `@orama/plugin-data-persistence`:
+CommonJS imports are still supported, but we suggest you to migrate to ESM.
 
-```diff
-- const { persistToFile } = require("@orama/plugin-data-persistence");
-+ const { persistToFile } = require("@orama/plugin-data-persistence/cjs");
+## TypeScript
+
+Set `moduleResolution` in the `compilerOptions` in your `tsconfig.json` to be either `Node16` or `NodeNext`.
+
+When importing types, always refer to the standard import:
+
+```ts copy
+import type { persistToFile } from '@orama/plugin-data-persistence'
 ```

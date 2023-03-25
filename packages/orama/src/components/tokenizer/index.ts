@@ -91,11 +91,15 @@ export async function createTokenizer(config: TokenizerConfig = {}): Promise<Def
       // Note that the initial .. is purposely left inside the import in order to be compatible
       // with vite.
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore This fails when verifying CJS but it's actually correct
-      const stemmersPath = import.meta.url.endsWith('ts') ? '../../stemmer/lib' : '../stemmer'
-      const stemmerImport = await import(`../${stemmersPath}/${STEMMERS[config.language]}.js`)
-      stemmer = stemmerImport.stemmer
+      try {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore This fails when verifying CJS but it's actually correct
+        const stemmersPath = import.meta.url.endsWith('ts') ? '../../stemmers/lib' : '../stemmers'
+        const stemmerImport = await import(`../${stemmersPath}/${STEMMERS[config.language]}.js`)
+        stemmer = stemmerImport.stemmer
+      } catch (e) {
+        throw createError('BUNDLED_ORAMA', config.language)
+      }
     }
   }
 

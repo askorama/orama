@@ -189,17 +189,15 @@ main().catch(console.error)
 
 #### Use CJS requires
 
-Orama methods can be required as CommonJS modules by requiring from `@orama/orama/cjs`.
+Orama methods can be required as CommonJS modules by requiring from `@orama/orama`.
 
 ```js
-const { create, insert } = require("@orama/orama/cjs")
+const { create, insert } = require("@orama/orama")
 
 create(/* ... */)
   .then(db => insert(db, { /* ... */ })
   .catch(console.error)
 ```
-
-Note that only main methods are supported so for internals and other supported exports you still have to use `await import`.
 
 ## Language
 
@@ -218,14 +216,14 @@ Example:
 
 ```js
 import { create } from '@orama/orama'
-import { stemmer } from '@orama/orama/components/stemmer/it'
+import { stemmer } from '@orama/orama/stemmers/it'
 
 const db = await create({
   schema: {
     author: 'string',
     quote: 'string',
   },
-  defaultLanguage: 'italian',
+  language: 'italian',
   components: {
     tokenizer: {
       stemmingFn: stemmer,
@@ -239,14 +237,14 @@ Example using CJS (see [using with commonJS](#using-with-commonjs) above):
 ```js
 async function main() {
   const { create } = await import('@orama/orama')
-  const { stemmer } = await import('@orama/orama/components/stemmer/it')
+  const { stemmer } = await import('@orama/orama/stemmers/it')
 
   const db = await create({
     schema: {
       author: 'string',
       quote: 'string',
     },
-    defaultLanguage: 'italian',
+    language: 'italian',
     components: {
       tokenizer: {
         stemmingFn: stemmer,
