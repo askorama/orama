@@ -64,6 +64,7 @@ importers:
   packages/docs:
     specifiers:
       '@orama/orama': workspace:*
+      '@orama/plugin-match-highlight': workspace:*
       next: ^13.2.4
       nextra: ^2.2.19
       nextra-theme-blog: ^2.2.19
@@ -73,6 +74,7 @@ importers:
       react-icons: ^4.8.0
     dependencies:
       '@orama/orama': link:../orama
+      '@orama/plugin-match-highlight': link:../plugin-match-highlight
       next: 13.2.4_biqbaboplfbrettd7655fr4n2y
       nextra: 2.2.19_ld2jel3hspngo3u5lti2kgl2sq
       nextra-theme-blog: 2.2.19_i765vautotixoofbdi6dinfkwe

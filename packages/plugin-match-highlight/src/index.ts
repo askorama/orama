@@ -1,4 +1,4 @@
-import { Document, Language, Orama, Result, Schema, search, SearchParams } from '@orama/orama'
+import { Document, Language, Orama, Result, Results, Schema, search, SearchParams } from '@orama/orama'
 
 export interface Position {
   start: number
@@ -9,8 +9,8 @@ export type OramaWithHighlight = Orama & {
   data: { positions: Record<string, Record<string, Record<string, Position[]>>> }
 }
 
-export type SearchResultWithHighlight = Result & {
-  positions: Record<string, Record<string, Position[]>>
+export type SearchResultWithHighlight = Results & {
+  hits: (Result & { positions: Position[] })[]
 }
 
 export async function afterInsert(orama: Orama | OramaWithHighlight, id: string): Promise<void> {
@@ -73,10 +73,10 @@ export async function searchWithHighlight(
   orama: OramaWithHighlight,
   params: SearchParams,
   language?: Language
-): Promise<SearchResultWithHighlight[]> {
+): Promise<SearchResultWithHighlight> {
   const result = await search(orama, params, language)
-  const queryTokens: string[] = await orama.tokenizer.tokenize(params.term)
-  return result.hits.map(hit =>
+  const queryTokens: string[] = await orama.tokenizer.tokenize(params.term, language)
+  const hits = result.hits.map(hit =>
     Object.assign(hit, {
       positions: Object.fromEntries(
         Object.entries(orama.data.positions[hit.id]).map(([propName, tokens]) => [
@@ -88,4 +88,9 @@ export async function searchWithHighlight(
       )
     })
   )
+
+  result.hits = hits
+
+  // @ts-ignore
+  return result
 }
