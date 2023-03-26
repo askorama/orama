@@ -1,5 +1,6 @@
 import { FaSlack } from 'react-icons/fa'
 import { Logo } from './components/Logo'
+import { Search } from './components/Search'
 
 const css = `
 li > ul.nx-mt-6 {
@@ -10,6 +11,7 @@ li > ul.nx-mt-6 > li:first-child {
   margin-top: 0;
 }
 `
+
 export default {
   project: {
     link: 'https://github.com/oramasearch/orama',
@@ -28,6 +30,9 @@ export default {
     return {
       titleTemplate: '%s – Orama',
     }
+  },
+  search: {
+    component: Search
   },
   head: (
     <>
