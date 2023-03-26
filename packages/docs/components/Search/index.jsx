@@ -79,6 +79,7 @@ async function createIndex(basePath, locale) {
   if (!(locale in indexes)) {
     indexes[locale] = await create({
       schema: {
+        id: 'string',
         title: 'string',
         url: 'string',
         content: 'string',
@@ -102,6 +103,7 @@ async function createIndex(basePath, locale) {
     const content = data[path].data['']
 
     documents.push({
+      id: url,
       title,
       url,
       content,
@@ -115,6 +117,7 @@ async function createIndex(basePath, locale) {
       const content = sectionData[sectionTitle]
 
       documents.push({
+        id: `${url}#${hash}`,
         title,
         url: `${url}#${hash}`,
         content,
@@ -189,12 +192,12 @@ export function Search() {
         boost: {
           title: 2,
         },
-        limit: 1e6,
+        limit: 30,
       })
         .then(results => {
           setResults(results)
           setGroupedResults(groupBy(results.hits, 'title'))
-
+          console.log(groupedResults)
           queryCache.set(cacheKey, results)
         })
         .catch(console.error)
