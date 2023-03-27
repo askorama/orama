@@ -138,7 +138,7 @@ export function Search() {
   const [groupedResults, setGroupedResults] = useState({})
   const [hasFocus, setHasFocus] = useState(false)
 
-  const { basePath, locale = 'en-US' } = useRouter()
+  const { basePath, locale = 'en-US', asPath } = useRouter()
 
   const inputRef = useRef(null)
   const wrapperRef = useRef(null)
@@ -211,6 +211,11 @@ export function Search() {
       setHasFocus(false)
     }
   }, [])
+
+  useEffect(() => {
+    setHasFocus(false)
+    setSearchTerm('')
+  }, [asPath])
 
   return (
     <div className="nextra-search nx-relative md:nx-w-64 nx-hidden md:nx-inline-block mx-min-w-[200px]">
