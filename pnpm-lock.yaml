@@ -63,6 +63,8 @@ importers:
 
   packages/docs:
     specifiers:
+      '@orama/orama': workspace:*
+      '@orama/plugin-match-highlight': workspace:*
       next: ^13.2.4
       nextra: ^2.2.19
       nextra-theme-blog: ^2.2.19
@@ -71,6 +73,8 @@ importers:
       react-dom: ^18.2.0
       react-icons: ^4.8.0
     dependencies:
+      '@orama/orama': link:../orama
+      '@orama/plugin-match-highlight': link:../plugin-match-highlight
       next: 13.2.4_biqbaboplfbrettd7655fr4n2y
       nextra: 2.2.19_ld2jel3hspngo3u5lti2kgl2sq
       nextra-theme-blog: 2.2.19_i765vautotixoofbdi6dinfkwe
@@ -5776,8 +5780,8 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
     dependencies:
-      JSONStream: 1.3.5
       is-text-path: 1.0.1
+      JSONStream: 1.3.5
       lodash: 4.17.21
       meow: 8.1.2
       split2: 3.2.2
@@ -12063,12 +12067,6 @@ packages:
   /react-dev-utils/12.0.1_wjtuovir4bgaqcifkekrkmozri:
     resolution: {integrity: sha512-84Ivxmr17KjUupyqzFode6xKhjwuEJDROWKJy/BthkL7Wn6NJ8h4WE6k/exAv6ImS+0oZLRRW5j/aINMHyeGeQ==}
     engines: {node: '>=14'}
-    peerDependencies:
-      typescript: '>=2.7'
-      webpack: '>=4'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
     dependencies:
       '@babel/code-frame': 7.18.6
       address: 1.2.2
@@ -12099,7 +12097,9 @@ packages:
     transitivePeerDependencies:
       - eslint
       - supports-color
+      - typescript
       - vue-template-compiler
+      - webpack
     dev: false
 
   /react-dom/17.0.2_react@17.0.2:

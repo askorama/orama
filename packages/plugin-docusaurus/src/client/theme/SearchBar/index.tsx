@@ -1,10 +1,11 @@
+import type { Result } from '@orama/orama'
+import type { Position } from '@orama/plugin-match-highlight'
 import { autocomplete } from '@algolia/autocomplete-js'
 import '@algolia/autocomplete-theme-classic/dist/theme.min.css'
 import { useColorMode } from '@docusaurus/theme-common'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import { usePluginData } from '@docusaurus/useGlobalData'
 import useIsBrowser from '@docusaurus/useIsBrowser'
-import { Position } from '@orama/plugin-match-highlight'
 import { createElement, Fragment, useEffect, useRef } from 'react'
 import { render } from 'react-dom'
 import { PLUGIN_NAME } from '../../../shared.js'
@@ -13,16 +14,16 @@ import { Footer } from './Footer.js'
 import { getOrama } from './getOrama.js'
 import './search.css'
 
-type Hit = SectionSchema & { position: Position }
+type Hit = Result & { positions: Position }
 
 const templates = {
   item({ item }: { item: Hit }) {
     return (
-      <a className="aa-ItemLink" href={item.pageRoute}>
+      <a className="aa-ItemLink" href={item.document.pageRoute as string}>
         <div className="aa-ItemContent">
           <div className="aa-ItemContentBody">
             <div className="aa-ItemContentTitle">
-              <h5 style={{ marginBottom: 0 }}>{item.sectionTitle}</h5>
+              <h5 style={{ marginBottom: 0 }}>{item.document.sectionTitle as string}</h5>
             </div>
             <div className="aa-ItemContentDescription">{snippet(item)}</div>
           </div>
@@ -35,13 +36,13 @@ const templates = {
 function snippet(item: Hit): JSX.Element {
   const PADDING = 20
   const PADDING_MARKER = '...'
-  const isBeginning = item.position.start < PADDING
-  const isEnd = item.position.start + item.position.length > item.sectionContent.length - PADDING
-  const preMatch = item.sectionContent.substring(isBeginning ? 0 : item.position.start - PADDING, item.position.start)
-  const match = item.sectionContent.substring(item.position.start, item.position.start + item.position.length)
-  const postMatch = item.sectionContent.substring(
-    item.position.start + item.position.length,
-    item.position.start + item.position.length + PADDING
+  const isBeginning = item.positions.start < PADDING
+  const isEnd = item.positions.start + item.positions.length > (item.document.sectionContent as string).length - PADDING
+  const preMatch = (item.document.sectionContent as string).substring(isBeginning ? 0 : item.positions.start - PADDING, item.positions.start)
+  const match = (item.document.sectionContent as string).substring(item.positions.start, item.positions.start + item.positions.length)
+  const postMatch = (item.document.sectionContent as string).substring(
+    item.positions.start + item.positions.length,
+    item.positions.start + item.positions.length + PADDING
   )
   return (
     <p>
@@ -80,9 +81,9 @@ export default function SearchBar(): JSX.Element {
             sourceId: 'orama',
             async getItems() {
               const results = await orama(query)
-              const processed = results.flatMap(hit =>
-                Object.values(hit.positions.sectionContent).flatMap(positions =>
-                  positions.map(position => ({
+              const processed = results.hits.flatMap(hit =>
+                Object.values((hit as any).positions.sectionContent).flatMap(positions =>
+                  (positions as any).map((position: Position) => ({
                     ...hit.document,
                     position
                   }))

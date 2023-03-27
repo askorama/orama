@@ -3,7 +3,7 @@ import { exec, ExecException } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { cp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { dirname, resolve } from 'node:path'
+import { resolve } from 'node:path'
 import { chdir } from 'node:process'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
@@ -52,7 +52,7 @@ await cleanup()
 await test('plugin is able to generate orama DB at build time', async () => {
   // Prepare the plugin
   const pluginInfo: Record<string, string> = JSON.parse(
-    await readFile(fileURLToPath(new URL(`../package.json`, import.meta.url)), 'utf-8')
+    await readFile(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf-8')
   )
   const pluginPath = fileURLToPath(new URL(`../orama-plugin-docusaurus-${pluginInfo.version}.tgz`, import.meta.url))
   const packResult = await execute('pnpm pack')
@@ -86,25 +86,25 @@ await test('generated DBs have indexed pages content', async () => {
 
   // Search results seem reasonable
   const indexSearchResult = await search('index')
-  assert.ok(indexSearchResult.length === 1)
-  assert.ok(indexSearchResult[0].document.pageRoute === 'http://localhost/')
+  assert.ok(indexSearchResult.count === 1)
+  assert.ok(indexSearchResult.hits[0].document.pageRoute === 'http://localhost/')
 
   const catSearchResult = await search('cat')
-  assert.ok(catSearchResult.length === 1)
-  assert.ok(catSearchResult[0].document.pageRoute === 'http://localhost/animals_cat')
+  assert.ok(catSearchResult.count === 1)
+  assert.ok(catSearchResult.hits[0].document.pageRoute === 'http://localhost/animals_cat')
 
   const dogSearchResult = await search('dog')
-  assert.ok(dogSearchResult.length === 4)
-  assert.ok(dogSearchResult[0].document.pageRoute === 'http://localhost/animals_dog')
+  assert.ok(dogSearchResult.count === 4)
+  assert.ok(dogSearchResult.hits[0].document.pageRoute === 'http://localhost/animals_dog')
 
   const domesticSearchResult = await search('domestic')
-  assert.ok(domesticSearchResult.length === 2)
-  assert.ok(domesticSearchResult[0].document.pageRoute === 'http://localhost/animals_cat')
-  assert.ok(domesticSearchResult[1].document.pageRoute === 'http://localhost/animals_dog')
+  assert.ok(domesticSearchResult.count === 2)
+  assert.ok(domesticSearchResult.hits[0].document.pageRoute === 'http://localhost/animals_cat')
+  assert.ok(domesticSearchResult.hits[1].document.pageRoute === 'http://localhost/animals_dog')
 
   // We do not have content about turtles
   const turtleSearchResult = await search('turtle')
-  assert.ok(turtleSearchResult.length === 0)
+  assert.ok(turtleSearchResult.count === 0)
 })
 
 await cleanup()

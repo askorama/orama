@@ -7,7 +7,7 @@ t.test('it should store the position of tokens', async t => {
     text: 'string'
   } as const
 
-  const db = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight<typeof schema>
+  const db = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight
 
   const id = await insert(db, { text: 'hello world' })
 
@@ -23,7 +23,7 @@ t.test('it should manage nested schemas', async t => {
     }
   } as const
 
-  const db = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight<typeof schema>
+  const db = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight
 
   const id = await insert(db, { other: { text: 'hello world' } })
 
@@ -37,7 +37,7 @@ t.test("it shouldn't stem tokens", async t => {
     text: 'string'
   } as const
 
-  const db = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight<typeof schema>
+  const db = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight
 
   const id = await insert(db, { text: 'hello personalization' })
 
@@ -51,12 +51,12 @@ t.test('should retrieve positions', async t => {
     text: 'string'
   } as const
 
-  const db = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight<typeof schema>
+  const db = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight
 
   await insert(db, { text: 'hello world' })
 
   const results = await searchWithHighlight(db, { term: 'hello' })
-  t.same(results[0].positions, { text: { hello: [{ start: 0, length: 5 }] } })
+  t.same(results.hits[0].positions, { text: { hello: [{ start: 0, length: 5 }] } })
 })
 
 t.test('should work with texts containing constructor and __proto__ properties', async t => {
@@ -64,12 +64,13 @@ t.test('should work with texts containing constructor and __proto__ properties',
     text: 'string'
   } as const
 
-  const db = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight<typeof schema>
+  const db = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight
 
   await insert(db, { text: 'constructor __proto__' })
 
   const results = await searchWithHighlight(db, { term: 'constructor' })
-  t.same(results[0].positions, {
+
+  t.same(results.hits[0].positions, {
     text: { constructor: [{ start: 0, length: 11 }] }
   })
 })
