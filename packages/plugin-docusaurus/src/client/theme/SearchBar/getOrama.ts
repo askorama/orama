@@ -34,10 +34,11 @@ export async function getOrama(baseUrl: string, indexData?: any): Promise<Search
       })
     )
 
-    searchFn = async (term: string) => searchWithHighlight(db, {
-      term,
-      properties: ['sectionTitle', 'sectionContent', 'type']
-    })
+    searchFn = async (term: string) =>
+      searchWithHighlight(db, {
+        term,
+        properties: ['sectionTitle', 'sectionContent', 'type']
+      })
   }
 
   return searchFn
