@@ -6,7 +6,6 @@
     "orama",
     "docusaurus"
   ],
-  "author": "",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/orama/plugin-docusaurus/issues"
@@ -32,7 +31,7 @@
   "scripts": {
     "dev": "swc --delete-dir-on-start -s -w --extensions .ts,.tsx,.cts -d dist src",
     "prebuild": "npm run lint",
-    "-build": "swc --delete-dir-on-start --extensions .ts,.tsx,.cts -d dist src",
+    "build": "swc --delete-dir-on-start --extensions .ts,.tsx,.cts -d dist src",
     "postbuild": "sh scripts/postbuild.sh",
     "-test": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
     "format": "prettier -w src",

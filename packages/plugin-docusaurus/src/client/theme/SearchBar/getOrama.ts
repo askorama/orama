@@ -1,6 +1,6 @@
 import { create, insert } from '@orama/orama'
 import {
-  afterInsert,
+  afterInsert as highlightAfterInsert,
   OramaWithHighlight,
   SearchResultWithHighlight,
   searchWithHighlight
@@ -8,7 +8,8 @@ import {
 import { INDEX_FILE } from '../../../shared.js'
 import { SectionSchema } from '../../../types.js'
 
-type SearchFunction = (term: string) => Promise<SearchResultWithHighlight[]>
+type SearchFunction = (term: string) => Promise<SearchResultWithHighlight>
+
 let searchFn: SearchFunction
 
 export async function getOrama(baseUrl: string, indexData?: any): Promise<SearchFunction> {
@@ -22,7 +23,7 @@ export async function getOrama(baseUrl: string, indexData?: any): Promise<Search
         type: 'string'
       },
       components: {
-        afterInsert
+        afterInsert: [highlightAfterInsert]
       }
     })) as OramaWithHighlight
 
@@ -33,7 +34,11 @@ export async function getOrama(baseUrl: string, indexData?: any): Promise<Search
       })
     )
 
-    searchFn = async (term: string) => searchWithHighlight(db, { term, properties: '*' })
+    searchFn = async (term: string) => searchWithHighlight(db, {
+      term,
+      properties: ['sectionTitle', 'sectionContent', 'type']
+    })
   }
+
   return searchFn
 }
