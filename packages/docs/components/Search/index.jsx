@@ -1,9 +1,9 @@
+import { create, insertMultiple } from '@orama/orama'
+import { formatNanoseconds, getNanosecondsTime } from '@orama/orama/internals'
+import { afterInsert as highlightAfterInsertHook, searchWithHighlight } from '@orama/plugin-match-highlight'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState, useRef } from 'react'
-import { create, insertMultiple } from '@orama/orama'
-import { getNanosecondsTime, formatNanoseconds } from '@orama/orama/internals'
-import { afterInsert as highlightAfterInsertHook, searchWithHighlight } from '@orama/plugin-match-highlight'
+import { useEffect, useRef, useState } from 'react'
 
 const indexes = {}
 
@@ -132,7 +132,7 @@ const queryCache = new Map()
 
 export function Search() {
   const [indexing, setIndexing] = useState(true)
-  const [indexingError, setIndexingError] = useState(false)
+  const [, setIndexingError] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [results, setResults] = useState()
   const [groupedResults, setGroupedResults] = useState({})
