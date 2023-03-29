@@ -38,8 +38,14 @@ function snippet(item: Hit): JSX.Element {
   const PADDING_MARKER = '...'
   const isBeginning = item.positions.start < PADDING
   const isEnd = item.positions.start + item.positions.length > (item.document.sectionContent as string).length - PADDING
-  const preMatch = (item.document.sectionContent as string).substring(isBeginning ? 0 : item.positions.start - PADDING, item.positions.start)
-  const match = (item.document.sectionContent as string).substring(item.positions.start, item.positions.start + item.positions.length)
+  const preMatch = (item.document.sectionContent as string).substring(
+    isBeginning ? 0 : item.positions.start - PADDING,
+    item.positions.start
+  )
+  const match = (item.document.sectionContent as string).substring(
+    item.positions.start,
+    item.positions.start + item.positions.length
+  )
   const postMatch = (item.document.sectionContent as string).substring(
     item.positions.start + item.positions.length,
     item.positions.start + item.positions.length + PADDING

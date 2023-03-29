@@ -32,7 +32,7 @@ export default {
     }
   },
   search: {
-    component: Search
+    component: Search,
   },
   head: (
     <>
