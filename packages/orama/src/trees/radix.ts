@@ -148,19 +148,19 @@ export function insert(root: Node, word: string, docId: string) {
 
       // the wordAtIndex is completely contained in the child node subword
       if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
-        const newNode = create(true, wordAtIndex, currentCharacter); // Create a new node with end set to true
-        newNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
+        const newNode = create(true, wordAtIndex, currentCharacter) // Create a new node with end set to true
+        newNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar
 
-        const newNodeChild = newNode.children[edgeLabelAtCommonPrefix];
-        newNodeChild.subWord = edgeLabel.substring(commonPrefixLength);
-        newNodeChild.key = edgeLabelAtCommonPrefix;
+        const newNodeChild = newNode.children[edgeLabelAtCommonPrefix]
+        newNodeChild.subWord = edgeLabel.substring(commonPrefixLength)
+        newNodeChild.key = edgeLabelAtCommonPrefix
 
-        root.children[currentCharacter] = newNode;
+        root.children[currentCharacter] = newNode
 
-        updateParent(newNode, root);
-        updateParent(newNodeChild, newNode);
-        addDocument(newNode, docId);
-        return;
+        updateParent(newNode, root)
+        updateParent(newNodeChild, newNode)
+        addDocument(newNode, docId)
+        return
       }
 
       // the wordAtIndex is partially contained in the child node subword
@@ -286,24 +286,24 @@ export function removeWord(root: Node, term: string): boolean {
 
 export function removeDocumentByWord(root: Node, term: string, docID: string, exact = true): boolean {
   if (!term) {
-    return true;
+    return true
   }
 
   for (let i = 0; i < term.length; i++) {
-    const character = term[i];
+    const character = term[i]
     if (character in root.children) {
-      const rootChildCurrentChar = root.children[character];
-      i += rootChildCurrentChar.subWord.length - 1;
-      root = rootChildCurrentChar;
+      const rootChildCurrentChar = root.children[character]
+      i += rootChildCurrentChar.subWord.length - 1
+      root = rootChildCurrentChar
 
       if (exact && root.word !== term) {
         // Do nothing if the exact condition is not met.
       } else {
-        removeDocument(root, docID);
+        removeDocument(root, docID)
       }
     } else {
-      return false;
+      return false
     }
   }
-  return true;
+  return true
 }

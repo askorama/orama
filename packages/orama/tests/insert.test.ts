@@ -162,20 +162,20 @@ t.test('insert short prefixes, as in #327 and #328', t => {
         id: 'string',
         abbrv: 'string',
         type: 'string',
-      }
+      },
     })
 
     await insertMultiple(db, [
       {
         id: '1',
-        abbrv:  'RDGE',
-        type:   'Ridge',
-       },
-       {
+        abbrv: 'RDGE',
+        type: 'Ridge',
+      },
+      {
         id: '2',
-        abbrv:  'RD',
-        type:   'Road',
-       }
+        abbrv: 'RD',
+        type: 'Road',
+      },
     ])
 
     const exactResults = await search(db, {
@@ -188,7 +188,6 @@ t.test('insert short prefixes, as in #327 and #328', t => {
       exact: false,
     })
 
-    
     t.same(exactResults.count, 1)
     t.same(exactResults.hits[0].id, '2')
     t.same(exactResults.hits[0].document.abbrv, 'RD')
@@ -199,7 +198,7 @@ t.test('insert short prefixes, as in #327 and #328', t => {
     t.same(prefixResults.hits[1].id, '1')
     t.same(prefixResults.hits[1].document.abbrv, 'RDGE')
   })
-  
+
   t.test('example 2', async t => {
     t.plan(5)
 
@@ -207,14 +206,14 @@ t.test('insert short prefixes, as in #327 and #328', t => {
       schema: {
         id: 'string',
         quote: 'string',
-      }
+      },
     })
 
     await insertMultiple(db, [
       { id: '1', quote: 'AB' },
       { id: '2', quote: 'ABCDEF' },
       { id: '3', quote: 'CDEF' },
-      { id: '4', quote: 'AB' }
+      { id: '4', quote: 'AB' },
     ])
 
     const exactResults = await search(db, {
@@ -227,6 +226,5 @@ t.test('insert short prefixes, as in #327 and #328', t => {
     t.same(exactResults.hits[0].document.quote, 'AB')
     t.same(exactResults.hits[1].id, '4')
     t.same(exactResults.hits[1].document.quote, 'AB')
-
   })
 })
