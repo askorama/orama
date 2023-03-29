@@ -6,7 +6,7 @@
 
 If you need more info, help, or want to provide general feedback on Orama, join
 the
-[Orama Slack channel](https://join.slack.com/t/oramasearch/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q)
+[Orama Slack channel](https://join.slack.com/t/orama-community/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q)
 
 # Installation
 
@@ -198,6 +198,8 @@ create(/* ... */)
   .then(db => insert(db, { /* ... */ })
   .catch(console.error)
 ```
+
+Note that only main methods are supported so for internals and other supported exports you still have to use `await import`.
 
 ## Language
 
