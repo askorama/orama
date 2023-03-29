@@ -148,18 +148,19 @@ export function insert(root: Node, word: string, docId: string) {
 
       // the wordAtIndex is completely contained in the child node subword
       if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
-        const newNode = create(true, wordAtIndex, currentCharacter)
-        newNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar
+        const newNode = create(true, wordAtIndex, currentCharacter); // Create a new node with end set to true
+        newNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar;
 
-        const newNodeChild = newNode.children[edgeLabelAtCommonPrefix]
-        newNodeChild.subWord = edgeLabel.substring(commonPrefixLength)
-        newNodeChild.key = edgeLabelAtCommonPrefix
+        const newNodeChild = newNode.children[edgeLabelAtCommonPrefix];
+        newNodeChild.subWord = edgeLabel.substring(commonPrefixLength);
+        newNodeChild.key = edgeLabelAtCommonPrefix;
 
-        root.children[currentCharacter] = newNode
+        root.children[currentCharacter] = newNode;
 
-        updateParent(newNode, root)
-        updateParent(newNodeChild, newNode)
-        return
+        updateParent(newNode, root);
+        updateParent(newNodeChild, newNode);
+        addDocument(newNode, docId);
+        return;
       }
 
       // the wordAtIndex is partially contained in the child node subword
