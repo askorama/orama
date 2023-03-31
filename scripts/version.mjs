@@ -1,0 +1,69 @@
+import { readFile, writeFile } from 'fs/promises'
+import { inc, valid } from 'semver'
+import { simpleGit } from 'simple-git'
+import { fileURLToPath } from 'url'
+import oramaPackage from '../packages/orama/package.json' assert { type: 'json' }
+
+const skip = (process.env.SKIP ?? '').split(/\s*,\s*/).map(s => s.trim())
+
+const packages = [
+  'orama',
+  'plugin-astro',
+  'plugin-data-persistence',
+  'plugin-docusaurus',
+  'plugin-match-highlight',
+  'plugin-parsedoc',
+].filter(p => !skip.includes(p))
+
+async function main() {
+  if (!process.argv[2]) {
+    console.error('\x1b[33mUsage: node version.mjs [VERSION | CHANGE [PRERELEASE]]\x1b[0m')
+    process.exit(1)
+  }
+
+  // Check if the new version is absolute, otherwise we take it from @orama/orama and increase
+  let version = process.argv[2]
+
+  if (!valid(version)) {
+    version = inc(oramaPackage.version, version, process.argv[3])
+  }
+
+  if (!valid(version)) {
+    console.error(
+      `\x1b[31mCannot increase version \x1b[1m${oramaPackage.version}\x1b[22m using operator \x1b[1m${process.argv[2]}\x1b[22m.\x1b[0m`,
+    )
+    process.exit(1)
+  }
+
+  // Perform the update
+  for (const pkg of packages) {
+    const packageJsonPath = fileURLToPath(new URL(`../packages/${pkg}/package.json`, import.meta.url))
+    const packageJson = JSON.parse(await readFile(packageJsonPath))
+
+    console.log(
+      `\x1b[32mUpdating package \x1b[1m${packageJson.name}\x1b[22m from \x1b[1m${packageJson.version}\x1b[22m to version \x1b[1m${version}\x1b[22m ...\x1b[0m`,
+    )
+    packageJson.version = version
+
+    if (process.env.DRY_RUN) {
+      continue
+    }
+
+    await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8')
+  }
+
+  // Make the commit, including the tag
+  if (!process.env.DRY_RUN) {
+    const git = simpleGit({ baseDir: fileURLToPath(new URL('..', import.meta.url)) })
+    console.log(`\x1b[32mCommitting changes and creating a tag (pushing is left to you) ...\x1b[0m`)
+    await git.commit(
+      'chore: Version bump',
+      packages.map(p => `packages/${p}/package.json`),
+      { '--no-verify': true },
+    )
+
+    await git.addTag(`v${version}`)
+  }
+}
+
+await main()
