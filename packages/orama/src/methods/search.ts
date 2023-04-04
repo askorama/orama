@@ -12,6 +12,7 @@ import {
   SearchParams,
   TokenMap,
   ElapsedTime,
+  IIndex,
 } from '../types.js'
 import { getNanosecondsTime, sortTokenScorePredicate } from '../utils.js'
 
@@ -22,6 +23,7 @@ const defaultBM25Params: BM25Params = {
 }
 
 async function createSearchContext(
+  index: IIndex,
   properties: string[],
   tokens: string[],
   params: SearchParams,
@@ -71,6 +73,7 @@ async function createSearchContext(
   }
 
   return {
+    index,
     timeStart: await getNanosecondsTime(),
     params,
     docsCount,
@@ -111,7 +114,13 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   }
 
   // Create the search context and the results
-  const context = await createSearchContext(propertiesToSearch, tokens, params, await orama.documentsStore.count(docs))
+  const context = await createSearchContext(
+    orama.index,
+    propertiesToSearch,
+    tokens,
+    params,
+    await orama.documentsStore.count(docs),
+  )
   const results: Result[] = Array.from({
     length: limit,
   })
@@ -134,7 +143,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
       const term = tokens[j]
 
       // Lookup
-      const scoreList = await orama.index.search(index, prop, term, context)
+      const scoreList = await orama.index.search(context, index, prop, term)
 
       context.indexMap[prop][term].push(...scoreList)
     }

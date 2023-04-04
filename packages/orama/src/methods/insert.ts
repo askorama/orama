@@ -48,7 +48,7 @@ export async function insert(orama: Orama, doc: Document, language?: string, ski
     }
 
     await orama.index.beforeInsert?.(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)
-    await orama.index.insert(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)
+    await orama.index.insert(orama.index, orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)
     await orama.index.afterInsert?.(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)
   }
 

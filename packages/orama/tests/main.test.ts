@@ -367,16 +367,16 @@ t.test('orama', t => {
     const search4 = await search(db, { term: 'f', limit: 2, offset: 2 })
 
     t.equal(search1.count, 4)
-    t.equal(search1.hits[0].document.animal, 'Fast chicken')
+    t.equal(search1.hits[0].document.animal, 'Fabolous ducks')
 
     t.equal(search2.count, 4)
-    t.equal(search2.hits[0].document.animal, 'Fabolous ducks')
+    t.equal(search2.hits[0].document.animal, 'Fantastic horse')
 
     t.equal(search3.count, 4)
-    t.equal(search3.hits[0].document.animal, 'Fantastic horse')
+    t.equal(search3.hits[0].document.animal, 'Fast chicken')
 
     t.equal(search4.count, 4)
-    t.equal(search4.hits[0].document.animal, 'Fantastic horse')
+    t.equal(search4.hits[0].document.animal, 'Fast chicken')
     t.equal(search4.hits[1].document.animal, 'Quick brown fox')
   })
 
