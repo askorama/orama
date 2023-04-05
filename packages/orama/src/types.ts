@@ -194,6 +194,7 @@ export type SearchContext = {
   uniqueDocsIDs: Record<string, number>
   indexMap: IndexMap
   docsIntersection: TokenMap
+  index: IIndex
 }
 
 export type ElapsedTime = {
@@ -224,10 +225,10 @@ export type SingleCallbackComponent = (orama: Orama, id: string, doc?: Document)
 
 export type MultipleCallbackComponent = (orama: Orama, doc: Document[] | string[]) => SyncOrAsyncValue
 
-export type IIndexInsertOrRemoveFunction<I extends OpaqueIndex = OpaqueIndex, R = void> = (
+export type IIndexInsertOrRemoveHookFunction<I extends OpaqueIndex = OpaqueIndex, R = void> = (
   index: I,
-  id: string,
   prop: string,
+  id: string,
   value: SearchableValue,
   language: string | undefined,
   tokenizer: Tokenizer,
@@ -237,15 +238,51 @@ export type IIndexInsertOrRemoveFunction<I extends OpaqueIndex = OpaqueIndex, R 
 export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   create: (orama: Orama<{ Index: I }>, schema: Schema) => SyncOrAsyncValue<I>
 
-  beforeInsert?: IIndexInsertOrRemoveFunction<I>
-  insert: IIndexInsertOrRemoveFunction<I>
-  afterInsert?: IIndexInsertOrRemoveFunction<I>
+  beforeInsert?: IIndexInsertOrRemoveHookFunction<I>
+  insert: (
+    implementation: IIndex<I>,
+    index: I,
+    prop: string,
+    id: string,
+    value: SearchableValue,
+    language: string | undefined,
+    tokenizer: Tokenizer,
+    docsCount: number,
+  ) => SyncOrAsyncValue
+  afterInsert?: IIndexInsertOrRemoveHookFunction<I>
 
-  beforeRemove?: IIndexInsertOrRemoveFunction<I>
-  remove: IIndexInsertOrRemoveFunction<I, boolean>
-  afterRemove?: IIndexInsertOrRemoveFunction<I>
+  beforeRemove?: IIndexInsertOrRemoveHookFunction<I>
+  remove: (
+    implementation: IIndex<I>,
+    index: I,
+    prop: string,
+    id: string,
+    value: SearchableValue,
+    language: string | undefined,
+    tokenizer: Tokenizer,
+    docsCount: number,
+  ) => SyncOrAsyncValue<boolean>
+  afterRemove?: IIndexInsertOrRemoveHookFunction<I>
 
-  search(index: I, prop: string, term: string, context: SearchContext): SyncOrAsyncValue<TokenScore[]>
+  insertDocumentScoreParameters(
+    index: I,
+    prop: string,
+    id: string,
+    tokens: string[],
+    docsCount: number,
+  ): SyncOrAsyncValue
+  insertTokenScoreParameters(index: I, prop: string, id: string, tokens: string[], token: string): SyncOrAsyncValue
+  removeDocumentScoreParameters(index: I, prop: string, id: string, docsCount: number): SyncOrAsyncValue
+  removeTokenScoreParameters(index: I, prop: string, token: string): SyncOrAsyncValue
+  calculateResultScores(
+    context: SearchContext,
+    index: I,
+    prop: string,
+    term: string,
+    ids: string[],
+  ): SyncOrAsyncValue<TokenScore[]>
+
+  search(context: SearchContext, index: I, prop: string, term: string): SyncOrAsyncValue<TokenScore[]>
   searchByWhereClause(index: I, filters: Record<string, boolean | ComparisonOperator>): SyncOrAsyncValue<string[]>
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>

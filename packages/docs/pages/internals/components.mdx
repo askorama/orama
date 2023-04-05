@@ -141,19 +141,48 @@ To customize the index used by Orama, provide an object which has at least the f
 
 * `create`: A function that receives an Orama instance and a schema and returns an index.
 * `insert`: A function that inserts a new document in the index. It receives the following arguments:
+  * `implementation`: The current index implementation.
   * `index`: The index.
-  * `id`: The ID of the document being inserted.
   * `prop`: The property that it is currently considered.
+  * `id`: The ID of the document being inserted.
   * `value`: The value of the property in the document. 
   * `language`: The language of the document.
   * `tokenizer`: The tokenizer associated with the current database.
   * `docsCount`: The number of documents in the documents store before the action is performed.
 * `remove`: A function that removes a document from the index. It receives the same arguments as `insert`.
+* `insertDocumentScoreParameters`: A function that inserts document information into the index for future results score calculation. It should be typically invoked within `insert`. It receives the following arguments:
+  * `index`: The index.
+  * `prop`: The property that it is currently considered.
+  * `id`: The ID of the document being inserted.
+  * `tokens`: The list of the tokens found in the document.
+  * `docsCount`: The number of documents in the documents store before the action is performed.
+* `insertTokenScoreParameters`: A function that inserts token information into the index for future results score calculation. It should be typically invoked within `insert`. It receives the following arguments:
+  * `index`: The index.
+  * `prop`: The property that it is currently considered.
+  * `id`: The ID of the document being inserted.
+  * `token`: The token.
+  * `tokens`: The list of the tokens found in the document.
+* `removeDocumentScoreParameters`: A function that removes document scores information from the index. It should be typically invoked within `remove`. It receives the following arguments:
+  * `index`: The index.
+  * `prop`: The property that it is currently considered.
+  * `id`: The ID of the document being inserted.
+  * `docsCount`: The number of documents in the documents store before the action is performed.
+* `removeTokenScoreParameters`: A function that removes token score information from the index. It should be typically invoked within `remove`. It receives the following arguments:
+  * `index`: The index.
+  * `prop`: The property that it is currently considered.
+  * `id`: The ID of the document being inserted.
+  * `token`: The token.
+* `calculateResultScores`: A function that calculates the score for the results of the current search. It should be typically invoked within `search`. It receives the following arguments:
+  * `context`: A search context with various useful informations about the search.
+  * `index`: The index.
+  * `prop`: The property search. 
+  * `term`: The term used to search.
+  * `ids`: The list of documents IDs matched by the search.
 * `search`: A function that search documents int index data and returns matching IDs with scores. It receives the following arguments:
+  * `context`: A search context with various useful informations about the search.
   * `index`: The index.
   * `prop`: The property to search. 
   * `term`: The term to search.
-  * `searchContext`: A search context with various useful informations about the search.
 * `searchByWhereClause`: A function that searchs in boolean and numeric indexes and returns a list of matching IDs. It receives the following arguments:
   * `index`: The index.
   * `filters`: An object where keys are the properties to match and the values are search operators as described in the [filters](usage/search/filters) page.
@@ -164,10 +193,10 @@ To customize the index used by Orama, provide an object which has at least the f
 
 The following functions are optional:
 
-* `beforeInsert` or `afterInsert`: A function invoked before or after `insert`. They accept the same arguments as `insert`.
-* `beforeRemove` or `afterRemove`: A function invoked before or after `remove`. They accept the same arguments as `remove`.
+* `beforeInsert` or `afterInsert`: A function invoked before or after `insert`. They accept the same arguments as `insert` except the first one.
+* `beforeRemove` or `afterRemove`: A function invoked before or after `remove`. They accept the same arguments as `remove` except the first one.
 
-For the more formal interface information, look for the `IIndex` interface in `src/types.ts` in Orama's source code.
+For the more formal interface information, look for the `IIndex` interface in `src/types.ts` in Orama's source code.
 
 The Orama's default index is based on BM25, Radix Trees and AVL trees. All its functions are exported via `@orama/orama/components` and can be composed to create a custom index:
 

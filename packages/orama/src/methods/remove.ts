@@ -24,7 +24,9 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
   for (const prop of indexableProperties) {
     const value = values[prop]
     await orama.index.beforeRemove?.(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)
-    if (!(await orama.index.remove(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount))) {
+    if (
+      !(await orama.index.remove(orama.index, orama.data.index, prop, id, value, language, orama.tokenizer, docsCount))
+    ) {
       result = false
     }
     await orama.index.afterRemove?.(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)

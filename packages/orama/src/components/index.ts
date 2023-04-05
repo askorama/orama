@@ -59,6 +59,101 @@ export interface Index extends OpaqueIndex {
 
 export type DefaultIndex = IIndex<Index>
 
+export async function insertDocumentScoreParameters(
+  index: Index,
+  prop: string,
+  id: string,
+  tokens: string[],
+  docsCount: number,
+): Promise<void> {
+  index.avgFieldLength[prop] = ((index.avgFieldLength[prop] ?? 0) * (docsCount - 1) + tokens.length) / docsCount
+  index.fieldLengths[prop][id] = tokens.length
+  index.frequencies[prop][id] = {}
+}
+
+export async function insertTokenScoreParameters(
+  index: Index,
+  prop: string,
+  id: string,
+  tokens: string[],
+  token: string,
+): Promise<void> {
+  let tokenFrequency = 0
+
+  for (const t of tokens) {
+    if (t === token) {
+      tokenFrequency++
+    }
+  }
+
+  const tf = tokenFrequency / tokens.length
+
+  index.frequencies[prop][id]![token] = tf
+
+  if (!(token in index.tokenOccurrencies[prop])) {
+    index.tokenOccurrencies[prop][token] = 0
+  }
+
+  // increase a token counter that may not yet exist
+  index.tokenOccurrencies[prop][token] = (index.tokenOccurrencies[prop][token] ?? 0) + 1
+}
+
+export async function removeDocumentScoreParameters(
+  index: Index,
+  prop: string,
+  id: string,
+  docsCount: number,
+): Promise<void> {
+  index.avgFieldLength[prop] =
+    (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][id]!) / (docsCount - 1)
+  index.fieldLengths[prop][id] = undefined
+  index.frequencies[prop][id] = undefined
+}
+
+export async function removeTokenScoreParameters(index: Index, prop: string, token: string): Promise<void> {
+  index.tokenOccurrencies[prop][token]--
+}
+
+export async function calculateResultScores(
+  context: SearchContext,
+  index: Index,
+  prop: string,
+  term: string,
+  ids: string[],
+): Promise<TokenScore[]> {
+  const documentIDs = Array.from(ids)
+
+  // Exact fields for TF-IDF
+  const avgFieldLength = index.avgFieldLength[prop]
+  const fieldLengths = index.fieldLengths[prop]
+  const oramaOccurrencies = index.tokenOccurrencies[prop]
+  const oramaFrequencies = index.frequencies[prop]
+
+  // oramaOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
+  const termOccurrencies = typeof oramaOccurrencies[term] === 'number' ? oramaOccurrencies[term] ?? 0 : 0
+
+  const scoreList: TokenScore[] = []
+
+  // Calculate TF-IDF value for each term, in each document, for each index.
+  const documentIDsLength = documentIDs.length
+  for (let k = 0; k < documentIDsLength; k++) {
+    const id = documentIDs[k]
+    const tf = oramaFrequencies?.[id]?.[term] ?? 0
+
+    const bm25 = BM25(
+      tf,
+      termOccurrencies,
+      context.docsCount,
+      fieldLengths[id]!,
+      avgFieldLength,
+      context.params.relevance! as Required<BM25Params>,
+    )
+
+    scoreList.push([id, bm25])
+  }
+  return scoreList
+}
+
 export async function create(
   orama: Orama<{ Index: Index }>,
   schema: Schema,
@@ -114,6 +209,7 @@ export async function create(
 }
 
 export async function insert(
+  implementation: IIndex<Index>,
   index: Index,
   prop: string,
   id: string,
@@ -133,38 +229,16 @@ export async function insert(
 
   const tokens = await tokenizer.tokenize(value as string, language)
 
-  if (!(id in index.frequencies[prop])) {
-    index.frequencies[prop][id] = {}
-  }
-
-  index.fieldLengths[prop][id] = tokens.length
-  index.avgFieldLength[prop] = ((index.avgFieldLength[prop] ?? 0) * (docsCount - 1) + tokens.length) / docsCount
+  await implementation.insertDocumentScoreParameters(index, prop, id, tokens, docsCount)
 
   for (const token of tokens) {
-    let tokenFrequency = 0
-
-    for (const t of tokens) {
-      if (t === token) {
-        tokenFrequency++
-      }
-    }
-
-    const tf = tokenFrequency / tokens.length
-
-    index.frequencies[prop][id]![token] = tf
-
-    if (!(token in index.tokenOccurrencies[prop])) {
-      index.tokenOccurrencies[prop][token] = 0
-    }
-
-    // increase a token counter that may not yet exist
-    index.tokenOccurrencies[prop][token] = (index.tokenOccurrencies[prop][token] ?? 0) + 1
-
+    await implementation.insertTokenScoreParameters(index, prop, id, tokens, token)
     radixInsert(index.indexes[prop] as RadixNode, token, id)
   }
 }
 
 export async function remove(
+  implementation: IIndex<Index>,
   index: Index,
   prop: string,
   id: string,
@@ -186,35 +260,25 @@ export async function remove(
 
   const tokens = await tokenizer.tokenize(value as string, language)
 
-  index.avgFieldLength[prop] =
-    (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][id]!) / (docsCount - 1)
-  index.fieldLengths[prop][id] = undefined
-  index.frequencies[prop][id] = undefined
+  await implementation.removeDocumentScoreParameters(index, prop, id, docsCount)
 
   for (const token of tokens) {
-    index.tokenOccurrencies[prop][token]--
+    await implementation.removeTokenScoreParameters(index, prop, token)
     radixRemoveDocument(index.indexes[prop] as RadixNode, token, id)
   }
 
   return true
 }
 
-export async function search(index: Index, prop: string, term: string, context: SearchContext): Promise<TokenScore[]> {
+export async function search(context: SearchContext, index: Index, prop: string, term: string): Promise<TokenScore[]> {
   if (!(prop in index.tokenOccurrencies)) {
     return []
   }
-
-  // Exact fields for TF-IDF
-  const avgFieldLength = index.avgFieldLength[prop]
-  const fieldLengths = index.fieldLengths[prop]
-  const oramaOccurrencies = index.tokenOccurrencies[prop]
-  const oramaFrequencies = index.frequencies[prop]
 
   // Performa the search
   const rootNode = index.indexes[prop] as RadixNode
   const { exact, tolerance } = context.params
   const searchResult = radixFind(rootNode, { term, exact, tolerance })
-
   const ids = new Set<string>()
 
   for (const key in searchResult) {
@@ -223,32 +287,7 @@ export async function search(index: Index, prop: string, term: string, context: 
     }
   }
 
-  const documentIDs = Array.from(ids)
-
-  // oramaOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
-  const termOccurrencies = typeof oramaOccurrencies[term] === 'number' ? oramaOccurrencies[term] ?? 0 : 0
-
-  const scoreList: TokenScore[] = []
-
-  // Calculate TF-IDF value for each term, in each document, for each index.
-  const documentIDsLength = documentIDs.length
-  for (let k = 0; k < documentIDsLength; k++) {
-    const id = documentIDs[k]
-    const tf = oramaFrequencies?.[id]?.[term] ?? 0
-
-    const bm25 = BM25(
-      tf,
-      termOccurrencies,
-      context.docsCount,
-      fieldLengths[id]!,
-      avgFieldLength,
-      context.params.relevance! as Required<BM25Params>,
-    )
-
-    scoreList.push([id, bm25])
-  }
-
-  return scoreList
+  return context.index.calculateResultScores(context, index, prop, term, Array.from(ids))
 }
 
 export async function searchByWhereClause(
@@ -385,6 +424,11 @@ export async function createIndex(): Promise<DefaultIndex> {
     create,
     insert,
     remove,
+    insertDocumentScoreParameters,
+    insertTokenScoreParameters,
+    removeDocumentScoreParameters,
+    removeTokenScoreParameters,
+    calculateResultScores,
     search,
     searchByWhereClause,
     getSearchableProperties,
