@@ -39,12 +39,30 @@ t.test('utils', t => {
   t.test('should check object properties', t => {
     t.plan(2)
 
-    const myObject = {
-      foo: 'bar',
-    }
+    t.test('should return the value of the property or undefined', t => {
+      t.plan(2)
 
-    t.equal(getOwnProperty(myObject, 'foo'), 'bar')
-    t.equal(getOwnProperty(myObject, 'bar'), undefined)
+      const myObject = {
+        foo: 'bar',
+      }
+  
+      t.equal(getOwnProperty(myObject, 'foo'), 'bar')
+      t.equal(getOwnProperty(myObject, 'bar'), undefined)
+    })
+
+    t.test('should return even if the hasOwn method is not available', t => {
+      t.plan(2)
+
+      // @ts-expect-error - we are testing the fallback
+      globalThis.Object.hasOwn = undefined
+
+      const myObject = {
+        foo: 'bar',
+      }
+
+      t.equal(getOwnProperty(myObject, 'foo'), 'bar')
+      t.equal(getOwnProperty(myObject, 'bar'), undefined)
+    })
   })
 
   t.test('should get value from a nested object', async t => {
