@@ -11,10 +11,11 @@ const second = BigInt(1e9)
 export const isServer = typeof window === 'undefined'
 
 export function sprintf(template: string, ...args: (string | number)[]): string {
-  return template.replaceAll(
+  return template.replace(
     /%(?:(?<position>\d+)\$)?(?<width>-?\d*\.?\d*)(?<type>[dfs])/g,
     function (...replaceArgs: Array<string | number | Record<string, string>>): string {
-      const { width: rawWidth, type, position } = replaceArgs.at(-1) as Record<string, string>
+      const groups = replaceArgs[replaceArgs.length - 1] as Record<string, string>
+      const { width: rawWidth, type, position } = groups
 
       const replacement = position ? args[Number.parseInt(position) - 1]! : args.shift()!
       const width = rawWidth === '' ? 0 : Number.parseInt(rawWidth)
