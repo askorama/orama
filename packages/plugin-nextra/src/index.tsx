@@ -1,9 +1,5 @@
 import type { Result } from '@orama/orama'
 import type { Position } from '@orama/plugin-match-highlight'
-// @ts-ignore
-import Link from 'next/link'
-// @ts-ignore
-import { useRouter } from 'next/router'
 import React, { useEffect, useRef, useState } from 'react'
 import { searchWithHighlight } from '@orama/plugin-match-highlight'
 import { createOramaIndex, grouDocumentsBy } from './utils/index.js'
@@ -29,6 +25,9 @@ const defaultProps: OramaSearchProps = {
   },
 }
 
+let Link;
+let Router;
+
 export function OramaSearch(props = defaultProps) {
   const [indexing, setIndexing] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -36,7 +35,8 @@ export function OramaSearch(props = defaultProps) {
   const [groupedResults, setGroupedResults] = useState({})
   const [hasFocus, setHasFocus] = useState(false)
 
-  const { basePath, locale = 'en-US', asPath } = useRouter()
+  // @todo delete default values
+  const { basePath = '', locale = 'en-US', asPath = '' } = Router?.useRouter() || {}
 
   const inputRef = useRef(null)
   const wrapperRef = useRef(null)
@@ -49,6 +49,19 @@ export function OramaSearch(props = defaultProps) {
         indexes[locale] = index
         setIndexing(false)
       })
+
+      // @todo: get rid of this big hack. Try to transpile CJS into ESM instead
+      import('next/link.js')
+        .then((mod) => {
+          Link = mod.default
+        })
+      
+      // @todo: get rid of this big hack. Try to transpile CJS into ESM instead
+      import('next/router.js')
+        .then((mod) => {
+          Router = mod.default
+        })
+    
     }, [])
 
   useEffect(() => {
@@ -63,14 +76,16 @@ export function OramaSearch(props = defaultProps) {
   }, [basePath, locale])
 
   useEffect(() => {
-    searchWithHighlight(indexes[locale], {
-      term: searchTerm,
-      limit: 30,
-    })
+    if (searchTerm) {
+      searchWithHighlight(indexes[locale], {
+        term: searchTerm,
+        limit: 30,
+      })
       .then((results) => {
         setResults(results)
         setGroupedResults(grouDocumentsBy(results.hits, 'collection'))
       })
+    }
 
   }, [searchTerm])
 
