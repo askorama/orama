@@ -12,7 +12,7 @@ type OramaDoc = {
   content: string
 }
 
-export function grouDocumentsBy(arr: HighlightedHits, key: string) {
+export function groupDocumentsBy(arr: HighlightedHits, key: string) {
   return arr.reduce((accumulator, currentValue) => {
     const keyValue = currentValue.document[key] as string
 

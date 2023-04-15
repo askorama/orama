@@ -1,8 +1,10 @@
 import type { Result } from '@orama/orama'
 import type { Position } from '@orama/plugin-match-highlight'
+import * as NextLink from 'next/link.js'
+import * as NextRouter from 'next/router.js'
 import React, { useEffect, useRef, useState } from 'react'
 import { searchWithHighlight } from '@orama/plugin-match-highlight'
-import { createOramaIndex, grouDocumentsBy } from './utils/index.js'
+import { createOramaIndex, groupDocumentsBy } from './utils/index.js'
 import { HighlightedDocument } from './components/HighlightedDocument.js'
 
 export type OramaSearchProps = {
@@ -13,6 +15,9 @@ export type OramaSearchProps = {
     content: number
   }
 }
+
+const Link = NextLink.default
+const Router = NextRouter.default
 
 const indexes = {}
 
@@ -25,9 +30,6 @@ const defaultProps: OramaSearchProps = {
   },
 }
 
-let Link;
-let Router;
-
 export function OramaSearch(props = defaultProps) {
   const [indexing, setIndexing] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -35,12 +37,12 @@ export function OramaSearch(props = defaultProps) {
   const [groupedResults, setGroupedResults] = useState({})
   const [hasFocus, setHasFocus] = useState(false)
 
-  // @todo delete default values
-  const { basePath = '', locale = 'en-US', asPath = '' } = Router?.useRouter() || {}
+  const { basePath, locale = 'en-US', asPath } = Router?.useRouter() || {}
 
   const inputRef = useRef(null)
   const wrapperRef = useRef(null)
 
+  // As soon as the page loads, we create the index on the client-side
   useEffect(() => {
     setIndexing(true)
     
@@ -49,21 +51,9 @@ export function OramaSearch(props = defaultProps) {
         indexes[locale] = index
         setIndexing(false)
       })
-
-      // @todo: get rid of this big hack. Try to transpile CJS into ESM instead
-      import('next/link.js')
-        .then((mod) => {
-          Link = mod.default
-        })
-      
-      // @todo: get rid of this big hack. Try to transpile CJS into ESM instead
-      import('next/router.js')
-        .then((mod) => {
-          Router = mod.default
-        })
-    
     }, [])
 
+  // If the locale changes, we create the index on the client-side
   useEffect(() => {
     if (!(locale in indexes)) {
       setIndexing(true)
@@ -75,20 +65,23 @@ export function OramaSearch(props = defaultProps) {
     }
   }, [basePath, locale])
 
+  // If the user types something, we search for it
   useEffect(() => {
     if (searchTerm) {
       searchWithHighlight(indexes[locale], {
         term: searchTerm,
-        limit: 30,
+        limit: props.limitResults,
+        boost: props.boost,
       })
       .then((results) => {
         setResults(results)
-        setGroupedResults(grouDocumentsBy(results.hits, 'collection'))
+        setGroupedResults(groupDocumentsBy(results.hits, 'collection'))
       })
     }
 
   }, [searchTerm])
 
+  // If the user presses ESC, we close the search box
   useEffect(() => {
     if (document.activeElement === inputRef.current) {
       setHasFocus(true)
@@ -97,6 +90,7 @@ export function OramaSearch(props = defaultProps) {
     }
   }, [])
 
+  // If the user presses ESC, we close the search box
   useEffect(() => {
     setHasFocus(false)
     setSearchTerm('')
@@ -155,11 +149,11 @@ export function OramaSearch(props = defaultProps) {
                               key={document.url + i}
                               className="nx-p-4 nx-mx-2.5 nx-break-words nx-rounded-md hover:nx-bg-primary-500 nx-text-primary-600"
                             >
-                              <Link href={document.url}>
+                              <Link.default href={document.url}>
                                 <div className="excerpt nx-mt-1 nx-text-sm nx-leading-[1.35rem] nx-text-gray-600 dark:nx-text-gray-400 contrast-more:dark:nx-text-gray-50">
                                   <HighlightedDocument hit={{ document, positions } as Result & { positions: Position[]; }} />
                                 </div>
-                              </Link>
+                              </Link.default>
                             </li>
                           ))}
                         </ul>
@@ -168,10 +162,10 @@ export function OramaSearch(props = defaultProps) {
                   ))}
                 </ul>
                 <div
-                  className="nx-sticky nx-p-4 nx-text-sm nx-bottom-0 nx-bg-neutral-900"
+                  className="nx-sticky nx-p-4 nx-text-sm nx-bottom-0 bg-neutral-100 contrast-more:dark:nx-bg-neutral-900"
                   style={{ transform: 'translate(0px, 11px)' }}
                 >
-                  <p className="nx-text-center">
+                  <p className="nx-text-center nx-text-gray-600 contrast-more:dark:nx-bg-neutral-100">
                     <b>{results.count}</b> result{results.count > 1 && 's'} found in <b>{results.elapsed.formatted}</b>.
                     Powered by{' '}
                     <a href="https://oramasearch.com?utm_source=nextra_plugin" target="_blank" className="nx-text-primary-600">
