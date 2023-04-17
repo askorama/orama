@@ -98,6 +98,9 @@ importers:
       '@orama/plugin-match-highlight':
         specifier: workspace:*
         version: link:../plugin-match-highlight
+      '@orama/plugin-nextra':
+        specifier: workspace:*
+        version: link:../plugin-nextra
       next:
         specifier: ^13.2.4
         version: 13.2.4(@babel/core@7.21.3)(react-dom@18.2.0)(react@18.2.0)

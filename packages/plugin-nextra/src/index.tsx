@@ -159,7 +159,7 @@ export function OramaSearch(props = defaultProps) {
                   ))}
                 </ul>
                 <div
-                  className="nx-sticky nx-p-4 nx-text-sm nx-bottom-0 nx-bg-neutral-100 contrast-more:dark:nx-bg-neutral-900"
+                  className="nx-sticky nx-p-4 nx-text-sm nx-bottom-0 nx-bg-gray-100 dark:nx-bg-neutral-900"
                   style={{ transform: 'translate(0px, 11px)' }}
                 >
                   <p className="nx-text-center nx-text-gray-600 contrast-more:dark:nx-bg-neutral-100">
