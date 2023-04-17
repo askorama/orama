@@ -3,9 +3,6 @@ import type { Document, SearchableValue, TokenScore } from './types.js'
 const baseId = Date.now().toString().slice(5)
 let lastId = 0
 
-// Checks if `hasOwn` method is defined avoiding errors with older Node.js versions
-const hasOwn = Object.hasOwn ?? Object.prototype.hasOwnProperty.call
-
 const k = 1024
 const nano = BigInt(1e3)
 const milli = BigInt(1e6)
@@ -14,10 +11,11 @@ const second = BigInt(1e9)
 export const isServer = typeof window === 'undefined'
 
 export function sprintf(template: string, ...args: (string | number)[]): string {
-  return template.replaceAll(
+  return template.replace(
     /%(?:(?<position>\d+)\$)?(?<width>-?\d*\.?\d*)(?<type>[dfs])/g,
     function (...replaceArgs: Array<string | number | Record<string, string>>): string {
-      const { width: rawWidth, type, position } = replaceArgs.at(-1) as Record<string, string>
+      const groups = replaceArgs[replaceArgs.length - 1] as Record<string, string>
+      const { width: rawWidth, type, position } = groups
 
       const replacement = position ? args[Number.parseInt(position) - 1]! : args.shift()!
       const width = rawWidth === '' ? 0 : Number.parseInt(rawWidth)
@@ -96,7 +94,12 @@ export function syncUniqueId(): string {
 }
 
 export function getOwnProperty<T = unknown>(object: Record<string, T>, property: string): T | undefined {
-  return hasOwn(object, property) ? object[property] : undefined
+  // Checks if `hasOwn` method is defined avoiding errors with older Node.js versions
+  if (Object.hasOwn === undefined) {
+    return Object.prototype.hasOwnProperty.call(object, property) ? object[property] : undefined;
+  }
+  
+  return Object.hasOwn(object, property) ? object[property] : undefined;
 }
 
 export function getTokenFrequency(token: string, tokens: string[]): number {
