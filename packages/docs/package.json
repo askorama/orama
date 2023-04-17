@@ -15,6 +15,7 @@
   "dependencies": {
     "@orama/orama": "workspace:*",
     "@orama/plugin-match-highlight": "workspace:*",
+    "@orama/plugin-nextra": "workspace:*",
     "next": "^13.2.4",
     "nextra": "^2.2.19",
     "nextra-theme-blog": "^2.2.19",

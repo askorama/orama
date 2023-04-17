@@ -25,6 +25,10 @@
       "dependsOn": ["@orama/orama#build", "^build"],
       "outputs": ["dist/**"]
     },
+    "@orama/plugin-nextra#build": {
+      "dependsOn": ["@orama/orama#build", "@orama/plugin-match-highlight#build", "^build"],
+      "outputs": ["dist/**"]
+    },
     "@orama/plugin-docusaurus#build": {
       "dependsOn": [
         "@orama/orama#build",

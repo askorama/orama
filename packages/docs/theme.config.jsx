@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react'
 import { FaSlack } from 'react-icons/fa'
-import { Logo } from './components/Logo'
-import { Search } from './components/Search'
+import { OramaSearch } from '@orama/plugin-nextra'
+import { useTheme } from 'next-themes'
+import { OramaLogo } from './components/Logo'
 
 const css = `
 li > ul.nx-mt-6 {
@@ -12,27 +14,43 @@ li > ul.nx-mt-6 > li:first-child {
 }
 `
 
+const useDark = () => {
+  const { resolvedTheme } = useTheme()
+  const [isDark, setIsDark] = useState(false)
+  useEffect(() => {
+    setIsDark(resolvedTheme === 'dark')
+    return () => false
+  }, [resolvedTheme])
+  return isDark
+}
+
 export default {
   project: {
     link: 'https://github.com/oramasearch/orama',
   },
-  logo: <Logo />,
+  logo: function Logo() {
+    const isDark = useDark()
+
+    return (
+      <OramaLogo isDark={isDark} />
+    )
+  },
   chat: {
-    link: 'https://join.slack.com/t/lyrasearch/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q',
+    link: 'https://join.slack.com/t/orama-community/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q',
     icon: <FaSlack style={{ width: 24, height: 24 }} />,
   },
   footer: {
     text: <p>Apache 2.0 - 2023 © OramaSearch Inc.</p>,
   },
-  docsRepositoryBase: 'https://github.com/oramasearch/orama/blob/packages/docs/pages',
-  darkMode: false,
+  docsRepositoryBase: 'https://github.com/oramasearch/orama/tree/main/packages/docs/pages',
+  darkMode: true,
   useNextSeoProps() {
     return {
       titleTemplate: '%s – Orama',
     }
   },
   search: {
-    component: Search,
+    component: OramaSearch,
   },
   head: (
     <>
