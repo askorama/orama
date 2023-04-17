@@ -13,15 +13,15 @@ type OramaDoc = {
 }
 
 export function groupDocumentsBy(arr: HighlightedHits, key: string) {
-  return arr.reduce((accumulator, currentValue) => {
-    const keyValue = currentValue.document[key] as string
-
-    if (!accumulator[keyValue]) {
-      accumulator[keyValue] = []
+  return arr.reduce((acc, current) => {
+    const keyValue = current.document[key] as string
+ 
+    if (!acc[keyValue]) {
+      acc[keyValue] = []
     }
 
-    accumulator[keyValue].push(currentValue)
-    return accumulator
+    acc[keyValue].push(current)
+    return acc
   }, {})
 }
 

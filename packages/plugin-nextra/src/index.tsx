@@ -1,7 +1,7 @@
 import type { Result } from '@orama/orama'
 import type { Position } from '@orama/plugin-match-highlight'
-import * as NextLink from 'next/link.js'
-import * as NextRouter from 'next/router.js'
+import NextLink from 'next/link.js'
+import { useRouter } from 'next/router.js'
 import React, { useEffect, useRef, useState } from 'react'
 import { searchWithHighlight } from '@orama/plugin-match-highlight'
 import { createOramaIndex, groupDocumentsBy } from './utils/index.js'
@@ -15,9 +15,6 @@ export type OramaSearchProps = {
     content: number
   }
 }
-
-const Link = NextLink.default
-const Router = NextRouter.default
 
 const indexes = {}
 
@@ -37,7 +34,7 @@ export function OramaSearch(props = defaultProps) {
   const [groupedResults, setGroupedResults] = useState({})
   const [hasFocus, setHasFocus] = useState(false)
 
-  const { basePath, locale = 'en-US', asPath } = Router?.useRouter() || {}
+  const { basePath, locale = 'en-US', asPath } = useRouter()
 
   const inputRef = useRef(null)
   const wrapperRef = useRef(null)
@@ -75,7 +72,7 @@ export function OramaSearch(props = defaultProps) {
       })
       .then((results) => {
         setResults(results)
-        setGroupedResults(groupDocumentsBy(results.hits, 'collection'))
+        setGroupedResults(groupDocumentsBy(results.hits, 'title'))
       })
     }
 
@@ -90,7 +87,7 @@ export function OramaSearch(props = defaultProps) {
     }
   }, [])
 
-  // If the user presses ESC, we close the search box
+  // If the path changes, we close the search box
   useEffect(() => {
     setHasFocus(false)
     setSearchTerm('')
@@ -149,11 +146,11 @@ export function OramaSearch(props = defaultProps) {
                               key={document.url + i}
                               className="nx-p-4 nx-mx-2.5 nx-break-words nx-rounded-md hover:nx-bg-primary-500 nx-text-primary-600"
                             >
-                              <Link.default href={document.url}>
+                              <NextLink.default href={document.url}>
                                 <div className="excerpt nx-mt-1 nx-text-sm nx-leading-[1.35rem] nx-text-gray-600 dark:nx-text-gray-400 contrast-more:dark:nx-text-gray-50">
                                   <HighlightedDocument hit={{ document, positions } as Result & { positions: Position[]; }} />
                                 </div>
-                              </Link.default>
+                              </NextLink.default>
                             </li>
                           ))}
                         </ul>
@@ -162,7 +159,7 @@ export function OramaSearch(props = defaultProps) {
                   ))}
                 </ul>
                 <div
-                  className="nx-sticky nx-p-4 nx-text-sm nx-bottom-0 bg-neutral-100 contrast-more:dark:nx-bg-neutral-900"
+                  className="nx-sticky nx-p-4 nx-text-sm nx-bottom-0 nx-bg-neutral-100 contrast-more:dark:nx-bg-neutral-900"
                   style={{ transform: 'translate(0px, 11px)' }}
                 >
                   <p className="nx-text-center nx-text-gray-600 contrast-more:dark:nx-bg-neutral-100">
