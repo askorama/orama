@@ -87,6 +87,6 @@ const docs = [
   },
 ];
 
-const ids = await insertMultiple(movieDB, docs, { batchSize: 500 });
-await removeMultiple(movieDB, ids, { batchSize: 500 });
+const ids = await insertMultiple(movieDB, docs, 500);
+await removeMultiple(movieDB, ids, 500);
 ```
