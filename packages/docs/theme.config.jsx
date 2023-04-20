@@ -31,9 +31,7 @@ export default {
   logo: function Logo() {
     const isDark = useDark()
 
-    return (
-      <OramaLogo isDark={isDark} />
-    )
+    return <OramaLogo isDark={isDark} />
   },
   chat: {
     link: 'https://join.slack.com/t/orama-community/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q',

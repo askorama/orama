@@ -96,10 +96,10 @@ export function syncUniqueId(): string {
 export function getOwnProperty<T = unknown>(object: Record<string, T>, property: string): T | undefined {
   // Checks if `hasOwn` method is defined avoiding errors with older Node.js versions
   if (Object.hasOwn === undefined) {
-    return Object.prototype.hasOwnProperty.call(object, property) ? object[property] : undefined;
+    return Object.prototype.hasOwnProperty.call(object, property) ? object[property] : undefined
   }
-  
-  return Object.hasOwn(object, property) ? object[property] : undefined;
+
+  return Object.hasOwn(object, property) ? object[property] : undefined
 }
 
 export function getTokenFrequency(token: string, tokens: string[]): number {

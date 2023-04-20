@@ -25,7 +25,7 @@
   "scripts": {
     "build": "swc --delete-dir-on-start --extensions .ts,.tsx,.cts -d dist src",
     "postbuild": "tsc -p . --emitDeclarationOnly",
-    "lint": "eslint src tests --ext .js,.ts,.cts"
+    "lint": "eslint src --ext .js,.ts,.cts"
   },
   "dependencies": {
     "@orama/orama": "workspace:*",

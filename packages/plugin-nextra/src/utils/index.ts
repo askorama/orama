@@ -6,16 +6,16 @@ import { afterInsert as highlightAfterInsertHook } from '@orama/plugin-match-hig
 type HighlightedHits = SearchResultWithHighlight['hits']
 
 type OramaDoc = {
-  id:      string
-  title:   string
-  url:     string
+  id: string
+  title: string
+  url: string
   content: string
 }
 
 export function groupDocumentsBy(arr: HighlightedHits, key: string) {
   return arr.reduce((acc, current) => {
     const keyValue = current.document[key] as string
- 
+
     if (!acc[keyValue]) {
       acc[keyValue] = []
     }
@@ -40,8 +40,8 @@ export async function createOramaIndex(basePath, locale): Promise<Orama> {
       afterInsert: [highlightAfterInsertHook],
       tokenizer: {
         stemming: false,
-      }
-    }
+      },
+    },
   })
 
   const paths = Object.keys(data)

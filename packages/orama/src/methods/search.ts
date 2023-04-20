@@ -13,6 +13,8 @@ import {
   TokenMap,
   ElapsedTime,
   IIndex,
+  Tokenizer,
+  IDocumentsStore,
 } from '../types.js'
 import { getNanosecondsTime, sortTokenScorePredicate } from '../utils.js'
 
@@ -23,10 +25,13 @@ const defaultBM25Params: BM25Params = {
 }
 
 async function createSearchContext(
+  tokenizer: Tokenizer,
   index: IIndex,
+  documentsStore: IDocumentsStore,
+  language: string | undefined,
+  params: SearchParams,
   properties: string[],
   tokens: string[],
-  params: SearchParams,
   docsCount: number,
 ): Promise<SearchContext> {
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
@@ -73,8 +78,11 @@ async function createSearchContext(
   }
 
   return {
-    index,
     timeStart: await getNanosecondsTime(),
+    tokenizer,
+    index,
+    documentsStore,
+    language,
     params,
     docsCount,
     uniqueDocsIDs: {},
@@ -115,10 +123,13 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
 
   // Create the search context and the results
   const context = await createSearchContext(
+    orama.tokenizer,
     orama.index,
+    orama.documentsStore,
+    language,
+    params,
     propertiesToSearch,
     tokens,
-    params,
     await orama.documentsStore.count(docs),
   )
   const results: Result[] = Array.from({
@@ -130,7 +141,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   let whereFiltersIDs: string[] = []
 
   if (hasFilters) {
-    whereFiltersIDs = await orama.index.searchByWhereClause(index, params.where!)
+    whereFiltersIDs = await orama.index.searchByWhereClause(context, index, params.where!)
   }
 
   // Now it's time to loop over all the indices and get the documents IDs for every single term

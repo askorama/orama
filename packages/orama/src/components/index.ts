@@ -291,6 +291,7 @@ export async function search(context: SearchContext, index: Index, prop: string,
 }
 
 export async function searchByWhereClause(
+  context: SearchContext,
   index: Index,
   filters: Record<string, boolean | ComparisonOperator>,
 ): Promise<string[]> {
@@ -311,6 +312,18 @@ export async function searchByWhereClause(
       const idx = index.indexes[param] as BooleanIndex
       const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
       filtersMap[param].push(...filteredIDs)
+      continue
+    }
+
+    if (typeof operation === 'string' || Array.isArray(operation)) {
+      const idx = index.indexes[param] as RadixNode
+
+      for (const raw of [operation].flat()) {
+        const term = await context.tokenizer.tokenize(raw, context.language, param)
+        const filteredIDsResults = radixFind(idx, { term: term[0], exact: true })
+        filtersMap[param].push(...Object.values(filteredIDsResults).flat())
+      }
+
       continue
     }
 

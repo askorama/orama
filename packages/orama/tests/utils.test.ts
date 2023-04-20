@@ -45,7 +45,7 @@ t.test('utils', t => {
       const myObject = {
         foo: 'bar',
       }
-  
+
       t.equal(getOwnProperty(myObject, 'foo'), 'bar')
       t.equal(getOwnProperty(myObject, 'bar'), undefined)
     })
