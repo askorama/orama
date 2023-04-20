@@ -63,7 +63,7 @@ INSERTED
 The tokenizer is used to tokenize documents fields and search terms. To customize the tokenizer used by Orama, provide an object which has at least the following properties:
 
 * `tokenize`: A function that accepts a string and language and returns a list of tokens.
-* `language` (string): The language supported by the tokenizer.
+* `language` (string): The language supported by the tokenizer.
 * `normalizationCache` (Map): It can used to cache tokens normalization.
 
 <Callout type="warning">The `tokenize` function **CANNOT** be async.</Callout>
@@ -74,7 +74,7 @@ In other words, a tokenizer must satisfy the following interface:
 interface Tokenizer {
   language: string
   normalizationCache: Map<string, string>
-  tokenize: (raw: string, language?: string) => string[] | Promise<string[]>
+  tokenize: (raw: string, language?: string, prop?: string) => string[] | Promise<string[]>
 }
 ```
 
@@ -184,6 +184,7 @@ To customize the index used by Orama, provide an object which has at least the f
   * `prop`: The property to search. 
   * `term`: The term to search.
 * `searchByWhereClause`: A function that searchs in boolean and numeric indexes and returns a list of matching IDs. It receives the following arguments:
+  * `context`: A search context with various useful informations about the search.
   * `index`: The index.
   * `filters`: An object where keys are the properties to match and the values are search operators as described in the [filters](usage/search/filters) page.
 * `getSearchableProperties`: A function that returns a list of all searchable properties in the index. It receives the index as the only argument.

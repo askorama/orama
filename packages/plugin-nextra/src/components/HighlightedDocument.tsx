@@ -1,4 +1,4 @@
-import type { Position, SearchResultWithHighlight } from "@orama/plugin-match-highlight"
+import type { Position, SearchResultWithHighlight } from '@orama/plugin-match-highlight'
 import React from 'react'
 
 type HighlightedDocumentProps = {

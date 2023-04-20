@@ -155,7 +155,7 @@ export type SearchParams = {
    *  }
    * });
    */
-  where?: Record<string, boolean | ComparisonOperator>
+  where?: Record<string, boolean | string | string[] | ComparisonOperator>
 }
 
 export type Result = {
@@ -189,12 +189,15 @@ export type IndexMap = Record<string, TokenMap>
 
 export type SearchContext = {
   timeStart: bigint
+  tokenizer: Tokenizer
+  index: IIndex
+  documentsStore: IDocumentsStore
+  language: string | undefined
   params: SearchParams
   docsCount: number
   uniqueDocsIDs: Record<string, number>
   indexMap: IndexMap
   docsIntersection: TokenMap
-  index: IIndex
 }
 
 export type ElapsedTime = {
@@ -283,7 +286,11 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   ): SyncOrAsyncValue<TokenScore[]>
 
   search(context: SearchContext, index: I, prop: string, term: string): SyncOrAsyncValue<TokenScore[]>
-  searchByWhereClause(index: I, filters: Record<string, boolean | ComparisonOperator>): SyncOrAsyncValue<string[]>
+  searchByWhereClause(
+    context: SearchContext,
+    index: I,
+    filters: Record<string, boolean | string | string[] | ComparisonOperator>,
+  ): SyncOrAsyncValue<string[]>
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
   getSearchablePropertiesWithTypes(index: I): SyncOrAsyncValue<Record<string, SearchableType>>
@@ -310,6 +317,7 @@ export type TokenizerConfig = {
   language?: Language
   stemming?: boolean
   stemmer?: Stemmer
+  stemmerSkipProperties?: string | string[]
   stopWords?: boolean | string[] | ((stopWords: string[]) => string[] | Promise<string[]>)
   allowDuplicates?: boolean
 }
@@ -317,7 +325,7 @@ export type TokenizerConfig = {
 export interface Tokenizer {
   language: string
   normalizationCache: Map<string, string>
-  tokenize: (raw: string, language?: string) => SyncOrAsyncValue<string[]>
+  tokenize: (raw: string, language?: string, prop?: string) => SyncOrAsyncValue<string[]>
 }
 
 export interface ObjectComponents {

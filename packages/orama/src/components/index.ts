@@ -227,7 +227,7 @@ export async function insert(
     return
   }
 
-  const tokens = await tokenizer.tokenize(value as string, language)
+  const tokens = await tokenizer.tokenize(value as string, language, prop)
 
   await implementation.insertDocumentScoreParameters(index, prop, id, tokens, docsCount)
 
@@ -258,7 +258,7 @@ export async function remove(
     return true
   }
 
-  const tokens = await tokenizer.tokenize(value as string, language)
+  const tokens = await tokenizer.tokenize(value as string, language, prop)
 
   await implementation.removeDocumentScoreParameters(index, prop, id, docsCount)
 
@@ -291,6 +291,7 @@ export async function search(context: SearchContext, index: Index, prop: string,
 }
 
 export async function searchByWhereClause(
+  context: SearchContext,
   index: Index,
   filters: Record<string, boolean | ComparisonOperator>,
 ): Promise<string[]> {
@@ -314,14 +315,26 @@ export async function searchByWhereClause(
       continue
     }
 
+    if (typeof operation === 'string' || Array.isArray(operation)) {
+      const idx = index.indexes[param] as RadixNode
+
+      for (const raw of [operation].flat()) {
+        const term = await context.tokenizer.tokenize(raw, context.language, param)
+        const filteredIDsResults = radixFind(idx, { term: term[0], exact: true })
+        filtersMap[param].push(...Object.values(filteredIDsResults).flat())
+      }
+
+      continue
+    }
+
     const operationKeys = Object.keys(operation)
 
     if (operationKeys.length > 1) {
       throw createError('INVALID_FILTER_OPERATION', operationKeys.length)
     }
 
-    const operationOpt = operationKeys[0] as ComparisonOperator
-    const operationValue = operation[operationOpt as unknown as keyof ComparisonOperator]
+    const operationOpt = operationKeys[0] as keyof ComparisonOperator
+    const operationValue = operation[operationOpt]
 
     const AVLNode = index.indexes[param] as AVLNode<number, string[]>
 

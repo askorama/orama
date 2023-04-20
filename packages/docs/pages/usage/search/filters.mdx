@@ -2,7 +2,10 @@
 
 You can use the `filters` interface to filter the search results.
 
-Filters are available for both numeric and boolean properties.
+Filters are available for numeric, boolean and string properties.
+
+On string properties it perform an exact matching on tokens so it is advised to disable stemming for the properties
+you want to use filters on (when using the default tokenizer you can provide the `stemmerSkipProperties` configuration property).
 
 If we consider the following schema:
 
@@ -16,8 +19,15 @@ const db = await create({
       rating: 'number',
       length: 'number',
       favorite: 'boolean',
+      tags: 'string'
     },
   },
+  components: {
+    tokenizer: {
+      stemming: true,
+      stemmerSkipProperties: ['meta.tags']
+    }
+  }
 })
 ```
 
@@ -36,7 +46,7 @@ const results = await search({
     'meta.favorite': true,
     length: {
       gt: 60,
-    },
+    }
   },
 })
 ```
@@ -61,6 +71,28 @@ const results = await search({
   term: 'prestige',
   where: {
     'meta.favorite': true,
+  },
+})
+```
+
+For string properties, you can specify a single string:
+
+```javascript copy
+const results = await search({
+  term: 'prestige',
+  where: {
+    'meta.tags': 'new',
+  },
+})
+```
+
+You can also specify a list of string, in this case it will return all documents that contain at least one of the values provided:
+
+```javascript copy
+const results = await search({
+  term: 'prestige',
+  where: {
+    'meta.tags': ['favorite', 'new'],
   },
 })
 ```

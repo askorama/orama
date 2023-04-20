@@ -8,14 +8,15 @@ import { stopWords as defaultStopWords } from './stop-words/index.js'
 interface DefaultTokenizer extends Tokenizer {
   language: string
   stemmer?: Stemmer
+  stemmerSkipProperties: Set<string>
   stopWords?: string[]
   allowDuplicates: boolean
   normalizationCache: Map<string, string>
-  normalizeToken(this: DefaultTokenizer, token: string): string
+  normalizeToken(this: DefaultTokenizer, token: string, prop: string | undefined): string
 }
 
-function normalizeToken(this: DefaultTokenizer, token: string): string {
-  const key = `${this.language}:${token}`
+function normalizeToken(this: DefaultTokenizer, prop: string, token: string): string {
+  const key = `${this.language}:${prop}:${token}`
 
   if (this.normalizationCache.has(key)) {
     return this.normalizationCache.get(key)!
@@ -28,7 +29,7 @@ function normalizeToken(this: DefaultTokenizer, token: string): string {
   }
 
   // Apply stemming if enabled
-  if (this.stemmer) {
+  if (this.stemmer && !this.stemmerSkipProperties.has(prop)) {
     token = this.stemmer(token)
   }
 
@@ -48,7 +49,7 @@ function trim(text: string[]): string[] {
   return text
 }
 
-function tokenize(this: DefaultTokenizer, input: string, language?: string): string[] {
+function tokenize(this: DefaultTokenizer, input: string, language?: string, prop?: string): string[] {
   if (language && language !== this.language) {
     throw createError('LANGUAGE_NOT_SUPPORTED', language)
   }
@@ -59,7 +60,11 @@ function tokenize(this: DefaultTokenizer, input: string, language?: string): str
   }
 
   const splitRule = SPLITTERS[this.language]
-  const tokens = input.toLowerCase().split(splitRule).map(this.normalizeToken).filter(Boolean)
+  const tokens = input
+    .toLowerCase()
+    .split(splitRule)
+    .map(this.normalizeToken.bind(this, prop ?? ''))
+    .filter(Boolean)
 
   const trimTokens = trim(tokens)
 
@@ -123,6 +128,7 @@ export async function createTokenizer(config: TokenizerConfig = {}): Promise<Def
     tokenize,
     language: config.language,
     stemmer,
+    stemmerSkipProperties: new Set(config.stemmerSkipProperties ? [config.stemmerSkipProperties].flat() : []),
     stopWords,
     allowDuplicates: Boolean(config.allowDuplicates),
     normalizeToken,
@@ -130,7 +136,7 @@ export async function createTokenizer(config: TokenizerConfig = {}): Promise<Def
   }
 
   tokenizer.tokenize = tokenize.bind(tokenizer)
-  tokenizer.normalizeToken = normalizeToken.bind(tokenizer)
+  tokenizer.normalizeToken = normalizeToken
 
   return tokenizer
 }

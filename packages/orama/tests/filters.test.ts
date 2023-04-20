@@ -357,3 +357,134 @@ t.test('boolean filters', async t => {
   t.equal(r3.count, 1)
   t.equal(r3.hits[0].id, '1')
 })
+
+t.test('string filters', async t => {
+  t.plan(9)
+
+  const db = await create({
+    schema: {
+      id: 'string',
+      name: 'string',
+      tags: 'string',
+    },
+  })
+
+  await insert(db, {
+    id: '1',
+    name: 'coffee type',
+    tags: 'coffee type',
+  })
+
+  await insert(db, {
+    id: '2',
+    name: 'coffee machine',
+    tags: 'coffee machine',
+  })
+
+  await insert(db, {
+    id: '3',
+    name: 'coffee maker',
+    tags: 'coffee maker',
+  })
+
+  await insert(db, {
+    id: '4',
+    name: 'coffee drinker',
+    tags: 'coffee drinker',
+  })
+
+  await insert(db, {
+    id: '5',
+    name: 'another',
+    tags: 'coffee drinker',
+  })
+
+  const r1 = await search(db, {
+    term: 'coffee',
+    properties: ['name'],
+    where: {
+      tags: 'coffee',
+    },
+  })
+
+  t.equal(r1.count, 4)
+  t.equal(r1.hits[0].id, '1')
+  t.equal(r1.hits[1].id, '2')
+  t.equal(r1.hits[2].id, '3')
+  t.equal(r1.hits[3].id, '4')
+
+  const r2 = await search(db, {
+    term: 'coffee',
+    properties: ['name'],
+    where: {
+      name: ['machine', 'maker'],
+    },
+  })
+
+  t.equal(r2.count, 2)
+  t.equal(r2.hits[0].id, '2')
+  t.equal(r2.hits[1].id, '3')
+
+  const r3 = await search(db, {
+    term: 'another',
+    properties: ['name'],
+    where: {
+      name: ['coffee'],
+    },
+  })
+
+  t.equal(r3.count, 0)
+})
+
+t.test('string filters with stemming', async t => {
+  t.plan(6)
+
+  const db = await create({
+    schema: {
+      id: 'string',
+      name: 'string',
+      tags: 'string',
+    },
+    components: {
+      tokenizer: {
+        stemming: true,
+      },
+    },
+  })
+
+  await insert(db, {
+    id: '1',
+    name: 'coffee',
+    tags: 'machine',
+  })
+
+  await insert(db, {
+    id: '2',
+    name: 'coffee',
+    tags: 'machines',
+  })
+
+  const r1 = await search(db, {
+    term: 'coffee',
+    properties: ['name'],
+    where: {
+      tags: 'machine',
+    },
+  })
+
+  t.equal(r1.count, 2)
+  t.equal(r1.hits[0].id, '1')
+  t.equal(r1.hits[1].id, '2')
+
+  const r2 = await search(db, {
+    term: 'coffee',
+    properties: ['name'],
+    where: {
+      tags: 'machines',
+    },
+  })
+
+  t.equal(r2.count, 2)
+  t.equal(r2.hits[0].id, '1')
+  t.equal(r2.hits[1].id, '2')
+})
