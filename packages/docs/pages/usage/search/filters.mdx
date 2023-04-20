@@ -34,7 +34,7 @@ const db = await create({
 We will be able to filter the search results by using the `where` property on numeric properties only:
 
 ```javascript copy
-const results = await search({
+const results = await search(db, {
   term: 'prestige',
   where: {
     year: {
@@ -67,7 +67,7 @@ As for now, the following operators are available for numeric properties:
 For boolean properties, you can simply set the property to `true` or `false`:
 
 ```javascript copy
-const results = await search({
+const results = await search(db, {
   term: 'prestige',
   where: {
     'meta.favorite': true,
@@ -78,7 +78,7 @@ const results = await search({
 For string properties, you can specify a single string:
 
 ```javascript copy
-const results = await search({
+const results = await search(db, {
   term: 'prestige',
   where: {
     'meta.tags': 'new',
@@ -89,7 +89,7 @@ const results = await search({
 You can also specify a list of string, in this case it will return all documents that contain at least one of the values provided:
 
 ```javascript copy
-const results = await search({
+const results = await search(db, {
   term: 'prestige',
   where: {
     'meta.tags': ['favorite', 'new'],
