@@ -209,16 +209,16 @@ language,
 You can specify a different language by using the `language` property
 during Orama initialization.
 
-Orama can analyze your input using an English
+By default, Orama will analyze your input using an English
 [Porter Stemmer](https://tartarus.org/martin/PorterStemmer/) function. <br />
-
 You can replace the default stemmer with a custom one, or a pre-built one
 shipped with the default Orama installation.
 
 Example:
 
 ```js
-import { create, stemmers } from '@orama/orama'
+import { create } from '@orama/orama'
+import { stemmer } from '@orama/orama/stemmers/it'
 
 const db = await create({
   schema: {
@@ -228,8 +228,7 @@ const db = await create({
   language: 'italian',
   components: {
     tokenizer: {
-      stemming: true,
-      stemmer: stemmers.italian,
+      stemmingFn: stemmer,
     },
   },
 })
@@ -238,23 +237,25 @@ const db = await create({
 Example using CJS (see [using with commonJS](#using-with-commonjs) above):
 
 ```js
-const { create, insert, stemmers } = require('@orama/orama')
+async function main() {
+  const { create } = await import('@orama/orama')
+  const { stemmer } = await import('@orama/orama/stemmers/it')
 
-create({
-  schema: {
-    author: 'string',
-    quote: 'string',
-  },
-  language: 'italian',
-  components: {
-    tokenizer: {
-      stemming: true,
-      stemmer: stemmers.italian,
+  const db = await create({
+    schema: {
+      author: 'string',
+      quote: 'string',
     },
-  },
-})
-  .then(db => insert(db, { /* ... */ })
-  .catch(console.error)
+    language: 'italian',
+    components: {
+      tokenizer: {
+        stemmingFn: stemmer,
+      },
+    },
+  })
+}
+
+main()
 ```
 
 Right now, Orama supports 26 languages and stemmers out of the box:
