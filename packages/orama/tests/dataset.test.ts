@@ -40,6 +40,11 @@ t.test('orama.dataset', async t => {
         second: 'string',
       },
     },
+    components: {
+      tokenizer: {
+        stemming: true,
+      },
+    },
   })
 
   const events = (dataset as EventJson).result.events.map(ev => ({

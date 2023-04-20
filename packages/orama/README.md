@@ -206,7 +206,7 @@ Note that only main methods are supported so for internals and other supported e
 Orama supports multiple languages. By default, it will use the `english`
 language,
 
-You can specify a different language by using the `defaultLanguage` property
+You can specify a different language by using the `language` property
 during Orama initialization.
 
 By default, Orama will analyze your input using an English

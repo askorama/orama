@@ -82,7 +82,7 @@ async function prepareOramaDb(
 
   const oramaDB = await createOramaDB({
     schema: defaultSchema,
-    ...(dbConfig.language ? { defaultLanguage: dbConfig.language } : undefined)
+    ...(dbConfig.language ? { language: dbConfig.language } : undefined)
   })
 
   for (const { pathname, generatedFilePath } of pathsToBeIndexed) {

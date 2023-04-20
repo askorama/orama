@@ -223,6 +223,11 @@ t.test('orama', t => {
         quote: 'string',
         author: 'string',
       },
+      components: {
+        tokenizer: {
+          stemming: true,
+        },
+      },
     })
 
     await insert(db, { quote: 'the quick, brown fox jumps over the lazy dog. What a fox!', author: 'John Doe' })

@@ -1,11 +1,11 @@
 import type { Result } from '@orama/orama'
-import type { Position } from '@orama/plugin-match-highlight'
+import type { Position, SearchResultWithHighlight } from '@orama/plugin-match-highlight'
+import { searchWithHighlight } from '@orama/plugin-match-highlight'
 import NextLink from 'next/link.js'
 import { useRouter } from 'next/router.js'
 import React, { useEffect, useRef, useState } from 'react'
-import { searchWithHighlight } from '@orama/plugin-match-highlight'
-import { createOramaIndex, groupDocumentsBy } from './utils/index.js'
 import { HighlightedDocument } from './components/HighlightedDocument.js'
+import { createOramaIndex, groupDocumentsBy } from './utils/index.js'
 
 export type OramaSearchProps = {
   limitResults: number
@@ -28,9 +28,9 @@ const defaultProps: OramaSearchProps = {
 }
 
 export function OramaSearch(props = defaultProps) {
-  const [indexing, setIndexing] = useState(false)
+  const [, setIndexing] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [results, setResults] = useState()
+  const [results, setResults] = useState<SearchResultWithHighlight>()
   const [groupedResults, setGroupedResults] = useState({})
   const [hasFocus, setHasFocus] = useState(false)
 
@@ -42,23 +42,21 @@ export function OramaSearch(props = defaultProps) {
   // As soon as the page loads, we create the index on the client-side
   useEffect(() => {
     setIndexing(true)
-    
-    createOramaIndex(basePath, locale)
-      .then((index) => {
-        indexes[locale] = index
-        setIndexing(false)
-      })
-    }, [])
+
+    createOramaIndex(basePath, locale).then(index => {
+      indexes[locale] = index
+      setIndexing(false)
+    })
+  }, [])
 
   // If the locale changes, we create the index on the client-side
   useEffect(() => {
     if (!(locale in indexes)) {
       setIndexing(true)
-      createOramaIndex(basePath, locale)
-        .then((index) => {
-          indexes[locale] = index
-          setIndexing(false)
-        })
+      createOramaIndex(basePath, locale).then(index => {
+        indexes[locale] = index
+        setIndexing(false)
+      })
     }
   }, [basePath, locale])
 
@@ -69,13 +67,11 @@ export function OramaSearch(props = defaultProps) {
         term: searchTerm,
         limit: props.limitResults,
         boost: props.boost,
-      })
-      .then((results) => {
+      }).then(results => {
         setResults(results)
         setGroupedResults(groupDocumentsBy(results.hits, 'title'))
       })
     }
-
   }, [searchTerm])
 
   // If the user presses ESC, we close the search box
@@ -148,7 +144,9 @@ export function OramaSearch(props = defaultProps) {
                             >
                               <NextLink.default href={document.url}>
                                 <div className="excerpt nx-mt-1 nx-text-sm nx-leading-[1.35rem] nx-text-gray-600 dark:nx-text-gray-400 contrast-more:dark:nx-text-gray-50">
-                                  <HighlightedDocument hit={{ document, positions } as Result & { positions: Position[]; }} />
+                                  <HighlightedDocument
+                                    hit={{ document, positions } as Result & { positions: Position[] }}
+                                  />
                                 </div>
                               </NextLink.default>
                             </li>
@@ -165,7 +163,11 @@ export function OramaSearch(props = defaultProps) {
                   <p className="nx-text-center nx-text-gray-600 contrast-more:dark:nx-bg-neutral-100">
                     <b>{results.count}</b> result{results.count > 1 && 's'} found in <b>{results.elapsed.formatted}</b>.
                     Powered by{' '}
-                    <a href="https://oramasearch.com?utm_source=nextra_plugin" target="_blank" className="nx-text-primary-600">
+                    <a
+                      href="https://oramasearch.com?utm_source=nextra_plugin"
+                      target="_blank"
+                      className="nx-text-primary-600"
+                    >
                       <b>Orama</b>
                     </a>
                   </p>
