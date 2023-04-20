@@ -37,12 +37,15 @@ t.test("it shouldn't stem tokens", async t => {
     text: 'string'
   } as const
 
-  const db = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight
+  const db = (await create({
+    schema,
+    components: { afterInsert, tokenizer: { stemming: false } }
+  })) as OramaWithHighlight
 
   const id = await insert(db, { text: 'hello personalization' })
 
   t.same(db.data.positions[id], {
-    text: { hello: [{ start: 0, length: 5 }], person: [{ start: 6, length: 15 }] }
+    text: { hello: [{ start: 0, length: 5 }], personalization: [{ start: 6, length: 15 }] }
   })
 })
 

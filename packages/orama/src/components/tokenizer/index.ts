@@ -1,7 +1,8 @@
 import { createError } from '../../errors.js'
 import { Stemmer, Tokenizer, TokenizerConfig } from '../../types.js'
 import { replaceDiacritics } from './diacritics.js'
-import { SPLITTERS, STEMMERS, SUPPORTED_LANGUAGES } from './languages.js'
+import { Language, SPLITTERS, SUPPORTED_LANGUAGES } from './languages.js'
+import { stemmers } from './stemmers.js'
 import { stopWords as defaultStopWords } from './stop-words/index.js'
 
 interface DefaultTokenizer extends Tokenizer {
@@ -76,30 +77,18 @@ export async function createTokenizer(config: TokenizerConfig = {}): Promise<Def
     throw createError('LANGUAGE_NOT_SUPPORTED', config.language)
   }
 
-  // Handle stemming
+  // Handle stemming - It is disabled by default
   let stemmer: Stemmer | undefined
 
-  if (config.stemming !== false) {
-    if (config.stemmer && typeof config.stemmer !== 'function') {
-      throw createError('INVALID_STEMMER_FUNCTION_TYPE')
-    }
-
+  if (config.stemming || (config.stemmer && !('stemming' in config))) {
     if (config.stemmer) {
+      if (typeof config.stemmer !== 'function') {
+        throw createError('INVALID_STEMMER_FUNCTION_TYPE')
+      }
+
       stemmer = config.stemmer
     } else {
-      // Check if we are in a TypeScript or Javascript scenario and determine the stemmers path
-      // Note that the initial .. is purposely left inside the import in order to be compatible
-      // with vite.
-
-      try {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore This fails when verifying CJS but it's actually correct
-        const stemmersPath = import.meta.url.endsWith('ts') ? '../../stemmers/lib' : '../stemmers'
-        const stemmerImport = await import(`../${stemmersPath}/${STEMMERS[config.language]}.js`)
-        stemmer = stemmerImport.stemmer
-      } catch (e) {
-        throw createError('BUNDLED_ORAMA', config.language)
-      }
+      stemmer = (stemmers as Record<Language, Stemmer>)[config.language]
     }
   }
 
