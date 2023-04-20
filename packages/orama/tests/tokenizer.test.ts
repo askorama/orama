@@ -4,7 +4,7 @@ import { createTokenizer } from '../src/components/tokenizer/index.js'
 import { stemmers } from '../src/components/tokenizer/stemmers.js'
 
 t.test('Tokenizer', async t => {
-  t.plan(15)
+  t.plan(18)
 
   t.test('Should tokenize and stem correctly in english', async t => {
     t.plan(2)
@@ -39,6 +39,63 @@ t.test('Tokenizer', async t => {
 
     t.strictSame(O1, ['thi', 'is', 'a', 'test', 'with', 'test', 'duplic'])
     t.strictSame(O2, ["it'", 'aliv', "it'", 'aliv'])
+  })
+
+  t.test('Should tokenize and stem correctly in english skipping appropriate properties (single)', async t => {
+    t.plan(2)
+
+    const tokenizer = await createTokenizer({
+      language: 'english',
+      stemming: true,
+      stemmerSkipProperties: 'notToStem',
+    })
+
+    const I1 = 'the quick brown fox jumps over the lazy dog'
+
+    const O1 = tokenizer.tokenize(I1, 'english')
+    const O2 = tokenizer.tokenize(I1, 'english', 'notToStem')
+
+    t.strictSame(O1, ['quick', 'brown', 'fox', 'jump', 'lazi', 'dog'])
+    t.strictSame(O2, ['quick', 'brown', 'fox', 'jumps', 'lazy', 'dog'])
+  })
+
+  t.test('Should tokenize and stem correctly in english skipping appropriate properties (multiple)', async t => {
+    t.plan(3)
+
+    const tokenizer = await createTokenizer({
+      language: 'english',
+      stemming: true,
+      stemmerSkipProperties: ['notToStem', 'another'],
+    })
+
+    const I1 = 'the quick brown fox jumps over the lazy dog'
+
+    const O1 = tokenizer.tokenize(I1, 'english')
+    const O2 = tokenizer.tokenize(I1, 'english', 'notToStem')
+    const O3 = tokenizer.tokenize(I1, 'english', 'another')
+
+    t.strictSame(O1, ['quick', 'brown', 'fox', 'jump', 'lazi', 'dog'])
+    t.strictSame(O2, ['quick', 'brown', 'fox', 'jumps', 'lazy', 'dog'])
+    t.strictSame(O3, ['quick', 'brown', 'fox', 'jumps', 'lazy', 'dog'])
+  })
+
+  t.test('Should tokenize and stem correctly in english skipping appropriate properties (invalid)', async t => {
+    t.plan(2)
+
+    const tokenizer = await createTokenizer({
+      language: 'english',
+      stemming: true,
+      // @ts-expect-error Testing error
+      stemmerSkipProperties: 1,
+    })
+
+    const I1 = 'the quick brown fox jumps over the lazy dog'
+
+    const O1 = tokenizer.tokenize(I1, 'english')
+    const O2 = tokenizer.tokenize(I1, 'english', 'notToStem')
+
+    t.strictSame(O1, ['quick', 'brown', 'fox', 'jump', 'lazi', 'dog'])
+    t.strictSame(O2, ['quick', 'brown', 'fox', 'jump', 'lazi', 'dog'])
   })
 
   t.test('Should tokenize and stem correctly in french', async t => {

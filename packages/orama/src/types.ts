@@ -310,6 +310,7 @@ export type TokenizerConfig = {
   language?: Language
   stemming?: boolean
   stemmer?: Stemmer
+  stemmerSkipProperties?: string | string[]
   stopWords?: boolean | string[] | ((stopWords: string[]) => string[] | Promise<string[]>)
   allowDuplicates?: boolean
 }
@@ -317,7 +318,7 @@ export type TokenizerConfig = {
 export interface Tokenizer {
   language: string
   normalizationCache: Map<string, string>
-  tokenize: (raw: string, language?: string) => SyncOrAsyncValue<string[]>
+  tokenize: (raw: string, language?: string, prop?: string) => SyncOrAsyncValue<string[]>
 }
 
 export interface ObjectComponents {

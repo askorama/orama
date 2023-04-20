@@ -63,7 +63,7 @@ INSERTED
 The tokenizer is used to tokenize documents fields and search terms. To customize the tokenizer used by Orama, provide an object which has at least the following properties:
 
 * `tokenize`: A function that accepts a string and language and returns a list of tokens.
-* `language` (string): The language supported by the tokenizer.
+* `language` (string): The language supported by the tokenizer.
 * `normalizationCache` (Map): It can used to cache tokens normalization.
 
 <Callout type="warning">The `tokenize` function **CANNOT** be async.</Callout>
@@ -74,7 +74,7 @@ In other words, a tokenizer must satisfy the following interface:
 interface Tokenizer {
   language: string
   normalizationCache: Map<string, string>
-  tokenize: (raw: string, language?: string) => string[] | Promise<string[]>
+  tokenize: (raw: string, language?: string, prop?: string) => string[] | Promise<string[]>
 }
 ```
 
