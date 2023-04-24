@@ -94,6 +94,8 @@ export type SearchParams = {
    *
    * d: Frequency normalization lower bound. Default value is 0.5.
    *
+   * Full documentation: https://docs.oramasearch.com/usage/search/BM25-algorithm
+   *
    * @see https://en.wikipedia.org/wiki/Okapi_BM25
    */
   relevance?: BM25Params
@@ -102,6 +104,8 @@ export type SearchParams = {
    *
    * The boost is a number that is multiplied to the score of the property.
    * It can be used to give more importance to some properties.
+   *
+   * Full documentation: https://docs.oramasearch.com/usage/search/fields-boosting
    *
    * @example
    * // Give more importance to the 'title' property.
@@ -118,6 +122,7 @@ export type SearchParams = {
   boost?: Record<string, number>
   /**
    * Facets configuration
+   * Full documentation: https://docs.oramasearch.com/usage/search/facets
    *
    * A facet is a feature that allows users to narrow down their search results by specific
    * attributes or characteristics, such as category, price, or location.
@@ -140,6 +145,7 @@ export type SearchParams = {
 
   /**
    * Filter the search results.
+   * Full documentation: https://docs.oramasearch.com/usage/search/filters
    *
    * @example
    * // Search for documents that contain 'Headphones' in the 'description' and 'title' fields and
@@ -156,6 +162,32 @@ export type SearchParams = {
    * });
    */
   where?: Record<string, boolean | string | string[] | ComparisonOperator>
+
+  /**
+   * Threshold to use for refining the search results.
+   * The threshold is a number between 0 and 1 that represents the minimum score of the documents to return.
+   * By default, the threshold is 1.
+   *
+   * Full documentation: https://docs.oramasearch.com/usage/search/threshold
+   *
+   * @example
+   *
+   * const result = await search(db, {
+   *  term: 'Red Headphones'
+   *  threshold: 0
+   * });
+   *
+   * // The result will contain all the documents that contain both 'Red' and 'Headphones' in their properties.
+   *
+   * const result2 = await search(db, {
+   *  term: 'Red Headphones'
+   *  threshold: 1
+   * });
+   *
+   * // The result will contain all the documents that contain either 'Red' and 'Headphones' in their properties.
+   */
+
+  threshold?: number
 }
 
 export type Result = {

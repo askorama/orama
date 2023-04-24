@@ -95,7 +95,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
-  const { limit = 10, offset = 0, term, properties } = params
+  const { limit = 10, offset = 0, term, properties, threshold = 1 } = params
 
   const { index, docs } = orama.data
   const tokens = await orama.tokenizer.tokenize(term, language)
@@ -161,7 +161,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
 
     const docIds = context.indexMap[prop]
     const vals = Object.values(docIds)
-    context.docsIntersection[prop] = prioritizeTokenScores(vals, params?.boost?.[prop] ?? 1)
+    context.docsIntersection[prop] = prioritizeTokenScores(vals, params?.boost?.[prop] ?? 1, threshold)
     const uniqueDocs = context.docsIntersection[prop]
 
     const uniqueDocsLength = uniqueDocs.length
