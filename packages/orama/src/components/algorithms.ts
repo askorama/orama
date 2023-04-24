@@ -1,7 +1,7 @@
 import { createError } from '../errors.js'
 import { TokenScore, BM25Params } from '../types.js'
 
-export function prioritizeTokenScores(arrays: TokenScore[][], boost: number): TokenScore[] {
+export function prioritizeTokenScores(arrays: TokenScore[][], boost: number, threshold = 1): TokenScore[] {
   if (boost === 0) {
     throw createError('INVALID_BOOST_VALUE')
   }
@@ -25,7 +25,26 @@ export function prioritizeTokenScores(arrays: TokenScore[][], boost: number): To
     }
   }
 
-  return Object.entries(tokenMap).sort((a, b) => b[1] - a[1])
+  const results = Object.entries(tokenMap).sort((a, b) => b[1] - a[1])
+
+  // If threshold is 1, it means we will return all the results with at least one search term,
+  // prioritizig the ones that contains more search terms (fuzzy match)
+  if (threshold === 1) {
+    return results
+  }
+
+  // If threshold is 0, it means we will only return all the results that contains ALL the search terms (exact match)
+  if (threshold === 0) {
+    const shortestArrayLength = Math.min(...arrays.map(arr => arr.length))
+    return results.slice(0, shortestArrayLength)
+  }
+
+  // If the theshold is between 0 and 1, we will return all the results that contains at least the threshold of search terms
+  // For example, if threshold is 0.5, we will return all the results that contains at least 50% of the search terms
+  // (fuzzy match with a minimum threshold)
+  const thresholdLength = Math.ceil((threshold * 100 * results.length) / 100)
+
+  return results.slice(0, thresholdLength)
 }
 
 export function BM25(
