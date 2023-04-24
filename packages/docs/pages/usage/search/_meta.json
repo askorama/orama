@@ -3,5 +3,6 @@
   "fields-boosting": "Fields boosting",
   "facets": "Facets",
   "filters": "Filters",
+  "threshold": "Threshold",
   "BM25-algorithm": "BM25 Algorithm"
 }
