@@ -9,7 +9,7 @@ t.test('preflight request', async t => {
   const db = await create({
     schema: {
       title: 'string',
-    }
+    },
   })
 
   await insert(db, { title: 'Red headphones' })

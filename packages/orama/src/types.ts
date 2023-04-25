@@ -191,18 +191,18 @@ export type SearchParams = {
   /**
    * Preflight query.
    * Will return just the facets (if needed) and the number of matched documents for the given query.
-   * 
+   *
    * Full documentation: https://docs.oramasearch.com/usage/search/preflight
-   * 
+   *
    * @example
-   * 
+   *
    * const result = await search(db, {
    *  term: 'Red Headphones',
    *  preflight: true
    * });
-   * 
+   *
    * console.log(result);
-   * 
+   *
    * // {
    * //   elapsed: {
    * //     raw: 181208,
