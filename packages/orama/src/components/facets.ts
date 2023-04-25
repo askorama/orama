@@ -61,7 +61,7 @@ export async function getFacets(
       // Range facets based on numbers
       if (properties[facet] === 'number') {
         for (const range of (facetsConfig[facet] as NumberFacetDefinition).ranges) {
-          if (facetValue >= range.from && facetValue <= range.to) {
+          if ((facetValue as number) >= range.from && (facetValue as number) <= range.to) {
             if (facets[facet].values[`${range.from}-${range.to}`] === undefined) {
               facets[facet].values[`${range.from}-${range.to}`] = 1
             } else {
@@ -71,7 +71,7 @@ export async function getFacets(
         }
       } else {
         // String or boolean based facets
-        const value = facetValue.toString()
+        const value = facetValue?.toString() ?? (properties[facet] === 'boolean' ? 'false' : '')
         facets[facet].values[value] = (facets[facet].values[value] ?? 0) + 1
       }
     }
