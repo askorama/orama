@@ -4,5 +4,6 @@
   "facets": "Facets",
   "filters": "Filters",
   "threshold": "Threshold",
+  "preflight": "Preflight Search",
   "BM25-algorithm": "BM25 Algorithm"
 }

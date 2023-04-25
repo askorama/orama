@@ -186,8 +186,32 @@ export type SearchParams = {
    *
    * // The result will contain all the documents that contain either 'Red' and 'Headphones' in their properties.
    */
-
   threshold?: number
+
+  /**
+   * Preflight query.
+   * Will return just the facets (if needed) and the number of matched documents for the given query.
+   * 
+   * Full documentation: https://docs.oramasearch.com/usage/search/preflight
+   * 
+   * @example
+   * 
+   * const result = await search(db, {
+   *  term: 'Red Headphones',
+   *  preflight: true
+   * });
+   * 
+   * console.log(result);
+   * 
+   * // {
+   * //   elapsed: {
+   * //     raw: 181208,
+   * //     formatted: '181μs'
+   * //   },
+   * //   count: 100,
+   * // }
+   */
+  preflight?: boolean
 }
 
 export type Result = {

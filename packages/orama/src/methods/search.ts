@@ -96,6 +96,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
   const { limit = 10, offset = 0, term, properties, threshold = 1 } = params
+  const isPreflight = params.preflight === true
 
   const { index, docs } = orama.data
   const tokens = await orama.tokenizer.tokenize(term, language)
@@ -189,32 +190,39 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   // Populate facets if needed
   const facets = shouldCalculateFacets ? await getFacets(orama, uniqueDocsArray, params.facets!) : {}
 
-  // We already have the list of ALL the document IDs containing the search terms.
-  // We loop over them starting from a positional value "offset" and ending at "offset + limit"
-  // to provide pagination capabilities to the search.
-  for (let i = offset; i < limit + offset; i++) {
-    const idAndScore = uniqueDocsArray[i]
+  if (!isPreflight) {
+    // We already have the list of ALL the document IDs containing the search terms.
+    // We loop over them starting from a positional value "offset" and ending at "offset + limit"
+    // to provide pagination capabilities to the search.
+    for (let i = offset; i < limit + offset; i++) {
+      const idAndScore = uniqueDocsArray[i]
 
-    // If there are no more results, just break the loop
-    if (typeof idAndScore === 'undefined') {
-      break
-    }
+      // If there are no more results, just break the loop
+      if (typeof idAndScore === 'undefined') {
+        break
+      }
 
-    const [id, score] = idAndScore
+      const [id, score] = idAndScore
 
-    if (!resultIDs.has(id)) {
-      // We retrieve the full document only AFTER making sure that we really want it.
-      // We never retrieve the full document preventively.
-      const fullDoc = await orama.documentsStore.get(docs, id)
-      results[i] = { id, score, document: fullDoc! }
-      resultIDs.add(id)
+      if (!resultIDs.has(id)) {
+        // We retrieve the full document only AFTER making sure that we really want it.
+        // We never retrieve the full document preventively.
+        const fullDoc = await orama.documentsStore.get(docs, id)
+        results[i] = { id, score, document: fullDoc! }
+        resultIDs.add(id)
+      }
     }
   }
 
   const searchResult: Results = {
     elapsed: (await orama.formatElapsedTime((await getNanosecondsTime()) - context.timeStart)) as ElapsedTime,
-    hits: results.filter(Boolean),
+    // We keep the hits array empty if it's a preflight request.
+    hits: [],
     count: uniqueDocsArray.length,
+  }
+
+  if (!isPreflight) {
+    searchResult.hits = results.filter(Boolean)
   }
 
   if (shouldCalculateFacets) {
