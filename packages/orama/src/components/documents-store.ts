@@ -28,6 +28,10 @@ export async function getMultiple(store: DocumentsStore, ids: string[]): Promise
   return found
 }
 
+export async function getAll(store: DocumentsStore): Promise<Record<string, Document>> {
+  return store.docs as Record<string, Document>
+}
+
 export async function store(store: DocumentsStore, id: string, doc: Document): Promise<boolean> {
   if (typeof store.docs[id] !== 'undefined') {
     return false
@@ -75,6 +79,7 @@ export async function createDocumentsStore(): Promise<DefaultDocumentsStore> {
     create,
     get,
     getMultiple,
+    getAll,
     store,
     remove,
     count,

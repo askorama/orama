@@ -6,22 +6,20 @@ export default function App({ Component, pageProps }) {
   return (
     <>
       <Component {...pageProps} />
-      {
-        googleAnalyticsID && (
-          <>
-            <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsID}`} />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
+      {googleAnalyticsID && (
+        <>
+          <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsID}`} />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
 
                 gtag('config', '${googleAnalyticsID}');
               `}
-            </Script>
-          </>
-        )
-      }
+          </Script>
+        </>
+      )}
     </>
   )
 }

@@ -75,7 +75,7 @@ export async function searchWithHighlight(
   language?: Language
 ): Promise<SearchResultWithHighlight> {
   const result = await search(orama, params, language)
-  const queryTokens: string[] = await orama.tokenizer.tokenize(params.term, language)
+  const queryTokens: string[] = await orama.tokenizer.tokenize(params.term ?? '', language)
   const hits = result.hits.map(hit =>
     Object.assign(hit, {
       positions: Object.fromEntries(

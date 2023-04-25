@@ -60,7 +60,7 @@ export type SearchParams = {
   /**
    * The word to search.
    */
-  term: string
+  term?: string
   /**
    * The properties of the document to search in.
    */
@@ -359,6 +359,7 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
   create: (orama: Orama<{ DocumentStore: D }>) => SyncOrAsyncValue<D>
   get(store: D, id: string): SyncOrAsyncValue<Document | undefined>
   getMultiple(store: D, ids: string[]): SyncOrAsyncValue<(Document | undefined)[]>
+  getAll(store: D): SyncOrAsyncValue<Record<string, Document>>
   store(store: D, id: string, doc: Document): SyncOrAsyncValue<boolean>
   remove(store: D, id: string): SyncOrAsyncValue<boolean>
   count(store: D): SyncOrAsyncValue<number>

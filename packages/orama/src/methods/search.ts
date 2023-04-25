@@ -99,7 +99,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   const isPreflight = params.preflight === true
 
   const { index, docs } = orama.data
-  const tokens = await orama.tokenizer.tokenize(term, language)
+  const tokens = await orama.tokenizer.tokenize(term ?? '', language)
 
   // Get searchable string properties
   let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
@@ -145,37 +145,43 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
     whereFiltersIDs = await orama.index.searchByWhereClause(context, index, params.where!)
   }
 
-  // Now it's time to loop over all the indices and get the documents IDs for every single term
-  const indexesLength = propertiesToSearch.length
-  for (let i = 0; i < indexesLength; i++) {
-    const prop = propertiesToSearch[i]
+  if (tokens.length) {
+    // Now it's time to loop over all the indices and get the documents IDs for every single term
+    const indexesLength = propertiesToSearch.length
+    for (let i = 0; i < indexesLength; i++) {
+      const prop = propertiesToSearch[i]
 
-    const tokensLength = tokens.length
-    for (let j = 0; j < tokensLength; j++) {
-      const term = tokens[j]
+      const tokensLength = tokens.length
+      for (let j = 0; j < tokensLength; j++) {
+        const term = tokens[j]
 
-      // Lookup
-      const scoreList = await orama.index.search(context, index, prop, term)
+        // Lookup
+        const scoreList = await orama.index.search(context, index, prop, term)
 
-      context.indexMap[prop][term].push(...scoreList)
-    }
+        context.indexMap[prop][term].push(...scoreList)
+      }
 
-    const docIds = context.indexMap[prop]
-    const vals = Object.values(docIds)
-    context.docsIntersection[prop] = prioritizeTokenScores(vals, params?.boost?.[prop] ?? 1, threshold)
-    const uniqueDocs = context.docsIntersection[prop]
+      const docIds = context.indexMap[prop]
+      const vals = Object.values(docIds)
+      context.docsIntersection[prop] = prioritizeTokenScores(vals, params?.boost?.[prop] ?? 1, threshold)
+      const uniqueDocs = context.docsIntersection[prop]
 
-    const uniqueDocsLength = uniqueDocs.length
-    for (let i = 0; i < uniqueDocsLength; i++) {
-      const [id, score] = uniqueDocs[i]
+      const uniqueDocsLength = uniqueDocs.length
+      for (let i = 0; i < uniqueDocsLength; i++) {
+        const [id, score] = uniqueDocs[i]
 
-      const prevScore = context.uniqueDocsIDs[id]
-      if (prevScore) {
-        context.uniqueDocsIDs[id] = prevScore + score + 0.5
-      } else {
-        context.uniqueDocsIDs[id] = score
+        const prevScore = context.uniqueDocsIDs[id]
+        if (prevScore) {
+          context.uniqueDocsIDs[id] = prevScore + score + 0.5
+        } else {
+          context.uniqueDocsIDs[id] = score
+        }
       }
     }
+  } else {
+    context.uniqueDocsIDs = Object.fromEntries(
+      Object.keys(await orama.documentsStore.getAll(orama.data.docs)).map(k => [k, 0]),
+    )
   }
 
   // Get unique doc IDs from uniqueDocsIDs map, sorted by value.

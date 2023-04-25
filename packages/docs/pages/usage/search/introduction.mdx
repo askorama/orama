@@ -241,3 +241,6 @@ When performing a search operation, the `elapsed` property will now return the f
   hits: [...]
 }
 ```
+
+If you want to return all documents in the database, then you can omit the `term` in the search parameters.
+This kind of search might be slower than a regular search and all scores will be returned as `0`.

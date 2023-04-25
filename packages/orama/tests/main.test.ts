@@ -213,7 +213,7 @@ t.test('document validation', t => {
 })
 
 t.test('orama', t => {
-  t.plan(19)
+  t.plan(20)
 
   t.test('should correctly search for data', async t => {
     t.plan(8)
@@ -262,6 +262,47 @@ t.test('orama', t => {
 
     t.equal(result7.count, 2)
     t.equal(result8.count, 2)
+  })
+
+  t.test('should correctly search without term', async t => {
+    t.plan(4)
+
+    const db = await create({
+      schema: {
+        quote: 'string',
+        author: 'string',
+      },
+      components: {
+        tokenizer: {
+          stemming: true,
+        },
+      },
+    })
+
+    const docs = [
+      { id: '0', quote: 'the quick, brown fox jumps over the lazy dog. What a fox!', author: 'John Doe' },
+      { id: '1', quote: 'Foxes are nice animals. But I prefer having a dog.', author: 'John Doe' },
+      { id: '2', quote: 'I like dogs. They are the best.', author: 'Jane Doe' },
+    ]
+
+    await insert(db, docs[0])
+    await insert(db, docs[1])
+    await insert(db, docs[2])
+
+    // Exact search
+    const result1 = await search(db, { exact: false })
+    const result2 = await search(db, { exact: true })
+
+    t.equal(result1.count, 3)
+    t.equal(result2.count, 3)
+    t.strictSame(
+      result1.hits.sort((a, b) => a.id.localeCompare(b.id)).map(h => h.document),
+      docs,
+    )
+    t.strictSame(
+      result1.hits.sort((a, b) => a.id.localeCompare(b.id)).map(h => h.document),
+      docs,
+    )
   })
 
   t.test('should correctly search for data returning doc including with unindexed keys', async t => {
@@ -359,12 +400,12 @@ t.test('orama', t => {
       },
     })
 
-    await insert(db, { animal: 'Quick brown fox' })
-    await insert(db, { animal: 'Lazy dog' })
-    await insert(db, { animal: 'Jumping penguin' })
-    await insert(db, { animal: 'Fast chicken' })
-    await insert(db, { animal: 'Fabolous ducks' })
-    await insert(db, { animal: 'Fantastic horse' })
+    await insert(db, { id: '0', animal: 'Quick brown fox' })
+    await insert(db, { id: '1', animal: 'Lazy dog' })
+    await insert(db, { id: '2', animal: 'Jumping penguin' })
+    await insert(db, { id: '3', animal: 'Fast chicken' })
+    await insert(db, { id: '4', animal: 'Fabolous ducks' })
+    await insert(db, { id: '5', animal: 'Fantastic horse' })
 
     const search1 = await search(db, { term: 'f', limit: 1, offset: 0 })
     const search2 = await search(db, { term: 'f', limit: 1, offset: 1 })
@@ -372,16 +413,16 @@ t.test('orama', t => {
     const search4 = await search(db, { term: 'f', limit: 2, offset: 2 })
 
     t.equal(search1.count, 4)
-    t.equal(search1.hits[0].document.animal, 'Fabolous ducks')
+    t.equal(search1.hits[0].document.animal, 'Fast chicken')
 
     t.equal(search2.count, 4)
-    t.equal(search2.hits[0].document.animal, 'Fantastic horse')
+    t.equal(search2.hits[0].document.animal, 'Fabolous ducks')
 
     t.equal(search3.count, 4)
-    t.equal(search3.hits[0].document.animal, 'Fast chicken')
+    t.equal(search3.hits[0].document.animal, 'Fantastic horse')
 
     t.equal(search4.count, 4)
-    t.equal(search4.hits[0].document.animal, 'Fast chicken')
+    t.equal(search4.hits[0].document.animal, 'Fantastic horse')
     t.equal(search4.hits[1].document.animal, 'Quick brown fox')
   })
 
