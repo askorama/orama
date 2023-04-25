@@ -44,7 +44,7 @@ export function prioritizeTokenScores(arrays: TokenScore[][], boost: number, thr
   // (fuzzy match with a minimum threshold)
   const thresholdLength = Math.ceil((threshold * 100 * results.length) / 100)
 
-  return results.slice(0, thresholdLength)
+  return results.slice(0, results.length + thresholdLength)
 }
 
 export function BM25(

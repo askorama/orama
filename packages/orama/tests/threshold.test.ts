@@ -143,6 +143,6 @@ t.test('should return all the exact matches + X% of the partial matches', async 
     threshold: 0.7,
   })
 
-  t.same(r1.count, 3)
+  t.same(r1.count, 4)
   t.same(r2.count, 3)
 })
