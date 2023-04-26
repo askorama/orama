@@ -53,6 +53,11 @@ const db = await create({
     author: 'string',
     quote: 'string',
   },
+  components: {
+    tokenizer: {
+      stopWords: false,
+    },
+  },
 })
 ```
 
