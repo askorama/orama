@@ -5,6 +5,7 @@ import type { remove as esmRemove, removeMultiple as esmRemoveMultiple } from '.
 import type { search as esmSearch } from '../methods/search.js'
 import type { load as esmLoad, save as esmSave } from '../methods/serialization.js'
 import type { update as esmUpdate, updateMultiple as esmUpdateMultiple } from '../methods/update.js'
+import type { addSynonyms as esmAddSynonyms, clearSynonyms as esmClearSynonyms, removeSynonyms as esmRemoveSynonyms, getSynonyms as esmGetSynonyms } from '../methods/synonyms.js'
 
 let _esmCount: typeof esmCount
 let _esmCreate: typeof esmCreate
@@ -18,6 +19,10 @@ let _esmSave: typeof esmSave
 let _esmSearch: typeof esmSearch
 let _esmUpdate: typeof esmUpdate
 let _esmUpdateMultiple: typeof esmUpdateMultiple
+let _esmAddSynonyms: typeof esmAddSynonyms
+let _esmClearSynonyms: typeof esmClearSynonyms
+let _esmRemoveSynonyms: typeof esmRemoveSynonyms
+let _esmGetSynonyms: typeof esmGetSynonyms
 
 export async function count(...args: Parameters<typeof esmCount>): ReturnType<typeof esmCount> {
   if (!_esmCount) {
@@ -131,6 +136,50 @@ export async function updateMultiple(
   }
 
   return _esmUpdateMultiple(...args)
+}
+
+export async function addSynonyms(
+  ...args: Parameters<typeof esmAddSynonyms>
+): ReturnType<typeof esmAddSynonyms> {
+  if (!_esmAddSynonyms) {
+    const imported = await import('../methods/synonyms.js')
+    _esmAddSynonyms = imported.addSynonyms
+  }
+
+  return _esmAddSynonyms(...args)
+}
+
+export async function clearSynonyms(
+  ...args: Parameters<typeof esmClearSynonyms>
+): ReturnType<typeof esmClearSynonyms> {
+  if (!_esmClearSynonyms) {
+    const imported = await import('../methods/synonyms.js')
+    _esmClearSynonyms = imported.clearSynonyms
+  }
+
+  return _esmClearSynonyms(...args)
+}
+
+export async function removeSynonyms(
+  ...args: Parameters<typeof esmRemoveSynonyms>
+): ReturnType<typeof esmRemoveSynonyms> {
+  if (!_esmRemoveSynonyms) {
+    const imported = await import('../methods/synonyms.js')
+    _esmRemoveSynonyms = imported.removeSynonyms
+  }
+
+  return _esmRemoveSynonyms(...args)
+}
+
+export async function getSynonyms(
+  ...args: Parameters<typeof esmGetSynonyms>
+): ReturnType<typeof esmGetSynonyms> {
+  if (!_esmGetSynonyms) {
+    const imported = await import('../methods/synonyms.js')
+    _esmGetSynonyms = imported.getSynonyms
+  }
+
+  return _esmGetSynonyms(...args)
 }
 
 export * as components from './components/defaults.cjs'

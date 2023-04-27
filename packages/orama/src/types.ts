@@ -1,4 +1,6 @@
-import { Language } from './components/tokenizer/languages.js'
+import type { Language } from './components/tokenizer/languages.js'
+import type { Matrix } from './graphs/adjacency-list.js'
+import { availableSynonymKinds } from './components/synonyms.js'
 
 export type Nullable<T> = T | null
 
@@ -428,6 +430,45 @@ export interface ArrayCallbackComponents {
   afterMultipleUpdate: MultipleCallbackComponent[]
 }
 
+export type SynonymsData = {
+  oneWay: Matrix;
+  twoWay: Matrix;
+};
+
+export type SynonymConfig = {
+  kind: typeof availableSynonymKinds[number];
+  word: string;
+  synonyms: string[];
+};
+
+export type ClearSynonymscConfig = {
+  kind: typeof availableSynonymKinds[number];
+  word: string;
+};
+
+export type GetSynonymsConfig = {
+  kind: typeof availableSynonymKinds[number];
+  word: string;
+};
+
+export type ISynonyms = {
+  create: (db: Orama) => SynonymsData;
+  add: (data: SynonymsData, config: SynonymConfig) => Promise<void> | void;
+  remove: (data: SynonymsData, config: SynonymConfig) => Promise<void> | void;
+  get: (data: SynonymsData, config: GetSynonymsConfig) => Promise<string[]> | string[];
+  clear: (data: SynonymsData, config: ClearSynonymscConfig) => Promise<void> | void;
+  getAlternateQueries: (
+    data: SynonymsData,
+    tokens: string[],
+    options?: AlternateQueriesOptions,
+  ) => Promise<string[]> | string[];
+};
+
+export type AlternateQueriesOptions = {
+  limit?: number;
+  cache?: Map<string, string[]>;
+};
+
 export type Components = Partial<ObjectComponents & FunctionComponents & SingleOrArrayCallbackComponents>
 
 export const kInsertions = Symbol('orama.insertions')
@@ -438,6 +479,7 @@ type ProvidedTypes = Partial<{ Schema: Schema; Index: OpaqueIndex; DocumentStore
 interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore> {
   index: I
   docs: D
+  synonyms: SynonymsData
 }
 
 type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
@@ -445,6 +487,7 @@ type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocument
   tokenizer: Tokenizer
   index: IIndex<I>
   documentsStore: IDocumentsStore<D>
+  synonyms: ISynonyms
   data: Data<I, D>
   caches: Record<string, unknown>
   [kInsertions]: number | undefined
