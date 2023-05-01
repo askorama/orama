@@ -2,19 +2,19 @@
   <img src="/misc/readme/orama-readme_logo-dark.png#gh-dark-mode-only" />
   <img src="/misc/readme/orama-readme_logo-light.png#gh-light-mode-only" />
 </p>
-
+<br />
 <h4 align="center">
   <a href="https://oramasearch.com?utm_source=github">Website</a> •
   <a href="https://oramasearch.com/blog?utm_source=github">Blog</a> •
   <a href="https://docs.oramasearch.com/blog?utm_source=github">Documentation</a> •
   <a href="https://join.slack.com/t/orama-community/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q">Slack</a>
 </h4>
-
+<br />
 <p align="center">
   A resilient, innovative and open-source search experience to achieve <br />
   seamless integration with your infrastructure and data
 </p>
-
+<br />
 <p align="center">
   <img src="/misc/readme/orama-readme_runs-dark.png#gh-dark-mode-only" />
   <img src="/misc/readme/orama-readme_runs-light.png#gh-light-mode-only" />
