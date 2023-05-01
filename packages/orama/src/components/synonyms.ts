@@ -93,20 +93,20 @@ export function getAlternateQueries(
   const { limit, cache } = options
   const alternateQueries = new Set<string>()
 
-  for (const token of tokens) {
-    let cachedSynonyms = cache!.get(token)
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]
+    let cachedSynonyms = cache?.get(token)
 
     if (!cachedSynonyms) {
       const oneWay = get(synonyms, { kind: 'oneWay', word: token })
       const twoWay = get(synonyms, { kind: 'twoWay', word: token })
-      cachedSynonyms = [...oneWay, ...twoWay]
-      cache!.set(token, cachedSynonyms)
+      cachedSynonyms = oneWay.concat(twoWay)
+      cache?.set(token, cachedSynonyms)
     }
 
-    for (const synonym of cachedSynonyms ?? []) {
+    for (const synonym of cachedSynonyms) {
       const alternateQueryTerms = [...tokens]
-      const termIndex = alternateQueryTerms.indexOf(token)
-      alternateQueryTerms[termIndex] = synonym
+      alternateQueryTerms[i] = synonym
 
       const alternateQuery = alternateQueryTerms.join(' ')
       alternateQueries.add(alternateQuery)
