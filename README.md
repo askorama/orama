@@ -6,7 +6,7 @@
 <h4 align="center">
   <a href="https://oramasearch.com?utm_source=github">Website</a> •
   <a href="https://oramasearch.com/blog?utm_source=github">Blog</a> •
-  <a href="https://docs.oramasearch.com/blog?utm_source=github">Documentation</a> •
+  <a href="https://docs.oramasearch.com?utm_source=github">Documentation</a> •
   <a href="https://join.slack.com/t/orama-community/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q">Slack</a>
 </h4>
 <br />
