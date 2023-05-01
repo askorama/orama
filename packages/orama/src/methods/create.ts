@@ -3,6 +3,7 @@ import { createDocumentsStore } from '../components/documents-store.js'
 import { OBJECT_COMPONENTS, FUNCTION_COMPONENTS, SINGLE_OR_ARRAY_COMPONENTS } from '../components/hooks.js'
 import { createIndex } from '../components/index.js'
 import { createTokenizer } from '../components/tokenizer/index.js'
+import { createSynonyms } from '../components/synonyms.js'
 import { createError } from '../errors.js'
 import {
   ArrayCallbackComponents,
@@ -79,6 +80,7 @@ export async function create({ schema, language, components }: CreateArguments):
   let tokenizer = components.tokenizer as Tokenizer
   let index = components.index
   let documentsStore = components.documentsStore
+  let synonyms = components.synonyms
 
   if (!tokenizer) {
     // Use the default tokenizer
@@ -99,6 +101,10 @@ export async function create({ schema, language, components }: CreateArguments):
 
   if (!documentsStore) {
     documentsStore = (await createDocumentsStore()) as unknown as IDocumentsStore
+  }
+
+  if (!synonyms) {
+    synonyms = await createSynonyms()
   }
 
   // Validate all other components
@@ -127,6 +133,7 @@ export async function create({ schema, language, components }: CreateArguments):
     tokenizer,
     index,
     documentsStore,
+    synonyms,
     getDocumentProperties,
     getDocumentIndexId,
     validateSchema,
@@ -144,6 +151,7 @@ export async function create({ schema, language, components }: CreateArguments):
   orama.data = {
     index: await orama.index.create(orama, schema),
     docs: await orama.documentsStore.create(orama),
+    synonyms: await orama.synonyms.create(orama),
   }
 
   return orama

@@ -391,6 +391,7 @@ export interface ObjectComponents {
   tokenizer: Tokenizer | TokenizerConfig
   index: IIndex
   documentsStore: IDocumentsStore
+  synonyms: ISynonyms
 }
 
 export interface FunctionComponents<S extends Schema = Schema> {
