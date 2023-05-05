@@ -131,7 +131,7 @@ export function insert(root: Node, word: string, docId: string) {
     const wordAtIndex = word.substring(i)
     const rootChildCurrentChar = root.children[currentCharacter]
 
-    if (currentCharacter in root.children) {
+    if (rootChildCurrentChar) {
       const edgeLabel = rootChildCurrentChar.subWord
       const edgeLabelLength = edgeLabel.length
 
