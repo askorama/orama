@@ -186,6 +186,42 @@ Result:
 }
 ```
 
+# Using with CommonJS
+
+Orama is packaged as ES modules, suitable for Node.js, Deno, Bun and modern browsers.
+
+**In most cases, simply `import` or `@orama/orama` will suffice ✨.**
+
+In Node.js, when not using ESM (with `"type": "module"` in the `package.json`), you have several ways to properly require Orama.
+Starting with version 0.4.0 it becomes:
+
+```js
+async function main() {
+  const { create, insert } = await import('@orama/orama')
+
+  const db = create(/* ... */)
+  insert(db, {
+    /* ... */
+  })
+}
+
+main().catch(console.error)
+```
+
+## Use CJS requires
+
+Orama methods can be required as CommonJS modules by requiring from `@orama/orama`.
+
+```js
+const { create, insert } = require("@orama/orama")
+
+create(/* ... */)
+  .then(db => insert(db, { /* ... */ })
+  .catch(console.error)
+```
+
+Note that only main methods are supported so for internals and other supported exports you still have to use `await import`.
+
 # Filters
 
 <details>
@@ -352,41 +388,32 @@ Learn more about facets in the [official facets docs](https://docs.oramasearch.c
 
 </details>
 
-### Using with CommonJS
+# Fields boosting
 
-Orama is packaged as ES modules, suitable for Node.js, Deno, Bun and modern browsers.
+<details>
+  <summary>
+    Using fields boosting with Orama
+  </summary>
 
-**In most cases, simply `import` or `@orama/orama` will suffice ✨.**
-
-In Node.js, when not using ESM (with `"type": "module"` in the `package.json`), you have several ways to properly require Orama.
-Starting with version 0.4.0 it becomes:
-
-```js
-async function main() {
-  const { create, insert } = await import('@orama/orama')
-
-  const db = create(/* ... */)
-  insert(db, {
-    /* ... */
-  })
-}
-
-main().catch(console.error)
-```
-
-#### Use CJS requires
-
-Orama methods can be required as CommonJS modules by requiring from `@orama/orama`.
+You can use the boost interface to boost the importance of a field in the search results.
 
 ```js
-const { create, insert } = require("@orama/orama")
-
-create(/* ... */)
-  .then(db => insert(db, { /* ... */ })
-  .catch(console.error)
+const searchResult = await search(movieDB, {
+  term: 'Harry',
+  properties: '*',
+  boost: {
+    title: 2,
+  },
+})
 ```
 
-Note that only main methods are supported so for internals and other supported exports you still have to use `await import`.
+In this example, we are boosting the `title` field by `2` and the `director` field by `1.5`.
+
+That means that any match of `'Harry'` in the `title` field will be considered twice as important as a match in any other field field.
+
+Read more about fields boosting in the [official fields boosting docs](https://docs.oramasearch.com/usage/search/fields-boosting)
+
+</details>
 
 ## Language
 
