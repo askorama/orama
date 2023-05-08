@@ -40,7 +40,7 @@ export default {
   footer: {
     text: <p>Apache 2.0 - 2023 © OramaSearch Inc.</p>,
   },
-  docsRepositoryBase: 'https://github.com/oramasearch/orama/tree/main/packages/docs/pages',
+  docsRepositoryBase: 'https://github.com/oramasearch/orama/tree/main/packages/docs',
   darkMode: true,
   useNextSeoProps() {
     return {
