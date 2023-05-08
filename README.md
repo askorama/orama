@@ -88,7 +88,7 @@ const db = await create({
 })
 ```
 
-If you are using Node.js without ESM, please see [build](#builds) section below on how to properly require Orama.
+If you are using Node.js without ESM, please see the [usage with CommonJS](#usage-with-commonjs) section below on how to properly require Orama.
 
 Orama will only index string properties, but will allow you to set and store
 additional data if needed.
@@ -194,7 +194,7 @@ Result:
 }
 ```
 
-# Using with CommonJS
+# Usage with CommonJS
 
 Orama is packaged as ES modules, suitable for Node.js, Deno, Bun and modern browsers.
 
