@@ -28,6 +28,14 @@ If you need more info, help, or want to provide general feedback on Orama, join
 the
 [Orama Slack channel](https://join.slack.com/t/orama-community/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q)
 
+# Highlighted features
+- [Search filters](https://docs.oramasearch.com/usage/search/filters)
+- [Facets](https://docs.oramasearch.com/usage/search/facets)
+- [Fields Boosting](https://docs.oramasearch.com/usage/search/fields-boosting)
+- [Typo tolerance](https://docs.oramasearch.com/usage/search/introduction#typo-tolerance)
+- [Exact match](https://docs.oramasearch.com/usage/search/introduction#exact-match)
+- [Stemming and tokenizing in 26 languages](https://docs.oramasearch.com/text-analysis/stemming)
+
 # Installation
 
 You can install Orama using `npm`, `yarn`, `pnpm`:
@@ -222,7 +230,9 @@ create(/* ... */)
 
 Note that only main methods are supported so for internals and other supported exports you still have to use `await import`.
 
-# Filters
+# Highlighted features
+
+### Filters
 
 <details>
   <summary>
@@ -282,7 +292,7 @@ Learn more about filters in the [official filters docs](https://docs.oramasearch
 
 </details>
 
-# Facets
+### Facets
 
 <details>
   <summary>
@@ -388,7 +398,7 @@ Learn more about facets in the [official facets docs](https://docs.oramasearch.c
 
 </details>
 
-# Fields boosting
+### Fields boosting
 
 <details>
   <summary>
