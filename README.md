@@ -58,7 +58,7 @@ Or import it directly in a browser module:
 </html>
 ```
 
-Read the complete documentation at [https://docs.oramasearch.com/](https://docs.oramasearch.com/).
+Read the complete documentation at [https://docs.oramasearch.com](https://docs.oramasearch.com).
 
 # Usage
 
@@ -70,8 +70,12 @@ import { create, insert, remove, search } from '@orama/orama'
 
 const db = await create({
   schema: {
-    author: 'string',
-    quote: 'string',
+    name: 'string',
+    description: 'string',
+    price: 'number',
+    meta: {
+      rating: 'number'
+    }
   },
 })
 ```
@@ -85,23 +89,30 @@ Once the db instance is created, you can start adding some documents:
 
 ```js
 await insert(db, {
-  quote: 'It is during our darkest moments that we must focus to see the light.',
-  author: 'Aristotle',
+  name: 'Wireless Headphones',
+  description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
+  price: 99.99,
+  meta: {
+    rating: 4.5
+  }
 })
 
 await insert(db, {
-  quote: 'If you really look closely, most overnight successes took a long time.',
-  author: 'Steve Jobs',
+  name: 'Smart LED Bulb',
+  description: 'Control the lighting in your home with this energy-efficient smart LED bulb, compatible with most smart home systems.',
+  price: 24.99,
+  meta: {
+    rating: 4.3
+  }
 })
 
 await insert(db, {
-  quote: 'If you are not willing to risk the usual, you will have to settle for the ordinary.',
-  author: 'Jim Rohn',
-})
-
-await insert(db, {
-  quote: "You miss 100% of the shots you don't take",
-  author: 'Wayne Gretzky - Michael Scott',
+  name: 'Portable Charger',
+  description: 'Never run out of power on-the-go with this compact and fast-charging portable charger for your devices.',
+  price: 29.99,
+  meta: {
+    rating: 3.6
+  }
 })
 ```
 
@@ -109,42 +120,34 @@ After the data has been inserted, you can finally start to query the database.
 
 ```js
 const searchResult = await search(db, {
-  term: 'if',
-  properties: '*',
-  boost: {
-    author: 1.5, // optional: boost author field by x1.5
-  },
+  term: 'headphones',
 })
 ```
 
 In the case above, you will be searching for all the documents containing the
-word `if`, looking up in every schema property (AKA index):
+word `headphones`, looking up in every schema property (AKA index):
 
 ```js
 {
   elapsed: {
-    raw: 184541,
-    formatted: '184μs',
+    raw: 99512,
+    formatted: '99μs',
   },
   hits: [
     {
       id: '41013877-56',
-      score: 0.025085832971998432,
+      score: 0.925085832971998432,
       document: {
-        quote: 'If you really look closely, most overnight successes took a long time.',
-        author: 'Steve Jobs'
-      }
-    },
-    {
-      id: '41013877-107',
-      score: 0.02315615351261394,
-      document: {
-        quote: 'If you are not willing to risk the usual, you will have to settle for the ordinary.',
-        author: 'Jim Rohn'
+        name: 'Wireless Headphones',
+        description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
+        price: 99.99,
+        meta: {
+          rating: 4.5
+        }
       }
     }
   ],
-  count: 2
+  count: 1
 }
 ```
 
@@ -152,8 +155,8 @@ You can also restrict the lookup to a specific property:
 
 ```js
 const searchResult = await search(db, {
-  term: 'Michael',
-  properties: ['author'],
+  term: 'immersive sound quality',
+  properties: ['description'],
 })
 ```
 
@@ -162,16 +165,20 @@ Result:
 ```js
 {
   elapsed: {
-    raw: 172166,
-    formatted: '172μs',
+    raw: 21492,
+    formatted: '21μs',
   },
   hits: [
     {
-      id: '41045799-144',
-      score: 0.12041199826559248,
+      id: '41013877-56',
+      score: 0.925085832971998432,
       document: {
-        quote: "You miss 100% of the shots you don't take",
-        author: 'Wayne Gretzky - Michael Scott'
+        name: 'Wireless Headphones',
+        description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
+        price: 99.99,
+        meta: {
+          rating: 4.5
+        }
       }
     }
   ],
@@ -179,13 +186,7 @@ Result:
 }
 ```
 
-If needed, you can also delete a given document by using the `remove` method:
-
-```js
-await remove(db, '41045799-144')
-```
-
-### Using with CommonJS
+# Using with CommonJS
 
 Orama is packaged as ES modules, suitable for Node.js, Deno, Bun and modern browsers.
 
@@ -207,7 +208,7 @@ async function main() {
 main().catch(console.error)
 ```
 
-#### Use CJS requires
+## Use CJS requires
 
 Orama methods can be required as CommonJS modules by requiring from `@orama/orama`.
 
@@ -221,10 +222,207 @@ create(/* ... */)
 
 Note that only main methods are supported so for internals and other supported exports you still have to use `await import`.
 
+# Filters
+
+<details>
+  <summary>
+    Using filters with Orama
+  </summary>
+
+You can use the `filters` interface to filter the search results. <br />
+Filters are available for numeric, boolean and string properties.
+
+On string properties, it performs an exact matching on tokens so it is advised to disable stemming for the properties you want to use filters on (when using the default tokenizer you can provide the `stemmerSkipProperties` configuration property).
+
+If we consider the following schema:
+
+```js
+const db = await create({
+  schema: {
+    id: 'string',
+    title: 'string',
+    year: 'number',
+    meta: {
+      rating: 'number',
+      length: 'number',
+      favorite: 'boolean',
+      tags: 'string'
+    },
+  },
+  components: {
+    tokenizer: {
+      stemming: true,
+      stemmerSkipProperties: ['meta.tags']
+    }
+  }
+})
+```
+
+We will be able to filter the search results by using the `where` property on numeric properties only:
+
+```js
+const results = await search(db, {
+  term: 'prestige',
+  where: {
+    year: {
+      gte: 2000,
+    },
+    'meta.rating': {
+      between: [5, 10],
+    },
+    'meta.favorite': true,
+    length: {
+      gt: 60,
+    }
+  },
+})
+```
+
+Learn more about filters in the [official filters docs](https://docs.oramasearch.com/usage/search/filters).
+
+</details>
+
+# Facets
+
+<details>
+  <summary>
+  Using facets with Orama
+  </summary>
+
+Facets are a powerful tool for filtering and narrowing down search results on the Orama search engine.
+
+With the Orama Faceted Search API, users can filter their search results by various criteria, such as category, price range, or other attributes, making it easier to find the information they need. Whether you're building a website, mobile app, or any other application, the Orama Faceted Search API is the perfect solution for adding faceted search functionality to your project.
+
+Given the following Orama schema:
+
+```js
+import { create } from '@orama/orama'
+ 
+const db = await create({
+  schema: {
+    title: 'string',
+    description: 'string',
+    categories: {
+      primary: 'string',
+      secondary: 'string',
+    },
+    rating: 'number',
+    isFavorite: 'boolean',
+  },
+})
+```
+
+Orama will be able to generate facets at search-time based on the schema. To do so, we need to specify the `facets` property in the `search` configuration:
+
+```js
+const results = await search(db, {
+  term: 'Movie about cars and racing',
+  properties: ['description'],
+  facets: {
+    'categories.first': {
+      size: 3,
+      order: 'DESC',
+    },
+    'categories.second': {
+      size: 2,
+      order: 'DESC',
+    },
+    rating: {
+      ranges: [
+        { from: 0, to: 3 },
+        { from: 3, to: 7 },
+        { from: 7, to: 10 },
+      ],
+    },
+    isFavorite: {
+      true: true,
+      false: true,
+    },
+  },
+})
+```
+
+This will generate the following results:
+
+```js
+{
+  elapsed: ...,
+  count: ...,
+  hits: { ... },
+  facets: {
+    'categories.first': {
+      count: 14,
+      values: {
+        'Action': 4,
+        'Adventure': 3,
+        'Comedy': 2,
+      }
+    },
+    'categories.second': {
+      count: 14,
+      values: {
+        'Cars': 4,
+        'Racing': 3,
+      }
+    },
+    rating: {
+      count: 3,
+      values: {
+        '0-3': 5,
+        '3-7': 15,
+        '7-10': 80,
+      }
+    },
+    isFavorite: {
+      count: 2,
+      values: {
+        'true': 5,
+        'false': 95,
+      }
+    },
+  }
+}
+```
+
+Learn more about facets in the [official facets docs](https://docs.oramasearch.com/usage/search/facets)
+
+</details>
+
+# Fields boosting
+
+<details>
+  <summary>
+    Using fields boosting with Orama
+  </summary>
+
+You can use the boost interface to boost the importance of a field in the search results.
+
+```js
+const searchResult = await search(movieDB, {
+  term: 'Harry',
+  properties: '*',
+  boost: {
+    title: 2,
+  },
+})
+```
+
+In this example, we are boosting the `title` field by `2` and the `director` field by `1.5`.
+
+That means that any match of `'Harry'` in the `title` field will be considered twice as important as a match in any other field field.
+
+Read more about fields boosting in the [official fields boosting docs](https://docs.oramasearch.com/usage/search/fields-boosting)
+
+</details>
+
 ## Language
 
+<details>
+  <summary>
+    Orama supports stemming and tokenization in 26 languages
+  </summary>
 Orama supports multiple languages. By default, it will use the `english`
-language,
+language.
 
 You can specify a different language by using the `language` property
 during Orama initialization.
@@ -306,6 +504,7 @@ Right now, Orama supports 26 languages and stemmers out of the box:
 - Swedish
 - Turkish
 - Ukrainian
+</details>
 
 # Official Docs
 
