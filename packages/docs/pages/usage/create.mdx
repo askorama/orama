@@ -51,3 +51,20 @@ const movieDB = await create({
   },
 })
 ```
+
+## Instance ID
+
+Every Orama instance has a unique `id` property, which can be used to identify a given instance when working with multiple databases.
+
+You can customize it by passing an `id` property during the creation of the instance:
+
+```javascript copy
+import { create } from '@orama/orama'
+
+const db = await create({
+  schema: {
+    word: 'string',
+  },
+  id: 'my-orama-instance'
+})
+```

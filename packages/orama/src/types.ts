@@ -451,8 +451,13 @@ type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocument
   [kRemovals]: number | undefined
 }
 
+type OramaID = {
+  id: string
+}
+
 export type Orama<
   P extends ProvidedTypes = { Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore },
 > = FunctionComponents &
   ArrayCallbackComponents &
-  Internals<Schema & P['Schema'], OpaqueIndex & P['Index'], OpaqueDocumentStore & P['DocumentStore']>
+  Internals<Schema & P['Schema'], OpaqueIndex & P['Index'], OpaqueDocumentStore & P['DocumentStore']> &
+  OramaID
