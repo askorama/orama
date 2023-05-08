@@ -230,9 +230,15 @@ create(/* ... */)
 
 Note that only main methods are supported so for internals and other supported exports you still have to use `await import`.
 
+# Community Rewards
+
+![Orama Community Rewards](https://raw.githubusercontent.com/oramasearch/orama/main/misc/readme/community-rewards.png)
+
+Are you using Orama in production? Have you written an article or made a YouTube video on Orama? [Contact us](mailto:info@oramasearch.com) to get some Orama swag in return!
+
 # Official Docs
 
-Read the complete documentation at [https://docs.oramasearch.com/](https://docs.oramasearch.com/).
+Read the complete documentation at [https://docs.oramasearch.com](https://docs.oramasearch.com).
 
 # License
 
