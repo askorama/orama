@@ -6,9 +6,15 @@ Search, everywhere.
 
 # Join Orama's Slack channel
 
-If you need more info, help, or want to provide general feedback on Orama, join
-the
-[Orama Slack channel](https://join.slack.com/t/orama-community/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q)
+If you need more info, help, or want to provide general feedback on Orama, join the [Orama Slack channel](https://join.slack.com/t/orama-community/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q)
+
+# Highlighted features
+- [Search filters](https://docs.oramasearch.com/usage/search/filters)
+- [Facets](https://docs.oramasearch.com/usage/search/facets)
+- [Fields Boosting](https://docs.oramasearch.com/usage/search/fields-boosting)
+- [Typo tolerance](https://docs.oramasearch.com/usage/search/introduction#typo-tolerance)
+- [Exact match](https://docs.oramasearch.com/usage/search/introduction#exact-match)
+- [Stemming and tokenization in 26 languages](https://docs.oramasearch.com/text-analysis/stemming)
 
 # Installation
 
@@ -40,7 +46,7 @@ Or import it directly in a browser module:
 </html>
 ```
 
-Read the complete documentation at [https://docs.oramasearch.com/](https://docs.oramasearch.com/).
+Read the complete documentation at [https://docs.oramasearch.com](https://docs.oramasearch.com).
 
 # Usage
 
@@ -52,13 +58,17 @@ import { create, insert, remove, search } from '@orama/orama'
 
 const db = await create({
   schema: {
-    author: 'string',
-    quote: 'string',
+    name: 'string',
+    description: 'string',
+    price: 'number',
+    meta: {
+      rating: 'number'
+    }
   },
 })
 ```
 
-If you are using Node.js without ESM, please see [build](#builds) section below on how to properly require Orama.
+If you are using Node.js without ESM, please see the [usage with CommonJS](#usage-with-commonjs) section below on how to properly require Orama.
 
 Orama will only index string properties, but will allow you to set and store
 additional data if needed.
@@ -67,23 +77,30 @@ Once the db instance is created, you can start adding some documents:
 
 ```js
 await insert(db, {
-  quote: 'It is during our darkest moments that we must focus to see the light.',
-  author: 'Aristotle',
+  name: 'Wireless Headphones',
+  description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
+  price: 99.99,
+  meta: {
+    rating: 4.5
+  }
 })
 
 await insert(db, {
-  quote: 'If you really look closely, most overnight successes took a long time.',
-  author: 'Steve Jobs',
+  name: 'Smart LED Bulb',
+  description: 'Control the lighting in your home with this energy-efficient smart LED bulb, compatible with most smart home systems.',
+  price: 24.99,
+  meta: {
+    rating: 4.3
+  }
 })
 
 await insert(db, {
-  quote: 'If you are not willing to risk the usual, you will have to settle for the ordinary.',
-  author: 'Jim Rohn',
-})
-
-await insert(db, {
-  quote: "You miss 100% of the shots you don't take",
-  author: 'Wayne Gretzky - Michael Scott',
+  name: 'Portable Charger',
+  description: 'Never run out of power on-the-go with this compact and fast-charging portable charger for your devices.',
+  price: 29.99,
+  meta: {
+    rating: 3.6
+  }
 })
 ```
 
@@ -91,42 +108,34 @@ After the data has been inserted, you can finally start to query the database.
 
 ```js
 const searchResult = await search(db, {
-  term: 'if',
-  properties: '*',
-  boost: {
-    author: 1.5, // optional: boost author field by x1.5
-  },
+  term: 'headphones',
 })
 ```
 
 In the case above, you will be searching for all the documents containing the
-word `if`, looking up in every schema property (AKA index):
+word `headphones`, looking up in every schema property (AKA index):
 
 ```js
 {
   elapsed: {
-    raw: 184541,
-    formatted: '184μs',
+    raw: 99512,
+    formatted: '99μs',
   },
   hits: [
     {
       id: '41013877-56',
-      score: 0.025085832971998432,
+      score: 0.925085832971998432,
       document: {
-        quote: 'If you really look closely, most overnight successes took a long time.',
-        author: 'Steve Jobs'
-      }
-    },
-    {
-      id: '41013877-107',
-      score: 0.02315615351261394,
-      document: {
-        quote: 'If you are not willing to risk the usual, you will have to settle for the ordinary.',
-        author: 'Jim Rohn'
+        name: 'Wireless Headphones',
+        description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
+        price: 99.99,
+        meta: {
+          rating: 4.5
+        }
       }
     }
   ],
-  count: 2
+  count: 1
 }
 ```
 
@@ -134,8 +143,8 @@ You can also restrict the lookup to a specific property:
 
 ```js
 const searchResult = await search(db, {
-  term: 'Michael',
-  properties: ['author'],
+  term: 'immersive sound quality',
+  properties: ['description'],
 })
 ```
 
@@ -144,16 +153,20 @@ Result:
 ```js
 {
   elapsed: {
-    raw: 172166,
-    formatted: '172μs',
+    raw: 21492,
+    formatted: '21μs',
   },
   hits: [
     {
-      id: '41045799-144',
-      score: 0.12041199826559248,
+      id: '41013877-56',
+      score: 0.925085832971998432,
       document: {
-        quote: "You miss 100% of the shots you don't take",
-        author: 'Wayne Gretzky - Michael Scott'
+        name: 'Wireless Headphones',
+        description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
+        price: 99.99,
+        meta: {
+          rating: 4.5
+        }
       }
     }
   ],
@@ -161,13 +174,7 @@ Result:
 }
 ```
 
-If needed, you can also delete a given document by using the `remove` method:
-
-```js
-await remove(db, '41045799-144')
-```
-
-### Using with CommonJS
+# Usage with CommonJS
 
 Orama is packaged as ES modules, suitable for Node.js, Deno, Bun and modern browsers.
 
@@ -189,7 +196,7 @@ async function main() {
 main().catch(console.error)
 ```
 
-#### Use CJS requires
+## Use CJS requires
 
 Orama methods can be required as CommonJS modules by requiring from `@orama/orama`.
 
@@ -203,95 +210,15 @@ create(/* ... */)
 
 Note that only main methods are supported so for internals and other supported exports you still have to use `await import`.
 
-## Language
+# Community Rewards
 
-Orama supports multiple languages. By default, it will use the `english`
-language,
+![Orama Community Rewards](https://raw.githubusercontent.com/oramasearch/orama/main/misc/readme/community-rewards.png)
 
-You can specify a different language by using the `language` property
-during Orama initialization.
-
-By default, Orama will analyze your input using an English
-[Porter Stemmer](https://tartarus.org/martin/PorterStemmer/) function. <br />
-You can replace the default stemmer with a custom one, or a pre-built one
-shipped with the default Orama installation.
-
-Example:
-
-```js
-import { create } from '@orama/orama'
-import { stemmer } from '@orama/orama/stemmers/it'
-
-const db = await create({
-  schema: {
-    author: 'string',
-    quote: 'string',
-  },
-  language: 'italian',
-  components: {
-    tokenizer: {
-      stemmingFn: stemmer,
-    },
-  },
-})
-```
-
-Example using CJS (see [using with commonJS](#using-with-commonjs) above):
-
-```js
-async function main() {
-  const { create } = await import('@orama/orama')
-  const { stemmer } = await import('@orama/orama/stemmers/it')
-
-  const db = await create({
-    schema: {
-      author: 'string',
-      quote: 'string',
-    },
-    language: 'italian',
-    components: {
-      tokenizer: {
-        stemmingFn: stemmer,
-      },
-    },
-  })
-}
-
-main()
-```
-
-Right now, Orama supports 26 languages and stemmers out of the box:
-
-- Arabic
-- Armenian
-- Bulgarian
-- Danish
-- Dutch
-- English
-- Finnish
-- French
-- German
-- Greek
-- Hindi
-- Hungarian
-- Indonesian
-- Irish
-- Italian
-- Nepali
-- Norwegian
-- Portuguese
-- Romanian
-- Russian
-- Serbian
-- Slovenian
-- Spanish
-- Swedish
-- Turkish
-- Ukrainian
+Are you using Orama in production? Have you written an article or made a YouTube video on Orama? [Contact us](mailto:info@oramasearch.com) to get some Orama swag in return!
 
 # Official Docs
 
-Read the complete documentation at [https://docs.oramasearch.com/](https://docs.oramasearch.com/).
+Read the complete documentation at [https://docs.oramasearch.com](https://docs.oramasearch.com).
 
 # License
 
