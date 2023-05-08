@@ -4,6 +4,7 @@ import { OBJECT_COMPONENTS, FUNCTION_COMPONENTS, SINGLE_OR_ARRAY_COMPONENTS } fr
 import { createIndex } from '../components/index.js'
 import { createTokenizer } from '../components/tokenizer/index.js'
 import { createError } from '../errors.js'
+import { uniqueId } from '../utils.js'
 import {
   ArrayCallbackComponents,
   Components,
@@ -20,6 +21,7 @@ interface CreateArguments {
   schema: Schema
   language?: string
   components?: Components
+  id?: string
 }
 
 function validateComponents(components: Components) {
@@ -71,9 +73,13 @@ function validateComponents(components: Components) {
   }
 }
 
-export async function create({ schema, language, components }: CreateArguments): Promise<Orama> {
+export async function create({ schema, language, components, id }: CreateArguments): Promise<Orama> {
   if (!components) {
     components = {}
+  }
+
+  if (!id) {
+    id = await uniqueId()
   }
 
   let tokenizer = components.tokenizer as Tokenizer
@@ -139,6 +145,7 @@ export async function create({ schema, language, components }: CreateArguments):
     beforeMultipleRemove,
     afterMultipleRemove,
     formatElapsedTime,
+    id,
   } as Orama
 
   orama.data = {
