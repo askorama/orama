@@ -1,4 +1,6 @@
-![Orama. Search, everywhere.](https://github.com/oramasearch/orama/blob/main/misc/oramasearch.gif?raw=true)
+# Orama
+
+Search, everywhere.
 
 [![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
 
