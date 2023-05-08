@@ -246,6 +246,112 @@ Learn more about filters in the [official filters docs](https://docs.oramasearch
 
 </details>
 
+# Facets
+
+<details>
+  <summary>
+  Using facets with Orama
+  </summary>
+
+Facets are a powerful tool for filtering and narrowing down search results on the Orama search engine.
+
+With the Orama Faceted Search API, users can filter their search results by various criteria, such as category, price range, or other attributes, making it easier to find the information they need. Whether you're building a website, mobile app, or any other application, the Orama Faceted Search API is the perfect solution for adding faceted search functionality to your project.
+
+Given the following Orama schema:
+
+```js
+import { create } from '@orama/orama'
+ 
+const db = await create({
+  schema: {
+    title: 'string',
+    description: 'string',
+    categories: {
+      primary: 'string',
+      secondary: 'string',
+    },
+    rating: 'number',
+    isFavorite: 'boolean',
+  },
+})
+```
+
+Orama will be able to generate facets at search-time based on the schema. To do so, we need to specify the `facets` property in the `search` configuration:
+
+```js
+const results = await search(db, {
+  term: 'Movie about cars and racing',
+  properties: ['description'],
+  facets: {
+    'categories.first': {
+      size: 3,
+      order: 'DESC',
+    },
+    'categories.second': {
+      size: 2,
+      order: 'DESC',
+    },
+    rating: {
+      ranges: [
+        { from: 0, to: 3 },
+        { from: 3, to: 7 },
+        { from: 7, to: 10 },
+      ],
+    },
+    isFavorite: {
+      true: true,
+      false: true,
+    },
+  },
+})
+```
+
+This will generate the following results:
+
+```js
+{
+  elapsed: ...,
+  count: ...,
+  hits: { ... },
+  facets: {
+    'categories.first': {
+      count: 14,
+      values: {
+        'Action': 4,
+        'Adventure': 3,
+        'Comedy': 2,
+      }
+    },
+    'categories.second': {
+      count: 14,
+      values: {
+        'Cars': 4,
+        'Racing': 3,
+      }
+    },
+    rating: {
+      count: 3,
+      values: {
+        '0-3': 5,
+        '3-7': 15,
+        '7-10': 80,
+      }
+    },
+    isFavorite: {
+      count: 2,
+      values: {
+        'true': 5,
+        'false': 95,
+      }
+    },
+  }
+}
+```
+
+Learn more about facets in the [official facets docs](https://docs.oramasearch.com/usage/search/facets)
+
+</details>
+
 ### Using with CommonJS
 
 Orama is packaged as ES modules, suitable for Node.js, Deno, Bun and modern browsers.
