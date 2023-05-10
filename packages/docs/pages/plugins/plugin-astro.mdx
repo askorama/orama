@@ -60,6 +60,12 @@ export default defineConfig({
 
 When running the `astro build` command, a new DB file will be persisted in the `dist/assets` directory. For the particular case of this example, it will be saved in the file `dist/assets/oramaDB_mydb.json`.
 
+### Local development
+
+Running Astro with `astro dev` does not [bundle the assets](https://docs.astro.build/en/reference/cli-reference/#astro-dev), including Orama's DBs, causing a "404 - not found" error when trying to load them.
+
+In order to use Orama in local Astro development, you can run `astro build` to build your project and then `astro preview` to [serve the built files](https://docs.astro.build/en/reference/cli-reference/#astro-preview) in the `dist/` folder.
+
 ## Loading the DB on client-side
 
 To use the generated DBs in your pages, you can include a script in your `<head>` section, as the following one:
