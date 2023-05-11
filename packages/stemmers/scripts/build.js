@@ -1,36 +1,60 @@
 import { minify, transform } from '@swc/core'
-import glob from 'glob'
-import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
 const rootDir = process.cwd()
-const sourceDir = resolve(rootDir, 'src')
+const sourceDir = resolve(rootDir, 'lib')
 const destinationDir = resolve(rootDir, 'dist')
 
-async function compile(swcConfig, jsExtension, tsExtension) {
-  // Copy static files
-  await cp(resolve(sourceDir, `index.${jsExtension}`), resolve(destinationDir, `index.${jsExtension}`))
-  await cp(resolve(sourceDir, 'index.d.ts'), resolve(destinationDir, `index.d.${tsExtension}`))
+const stemmers = {
+  arabic: 'ar',
+  armenian: 'am',
+  bulgarian: 'bg',
+  danish: 'dk',
+  dutch: 'nl',
+  english: 'en',
+  finnish: 'fi',
+  french: 'fr',
+  german: 'de',
+  greek: 'gr',
+  hungarian: 'hu',
+  indian: 'in',
+  indonesian: 'id',
+  irish: 'ie',
+  italian: 'it',
+  lithuanian: 'lt',
+  nepali: 'np',
+  norwegian: 'no',
+  portuguese: 'pt',
+  romanian: 'ro',
+  russian: 'ru',
+  serbian: 'rs',
+  slovenian: 'ru',
+  spanish: 'es',
+  swedish: 'se',
+  turkish: 'tr',
+  ukrainian: 'uk',
+}
 
-  const filesGlob = await glob('*.js', { cwd: resolve(rootDir, 'lib') })
+async function compile(lang, jsExtension, tsExtension, moduleType) {
+  const content = await readFile(resolve(sourceDir, `${lang}.js`), 'utf-8')
 
-  await Promise.all(
-    filesGlob.map(async file => {
-      const lang = file.replace('.js', '')
+  const compiled = await transform(content, {
+    module: { type: moduleType },
+    env: { targets: 'node >= 16' },
+    jsc: { target: 'es2022' },
+  })
 
-      // Compile and minifiy the file using SWC
-      const content = await readFile(resolve(rootDir, 'lib', file), 'utf-8')
+  const minified = await minify(compiled.code, { sourceMap: true })
 
-      const compiled = await transform(content, swcConfig)
+  await writeFile(resolve(destinationDir, `${lang}.${jsExtension}`), minified.code, 'utf-8')
+  await writeFile(resolve(destinationDir, `${lang}.${jsExtension}.map`), minified.map, 'utf-8')
 
-      const minified = await minify(compiled.code, { sourceMap: true })
-
-      await writeFile(resolve(destinationDir, `${lang}.${jsExtension}`), minified.code, 'utf-8')
-      await writeFile(resolve(destinationDir, `${lang}.${jsExtension}.map`), minified.map, 'utf-8')
-
-      // Copy the definition file
-      await cp(resolve(sourceDir, 'lang.d.ts'), resolve(destinationDir, `${lang}.d.${tsExtension}`))
-    }),
+  // Create the definition file
+  await writeFile(
+    resolve(destinationDir, `${lang}.d.${tsExtension}`),
+    'export declare function stemmer(word: string): string',
+    'utf-8',
   )
 }
 
@@ -39,40 +63,24 @@ async function main() {
   await rm(destinationDir, { recursive: true, force: true })
   await mkdir(destinationDir)
 
-  // Compile different versions
-  // ESM
-  await compile(
-    {
-      module: {
-        type: 'nodenext',
-      },
-      env: {
-        targets: 'node >= 16',
-      },
-      jsc: {
-        target: 'es2022',
-      },
-    },
-    'js',
-    'ts',
-  )
+  const exports = {}
 
-  // CJS
-  await compile(
-    {
-      module: {
-        type: 'commonjs',
-      },
-      env: {
-        targets: 'node >= 16',
-      },
-      jsc: {
-        target: 'es2022',
-      },
-    },
-    'cjs',
-    'cts',
-  )
+  // Copy all relevant files
+  for (const [long, short] of Object.entries(stemmers)) {
+    await compile(short, 'js', 'ts', 'nodenext')
+    await compile(short, 'cjs', 'cts', 'commonjs')
+
+    exports[`./${long}`] = {
+      types: `./dist/${short}.d.ts`,
+      import: `./dist/${short}.js`,
+      require: `./dist/${short}.cjs`,
+    }
+  }
+
+  // Update package.json
+  const packageJson = JSON.parse(await readFile(resolve(rootDir, 'package.json'), 'utf-8'))
+  packageJson.exports = exports
+  await writeFile(resolve(rootDir, 'package.json'), JSON.stringify(packageJson, null, 2))
 
   // Copy the English stemmer to the Orama package
   const englishStemmer = await readFile(resolve(rootDir, 'lib/en.js'), 'utf-8')

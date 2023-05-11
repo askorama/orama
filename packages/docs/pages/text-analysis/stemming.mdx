@@ -11,11 +11,13 @@ Read more: [_Wikipedia_](https://en.wikipedia.org/wiki/Stemming)
 
 </Callout>
 
-When stemming is enabled, Orama uses **the English language analyzer**, but we can override this behavior by setting the property `language` at database initialization, and importing a custom stemmer:
+When stemming is enabled, Orama uses **the English language analyzer**, but we can override this behavior by setting the property `language` at database initialization, and importing a custom stemmer.
+
+Note that as of Orama 1.0.0 only the English stemmer is shipped with Orama. Other languages are published in the `@orama/stemmers` package, which must be installed manually.
 
 ```javascript copy
-import { create, stemmers } from '@orama/orama'
-import { italian } from '@orama/stemmers' // Note that this must be installed explicitly
+import { create } from '@orama/orama'
+import { stemmer } from '@orama/stemmers/italian'
 
 const db = create({
   schema: {
@@ -26,7 +28,7 @@ const db = create({
   components: {
     tokenizer: {
       stemming: true,
-      stemmer: italian,
+      stemmer
     },
   },
 })

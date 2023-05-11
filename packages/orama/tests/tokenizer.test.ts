@@ -1,7 +1,19 @@
 import t from 'tap'
 
+import { stemmer as bulgarianStemmer } from '@orama/stemmers/bulgarian'
+import { stemmer as danishStemmer } from '@orama/stemmers/danish'
+import { stemmer as dutchStemmer } from '@orama/stemmers/dutch'
+import { stemmer as finnishStemmer } from '@orama/stemmers/finnish'
+import { stemmer as frenchStemmer } from '@orama/stemmers/french'
+import { stemmer as germanStemmer } from '@orama/stemmers/german'
+import { stemmer as italianStemmer } from '@orama/stemmers/italian'
+import { stemmer as norwegianStemmer } from '@orama/stemmers/norwegian'
+import { stemmer as portugueseStemmer } from '@orama/stemmers/portuguese'
+import { stemmer as russianStemmer } from '@orama/stemmers/russian'
+import { stemmer as spanishStemmer } from '@orama/stemmers/spanish'
+import { stemmer as swedishStemmer } from '@orama/stemmers/swedish'
+import { stemmer as ukrainianStemmer } from '@orama/stemmers/ukrainian'
 import { createTokenizer } from '../src/components/tokenizer/index.js'
-import * as stemmers from '@orama/stemmers'
 
 t.test('Tokenizer', async t => {
   t.plan(20)
@@ -101,7 +113,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in french', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'french', stemmer: stemmers.french })
+    const tokenizer = await createTokenizer({ language: 'french', stemmer: frenchStemmer })
 
     const I1 = 'voyons quel temps il fait dehors'
     const I2 = "j'ai fait des gâteaux"
@@ -116,7 +128,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in italian', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'italian', stemmer: stemmers.italian })
+    const tokenizer = await createTokenizer({ language: 'italian', stemmer: italianStemmer })
 
     const I1 = 'ho cucinato delle torte'
     const I2 = 'dormire è una cosa difficile quando i test non passano'
@@ -131,7 +143,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in norwegian', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'norwegian', stemmer: stemmers.norwegian })
+    const tokenizer = await createTokenizer({ language: 'norwegian', stemmer: norwegianStemmer })
     const I1 = 'Jeg kokte noen kaker'
     const I2 = 'å sove er en vanskelig ting når testene mislykkes'
 
@@ -145,7 +157,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in portuguese', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'portuguese', stemmer: stemmers.portuguese })
+    const tokenizer = await createTokenizer({ language: 'portuguese', stemmer: portugueseStemmer })
 
     const I1 = 'Eu cozinhei alguns bolos'
     const I2 = 'dormir é uma coisa difícil quando os testes falham'
@@ -160,7 +172,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in russian', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'russian', stemmer: stemmers.russian })
+    const tokenizer = await createTokenizer({ language: 'russian', stemmer: russianStemmer })
 
     const I1 = 'я приготовила пирожные'
     const I2 = 'спать трудно, когда тесты не срабатывают'
@@ -175,7 +187,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in swedish', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'swedish', stemmer: stemmers.swedish })
+    const tokenizer = await createTokenizer({ language: 'swedish', stemmer: swedishStemmer })
     const I1 = 'Jag lagade några kakor'
     const I2 = 'att sova är en svår sak när testerna misslyckas'
 
@@ -189,7 +201,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in spanish', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'spanish', stemmer: stemmers.spanish })
+    const tokenizer = await createTokenizer({ language: 'spanish', stemmer: spanishStemmer })
 
     const I1 = 'cociné unos pasteles'
     const I2 = 'dormir es algo dificil cuando las pruebas fallan'
@@ -204,7 +216,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in dutch', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'dutch', stemmer: stemmers.dutch })
+    const tokenizer = await createTokenizer({ language: 'dutch', stemmer: dutchStemmer })
     const I1 = 'de kleine koeien'
     const I2 = 'Ik heb wat taarten gemaakt'
 
@@ -218,7 +230,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in german', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'german', stemmer: stemmers.german })
+    const tokenizer = await createTokenizer({ language: 'german', stemmer: germanStemmer })
 
     const I1 = 'Schlaf ist eine harte Sache, wenn Tests fehlschlagen'
     const I2 = 'Ich habe ein paar Kekse gebacken'
@@ -233,7 +245,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in finnish', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'finnish', stemmer: stemmers.finnish })
+    const tokenizer = await createTokenizer({ language: 'finnish', stemmer: finnishStemmer })
 
     const I1 = 'Uni on vaikea asia, kun testit epäonnistuvat'
     const I2 = 'Leivoin keksejä'
@@ -248,7 +260,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in danish', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'danish', stemmer: stemmers.danish })
+    const tokenizer = await createTokenizer({ language: 'danish', stemmer: danishStemmer })
 
     const I1 = 'Søvn er en svær ting, når prøver mislykkes'
     const I2 = 'Jeg bagte småkager'
@@ -263,7 +275,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in ukrainian', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'ukrainian', stemmer: stemmers.ukrainian })
+    const tokenizer = await createTokenizer({ language: 'ukrainian', stemmer: ukrainianStemmer })
 
     const I1 = 'Коли тести не проходять, спати важко'
     const I2 = 'я приготувала тістечка'
@@ -278,7 +290,7 @@ t.test('Tokenizer', async t => {
   t.test('should tokenize and stem correctly in bulgarian', async t => {
     t.plan(2)
 
-    const tokenizer = await createTokenizer({ language: 'bulgarian', stemmer: stemmers.bulgarian, stopWords: [] })
+    const tokenizer = await createTokenizer({ language: 'bulgarian', stemmer: bulgarianStemmer, stopWords: [] })
 
     const I1 = 'Кокошката е малка крава която не може да се събере с теста'
     const I2 = 'Има първа вероятност да се случи нещо неочаквано докато се изпълняват тестовете'

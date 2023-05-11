@@ -9,7 +9,7 @@ synchronous or return a promise and Orama will make sure everything is handled c
 
 When no components are specified, an Orama database is created with some defaults components which satisfies most common use cases:
 
-* English tokenizer with stemming enabled.
+* English tokenizer with stemming disabled.
 * BM25 and Radix-Tree based index.
 * In memory documents store.
 
@@ -598,7 +598,7 @@ interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore> {
 }
 ```
 
-### Step 4: Define your component default implementation
+### Step 3: Define your component default implementation
 
 Create a file (or folder if appropriate) under the `src/components` folder with appropriate exports.
 
@@ -621,7 +621,7 @@ Example (`../components/shiningDetector.js`):
 
 Note that exporting a `create*` factory function is not strictly needed but it helps to isolate initialization tasks.
 
-### Step 5: Update the `create` method
+### Step 4: Update the `create` method
 
 Update the `create` method in `src/methods/create.ts` to use the component provided in the options, or create a new one using the object or factory function defined in the previous step.
 
