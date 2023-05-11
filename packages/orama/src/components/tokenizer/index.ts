@@ -1,12 +1,12 @@
 import { createError } from '../../errors.js'
-import { Stemmer, Tokenizer, TokenizerConfig } from '../../types.js'
+import { Stemmer, Tokenizer, DefaultTokenizerConfig } from '../../types.js'
 import { replaceDiacritics } from './diacritics.js'
 import { Language, SPLITTERS, SUPPORTED_LANGUAGES } from './languages.js'
-import { stemmers } from './stemmers.js'
 import { stopWords as defaultStopWords } from './stop-words/index.js'
+import { stemmer as english } from './english-stemmer.js'
 
 interface DefaultTokenizer extends Tokenizer {
-  language: string
+  language: Language
   stemmer?: Stemmer
   stemmerSkipProperties: Set<string>
   stopWords?: string[]
@@ -75,7 +75,7 @@ function tokenize(this: DefaultTokenizer, input: string, language?: string, prop
   return trimTokens
 }
 
-export async function createTokenizer(config: TokenizerConfig = {}): Promise<DefaultTokenizer> {
+export async function createTokenizer(config: DefaultTokenizerConfig = {}): Promise<DefaultTokenizer> {
   if (!config.language) {
     config.language = 'english'
   } else if (!SUPPORTED_LANGUAGES.includes(config.language)) {
@@ -93,7 +93,11 @@ export async function createTokenizer(config: TokenizerConfig = {}): Promise<Def
 
       stemmer = config.stemmer
     } else {
-      stemmer = (stemmers as Record<Language, Stemmer>)[config.language]
+      if (config.language === 'english') {
+        stemmer = english
+      } else {
+        throw createError('MISSING_STEMMER', config.language)
+      }
     }
   }
 

@@ -426,7 +426,7 @@ t.test('orama', t => {
     t.equal(search4.hits[1].document.animal, 'Quick brown fox')
   })
 
-  t.test('Should throw an error when searching in non-existing indices', async t => {
+  t.test('should throw an error when searching in non-existing indices', async t => {
     t.plan(1)
 
     const db = await create({ schema: { foo: 'string', baz: 'string' } })
@@ -443,7 +443,7 @@ t.test('orama', t => {
     )
   })
 
-  t.test('Should correctly remove a document after its insertion', async t => {
+  t.test('should correctly remove a document after its insertion', async t => {
     t.plan(4)
 
     const db = await create({
@@ -485,7 +485,7 @@ t.test('orama', t => {
   })
 
   // Tests for https://github.com/oramasearch/orama/issues/52
-  t.test('Should correctly remove documents via substring search', async t => {
+  t.test('should correctly remove documents via substring search', async t => {
     t.plan(1)
 
     const orama = await create({
@@ -507,7 +507,7 @@ t.test('orama', t => {
     t.equal(searchResult.count, 2)
   })
 
-  t.test('Should remove a document with a nested schema', async t => {
+  t.test('should remove a document with a nested schema', async t => {
     t.plan(4)
 
     const movieDB = await create({
@@ -595,7 +595,7 @@ t.test('orama', t => {
     t.equal(searchResult2.count, 1)
   })
 
-  t.test('Should preserve identical docs after deletion', async t => {
+  t.test('should preserve identical docs after deletion', async t => {
     t.plan(8)
 
     const db = await create({
@@ -643,7 +643,7 @@ t.test('orama', t => {
     t.equal(searchResult2.hits[0].id, id2)
   })
 
-  t.test('Should be able to insert documens with non-searchable fields', async t => {
+  t.test('should be able to insert documens with non-searchable fields', async t => {
     t.plan(2)
 
     const db = await create({
@@ -677,7 +677,7 @@ t.test('orama', t => {
     t.equal(searchResult.hits[0].document.author, 'Frank Zappa')
   })
 
-  t.test('Should exact match', async t => {
+  t.test('should exact match', async t => {
     t.plan(4)
 
     const db = await create({
@@ -733,7 +733,7 @@ t.test('orama', t => {
     t.equal(searchResult.count, 0)
   })
 
-  t.test('Should tolerate typos', async t => {
+  t.test('should tolerate typos', async t => {
     t.plan(2)
 
     const db = await create({
@@ -769,7 +769,7 @@ t.test('orama', t => {
     t.equal(moreTolerantSearch.count, 2)
   })
 
-  t.test('Should support nested properties', async t => {
+  t.test('should support nested properties', async t => {
     t.plan(4)
 
     const db = await create({
@@ -824,7 +824,7 @@ t.test('orama', t => {
     t.equal(resultAuthorName.count, 0)
   })
 
-  t.test('Should support multiple nested properties', async t => {
+  t.test('should support multiple nested properties', async t => {
     t.plan(3)
 
     const db = await create({

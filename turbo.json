@@ -13,6 +13,10 @@
     "deploy": {
       "dependsOn": ["^lint", "^build", "^test"]
     },
+    "@orama/orama#build": {
+      "dependsOn": ["@orama/stemmers#build", "^build"],
+      "outputs": ["dist/**"]
+    },
     "@orama/plugin-match-highlight#build": {
       "dependsOn": ["@orama/orama#build", "^build"],
       "outputs": ["dist/**"]

@@ -1,7 +1,6 @@
-import { transformFile } from '@swc/core'
 import glob from 'glob'
 import { spawn } from 'node:child_process'
-import { cp, mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
 const rootDir = process.cwd()
@@ -58,13 +57,6 @@ async function esm() {
 
   // Create types declarations
   await execute('ESM', 'tsc', ['-p', '.', '--emitDeclarationOnly'])
-
-  // Copy stemmers
-  step('ESM', 'Copying stemmers/lib to dist/stemmers ...')
-  await cp(resolve(rootDir, 'stemmers/lib'), resolve(destinationDir, 'stemmers'), { recursive: true })
-
-  step('ESM', 'Fixing file inclusions ...')
-  await replaceInFile(resolve(destinationDir, 'components/tokenizer/stemmers.d.ts'), ['@stemmers', '../../stemmers'])
 }
 
 async function cjs() {
@@ -92,34 +84,6 @@ async function cjs() {
     /require\("\.\/(.+)\.cts"\)/g,
     'require("./$1.cjs")',
   ])
-  await replaceInFile(resolve(destinationDir, 'cjs/stemmers.cjs'), [
-    ['../stemmers', './stemmers'],
-    ['.js");', '.cjs");'],
-  ])
-  await replaceInFile(resolve(destinationDir, 'cjs/stemmers.d.cts'), [
-    ['@stemmers', './stemmers'],
-    [".js';", ".cjs';"],
-  ])
-
-  // Transpile stemmers
-  step('CJS', 'Transpiling stemmers/lib to dist/cjs/stemmers ...')
-  const stemmersSource = resolve(rootDir, 'stemmers/lib')
-  const stemmersDestination = resolve(destinationDir, 'cjs/stemmers')
-  await mkdir(stemmersDestination)
-  let stemmers = await readdir(stemmersSource)
-  stemmers = stemmers.filter(p => p.endsWith('.js')).map(s => s.replace(/\.js$/, ''))
-
-  await Promise.all(
-    stemmers.map(async stemmer => {
-      const transformed = await transformFile(resolve(stemmersSource, stemmer + '.js'), {
-        swcrc: false,
-        module: { type: 'commonjs' },
-      })
-
-      await writeFile(resolve(stemmersDestination, stemmer + '.cjs'), transformed.code)
-      await cp(resolve(stemmersSource, stemmer + '.d.ts'), resolve(stemmersDestination, stemmer + '.d.cts'))
-    }),
-  )
 }
 
 async function main() {

@@ -370,7 +370,7 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
 
 export type Stemmer = (word: string) => string
 
-export type TokenizerConfig = {
+export type DefaultTokenizerConfig = {
   language?: Language
   stemming?: boolean
   stemmer?: Stemmer
@@ -386,7 +386,7 @@ export interface Tokenizer {
 }
 
 export interface ObjectComponents {
-  tokenizer: Tokenizer | TokenizerConfig
+  tokenizer: Tokenizer | DefaultTokenizerConfig
   index: IIndex
   documentsStore: IDocumentsStore
 }
