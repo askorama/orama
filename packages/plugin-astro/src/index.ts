@@ -63,20 +63,12 @@ async function prepareOramaDb(
 
   // pathname is usually of the form `some/path/`, while `r.route` usually takes
   // the form `/some/path`. That's why we strip start & end slashes to compare.
+  const basePath = routes[0].distURL?.pathname?.replace(/\/$/, '').split('dist/')[0] + 'dist/'
   const pathsToBeIndexed = pages
     .filter(({ pathname }) => dbConfig.pathMatcher.test(pathname))
     .map(({ pathname }) => ({
       pathname,
-      generatedFilePath: routes.filter(r => {
-        const route = r.route.replace(/(^\/|\/$)/g, '')
-        const pathName = pathname.replace(/(^\/|\/$)/g, '')
-
-        if (dbConfig.caseSensitive) {
-          return route.toLowerCase() === pathName.toLowerCase()
-        }
-
-        return route === pathName
-      })[0]?.distURL?.pathname
+      generatedFilePath: basePath + pathname.replace(/^\//, '') + 'index.html'
     }))
     .filter(({ generatedFilePath }) => !!generatedFilePath)
 

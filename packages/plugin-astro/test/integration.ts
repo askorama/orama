@@ -76,6 +76,7 @@ await test('plugin is able to generate orama DB at build time', async () => {
   // The Orama DBs have been generated
   assert.ok(existsSync(resolve(sandbox, 'dist', 'assets', 'oramaDB_animals.json')))
   assert.ok(existsSync(resolve(sandbox, 'dist', 'assets', 'oramaDB_games.json')))
+  assert.ok(existsSync(resolve(sandbox, 'dist', 'assets', 'oramaDB_dynamic.json')))
 })
 
 await test('generated DBs have indexed pages content', async () => {
@@ -90,6 +91,12 @@ await test('generated DBs have indexed pages content', async () => {
   const gamesData = JSON.parse(rawGamesData) as Schema
   const gamesDB = await createOramaDB({ schema: { _: 'string' } })
   await loadOramaDB(gamesDB, gamesData as any)
+
+  // Loading "dynamic DB"
+  const rawDynamicData = await readFile(resolve(sandbox, 'dist/assets/oramaDB_dynamic.json'), 'utf8')
+  const dynamicData = JSON.parse(rawDynamicData) as Schema
+  const dynamicDB = await createOramaDB({ schema: { _: 'string' } })
+  await loadOramaDB(dynamicDB, dynamicData as any)
 
   // Search results seem reasonable
   const catSearchResult = await search(animalsDB, { term: 'cat' })
@@ -106,6 +113,14 @@ await test('generated DBs have indexed pages content', async () => {
   // We do not have content about turtles
   const turtleSearchResult = await search(animalsDB, { term: 'turtle' })
   assert.ok(turtleSearchResult.count === 0)
+
+  // Dynamic pages are indexed
+  const dynamicTestSearchResult = await search(dynamicDB, { term: 'thiswasjustatest' })
+  assert.ok(dynamicTestSearchResult.count === 1)
+
+  // pathMatcher works on dynamic pages
+  const dynamicTestMissingSearchResult = await search(dynamicDB, { term: 'ninja' })
+  assert.ok(dynamicTestMissingSearchResult.count === 0)
 })
 
 await cleanup()

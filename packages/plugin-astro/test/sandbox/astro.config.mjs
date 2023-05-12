@@ -13,8 +13,10 @@ export default defineConfig({
   integrations: [
     orama({
       animals: { pathMatcher: /animals_.+$/ },
-      games: { pathMatcher: /games_.+$/ }
+      games: { pathMatcher: /games_.+$/ },
+      dynamic: { pathMatcher: /blog\/inner-path\/article(.*)$/ }
     })
   ],
-  trailingSlash: 'always'
+  trailingSlash: 'always',
+  output: 'static'
 })
