@@ -12,11 +12,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "moduleResolution": "nodenext",
-    "baseUrl": ".",
-    "paths": {
-      "@stemmers/*": ["stemmers/lib/*"]
-    }
+    "moduleResolution": "nodenext"
   },
   "include": ["src/*.ts", "src/**/*.ts"]
 }

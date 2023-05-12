@@ -9,6 +9,7 @@ Search, everywhere.
 If you need more info, help, or want to provide general feedback on Orama, join the [Orama Slack channel](https://join.slack.com/t/orama-community/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q)
 
 # Highlighted features
+
 - [Search filters](https://docs.oramasearch.com/usage/search/filters)
 - [Facets](https://docs.oramasearch.com/usage/search/facets)
 - [Fields Boosting](https://docs.oramasearch.com/usage/search/fields-boosting)
@@ -62,8 +63,8 @@ const db = await create({
     description: 'string',
     price: 'number',
     meta: {
-      rating: 'number'
-    }
+      rating: 'number',
+    },
   },
 })
 ```
@@ -81,26 +82,28 @@ await insert(db, {
   description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
   price: 99.99,
   meta: {
-    rating: 4.5
-  }
+    rating: 4.5,
+  },
 })
 
 await insert(db, {
   name: 'Smart LED Bulb',
-  description: 'Control the lighting in your home with this energy-efficient smart LED bulb, compatible with most smart home systems.',
+  description:
+    'Control the lighting in your home with this energy-efficient smart LED bulb, compatible with most smart home systems.',
   price: 24.99,
   meta: {
-    rating: 4.3
-  }
+    rating: 4.3,
+  },
 })
 
 await insert(db, {
   name: 'Portable Charger',
-  description: 'Never run out of power on-the-go with this compact and fast-charging portable charger for your devices.',
+  description:
+    'Never run out of power on-the-go with this compact and fast-charging portable charger for your devices.',
   price: 29.99,
   meta: {
-    rating: 3.6
-  }
+    rating: 3.6,
+  },
 })
 ```
 

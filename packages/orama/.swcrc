@@ -14,10 +14,6 @@
       },
       "experimental": {
         "keepImportAssertions": true
-      },
-      "baseUrl": ".",
-      "paths": {
-        "@stemmers/*": ["./src/stemmers/*"]
       }
     },
     "sourceMaps": true
@@ -41,10 +37,6 @@
       },
       "experimental": {
         "keepImportAssertions": true
-      },
-      "baseUrl": ".",
-      "paths": {
-        "@stemmers/*": ["./src/stemmers/*"]
       }
     },
     "sourceMaps": true

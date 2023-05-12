@@ -135,4 +135,3 @@ export async function updateMultiple(
 
 export * as components from './components/defaults.cjs'
 export * as internals from './internals.cjs'
-export * from './stemmers.cjs'
