@@ -108,8 +108,7 @@ await insert(db, {
 
 await insert(db, {
   name: 'Smart LED Bulb',
-  description:
-    'Control the lighting in your home with this energy-efficient smart LED bulb, compatible with most smart home systems.',
+  description: 'Control the lighting in your home with this energy-efficient smart LED bulb, compatible with most smart home systems.',
   price: 24.99,
   meta: {
     rating: 4.3,

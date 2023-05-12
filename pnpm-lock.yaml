@@ -7,9 +7,6 @@ importers:
       '@changesets/cli':
         specifier: ^2.26.0
         version: 2.26.0
-      next:
-        specifier: ^13.3.0
-        version: 13.3.0(@babel/core@7.21.8)(react-dom@18.2.0)(react@18.2.0)
     devDependencies:
       '@swc/cli':
         specifier: ^0.1.59
