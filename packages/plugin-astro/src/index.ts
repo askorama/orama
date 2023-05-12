@@ -61,15 +61,19 @@ async function prepareOramaDb(
     }
   })
 
-  // pathname is usually of the form `some/path/`, while `r.route` usually takes
-  // the form `/some/path`. That's why we strip start & end slashes to compare.
+  // All routes are in the same folder, we can use the first one to get the basePath
   const basePath = routes[0].distURL?.pathname?.replace(/\/$/, '').split('dist/')[0] + 'dist/'
   const pathsToBeIndexed = pages
     .filter(({ pathname }) => dbConfig.pathMatcher.test(pathname))
-    .map(({ pathname }) => ({
-      pathname,
-      generatedFilePath: basePath + pathname.replace(/^\//, '') + 'index.html'
-    }))
+    .map(({ pathname }) => {
+      // Some pages like 404 are generated as 404.html while others are usually pageName/index.html
+      const matchingPathname = routes.find(r => r.distURL?.pathname.endsWith(pathname.replace(/\/$/, '') + '.html'))
+        ?.distURL?.pathname
+      return {
+        pathname,
+        generatedFilePath: matchingPathname ?? `${basePath}${pathname}index.html`
+      }
+    })
     .filter(({ generatedFilePath }) => !!generatedFilePath)
 
   const oramaDB = await createOramaDB({

@@ -14,9 +14,9 @@ export default defineConfig({
     orama({
       animals: { pathMatcher: /animals_.+$/ },
       games: { pathMatcher: /games_.+$/ },
-      dynamic: { pathMatcher: /blog\/inner-path\/article(.*)$/ }
+      dynamic: { pathMatcher: /blog\/inner-path\/article(.*)$/ },
+      allSite: { pathMatcher: /.*/ }
     })
   ],
-  trailingSlash: 'always',
-  output: 'static'
+  trailingSlash: 'always'
 })
