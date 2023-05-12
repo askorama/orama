@@ -1,6 +1,6 @@
 {
   "name": "@orama/docs",
-  "version": "1.0.0-beta.15",
+  "version": "1.0.0-beta.16",
   "description": "Documentation for Orama",
   "private": true,
   "main": "index.js",
