@@ -117,8 +117,7 @@ await insert(db, {
 
 await insert(db, {
   name: 'Portable Charger',
-  description:
-    'Never run out of power on-the-go with this compact and fast-charging portable charger for your devices.',
+  description: 'Never run out of power on-the-go with this compact and fast-charging portable charger for your devices.',
   price: 29.99,
   meta: {
     rating: 3.6,
