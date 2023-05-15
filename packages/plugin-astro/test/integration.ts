@@ -98,6 +98,12 @@ await test('generated DBs have indexed pages content', async () => {
   const dynamicDB = await createOramaDB({ schema: { _: 'string' } })
   await loadOramaDB(dynamicDB, dynamicData as any)
 
+  // Loading "allSite DB"
+  const rawAllSiteData = await readFile(resolve(sandbox, 'dist/assets/oramaDB_allSite.json'), 'utf8')
+  const allSiteData = JSON.parse(rawAllSiteData) as Schema
+  const allSiteDB = await createOramaDB({ schema: { _: 'string' } })
+  await loadOramaDB(allSiteDB, allSiteData as any)
+
   // Search results seem reasonable
   const catSearchResult = await search(animalsDB, { term: 'cat' })
   assert.ok(catSearchResult.count === 1)
