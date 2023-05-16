@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert, insertMultiple, search } from '../src'
+import { create, insert, insertMultiple, search } from '../src/index.js'
 
 t.test('create should support array of string', async t => {
   const db = await create({
@@ -15,7 +15,7 @@ t.test('create should support array of string', async t => {
   const [harryId, jamesId, lilyId] = await insertMultiple(db, [
     { name: ['Harry', 'James', 'Potter'] },
     { name: ['James', 'Potter'] },
-    { name: ['Lily', 'Evans', 'Potter'] },
+    { name: ['Lily', 'Lily', 'Lily', 'Lily', 'Evans', 'Potter'] },
   ])
 
   await checkSearchTerm(t, db, 'Albus', [albusId])
@@ -39,28 +39,62 @@ t.test('create should support array of string', async t => {
   await checkSearchWhere(t, db, 'name', ['P'], [])
   await checkSearchWhere(t, db, 'name', ['foo'], [])
 
+  await checkSearchFacets(t, db, 'name', {}, {
+    count: 9,
+    values: {
+      James: 2,
+      Potter: 3,
+      Lily: 1,
+      Evans: 1,
+      Albus: 1,
+      Percival: 1,
+      Wulfric: 1,
+      Brian: 1,
+      Harry: 1
+    }
+  })
+
   t.end()
 })
 
 t.test('create should support array of number', async t => {
   const db = await create({
     schema: {
-      n: 'number[]',
+      num: 'number[]',
     },
   })
 
   const first = await insert(db, {
-    n: [5],
+    num: [5],
   })
 
-  const [second, third, fourth] = await insertMultiple(db, [{ n: [2, 7] }, { n: [3, 5, 7, 35] }, { n: [3, 2, 5] }])
+  const [second, third, fourth] = await insertMultiple(db, [
+    { num: [2, 7] },
+    { num: [3, 5, 7, 35] },
+    { num: [3, 2, 5] }
+  ])
 
-  await checkSearchWhere(t, db, 'n', { eq: 5 }, [first, third, fourth])
-  await checkSearchWhere(t, db, 'n', { eq: 35 }, [third])
-  await checkSearchWhere(t, db, 'n', { gt: 6 }, [second, third])
-  await checkSearchWhere(t, db, 'n', { gte: 7 }, [second, third])
-  await checkSearchWhere(t, db, 'n', { between: [6, 10] }, [second, third])
-  await checkSearchWhere(t, db, 'n', { eg: 42 }, [])
+  await checkSearchWhere(t, db, 'num', { eq: 5 }, [first, third, fourth])
+  await checkSearchWhere(t, db, 'num', { eq: 35 }, [third])
+  await checkSearchWhere(t, db, 'num', { gt: 6 }, [second, third])
+  await checkSearchWhere(t, db, 'num', { gte: 7 }, [second, third])
+  await checkSearchWhere(t, db, 'num', { between: [6, 10] }, [second, third])
+  await checkSearchWhere(t, db, 'num', { eg: 42 }, [])
+
+  await checkSearchFacets(t, db, 'num', {
+    ranges: [
+      { from: 0, to: 3 },
+      { from: 3, to: 7 },
+      { from: 7, to: 10 },
+    ]
+  }, {
+    count: 3,
+    values: {
+      "0-3": 3,
+      "3-7": 4,
+      "7-10": 2,
+    }
+  })
 
   t.end()
 })
@@ -85,6 +119,17 @@ t.test('create should support array of boolean', async t => {
   await checkSearchWhere(t, db, 'b', true, [first, third, fourth])
   await checkSearchWhere(t, db, 'b', false, [second, third])
 
+  await checkSearchFacets(t, db, 'b', {
+    true: true,
+    false: true,
+  }, {
+    count: 2,
+    values: {
+      "true": 3,
+      "false": 2,
+    }
+  })
+
   t.end()
 })
 
@@ -106,4 +151,13 @@ async function checkSearchWhere(t, db, key, where, expectedIds) {
   t.equal(result.hits.length, expectedIds.length)
   t.equal(result.count, expectedIds.length)
   t.strictSame(new Set(result.hits.map(h => h.id)), new Set(expectedIds))
+}
+
+async function checkSearchFacets(t: Tap.Test, db, key, facet, expectedFacet) {
+  const result = await search(db, {
+    facets: {
+      [key]: facet,
+    },
+  })
+  t.strictSame(result.facets![key], expectedFacet)
 }

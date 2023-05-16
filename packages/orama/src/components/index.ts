@@ -222,13 +222,13 @@ async function insertScalar(
   docsCount: number,
 ): Promise<void> {
   switch (schemaType) {
+    case 'boolean':
+      (index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].push(id)
+      break
     case 'number':
       avlInsert(index.indexes[prop] as AVLNode<number, string[]>, value as number, [id])
       break
-    case 'boolean':
-      ;(index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].push(id)
-      break
-    case 'string':
+    case 'string': {
       const tokens = await tokenizer.tokenize(value as string, language, prop)
       await implementation.insertDocumentScoreParameters(index, prop, id, tokens, docsCount)
 
@@ -239,6 +239,7 @@ async function insertScalar(
       }
 
       break
+    }
   }
 }
 

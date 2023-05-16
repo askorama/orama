@@ -20,10 +20,6 @@ export function sprintf(template: string, ...args: (string | number)[]): string 
       const replacement = position ? args[Number.parseInt(position) - 1]! : args.shift()!
       const width = rawWidth === '' ? 0 : Number.parseInt(rawWidth)
 
-      if (replacement === undefined) {
-        console.log('AAAAAAA', template)
-      }
-
       switch (type) {
         case 'd':
           return replacement.toString().padStart(width, '0')

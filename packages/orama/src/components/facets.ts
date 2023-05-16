@@ -4,6 +4,7 @@ import type {
   NumberFacetDefinition,
   Orama,
   SearchParams,
+  SearchableValue,
   StringFacetDefinition,
   TokenScore,
 } from '../types.js'
@@ -56,23 +57,64 @@ export async function getFacets(
     for (const facet of facetKeys) {
       const facetValue = facet.includes('.')
         ? (await getNested<string>(doc!, facet))!
-        : (doc![facet] as number | boolean)
+        : (doc![facet] as SearchableValue)
 
-      // Range facets based on numbers
-      if (properties[facet] === 'number') {
-        for (const range of (facetsConfig[facet] as NumberFacetDefinition).ranges) {
-          if ((facetValue as number) >= range.from && (facetValue as number) <= range.to) {
-            if (facets[facet].values[`${range.from}-${range.to}`] === undefined) {
-              facets[facet].values[`${range.from}-${range.to}`] = 1
-            } else {
-              facets[facet].values[`${range.from}-${range.to}`]++
+      const alreadyInsertedValues = new Set()
+      switch (properties[facet]) {
+        case 'number': {
+          for (const range of (facetsConfig[facet] as NumberFacetDefinition).ranges) {
+            if ((facetValue as number) >= range.from && (facetValue as number) <= range.to) {
+              if (facets[facet].values[`${range.from}-${range.to}`] === undefined) {
+                facets[facet].values[`${range.from}-${range.to}`] = 1
+              } else {
+                facets[facet].values[`${range.from}-${range.to}`]++
+              }
             }
           }
+          break
         }
-      } else {
-        // String or boolean based facets
-        const value = facetValue?.toString() ?? (properties[facet] === 'boolean' ? 'false' : '')
-        facets[facet].values[value] = (facets[facet].values[value] ?? 0) + 1
+        case 'boolean':
+        case 'string': {
+          // String or boolean based facets
+          const value = facetValue?.toString() ?? (properties[facet] === 'boolean' ? 'false' : '')
+          facets[facet].values[value] = (facets[facet].values[value] ?? 0) + 1
+          break
+        }
+        case 'boolean[]':
+        case 'string[]': {
+          for (const v of (facetValue as Array<string>)) {
+            // String or boolean based facets
+            const value = v?.toString() ?? (properties[facet] === 'boolean' ? 'false' : '')
+            if (alreadyInsertedValues.has(value)) {
+              continue
+            }
+
+            facets[facet].values[value] = (facets[facet].values[value] ?? 0) + 1
+
+            alreadyInsertedValues.add(value)
+          }
+          break
+        }
+        case 'number[]': {
+          const ranges = (facetsConfig[facet] as NumberFacetDefinition).ranges
+          for (const range of ranges) {
+            const value = `${range.from}-${range.to}`
+
+            for (const v of (facetValue as Array<number>)) {
+              if ((v as number) >= range.from && (v as number) <= range.to) {
+                if (facets[facet].values[value] === undefined) {
+                  facets[facet].values[value] = 1
+                } else {
+                  facets[facet].values[value]++
+                  alreadyInsertedValues.add(value)
+                  break
+                }
+              }
+            }
+
+          }
+          break
+        }
       }
     }
   }
