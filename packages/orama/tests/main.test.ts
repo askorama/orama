@@ -124,7 +124,8 @@ t.test('document validation', t => {
     t.ok(await insert(db, { quote: 'hello, world!', author: 'me' }))
 
     await t.rejects(() => insert(db, { quote: 'hello, world!', author: true }), {
-      code: 'INVALID_DOCUMENT_PROPERTY',
+      code: 'SCHEMA_VALIDATION_FAILURE',
+      message: 'Cannot insert document due schema validation failure on "author" property.',
     })
   })
 

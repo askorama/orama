@@ -397,7 +397,7 @@ export interface ObjectComponents {
 }
 
 export interface FunctionComponents<S extends Schema = Schema> {
-  validateSchema(doc: Document, schema: S): SyncOrAsyncValue<boolean>
+  validateSchema(doc: Document, schema: S): SyncOrAsyncValue<string | undefined>
   getDocumentIndexId(doc: Document): SyncOrAsyncValue<string>
   getDocumentProperties(doc: Document, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>
   formatElapsedTime(number: bigint): SyncOrAsyncValue<number | string | object | ElapsedTime>

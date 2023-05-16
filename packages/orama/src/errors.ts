@@ -21,6 +21,7 @@ const errors = {
   UNKNOWN_INDEX: `Invalid property name "%s". Expected a wildcard string ("*") or array containing one of the following properties: %s`,
   INVALID_BOOST_VALUE: `Boost value must be a number greater than, or less than 0.`,
   INVALID_FILTER_OPERATION: `You can only use one operation per filter, you requested %d.`,
+  SCHEMA_VALIDATION_FAILURE: `Cannot insert document due schema validation failure on "%s" property.`,
 }
 
 export type ErrorCode = keyof typeof errors

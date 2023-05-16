@@ -23,20 +23,24 @@ export async function getDocumentIndexId(doc: Document): Promise<string> {
   return await uniqueId()
 }
 
-export async function validateSchema<S extends Schema = Schema>(doc: Document, schema: S): Promise<boolean> {
+export async function validateSchema<S extends Schema = Schema>(doc: Document, schema: S): Promise<string | undefined> {
   for (const [prop, type] of Object.entries(schema)) {
     const value = doc[prop]
 
+    if (typeof value === 'undefined') {
+      continue
+    }
+
     if (typeof type === 'string' && isArrayType(type)) {
       if (!Array.isArray(value)) {
-        return false
+        return prop
       }
       const expectedType = getInnerType(type as ArraySearchableType)
 
       const valueLength = value.length
       for (let i = 0; i < valueLength; i++) {
         if (typeof value[i] !== expectedType) {
-          return false
+          return prop + '.' + i
         }
       }
 
@@ -45,20 +49,22 @@ export async function validateSchema<S extends Schema = Schema>(doc: Document, s
 
     if (typeof type === 'object') {
       if (!value || typeof value !== 'object') {
-        return false
+        return prop
       }
 
-      if (!validateSchema(value as Document, type)) {
-        return false
+      const subProp = await validateSchema(value as Document, type)
+      if (subProp) {
+        return prop + '.' + subProp
       }
+      continue
     }
 
     if (typeof value !== type) {
-      return false
+      return prop
     }
   }
 
-  return true
+  return undefined
 }
 
 const IS_ARRAY_TYPE: Record<SearchableType, boolean> = {

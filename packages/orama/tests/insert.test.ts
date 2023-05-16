@@ -75,7 +75,10 @@ t.test('insert', t => {
           id: 123,
           name: 'John',
         }),
-      { code: 'DOCUMENT_ID_MUST_BE_STRING' },
+      {
+        code: 'SCHEMA_VALIDATION_FAILURE',
+        message: 'Cannot insert document due schema validation failure on "id" property.',
+      },
     )
   })
 
