@@ -18,9 +18,9 @@ export interface Schema extends Record<string, SearchableType | Schema> {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Document extends Record<string, SearchableValue | Document | unknown> {}
 
-export type SearchableType = 'string' | 'number' | 'boolean'
+export type SearchableType = 'string' | 'number' | 'boolean' | 'string[]' | 'number[]' | 'boolean[]'
 
-export type SearchableValue = string | number | boolean
+export type SearchableValue = string | number | boolean | Array<string> | Array<number> | Array<boolean>
 
 export type BM25Params = {
   k?: number
@@ -304,6 +304,7 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
     prop: string,
     id: string,
     value: SearchableValue,
+    schemaType: SearchableType,
     language: string | undefined,
     tokenizer: Tokenizer,
     docsCount: number,

@@ -20,6 +20,10 @@ export function sprintf(template: string, ...args: (string | number)[]): string 
       const replacement = position ? args[Number.parseInt(position) - 1]! : args.shift()!
       const width = rawWidth === '' ? 0 : Number.parseInt(rawWidth)
 
+      if (replacement === undefined) {
+        console.log('AAAAAAA', template)
+      }
+
       switch (type) {
         case 'd':
           return replacement.toString().padStart(width, '0')
@@ -185,11 +189,8 @@ export function intersect<T>(arrays: ReadonlyArray<T>[]): T[] {
   })
 }
 
-export async function getDocumentProperties(
-  doc: Document,
-  paths: string[],
-): Promise<Record<string, string | number | boolean>> {
-  const properties: Record<string, string | number | boolean> = {}
+export async function getDocumentProperties(doc: Document, paths: string[]): Promise<Record<string, SearchableValue>> {
+  const properties: Record<string, SearchableValue> = {}
 
   const pathsLength = paths.length
   for (let i = 0; i < pathsLength; i++) {
@@ -202,7 +203,7 @@ export async function getDocumentProperties(
       current = (current as Document)[pathTokens[j]!] as Document | SearchableValue
 
       // We found an object but we were supposed to be done
-      if (typeof current === 'object' && current !== null && j === pathTokensLength - 1) {
+      if (typeof current === 'object' && !Array.isArray(current) && current !== null && j === pathTokensLength - 1) {
         current = undefined
         break
       } else if ((current === null || typeof current !== 'object') && j < pathTokensLength - 1) {
@@ -220,10 +221,7 @@ export async function getDocumentProperties(
   return properties
 }
 
-export async function getNested<T = 'string' | 'number' | 'boolean'>(
-  obj: object,
-  path: string,
-): Promise<T | undefined> {
+export async function getNested<T = SearchableValue>(obj: object, path: string): Promise<T | undefined> {
   const props = await getDocumentProperties(obj as Document, [path])
 
   return props[path] as T | undefined

@@ -25,17 +25,35 @@ export async function getDocumentIndexId(doc: Document): Promise<string> {
 
 export async function validateSchema<S extends Schema = Schema>(doc: Document, schema: S): Promise<boolean> {
   for (const [prop, type] of Object.entries(schema)) {
+    const value = doc[prop]
+
+    if (typeof type === 'string' && type.endsWith('[]')) {
+      if (!Array.isArray(value)) {
+        return false
+      }
+      const expectedType = type.slice(0, -2)
+
+      const valueLength = value.length
+      for (let i = 0; i < valueLength; i++) {
+        if (typeof value[i] !== expectedType) {
+          return false
+        }
+      }
+
+      continue
+    }
+
     if (typeof type === 'object') {
-      if (!doc[prop] || (typeof doc[prop] !== 'object' && Array.isArray(doc[prop]))) {
+      if (!value || typeof value !== 'object') {
         return false
       }
 
-      if (!validateSchema(doc[prop] as Document, type)) {
+      if (!validateSchema(value as Document, type)) {
         return false
       }
     }
 
-    if (typeof doc[prop] !== type) {
+    if (typeof value !== type) {
       return false
     }
   }

@@ -184,18 +184,20 @@ export async function create(
 
     switch (type) {
       case 'boolean':
+      case 'boolean[]':
         index.indexes[path] = { true: [], false: [] }
         break
       case 'number':
+      case 'number[]':
         index.indexes[path] = avlCreate<number, string[]>(0, [])
         break
       case 'string':
+      case 'string[]':
         index.indexes[path] = radixCreate()
         index.avgFieldLength[path] = 0
         index.frequencies[path] = {}
         index.tokenOccurrencies[path] = {}
         index.fieldLengths[path] = {}
-
         break
       default:
         throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : typeActualType)
@@ -208,32 +210,59 @@ export async function create(
   return index
 }
 
+async function insertScalar(
+  implementation: IIndex<Index>,
+  index: Index,
+  prop: string,
+  id: string,
+  value: SearchableValue,
+  schemaType: SearchableType,
+  language: string | undefined,
+  tokenizer: Tokenizer,
+  docsCount: number,
+): Promise<void> {
+  switch (schemaType) {
+    case 'number':
+      avlInsert(index.indexes[prop] as AVLNode<number, string[]>, value as number, [id])
+      break
+    case 'boolean':
+      ;(index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].push(id)
+      break
+    case 'string':
+      const tokens = await tokenizer.tokenize(value as string, language, prop)
+      await implementation.insertDocumentScoreParameters(index, prop, id, tokens, docsCount)
+
+      for (const token of tokens) {
+        await implementation.insertTokenScoreParameters(index, prop, id, tokens, token)
+
+        radixInsert(index.indexes[prop] as RadixNode, token, id)
+      }
+
+      break
+  }
+}
+
 export async function insert(
   implementation: IIndex<Index>,
   index: Index,
   prop: string,
   id: string,
   value: SearchableValue,
+  schemaType: SearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<void> {
-  if (typeof value === 'number') {
-    avlInsert(index.indexes[prop] as AVLNode<number, string[]>, value as number, [id])
-    return
-  } else if (typeof value === 'boolean') {
-    // eslint-disable-next-line @typescript-eslint/no-extra-semi
-    ;(index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].push(id)
-    return
+  if (!schemaType.endsWith('[]')) {
+    return insertScalar(implementation, index, prop, id, value, schemaType, language, tokenizer, docsCount)
   }
 
-  const tokens = await tokenizer.tokenize(value as string, language, prop)
+  const innerSchemaType = schemaType.slice(0, -2) as SearchableType
 
-  await implementation.insertDocumentScoreParameters(index, prop, id, tokens, docsCount)
-
-  for (const token of tokens) {
-    await implementation.insertTokenScoreParameters(index, prop, id, tokens, token)
-    radixInsert(index.indexes[prop] as RadixNode, token, id)
+  const elements = value as Array<string | number | boolean>
+  const elementsLength = elements.length
+  for (let i = 0; i < elementsLength; i++) {
+    insert(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer, docsCount)
   }
 }
 
@@ -382,9 +411,7 @@ export async function getSearchableProperties(index: Index): Promise<string[]> {
   return index.searchableProperties
 }
 
-export async function getSearchablePropertiesWithTypes(
-  index: Index,
-): Promise<Record<string, 'string' | 'number' | 'boolean'>> {
+export async function getSearchablePropertiesWithTypes(index: Index): Promise<Record<string, SearchableType>> {
   return index.searchablePropertiesWithTypes
 }
 
