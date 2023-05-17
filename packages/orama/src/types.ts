@@ -321,6 +321,7 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
     prop: string,
     id: string,
     value: SearchableValue,
+    schemaType: SearchableType,
     language: string | undefined,
     tokenizer: Tokenizer,
     docsCount: number,

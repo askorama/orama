@@ -19,17 +19,20 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
   }
 
   const indexableProperties = await orama.index.getSearchableProperties(index)
+  const indexablePropertiesWithTypes = await orama.index.getSearchablePropertiesWithTypes(index)
   const values = await orama.getDocumentProperties(doc, indexableProperties)
 
   for (const prop of indexableProperties) {
     const value = values[prop]
-    await orama.index.beforeRemove?.(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)
+    const schemaType = indexablePropertiesWithTypes[prop]
+
+    await orama.index.beforeRemove?.(orama.data.index, prop, id, value, schemaType, language, orama.tokenizer, docsCount)
     if (
-      !(await orama.index.remove(orama.index, orama.data.index, prop, id, value, language, orama.tokenizer, docsCount))
+      !(await orama.index.remove(orama.index, orama.data.index, prop, id, value, schemaType, language, orama.tokenizer, docsCount))
     ) {
       result = false
     }
-    await orama.index.afterRemove?.(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)
+    await orama.index.afterRemove?.(orama.data.index, prop, id, value, schemaType, language, orama.tokenizer, docsCount)
   }
 
   if (!skipHooks) {

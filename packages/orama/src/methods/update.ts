@@ -10,14 +10,14 @@ export async function update(
   language?: string,
   skipHooks?: boolean,
 ): Promise<string> {
-  if (!skipHooks) {
+  if (!skipHooks && orama.beforeUpdate) {
     await runSingleHook(orama.beforeUpdate, orama, id)
   }
 
   await remove(orama, id, language, skipHooks)
   const newId = await insert(orama, doc, language, skipHooks)
 
-  if (!skipHooks) {
+  if (!skipHooks && orama.afterUpdate) {
     await runSingleHook(orama.afterUpdate, orama, newId)
   }
 

@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert, insertMultiple, search } from '../src/index.js'
+import { create, getByID, insert, insertMultiple, load, remove, save, search, update } from '../src/index.js'
 
 t.test('create should support array of string', async t => {
   const db = await create({
@@ -149,6 +149,88 @@ t.test('create should support array of boolean', async t => {
   )
 
   t.end()
+})
+
+t.test('remove should support array as well', async t => {
+  t.plan(2)
+
+  const db = await create({
+    schema: {
+      strings: 'string[]',
+      num: 'number[]',
+      b: 'boolean[]',
+    },
+  })
+
+  const docId = await insert(db, {
+    strings: ['Albus', 'Percival', 'Wulfric', 'Brian'],
+    num: [3, 5, 7, 35],
+    b: [true, true, true],
+  })
+  t.ok(docId)
+
+  const removed = await remove(db, docId)
+  t.ok(removed)
+})
+
+t.test('serialization should support array as well', async t => {
+  t.plan(2)
+
+  const db = await create({
+    schema: {
+      strings: 'string[]',
+      num: 'number[]',
+      b: 'boolean[]',
+    },
+  })
+  const docId = await insert(db, {
+    strings: ['Albus', 'Percival', 'Wulfric', 'Brian'],
+    num: [3, 5, 7, 35],
+    b: [true, true, true],
+  })
+  t.ok(docId)
+
+  const raw = await save(db)
+  const db2 = await create({
+    schema: {
+      strings: 'string[]',
+      num: 'number[]',
+      b: 'boolean[]',
+    },
+  })
+  await load(db2, raw)
+
+  const doc = await getByID(db, docId)
+  t.strictSame(doc, {
+    strings: [ 'Albus', 'Percival', 'Wulfric', 'Brian' ],
+    num: [ 3, 5, 7, 35 ],
+    b: [ true, true, true ]
+  })
+})
+
+t.test('update supports array as well', async t => {
+  t.plan(2)
+
+  const db = await create({
+    schema: {
+      strings: 'string[]',
+      num: 'number[]',
+      b: 'boolean[]',
+    },
+  })
+  const docId = await insert(db, {
+    strings: ['Albus', 'Percival', 'Wulfric', 'Brian'],
+    num: [3, 5, 7, 35],
+    b: [true, true, true],
+  })
+  t.ok(docId)
+
+  const newDocId = await update(db, docId, {
+    strings: ['Harry', 'James', 'Potter'],
+    num: [2, 3],
+    b: [false, true],
+  })
+  t.ok(newDocId)
 })
 
 async function checkSearchTerm(t, db, term, expectedIds) {
