@@ -1,3 +1,4 @@
+import { isArrayType } from '../components.js'
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { trackInsertion } from '../components/sync-blocking-checker.js'
 import { createError } from '../errors.js'
@@ -35,7 +36,7 @@ export async function insert(orama: Orama, doc: Document, language?: string, ski
     const actualType = typeof value
     const expectedType = indexablePropertiesWithTypes[key]
 
-    if (expectedType.endsWith('[]') && Array.isArray(value)) {
+    if (isArrayType(expectedType) && Array.isArray(value)) {
       continue
     }
 
@@ -52,7 +53,16 @@ export async function insert(orama: Orama, doc: Document, language?: string, ski
       continue
     }
 
-    await orama.index.beforeInsert?.(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)
+    await orama.index.beforeInsert?.(
+      orama.data.index,
+      prop,
+      id,
+      value,
+      expectedType,
+      language,
+      orama.tokenizer,
+      docsCount,
+    )
     await orama.index.insert(
       orama.index,
       orama.data.index,
@@ -64,7 +74,16 @@ export async function insert(orama: Orama, doc: Document, language?: string, ski
       orama.tokenizer,
       docsCount,
     )
-    await orama.index.afterInsert?.(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)
+    await orama.index.afterInsert?.(
+      orama.data.index,
+      prop,
+      id,
+      value,
+      expectedType,
+      language,
+      orama.tokenizer,
+      docsCount,
+    )
   }
 
   if (!skipHooks) {

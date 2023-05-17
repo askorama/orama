@@ -18,9 +18,11 @@ export interface Schema extends Record<string, SearchableType | Schema> {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Document extends Record<string, SearchableValue | Document | unknown> {}
 
-export type SearchableType = 'string' | 'number' | 'boolean' | 'string[]' | 'number[]' | 'boolean[]'
+export type ScalarSearchableType = 'string' | 'number' | 'boolean'
+export type ArraySearchableType = 'string[]' | 'number[]' | 'boolean[]'
+export type SearchableType = ScalarSearchableType | ArraySearchableType
 
-export type SearchableValue = string | number | boolean | Array<string> | Array<number> | Array<boolean>
+export type SearchableValue = string | number | boolean | string[] | number[] | boolean[]
 
 export type BM25Params = {
   k?: number
@@ -289,6 +291,7 @@ export type IIndexInsertOrRemoveHookFunction<I extends OpaqueIndex = OpaqueIndex
   prop: string,
   id: string,
   value: SearchableValue,
+  type: SearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number,

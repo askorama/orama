@@ -1,5 +1,5 @@
 import { createError } from '../errors.js'
-import { Document, ElapsedTime, Schema } from '../types.js'
+import { ArraySearchableType, Document, ElapsedTime, ScalarSearchableType, Schema, SearchableType } from '../types.js'
 import { uniqueId, formatNanoseconds } from '../utils.js'
 
 export { getDocumentProperties } from '../utils.js'
@@ -27,11 +27,11 @@ export async function validateSchema<S extends Schema = Schema>(doc: Document, s
   for (const [prop, type] of Object.entries(schema)) {
     const value = doc[prop]
 
-    if (typeof type === 'string' && type.endsWith('[]')) {
+    if (typeof type === 'string' && isArrayType(type)) {
       if (!Array.isArray(value)) {
         return false
       }
-      const expectedType = type.slice(0, -2)
+      const expectedType = getInnerType(type as ArraySearchableType)
 
       const valueLength = value.length
       for (let i = 0; i < valueLength; i++) {
@@ -59,4 +59,24 @@ export async function validateSchema<S extends Schema = Schema>(doc: Document, s
   }
 
   return true
+}
+
+const IS_ARRAY_TYPE: Record<SearchableType, boolean> = {
+  'string': false,
+  'number': false,
+  'boolean': false,
+  'string[]': true,
+  'number[]': true,
+  'boolean[]': true,
+}
+const INNER_TYPE: Record<ArraySearchableType, ScalarSearchableType> = {
+  'string[]': 'string',
+  'number[]': 'number',
+  'boolean[]': 'boolean',
+}
+export function isArrayType(type: SearchableType) {
+  return IS_ARRAY_TYPE[type]
+}
+export function getInnerType(type: ArraySearchableType): ScalarSearchableType {
+  return INNER_TYPE[type]
 }

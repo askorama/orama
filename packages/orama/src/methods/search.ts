@@ -107,9 +107,8 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
     const propertiesToSearchWithTypes = await orama.index.getSearchablePropertiesWithTypes(index)
 
     propertiesToSearch = await orama.index.getSearchableProperties(index)
-    propertiesToSearch = propertiesToSearch.filter(
-      (prop: string) =>
-        propertiesToSearchWithTypes[prop] === 'string' || propertiesToSearchWithTypes[prop] === 'string[]',
+    propertiesToSearch = propertiesToSearch.filter((prop: string) =>
+      propertiesToSearchWithTypes[prop].startsWith('string'),
     )
 
     orama.caches['propertiesToSearch'] = propertiesToSearch

@@ -17,6 +17,7 @@ import {
   removeDocumentByWord as radixRemoveDocument,
 } from '../trees/radix.js'
 import {
+  ArraySearchableType,
   BM25Params,
   ComparisonOperator,
   IIndex,
@@ -31,6 +32,7 @@ import {
 } from '../types.js'
 import { intersect } from '../utils.js'
 import { BM25 } from './algorithms.js'
+import { getInnerType, isArrayType } from './defaults.js'
 
 export type FrequencyMap = {
   [property: string]: {
@@ -254,16 +256,16 @@ export async function insert(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<void> {
-  if (!schemaType.endsWith('[]')) {
+  if (!isArrayType(schemaType)) {
     return insertScalar(implementation, index, prop, id, value, schemaType, language, tokenizer, docsCount)
   }
 
-  const innerSchemaType = schemaType.slice(0, -2) as SearchableType
+  const innerSchemaType = getInnerType(schemaType as ArraySearchableType)
 
   const elements = value as Array<string | number | boolean>
   const elementsLength = elements.length
   for (let i = 0; i < elementsLength; i++) {
-    insert(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer, docsCount)
+    insertScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer, docsCount)
   }
 }
 
