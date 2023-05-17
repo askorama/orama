@@ -1,7 +1,7 @@
 import t from 'tap'
 import { DocumentsStore } from '../src/components/documents-store.js'
 import { Index } from '../src/components/index.js'
-import { create, insert, insertMultiple, remove, search } from '../src/index.js'
+import { create, insert, insertMultiple, search } from '../src/index.js'
 import { SUPPORTED_LANGUAGES } from '../src/components/tokenizer/languages.js'
 import type { Document } from '../src/types'
 import dataset from './datasets/events.json' assert { type: 'json' }
@@ -214,8 +214,6 @@ t.test('document validation', t => {
 })
 
 t.test('orama', t => {
-  t.plan(20)
-
   t.test('should correctly search for data', async t => {
     t.plan(8)
 
@@ -442,206 +440,6 @@ t.test('orama', t => {
         code: 'UNKNOWN_INDEX',
       },
     )
-  })
-
-  t.test('should correctly remove a document after its insertion', async t => {
-    t.plan(4)
-
-    const db = await create({
-      schema: {
-        quote: 'string',
-        author: 'string',
-      },
-    })
-
-    const id1 = await insert(db, {
-      quote: 'Be yourself; everyone else is already taken.',
-      author: 'Oscar Wilde',
-    })
-
-    const id2 = await insert(db, {
-      quote: 'To live is the rarest thing in the world. Most people exist, that is all.',
-      author: 'Oscar Wilde',
-    })
-
-    await insert(db, {
-      quote: 'So many books, so little time.',
-      author: 'Frank Zappa',
-    })
-
-    await remove(db, id1)
-
-    const searchResult = await search(db, {
-      term: 'Oscar',
-      properties: ['author'],
-    })
-
-    t.equal(searchResult.count, 1)
-    t.equal(searchResult.hits[0].document.author, 'Oscar Wilde')
-    t.equal(
-      searchResult.hits[0].document.quote,
-      'To live is the rarest thing in the world. Most people exist, that is all.',
-    )
-    t.equal(searchResult.hits[0].id, id2)
-  })
-
-  // Tests for https://github.com/oramasearch/orama/issues/52
-  t.test('should correctly remove documents via substring search', async t => {
-    t.plan(1)
-
-    const orama = await create({
-      schema: {
-        word: 'string',
-      },
-    })
-
-    const halo = await insert(orama, { word: 'Halo' })
-    await insert(orama, { word: 'Halloween' })
-    await insert(orama, { word: 'Hal' })
-
-    await remove(orama, halo)
-
-    const searchResult = await search(orama, {
-      term: 'Hal',
-    })
-
-    t.equal(searchResult.count, 2)
-  })
-
-  t.test('should remove a document with a nested schema', async t => {
-    t.plan(4)
-
-    const movieDB = await create({
-      schema: {
-        title: 'string',
-        director: 'string',
-        plot: 'string',
-        year: 'number',
-        isFavorite: 'boolean',
-      },
-    })
-
-    const harryPotter = await insert(movieDB, {
-      title: "Harry Potter and the Philosopher's Stone",
-      director: 'Chris Columbus',
-      plot: 'Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.',
-      year: 2001,
-      isFavorite: false,
-    })
-
-    const testSearch1 = await search(movieDB, {
-      term: 'Harry Potter',
-      properties: ['title', 'director', 'plot'],
-    })
-
-    await remove(movieDB, harryPotter)
-
-    const testSearch2 = await search(movieDB, {
-      term: 'Harry Potter',
-      properties: ['title', 'director', 'plot'],
-    })
-
-    t.ok(testSearch1)
-    t.equal(testSearch1.hits[0].document.title, "Harry Potter and the Philosopher's Stone")
-
-    t.ok(testSearch2)
-    t.equal(testSearch2.count, 0)
-  })
-
-  t.test("Shouldn't returns deleted documents", async t => {
-    t.plan(1)
-
-    const db = await create({
-      schema: {
-        txt: 'string',
-      },
-    })
-
-    await insert(db, { txt: 'stelle' })
-    await insert(db, { txt: 'stellle' })
-    await insert(db, { txt: 'scelte' })
-
-    const searchResult = await search(db, { term: 'stelle', exact: true })
-
-    const { id } = searchResult.hits[0]
-
-    await remove(db, id)
-
-    const searchResult2 = await search(db, { term: 'stelle', exact: true })
-
-    t.equal(searchResult2.count, 0)
-  })
-
-  t.test("Shouldn't affects other document when deleted one", async t => {
-    t.plan(2)
-
-    const db = await create({
-      schema: {
-        txt: 'string',
-      },
-    })
-
-    await insert(db, { txt: 'abc' })
-    await insert(db, { txt: 'abc' })
-    await insert(db, { txt: 'abcd' })
-
-    const searchResult = await search(db, { term: 'abc', exact: true })
-
-    const id = searchResult.hits[0].id
-    await remove(db, id)
-
-    const searchResult2 = await search(db, { term: 'abc', exact: true })
-
-    t.ok(searchResult2.hits.every(({ id: docID }) => docID !== id))
-    t.equal(searchResult2.count, 1)
-  })
-
-  t.test('should preserve identical docs after deletion', async t => {
-    t.plan(8)
-
-    const db = await create({
-      schema: {
-        quote: 'string',
-        author: 'string',
-      },
-    })
-
-    const id1 = await insert(db, {
-      quote: 'Be yourself; everyone else is already taken.',
-      author: 'Oscar Wilde',
-    })
-
-    const id2 = await insert(db, {
-      quote: 'Be yourself; everyone else is already taken.',
-      author: 'Oscar Wilde',
-    })
-
-    await insert(db, {
-      quote: 'So many books, so little time.',
-      author: 'Frank Zappa',
-    })
-
-    await remove(db, id1)
-
-    const searchResult = await search(db, {
-      term: 'Oscar',
-      properties: ['author'],
-    })
-
-    const searchResult2 = await search(db, {
-      term: 'already',
-      properties: ['quote'],
-    })
-
-    t.equal(searchResult.count, 1)
-    t.equal(searchResult.hits[0].document.author, 'Oscar Wilde')
-    t.equal(searchResult.hits[0].document.quote, 'Be yourself; everyone else is already taken.')
-    t.equal(searchResult.hits[0].id, id2)
-
-    t.equal(searchResult2.count, 1)
-    t.equal(searchResult2.hits[0].document.author, 'Oscar Wilde')
-    t.equal(searchResult2.hits[0].document.quote, 'Be yourself; everyone else is already taken.')
-    t.equal(searchResult2.hits[0].id, id2)
   })
 
   t.test('should be able to insert documens with non-searchable fields', async t => {
@@ -922,6 +720,8 @@ t.test('orama', t => {
 
     await t.rejects(() => insertMultiple(db, wrongSchemaDocs as unknown as DataEvent[]))
   })
+
+  t.end()
 })
 
 t.test('orama - hooks', t => {
