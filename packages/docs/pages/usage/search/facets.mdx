@@ -177,3 +177,35 @@ In the search result, `boolean` facets will be returned as an `object` with the 
   }
 }
 ```
+
+### How facets works on array fields
+
+Orama treats each array element as a single element of the facet:
+
+```javascript copy
+const db = await create({
+  schema: {
+    name: 'string[]',
+  },
+})
+await insert(db, {
+  name: ['Albus', 'Percival Wulfric Brian'],
+})
+
+const results = await search(db, {
+  facets: {
+    'name': {},
+  }
+})
+```
+
+`result.facets` is the following object:
+```json
+{
+  "count": 2,
+  "values": {
+    "Albus": 1,
+    "Percival Wulfric Brian": 1
+  }
+}
+```

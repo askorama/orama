@@ -71,7 +71,8 @@ await uniqueId() // 37149225-243
 
 If you cannot use set `moduleResolution` to `nodenext` or `node16` in the `tsconfig.json`, you can import internals directly from the main entrypoint:
 
-```
+```typescript
 import { internals } from '@orama/orama'
 
 await internals.boundedLevenshtein()
+```
