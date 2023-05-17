@@ -4,6 +4,7 @@ import type {
   NumberFacetDefinition,
   Orama,
   SearchParams,
+  SearchableValue,
   StringFacetDefinition,
   TokenScore,
 } from '../types.js'
@@ -56,23 +57,37 @@ export async function getFacets(
     for (const facet of facetKeys) {
       const facetValue = facet.includes('.')
         ? (await getNested<string>(doc!, facet))!
-        : (doc![facet] as number | boolean)
+        : (doc![facet] as SearchableValue)
 
-      // Range facets based on numbers
-      if (properties[facet] === 'number') {
-        for (const range of (facetsConfig[facet] as NumberFacetDefinition).ranges) {
-          if ((facetValue as number) >= range.from && (facetValue as number) <= range.to) {
-            if (facets[facet].values[`${range.from}-${range.to}`] === undefined) {
-              facets[facet].values[`${range.from}-${range.to}`] = 1
-            } else {
-              facets[facet].values[`${range.from}-${range.to}`]++
-            }
-          }
+      const propertyType = properties[facet]
+      switch (propertyType) {
+        case 'number': {
+          const ranges = (facetsConfig[facet] as NumberFacetDefinition).ranges
+          calculateNumberFacet(ranges, facets[facet].values, facetValue as number)
+          break
         }
-      } else {
-        // String or boolean based facets
-        const value = facetValue?.toString() ?? (properties[facet] === 'boolean' ? 'false' : '')
-        facets[facet].values[value] = (facets[facet].values[value] ?? 0) + 1
+        case 'number[]': {
+          const alreadyInsertedValues = new Set<string>()
+          const ranges = (facetsConfig[facet] as NumberFacetDefinition).ranges
+          for (const v of facetValue as Array<number>) {
+            calculateNumberFacet(ranges, facets[facet].values, v, alreadyInsertedValues)
+          }
+          break
+        }
+        case 'boolean':
+        case 'string': {
+          calculateBooleanOrStringFacet(facets[facet].values, facetValue as string | boolean, propertyType)
+          break
+        }
+        case 'boolean[]':
+        case 'string[]': {
+          const alreadyInsertedValues = new Set<string>()
+          const innerType = propertyType === 'boolean[]' ? 'boolean' : 'string'
+          for (const v of facetValue as Array<string | boolean>) {
+            calculateBooleanOrStringFacet(facets[facet].values, v, innerType, alreadyInsertedValues)
+          }
+          break
+        }
       }
     }
   }
@@ -94,4 +109,47 @@ export async function getFacets(
   }
 
   return facets
+}
+
+function calculateNumberFacet(
+  ranges: NumberFacetDefinition['ranges'],
+  values: Record<string, number>,
+  facetValue: number,
+  alreadyInsertedValues?: Set<string>,
+) {
+  for (const range of ranges) {
+    const value = `${range.from}-${range.to}`
+    if (alreadyInsertedValues && alreadyInsertedValues.has(value)) {
+      continue
+    }
+
+    if (facetValue >= range.from && facetValue <= range.to) {
+      if (values[value] === undefined) {
+        values[value] = 1
+      } else {
+        values[value]++
+
+        if (alreadyInsertedValues) {
+          alreadyInsertedValues.add(value)
+        }
+      }
+    }
+  }
+}
+
+function calculateBooleanOrStringFacet(
+  values: Record<string, number>,
+  facetValue: string | boolean,
+  propertyType: 'string' | 'boolean',
+  alreadyInsertedValues?: Set<string>,
+) {
+  // String or boolean based facets
+  const value = facetValue?.toString() ?? (propertyType === 'boolean' ? 'false' : '')
+  if (alreadyInsertedValues && alreadyInsertedValues.has(value)) {
+    return
+  }
+  values[value] = (values[value] ?? 0) + 1
+  if (alreadyInsertedValues) {
+    alreadyInsertedValues.add(value)
+  }
 }

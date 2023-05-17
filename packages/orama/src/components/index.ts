@@ -17,11 +17,13 @@ import {
   removeDocumentByWord as radixRemoveDocument,
 } from '../trees/radix.js'
 import {
+  ArraySearchableType,
   BM25Params,
   ComparisonOperator,
   IIndex,
   OpaqueIndex,
   Orama,
+  ScalarSearchableType,
   Schema,
   SearchableType,
   SearchableValue,
@@ -31,6 +33,7 @@ import {
 } from '../types.js'
 import { intersect } from '../utils.js'
 import { BM25 } from './algorithms.js'
+import { getInnerType, isArrayType } from './defaults.js'
 
 export type FrequencyMap = {
   [property: string]: {
@@ -184,18 +187,20 @@ export async function create(
 
     switch (type) {
       case 'boolean':
+      case 'boolean[]':
         index.indexes[path] = { true: [], false: [] }
         break
       case 'number':
+      case 'number[]':
         index.indexes[path] = avlCreate<number, string[]>(0, [])
         break
       case 'string':
+      case 'string[]':
         index.indexes[path] = radixCreate()
         index.avgFieldLength[path] = 0
         index.frequencies[path] = {}
         index.tokenOccurrencies[path] = {}
         index.fieldLengths[path] = {}
-
         break
       default:
         throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : typeActualType)
@@ -208,32 +213,98 @@ export async function create(
   return index
 }
 
+async function insertScalar(
+  implementation: IIndex<Index>,
+  index: Index,
+  prop: string,
+  id: string,
+  value: SearchableValue,
+  schemaType: ScalarSearchableType,
+  language: string | undefined,
+  tokenizer: Tokenizer,
+  docsCount: number,
+): Promise<void> {
+  switch (schemaType) {
+    case 'boolean':
+      (index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].push(id)
+      break
+    case 'number':
+      avlInsert(index.indexes[prop] as AVLNode<number, string[]>, value as number, [id])
+      break
+    case 'string': {
+      const tokens = await tokenizer.tokenize(value as string, language, prop)
+      await implementation.insertDocumentScoreParameters(index, prop, id, tokens, docsCount)
+
+      for (const token of tokens) {
+        await implementation.insertTokenScoreParameters(index, prop, id, tokens, token)
+
+        radixInsert(index.indexes[prop] as RadixNode, token, id)
+      }
+
+      break
+    }
+  }
+}
+
 export async function insert(
   implementation: IIndex<Index>,
   index: Index,
   prop: string,
   id: string,
   value: SearchableValue,
+  schemaType: SearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<void> {
-  if (typeof value === 'number') {
-    avlInsert(index.indexes[prop] as AVLNode<number, string[]>, value as number, [id])
-    return
-  } else if (typeof value === 'boolean') {
-    // eslint-disable-next-line @typescript-eslint/no-extra-semi
-    ;(index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].push(id)
-    return
+  if (!isArrayType(schemaType)) {
+    return insertScalar(implementation, index, prop, id, value, schemaType as ScalarSearchableType, language, tokenizer, docsCount)
   }
 
-  const tokens = await tokenizer.tokenize(value as string, language, prop)
+  const innerSchemaType = getInnerType(schemaType as ArraySearchableType)
 
-  await implementation.insertDocumentScoreParameters(index, prop, id, tokens, docsCount)
+  const elements = value as Array<string | number | boolean>
+  const elementsLength = elements.length
+  for (let i = 0; i < elementsLength; i++) {
+    await insertScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer, docsCount)
+  }
+}
 
-  for (const token of tokens) {
-    await implementation.insertTokenScoreParameters(index, prop, id, tokens, token)
-    radixInsert(index.indexes[prop] as RadixNode, token, id)
+async function removeScalar(
+  implementation: IIndex<Index>,
+  index: Index,
+  prop: string,
+  id: string,
+  value: SearchableValue,
+  schemaType: ScalarSearchableType,
+  language: string | undefined,
+  tokenizer: Tokenizer,
+  docsCount: number,
+): Promise<boolean> {
+  switch (schemaType) {
+    case 'number': {
+      avlRemoveDocument(index.indexes[prop] as AVLNode<number, string[]>, id, value)
+      return true
+    }
+    case 'boolean': {
+      const booleanKey = value ? 'true' : 'false'
+      const position = (index.indexes[prop] as BooleanIndex)[booleanKey].indexOf(id)
+
+      ;(index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].splice(position, 1)
+      return true
+    }
+    case 'string': {
+      const tokens = await tokenizer.tokenize(value as string, language, prop)
+
+      await implementation.removeDocumentScoreParameters(index, prop, id, docsCount)
+
+      for (const token of tokens) {
+        await implementation.removeTokenScoreParameters(index, prop, token)
+        radixRemoveDocument(index.indexes[prop] as RadixNode, token, id)
+      }
+
+      return true
+    }
   }
 }
 
@@ -243,28 +314,21 @@ export async function remove(
   prop: string,
   id: string,
   value: SearchableValue,
+  schemaType: SearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<boolean> {
-  if (typeof value === 'number') {
-    avlRemoveDocument(index.indexes[prop] as AVLNode<number, string[]>, id, value)
-    return true
-  } else if (typeof value === 'boolean') {
-    const booleanKey = value ? 'true' : 'false'
-    const position = (index.indexes[prop] as BooleanIndex)[booleanKey].indexOf(id)
-
-    ;(index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].splice(position, 1)
-    return true
+  if (!isArrayType(schemaType)) {
+    return removeScalar(implementation, index, prop, id, value, schemaType as ScalarSearchableType, language, tokenizer, docsCount)
   }
 
-  const tokens = await tokenizer.tokenize(value as string, language, prop)
+  const innerSchemaType = getInnerType(schemaType as ArraySearchableType)
 
-  await implementation.removeDocumentScoreParameters(index, prop, id, docsCount)
-
-  for (const token of tokens) {
-    await implementation.removeTokenScoreParameters(index, prop, token)
-    radixRemoveDocument(index.indexes[prop] as RadixNode, token, id)
+  const elements = value as Array<string | number | boolean>
+  const elementsLength = elements.length
+  for (let i = 0; i < elementsLength; i++) {
+    await removeScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer, docsCount)
   }
 
   return true
@@ -382,9 +446,7 @@ export async function getSearchableProperties(index: Index): Promise<string[]> {
   return index.searchableProperties
 }
 
-export async function getSearchablePropertiesWithTypes(
-  index: Index,
-): Promise<Record<string, 'string' | 'number' | 'boolean'>> {
+export async function getSearchablePropertiesWithTypes(index: Index): Promise<Record<string, SearchableType>> {
   return index.searchablePropertiesWithTypes
 }
 

@@ -52,6 +52,20 @@ const movieDB = await create({
 })
 ```
 
+## Multivalue fields
+
+Orama also supports arrays as fields as well.
+
+```javascript copy
+const db = await create({
+  schema: {
+    name: 'string[]',
+    numbers: 'number[]',
+    booleans: 'boolean[]',
+  },
+})
+```
+
 ## Instance ID
 
 Every Orama instance has a unique `id` property, which can be used to identify a given instance when working with multiple databases.

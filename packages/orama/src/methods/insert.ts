@@ -1,3 +1,4 @@
+import { isArrayType } from '../components.js'
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { trackInsertion } from '../components/sync-blocking-checker.js'
 import { createError } from '../errors.js'
@@ -35,6 +36,10 @@ export async function insert(orama: Orama, doc: Document, language?: string, ski
     const actualType = typeof value
     const expectedType = indexablePropertiesWithTypes[key]
 
+    if (isArrayType(expectedType) && Array.isArray(value)) {
+      continue
+    }
+
     if (actualType !== expectedType) {
       throw createError('INVALID_DOCUMENT_PROPERTY', key, expectedType, actualType)
     }
@@ -42,14 +47,43 @@ export async function insert(orama: Orama, doc: Document, language?: string, ski
 
   for (const prop of indexableProperties) {
     const value = values[prop]
+    const expectedType = indexablePropertiesWithTypes[prop]
 
     if (typeof value === 'undefined') {
       continue
     }
 
-    await orama.index.beforeInsert?.(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)
-    await orama.index.insert(orama.index, orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)
-    await orama.index.afterInsert?.(orama.data.index, prop, id, value, language, orama.tokenizer, docsCount)
+    await orama.index.beforeInsert?.(
+      orama.data.index,
+      prop,
+      id,
+      value,
+      expectedType,
+      language,
+      orama.tokenizer,
+      docsCount,
+    )
+    await orama.index.insert(
+      orama.index,
+      orama.data.index,
+      prop,
+      id,
+      value,
+      expectedType,
+      language,
+      orama.tokenizer,
+      docsCount,
+    )
+    await orama.index.afterInsert?.(
+      orama.data.index,
+      prop,
+      id,
+      value,
+      expectedType,
+      language,
+      orama.tokenizer,
+      docsCount,
+    )
   }
 
   if (!skipHooks) {

@@ -1,5 +1,5 @@
 import { createError } from '../errors.js'
-import { Document, ElapsedTime, Schema } from '../types.js'
+import { ArraySearchableType, Document, ElapsedTime, ScalarSearchableType, Schema, SearchableType } from '../types.js'
 import { uniqueId, formatNanoseconds } from '../utils.js'
 
 export { getDocumentProperties } from '../utils.js'
@@ -25,20 +25,58 @@ export async function getDocumentIndexId(doc: Document): Promise<string> {
 
 export async function validateSchema<S extends Schema = Schema>(doc: Document, schema: S): Promise<boolean> {
   for (const [prop, type] of Object.entries(schema)) {
+    const value = doc[prop]
+
+    if (typeof type === 'string' && isArrayType(type)) {
+      if (!Array.isArray(value)) {
+        return false
+      }
+      const expectedType = getInnerType(type as ArraySearchableType)
+
+      const valueLength = value.length
+      for (let i = 0; i < valueLength; i++) {
+        if (typeof value[i] !== expectedType) {
+          return false
+        }
+      }
+
+      continue
+    }
+
     if (typeof type === 'object') {
-      if (!doc[prop] || (typeof doc[prop] !== 'object' && Array.isArray(doc[prop]))) {
+      if (!value || typeof value !== 'object') {
         return false
       }
 
-      if (!validateSchema(doc[prop] as Document, type)) {
+      if (!validateSchema(value as Document, type)) {
         return false
       }
     }
 
-    if (typeof doc[prop] !== type) {
+    if (typeof value !== type) {
       return false
     }
   }
 
   return true
+}
+
+const IS_ARRAY_TYPE: Record<SearchableType, boolean> = {
+  'string': false,
+  'number': false,
+  'boolean': false,
+  'string[]': true,
+  'number[]': true,
+  'boolean[]': true,
+}
+const INNER_TYPE: Record<ArraySearchableType, ScalarSearchableType> = {
+  'string[]': 'string',
+  'number[]': 'number',
+  'boolean[]': 'boolean',
+}
+export function isArrayType(type: SearchableType) {
+  return IS_ARRAY_TYPE[type]
+}
+export function getInnerType(type: ArraySearchableType): ScalarSearchableType {
+  return INNER_TYPE[type]
 }
