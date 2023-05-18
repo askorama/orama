@@ -39,6 +39,8 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
     await runSingleHook(orama.afterRemove, orama, id)
   }
 
+  await orama.documentsStore.remove(orama.data.docs, id)
+
   trackRemoval(orama)
   return result
 }

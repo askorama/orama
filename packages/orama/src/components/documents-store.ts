@@ -48,7 +48,7 @@ export async function remove(store: DocumentsStore, id: string): Promise<boolean
     return false
   }
 
-  store.docs[id] = undefined
+  delete store.docs[id]
   store.count--
 
   return true

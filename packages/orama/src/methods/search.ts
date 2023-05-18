@@ -180,6 +180,11 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
         }
       }
     }
+  } else if (tokens.length === 0 && term) {
+    // This case is hard to handle correctly.
+    // For the time being, if tokenizer returns empty array but the term is not empty,
+    // we returns an empty result set
+    context.uniqueDocsIDs = {}
   } else {
     context.uniqueDocsIDs = Object.fromEntries(
       Object.keys(await orama.documentsStore.getAll(orama.data.docs)).map(k => [k, 0]),

@@ -65,7 +65,6 @@ function tokenize(this: DefaultTokenizer, input: string, language?: string, prop
     .split(splitRule)
     .map(this.normalizeToken.bind(this, prop ?? ''))
     .filter(Boolean)
-
   const trimTokens = trim(tokens)
 
   if (!this.allowDuplicates) {

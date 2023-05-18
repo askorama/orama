@@ -5,7 +5,10 @@ import { createError } from '../errors.js'
 import { Document, Orama } from '../types.js'
 
 export async function insert(orama: Orama, doc: Document, language?: string, skipHooks?: boolean): Promise<string> {
-  await orama.validateSchema(doc, orama.schema)
+  const errorProperty = await orama.validateSchema(doc, orama.schema)
+  if (errorProperty) {
+    throw createError('SCHEMA_VALIDATION_FAILURE', errorProperty)
+  }
   const { index, docs } = orama.data
 
   const id = await orama.getDocumentIndexId(doc)

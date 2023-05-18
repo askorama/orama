@@ -137,7 +137,6 @@ export function insert(root: Node, word: string, docId: string) {
 
       const commonPrefix = getCommonPrefix(edgeLabel, wordAtIndex)
       const commonPrefixLength = commonPrefix.length
-      const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength]
 
       // the wordAtIndex matches exactly with an existing child node
       if (edgeLabel === wordAtIndex) {
@@ -146,6 +145,7 @@ export function insert(root: Node, word: string, docId: string) {
         return
       }
 
+      const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength]
       // the wordAtIndex is completely contained in the child node subword
       if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
         const newNode = create(true, wordAtIndex, currentCharacter) // Create a new node with end set to true

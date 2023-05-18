@@ -281,7 +281,9 @@ Depending on the use case the component must return a value. Orama will await if
 
 ### `validateSchema`
 
-The component is used to validate a document against the schema. The function should return `true` if the document is valid according to the schema, `false` otherwise.
+The component is used to validate a document against the schema.
+The function should return `undefined` if the document is valid according to the schema,
+the path of the invalid property otherwise.
 
 The function will receive two arguments:
 

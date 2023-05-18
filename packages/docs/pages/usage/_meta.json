@@ -1,7 +1,7 @@
 {
   "create": "Create",
   "insert": "Insert",
-  "delete": "Delete",
+  "remove": "Remove",
   "update": "Update",
   "utilities": "Utilities",
   "search": "Search"
