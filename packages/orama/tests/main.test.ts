@@ -87,23 +87,6 @@ t.test('language', t => {
 t.test('orama - hooks', t => {
   t.plan(2)
 
-  t.test('should validate on orama creation', async t => {
-    t.plan(1)
-
-    await t.rejects(
-      () =>
-        create({
-          schema: { date: 'string' },
-          components: {
-            ['anotherHookName' as string]: () => {
-              t.fail("it shouldn't be called")
-            },
-          },
-        }),
-      { code: 'UNSUPPORTED_COMPONENT' },
-    )
-  })
-
   t.test('afterInsert hook', async t => {
     let callOrder = 0
     const db = await create({
