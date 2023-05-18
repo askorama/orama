@@ -37,7 +37,7 @@ t.test('remove method', t => {
       t.ok(await getByID(db, id4))
 
       const result = await search(db, {
-        term: '*',
+        term: '',
       })
       t.equal(result.count, 3)
 
