@@ -9,6 +9,11 @@ export async function insert(orama: Orama, doc: Document, language?: string, ski
   if (errorProperty) {
     throw createError('SCHEMA_VALIDATION_FAILURE', errorProperty)
   }
+
+  return innerInsert(orama, doc, language, skipHooks)
+}
+
+async function innerInsert(orama: Orama, doc: Document, language?: string, skipHooks?: boolean): Promise<string> {
   const { index, docs } = orama.data
 
   const id = await orama.getDocumentIndexId(doc)
@@ -105,16 +110,35 @@ export async function insertMultiple(
   language?: string,
   skipHooks?: boolean,
 ): Promise<string[]> {
-  if (!batchSize) {
-    batchSize = 1000
-  }
-
   if (!skipHooks) {
     await runMultipleHook(orama.beforeMultipleInsert, orama, docs)
   }
 
-  const ids: string[] = []
+  // Validate all documents before the insertion
+  const docsLength = docs.length
+  for (let i = 0; i < docsLength; i++) {
+    const errorProperty = await orama.validateSchema(docs[i], orama.schema)
+    if (errorProperty) {
+      throw createError('SCHEMA_VALIDATION_FAILURE', errorProperty)
+    }
+  }
 
+  return innerInsertMultiple(orama, docs, batchSize, language, skipHooks)
+}
+
+
+export async function innerInsertMultiple(
+  orama: Orama,
+  docs: Document[],
+  batchSize?: number,
+  language?: string,
+  skipHooks?: boolean,
+): Promise<string[]> {
+  if (!batchSize) {
+    batchSize = 1000
+  }
+
+  const ids: string[] = []
   await new Promise<void>((resolve, reject) => {
     let i = 0
     async function _insertMultiple() {

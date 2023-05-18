@@ -1,11 +1,11 @@
 import t from 'tap'
-import { create, insert, getByID, update, updateMultiple } from '../src/index.js'
+import { create, insert, getByID, update, updateMultiple, count } from '../src/index.js'
 
 t.test('update method', t => {
   t.plan(1)
 
   t.test('should remove a document the old document and insert the new one', async t => {
-    t.plan(2)
+    t.plan(3)
 
     const db = await create({
       schema: {
@@ -38,41 +38,69 @@ t.test('update method', t => {
 
     const newDoc = await getByID(db, newDocId)
     t.ok(newDoc)
+
+    t.equal(await count(db), 1)
   })
 })
 
 t.test('updateMultiple', async t => {
-  const db = await create({
-    schema: {
-      quote: 'string',
-      author: 'string',
-    },
+  t.test('should update the documents', async t => {
+    const db = await create({
+      schema: {
+        quote: 'string',
+        author: 'string',
+      },
+    })
+
+    const oldDocId1 = await insert(db, {
+      quote: "Life is what happens when you're busy making other plans",
+      author: 'John Lennon',
+    })
+    const oldDocId2 = await insert(db, {
+      quote: 'What I cannot create, I do not understand',
+    })
+
+    const [id1, id2] = await updateMultiple(db, [oldDocId1, oldDocId2], [
+      {
+        quote: 'He who is brave is free',
+        author: 'Seneca',
+      },
+      {
+        quote: 'You must be the change you wish to see in the world',
+        author: 'Mahatma Gandhi',
+      }
+    ])
+
+    t.notOk(await getByID(db, oldDocId1))
+    t.notOk(await getByID(db, oldDocId2))
+
+    t.ok(await getByID(db, id1))
+    t.ok(await getByID(db, id2))
+
+    t.end()
   })
 
-  const oldDocId1 = await insert(db, {
-    quote: "Life is what happens when you're busy making other plans",
-    author: 'John Lennon',
+  t.test('should skip the update if a document is not valid', async t => {
+    const db = await create({
+      schema: {
+        quote: 'string',
+      },
+    })
+
+    const oldDocId = await insert(db, {
+      quote: "Life is what happens when you're busy making other plans",
+      author: 'John Lennon',
+    })
+
+    await t.rejects(updateMultiple(db, [oldDocId], [
+      { quote: 55 }
+    ]))
+
+    t.ok(await getByID(db, oldDocId))
+    t.equal(await count(db), 1)
+
+    t.end()
   })
-  const oldDocId2 = await insert(db, {
-    quote: 'What I cannot create, I do not understand',
-  })
-
-  const [id1, id2] = await updateMultiple(db, [oldDocId1, oldDocId2], [
-    {
-      quote: 'He who is brave is free',
-      author: 'Seneca',
-    },
-    {
-      quote: 'You must be the change you wish to see in the world',
-      author: 'Mahatma Gandhi',
-    }
-  ])
-
-  t.notOk(await getByID(db, oldDocId1))
-  t.notOk(await getByID(db, oldDocId2))
-
-  t.ok(await getByID(db, id1))
-  t.ok(await getByID(db, id2))
 
   t.end()
 })

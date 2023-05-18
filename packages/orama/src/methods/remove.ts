@@ -1,6 +1,5 @@
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { trackRemoval } from '../components/sync-blocking-checker.js'
-import { createError } from '../errors.js'
 import { Orama } from '../types.js'
 
 export async function remove(orama: Orama, id: string, language?: string, skipHooks?: boolean): Promise<boolean> {
@@ -9,7 +8,7 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
 
   const doc = await orama.documentsStore.get(docs, id)
   if (!doc) {
-    throw createError('DOCUMENT_DOES_NOT_EXIST', id)
+    return false
   }
 
   const docsCount = await orama.documentsStore.count(docs)
@@ -51,8 +50,8 @@ export async function removeMultiple(
   batchSize?: number,
   language?: string,
   skipHooks?: boolean,
-): Promise<boolean> {
-  let result = true
+): Promise<number> {
+  let result = 0
 
   if (!batchSize) {
     batchSize = 1000
@@ -74,8 +73,8 @@ export async function removeMultiple(
 
       for (const doc of batch) {
         try {
-          if (!(await remove(orama, doc, language, skipHooks))) {
-            result = false
+          if (await remove(orama, doc, language, skipHooks)) {
+            result++
           }
         } catch (err) {
           reject(err)

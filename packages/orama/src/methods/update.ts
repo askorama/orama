@@ -1,6 +1,7 @@
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
+import { createError } from '../errors.js'
 import { Document, Orama } from '../types.js'
-import { insert, insertMultiple } from './insert.js'
+import { innerInsertMultiple, insert } from './insert.js'
 import { remove, removeMultiple } from './remove.js'
 
 export async function update(
@@ -32,16 +33,21 @@ export async function updateMultiple(
   language?: string,
   skipHooks?: boolean,
 ): Promise<string[]> {
-  if (!batchSize) {
-    batchSize = 1000
-  }
-
   if (!skipHooks) {
     await runMultipleHook(orama.beforeMultipleUpdate, orama, ids)
   }
 
+  // Validate all documents before the insertion
+  const docsLength = docs.length
+  for (let i = 0; i < docsLength; i++) {
+    const errorProperty = await orama.validateSchema(docs[i], orama.schema)
+    if (errorProperty) {
+      throw createError('SCHEMA_VALIDATION_FAILURE', errorProperty)
+    }
+  }
+
   await removeMultiple(orama, ids, batchSize, language, skipHooks)
-  const newIds = await insertMultiple(orama, docs, batchSize, language, skipHooks)
+  const newIds = await innerInsertMultiple(orama, docs, batchSize, language, skipHooks)
 
   if (!skipHooks) {
     await runMultipleHook(orama.afterMultipleUpdate, orama, newIds)
