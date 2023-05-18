@@ -26,12 +26,15 @@ export async function getDocumentIndexId(doc: Document): Promise<string> {
 export async function validateSchema<S extends Schema = Schema>(doc: Document, schema: S): Promise<string | undefined> {
   for (const [prop, type] of Object.entries(schema)) {
     const value = doc[prop]
+    const typeOfValue = typeof value
 
-    if (typeof value === 'undefined') {
+    if (typeOfValue === 'undefined') {
       continue
     }
 
-    if (typeof type === 'string' && isArrayType(type)) {
+    const typeOfType = typeof type
+
+    if (typeOfType === 'string' && isArrayType(type as SearchableType)) {
       if (!Array.isArray(value)) {
         return prop
       }
@@ -47,19 +50,19 @@ export async function validateSchema<S extends Schema = Schema>(doc: Document, s
       continue
     }
 
-    if (typeof type === 'object') {
-      if (!value || typeof value !== 'object') {
+    if (typeOfType === 'object') {
+      if (!value || typeOfValue !== 'object') {
         return prop
       }
 
-      const subProp = await validateSchema(value as Document, type)
+      const subProp = await validateSchema(value as Document, type as Schema)
       if (subProp) {
         return prop + '.' + subProp
       }
       continue
     }
 
-    if (typeof value !== type) {
+    if (typeOfValue !== type) {
       return prop
     }
   }

@@ -85,8 +85,6 @@ t.test('language', t => {
 })
 
 t.test('orama - hooks', t => {
-  t.plan(2)
-
   t.test('afterInsert hook', async t => {
     let callOrder = 0
     const db = await create({
@@ -112,6 +110,8 @@ t.test('orama - hooks', t => {
     })
     t.same(++callOrder, 2)
   })
+
+  t.end()
 })
 
 t.test('custom tokenizer configuration', t => {
