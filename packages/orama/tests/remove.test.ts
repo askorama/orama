@@ -1,6 +1,6 @@
 import t from 'tap'
 import { Index } from '../src/components/index.js'
-import { remove, create, insert, getByID, search, Orama, SearchParams, removeMultiple } from '../src/index.js'
+import { remove, create, insert, getByID, search, Orama, SearchParams, removeMultiple, count } from '../src/index.js'
 
 t.test('remove method', t => {
   t.test('removes the given document', async t => {
@@ -155,7 +155,7 @@ t.test('remove method', t => {
 
   t.test('should throw an error on unknown document', async t => {
     const [db] = await createSimpleDB()
-    await t.rejects(() => remove(db, 'unknown index id'))
+    t.equal(await remove(db, 'unknown index id'), false)
     t.end()
   })
 
@@ -170,6 +170,8 @@ t.test('removeMultiple method', t => {
 
     t.ok(await getByID(db, id3))
     t.ok(await getByID(db, id4))
+
+    t.equal(await count(db), 2)
 
     t.end()
   })
@@ -187,6 +189,26 @@ t.test('removeMultiple method', t => {
     clearInterval(intervalId)
 
     t.equal(count, 5)
+
+    t.end()
+  })
+
+  t.test('should throw an error on error', async t => {
+    const db = await create({
+      schema: {
+        name: 'string',
+      },
+      components: {
+        beforeMultipleRemove: function() {
+          throw new Error('Kaboom')
+        }
+      },
+    })
+    const id1 = await insert(db, { name: 'coffee' })
+
+    await t.rejects(removeMultiple(db, [id1]), {
+      message: 'Kaboom'
+    })
 
     t.end()
   })
