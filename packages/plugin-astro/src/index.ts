@@ -3,7 +3,7 @@ import { create as createOramaDB, insert as insertIntoOramaDB, save as saveOrama
 import type { AstroConfig, AstroIntegration, RouteData } from 'astro'
 import { compile } from 'html-to-text'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { join as joinPath } from 'node:path'
+import path from 'node:path'
 
 interface AstroPage {
   pathname: string
@@ -17,6 +17,9 @@ interface AstroBuildDoneArgs {
   pages: AstroPage[]
   routes: RouteData[]
 }
+
+const isWindows = process.platform === 'win32';
+const joinPath = (isWindows ? path.win32 : path).join;
 
 export const defaultSchema: Schema = {
   path: 'string',
@@ -113,7 +116,7 @@ export function createPlugin(options: Record<string, OramaOptions>): AstroIntegr
         config = cfg
       },
       'astro:build:done': async function ({ pages, routes }: AstroBuildDoneArgs): Promise<void> {
-        const assetsDir = joinPath(config.outDir.pathname, 'assets')
+        const assetsDir = joinPath(config.outDir.pathname, 'assets').slice(isWindows ? 1 : 0);
         if (!existsSync(assetsDir)) {
           mkdirSync(assetsDir)
         }
