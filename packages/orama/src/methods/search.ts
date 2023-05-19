@@ -191,18 +191,21 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
     )
   }
 
-  // Get unique doc IDs from uniqueDocsIDs map, sorted by value.
-  let uniqueDocsArray = Object.entries(context.uniqueDocsIDs).sort(sortTokenScorePredicate)
+  // Get unique doc IDs from uniqueDocsIDs map
+  let uniqueDocsArray = Object.entries(context.uniqueDocsIDs)
 
   // If filters are enabled, we need to remove the IDs of the documents that don't match the filters.
   if (hasFilters) {
     uniqueDocsArray = intersectFilteredIDs(whereFiltersIDs, uniqueDocsArray)
   }
 
-  const resultIDs: Set<string> = new Set()
-  // Populate facets if needed
-  const facets = shouldCalculateFacets ? await getFacets(orama, uniqueDocsArray, params.facets!) : {}
+  if (params.sortByKey) {
+    uniqueDocsArray = await orama.sort.sortByKey(orama.data.sort, uniqueDocsArray, params.sortByKey)
+  } else {
+    uniqueDocsArray = uniqueDocsArray.sort(sortTokenScorePredicate)
+  }
 
+  const resultIDs: Set<string> = new Set()
   if (!isPreflight) {
     // We already have the list of ALL the document IDs containing the search terms.
     // We loop over them starting from a positional value "offset" and ending at "offset + limit"
@@ -239,6 +242,8 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   }
 
   if (shouldCalculateFacets) {
+    // Populate facets if needed
+    const facets = await getFacets(orama, uniqueDocsArray, params.facets!)
     searchResult.facets = facets
   }
 

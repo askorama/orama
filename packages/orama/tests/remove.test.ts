@@ -159,6 +159,15 @@ t.test('remove method', t => {
     t.end()
   })
 
+  t.test('should remove unindexed-document', async t => {
+    const [db] = await createSimpleDB()
+    const id5 = await insert(db, {})
+
+    await remove(db, id5)
+
+    t.end()
+  })
+
   t.end()
 })
 

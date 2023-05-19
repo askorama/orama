@@ -1,5 +1,5 @@
 import t from 'tap'
-import { Orama, create, getByID, insert, search } from '../src/index.js'
+import { Orama, create, getByID, insert, insertMultiple, remove, search } from '../src/index.js'
 
 t.test('search method', t => {
 
@@ -320,6 +320,114 @@ t.test('search method', t => {
 
       t.end()
     })
+    t.end()
+  })
+
+  t.test('with sortByKey', t => {
+    t.test('should sort correctly - asc', async t => {
+      const db = await create({
+        schema: {
+          number: 'number'
+        },
+        sortSchema: {
+          number: 'number'
+        }
+      })
+      const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
+        { number: 5 },
+        { number: 2 },
+        { number: 7 },
+        { number: 10 },
+        { number: -3 },
+        { }
+      ])
+      const result = await search(db, {
+        sortByKey: 'number'
+      })
+
+      t.strictSame(result.hits.map(d => d.id), [
+        id5, id2, id1, id3, id4, id6
+      ])
+
+      t.end()
+    })
+
+    t.test('should sort correctly - desc', async t => {
+      const db = await create({
+        schema: {
+          number: 'number'
+        },
+        sortSchema: {
+          number: 'number'
+        }
+      })
+      const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
+        { number: 5 },
+        { number: 2 },
+        { number: 7 },
+        { number: 10 },
+        { number: -3 },
+        { }
+      ])
+      const result = await search(db, {
+        sortByKey: '-number'
+      })
+
+      t.strictSame(result.hits.map(d => d.id), [
+        id4, id3, id1, id2, id5, id6
+      ])
+
+      t.end()
+    })
+
+    t.test('should work correctly also after removal', async t => {
+      const db = await create({
+        schema: { number: 'number' },
+        sortSchema: { number: 'number' }
+      })
+      const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
+        { number: 5 },
+        { number: 2 },
+        { number: 7 },
+        { number: 10 },
+        { number: -3 },
+        { }
+      ])
+      let descExpected = [ id4, id3, id1, id2, id5, id6 ]
+      let ascExpected = [ id5, id2, id1, id3, id4, id6 ]
+
+      let resultAsc = await search(db, { sortByKey: 'number' })
+      t.strictSame(resultAsc.hits.map(d => d.id), ascExpected)
+      let resultDesc = await search(db, { sortByKey: '-number' })
+      t.strictSame(resultDesc.hits.map(d => d.id), descExpected)
+
+      const elementToRemove = [id2, id1, id4, id3, id5, id6]
+      for (const idToRemove of elementToRemove) {
+        await remove(db, idToRemove)
+        descExpected = descExpected.filter(id => id !== idToRemove)
+        ascExpected = ascExpected.filter(id => id !== idToRemove)
+
+        resultAsc = await search(db, { sortByKey: 'number' })
+        t.strictSame(resultAsc.hits.map(d => d.id), ascExpected)
+        resultDesc = await search(db, { sortByKey: '-number' })
+        t.strictSame(resultDesc.hits.map(d => d.id), descExpected)
+      }
+
+      t.end()
+    })
+
+    t.test('should throw if `sortByKey` is unknown', async t => {
+      const db = await create({
+        schema: {
+          number: 'number'
+        },
+        sortSchema: {}
+      })
+      await t.rejects(search(db, { sortByKey: '-number' }))
+
+      t.end()
+    })
+
     t.end()
   })
 

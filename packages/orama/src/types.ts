@@ -13,6 +13,9 @@ export interface OpaqueIndex {}
 export interface OpaqueDocumentStore {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface OpaqueSort {}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Schema extends Record<string, SearchableType | Schema> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -22,7 +25,9 @@ export type ScalarSearchableType = 'string' | 'number' | 'boolean'
 export type ArraySearchableType = 'string[]' | 'number[]' | 'boolean[]'
 export type SearchableType = ScalarSearchableType | ArraySearchableType
 
-export type SearchableValue = string | number | boolean | string[] | number[] | boolean[]
+export type ScalarSearchableValue = string | number | boolean
+export type ArraySearchableValue = string[] | number[] | boolean[]
+export type SearchableValue = ScalarSearchableValue | ArraySearchableValue
 
 export type BM25Params = {
   k?: number
@@ -75,6 +80,10 @@ export type SearchParams = {
    * The number of matched documents to skip.
    */
   offset?: number
+  /**
+   * The key of the document used to sort the result.
+   */
+  sortByKey?: string
   /**
    * Whether to match the term exactly.
    */
@@ -373,6 +382,29 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
   save<R = unknown>(store: D): SyncOrAsyncValue<R>
 }
 
+export interface ISort<S extends OpaqueSort = OpaqueSort> {
+  create: (orama: Orama<{ Sort: S }>, schema: Schema) => SyncOrAsyncValue<S>
+  insert: (
+    sort: S,
+    prop: string,
+    id: string,
+    value: ScalarSearchableValue,
+    schemaType: ScalarSearchableType,
+    language: string | undefined,
+  ) => SyncOrAsyncValue
+
+  remove: (
+    sort: S,
+    prop: string,
+    id: string,
+  ) => SyncOrAsyncValue
+
+  sortByKey(sort: S, docIds: [string, number][], key: string): Promise<[string, number][]>
+
+  getSortableProperties(index: S): SyncOrAsyncValue<string[]>
+  getSortablePropertiesWithTypes(index: S): SyncOrAsyncValue<Record<string, ScalarSearchableType>>
+}
+
 export type Stemmer = (word: string) => string
 
 export type DefaultTokenizerConfig = {
@@ -394,6 +426,7 @@ export interface ObjectComponents {
   tokenizer: Tokenizer | DefaultTokenizerConfig
   index: IIndex
   documentsStore: IDocumentsStore
+  sort: ISort
 }
 
 export interface FunctionComponents<S extends Schema = Schema> {
@@ -438,19 +471,26 @@ export type Components = Partial<ObjectComponents & FunctionComponents & SingleO
 export const kInsertions = Symbol('orama.insertions')
 export const kRemovals = Symbol('orama.removals')
 
-type ProvidedTypes = Partial<{ Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore }>
+type ProvidedTypes = Partial<{
+  Schema: Schema;
+  Index: OpaqueIndex;
+  DocumentStore: OpaqueDocumentStore;
+  Sort: OpaqueSort;
+}>
 
-interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore> {
+interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore, S extends OpaqueSort> {
   index: I
   docs: D
+  sort: S
 }
 
-type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
+type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSort> = {
   schema: S
   tokenizer: Tokenizer
   index: IIndex<I>
   documentsStore: IDocumentsStore<D>
-  data: Data<I, D>
+  sort: ISort<So>
+  data: Data<I, D, So>
   caches: Record<string, unknown>
   [kInsertions]: number | undefined
   [kRemovals]: number | undefined
@@ -461,8 +501,8 @@ type OramaID = {
 }
 
 export type Orama<
-  P extends ProvidedTypes = { Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore },
+  P extends ProvidedTypes = { Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore, Sort: OpaqueSort },
 > = FunctionComponents &
   ArrayCallbackComponents &
-  Internals<Schema & P['Schema'], OpaqueIndex & P['Index'], OpaqueDocumentStore & P['DocumentStore']> &
+  Internals<Schema & P['Schema'], OpaqueIndex & P['Index'], OpaqueDocumentStore & P['DocumentStore'], OpaqueSort & P['Sort']> &
   OramaID

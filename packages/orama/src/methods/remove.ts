@@ -23,6 +23,11 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
 
   for (const prop of indexableProperties) {
     const value = values[prop]
+    // The document doens't contain the key
+    if (typeof value === 'undefined') {
+      continue
+    }
+
     const schemaType = indexablePropertiesWithTypes[prop]
 
     await orama.index.beforeRemove?.(orama.data.index, prop, id, value, schemaType, language, orama.tokenizer, docsCount)
@@ -32,6 +37,17 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
       result = false
     }
     await orama.index.afterRemove?.(orama.data.index, prop, id, value, schemaType, language, orama.tokenizer, docsCount)
+  }
+
+  const sortableProperties = await orama.sort.getSortableProperties(orama.data.sort)
+  const sortableValues = await orama.getDocumentProperties(doc, sortableProperties)
+  for (const prop of sortableProperties) {
+    // The document doens't contain the key
+    if (typeof sortableValues[prop] === 'undefined') {
+      continue
+    }
+
+    await orama.sort.remove(orama.data.sort, prop, id)
   }
 
   if (!skipHooks) {
