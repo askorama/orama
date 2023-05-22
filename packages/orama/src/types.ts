@@ -19,6 +19,9 @@ export interface OpaqueSort {}
 export interface Schema extends Record<string, SearchableType | Schema> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface SortSchema extends Record<string, SortType | SortSchema> {}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Document extends Record<string, SearchableValue | Document | unknown> {}
 
 export type ScalarSearchableType = 'string' | 'number' | 'boolean'
@@ -28,6 +31,9 @@ export type SearchableType = ScalarSearchableType | ArraySearchableType
 export type ScalarSearchableValue = string | number | boolean
 export type ArraySearchableValue = string[] | number[] | boolean[]
 export type SearchableValue = ScalarSearchableValue | ArraySearchableValue
+
+export type SortType = 'string' | 'number' | 'boolean'
+export type SortValue = string | number | boolean
 
 export type BM25Params = {
   k?: number
@@ -63,6 +69,20 @@ export type ComparisonOperator = {
   between?: [number, number]
 }
 
+/**
+ * Define which properties to sort for.
+*/
+export type SortByParams = {
+  /**
+   * The key of the document used to sort the result.
+   */
+  property: string,
+  /**
+   * Whether to sort the result in ascending or descending order.
+   */
+  order?: "ASC" | "DESC"
+}
+
 export type SearchParams = {
   /**
    * The word to search.
@@ -83,7 +103,7 @@ export type SearchParams = {
   /**
    * The key of the document used to sort the result.
    */
-  sortByKey?: string
+  sortBy?: SortByParams
   /**
    * Whether to match the term exactly.
    */
@@ -383,13 +403,13 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
 }
 
 export interface ISort<S extends OpaqueSort = OpaqueSort> {
-  create: (orama: Orama<{ Sort: S }>, schema: Schema) => SyncOrAsyncValue<S>
+  create: (orama: Orama<{ Sort: S }>, schema: SortSchema) => SyncOrAsyncValue<S>
   insert: (
     sort: S,
     prop: string,
     id: string,
-    value: ScalarSearchableValue,
-    schemaType: ScalarSearchableType,
+    value: SortValue,
+    schemaType: SortType,
     language: string | undefined,
   ) => SyncOrAsyncValue
 
@@ -399,10 +419,10 @@ export interface ISort<S extends OpaqueSort = OpaqueSort> {
     id: string,
   ) => SyncOrAsyncValue
 
-  sortByKey(sort: S, docIds: [string, number][], key: string): Promise<[string, number][]>
+  sortBy(sort: S, docIds: [string, number][], by: SortByParams): Promise<[string, number][]>
 
   getSortableProperties(index: S): SyncOrAsyncValue<string[]>
-  getSortablePropertiesWithTypes(index: S): SyncOrAsyncValue<Record<string, ScalarSearchableType>>
+  getSortablePropertiesWithTypes(index: S): SyncOrAsyncValue<Record<string, SortType>>
 }
 
 export type Stemmer = (word: string) => string

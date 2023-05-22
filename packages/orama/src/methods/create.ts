@@ -16,12 +16,13 @@ import {
   SingleOrArrayCallbackComponents,
   Tokenizer,
   ISort,
+  SortSchema,
 } from '../types.js'
 import { createSort } from '../components/sort.js'
 
 interface CreateArguments {
   schema: Schema
-  sortSchema?: Schema,
+  sortSchema?: SortSchema,
   language?: string
   components?: Components
   id?: string

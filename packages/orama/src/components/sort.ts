@@ -1,17 +1,17 @@
 import { createError } from "../errors.js"
-import { ISort, OpaqueSort, Orama, ScalarSearchableType, ScalarSearchableValue, Schema } from "../types.js"
+import { ISort, OpaqueSort, Orama, SortByParams, SortSchema, SortType, SortValue } from "../types.js"
 
 
 interface PropertySort<K> {
   docs: Record<string, number>
   orderedDocs: [string, K][]
-  type: ScalarSearchableType
+  type: SortType
   n: number
 }
 
 export interface Sort extends OpaqueSort {
   sortableProperties: string[],
-  sortablePropertiesWithTypes: Record<string, ScalarSearchableType>
+  sortablePropertiesWithTypes: Record<string, SortType>
   sorts: Record<string, PropertySort<number | string | boolean>>
 }
 
@@ -19,7 +19,7 @@ export type DefaultSort = ISort<Sort>
 
 function innerCreate(
   orama: Orama<{ Sort: Sort }>,
-  schema: Schema,
+  schema: SortSchema,
   prefix: string,
 ): Sort {
   const sort: Sort = {
@@ -34,7 +34,7 @@ function innerCreate(
 
     if (typeActualType === 'object' && !Array.isArray(type)) {
       // Nested
-      const ret = innerCreate(orama, type as Schema, path)
+      const ret = innerCreate(orama, type as SortSchema, path)
       sort.sortableProperties.push(...ret.sortableProperties)
       sort.sorts = {
         ...sort.sorts,
@@ -60,12 +60,8 @@ function innerCreate(
           n: 0
         }
         break
-      case 'boolean[]':
-      case 'number[]':
-      case 'string[]':
-        throw createError('CANNOT_SORT_BY_ARRAY', path, type)
       default:
-        throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : typeActualType)
+        throw createError('INVALID_SORT_SCHEMA_TYPE', Array.isArray(type) ? 'array' : typeActualType)
     }
   }
 
@@ -74,7 +70,7 @@ function innerCreate(
 
 async function create(
   orama: Orama<{ Sort: Sort }>,
-  schema: Schema,
+  schema: SortSchema,
 ): Promise<Sort> {
   return innerCreate(orama, schema, '')
 }
@@ -83,22 +79,22 @@ async function insert(
   sort: Sort,
   prop: string,
   id: string,
-  value: ScalarSearchableValue,
-  schemaType: ScalarSearchableType,
+  value: SortValue,
+  schemaType: SortType,
   language: string | undefined,
 ): Promise<void> {
-  const s = sort.sorts[prop] as PropertySort<ScalarSearchableValue>
+  const s = sort.sorts[prop] as PropertySort<SortValue>
 
-  let predicate: (value: [string, ScalarSearchableValue]) => boolean
+  let predicate: (value: [string, SortValue]) => boolean
   switch(schemaType) {
     case "string":
-      predicate = (d: [string, ScalarSearchableValue]) => (d[1] as string).localeCompare(value as string, language) > 0
+      predicate = (d: [string, SortValue]) => (d[1] as string).localeCompare(value as string, language) > 0
       break;
     case "number":
-      predicate = (d: [string, ScalarSearchableValue]) => (d[1] as number) > (value as number)
+      predicate = (d: [string, SortValue]) => (d[1] as number) > (value as number)
       break;
     case "boolean":
-      predicate = () => value as boolean
+      predicate = (d: [string, SortValue]) => d[1] as boolean
       break;
   }
 
@@ -124,7 +120,7 @@ async function remove(
   prop: string,
   id: string,
 ) {
-  const s = sort.sorts[prop] as PropertySort<ScalarSearchableValue>
+  const s = sort.sorts[prop] as PropertySort<SortValue>
 
   const index = s.docs[id]
   delete s.docs[id]
@@ -138,15 +134,13 @@ async function remove(
   s.orderedDocs.splice(index, 1)
 }
 
-async function sortByKey(sort: Sort, docIds: [string, number][], key: string): Promise<[string, number][]> {
-  const isDesc = key[0] === '-'
-  if (isDesc) {
-    key = key.slice(1)
-  }
+async function sortBy(sort: Sort, docIds: [string, number][], by: SortByParams): Promise<[string, number][]> {
+  const property = by.property
+  const isDesc = by.order === 'DESC'
 
-  const s = sort.sorts[key]
+  const s = sort.sorts[property]
   if (!s) {
-    throw createError('UNABLE_TO_SORT_ON_UNKNOWN_FIELD', key, sort.sortableProperties.join(', '))
+    throw createError('UNABLE_TO_SORT_ON_UNKNOWN_FIELD', property, sort.sortableProperties.join(', '))
   }
 
   const docIdsLength = docIds.length
@@ -184,7 +178,7 @@ async function getSortableProperties(sort: Sort): Promise<string[]> {
   return sort.sortableProperties
 }
 
-async function getSortablePropertiesWithTypes(sort: Sort): Promise<Record<string, ScalarSearchableType>> {
+async function getSortablePropertiesWithTypes(sort: Sort): Promise<Record<string, SortType>> {
   return sort.sortablePropertiesWithTypes
 }
 
@@ -193,7 +187,7 @@ export async function createSort(): Promise<DefaultSort> {
     create,
     insert,
     remove,
-    sortByKey,
+    sortBy,
     getSortableProperties,
     getSortablePropertiesWithTypes,
   }

@@ -199,8 +199,8 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
     uniqueDocsArray = intersectFilteredIDs(whereFiltersIDs, uniqueDocsArray)
   }
 
-  if (params.sortByKey) {
-    uniqueDocsArray = await orama.sort.sortByKey(orama.data.sort, uniqueDocsArray, params.sortByKey)
+  if (params.sortBy) {
+    uniqueDocsArray = await orama.sort.sortBy(orama.data.sort, uniqueDocsArray, params.sortBy)
   } else {
     uniqueDocsArray = uniqueDocsArray.sort(sortTokenScorePredicate)
   }
