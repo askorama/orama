@@ -225,7 +225,7 @@ const movieDB = await create({
 
 ### `documentsStore`
 
-The index component is used to store the documents in Orama.
+The documentsStore component is used to store the documents in Orama.
 
 To customize the documents store used by Orama, provide an object which has at least the following properties:
 
@@ -269,6 +269,52 @@ const movieDB = await create({
       load(raw) {
         // Do something here
       }
+    }
+  }
+})
+```
+
+### `sort`
+
+The sort component is used to store the documents in Orama.
+
+To customize the documents sort used by Orama, provide an object which has at least the following properties:
+
+* `insert`: A function that inserts a new document in the sort. It receives the following arguments:
+  * `sort`: The sort returned by the `create` function.
+  * `prop`: The property that it is currently considered.
+  * `id`: The ID of the document being inserted.
+  * `value`: The value of the property in the document.
+  * `schemaType`: The type of the property in the document according with the sort schema.
+  * `language`: The language of the document.
+* `remove`: A function that removes a document from the index. It receives the following arguments:
+  * `sort`: The sort returned by the `create` function.
+  * `prop`: The property that it is currently considered.
+  * `id`: The ID of the document being inserted.
+* `sortBy`: A function that inserts document information into the index for future results score calculation. It should be typically invoked within `insert`. It receives the following arguments:
+  * `sort`: The index.
+  * `docIds`: A [string, number] array contains for each id the weight.
+  * `by`: The SortParamets specified during the search
+* `getSortableProperties`: A function that returns a list of all sortable properties in the sort. It receives the index as the only argument.
+* `getSortablePropertiesWithTypes`: A function that returns an object where keys are the sortable properties in the sort and the values are the type of the sort for a property. It receives the index as the only argument.
+* `load`: A function that deserializes an sort from a JavaScript object. It receives a JavaScript object as its only argument and must return an sort.
+* `save`: A function that serializes the sort into a JavaScript object. It receives the sort as the only argument and must return a JavaScript object.
+
+```javascript
+import { create } from '@orama/orama'
+
+const movieDB = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+  },
+  sort: {
+    title: 'string',
+    director: 'string',
+  }
+  components: {
+    sort {
+      // Define the custom component here
     }
   }
 })

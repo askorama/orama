@@ -182,11 +182,31 @@ async function getSortablePropertiesWithTypes(sort: Sort): Promise<Record<string
   return sort.sortablePropertiesWithTypes
 }
 
+export async function load<R = unknown>(raw: R): Promise<Sort> {
+  const rawDocument = raw as Sort
+
+  return {
+    sortableProperties: rawDocument.sortableProperties,
+    sortablePropertiesWithTypes: rawDocument.sortablePropertiesWithTypes,
+    sorts: rawDocument.sorts
+  }
+}
+
+export async function save<R = unknown>(s: Sort): Promise<R> {
+  return {
+    sortableProperties: s.sortableProperties,
+    sortablePropertiesWithTypes: s.sortablePropertiesWithTypes,
+    sorts: s.sorts
+  } as R
+}
+
 export async function createSort(): Promise<DefaultSort> {
   return {
     create,
     insert,
     remove,
+    save,
+    load,
     sortBy,
     getSortableProperties,
     getSortablePropertiesWithTypes,

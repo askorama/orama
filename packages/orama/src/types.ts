@@ -412,12 +412,14 @@ export interface ISort<S extends OpaqueSort = OpaqueSort> {
     schemaType: SortType,
     language: string | undefined,
   ) => SyncOrAsyncValue
-
   remove: (
     sort: S,
     prop: string,
     id: string,
   ) => SyncOrAsyncValue
+
+  load<R = unknown>(raw: R): SyncOrAsyncValue<S>
+  save<R = unknown>(store: S): SyncOrAsyncValue<R>
 
   sortBy(sort: S, docIds: [string, number][], by: SortByParams): Promise<[string, number][]>
 

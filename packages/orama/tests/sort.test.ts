@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert, insertMultiple, remove, search } from '../src/index.js'
+import { create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
 
 t.test('search with sortByKey', t => {
   t.test('on number', async t => {
@@ -365,6 +365,14 @@ t.test('search with sortByKey', t => {
             order.push('remove')
             return
           },
+          async load() {
+            order.push('load')
+            return {}
+          },
+          async save<R>() {
+            order.push('save')
+            return {} as R
+          },
           getSortableProperties() {
             return ['number']
           },
@@ -379,9 +387,11 @@ t.test('search with sortByKey', t => {
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })
     await remove(db, id)
+    const raw = await save(db)
+    await load(db, raw)
     
     t.strictSame(order, [
-      'create', 'insert', 'sortBy', 'remove'
+      'create', 'insert', 'sortBy', 'remove', 'save', 'load'
     ])
 
     t.end()
@@ -397,6 +407,54 @@ t.test('search with sortByKey', t => {
 
     t.end()
   })
+
+  t.end()
+})
+
+t.test('serialize work fine', async t => {
+  const db = await create({
+    schema: {},
+    sortSchema: {
+      title: 'string',
+      year: 'number',
+      isTop: 'boolean',
+      meta: {
+        tag: 'string',
+        rating: 'number',
+        favorite: 'boolean',
+      },
+    }
+  })
+  const id = await insert(db, {
+    title: 'The title',
+    year: 2000,
+    isTop: true,
+    meta: {
+      tag: 'tag',
+      rating: 5,
+      favorite: true
+    }
+  })
+  const raw = await save(db)
+
+  const db2 = await create({
+    schema: {},
+    sortSchema: {
+      title: 'string',
+      year: 'number',
+      isTop: 'boolean',
+      meta: {
+        tag: 'string',
+        rating: 'number',
+        favorite: 'boolean',
+      },
+    }
+  })
+  await t.resolves(load(db2, raw))
+
+  const r = await search(db2, { sortBy: { property: 'title' } })
+
+  t.strictSame(r.hits.map(d => d.id), [id])
 
   t.end()
 })
