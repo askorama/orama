@@ -1,15 +1,14 @@
 import t from 'tap'
-import { create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
+import { Orama, create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
+import { sort as defaultSort } from '../src/components.js'
+import { DefaultSort, Sort } from '../src/components/sort.js'
 
-t.test('search with sortByKey', t => {
+t.test('search with sortBy', t => {
   t.test('on number', async t => {
     const db = await create({
       schema: {
         number: 'number'
       },
-      sortSchema: {
-        number: 'number'
-      }
     })
     const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
       { number: 5 },
@@ -62,8 +61,7 @@ t.test('search with sortByKey', t => {
 
     t.test('should work correctly also after removal', async t => {
       const db = await create({
-        schema: { number: 'number' },
-        sortSchema: { number: 'number' }
+        schema: { number: 'number' }
       })
       const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
         { number: 5 },
@@ -104,9 +102,6 @@ t.test('search with sortByKey', t => {
       schema: {
         string: 'string'
       },
-      sortSchema: {
-        string: 'string'
-      }
     })
     const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
       { string: 'a' },
@@ -147,9 +142,6 @@ t.test('search with sortByKey', t => {
         schema: {
           string: 'string'
         },
-        sortSchema: {
-          string: 'string'
-        }
       })
       const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
         { string: 'a' },
@@ -185,92 +177,6 @@ t.test('search with sortByKey', t => {
     t.end()
   })
 
-  t.test('on boolean', async t => {
-    const db = await create({
-      schema: {
-        boolean: 'boolean'
-      },
-      sortSchema: {
-        boolean: 'boolean'
-      }
-    })
-    const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
-      { boolean: true },
-      { boolean: false },
-      { boolean: false },
-      { boolean: true },
-      { boolean: true },
-      { }
-    ])
-
-    t.test('should sort correctly - asc', async t => {
-      const result = await search(db, {
-        sortBy: {
-          property: 'boolean'
-        }
-      })
-      t.strictSame(result.hits.map(d => d.id), [
-        id2, id3, id5, id4, id1, id6
-      ])
-      t.end()
-    })
-
-    t.test('should sort correctly - desc', async t => {
-      const result = await search(db, {
-        sortBy: {
-          property: 'boolean',
-          order: 'DESC'
-        }
-      })
-      t.strictSame(result.hits.map(d => d.id), [
-        id1, id4,id5, id3, id2, id6
-      ])
-      t.end()
-    })
-
-    t.test('should work correctly also after removal', async t => {
-      const db = await create({
-        schema: {
-          boolean: 'boolean'
-        },
-        sortSchema: {
-          boolean: 'boolean'
-        }
-      })
-      const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
-        { boolean: true },
-        { boolean: false },
-        { boolean: false },
-        { boolean: true },
-        { boolean: true },
-        { }
-      ])
-      let ascExpected = [ id2, id3, id5, id4, id1, id6 ]
-      let descExpected = [ id1, id4,id5, id3, id2, id6 ]
-
-      let resultAsc = await search(db, { sortBy: { property: 'boolean' } })
-      t.strictSame(resultAsc.hits.map(d => d.id), ascExpected)
-      let resultDesc = await search(db, { sortBy: { property: 'boolean', order: 'DESC' } })
-      t.strictSame(resultDesc.hits.map(d => d.id), descExpected)
-
-      const elementToRemove = [id2, id1, id4, id3, id5, id6]
-      for (const idToRemove of elementToRemove) {
-        await remove(db, idToRemove)
-        descExpected = descExpected.filter(id => id !== idToRemove)
-        ascExpected = ascExpected.filter(id => id !== idToRemove)
-
-        resultAsc = await search(db, { sortBy: { property: 'boolean' } })
-        t.strictSame(resultAsc.hits.map(d => d.id), ascExpected)
-        resultDesc = await search(db, { sortBy: { property: 'boolean', order: 'DESC' } })
-        t.strictSame(resultDesc.hits.map(d => d.id), descExpected)
-      }
-
-      t.end()
-    })
-
-    t.end()
-  })
-
   t.test('on nested property', async t => {
     const db = await create({
       schema: {
@@ -278,11 +184,6 @@ t.test('search with sortByKey', t => {
           number: 'number'
         }
       },
-      sortSchema: {
-        obj: {
-          number: 'number'
-        }
-      }
     })
     const [id1, id2, id3, id4, id5, id6, id7] = await insertMultiple(db, [
       { obj: { number: 5 } },
@@ -338,48 +239,43 @@ t.test('search with sortByKey', t => {
   })
 
   t.test('should allow custom component', async t => {
+    const s = await defaultSort.createSort() as DefaultSort
     const order: string[] = []
     const db = await create({
       schema: {
         number: 'number'
       },
-      sortSchema: {
-        number: 'number'
-      },
       components: {
         sort: {
-          async sortBy(sort, docIds) {
+          async sortBy(sort, docIds, by) {
             order.push('sortBy')
-            return docIds
+            return s.sortBy(sort as Sort, docIds, by)
           },
-          async create() {
+          async create(orama, schema, config) {
             order.push('create')
-            return {
-            }
+            return s.create(orama as unknown as Orama<{ Sort: Sort}>, schema, config)
           },
-          async insert() {
+          async insert(sort, prop, id, value, schemaType, language) {
             order.push('insert')
-            return
+            return s.insert(sort as Sort, prop, id, value, schemaType, language)
           },
-          async remove() {
+          async remove(sort, prop, id) {
             order.push('remove')
-            return
+            return s.remove(sort as Sort, prop, id)
           },
-          async load() {
+          async load(raw) {
             order.push('load')
-            return {}
+            return s.load(raw)
           },
-          async save<R>() {
+          async save(sort) {
             order.push('save')
-            return {} as R
+            return s.save(sort as Sort)
           },
-          getSortableProperties() {
-            return ['number']
+          getSortableProperties(sort) {
+            return s.getSortableProperties(sort as Sort)
           },
-          getSortablePropertiesWithTypes() {
-            return {
-              number: 'number'
-            }
+          getSortablePropertiesWithTypes(sort) {
+            return s.getSortablePropertiesWithTypes(sort as Sort)
           },
         }
       }
@@ -397,11 +293,25 @@ t.test('search with sortByKey', t => {
     t.end()
   })
 
-  t.test('should throw if `sortByKey` is unknown', async t => {
+  t.test('should throw if `sortBy` is unknown', async t => {
     const db = await create({
       schema: {
         number: 'number'
       },
+    })
+    await t.rejects(search(db, { sortBy: { property: 'foobar' } }))
+
+    t.end()
+  })
+
+  t.test('should throw if `sortBy` is ignored', async t => {
+    const db = await create({
+      schema: {
+        number: 'number'
+      },
+      sort: {
+        deniedProperties: ['number'],
+      }
     })
     await t.rejects(search(db, { sortBy: { property: 'number' } }))
 
@@ -413,8 +323,7 @@ t.test('search with sortByKey', t => {
 
 t.test('serialize work fine', async t => {
   const db = await create({
-    schema: {},
-    sortSchema: {
+    schema: {
       title: 'string',
       year: 'number',
       isTop: 'boolean',
@@ -438,8 +347,7 @@ t.test('serialize work fine', async t => {
   const raw = await save(db)
 
   const db2 = await create({
-    schema: {},
-    sortSchema: {
+    schema: {
       title: 'string',
       year: 'number',
       isTop: 'boolean',

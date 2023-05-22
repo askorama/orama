@@ -203,7 +203,7 @@ export async function create(
         index.fieldLengths[path] = {}
         break
       default:
-        throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : typeActualType)
+        throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type as unknown as string, path)
     }
 
     index.searchableProperties.push(path)

@@ -1,6 +1,5 @@
 import { createError } from "../errors.js"
-import { ISort, OpaqueSort, Orama, SortByParams, SortSchema, SortType, SortValue } from "../types.js"
-
+import { ISort, OpaqueSort, Orama, Schema, SortByParams, SortConfig, SortType, SortValue } from "../types.js"
 
 interface PropertySort<K> {
   docs: Record<string, number>
@@ -19,7 +18,8 @@ export type DefaultSort = ISort<Sort>
 
 function innerCreate(
   orama: Orama<{ Sort: Sort }>,
-  schema: SortSchema,
+  schema: Schema,
+  sortableDeniedProperties: string[],
   prefix: string,
 ): Sort {
   const sort: Sort = {
@@ -32,9 +32,13 @@ function innerCreate(
     const typeActualType = typeof type
     const path = `${prefix}${prefix ? '.' : ''}${prop}`
 
+    if (sortableDeniedProperties.includes(path)) {
+      continue
+    }
+
     if (typeActualType === 'object' && !Array.isArray(type)) {
       // Nested
-      const ret = innerCreate(orama, type as SortSchema, path)
+      const ret = innerCreate(orama, type as Schema, sortableDeniedProperties, path)
       sort.sortableProperties.push(...ret.sortableProperties)
       sort.sorts = {
         ...sort.sorts,
@@ -48,7 +52,6 @@ function innerCreate(
     }
 
     switch (type) {
-      case 'boolean':
       case 'number':
       case 'string':
         sort.sortableProperties.push(path)
@@ -60,8 +63,15 @@ function innerCreate(
           n: 0
         }
         break
+      case 'boolean':
+      case 'boolean[]':
+      case 'number[]':
+      case 'string[]':
+        // We want to sort the arrays
+        continue
       default:
-        throw createError('INVALID_SORT_SCHEMA_TYPE', Array.isArray(type) ? 'array' : typeActualType)
+        console.log('INVALID_SORT_SCHEMA_TYPE', path, typeActualType)
+        throw createError('INVALID_SORT_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type as unknown as string, path)
     }
   }
 
@@ -70,9 +80,10 @@ function innerCreate(
 
 async function create(
   orama: Orama<{ Sort: Sort }>,
-  schema: SortSchema,
+  schema: Schema,
+  config?: SortConfig,
 ): Promise<Sort> {
-  return innerCreate(orama, schema, '')
+  return innerCreate(orama, schema, (config || {}).deniedProperties || [], '')
 }
 
 async function insert(
@@ -92,9 +103,6 @@ async function insert(
       break;
     case "number":
       predicate = (d: [string, SortValue]) => (d[1] as number) > (value as number)
-      break;
-    case "boolean":
-      predicate = (d: [string, SortValue]) => d[1] as boolean
       break;
   }
 

@@ -16,13 +16,13 @@ import {
   SingleOrArrayCallbackComponents,
   Tokenizer,
   ISort,
-  SortSchema,
+  SortConfig,
 } from '../types.js'
 import { createSort } from '../components/sort.js'
 
 interface CreateArguments {
   schema: Schema
-  sortSchema?: SortSchema,
+  sort?: SortConfig,
   language?: string
   components?: Components
   id?: string
@@ -77,7 +77,7 @@ function validateComponents(components: Components) {
   }
 }
 
-export async function create({ schema, sortSchema, language, components, id }: CreateArguments): Promise<Orama> {
+export async function create({ schema, sort: s, language, components, id }: CreateArguments): Promise<Orama> {
   if (!components) {
     components = {}
   }
@@ -169,7 +169,7 @@ export async function create({ schema, sortSchema, language, components, id }: C
   orama.data = {
     index: await orama.index.create(orama, schema),
     docs: await orama.documentsStore.create(orama),
-    sort: await orama.sort.create(orama, sortSchema || {})
+    sort: await orama.sort.create(orama, schema, s)
   }
 
   return orama

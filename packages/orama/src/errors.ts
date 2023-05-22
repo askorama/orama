@@ -12,7 +12,7 @@ const errors = {
   UNSUPPORTED_COMPONENT: `Unsupported component "%s".`,
   COMPONENT_MUST_BE_FUNCTION: `The component "%s" must be a function.`,
   COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS: `The component "%s" must be a function or an array of functions.`,
-  INVALID_SCHEMA_TYPE: `Unsupported schema type "%s". Expected "string", "boolean" or "number" or array of them.`,
+  INVALID_SCHEMA_TYPE: `Unsupported schema type "%s" at "%s". Expected "string", "boolean" or "number" or array of them.`,
   DOCUMENT_ID_MUST_BE_STRING: `Document id must be of type "string". Got "%s" instead.`,
   DOCUMENT_ALREADY_EXISTS: `A document with id "%s" already exists.`,
   DOCUMENT_DOES_NOT_EXIST: `A document with id "%s" does not exists.`,
@@ -22,7 +22,7 @@ const errors = {
   INVALID_BOOST_VALUE: `Boost value must be a number greater than, or less than 0.`,
   INVALID_FILTER_OPERATION: `You can only use one operation per filter, you requested %d.`,
   SCHEMA_VALIDATION_FAILURE: `Cannot insert document due schema validation failure on "%s" property.`,
-  INVALID_SORT_SCHEMA_TYPE: `Unsupported sort schema type "%s". Expected "string", "boolean" or "number".`,
+  INVALID_SORT_SCHEMA_TYPE: `Unsupported sort schema type "%s" at "%s". Expected "string" or "number".`,
   CANNOT_SORT_BY_ARRAY: `Cannot configure sort for "%s" because it is an array (%s).`,
   UNABLE_TO_SORT_ON_UNKNOWN_FIELD: `Unable to sort on unknown field "%s". Allowed fields: %s`,
 }

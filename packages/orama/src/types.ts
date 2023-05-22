@@ -19,9 +19,6 @@ export interface OpaqueSort {}
 export interface Schema extends Record<string, SearchableType | Schema> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface SortSchema extends Record<string, SortType | SortSchema> {}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Document extends Record<string, SearchableValue | Document | unknown> {}
 
 export type ScalarSearchableType = 'string' | 'number' | 'boolean'
@@ -32,8 +29,8 @@ export type ScalarSearchableValue = string | number | boolean
 export type ArraySearchableValue = string[] | number[] | boolean[]
 export type SearchableValue = ScalarSearchableValue | ArraySearchableValue
 
-export type SortType = 'string' | 'number' | 'boolean'
-export type SortValue = string | number | boolean
+export type SortType = 'string' | 'number'
+export type SortValue = string | number
 
 export type BM25Params = {
   k?: number
@@ -402,8 +399,12 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
   save<R = unknown>(store: D): SyncOrAsyncValue<R>
 }
 
+export interface SortConfig {
+  deniedProperties?: string[]
+}
+
 export interface ISort<S extends OpaqueSort = OpaqueSort> {
-  create: (orama: Orama<{ Sort: S }>, schema: SortSchema) => SyncOrAsyncValue<S>
+  create: (orama: Orama<{ Sort: S }>, schema: Schema, sortConfig?: SortConfig) => SyncOrAsyncValue<S>
   insert: (
     sort: S,
     prop: string,

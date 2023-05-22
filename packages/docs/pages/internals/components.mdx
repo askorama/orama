@@ -302,23 +302,46 @@ To customize the documents sort used by Orama, provide an object which has at le
 
 ```javascript
 import { create } from '@orama/orama'
+import { sort as defaultSort } from '@orama/orama/components.js'
+import { DefaultSort, Sort } from '@orama/orama/components/sort.js'
 
-const movieDB = await create({
+const s = await defaultSort.createSort() as DefaultSort
+const db = await create({
   schema: {
-    title: 'string',
-    director: 'string',
+    number: 'number'
   },
-  sort: {
-    title: 'string',
-    director: 'string',
-  }
   components: {
-    sort {
-      // Define the custom component here
+    sort: {
+      async sortBy(sort, docIds, by) {
+        return s.sortBy(sort as Sort, docIds, by)
+      },
+      async create(orama, schema, config) {
+        return s.create(orama as unknown as Orama<{ Sort: Sort}>, schema, config)
+      },
+      async insert(sort, prop, id, value, schemaType, language) {
+        return s.insert(sort as Sort, prop, id, value, schemaType, language)
+      },
+      async remove(sort, prop, id) {
+        return s.remove(sort as Sort, prop, id)
+      },
+      async load(raw) {
+        return s.load(raw)
+      },
+      async save(sort) {
+        return s.save(sort as Sort)
+      },
+      getSortableProperties(sort) {
+        return s.getSortableProperties(sort as Sort)
+      },
+      getSortablePropertiesWithTypes(sort) {
+        return s.getSortablePropertiesWithTypes(sort as Sort)
+      },
     }
   }
 })
 ```
+
+
 
 ### General purpose components
 

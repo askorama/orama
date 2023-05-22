@@ -1,0 +1,79 @@
+# Sorting
+
+To sort, Orama uses the properties defined in the `schema` to know on which properties you want to sort.
+
+```javascript copy
+const db = await create({
+  schema: {
+    title: 'string',
+    year: 'number',
+    isTop: 'boolean',
+    meta: {
+      tag: 'string',
+      rating: 'number',
+      favorite: 'boolean',
+    },
+  }
+})
+const results = await search(db, {
+  term: 'prestige',
+  sort: {
+    property: 'title', // or 'year', 'isTop'
+  }
+})
+```
+
+Orama supports sorting on 'string' and 'number'.
+
+You can also specify nested properties using the '.' notation: `'meta.tag'`, `'meta.rating'` and `'meta.favorite'`
+
+## Reverse order
+
+Orama supports the reverse order specifying the key `order`:
+
+```javascript
+
+const db = await create({
+  schema: {
+    title: 'string',
+    year: 'number',
+    isTop: 'boolean',
+    meta: {
+      tag: 'string',
+      rating: 'number',
+      favorite: 'boolean',
+    },
+  }
+})
+const results = await search(db, {
+  term: 'prestige',
+  sort: {
+    property: 'title', // or 'year', 'isTop'
+    order: 'DESC'
+  }
+})
+```
+
+## Memory optimization
+
+By default, Orama allows the sort on all properties defined in the schema.
+This creates an in-memory sort index for each properties.
+If you want to optimize the memory usage, Orama supports the `sortableDeniedProperties` list.
+
+```javascript
+const db = await create({
+  schema: {
+    title: 'string',
+    year: 'number',
+    isTop: 'boolean',
+    meta: {
+      tag: 'string',
+      rating: 'number',
+      favorite: 'boolean',
+    },
+  },
+  sort: {
+    deniedProperties: ['yeay', 'meta.tag']
+  },
+})
+```
