@@ -93,8 +93,8 @@ async function innerInsert(orama: Orama, doc: Document, language?: string, skipH
     )
   }
 
-  const sortableProperties = await orama.sorter.getSortableProperties(orama.data.sorter)
-  const sortablePropertiesWithTypes = await orama.sorter.getSortablePropertiesWithTypes(orama.data.sorter)
+  const sortableProperties = await orama.sorter.getSortableProperties(orama.data.sorting)
+  const sortablePropertiesWithTypes = await orama.sorter.getSortablePropertiesWithTypes(orama.data.sorting)
   const sortableValues = await orama.getDocumentProperties(doc, sortableProperties)
   for (const prop of sortableProperties) {
     const value = sortableValues[prop] as SortValue
@@ -104,7 +104,7 @@ async function innerInsert(orama: Orama, doc: Document, language?: string, skipH
 
     const expectedType = sortablePropertiesWithTypes[prop]
 
-    await orama.sorter.insert(orama.data.sorter, prop, id, value, expectedType, language)
+    await orama.sorter.insert(orama.data.sorting, prop, id, value, expectedType, language)
   }
 
   if (!skipHooks) {

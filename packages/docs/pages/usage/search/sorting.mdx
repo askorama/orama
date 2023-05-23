@@ -7,7 +7,7 @@ const db = await create({
   schema: {
     title: 'string',
     year: 'number',
-    isTop: 'boolean',
+    inPromotion: 'boolean',
     meta: {
       tag: 'string',
       rating: 'number',
@@ -18,7 +18,7 @@ const db = await create({
 const results = await search(db, {
   term: 'prestige',
   sortBy: {
-    property: 'title', // or 'year', 'isTop'
+    property: 'title', // or 'year', 'inPromotion'
   }
 })
 ```
@@ -45,7 +45,7 @@ const db = await create({
   schema: {
     title: 'string',
     year: 'number',
-    isTop: 'boolean',
+    inPromotion: 'boolean',
     meta: {
       tag: 'string',
       rating: 'number',
@@ -56,7 +56,7 @@ const db = await create({
 const results = await search(db, {
   term: 'prestige',
   sortBy: {
-    property: 'title', // or 'year', 'isTop'
+    property: 'title', // or 'year', 'inPromotion'
     order: 'DESC' // default is "ASC"
   }
 })
@@ -73,7 +73,7 @@ const db = await create({
   schema: {
     title: 'string',
     year: 'number',
-    isTop: 'boolean',
+    inPromotion: 'boolean',
     meta: {
       tag: 'string',
       rating: 'number',
@@ -93,7 +93,7 @@ const db = await create({
   schema: {
     title: 'string',
     year: 'number',
-    isTop: 'boolean',
+    inPromotion: 'boolean',
     meta: {
       tag: 'string',
       rating: 'number',
@@ -102,6 +102,7 @@ const db = await create({
   },
   sortBy: (a, b) => {
     // Implement the custom sort algorithm 
+    return a[2].year - b[2].year
   }
 })
 ```

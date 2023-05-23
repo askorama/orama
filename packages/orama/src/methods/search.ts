@@ -15,7 +15,6 @@ import {
   IIndex,
   Tokenizer,
   IDocumentsStore,
-  Document,
   CustomSorterFunctionItem,
 } from '../types.js'
 import { getNanosecondsTime, sortTokenScorePredicate } from '../utils.js'
@@ -209,7 +208,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
       docsWithIdAndScore.sort(params.sortBy)
       uniqueDocsArray = docsWithIdAndScore.map(([id, score]) => [id, score])
     } else {
-      uniqueDocsArray = await orama.sorter.sortBy(orama.data.sorter, uniqueDocsArray, params.sortBy)
+      uniqueDocsArray = await orama.sorter.sortBy(orama.data.sorting, uniqueDocsArray, params.sortBy)
     }
   } else {
     uniqueDocsArray = uniqueDocsArray.sort(sortTokenScorePredicate)

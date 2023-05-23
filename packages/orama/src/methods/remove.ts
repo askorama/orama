@@ -39,7 +39,7 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
     await orama.index.afterRemove?.(orama.data.index, prop, id, value, schemaType, language, orama.tokenizer, docsCount)
   }
 
-  const sortableProperties = await orama.sorter.getSortableProperties(orama.data.sorter)
+  const sortableProperties = await orama.sorter.getSortableProperties(orama.data.sorting)
   const sortableValues = await orama.getDocumentProperties(doc, sortableProperties)
   for (const prop of sortableProperties) {
     // The document doens't contain the key
@@ -47,7 +47,7 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
       continue
     }
 
-    await orama.sorter.remove(orama.data.sorter, prop, id)
+    await orama.sorter.remove(orama.data.sorting, prop, id)
   }
 
   if (!skipHooks) {

@@ -175,6 +175,87 @@ t.test('search with sortBy', t => {
     t.end()
   })
 
+
+  t.test('on boolean', async t => {
+    const db = await create({
+      schema: {
+        boolean: 'boolean'
+      },
+    })
+    const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
+      { boolean: true },
+      { boolean: false },
+      { boolean: false },
+      { boolean: true },
+      { boolean: true },
+      { }
+    ])
+
+    t.test('should sort correctly - asc', async t => {
+      const result = await search(db, {
+        sortBy: {
+          property: 'boolean'
+        }
+      })
+      t.strictSame(result.hits.map(d => d.id), [
+        id2, id3, id5, id4, id1, id6
+      ])
+      t.end()
+    })
+
+    t.test('should sort correctly - desc', async t => {
+      const result = await search(db, {
+        sortBy: {
+          property: 'boolean',
+          order: 'DESC'
+        }
+      })
+      t.strictSame(result.hits.map(d => d.id), [
+        id1, id4, id5, id3, id2, id6
+      ])
+      t.end()
+    })
+
+    t.test('should work correctly also after removal', async t => {
+      const db = await create({
+        schema: {
+          boolean: 'boolean'
+        },
+      })
+      const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
+        { boolean: true },
+        { boolean: false },
+        { boolean: false },
+        { boolean: true },
+        { boolean: true },
+        { }
+      ])
+      let ascExpected = [ id2, id3, id5, id4, id1, id6 ]
+      let descExpected = [ id1, id4, id5, id3, id2, id6 ]
+
+      let resultAsc = await search(db, { sortBy: { property: 'boolean' } })
+      t.strictSame(resultAsc.hits.map(d => d.id), ascExpected)
+      let resultDesc = await search(db, { sortBy: { property: 'boolean', order: 'DESC' } })
+      t.strictSame(resultDesc.hits.map(d => d.id), descExpected)
+
+      const elementToRemove = [id2, id1, id4, id3, id5, id6]
+      for (const idToRemove of elementToRemove) {
+        await remove(db, idToRemove)
+        descExpected = descExpected.filter(id => id !== idToRemove)
+        ascExpected = ascExpected.filter(id => id !== idToRemove)
+
+        resultAsc = await search(db, { sortBy: { property: 'boolean' } })
+        t.strictSame(resultAsc.hits.map(d => d.id), ascExpected)
+        resultDesc = await search(db, { sortBy: { property: 'boolean', order: 'DESC' } })
+        t.strictSame(resultDesc.hits.map(d => d.id), descExpected)
+      }
+
+      t.end()
+    })
+
+    t.end()
+  })
+
   t.test('on nested property', async t => {
     const db = await create({
       schema: {

@@ -53,6 +53,7 @@ function innerCreate(
     }
 
     switch (type) {
+      case 'boolean':
       case 'number':
       case 'string':
         sorter.sortableProperties.push(path)
@@ -64,7 +65,6 @@ function innerCreate(
           n: 0
         }
         break
-      case 'boolean':
       case 'boolean[]':
       case 'number[]':
       case 'string[]':
@@ -97,6 +97,9 @@ function stringSort(value: SortValue, language: string | undefined, d: [string, 
 function numerSort(value: SortValue, d: [string, SortValue]): boolean {
   return (d[1] as number) > (value as number)
 }
+function booleanSort(value: SortValue, d: [string, SortValue]): boolean {
+  return d[1] as boolean
+}
 
 async function insert<S extends OpaqueSorter = OpaqueSorter>(
   so: S,
@@ -114,11 +117,14 @@ async function insert<S extends OpaqueSorter = OpaqueSorter>(
 
   let predicate: (value: [string, SortValue]) => boolean
   switch(schemaType) {
-    case "string":
+    case 'string':
       predicate = stringSort.bind(null, value, language)
       break;
-    case "number":
+    case 'number':
       predicate = numerSort.bind(null, value)
+      break;
+    case 'boolean':
+      predicate = booleanSort.bind(null, value)
       break;
   }
 

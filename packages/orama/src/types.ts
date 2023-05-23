@@ -29,8 +29,8 @@ export type ScalarSearchableValue = string | number | boolean
 export type ArraySearchableValue = string[] | number[] | boolean[]
 export type SearchableValue = ScalarSearchableValue | ArraySearchableValue
 
-export type SortType = 'string' | 'number'
-export type SortValue = string | number
+export type SortType = 'string' | 'number' | 'boolean'
+export type SortValue = string | number | boolean
 
 export type BM25Params = {
   k?: number
@@ -513,7 +513,7 @@ type ProvidedTypes = Partial<{
 interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore, S extends OpaqueSorter> {
   index: I
   docs: D
-  sorter: S
+  sorting: S
 }
 
 type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter> = {
