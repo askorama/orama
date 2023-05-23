@@ -93,20 +93,18 @@ async function innerInsert(orama: Orama, doc: Document, language?: string, skipH
     )
   }
 
-  if (typeof orama.data.sort !== 'undefined') {
-    const sortableProperties = await orama.sort.getSortableProperties(orama.data.sort)
-    const sortablePropertiesWithTypes = await orama.sort.getSortablePropertiesWithTypes(orama.data.sort)
-    const sortableValues = await orama.getDocumentProperties(doc, sortableProperties)
-    for (const prop of sortableProperties) {
-      const value = sortableValues[prop] as SortValue
-      if (typeof value === 'undefined') {
-        continue
-      }
-
-      const expectedType = sortablePropertiesWithTypes[prop]
-
-      await orama.sort.insert(orama.data.sort, prop, id, value, expectedType, language)
+  const sortableProperties = await orama.sorter.getSortableProperties(orama.data.sorter)
+  const sortablePropertiesWithTypes = await orama.sorter.getSortablePropertiesWithTypes(orama.data.sorter)
+  const sortableValues = await orama.getDocumentProperties(doc, sortableProperties)
+  for (const prop of sortableProperties) {
+    const value = sortableValues[prop] as SortValue
+    if (typeof value === 'undefined') {
+      continue
     }
+
+    const expectedType = sortablePropertiesWithTypes[prop]
+
+    await orama.sorter.insert(orama.data.sorter, prop, id, value, expectedType, language)
   }
 
   if (!skipHooks) {

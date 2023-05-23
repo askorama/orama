@@ -13,7 +13,7 @@ export interface OpaqueIndex {}
 export interface OpaqueDocumentStore {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface OpaqueSort {}
+export interface OpaqueSorter {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Schema extends Record<string, SearchableType | Schema> {}
@@ -399,15 +399,15 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
   save<R = unknown>(store: D): SyncOrAsyncValue<R>
 }
 
-export interface SortConfig {
+export interface SorterConfig {
   enabled?: boolean,
   deniedProperties?: string[]
 }
 
-export interface ISort<S extends OpaqueSort = OpaqueSort> {
-  create: (orama: Orama<{ Sort: S }>, schema: Schema, sortConfig?: SortConfig) => SyncOrAsyncValue<S>
+export interface ISorter<S extends OpaqueSorter = OpaqueSorter> {
+  create: (orama: Orama<{ Sorter: S }>, schema: Schema, sorterConfig?: SorterConfig) => SyncOrAsyncValue<S>
   insert: (
-    sort: S,
+    sorter: S,
     prop: string,
     id: string,
     value: SortValue,
@@ -415,18 +415,18 @@ export interface ISort<S extends OpaqueSort = OpaqueSort> {
     language: string | undefined,
   ) => SyncOrAsyncValue
   remove: (
-    sort: S,
+    sorter: S,
     prop: string,
     id: string,
   ) => SyncOrAsyncValue
 
   load<R = unknown>(raw: R): SyncOrAsyncValue<S>
-  save<R = unknown>(store: S): SyncOrAsyncValue<R>
+  save<R = unknown>(sorter: S): SyncOrAsyncValue<R>
 
-  sortBy(sort: S, docIds: [string, number][], by: SortByParams): Promise<[string, number][]>
+  sortBy(sorter: S, docIds: [string, number][], by: SortByParams): Promise<[string, number][]>
 
-  getSortableProperties(index: S): SyncOrAsyncValue<string[]>
-  getSortablePropertiesWithTypes(index: S): SyncOrAsyncValue<Record<string, SortType>>
+  getSortableProperties(sorter: S): SyncOrAsyncValue<string[]>
+  getSortablePropertiesWithTypes(sorter: S): SyncOrAsyncValue<Record<string, SortType>>
 }
 
 export type Stemmer = (word: string) => string
@@ -450,7 +450,7 @@ export interface ObjectComponents {
   tokenizer: Tokenizer | DefaultTokenizerConfig
   index: IIndex
   documentsStore: IDocumentsStore
-  sort: ISort
+  sorter: ISorter
 }
 
 export interface FunctionComponents<S extends Schema = Schema> {
@@ -499,21 +499,21 @@ type ProvidedTypes = Partial<{
   Schema: Schema;
   Index: OpaqueIndex;
   DocumentStore: OpaqueDocumentStore;
-  Sort: OpaqueSort;
+  Sorter: OpaqueSorter;
 }>
 
-interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore, S extends OpaqueSort> {
+interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore, S extends OpaqueSorter> {
   index: I
   docs: D
-  sort: S
+  sorter: S
 }
 
-type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSort> = {
+type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter> = {
   schema: S
   tokenizer: Tokenizer
   index: IIndex<I>
   documentsStore: IDocumentsStore<D>
-  sort: ISort<So>
+  sorter: ISorter<So>
   data: Data<I, D, So>
   caches: Record<string, unknown>
   [kInsertions]: number | undefined
@@ -525,8 +525,8 @@ type OramaID = {
 }
 
 export type Orama<
-  P extends ProvidedTypes = { Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore, Sort: OpaqueSort },
+  P extends ProvidedTypes = { Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore, Sorter: OpaqueSorter },
 > = FunctionComponents &
   ArrayCallbackComponents &
-  Internals<Schema & P['Schema'], OpaqueIndex & P['Index'], OpaqueDocumentStore & P['DocumentStore'], OpaqueSort & P['Sort']> &
+  Internals<Schema & P['Schema'], OpaqueIndex & P['Index'], OpaqueDocumentStore & P['DocumentStore'], OpaqueSorter & P['Sorter']> &
   OramaID

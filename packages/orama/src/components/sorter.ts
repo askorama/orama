@@ -1,5 +1,5 @@
 import { createError } from "../errors.js"
-import { ISort, OpaqueSort, Orama, Schema, SortByParams, SortConfig, SortType, SortValue } from "../types.js"
+import { ISorter, OpaqueSorter, Orama, Schema, SortByParams, SorterConfig, SortType, SortValue } from "../types.js"
 
 interface PropertySort<K> {
   docs: Record<string, number>
@@ -8,22 +8,22 @@ interface PropertySort<K> {
   n: number
 }
 
-export interface Sort extends OpaqueSort {
+export interface Sorter extends OpaqueSorter {
   enabled: boolean,
   sortableProperties: string[],
   sortablePropertiesWithTypes: Record<string, SortType>
   sorts: Record<string, PropertySort<number | string | boolean>>
 }
 
-export type DefaultSort = ISort<Sort>
+export type DefaultSorter = ISorter<Sorter>
 
 function innerCreate(
-  orama: Orama<{ Sort: Sort }>,
+  orama: Orama<{ Sorter: Sorter }>,
   schema: Schema,
   sortableDeniedProperties: string[],
   prefix: string,
-): Sort {
-  const sort: Sort = {
+): Sorter {
+  const sorter: Sorter = {
     enabled: true,
     sortableProperties: [],
     sortablePropertiesWithTypes: {},
@@ -41,13 +41,13 @@ function innerCreate(
     if (typeActualType === 'object' && !Array.isArray(type)) {
       // Nested
       const ret = innerCreate(orama, type as Schema, sortableDeniedProperties, path)
-      sort.sortableProperties.push(...ret.sortableProperties)
-      sort.sorts = {
-        ...sort.sorts,
+      sorter.sortableProperties.push(...ret.sortableProperties)
+      sorter.sorts = {
+        ...sorter.sorts,
         ...ret.sorts
       }
-      sort.sortablePropertiesWithTypes = {
-        ...sort.sortablePropertiesWithTypes,
+      sorter.sortablePropertiesWithTypes = {
+        ...sorter.sortablePropertiesWithTypes,
         ...ret.sortablePropertiesWithTypes
       }
       continue
@@ -56,9 +56,9 @@ function innerCreate(
     switch (type) {
       case 'number':
       case 'string':
-        sort.sortableProperties.push(path)
-        sort.sortablePropertiesWithTypes[path] = type
-        sort.sorts[path] = {
+        sorter.sortableProperties.push(path)
+        sorter.sortablePropertiesWithTypes[path] = type
+        sorter.sorts[path] = {
           docs: {},
           orderedDocs: [],
           type: type,
@@ -69,50 +69,57 @@ function innerCreate(
       case 'boolean[]':
       case 'number[]':
       case 'string[]':
-        // We want to sort the arrays
+        // We don't allow to sort by arrays
         continue
       default:
         throw createError('INVALID_SORT_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type as unknown as string, path)
     }
   }
 
-  return sort
+  return sorter
 }
 
 async function create(
-  orama: Orama<{ Sort: Sort }>,
+  orama: Orama<{ Sorter: Sorter }>,
   schema: Schema,
-  config?: SortConfig,
-): Promise<Sort> {
+  config?: SorterConfig,
+): Promise<Sorter> {
   const isSortEnabled = config?.enabled !== false
   if (!isSortEnabled) {
     return {
       disabled: true
-    } as unknown as Sort
+    } as unknown as Sorter
   }
   return innerCreate(orama, schema, (config || {}).deniedProperties || [], '')
 }
 
+function stringSort(value: SortValue, language: string | undefined, d: [string, SortValue]): boolean {
+  return (d[1] as string).localeCompare(value as string, language) > 0
+}
+function numerSort(value: SortValue, d: [string, SortValue]): boolean {
+  return (d[1] as number) > (value as number)
+}
+
 async function insert(
-  sort: Sort,
+  sorter: Sorter,
   prop: string,
   id: string,
   value: SortValue,
   schemaType: SortType,
   language: string | undefined,
 ): Promise<void> {
-  if (!sort.enabled) {
+  if (!sorter.enabled) {
     return
   }
-  const s = sort.sorts[prop] as PropertySort<SortValue>
+  const s = sorter.sorts[prop] as PropertySort<SortValue>
 
   let predicate: (value: [string, SortValue]) => boolean
   switch(schemaType) {
     case "string":
-      predicate = (d: [string, SortValue]) => (d[1] as string).localeCompare(value as string, language) > 0
+      predicate = stringSort.bind(null, value, language)
       break;
     case "number":
-      predicate = (d: [string, SortValue]) => (d[1] as number) > (value as number)
+      predicate = numerSort.bind(null, value)
       break;
   }
 
@@ -134,14 +141,14 @@ async function insert(
 }
 
 async function remove(
-  sort: Sort,
+  sorter: Sorter,
   prop: string,
   id: string,
 ) {
-  if (!sort.enabled) {
+  if (!sorter.enabled) {
     return
   }
-  const s = sort.sorts[prop] as PropertySort<SortValue>
+  const s = sorter.sorts[prop] as PropertySort<SortValue>
 
   const index = s.docs[id]
   delete s.docs[id]
@@ -155,23 +162,23 @@ async function remove(
   s.orderedDocs.splice(index, 1)
 }
 
-async function sortBy(sort: Sort, docIds: [string, number][], by: SortByParams): Promise<[string, number][]> {
-  if (!sort.enabled) {
+async function sortBy(sorter: Sorter, docIds: [string, number][], by: SortByParams): Promise<[string, number][]> {
+  if (!sorter.enabled) {
     throw createError('SORT_DISABLED')
   }
 
   const property = by.property
   const isDesc = by.order === 'DESC'
 
-  const s = sort.sorts[property]
+  const s = sorter.sorts[property]
   if (!s) {
-    throw createError('UNABLE_TO_SORT_ON_UNKNOWN_FIELD', property, sort.sortableProperties.join(', '))
+    throw createError('UNABLE_TO_SORT_ON_UNKNOWN_FIELD', property, sorter.sortableProperties.join(', '))
   }
 
   const docIdsLength = docIds.length
 
-  // Calculate how many documents aren't inside the sort index.
-  // Used only for "desc" sort.
+  // Calculate how many documents aren't inside the sorter index.
+  // Used only for "DESC" sort.
   let unsortableDocumentTotal = 0
   if (isDesc) {
     for (let i = 0; i < docIdsLength; i++) {
@@ -199,28 +206,28 @@ async function sortBy(sort: Sort, docIds: [string, number][], by: SortByParams):
   return ret
 }
 
-async function getSortableProperties(sort: Sort): Promise<string[]> {
-  if (!sort.enabled) {
+async function getSortableProperties(sorter: Sorter): Promise<string[]> {
+  if (!sorter.enabled) {
     return []
   }
 
-  return sort.sortableProperties
+  return sorter.sortableProperties
 }
 
-async function getSortablePropertiesWithTypes(sort: Sort): Promise<Record<string, SortType>> {
-  if (!sort.enabled) {
+async function getSortablePropertiesWithTypes(sorter: Sorter): Promise<Record<string, SortType>> {
+  if (!sorter.enabled) {
     return {}
   }
 
-  return sort.sortablePropertiesWithTypes
+  return sorter.sortablePropertiesWithTypes
 }
 
-export async function load<R = unknown>(raw: R): Promise<Sort> {
-  const rawDocument = raw as Sort
+export async function load<R = unknown>(raw: R): Promise<Sorter> {
+  const rawDocument = raw as Sorter
   if (!rawDocument.enabled) {
     return {
       enabled: false
-    } as unknown as Sort
+    } as unknown as Sorter
   }
 
   return {
@@ -231,22 +238,22 @@ export async function load<R = unknown>(raw: R): Promise<Sort> {
   }
 }
 
-export async function save<R = unknown>(s: Sort): Promise<R> {
-  if (!s.enabled) {
+export async function save<R = unknown>(sorter: Sorter): Promise<R> {
+  if (!sorter.enabled) {
     return {
       enabled: false
     } as unknown as R
   }
 
   return {
-    sortableProperties: s.sortableProperties,
-    sortablePropertiesWithTypes: s.sortablePropertiesWithTypes,
-    sorts: s.sorts,
-    enabled: s.enabled,
+    sortableProperties: sorter.sortableProperties,
+    sortablePropertiesWithTypes: sorter.sortablePropertiesWithTypes,
+    sorts: sorter.sorts,
+    enabled: sorter.enabled,
   } as R
 }
 
-export async function createSort(): Promise<DefaultSort> {
+export async function createSorter(): Promise<DefaultSorter> {
   return {
     create,
     insert,

@@ -1,6 +1,6 @@
 import { Document, MultipleCallbackComponent, Orama, SingleCallbackComponent } from '../types.js'
 
-export const OBJECT_COMPONENTS = ['tokenizer', 'index', 'documentsStore', 'sort']
+export const OBJECT_COMPONENTS = ['tokenizer', 'index', 'documentsStore', 'sorter']
 
 export const FUNCTION_COMPONENTS = [
   'validateSchema',

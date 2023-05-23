@@ -274,67 +274,49 @@ const movieDB = await create({
 })
 ```
 
-### `sort`
+### `sorter`
 
-The sort component is used to store the documents in Orama.
+The sorter component is used to store the documents in Orama.
 
 To customize the documents sort used by Orama, provide an object which has at least the following properties:
 
-* `insert`: A function that inserts a new document in the sort. It receives the following arguments:
-  * `sort`: The sort returned by the `create` function.
+* `insert`: A function that inserts a new document in the sorter. It receives the following arguments:
+  * `sorter`: The sorter returned by the `create` function.
   * `prop`: The property that it is currently considered.
   * `id`: The ID of the document being inserted.
   * `value`: The value of the property in the document.
   * `schemaType`: The type of the property in the document according with the sort schema.
   * `language`: The language of the document.
 * `remove`: A function that removes a document from the index. It receives the following arguments:
-  * `sort`: The sort returned by the `create` function.
+  * `sorter`: The sorter returned by the `create` function.
   * `prop`: The property that it is currently considered.
   * `id`: The ID of the document being inserted.
 * `sortBy`: A function that inserts document information into the index for future results score calculation. It should be typically invoked within `insert`. It receives the following arguments:
-  * `sort`: The index.
+  * `sorter`: The index.
   * `docIds`: A [string, number] array contains for each id the weight.
   * `by`: The SortParamets specified during the search
-* `getSortableProperties`: A function that returns a list of all sortable properties in the sort. It receives the index as the only argument.
-* `getSortablePropertiesWithTypes`: A function that returns an object where keys are the sortable properties in the sort and the values are the type of the sort for a property. It receives the index as the only argument.
+* `getSortableProperties`: A function that returns a list of all sortable properties in the sorter. It receives the index as the only argument.
+* `getSortablePropertiesWithTypes`: A function that returns an object where keys are the sortable properties in the sorter and the values are the type of the sort for a property. It receives the index as the only argument.
 * `load`: A function that deserializes an sort from a JavaScript object. It receives a JavaScript object as its only argument and must return an sort.
-* `save`: A function that serializes the sort into a JavaScript object. It receives the sort as the only argument and must return a JavaScript object.
+* `save`: A function that serializes the sorter into a JavaScript object. It receives the sorter as the only argument and must return a JavaScript object.
 
 ```javascript
 import { create } from '@orama/orama'
-import { sort as defaultSort } from '@orama/orama/components.js'
-import { DefaultSort, Sort } from '@orama/orama/components/sort.js'
+import { sorter as defaultSorter } from '@orama/orama/components.js'
+import { DefaultSorter, Sorter } from '@orama/orama/components/sorter.js'
 
-const s = await defaultSort.createSort() as DefaultSort
+const s = await defaultSorter.createSorter()
 const db = await create({
   schema: {
     number: 'number'
   },
   components: {
-    sort: {
-      async sortBy(sort, docIds, by) {
-        return s.sortBy(sort as Sort, docIds, by)
-      },
-      async create(orama, schema, config) {
-        return s.create(orama as unknown as Orama<{ Sort: Sort}>, schema, config)
-      },
-      async insert(sort, prop, id, value, schemaType, language) {
-        return s.insert(sort as Sort, prop, id, value, schemaType, language)
-      },
+    sorter: {
+      // override partially the default sorter
+      ...(s as unknown as ISorter),
       async remove(sort, prop, id) {
-        return s.remove(sort as Sort, prop, id)
-      },
-      async load(raw) {
-        return s.load(raw)
-      },
-      async save(sort) {
-        return s.save(sort as Sort)
-      },
-      getSortableProperties(sort) {
-        return s.getSortableProperties(sort as Sort)
-      },
-      getSortablePropertiesWithTypes(sort) {
-        return s.getSortablePropertiesWithTypes(sort as Sort)
+        // apply custom logic here
+        return s.remove(sort as Sorter, prop, id)
       },
     }
   }

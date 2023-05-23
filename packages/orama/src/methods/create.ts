@@ -15,14 +15,14 @@ import {
   FunctionComponents,
   SingleOrArrayCallbackComponents,
   Tokenizer,
-  ISort,
-  SortConfig,
+  ISorter,
+  SorterConfig,
 } from '../types.js'
-import { createSort } from '../components/sort.js'
+import { createSorter } from '../components/sorter.js'
 
 interface CreateArguments {
   schema: Schema
-  sort?: SortConfig,
+  sort?: SorterConfig,
   language?: string
   components?: Components
   id?: string
@@ -77,7 +77,7 @@ function validateComponents(components: Components) {
   }
 }
 
-export async function create({ schema, sort: s, language, components, id }: CreateArguments): Promise<Orama> {
+export async function create({ schema, sort, language, components, id }: CreateArguments): Promise<Orama> {
   if (!components) {
     components = {}
   }
@@ -89,7 +89,7 @@ export async function create({ schema, sort: s, language, components, id }: Crea
   let tokenizer = components.tokenizer as Tokenizer
   let index = components.index
   let documentsStore = components.documentsStore
-  let sort = components.sort
+  let sorter = components.sorter
 
   if (!tokenizer) {
     // Use the default tokenizer
@@ -108,8 +108,8 @@ export async function create({ schema, sort: s, language, components, id }: Crea
     index = (await createIndex()) as unknown as IIndex
   }
 
-  if (!sort) {
-    sort = (await createSort()) as unknown as ISort
+  if (!sorter) {
+    sorter = (await createSorter()) as unknown as ISorter
   }
 
   if (!documentsStore) {
@@ -145,7 +145,7 @@ export async function create({ schema, sort: s, language, components, id }: Crea
     schema,
     tokenizer,
     index,
-    sort,
+    sorter,
     documentsStore,
     getDocumentProperties,
     getDocumentIndexId,
@@ -169,7 +169,7 @@ export async function create({ schema, sort: s, language, components, id }: Crea
   orama.data = {
     index: await orama.index.create(orama, schema),
     docs: await orama.documentsStore.create(orama),
-    sort: await orama.sort.create(orama, schema, s),
+    sorter: await orama.sorter.create(orama, schema, sort),
   }
 
   return orama

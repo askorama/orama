@@ -1,7 +1,7 @@
 import t from 'tap'
-import { Orama, create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
+import { ISorter, Orama, create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
 import { sort as defaultSort } from '../src/components.js'
-import { DefaultSort, Sort } from '../src/components/sort.js'
+import { DefaultSorter, Sorter } from '../src/components/sorter.js'
 
 t.test('search with sortBy', t => {
   t.test('on number', async t => {
@@ -239,29 +239,29 @@ t.test('search with sortBy', t => {
   })
 
   t.test('should allow custom component', async t => {
-    const s = await defaultSort.createSort() as DefaultSort
+    const s = await defaultSort.createSorter() as DefaultSorter
     const order: string[] = []
     const db = await create({
       schema: {
         number: 'number'
       },
       components: {
-        sort: {
+        sorter: {
           async sortBy(sort, docIds, by) {
             order.push('sortBy')
-            return s.sortBy(sort as Sort, docIds, by)
+            return s.sortBy(sort as Sorter, docIds, by)
           },
           async create(orama, schema, config) {
             order.push('create')
-            return s.create(orama as unknown as Orama<{ Sort: Sort}>, schema, config)
+            return s.create(orama as unknown as Orama<{ Sorter: Sorter}>, schema, config)
           },
           async insert(sort, prop, id, value, schemaType, language) {
             order.push('insert')
-            return s.insert(sort as Sort, prop, id, value, schemaType, language)
+            return s.insert(sort as Sorter, prop, id, value, schemaType, language)
           },
           async remove(sort, prop, id) {
             order.push('remove')
-            return s.remove(sort as Sort, prop, id)
+            return s.remove(sort as Sorter, prop, id)
           },
           async load(raw) {
             order.push('load')
@@ -269,13 +269,13 @@ t.test('search with sortBy', t => {
           },
           async save(sort) {
             order.push('save')
-            return s.save(sort as Sort)
+            return s.save(sort as Sorter)
           },
           getSortableProperties(sort) {
-            return s.getSortableProperties(sort as Sort)
+            return s.getSortableProperties(sort as Sorter)
           },
           getSortablePropertiesWithTypes(sort) {
-            return s.getSortablePropertiesWithTypes(sort as Sort)
+            return s.getSortablePropertiesWithTypes(sort as Sorter)
           },
         }
       }
@@ -288,6 +288,36 @@ t.test('search with sortBy', t => {
     
     t.strictSame(order, [
       'create', 'insert', 'sortBy', 'remove', 'save', 'load'
+    ])
+
+    t.end()
+  })
+
+  t.test('should allow custom component - partially', async t => {
+    const s = await defaultSort.createSorter()
+    const order: string[] = []
+    const db = await create({
+      schema: {
+        number: 'number'
+      },
+      components: {
+        sorter: {
+          ...(s as unknown as ISorter),
+          async remove(sort, prop, id) {
+            order.push('remove')
+            return s.remove(sort as Sorter, prop, id)
+          },
+        }
+      }
+    })
+    const id = await insert(db, { number: 1 })
+    await search(db, { sortBy: { property: 'number' } })
+    await remove(db, id)
+    const raw = await save(db)
+    await load(db, raw)
+    
+    t.strictSame(order, [
+      'remove'
     ])
 
     t.end()
