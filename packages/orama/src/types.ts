@@ -67,9 +67,15 @@ export type ComparisonOperator = {
 }
 
 /**
+ * A custom sorter function item as [id, score, document].
+ */
+export type CustomSorterFunctionItem = [string, number, Document]
+
+export type CustomSorterFunction = (a: CustomSorterFunctionItem, b: CustomSorterFunctionItem) => number
+/**
  * Define which properties to sort for.
 */
-export type SortByParams = {
+export type SorterParams = {
   /**
    * The key of the document used to sort the result.
    */
@@ -79,6 +85,8 @@ export type SortByParams = {
    */
   order?: "ASC" | "DESC"
 }
+
+export type SortByParams = SorterParams | CustomSorterFunction
 
 export type SearchParams = {
   /**
@@ -401,11 +409,11 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
 
 export interface SorterConfig {
   enabled?: boolean,
-  deniedProperties?: string[]
+  unsortableProperties?: string[]
 }
 
 export interface ISorter<S extends OpaqueSorter = OpaqueSorter> {
-  create: (orama: Orama<{ Sorter: S }>, schema: Schema, sorterConfig?: SorterConfig) => SyncOrAsyncValue<S>
+  create: (schema: Schema, sorterConfig?: SorterConfig) => SyncOrAsyncValue<S>
   insert: (
     sorter: S,
     prop: string,
@@ -423,7 +431,7 @@ export interface ISorter<S extends OpaqueSorter = OpaqueSorter> {
   load<R = unknown>(raw: R): SyncOrAsyncValue<S>
   save<R = unknown>(sorter: S): SyncOrAsyncValue<R>
 
-  sortBy(sorter: S, docIds: [string, number][], by: SortByParams): Promise<[string, number][]>
+  sortBy(sorter: S, docIds: [string, number][], by: SorterParams): Promise<[string, number][]>
 
   getSortableProperties(sorter: S): SyncOrAsyncValue<string[]>
   getSortablePropertiesWithTypes(sorter: S): SyncOrAsyncValue<Record<string, SortType>>

@@ -206,6 +206,7 @@ The Orama's default index is based on BM25, Radix Trees and AVL trees. All its f
 import { create } from '@orama/orama'
 import { index as defaultIndex } from '@orama/orama/components'
 
+const index = await defaultIndex.createIndex()
 const movieDB = await create({
   schema: {
     title: 'string',
@@ -214,7 +215,7 @@ const movieDB = await create({
   components: {
     // This index will only customize the deserialization
     index: {
-      ...defaultIndex,
+      ...index,
       load(raw) {
         // Do something here
       }
@@ -257,18 +258,20 @@ The Orama's default documents store is based on simple JavaScript object. All it
 import { create } from '@orama/orama'
 import { documentsStore as defaultDocumentsStore } from '@orama/orama/components'
 
+const store = await defaultDocumentsStore.createDocumentsStore()
 const movieDB = await create({
   schema: {
     title: 'string',
     director: 'string',
   },
   components: {
-    // This index will only customize the deserialization
+    // override partially the default documents store
     documentsStore: {
-      ...defaultDocumentsStore,
-      load(raw) {
-        // Do something here
-      }
+      ...store,
+      remove(s, id) {
+        // Apply custom logic
+        return store.remove(s, id)
+      },
     }
   }
 })
@@ -280,6 +283,7 @@ The sorter component is used to store the documents in Orama.
 
 To customize the documents sort used by Orama, provide an object which has at least the following properties:
 
+* `create`: A function that receives the schema and the configutation and returns a sorter.
 * `insert`: A function that inserts a new document in the sorter. It receives the following arguments:
   * `sorter`: The sorter returned by the `create` function.
   * `prop`: The property that it is currently considered.
@@ -292,7 +296,7 @@ To customize the documents sort used by Orama, provide an object which has at le
   * `prop`: The property that it is currently considered.
   * `id`: The ID of the document being inserted.
 * `sortBy`: A function that inserts document information into the index for future results score calculation. It should be typically invoked within `insert`. It receives the following arguments:
-  * `sorter`: The index.
+  * `sorter`: The sorter returned by the `create` function.
   * `docIds`: A [string, number] array contains for each id the weight.
   * `by`: The SortParamets specified during the search
 * `getSortableProperties`: A function that returns a list of all sortable properties in the sorter. It receives the index as the only argument.
@@ -303,9 +307,8 @@ To customize the documents sort used by Orama, provide an object which has at le
 ```javascript
 import { create } from '@orama/orama'
 import { sorter as defaultSorter } from '@orama/orama/components.js'
-import { DefaultSorter, Sorter } from '@orama/orama/components/sorter.js'
 
-const s = await defaultSorter.createSorter()
+const s = await defaultSort.createSorter()
 const db = await create({
   schema: {
     number: 'number'
@@ -313,17 +316,15 @@ const db = await create({
   components: {
     sorter: {
       // override partially the default sorter
-      ...(s as unknown as ISorter),
+      ...s,
       async remove(sort, prop, id) {
-        // apply custom logic here
-        return s.remove(sort as Sorter, prop, id)
+        // Apply custom logic here
+        return s.remove(sort, prop, id)
       },
     }
   }
 })
 ```
-
-
 
 ### General purpose components
 

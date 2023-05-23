@@ -157,8 +157,8 @@ export async function calculateResultScores(
   return scoreList
 }
 
-export async function create(
-  orama: Orama<{ Index: Index }>,
+export async function create<I extends OpaqueIndex = OpaqueIndex>(
+  orama: Orama<{ Index: I }>,
   schema: Schema,
   index?: Index,
   prefix = '',
@@ -246,9 +246,9 @@ async function insertScalar(
   }
 }
 
-export async function insert(
-  implementation: IIndex<Index>,
-  index: Index,
+export async function insert<I extends OpaqueIndex = OpaqueIndex>(
+  impl: IIndex<I>,
+  i: I,
   prop: string,
   id: string,
   value: SearchableValue,
@@ -257,6 +257,8 @@ export async function insert(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<void> {
+  const implementation = impl as unknown as IIndex<Index>
+  const index = i as unknown as Index
   if (!isArrayType(schemaType)) {
     return insertScalar(implementation, index, prop, id, value, schemaType as ScalarSearchableType, language, tokenizer, docsCount)
   }
@@ -308,9 +310,9 @@ async function removeScalar(
   }
 }
 
-export async function remove(
-  implementation: IIndex<Index>,
-  index: Index,
+export async function remove<I extends OpaqueIndex = OpaqueIndex>(
+  impl: IIndex<I>,
+  i: I,
   prop: string,
   id: string,
   value: SearchableValue,
@@ -319,6 +321,9 @@ export async function remove(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<boolean> {
+  const implementation = impl as unknown as IIndex<Index>
+  const index = i as unknown as Index
+
   if (!isArrayType(schemaType)) {
     return removeScalar(implementation, index, prop, id, value, schemaType as ScalarSearchableType, language, tokenizer, docsCount)
   }
@@ -494,7 +499,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
   } as R
 }
 
-export async function createIndex(): Promise<DefaultIndex> {
+export async function createIndex(): Promise<IIndex<OpaqueIndex>> {
   return {
     create,
     insert,

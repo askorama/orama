@@ -1,7 +1,5 @@
 import t from 'tap'
-import { ISorter, Orama, create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
-import { sort as defaultSort } from '../src/components.js'
-import { DefaultSorter, Sorter } from '../src/components/sorter.js'
+import { CustomSorterFunctionItem, create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
 
 t.test('search with sortBy', t => {
   t.test('on number', async t => {
@@ -238,91 +236,6 @@ t.test('search with sortBy', t => {
     t.end()
   })
 
-  t.test('should allow custom component', async t => {
-    const s = await defaultSort.createSorter() as DefaultSorter
-    const order: string[] = []
-    const db = await create({
-      schema: {
-        number: 'number'
-      },
-      components: {
-        sorter: {
-          async sortBy(sort, docIds, by) {
-            order.push('sortBy')
-            return s.sortBy(sort as Sorter, docIds, by)
-          },
-          async create(orama, schema, config) {
-            order.push('create')
-            return s.create(orama as unknown as Orama<{ Sorter: Sorter}>, schema, config)
-          },
-          async insert(sort, prop, id, value, schemaType, language) {
-            order.push('insert')
-            return s.insert(sort as Sorter, prop, id, value, schemaType, language)
-          },
-          async remove(sort, prop, id) {
-            order.push('remove')
-            return s.remove(sort as Sorter, prop, id)
-          },
-          async load(raw) {
-            order.push('load')
-            return s.load(raw)
-          },
-          async save(sort) {
-            order.push('save')
-            return s.save(sort as Sorter)
-          },
-          getSortableProperties(sort) {
-            return s.getSortableProperties(sort as Sorter)
-          },
-          getSortablePropertiesWithTypes(sort) {
-            return s.getSortablePropertiesWithTypes(sort as Sorter)
-          },
-        }
-      }
-    })
-    const id = await insert(db, { number: 1 })
-    await search(db, { sortBy: { property: 'number' } })
-    await remove(db, id)
-    const raw = await save(db)
-    await load(db, raw)
-    
-    t.strictSame(order, [
-      'create', 'insert', 'sortBy', 'remove', 'save', 'load'
-    ])
-
-    t.end()
-  })
-
-  t.test('should allow custom component - partially', async t => {
-    const s = await defaultSort.createSorter()
-    const order: string[] = []
-    const db = await create({
-      schema: {
-        number: 'number'
-      },
-      components: {
-        sorter: {
-          ...(s as unknown as ISorter),
-          async remove(sort, prop, id) {
-            order.push('remove')
-            return s.remove(sort as Sorter, prop, id)
-          },
-        }
-      }
-    })
-    const id = await insert(db, { number: 1 })
-    await search(db, { sortBy: { property: 'number' } })
-    await remove(db, id)
-    const raw = await save(db)
-    await load(db, raw)
-    
-    t.strictSame(order, [
-      'remove'
-    ])
-
-    t.end()
-  })
-
   t.test('should throw if `sortBy` is unknown', async t => {
     const db = await create({
       schema: {
@@ -340,10 +253,41 @@ t.test('search with sortBy', t => {
         number: 'number'
       },
       sort: {
-        deniedProperties: ['number'],
+        unsortableProperties: ['number'],
       }
     })
     await t.rejects(search(db, { sortBy: { property: 'number' } }))
+
+    t.end()
+  })
+
+  t.test('should allow custom function', async t => {
+    interface Doc {
+      string?: string
+    }
+    const db = await create({
+      schema: {
+        string: 'string'
+      },
+    })
+    const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
+      { string: 'a' },
+      { string: 'e' },
+      { string: 'z' },
+      { string: 'd' },
+      { string: 'f' },
+      { }
+    ])
+
+    const result = await search(db, {
+      sortBy: (a: CustomSorterFunctionItem, b: CustomSorterFunctionItem) => {
+        return ((a[2] as unknown as Doc).string || '').localeCompare((b[2] as unknown as Doc).string || '')
+      }
+    })
+
+    t.strictSame(result.hits.map(d => d.id), [
+      id6, id1, id4, id2, id5, id3
+    ])
 
     t.end()
   })

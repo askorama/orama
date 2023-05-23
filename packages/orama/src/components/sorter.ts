@@ -1,5 +1,5 @@
 import { createError } from "../errors.js"
-import { ISorter, OpaqueSorter, Orama, Schema, SortByParams, SorterConfig, SortType, SortValue } from "../types.js"
+import { ISorter, OpaqueSorter, Schema, SorterConfig, SorterParams, SortType, SortValue } from "../types.js"
 
 interface PropertySort<K> {
   docs: Record<string, number>
@@ -18,7 +18,6 @@ export interface Sorter extends OpaqueSorter {
 export type DefaultSorter = ISorter<Sorter>
 
 function innerCreate(
-  orama: Orama<{ Sorter: Sorter }>,
   schema: Schema,
   sortableDeniedProperties: string[],
   prefix: string,
@@ -40,7 +39,7 @@ function innerCreate(
 
     if (typeActualType === 'object' && !Array.isArray(type)) {
       // Nested
-      const ret = innerCreate(orama, type as Schema, sortableDeniedProperties, path)
+      const ret = innerCreate(type as Schema, sortableDeniedProperties, path)
       sorter.sortableProperties.push(...ret.sortableProperties)
       sorter.sorts = {
         ...sorter.sorts,
@@ -80,7 +79,6 @@ function innerCreate(
 }
 
 async function create(
-  orama: Orama<{ Sorter: Sorter }>,
   schema: Schema,
   config?: SorterConfig,
 ): Promise<Sorter> {
@@ -90,7 +88,7 @@ async function create(
       disabled: true
     } as unknown as Sorter
   }
-  return innerCreate(orama, schema, (config || {}).deniedProperties || [], '')
+  return innerCreate(schema, (config || {}).unsortableProperties || [], '')
 }
 
 function stringSort(value: SortValue, language: string | undefined, d: [string, SortValue]): boolean {
@@ -100,14 +98,15 @@ function numerSort(value: SortValue, d: [string, SortValue]): boolean {
   return (d[1] as number) > (value as number)
 }
 
-async function insert(
-  sorter: Sorter,
+async function insert<S extends OpaqueSorter = OpaqueSorter>(
+  so: S,
   prop: string,
   id: string,
   value: SortValue,
   schemaType: SortType,
   language: string | undefined,
 ): Promise<void> {
+  const sorter = so as unknown as Sorter
   if (!sorter.enabled) {
     return
   }
@@ -134,17 +133,19 @@ async function insert(
   s.docs[id] = index
 
   // Increment position for the greather documents
-  for (let i = index + 1; i < s.orderedDocs.length; i++) {
+  const orderedDocsLength = s.orderedDocs.length
+  for (let i = index + 1; i < orderedDocsLength; i++) {
     const docId = s.orderedDocs[i][0]
     s.docs[docId]++
   }
 }
 
-async function remove(
-  sorter: Sorter,
+async function remove<S extends OpaqueSorter = OpaqueSorter>(
+  so: S,
   prop: string,
   id: string,
 ) {
+  const sorter = so as unknown as Sorter
   if (!sorter.enabled) {
     return
   }
@@ -154,7 +155,8 @@ async function remove(
   delete s.docs[id]
 
   // Decrement position for the greather documents
-  for (let i = index + 1; i < s.orderedDocs.length; i++) {
+  const orderedDocsLength = s.orderedDocs.length
+  for (let i = index + 1; i < orderedDocsLength; i++) {
     const docId = s.orderedDocs[i][0]
     s.docs[docId]--
   }
@@ -162,7 +164,7 @@ async function remove(
   s.orderedDocs.splice(index, 1)
 }
 
-async function sortBy(sorter: Sorter, docIds: [string, number][], by: SortByParams): Promise<[string, number][]> {
+async function sortBy(sorter: Sorter, docIds: [string, number][], by: SorterParams): Promise<[string, number][]> {
   if (!sorter.enabled) {
     throw createError('SORT_DISABLED')
   }
@@ -253,7 +255,7 @@ export async function save<R = unknown>(sorter: Sorter): Promise<R> {
   } as R
 }
 
-export async function createSorter(): Promise<DefaultSorter> {
+export async function createSorter(): Promise<ISorter<OpaqueSorter>> {
   return {
     create,
     insert,
