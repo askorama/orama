@@ -2,7 +2,7 @@ import { isArrayType } from '../components.js'
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { trackInsertion } from '../components/sync-blocking-checker.js'
 import { createError } from '../errors.js'
-import { Document, Orama } from '../types.js'
+import { Document, Orama, SortValue } from '../types.js'
 
 export async function insert(orama: Orama, doc: Document, language?: string, skipHooks?: boolean): Promise<string> {
   const errorProperty = await orama.validateSchema(doc, orama.schema)
@@ -93,18 +93,20 @@ async function innerInsert(orama: Orama, doc: Document, language?: string, skipH
     )
   }
 
-  const sortableProperties = await orama.sort.getSortableProperties(orama.data.sort)
-  const sortablePropertiesWithTypes = await orama.sort.getSortablePropertiesWithTypes(orama.data.sort)
-  const sortableValues = await orama.getDocumentProperties(doc, sortableProperties)
-  for (const prop of sortableProperties) {
-    const value = sortableValues[prop]
-    if (typeof value === 'undefined') {
-      continue
+  if (typeof orama.data.sort !== 'undefined') {
+    const sortableProperties = await orama.sort.getSortableProperties(orama.data.sort)
+    const sortablePropertiesWithTypes = await orama.sort.getSortablePropertiesWithTypes(orama.data.sort)
+    const sortableValues = await orama.getDocumentProperties(doc, sortableProperties)
+    for (const prop of sortableProperties) {
+      const value = sortableValues[prop] as SortValue
+      if (typeof value === 'undefined') {
+        continue
+      }
+
+      const expectedType = sortablePropertiesWithTypes[prop]
+
+      await orama.sort.insert(orama.data.sort, prop, id, value, expectedType, language)
     }
-
-    const expectedType = sortablePropertiesWithTypes[prop]
-
-    await orama.sort.insert(orama.data.sort, prop, id, value, expectedType, language)
   }
 
   if (!skipHooks) {

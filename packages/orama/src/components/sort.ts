@@ -9,6 +9,7 @@ interface PropertySort<K> {
 }
 
 export interface Sort extends OpaqueSort {
+  enabled: boolean,
   sortableProperties: string[],
   sortablePropertiesWithTypes: Record<string, SortType>
   sorts: Record<string, PropertySort<number | string | boolean>>
@@ -23,6 +24,7 @@ function innerCreate(
   prefix: string,
 ): Sort {
   const sort: Sort = {
+    enabled: true,
     sortableProperties: [],
     sortablePropertiesWithTypes: {},
     sorts: {}
@@ -70,7 +72,6 @@ function innerCreate(
         // We want to sort the arrays
         continue
       default:
-        console.log('INVALID_SORT_SCHEMA_TYPE', path, typeActualType)
         throw createError('INVALID_SORT_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type as unknown as string, path)
     }
   }
@@ -83,6 +84,12 @@ async function create(
   schema: Schema,
   config?: SortConfig,
 ): Promise<Sort> {
+  const isSortEnabled = config?.enabled !== false
+  if (!isSortEnabled) {
+    return {
+      disabled: true
+    } as unknown as Sort
+  }
   return innerCreate(orama, schema, (config || {}).deniedProperties || [], '')
 }
 
@@ -94,6 +101,9 @@ async function insert(
   schemaType: SortType,
   language: string | undefined,
 ): Promise<void> {
+  if (!sort.enabled) {
+    return
+  }
   const s = sort.sorts[prop] as PropertySort<SortValue>
 
   let predicate: (value: [string, SortValue]) => boolean
@@ -128,6 +138,9 @@ async function remove(
   prop: string,
   id: string,
 ) {
+  if (!sort.enabled) {
+    return
+  }
   const s = sort.sorts[prop] as PropertySort<SortValue>
 
   const index = s.docs[id]
@@ -143,6 +156,10 @@ async function remove(
 }
 
 async function sortBy(sort: Sort, docIds: [string, number][], by: SortByParams): Promise<[string, number][]> {
+  if (!sort.enabled) {
+    throw createError('SORT_DISABLED')
+  }
+
   const property = by.property
   const isDesc = by.order === 'DESC'
 
@@ -183,28 +200,49 @@ async function sortBy(sort: Sort, docIds: [string, number][], by: SortByParams):
 }
 
 async function getSortableProperties(sort: Sort): Promise<string[]> {
+  if (!sort.enabled) {
+    return []
+  }
+
   return sort.sortableProperties
 }
 
 async function getSortablePropertiesWithTypes(sort: Sort): Promise<Record<string, SortType>> {
+  if (!sort.enabled) {
+    return {}
+  }
+
   return sort.sortablePropertiesWithTypes
 }
 
 export async function load<R = unknown>(raw: R): Promise<Sort> {
   const rawDocument = raw as Sort
+  if (!rawDocument.enabled) {
+    return {
+      enabled: false
+    } as unknown as Sort
+  }
 
   return {
     sortableProperties: rawDocument.sortableProperties,
     sortablePropertiesWithTypes: rawDocument.sortablePropertiesWithTypes,
-    sorts: rawDocument.sorts
+    sorts: rawDocument.sorts,
+    enabled: true
   }
 }
 
 export async function save<R = unknown>(s: Sort): Promise<R> {
+  if (!s.enabled) {
+    return {
+      enabled: false
+    } as unknown as R
+  }
+
   return {
     sortableProperties: s.sortableProperties,
     sortablePropertiesWithTypes: s.sortablePropertiesWithTypes,
-    sorts: s.sorts
+    sorts: s.sorts,
+    enabled: s.enabled,
   } as R
 }
 

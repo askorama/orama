@@ -169,7 +169,7 @@ export async function create({ schema, sort: s, language, components, id }: Crea
   orama.data = {
     index: await orama.index.create(orama, schema),
     docs: await orama.documentsStore.create(orama),
-    sort: await orama.sort.create(orama, schema, s)
+    sort: await orama.sort.create(orama, schema, s),
   }
 
   return orama

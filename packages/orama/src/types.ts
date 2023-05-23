@@ -400,6 +400,7 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
 }
 
 export interface SortConfig {
+  enabled?: boolean,
   deniedProperties?: string[]
 }
 

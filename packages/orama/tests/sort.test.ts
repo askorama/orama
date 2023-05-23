@@ -366,3 +366,44 @@ t.test('serialize work fine', async t => {
 
   t.end()
 })
+
+t.test('disabled', async t => {
+  const db = await create({
+    schema: {
+      number: 'number'
+    },
+    sort: {
+      enabled: false
+    }
+  })
+  const id = await insert(db, { number: 1 })
+  await t.rejects(search(db, { sortBy: { property: 'number' } }), {
+    code: 'SORT_DISABLED',
+  })
+  await remove(db, id)
+  const raw = await save(db)
+
+  t.strictSame((raw.sort as { enabled: boolean }), {enabled: false})
+
+  const db2 = await create({
+    schema: {
+      number: 'number'
+    },
+    sort: {
+      enabled: false
+    }
+  })
+
+  await load(db2, raw)
+
+  const id2 = await insert(db2, { number: 1 })
+  await t.rejects(search(db2, { sortBy: { property: 'number' } }), {
+    code: 'SORT_DISABLED',
+  })
+  await remove(db2, id2)
+  const raw2 = await save(db2)
+
+  t.equal((raw2.sort as { enabled: boolean }).enabled, false)
+
+  t.end()
+})
