@@ -1,5 +1,5 @@
 import { createError } from "../errors.js"
-import { ISorter, OpaqueSorter, Schema, SorterConfig, SorterParams, SortType, SortValue } from "../types.js"
+import { ISorter, OpaqueDocumentStore, OpaqueIndex, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from "../types.js"
 
 interface PropertySort<K> {
   docs: Record<string, number>
@@ -78,7 +78,8 @@ function innerCreate(
   return sorter
 }
 
-async function create(
+async function create<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
+  _: Orama<S, I, D, Sorter>,
   schema: Schema,
   config?: SorterConfig,
 ): Promise<Sorter> {
@@ -101,8 +102,8 @@ function booleanSort(value: SortValue, d: [string, SortValue]): boolean {
   return d[1] as boolean
 }
 
-async function insert<S extends OpaqueSorter = OpaqueSorter>(
-  so: S,
+async function insert(
+  so: Sorter,
   prop: string,
   id: string,
   value: SortValue,
@@ -146,8 +147,8 @@ async function insert<S extends OpaqueSorter = OpaqueSorter>(
   }
 }
 
-async function remove<S extends OpaqueSorter = OpaqueSorter>(
-  so: S,
+async function remove(
+  so: Sorter,
   prop: string,
   id: string,
 ) {
@@ -261,7 +262,7 @@ export async function save<R = unknown>(sorter: Sorter): Promise<R> {
   } as R
 }
 
-export async function createSorter(): Promise<ISorter<OpaqueSorter>> {
+export async function createSorter(): Promise<DefaultSorter> {
   return {
     create,
     insert,

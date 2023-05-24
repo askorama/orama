@@ -14,12 +14,11 @@ export async function create(): Promise<DocumentsStore> {
   }
 }
 
-export async function get<D extends OpaqueDocumentStore = OpaqueDocumentStore>(store: D, id: string): Promise<Document | undefined> {
+export async function get(store: DocumentsStore, id: string): Promise<Document | undefined> {
   return (store as unknown as DocumentsStore).docs[id]
 }
 
-export async function getMultiple<D extends OpaqueDocumentStore = OpaqueDocumentStore>(s: D, ids: string[]): Promise<(Document | undefined)[]> {
-  const store = s as unknown as DocumentsStore
+export async function getMultiple(store: DocumentsStore, ids: string[]): Promise<(Document | undefined)[]> {
   const found: (Document | undefined)[] = Array.from({ length: ids.length })
 
   for (let i = 0; i < ids.length; i++) {
@@ -29,12 +28,11 @@ export async function getMultiple<D extends OpaqueDocumentStore = OpaqueDocument
   return found
 }
 
-export async function getAll<D extends OpaqueDocumentStore = OpaqueDocumentStore>(store: D): Promise<Record<string, Document>> {
-  return (store as unknown as DocumentsStore).docs as Record<string, Document>
+export async function getAll(store: DocumentsStore): Promise<Record<string, Document>> {
+  return store.docs as Record<string, Document>
 }
 
-export async function store<D extends OpaqueDocumentStore = OpaqueDocumentStore>(s: D, id: string, doc: Document): Promise<boolean> {
-  const store = s as unknown as DocumentsStore
+export async function store(store: DocumentsStore, id: string, doc: Document): Promise<boolean> {
   if (typeof store.docs[id] !== 'undefined') {
     return false
   }
@@ -45,8 +43,7 @@ export async function store<D extends OpaqueDocumentStore = OpaqueDocumentStore>
   return true
 }
 
-export async function remove<D extends OpaqueDocumentStore = OpaqueDocumentStore>(s: D, id: string): Promise<boolean> {
-  const store = s as unknown as DocumentsStore
+export async function remove(store: DocumentsStore, id: string): Promise<boolean> {
   if (typeof store.docs[id] === 'undefined') {
     return false
   }
@@ -57,8 +54,8 @@ export async function remove<D extends OpaqueDocumentStore = OpaqueDocumentStore
   return true
 }
 
-export async function count<D extends OpaqueDocumentStore = OpaqueDocumentStore>(store: D): Promise<number> {
-  return (store as unknown as DocumentsStore).count
+export async function count(store: DocumentsStore): Promise<number> {
+  return store.count
 }
 
 export async function load<R = unknown>(raw: R): Promise<DocumentsStore> {
@@ -70,14 +67,14 @@ export async function load<R = unknown>(raw: R): Promise<DocumentsStore> {
   }
 }
 
-export async function save<R = unknown>(docs: DocumentsStore): Promise<R> {
+export async function save<R = unknown>(store: DocumentsStore): Promise<R> {
   return {
-    docs: docs.docs,
-    count: docs.count,
+    docs: store.docs,
+    count: store.count,
   } as R
 }
 
-export async function createDocumentsStore(): Promise<IDocumentsStore<OpaqueDocumentStore>> {
+export async function createDocumentsStore(): Promise<DefaultDocumentsStore> {
   return {
     create,
     get,

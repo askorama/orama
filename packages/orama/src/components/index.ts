@@ -21,7 +21,9 @@ import {
   BM25Params,
   ComparisonOperator,
   IIndex,
+  OpaqueDocumentStore,
   OpaqueIndex,
+  OpaqueSorter,
   Orama,
   ScalarSearchableType,
   Schema,
@@ -157,8 +159,8 @@ export async function calculateResultScores(
   return scoreList
 }
 
-export async function create<I extends OpaqueIndex = OpaqueIndex>(
-  orama: Orama<{ Index: I }>,
+export async function create<S extends Schema, D extends OpaqueDocumentStore, So extends OpaqueSorter>(
+  orama: Orama<S, Index, D, So>,
   schema: Schema,
   index?: Index,
   prefix = '',
@@ -246,9 +248,9 @@ async function insertScalar(
   }
 }
 
-export async function insert<I extends OpaqueIndex = OpaqueIndex>(
-  impl: IIndex<I>,
-  i: I,
+export async function insert(
+  impl: DefaultIndex,
+  i: Index,
   prop: string,
   id: string,
   value: SearchableValue,
@@ -310,9 +312,9 @@ async function removeScalar(
   }
 }
 
-export async function remove<I extends OpaqueIndex = OpaqueIndex>(
-  impl: IIndex<I>,
-  i: I,
+export async function remove(
+  impl: DefaultIndex,
+  i: Index,
   prop: string,
   id: string,
   value: SearchableValue,
@@ -499,7 +501,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
   } as R
 }
 
-export async function createIndex(): Promise<IIndex<OpaqueIndex>> {
+export async function createIndex(): Promise<DefaultIndex> {
   return {
     create,
     insert,
