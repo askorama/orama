@@ -7,9 +7,12 @@ const warn =
     console.warn(`[WARNING] [${options.code}] ${message}`)
   }
 
-export function trackInsertion
-<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter>
-(orama: Orama<S, I, D, So>): void {
+export function trackInsertion<
+  S extends Schema,
+  I extends OpaqueIndex,
+  D extends OpaqueDocumentStore,
+  So extends OpaqueSorter,
+>(orama: Orama<S, I, D, So>): void {
   if (typeof orama[kInsertions] !== 'number') {
     queueMicrotask(() => {
       orama[kInsertions] = undefined
@@ -30,9 +33,12 @@ export function trackInsertion
   }
 }
 
-export function trackRemoval
-<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter>
-(orama: Orama<S, I, D, So>): void {
+export function trackRemoval<
+  S extends Schema,
+  I extends OpaqueIndex,
+  D extends OpaqueDocumentStore,
+  So extends OpaqueSorter,
+>(orama: Orama<S, I, D, So>): void {
   if (typeof orama[kRemovals] !== 'number') {
     queueMicrotask(() => {
       orama[kRemovals] = undefined

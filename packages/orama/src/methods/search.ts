@@ -96,9 +96,12 @@ async function createSearchContext<I extends OpaqueIndex, D extends OpaqueDocume
   }
 }
 
-export async function search
-<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter>
-(orama: Orama<S, I, D, So>, params: SearchParams, language?: string): Promise<Results> {
+export async function search<
+  S extends Schema,
+  I extends OpaqueIndex,
+  D extends OpaqueDocumentStore,
+  So extends OpaqueSorter,
+>(orama: Orama<S, I, D, So>, params: SearchParams, language?: string): Promise<Results> {
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
@@ -210,7 +213,11 @@ export async function search
     if (typeof params.sortBy === 'function') {
       const ids: string[] = uniqueDocsArray.map(([id]) => id)
       const docs = await orama.documentsStore.getMultiple(orama.data.docs, ids)
-      const docsWithIdAndScore: CustomSorterFunctionItem[] = docs.map((d, i) => [uniqueDocsArray[i][0], uniqueDocsArray[i][1] , d!])
+      const docsWithIdAndScore: CustomSorterFunctionItem[] = docs.map((d, i) => [
+        uniqueDocsArray[i][0],
+        uniqueDocsArray[i][1],
+        d!,
+      ])
       docsWithIdAndScore.sort(params.sortBy)
       uniqueDocsArray = docsWithIdAndScore.map(([id, score]) => [id, score])
     } else {

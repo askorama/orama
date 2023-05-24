@@ -20,17 +20,25 @@ import {
 } from '../types.js'
 import { createSorter } from '../components/sorter.js'
 
-interface CreateArguments<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter> {
+interface CreateArguments<
+  S extends Schema,
+  I extends OpaqueIndex,
+  D extends OpaqueDocumentStore,
+  So extends OpaqueSorter,
+> {
   schema: Schema
-  sort?: SorterConfig,
+  sort?: SorterConfig
   language?: string
   components?: Components<S, I, D, So>
   id?: string
 }
 
-function validateComponents
-<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter>
-(components: Components<S, I, D, So>) {
+function validateComponents<
+  S extends Schema,
+  I extends OpaqueIndex,
+  D extends OpaqueDocumentStore,
+  So extends OpaqueSorter,
+>(components: Components<S, I, D, So>) {
   const defaultComponents = {
     formatElapsedTime,
     getDocumentIndexId,
@@ -79,9 +87,12 @@ function validateComponents
   }
 }
 
-export async function create<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter>(
-  { schema, sort, language, components, id }: CreateArguments<S, I, D, So>
-): Promise<Orama<S, I, D, So>> {
+export async function create<
+  S extends Schema,
+  I extends OpaqueIndex,
+  D extends OpaqueDocumentStore,
+  So extends OpaqueSorter,
+>({ schema, sort, language, components, id }: CreateArguments<S, I, D, So>): Promise<Orama<S, I, D, So>> {
   if (!components) {
     components = {}
   }
@@ -109,11 +120,11 @@ export async function create<S extends Schema, I extends OpaqueIndex, D extends 
   }
 
   if (!index) {
-    index = (await createIndex())
+    index = await createIndex()
   }
 
   if (!sorter) {
-    sorter = (await createSorter())
+    sorter = await createSorter()
   }
 
   if (!documentsStore) {

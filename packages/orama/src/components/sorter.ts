@@ -1,5 +1,16 @@
-import { createError } from "../errors.js"
-import { ISorter, OpaqueDocumentStore, OpaqueIndex, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from "../types.js"
+import { createError } from '../errors.js'
+import {
+  ISorter,
+  OpaqueDocumentStore,
+  OpaqueIndex,
+  OpaqueSorter,
+  Orama,
+  Schema,
+  SorterConfig,
+  SorterParams,
+  SortType,
+  SortValue,
+} from '../types.js'
 
 interface PropertySort<K> {
   docs: Record<string, number>
@@ -9,24 +20,20 @@ interface PropertySort<K> {
 }
 
 export interface Sorter extends OpaqueSorter {
-  enabled: boolean,
-  sortableProperties: string[],
+  enabled: boolean
+  sortableProperties: string[]
   sortablePropertiesWithTypes: Record<string, SortType>
   sorts: Record<string, PropertySort<number | string | boolean>>
 }
 
 export type DefaultSorter = ISorter<Sorter>
 
-function innerCreate(
-  schema: Schema,
-  sortableDeniedProperties: string[],
-  prefix: string,
-): Sorter {
+function innerCreate(schema: Schema, sortableDeniedProperties: string[], prefix: string): Sorter {
   const sorter: Sorter = {
     enabled: true,
     sortableProperties: [],
     sortablePropertiesWithTypes: {},
-    sorts: {}
+    sorts: {},
   }
 
   for (const [prop, type] of Object.entries(schema)) {
@@ -43,11 +50,11 @@ function innerCreate(
       sorter.sortableProperties.push(...ret.sortableProperties)
       sorter.sorts = {
         ...sorter.sorts,
-        ...ret.sorts
+        ...ret.sorts,
       }
       sorter.sortablePropertiesWithTypes = {
         ...sorter.sortablePropertiesWithTypes,
-        ...ret.sortablePropertiesWithTypes
+        ...ret.sortablePropertiesWithTypes,
       }
       continue
     }
@@ -62,7 +69,7 @@ function innerCreate(
           docs: {},
           orderedDocs: [],
           type: type,
-          n: 0
+          n: 0,
         }
         break
       case 'boolean[]':
@@ -71,7 +78,7 @@ function innerCreate(
         // We don't allow to sort by arrays
         continue
       default:
-        throw createError('INVALID_SORT_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type as unknown as string, path)
+        throw createError('INVALID_SORT_SCHEMA_TYPE', Array.isArray(type) ? 'array' : (type as unknown as string), path)
     }
   }
 
@@ -86,7 +93,7 @@ async function create<S extends Schema, I extends OpaqueIndex, D extends OpaqueD
   const isSortEnabled = config?.enabled !== false
   if (!isSortEnabled) {
     return {
-      disabled: true
+      disabled: true,
     } as unknown as Sorter
   }
   return innerCreate(schema, (config || {}).unsortableProperties || [], '')
@@ -117,16 +124,16 @@ async function insert(
   const s = sorter.sorts[prop] as PropertySort<SortValue>
 
   let predicate: (value: [string, SortValue]) => boolean
-  switch(schemaType) {
+  switch (schemaType) {
     case 'string':
       predicate = stringSort.bind(null, value, language)
-      break;
+      break
     case 'number':
       predicate = numerSort.bind(null, value)
-      break;
+      break
     case 'boolean':
       predicate = booleanSort.bind(null, value)
-      break;
+      break
   }
 
   // Find the right position to insert the element
@@ -147,11 +154,7 @@ async function insert(
   }
 }
 
-async function remove(
-  so: Sorter,
-  prop: string,
-  id: string,
-) {
+async function remove(so: Sorter, prop: string, id: string) {
   const sorter = so as unknown as Sorter
   if (!sorter.enabled) {
     return
@@ -235,7 +238,7 @@ export async function load<R = unknown>(raw: R): Promise<Sorter> {
   const rawDocument = raw as Sorter
   if (!rawDocument.enabled) {
     return {
-      enabled: false
+      enabled: false,
     } as unknown as Sorter
   }
 
@@ -243,14 +246,14 @@ export async function load<R = unknown>(raw: R): Promise<Sorter> {
     sortableProperties: rawDocument.sortableProperties,
     sortablePropertiesWithTypes: rawDocument.sortablePropertiesWithTypes,
     sorts: rawDocument.sorts,
-    enabled: true
+    enabled: true,
   }
 }
 
 export async function save<R = unknown>(sorter: Sorter): Promise<R> {
   if (!sorter.enabled) {
     return {
-      enabled: false
+      enabled: false,
     } as unknown as R
   }
 

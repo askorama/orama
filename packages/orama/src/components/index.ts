@@ -119,9 +119,7 @@ export async function removeTokenScoreParameters(index: Index, prop: string, tok
   index.tokenOccurrencies[prop][token]--
 }
 
-export async function calculateResultScores
-<I extends OpaqueIndex, D extends OpaqueDocumentStore>
-(
+export async function calculateResultScores<I extends OpaqueIndex, D extends OpaqueDocumentStore>(
   context: SearchContext<I, D>,
   index: Index,
   prop: string,
@@ -207,7 +205,7 @@ export async function create<S extends Schema, D extends OpaqueDocumentStore, So
         index.fieldLengths[path] = {}
         break
       default:
-        throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type as unknown as string, path)
+        throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : (type as unknown as string), path)
     }
 
     index.searchableProperties.push(path)
@@ -229,9 +227,11 @@ async function insertScalar(
   docsCount: number,
 ): Promise<void> {
   switch (schemaType) {
-    case 'boolean':
-      (index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].push(id)
+    case 'boolean': {
+      const booleanIndex = index.indexes[prop] as BooleanIndex
+      booleanIndex[value ? 'true' : 'false'].push(id)
       break
+    }
     case 'number':
       avlInsert(index.indexes[prop] as AVLNode<number, string[]>, value as number, [id])
       break
@@ -264,7 +264,17 @@ export async function insert(
   const implementation = impl as unknown as IIndex<Index>
   const index = i as unknown as Index
   if (!isArrayType(schemaType)) {
-    return insertScalar(implementation, index, prop, id, value, schemaType as ScalarSearchableType, language, tokenizer, docsCount)
+    return insertScalar(
+      implementation,
+      index,
+      prop,
+      id,
+      value,
+      schemaType as ScalarSearchableType,
+      language,
+      tokenizer,
+      docsCount,
+    )
   }
 
   const innerSchemaType = getInnerType(schemaType as ArraySearchableType)
@@ -329,7 +339,17 @@ export async function remove(
   const index = i as unknown as Index
 
   if (!isArrayType(schemaType)) {
-    return removeScalar(implementation, index, prop, id, value, schemaType as ScalarSearchableType, language, tokenizer, docsCount)
+    return removeScalar(
+      implementation,
+      index,
+      prop,
+      id,
+      value,
+      schemaType as ScalarSearchableType,
+      language,
+      tokenizer,
+      docsCount,
+    )
   }
 
   const innerSchemaType = getInnerType(schemaType as ArraySearchableType)
@@ -343,9 +363,12 @@ export async function remove(
   return true
 }
 
-export async function search
-<D extends OpaqueDocumentStore>
-(context: SearchContext<Index, D>, index: Index, prop: string, term: string): Promise<TokenScore[]> {
+export async function search<D extends OpaqueDocumentStore>(
+  context: SearchContext<Index, D>,
+  index: Index,
+  prop: string,
+  term: string,
+): Promise<TokenScore[]> {
   if (!(prop in index.tokenOccurrencies)) {
     return []
   }
@@ -365,9 +388,7 @@ export async function search
   return context.index.calculateResultScores(context, index, prop, term, Array.from(ids))
 }
 
-export async function searchByWhereClause
-<I extends OpaqueIndex, D extends OpaqueDocumentStore>
-(
+export async function searchByWhereClause<I extends OpaqueIndex, D extends OpaqueDocumentStore>(
   context: SearchContext<I, D>,
   index: Index,
   filters: Record<string, boolean | ComparisonOperator>,
