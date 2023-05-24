@@ -66,7 +66,7 @@ const results = await search(db, {
 
 By default, Orama allows the sort on all properties defined in the schema.
 This creates an in-memory sort index for each properties.
-If you want to optimize the memory usage, Orama supports the `sortableDeniedProperties` list.
+If you want to optimize the memory usage, Orama supports the `unsortableProperties` list.
 
 ```javascript
 const db = await create({
@@ -81,7 +81,7 @@ const db = await create({
     },
   },
   sortBy: {
-    deniedProperties: ['year', 'meta.tag']
+    unsortableProperties: ['year', 'meta.tag']
   },
 })
 ```
