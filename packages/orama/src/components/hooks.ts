@@ -38,7 +38,12 @@ export async function runSingleHook<
   I extends OpaqueIndex,
   D extends OpaqueDocumentStore,
   So extends OpaqueSorter,
->(hooks: SingleCallbackComponent<S, I, D, So>[], orama: Orama<S, I, D, So>, id: string, doc?: Document): Promise<void> {
+>(
+  hooks: SingleCallbackComponent<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>[],
+  orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
+  id: string,
+  doc?: Document,
+): Promise<void> {
   for (let i = 0; i < hooks.length; i++) {
     await hooks[i](orama, id, doc)
   }
@@ -50,8 +55,8 @@ export async function runMultipleHook<
   D extends OpaqueDocumentStore,
   So extends OpaqueSorter,
 >(
-  hooks: MultipleCallbackComponent<S, I, D, So>[],
-  orama: Orama<S, I, D, So>,
+  hooks: MultipleCallbackComponent<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>[],
+  orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
   docsOrIds: Document[] | string[],
 ): Promise<void> {
   for (let i = 0; i < hooks.length; i++) {

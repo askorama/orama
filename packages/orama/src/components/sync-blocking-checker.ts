@@ -1,4 +1,4 @@
-import { kInsertions, kRemovals, OpaqueDocumentStore, OpaqueIndex, OpaqueSorter, Orama, Schema } from '../types.js'
+import { kInsertions, kRemovals, Orama } from '../types.js'
 
 // Web platforms don't have process. React-Native doesn't have process.emitWarning.
 const warn =
@@ -7,12 +7,7 @@ const warn =
     console.warn(`[WARNING] [${options.code}] ${message}`)
   }
 
-export function trackInsertion<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter,
->(orama: Orama<S, I, D, So>): void {
+export function trackInsertion(orama: Orama): void {
   if (typeof orama[kInsertions] !== 'number') {
     queueMicrotask(() => {
       orama[kInsertions] = undefined
@@ -33,12 +28,7 @@ export function trackInsertion<
   }
 }
 
-export function trackRemoval<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter,
->(orama: Orama<S, I, D, So>): void {
+export function trackRemoval(orama: Orama): void {
   if (typeof orama[kRemovals] !== 'number') {
     queueMicrotask(() => {
       orama[kRemovals] = undefined

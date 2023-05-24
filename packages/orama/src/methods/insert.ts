@@ -2,14 +2,9 @@ import { isArrayType } from '../components.js'
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { trackInsertion } from '../components/sync-blocking-checker.js'
 import { createError } from '../errors.js'
-import { Document, OpaqueDocumentStore, OpaqueIndex, OpaqueSorter, Orama, Schema, SortValue } from '../types.js'
+import { Document, Orama, SortValue } from '../types.js'
 
-export async function insert<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter,
->(orama: Orama<S, I, D, So>, doc: Document, language?: string, skipHooks?: boolean): Promise<string> {
+export async function insert(orama: Orama, doc: Document, language?: string, skipHooks?: boolean): Promise<string> {
   const errorProperty = await orama.validateSchema(doc, orama.schema)
   if (errorProperty) {
     throw createError('SCHEMA_VALIDATION_FAILURE', errorProperty)
@@ -18,12 +13,7 @@ export async function insert<
   return innerInsert(orama, doc, language, skipHooks)
 }
 
-async function innerInsert<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter,
->(orama: Orama<S, I, D, So>, doc: Document, language?: string, skipHooks?: boolean): Promise<string> {
+async function innerInsert(orama: Orama, doc: Document, language?: string, skipHooks?: boolean): Promise<string> {
   const { index, docs } = orama.data
 
   const id = await orama.getDocumentIndexId(doc)
@@ -126,13 +116,8 @@ async function innerInsert<
   return id
 }
 
-export async function insertMultiple<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter,
->(
-  orama: Orama<S, I, D, So>,
+export async function insertMultiple(
+  orama: Orama,
   docs: Document[],
   batchSize?: number,
   language?: string,
@@ -154,13 +139,8 @@ export async function insertMultiple<
   return innerInsertMultiple(orama, docs, batchSize, language, skipHooks)
 }
 
-export async function innerInsertMultiple<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter,
->(
-  orama: Orama<S, I, D, So>,
+export async function innerInsertMultiple(
+  orama: Orama,
   docs: Document[],
   batchSize?: number,
   language?: string,

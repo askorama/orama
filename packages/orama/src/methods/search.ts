@@ -16,10 +16,8 @@ import {
   Tokenizer,
   IDocumentsStore,
   CustomSorterFunctionItem,
-  Schema,
   OpaqueIndex,
   OpaqueDocumentStore,
-  OpaqueSorter,
 } from '../types.js'
 import { getNanosecondsTime, sortTokenScorePredicate } from '../utils.js'
 
@@ -96,12 +94,7 @@ async function createSearchContext<I extends OpaqueIndex, D extends OpaqueDocume
   }
 }
 
-export async function search<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter,
->(orama: Orama<S, I, D, So>, params: SearchParams, language?: string): Promise<Results> {
+export async function search(orama: Orama, params: SearchParams, language?: string): Promise<Results> {
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0

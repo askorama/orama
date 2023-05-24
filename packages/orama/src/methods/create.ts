@@ -17,28 +17,19 @@ import {
   OpaqueIndex,
   OpaqueDocumentStore,
   OpaqueSorter,
+  ProvidedTypes,
 } from '../types.js'
 import { createSorter } from '../components/sorter.js'
 
-interface CreateArguments<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter,
-> {
+interface CreateArguments<A extends ProvidedTypes> {
   schema: Schema
   sort?: SorterConfig
   language?: string
-  components?: Components<S, I, D, So>
+  components?: Components<A>
   id?: string
 }
 
-function validateComponents<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter,
->(components: Components<S, I, D, So>) {
+function validateComponents<A extends ProvidedTypes>(components: Components<A>) {
   const defaultComponents = {
     formatElapsedTime,
     getDocumentIndexId,
@@ -60,7 +51,7 @@ function validateComponents<
   }
 
   for (const rawKey of SINGLE_OR_ARRAY_COMPONENTS) {
-    const key = rawKey as keyof ArrayCallbackComponents<S, I, D, So>
+    const key = rawKey as keyof ArrayCallbackComponents<A>
 
     if (!components[key]) {
       components[key] = []
@@ -69,7 +60,7 @@ function validateComponents<
       components[key] = [components[key]]
     }
 
-    for (const fn of components[key] as unknown as SingleOrArrayCallbackComponents<S, I, D, So>[]) {
+    for (const fn of components[key] as unknown as SingleOrArrayCallbackComponents<A>[]) {
       if (typeof fn !== 'function') {
         throw createError('COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS', key)
       }
@@ -87,12 +78,13 @@ function validateComponents<
   }
 }
 
-export async function create<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter,
->({ schema, sort, language, components, id }: CreateArguments<S, I, D, So>): Promise<Orama<S, I, D, So>> {
+export async function create<A extends ProvidedTypes>({
+  schema,
+  sort,
+  language,
+  components,
+  id,
+}: CreateArguments<A>): Promise<Orama<A>> {
   if (!components) {
     components = {}
   }
@@ -179,7 +171,7 @@ export async function create<
     afterMultipleUpdate,
     formatElapsedTime,
     id,
-  } as Orama<S, I, D, So>
+  } as Orama
 
   orama.data = {
     index: await orama.index.create(orama, schema),

@@ -14,7 +14,7 @@ async function rm(path: string): Promise<void> {
   return _rm(path)
 }
 
-async function generateTestDBInstance(): Promise<Orama<any, any, any, any>> {
+async function generateTestDBInstance(): Promise<Orama<any>> {
   const db = await create({
     schema: {
       quote: 'string',

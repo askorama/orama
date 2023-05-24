@@ -1,16 +1,5 @@
 import { createError } from '../errors.js'
-import {
-  ISorter,
-  OpaqueDocumentStore,
-  OpaqueIndex,
-  OpaqueSorter,
-  Orama,
-  Schema,
-  SorterConfig,
-  SorterParams,
-  SortType,
-  SortValue,
-} from '../types.js'
+import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from '../types.js'
 
 interface PropertySort<K> {
   docs: Record<string, number>
@@ -85,11 +74,7 @@ function innerCreate(schema: Schema, sortableDeniedProperties: string[], prefix:
   return sorter
 }
 
-async function create<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-  _: Orama<S, I, D, Sorter>,
-  schema: Schema,
-  config?: SorterConfig,
-): Promise<Sorter> {
+async function create(_: Orama, schema: Schema, config?: SorterConfig): Promise<Sorter> {
   const isSortEnabled = config?.enabled !== false
   if (!isSortEnabled) {
     return {

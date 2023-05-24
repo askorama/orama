@@ -1,15 +1,16 @@
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { createError } from '../errors.js'
-import { Document, OpaqueDocumentStore, OpaqueIndex, OpaqueSorter, Orama, Schema } from '../types.js'
+import { Document, Orama } from '../types.js'
 import { innerInsertMultiple, insert } from './insert.js'
 import { remove, removeMultiple } from './remove.js'
 
-export async function update<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter,
->(orama: Orama<S, I, D, So>, id: string, doc: Document, language?: string, skipHooks?: boolean): Promise<string> {
+export async function update(
+  orama: Orama,
+  id: string,
+  doc: Document,
+  language?: string,
+  skipHooks?: boolean,
+): Promise<string> {
   if (!skipHooks && orama.beforeUpdate) {
     await runSingleHook(orama.beforeUpdate, orama, id)
   }
@@ -24,13 +25,8 @@ export async function update<
   return newId
 }
 
-export async function updateMultiple<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter,
->(
-  orama: Orama<S, I, D, So>,
+export async function updateMultiple(
+  orama: Orama,
   ids: string[],
   docs: Document[],
   batchSize?: number,

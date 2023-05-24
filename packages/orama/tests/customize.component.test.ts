@@ -1,13 +1,18 @@
 import t from 'tap'
-import { create, insert, load, remove, save, search } from '../src/index.js'
-import { sorter as defaultSorter, documentsStore as defaultDocumentsStore, index as defaultIndex } from '../src/components.js'
+import { ISorter, OpaqueSorter, Orama, create, insert, load, remove, save, search } from '../src/index.js'
+import {
+  sorter as defaultSorter,
+  documentsStore as defaultDocumentsStore,
+  index as defaultIndex,
+} from '../src/components.js'
+import { DefaultSorter, Sorter } from '../src/components/sorter.js'
 
 t.test('index', t => {
   t.test('should allow custom component', async t => {
     const index = await defaultIndex.createIndex()
     const db = await create({
       schema: {
-        number: 'number'
+        number: 'number',
       },
       components: {
         index: {
@@ -15,8 +20,8 @@ t.test('index', t => {
           remove(impl, i, prop, id, value, schemaType, language, tokenizer, docsCount) {
             return index.remove(impl, i, prop, id, value, schemaType, language, tokenizer, docsCount)
           },
-        }
-      }
+        },
+      },
     })
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })
@@ -35,7 +40,7 @@ t.test('documentStore', t => {
     const store = await defaultDocumentsStore.createDocumentsStore()
     const db = await create({
       schema: {
-        number: 'number'
+        number: 'number',
       },
       components: {
         documentsStore: {
@@ -67,7 +72,7 @@ t.test('documentStore', t => {
             return store.store(s, id, doc)
           },
         },
-      }
+      },
     })
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })
@@ -82,7 +87,7 @@ t.test('documentStore', t => {
     const store = await defaultDocumentsStore.createDocumentsStore()
     const db = await create({
       schema: {
-        number: 'number'
+        number: 'number',
       },
       components: {
         documentsStore: {
@@ -91,7 +96,7 @@ t.test('documentStore', t => {
             return store.remove(s, id)
           },
         },
-      }
+      },
     })
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })
@@ -111,7 +116,7 @@ t.test('sorter', t => {
     const order: string[] = []
     const db = await create({
       schema: {
-        number: 'number'
+        number: 'number',
       },
       components: {
         sorter: {
@@ -145,18 +150,16 @@ t.test('sorter', t => {
           getSortablePropertiesWithTypes(sort) {
             return s.getSortablePropertiesWithTypes(sort)
           },
-        }
-      }
+        },
+      },
     })
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })
     await remove(db, id)
     const raw = await save(db)
     await load(db, raw)
-    
-    t.strictSame(order, [
-      'create', 'insert', 'sortBy', 'remove', 'save', 'load'
-    ])
+
+    t.strictSame(order, ['create', 'insert', 'sortBy', 'remove', 'save', 'load'])
 
     t.end()
   })
@@ -166,27 +169,80 @@ t.test('sorter', t => {
     const order: string[] = []
     const db = await create({
       schema: {
-        number: 'number'
+        number: 'number',
       },
       components: {
         sorter: {
-          ...(s),
+          ...s,
           async remove(sort, prop, id) {
             order.push('remove')
             return s.remove(sort, prop, id)
           },
-        }
-      }
+        },
+      },
     })
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })
     await remove(db, id)
     const raw = await save(db)
     await load(db, raw)
-    
-    t.strictSame(order, [
-      'remove'
-    ])
+
+    t.strictSame(order, ['remove'])
+
+    t.end()
+  })
+
+  t.test('should allow custom component - partial type definition', async t => {
+    interface SorterStorage extends OpaqueSorter {
+      storage: Sorter
+    }
+    class MyCustomSorter implements ISorter<SorterStorage> {
+      constructor(private sorter: DefaultSorter) {
+        this.sorter = sorter
+      }
+      async sortBy(sort, docIds, by) {
+        return this.sorter.sortBy(sort.storage, docIds, by)
+      }
+      async create(orama, schema, config) {
+        return {
+          storage: await this.sorter.create(orama, schema, config),
+        }
+      }
+      async insert(sort: SorterStorage, prop, id, value, schemaType, language) {
+        return this.sorter.insert(sort.storage, prop, id, value, schemaType, language)
+      }
+      async remove(sort: SorterStorage, prop, id) {
+        return this.sorter.remove(sort.storage, prop, id)
+      }
+      async load(raw) {
+        return {
+          storage: await this.sorter.load(raw),
+        }
+      }
+      async save<R = unknown>(sort) {
+        return this.sorter.save(sort.storage) as R
+      }
+      getSortableProperties(sort) {
+        return this.sorter.getSortableProperties(sort.storage)
+      }
+      getSortablePropertiesWithTypes(sort) {
+        return this.sorter.getSortablePropertiesWithTypes(sort.storage)
+      }
+    }
+
+    const db: Orama<{ Sorter: MyCustomSorter }> = await create({
+      schema: {
+        number: 'number',
+      },
+      components: {
+        sorter: new MyCustomSorter(await defaultSorter.createSorter()),
+      },
+    })
+    const id = await insert(db, { number: 1 })
+    await search(db, { sortBy: { property: 'number' } })
+    await remove(db, id)
+    const raw = await save(db)
+    await load(db, raw)
 
     t.end()
   })

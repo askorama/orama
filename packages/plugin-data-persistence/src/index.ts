@@ -1,5 +1,5 @@
 import { decode, encode } from '@msgpack/msgpack'
-import { create, load, OpaqueDocumentStore, OpaqueIndex, OpaqueSorter, Orama, save, Schema } from '@orama/orama'
+import { create, load, Orama, save, Schema } from '@orama/orama'
 // @ts-expect-error dpack does not expose types
 import * as dpack from 'dpack'
 import { FILESYSTEM_NOT_SUPPORTED_ON_RUNTIME, UNSUPPORTED_FORMAT } from './errors.js'
@@ -152,12 +152,11 @@ export async function getDefaultFileName(format: PersistenceFormat, runtime?: Ru
   return `${dbName}.${extension}`
 }
 
-export async function persist<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter
->(db: Orama<S, I, D, So>, format: PersistenceFormat = 'binary', runtime?: Runtime): Promise<string | Buffer> {
+export async function persist<T extends Schema>(
+  db: Orama<{ Schema: T }>,
+  format: PersistenceFormat = 'binary',
+  runtime?: Runtime
+): Promise<string | Buffer> {
   if (!runtime) {
     runtime = detectRuntime()
   }
@@ -191,12 +190,11 @@ export async function persist<
   return serialized
 }
 
-export async function restore<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter
->(format: PersistenceFormat, data: string | Buffer, runtime?: Runtime): Promise<Orama<S, I, D, So>> {
+export async function restore<T extends Schema>(
+  format: PersistenceFormat,
+  data: string | Buffer,
+  runtime?: Runtime
+): Promise<Orama<T>> {
   if (!runtime) {
     runtime = detectRuntime()
   }
@@ -230,15 +228,15 @@ export async function restore<
 
   await load(db, deserialized)
 
-  return db as unknown as Orama<S, I, D, So>
+  return db as unknown as Orama<T>
 }
 
-export async function persistToFile<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter
->(db: Orama<S, I, D, So>, format: PersistenceFormat = 'binary', path?: string, runtime?: Runtime): Promise<string> {
+export async function persistToFile<T extends Schema>(
+  db: Orama<{ Schema: T }>,
+  format: PersistenceFormat = 'binary',
+  path?: string,
+  runtime?: Runtime
+): Promise<string> {
   if (!runtime) {
     runtime = detectRuntime()
   }
@@ -258,12 +256,11 @@ export async function persistToFile<
   return path
 }
 
-export async function restoreFromFile<
-  S extends Schema,
-  I extends OpaqueIndex,
-  D extends OpaqueDocumentStore,
-  So extends OpaqueSorter
->(format: PersistenceFormat = 'binary', path?: string, runtime?: Runtime): Promise<Orama<S, I, D, So>> {
+export async function restoreFromFile<T extends Schema>(
+  format: PersistenceFormat = 'binary',
+  path?: string,
+  runtime?: Runtime
+): Promise<Orama<T>> {
   if (!runtime) {
     runtime = detectRuntime()
   }

@@ -23,7 +23,6 @@ import {
   IIndex,
   OpaqueDocumentStore,
   OpaqueIndex,
-  OpaqueSorter,
   Orama,
   ScalarSearchableType,
   Schema,
@@ -159,8 +158,8 @@ export async function calculateResultScores<I extends OpaqueIndex, D extends Opa
   return scoreList
 }
 
-export async function create<S extends Schema, D extends OpaqueDocumentStore, So extends OpaqueSorter>(
-  orama: Orama<S, Index, D, So>,
+export async function create(
+  orama: Orama<{ Index: DefaultIndex }>,
   schema: Schema,
   index?: Index,
   prefix = '',
