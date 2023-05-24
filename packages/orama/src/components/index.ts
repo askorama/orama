@@ -119,8 +119,10 @@ export async function removeTokenScoreParameters(index: Index, prop: string, tok
   index.tokenOccurrencies[prop][token]--
 }
 
-export async function calculateResultScores(
-  context: SearchContext,
+export async function calculateResultScores
+<I extends OpaqueIndex, D extends OpaqueDocumentStore>
+(
+  context: SearchContext<I, D>,
   index: Index,
   prop: string,
   term: string,
@@ -341,7 +343,9 @@ export async function remove(
   return true
 }
 
-export async function search(context: SearchContext, index: Index, prop: string, term: string): Promise<TokenScore[]> {
+export async function search
+<D extends OpaqueDocumentStore>
+(context: SearchContext<Index, D>, index: Index, prop: string, term: string): Promise<TokenScore[]> {
   if (!(prop in index.tokenOccurrencies)) {
     return []
   }
@@ -361,8 +365,10 @@ export async function search(context: SearchContext, index: Index, prop: string,
   return context.index.calculateResultScores(context, index, prop, term, Array.from(ids))
 }
 
-export async function searchByWhereClause(
-  context: SearchContext,
+export async function searchByWhereClause
+<I extends OpaqueIndex, D extends OpaqueDocumentStore>
+(
+  context: SearchContext<I, D>,
   index: Index,
   filters: Record<string, boolean | ComparisonOperator>,
 ): Promise<string[]> {

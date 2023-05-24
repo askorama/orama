@@ -279,11 +279,11 @@ export type TokenMap = Record<string, TokenScore[]>
 
 export type IndexMap = Record<string, TokenMap>
 
-export type SearchContext = {
+export type SearchContext<I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
   timeStart: bigint
   tokenizer: Tokenizer
-  index: IIndex
-  documentsStore: IDocumentsStore
+  index: IIndex<I>
+  documentsStore: IDocumentsStore<D>
   language: string | undefined
   params: SearchParams
   docsCount: number
@@ -374,17 +374,17 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   insertTokenScoreParameters(index: I, prop: string, id: string, tokens: string[], token: string): SyncOrAsyncValue
   removeDocumentScoreParameters(index: I, prop: string, id: string, docsCount: number): SyncOrAsyncValue
   removeTokenScoreParameters(index: I, prop: string, token: string): SyncOrAsyncValue
-  calculateResultScores(
-    context: SearchContext,
+  calculateResultScores<D extends OpaqueDocumentStore>(
+    context: SearchContext<I, D>,
     index: I,
     prop: string,
     term: string,
     ids: string[],
   ): SyncOrAsyncValue<TokenScore[]>
 
-  search(context: SearchContext, index: I, prop: string, term: string): SyncOrAsyncValue<TokenScore[]>
-  searchByWhereClause(
-    context: SearchContext,
+  search<D extends OpaqueDocumentStore>(context: SearchContext<I, D>, index: I, prop: string, term: string): SyncOrAsyncValue<TokenScore[]>
+  searchByWhereClause<D extends OpaqueDocumentStore>(
+    context: SearchContext<I, D>,
     index: I,
     filters: Record<string, boolean | string | string[] | ComparisonOperator>,
   ): SyncOrAsyncValue<string[]>

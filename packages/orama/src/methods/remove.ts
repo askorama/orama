@@ -1,8 +1,10 @@
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { trackRemoval } from '../components/sync-blocking-checker.js'
-import { Orama } from '../types.js'
+import { OpaqueDocumentStore, OpaqueIndex, OpaqueSorter, Orama, Schema } from '../types.js'
 
-export async function remove(orama: Orama, id: string, language?: string, skipHooks?: boolean): Promise<boolean> {
+export async function remove
+<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter>
+(orama: Orama<S, I, D, So>, id: string, language?: string, skipHooks?: boolean): Promise<boolean> {
   let result = true
   const { index, docs } = orama.data
 
@@ -60,8 +62,9 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
   return result
 }
 
-export async function removeMultiple(
-  orama: Orama,
+export async function removeMultiple
+<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter>(
+  orama: Orama<S, I, D, So>,
   ids: string[],
   batchSize?: number,
   language?: string,

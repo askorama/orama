@@ -1,11 +1,13 @@
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { createError } from '../errors.js'
-import { Document, Orama } from '../types.js'
+import { Document, OpaqueDocumentStore, OpaqueIndex, OpaqueSorter, Orama, Schema } from '../types.js'
 import { innerInsertMultiple, insert } from './insert.js'
 import { remove, removeMultiple } from './remove.js'
 
-export async function update(
-  orama: Orama,
+export async function update
+<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter>
+(
+  orama: Orama<S, I, D, So>,
   id: string,
   doc: Document,
   language?: string,
@@ -25,8 +27,10 @@ export async function update(
   return newId
 }
 
-export async function updateMultiple(
-  orama: Orama,
+export async function updateMultiple
+<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter>
+(
+  orama: Orama<S, I, D, So>,
   ids: string[],
   docs: Document[],
   batchSize?: number,
