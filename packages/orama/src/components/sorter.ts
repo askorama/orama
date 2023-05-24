@@ -95,14 +95,13 @@ function booleanSort(value: SortValue, d: [string, SortValue]): boolean {
 }
 
 async function insert(
-  so: Sorter,
+  sorter: Sorter,
   prop: string,
   id: string,
   value: SortValue,
   schemaType: SortType,
   language: string | undefined,
 ): Promise<void> {
-  const sorter = so as unknown as Sorter
   if (!sorter.enabled) {
     return
   }
@@ -139,8 +138,7 @@ async function insert(
   }
 }
 
-async function remove(so: Sorter, prop: string, id: string) {
-  const sorter = so as unknown as Sorter
+async function remove(sorter: Sorter, prop: string, id: string) {
   if (!sorter.enabled) {
     return
   }

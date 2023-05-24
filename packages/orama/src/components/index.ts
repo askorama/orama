@@ -250,8 +250,8 @@ async function insertScalar(
 }
 
 export async function insert(
-  impl: DefaultIndex,
-  i: Index,
+  implementation: DefaultIndex,
+  index: Index,
   prop: string,
   id: string,
   value: SearchableValue,
@@ -260,8 +260,6 @@ export async function insert(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<void> {
-  const implementation = impl as unknown as IIndex<Index>
-  const index = i as unknown as Index
   if (!isArrayType(schemaType)) {
     return insertScalar(
       implementation,
@@ -324,8 +322,8 @@ async function removeScalar(
 }
 
 export async function remove(
-  impl: DefaultIndex,
-  i: Index,
+  implementation: DefaultIndex,
+  index: Index,
   prop: string,
   id: string,
   value: SearchableValue,
@@ -334,9 +332,6 @@ export async function remove(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<boolean> {
-  const implementation = impl as unknown as IIndex<Index>
-  const index = i as unknown as Index
-
   if (!isArrayType(schemaType)) {
     return removeScalar(
       implementation,

@@ -15,7 +15,7 @@ export async function create(): Promise<DocumentsStore> {
 }
 
 export async function get(store: DocumentsStore, id: string): Promise<Document | undefined> {
-  return (store as unknown as DocumentsStore).docs[id]
+  return store.docs[id]
 }
 
 export async function getMultiple(store: DocumentsStore, ids: string[]): Promise<(Document | undefined)[]> {
