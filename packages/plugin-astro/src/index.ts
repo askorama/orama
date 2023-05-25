@@ -82,7 +82,7 @@ async function prepareOramaDb(
   })
 
   for (const { pathname, generatedFilePath } of pathsToBeIndexed) {
-    const htmlContent = readFileSync(generatedFilePath, { encoding: 'utf8' })
+    const htmlContent = readFileSync(generatedFilePath as string, { encoding: 'utf8' })
 
     const title = titleConverter(htmlContent) ?? ''
     const h1 = h1Converter(htmlContent) ?? ''
