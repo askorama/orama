@@ -18,6 +18,10 @@ import {
   OpaqueDocumentStore,
   OpaqueSorter,
   ProvidedTypes,
+  AfterSearch,
+  SingleCallbackComponent,
+  MultipleCallbackComponent,
+  SingleOrArray,
 } from '../types.js'
 import { createSorter } from '../components/sorter.js'
 
@@ -53,7 +57,12 @@ function validateComponents<P extends ProvidedTypes>(components: Components<P>) 
   for (const rawKey of SINGLE_OR_ARRAY_COMPONENTS) {
     const key = rawKey as keyof ArrayCallbackComponents<P>
 
-    if (!components[key]) {
+    const component:
+      | SingleOrArray<AfterSearch<P>>
+      | SingleOrArray<SingleCallbackComponent<P>>
+      | SingleOrArray<MultipleCallbackComponent<P>>
+      | undefined = components[key]
+    if (!component) {
       components[key] = []
     } else if (!Array.isArray(components[key])) {
       // @ts-expect-error TSC is unable to resolve this
@@ -129,6 +138,7 @@ export async function create<P extends ProvidedTypes>({
     afterRemove,
     beforeUpdate,
     afterUpdate,
+    afterSearch,
     beforeMultipleInsert,
     afterMultipleInsert,
     beforeMultipleRemove,
@@ -155,6 +165,7 @@ export async function create<P extends ProvidedTypes>({
     afterRemove,
     beforeUpdate,
     afterUpdate,
+    afterSearch,
     beforeMultipleInsert,
     afterMultipleInsert,
     beforeMultipleRemove,

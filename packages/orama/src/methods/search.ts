@@ -2,6 +2,7 @@ import { prioritizeTokenScores } from '../components/algorithms.js'
 import { getFacets } from '../components/facets.js'
 import { intersectFilteredIDs } from '../components/filters.js'
 import { getGroups } from '../components/groups.js'
+import { runAfterSearch } from '../components/hooks.js'
 import { createError } from '../errors.js'
 import {
   BM25Params,
@@ -38,6 +39,7 @@ async function createSearchContext<I extends OpaqueIndex, D extends OpaqueDocume
   properties: string[],
   tokens: string[],
   docsCount: number,
+  timeStart: bigint,
 ): Promise<SearchContext<I, D, AggValue>> {
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
   // const hasFilters = Object.keys(params.where ?? {}).length > 0;
@@ -83,7 +85,7 @@ async function createSearchContext<I extends OpaqueIndex, D extends OpaqueDocume
   }
 
   return {
-    timeStart: await getNanosecondsTime(),
+    timeStart,
     tokenizer,
     index,
     documentsStore,
@@ -97,6 +99,8 @@ async function createSearchContext<I extends OpaqueIndex, D extends OpaqueDocume
 }
 
 export async function search<AggValue = Result[]>(orama: Orama, params: SearchParams<AggValue>, language?: string): Promise<Results<AggValue>> {
+  const timeStart = await getNanosecondsTime()
+
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
@@ -139,6 +143,7 @@ export async function search<AggValue = Result[]>(orama: Orama, params: SearchPa
     propertiesToSearch,
     tokens,
     await orama.documentsStore.count(docs),
+    timeStart,
   )
 
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
@@ -228,8 +233,8 @@ export async function search<AggValue = Result[]>(orama: Orama, params: SearchPa
 
   const searchResult: Results<AggValue> = {
     elapsed: {
-      raw: 0,
       formatted: '',
+      raw: 0,
     },
     // We keep the hits array empty if it's a preflight request.
     hits: [],
@@ -250,6 +255,11 @@ export async function search<AggValue = Result[]>(orama: Orama, params: SearchPa
     searchResult.groups = await getGroups(orama, uniqueDocsArray, params.groupBy)
   }
 
+  if (orama.afterSearch) {
+    await runAfterSearch(orama.afterSearch, orama, params, language, searchResult)
+  }
+
+  // Calculate elapsed time only at the end of the function
   searchResult.elapsed = (await orama.formatElapsedTime(
     (await getNanosecondsTime()) - context.timeStart,
   )) as ElapsedTime
