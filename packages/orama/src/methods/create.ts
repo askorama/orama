@@ -8,23 +8,28 @@ import { uniqueId } from '../utils.js'
 import {
   ArrayCallbackComponents,
   Components,
-  IDocumentsStore,
-  IIndex,
   Orama,
   Schema,
   FunctionComponents,
   SingleOrArrayCallbackComponents,
   Tokenizer,
+  SorterConfig,
+  OpaqueIndex,
+  OpaqueDocumentStore,
+  OpaqueSorter,
+  ProvidedTypes,
 } from '../types.js'
+import { createSorter } from '../components/sorter.js'
 
-interface CreateArguments {
+interface CreateArguments<A extends ProvidedTypes> {
   schema: Schema
+  sort?: SorterConfig
   language?: string
-  components?: Components
+  components?: Components<A>
   id?: string
 }
 
-function validateComponents(components: Components) {
+function validateComponents<A extends ProvidedTypes>(components: Components<A>) {
   const defaultComponents = {
     formatElapsedTime,
     getDocumentIndexId,
@@ -46,7 +51,7 @@ function validateComponents(components: Components) {
   }
 
   for (const rawKey of SINGLE_OR_ARRAY_COMPONENTS) {
-    const key = rawKey as keyof ArrayCallbackComponents
+    const key = rawKey as keyof ArrayCallbackComponents<A>
 
     if (!components[key]) {
       components[key] = []
@@ -55,7 +60,7 @@ function validateComponents(components: Components) {
       components[key] = [components[key]]
     }
 
-    for (const fn of components[key] as unknown as SingleOrArrayCallbackComponents[]) {
+    for (const fn of components[key] as unknown as SingleOrArrayCallbackComponents<A>[]) {
       if (typeof fn !== 'function') {
         throw createError('COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS', key)
       }
@@ -73,7 +78,13 @@ function validateComponents(components: Components) {
   }
 }
 
-export async function create({ schema, language, components, id }: CreateArguments): Promise<Orama> {
+export async function create<A extends ProvidedTypes>({
+  schema,
+  sort,
+  language,
+  components,
+  id,
+}: CreateArguments<A>): Promise<Orama<A>> {
   if (!components) {
     components = {}
   }
@@ -83,8 +94,9 @@ export async function create({ schema, language, components, id }: CreateArgumen
   }
 
   let tokenizer = components.tokenizer as Tokenizer
-  let index = components.index
-  let documentsStore = components.documentsStore
+  let index: OpaqueIndex | undefined = components.index
+  let documentsStore: OpaqueDocumentStore | undefined = components.documentsStore
+  let sorter: OpaqueSorter | undefined = components.sorter
 
   if (!tokenizer) {
     // Use the default tokenizer
@@ -100,11 +112,15 @@ export async function create({ schema, language, components, id }: CreateArgumen
   }
 
   if (!index) {
-    index = (await createIndex()) as unknown as IIndex
+    index = await createIndex()
+  }
+
+  if (!sorter) {
+    sorter = await createSorter()
   }
 
   if (!documentsStore) {
-    documentsStore = (await createDocumentsStore()) as unknown as IDocumentsStore
+    documentsStore = await createDocumentsStore()
   }
 
   // Validate all other components
@@ -136,6 +152,7 @@ export async function create({ schema, language, components, id }: CreateArgumen
     schema,
     tokenizer,
     index,
+    sorter,
     documentsStore,
     getDocumentProperties,
     getDocumentIndexId,
@@ -159,6 +176,7 @@ export async function create({ schema, language, components, id }: CreateArgumen
   orama.data = {
     index: await orama.index.create(orama, schema),
     docs: await orama.documentsStore.create(orama),
+    sorting: await orama.sorter.create(orama, schema, sort),
   }
 
   return orama

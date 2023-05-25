@@ -15,6 +15,9 @@ import {
   IIndex,
   Tokenizer,
   IDocumentsStore,
+  CustomSorterFunctionItem,
+  OpaqueIndex,
+  OpaqueDocumentStore,
 } from '../types.js'
 import { getNanosecondsTime, sortTokenScorePredicate } from '../utils.js'
 
@@ -24,16 +27,16 @@ const defaultBM25Params: BM25Params = {
   d: 0.5,
 }
 
-async function createSearchContext(
+async function createSearchContext<I extends OpaqueIndex, D extends OpaqueDocumentStore>(
   tokenizer: Tokenizer,
-  index: IIndex,
-  documentsStore: IDocumentsStore,
+  index: IIndex<I>,
+  documentsStore: IDocumentsStore<D>,
   language: string | undefined,
   params: SearchParams,
   properties: string[],
   tokens: string[],
   docsCount: number,
-): Promise<SearchContext> {
+): Promise<SearchContext<I, D>> {
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
   // const hasFilters = Object.keys(params.where ?? {}).length > 0;
   // let whereFiltersIDs: string[] = [];
@@ -191,18 +194,33 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
     )
   }
 
-  // Get unique doc IDs from uniqueDocsIDs map, sorted by value.
-  let uniqueDocsArray = Object.entries(context.uniqueDocsIDs).sort(sortTokenScorePredicate)
+  // Get unique doc IDs from uniqueDocsIDs map
+  let uniqueDocsArray = Object.entries(context.uniqueDocsIDs)
 
   // If filters are enabled, we need to remove the IDs of the documents that don't match the filters.
   if (hasFilters) {
     uniqueDocsArray = intersectFilteredIDs(whereFiltersIDs, uniqueDocsArray)
   }
 
-  const resultIDs: Set<string> = new Set()
-  // Populate facets if needed
-  const facets = shouldCalculateFacets ? await getFacets(orama, uniqueDocsArray, params.facets!) : {}
+  if (params.sortBy) {
+    if (typeof params.sortBy === 'function') {
+      const ids: string[] = uniqueDocsArray.map(([id]) => id)
+      const docs = await orama.documentsStore.getMultiple(orama.data.docs, ids)
+      const docsWithIdAndScore: CustomSorterFunctionItem[] = docs.map((d, i) => [
+        uniqueDocsArray[i][0],
+        uniqueDocsArray[i][1],
+        d!,
+      ])
+      docsWithIdAndScore.sort(params.sortBy)
+      uniqueDocsArray = docsWithIdAndScore.map(([id, score]) => [id, score])
+    } else {
+      uniqueDocsArray = await orama.sorter.sortBy(orama.data.sorting, uniqueDocsArray, params.sortBy)
+    }
+  } else {
+    uniqueDocsArray = uniqueDocsArray.sort(sortTokenScorePredicate)
+  }
 
+  const resultIDs: Set<string> = new Set()
   if (!isPreflight) {
     // We already have the list of ALL the document IDs containing the search terms.
     // We loop over them starting from a positional value "offset" and ending at "offset + limit"
@@ -239,6 +257,8 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   }
 
   if (shouldCalculateFacets) {
+    // Populate facets if needed
+    const facets = await getFacets(orama, uniqueDocsArray, params.facets!)
     searchResult.facets = facets
   }
 

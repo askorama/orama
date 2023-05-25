@@ -3,6 +3,7 @@
   "fields-boosting": "Fields boosting",
   "facets": "Facets",
   "filters": "Filters",
+  "sorting": "Sorting",
   "threshold": "Threshold",
   "preflight": "Preflight Search",
   "BM25-algorithm": "BM25 Algorithm"

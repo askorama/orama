@@ -71,9 +71,9 @@ export async function validateSchema<S extends Schema = Schema>(doc: Document, s
 }
 
 const IS_ARRAY_TYPE: Record<SearchableType, boolean> = {
-  'string': false,
-  'number': false,
-  'boolean': false,
+  string: false,
+  number: false,
+  boolean: false,
   'string[]': true,
   'number[]': true,
   'boolean[]': true,

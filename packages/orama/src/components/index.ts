@@ -21,6 +21,7 @@ import {
   BM25Params,
   ComparisonOperator,
   IIndex,
+  OpaqueDocumentStore,
   OpaqueIndex,
   Orama,
   ScalarSearchableType,
@@ -117,8 +118,8 @@ export async function removeTokenScoreParameters(index: Index, prop: string, tok
   index.tokenOccurrencies[prop][token]--
 }
 
-export async function calculateResultScores(
-  context: SearchContext,
+export async function calculateResultScores<I extends OpaqueIndex, D extends OpaqueDocumentStore>(
+  context: SearchContext<I, D>,
   index: Index,
   prop: string,
   term: string,
@@ -158,7 +159,7 @@ export async function calculateResultScores(
 }
 
 export async function create(
-  orama: Orama<{ Index: Index }>,
+  orama: Orama<{ Index: DefaultIndex }>,
   schema: Schema,
   index?: Index,
   prefix = '',
@@ -203,7 +204,7 @@ export async function create(
         index.fieldLengths[path] = {}
         break
       default:
-        throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : typeActualType)
+        throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : (type as unknown as string), path)
     }
 
     index.searchableProperties.push(path)
@@ -225,9 +226,11 @@ async function insertScalar(
   docsCount: number,
 ): Promise<void> {
   switch (schemaType) {
-    case 'boolean':
-      (index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].push(id)
+    case 'boolean': {
+      const booleanIndex = index.indexes[prop] as BooleanIndex
+      booleanIndex[value ? 'true' : 'false'].push(id)
       break
+    }
     case 'number':
       avlInsert(index.indexes[prop] as AVLNode<number, string[]>, value as number, [id])
       break
@@ -247,7 +250,7 @@ async function insertScalar(
 }
 
 export async function insert(
-  implementation: IIndex<Index>,
+  implementation: DefaultIndex,
   index: Index,
   prop: string,
   id: string,
@@ -258,7 +261,17 @@ export async function insert(
   docsCount: number,
 ): Promise<void> {
   if (!isArrayType(schemaType)) {
-    return insertScalar(implementation, index, prop, id, value, schemaType as ScalarSearchableType, language, tokenizer, docsCount)
+    return insertScalar(
+      implementation,
+      index,
+      prop,
+      id,
+      value,
+      schemaType as ScalarSearchableType,
+      language,
+      tokenizer,
+      docsCount,
+    )
   }
 
   const innerSchemaType = getInnerType(schemaType as ArraySearchableType)
@@ -309,7 +322,7 @@ async function removeScalar(
 }
 
 export async function remove(
-  implementation: IIndex<Index>,
+  implementation: DefaultIndex,
   index: Index,
   prop: string,
   id: string,
@@ -320,7 +333,17 @@ export async function remove(
   docsCount: number,
 ): Promise<boolean> {
   if (!isArrayType(schemaType)) {
-    return removeScalar(implementation, index, prop, id, value, schemaType as ScalarSearchableType, language, tokenizer, docsCount)
+    return removeScalar(
+      implementation,
+      index,
+      prop,
+      id,
+      value,
+      schemaType as ScalarSearchableType,
+      language,
+      tokenizer,
+      docsCount,
+    )
   }
 
   const innerSchemaType = getInnerType(schemaType as ArraySearchableType)
@@ -334,7 +357,12 @@ export async function remove(
   return true
 }
 
-export async function search(context: SearchContext, index: Index, prop: string, term: string): Promise<TokenScore[]> {
+export async function search<D extends OpaqueDocumentStore>(
+  context: SearchContext<Index, D>,
+  index: Index,
+  prop: string,
+  term: string,
+): Promise<TokenScore[]> {
   if (!(prop in index.tokenOccurrencies)) {
     return []
   }
@@ -354,8 +382,8 @@ export async function search(context: SearchContext, index: Index, prop: string,
   return context.index.calculateResultScores(context, index, prop, term, Array.from(ids))
 }
 
-export async function searchByWhereClause(
-  context: SearchContext,
+export async function searchByWhereClause<I extends OpaqueIndex, D extends OpaqueDocumentStore>(
+  context: SearchContext<I, D>,
   index: Index,
   filters: Record<string, boolean | ComparisonOperator>,
 ): Promise<string[]> {

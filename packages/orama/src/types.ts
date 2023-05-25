@@ -13,6 +13,9 @@ export interface OpaqueIndex {}
 export interface OpaqueDocumentStore {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface OpaqueSorter {}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Schema extends Record<string, SearchableType | Schema> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -22,7 +25,12 @@ export type ScalarSearchableType = 'string' | 'number' | 'boolean'
 export type ArraySearchableType = 'string[]' | 'number[]' | 'boolean[]'
 export type SearchableType = ScalarSearchableType | ArraySearchableType
 
-export type SearchableValue = string | number | boolean | string[] | number[] | boolean[]
+export type ScalarSearchableValue = string | number | boolean
+export type ArraySearchableValue = string[] | number[] | boolean[]
+export type SearchableValue = ScalarSearchableValue | ArraySearchableValue
+
+export type SortType = 'string' | 'number' | 'boolean'
+export type SortValue = string | number | boolean
 
 export type BM25Params = {
   k?: number
@@ -58,6 +66,28 @@ export type ComparisonOperator = {
   between?: [number, number]
 }
 
+/**
+ * A custom sorter function item as [id, score, document].
+ */
+export type CustomSorterFunctionItem = [string, number, Document]
+
+export type CustomSorterFunction = (a: CustomSorterFunctionItem, b: CustomSorterFunctionItem) => number
+/**
+ * Define which properties to sort for.
+ */
+export type SorterParams = {
+  /**
+   * The key of the document used to sort the result.
+   */
+  property: string
+  /**
+   * Whether to sort the result in ascending or descending order.
+   */
+  order?: 'ASC' | 'DESC'
+}
+
+export type SortByParams = SorterParams | CustomSorterFunction
+
 export type SearchParams = {
   /**
    * The word to search.
@@ -75,6 +105,10 @@ export type SearchParams = {
    * The number of matched documents to skip.
    */
   offset?: number
+  /**
+   * The key of the document used to sort the result.
+   */
+  sortBy?: SortByParams
   /**
    * Whether to match the term exactly.
    */
@@ -245,11 +279,11 @@ export type TokenMap = Record<string, TokenScore[]>
 
 export type IndexMap = Record<string, TokenMap>
 
-export type SearchContext = {
+export type SearchContext<I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
   timeStart: bigint
   tokenizer: Tokenizer
-  index: IIndex
-  documentsStore: IDocumentsStore
+  index: IIndex<I>
+  documentsStore: IDocumentsStore<D>
   language: string | undefined
   params: SearchParams
   docsCount: number
@@ -282,9 +316,16 @@ export type Results = {
   facets?: FacetResult
 }
 
-export type SingleCallbackComponent = (orama: Orama, id: string, doc?: Document) => SyncOrAsyncValue
+export type SingleCallbackComponent<A extends ProvidedTypes> = (
+  orama: Orama<A>,
+  id: string,
+  doc?: Document,
+) => SyncOrAsyncValue
 
-export type MultipleCallbackComponent = (orama: Orama, doc: Document[] | string[]) => SyncOrAsyncValue
+export type MultipleCallbackComponent<A extends ProvidedTypes> = (
+  orama: Orama<A>,
+  doc: Document[] | string[],
+) => SyncOrAsyncValue
 
 export type IIndexInsertOrRemoveHookFunction<I extends OpaqueIndex = OpaqueIndex, R = void> = (
   index: I,
@@ -298,7 +339,10 @@ export type IIndexInsertOrRemoveHookFunction<I extends OpaqueIndex = OpaqueIndex
 ) => SyncOrAsyncValue<R>
 
 export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
-  create: (orama: Orama<{ Index: I }>, schema: Schema) => SyncOrAsyncValue<I>
+  create<S extends Schema, D extends OpaqueDocumentStore, So extends OpaqueSorter>(
+    orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
+    schema: Schema,
+  ): SyncOrAsyncValue<I>
 
   beforeInsert?: IIndexInsertOrRemoveHookFunction<I>
   insert: (
@@ -338,17 +382,22 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   insertTokenScoreParameters(index: I, prop: string, id: string, tokens: string[], token: string): SyncOrAsyncValue
   removeDocumentScoreParameters(index: I, prop: string, id: string, docsCount: number): SyncOrAsyncValue
   removeTokenScoreParameters(index: I, prop: string, token: string): SyncOrAsyncValue
-  calculateResultScores(
-    context: SearchContext,
+  calculateResultScores<D extends OpaqueDocumentStore>(
+    context: SearchContext<I, D>,
     index: I,
     prop: string,
     term: string,
     ids: string[],
   ): SyncOrAsyncValue<TokenScore[]>
 
-  search(context: SearchContext, index: I, prop: string, term: string): SyncOrAsyncValue<TokenScore[]>
-  searchByWhereClause(
-    context: SearchContext,
+  search<D extends OpaqueDocumentStore>(
+    context: SearchContext<I, D>,
+    index: I,
+    prop: string,
+    term: string,
+  ): SyncOrAsyncValue<TokenScore[]>
+  searchByWhereClause<D extends OpaqueDocumentStore>(
+    context: SearchContext<I, D>,
     index: I,
     filters: Record<string, boolean | string | string[] | ComparisonOperator>,
   ): SyncOrAsyncValue<string[]>
@@ -361,7 +410,9 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
 }
 
 export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentStore> {
-  create: (orama: Orama<{ DocumentStore: D }>) => SyncOrAsyncValue<D>
+  create<S extends Schema, I extends OpaqueIndex, So extends OpaqueSorter>(
+    orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
+  ): SyncOrAsyncValue<D>
   get(store: D, id: string): SyncOrAsyncValue<Document | undefined>
   getMultiple(store: D, ids: string[]): SyncOrAsyncValue<(Document | undefined)[]>
   getAll(store: D): SyncOrAsyncValue<Record<string, Document>>
@@ -371,6 +422,36 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
 
   load<R = unknown>(raw: R): SyncOrAsyncValue<D>
   save<R = unknown>(store: D): SyncOrAsyncValue<R>
+}
+
+export interface SorterConfig {
+  enabled?: boolean
+  unsortableProperties?: string[]
+}
+
+export interface ISorter<So extends OpaqueSorter = OpaqueSorter> {
+  create<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
+    orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
+    schema: Schema,
+    sorterConfig?: SorterConfig,
+  ): SyncOrAsyncValue<So>
+  insert: (
+    sorter: So,
+    prop: string,
+    id: string,
+    value: SortValue,
+    schemaType: SortType,
+    language: string | undefined,
+  ) => SyncOrAsyncValue
+  remove: (sorter: So, prop: string, id: string) => SyncOrAsyncValue
+
+  load<R = unknown>(raw: R): SyncOrAsyncValue<So>
+  save<R = unknown>(sorter: So): SyncOrAsyncValue<R>
+
+  sortBy(sorter: So, docIds: [string, number][], by: SorterParams): Promise<[string, number][]>
+
+  getSortableProperties(sorter: So): SyncOrAsyncValue<string[]>
+  getSortablePropertiesWithTypes(sorter: So): SyncOrAsyncValue<Record<string, SortType>>
 }
 
 export type Stemmer = (word: string) => string
@@ -390,10 +471,11 @@ export interface Tokenizer {
   tokenize: (raw: string, language?: string, prop?: string) => SyncOrAsyncValue<string[]>
 }
 
-export interface ObjectComponents {
+export interface ObjectComponents<I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter> {
   tokenizer: Tokenizer | DefaultTokenizerConfig
-  index: IIndex
-  documentsStore: IDocumentsStore
+  index: I
+  documentsStore: D
+  sorter: So
 }
 
 export interface FunctionComponents<S extends Schema = Schema> {
@@ -403,54 +485,58 @@ export interface FunctionComponents<S extends Schema = Schema> {
   formatElapsedTime(number: bigint): SyncOrAsyncValue<number | string | object | ElapsedTime>
 }
 
-export interface SingleOrArrayCallbackComponents {
-  beforeInsert: SingleOrArray<SingleCallbackComponent>
-  afterInsert: SingleOrArray<SingleCallbackComponent>
-  beforeRemove: SingleOrArray<SingleCallbackComponent>
-  afterRemove: SingleOrArray<SingleCallbackComponent>
-  beforeUpdate: SingleOrArray<SingleCallbackComponent>
-  afterUpdate: SingleOrArray<SingleCallbackComponent>
-  beforeMultipleInsert: SingleOrArray<MultipleCallbackComponent>
-  afterMultipleInsert: SingleOrArray<MultipleCallbackComponent>
-  beforeMultipleRemove: SingleOrArray<MultipleCallbackComponent>
-  afterMultipleRemove: SingleOrArray<MultipleCallbackComponent>
-  beforeMultipleUpdate: SingleOrArray<MultipleCallbackComponent>
-  afterMultipleUpdate: SingleOrArray<MultipleCallbackComponent>
+export interface SingleOrArrayCallbackComponents<A extends ProvidedTypes> {
+  beforeInsert: SingleOrArray<SingleCallbackComponent<A>>
+  afterInsert: SingleOrArray<SingleCallbackComponent<A>>
+  beforeRemove: SingleOrArray<SingleCallbackComponent<A>>
+  afterRemove: SingleOrArray<SingleCallbackComponent<A>>
+  beforeUpdate: SingleOrArray<SingleCallbackComponent<A>>
+  afterUpdate: SingleOrArray<SingleCallbackComponent<A>>
+  beforeMultipleInsert: SingleOrArray<MultipleCallbackComponent<A>>
+  afterMultipleInsert: SingleOrArray<MultipleCallbackComponent<A>>
+  beforeMultipleRemove: SingleOrArray<MultipleCallbackComponent<A>>
+  afterMultipleRemove: SingleOrArray<MultipleCallbackComponent<A>>
+  beforeMultipleUpdate: SingleOrArray<MultipleCallbackComponent<A>>
+  afterMultipleUpdate: SingleOrArray<MultipleCallbackComponent<A>>
 }
 
-export interface ArrayCallbackComponents {
-  beforeInsert: SingleCallbackComponent[]
-  afterInsert: SingleCallbackComponent[]
-  beforeRemove: SingleCallbackComponent[]
-  afterRemove: SingleCallbackComponent[]
-  beforeUpdate: SingleCallbackComponent[]
-  afterUpdate: SingleCallbackComponent[]
-  beforeMultipleInsert: MultipleCallbackComponent[]
-  afterMultipleInsert: MultipleCallbackComponent[]
-  beforeMultipleRemove: MultipleCallbackComponent[]
-  afterMultipleRemove: MultipleCallbackComponent[]
-  beforeMultipleUpdate: MultipleCallbackComponent[]
-  afterMultipleUpdate: MultipleCallbackComponent[]
+export interface ArrayCallbackComponents<A extends ProvidedTypes> {
+  beforeInsert: SingleCallbackComponent<A>[]
+  afterInsert: SingleCallbackComponent<A>[]
+  beforeRemove: SingleCallbackComponent<A>[]
+  afterRemove: SingleCallbackComponent<A>[]
+  beforeUpdate: SingleCallbackComponent<A>[]
+  afterUpdate: SingleCallbackComponent<A>[]
+  beforeMultipleInsert: MultipleCallbackComponent<A>[]
+  afterMultipleInsert: MultipleCallbackComponent<A>[]
+  beforeMultipleRemove: MultipleCallbackComponent<A>[]
+  afterMultipleRemove: MultipleCallbackComponent<A>[]
+  beforeMultipleUpdate: MultipleCallbackComponent<A>[]
+  afterMultipleUpdate: MultipleCallbackComponent<A>[]
 }
 
-export type Components = Partial<ObjectComponents & FunctionComponents & SingleOrArrayCallbackComponents>
+export type Components<A extends ProvidedTypes> = Partial<
+  ObjectComponents<A['Index'], A['DocumentStore'], A['Sorter']> &
+    FunctionComponents &
+    SingleOrArrayCallbackComponents<A>
+>
 
 export const kInsertions = Symbol('orama.insertions')
 export const kRemovals = Symbol('orama.removals')
 
-type ProvidedTypes = Partial<{ Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore }>
-
-interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore> {
+interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore, S extends OpaqueSorter> {
   index: I
   docs: D
+  sorting: S
 }
 
-type Internals<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
-  schema: S
+type Internals<A extends ProvidedTypes> = {
+  schema: A['Schema']
   tokenizer: Tokenizer
-  index: IIndex<I>
-  documentsStore: IDocumentsStore<D>
-  data: Data<I, D>
+  index: IIndex<A['Index']>
+  documentsStore: IDocumentsStore<A['DocumentStore']>
+  sorter: ISorter<A['Sorter']>
+  data: Data<A['Index'], A['DocumentStore'], A['Sorter']>
   caches: Record<string, unknown>
   [kInsertions]: number | undefined
   [kRemovals]: number | undefined
@@ -460,9 +546,26 @@ type OramaID = {
   id: string
 }
 
+export type ProvidedTypes = {
+  Schema: Schema
+  Index: OpaqueIndex
+  DocumentStore: OpaqueDocumentStore
+  Sorter: OpaqueSorter
+}
+
+type RequiredInner<T extends Partial<ProvidedTypes>> = {
+  [Key in keyof ProvidedTypes]: Key extends keyof ProvidedTypes
+    ? ProvidedTypes[Key]
+    : Key extends keyof T
+    ? T[Key]
+    : never
+}
+
 export type Orama<
-  P extends ProvidedTypes = { Schema: Schema; Index: OpaqueIndex; DocumentStore: OpaqueDocumentStore },
-> = FunctionComponents &
-  ArrayCallbackComponents &
-  Internals<Schema & P['Schema'], OpaqueIndex & P['Index'], OpaqueDocumentStore & P['DocumentStore']> &
-  OramaID
+  A extends Partial<ProvidedTypes> = {
+    Schema: Schema
+    Index: OpaqueIndex
+    DocumentStore: OpaqueDocumentStore
+    Sorter: OpaqueSorter
+  },
+> = FunctionComponents & ArrayCallbackComponents<RequiredInner<A>> & Internals<RequiredInner<A>> & OramaID

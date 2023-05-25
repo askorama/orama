@@ -3,6 +3,7 @@ import type {
   FacetSorting,
   NumberFacetDefinition,
   Orama,
+  Schema,
   SearchParams,
   SearchableValue,
   StringFacetDefinition,
@@ -18,8 +19,8 @@ function sortingPredicate(order: FacetSorting = 'desc', a: [string, number], b: 
   }
 }
 
-export async function getFacets(
-  orama: Orama,
+export async function getFacets<S extends Schema>(
+  orama: Orama<{ Schema: S }>,
   results: TokenScore[],
   facetsConfig: Required<SearchParams>['facets'],
 ): Promise<FacetResult> {

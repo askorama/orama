@@ -29,7 +29,6 @@ function removeVariadicData(res: Results): Omit<Results, 'elapsed'> {
 }
 
 t.test('orama.dataset', async t => {
-  t.plan(4)
   const db = await create({
     schema: {
       date: 'string',
@@ -39,6 +38,9 @@ t.test('orama.dataset', async t => {
         first: 'string',
         second: 'string',
       },
+    },
+    sort: {
+      enabled: false,
     },
     components: {
       tokenizer: {
@@ -60,8 +62,6 @@ t.test('orama.dataset', async t => {
   await insertMultiple(db, events)
 
   t.test('should correctly populate the database with a large dataset', async t => {
-    t.plan(4)
-
     const s1 = await search(db, {
       term: 'august',
       exact: true,
@@ -90,12 +90,12 @@ t.test('orama.dataset', async t => {
     t.equal(s1.count, 1117)
     t.equal(s2.count, 7314)
     t.equal(s3.count, 7314)
+
+    t.end()
   })
 
   //  Tests for https://github.com/OramaSearch/orama/issues/159
   t.test('should correctly search long strings', async t => {
-    t.plan(3)
-
     const s1 = await search(db, {
       term: 'e into the',
       properties: ['description'],
@@ -114,11 +114,11 @@ t.test('orama.dataset', async t => {
     t.equal(s1.count, 14979)
     t.equal(s2.count, 2926)
     t.equal(s3.count, 3332)
+
+    t.end()
   })
 
   t.test('should perform paginate search', async t => {
-    t.plan(5)
-
     const s1 = removeVariadicData(
       await search(db, {
         term: 'war',
@@ -195,11 +195,11 @@ t.test('orama.dataset', async t => {
 
     t.equal(s4.count, 2357)
     t.equal(s5.hits.length, 10)
+
+    t.end()
   })
 
   t.test('should correctly delete documents', async t => {
-    t.plan(1)
-
     const documentsToDelete = await search(db, {
       term: 'war',
       exact: true,
@@ -221,5 +221,9 @@ t.test('orama.dataset', async t => {
     })
 
     t.equal(newSearch.count, 2347)
+
+    t.end()
   })
+
+  t.end()
 })

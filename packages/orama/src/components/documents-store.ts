@@ -67,10 +67,10 @@ export async function load<R = unknown>(raw: R): Promise<DocumentsStore> {
   }
 }
 
-export async function save<R = unknown>(docs: DocumentsStore): Promise<R> {
+export async function save<R = unknown>(store: DocumentsStore): Promise<R> {
   return {
-    docs: docs.docs,
-    count: docs.count,
+    docs: store.docs,
+    count: store.count,
   } as R
 }
 
