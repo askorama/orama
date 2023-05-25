@@ -6,6 +6,11 @@ export type Node<K, V> = {
   height: number
 }
 
+type StackNode<K, V> = {
+  node: Node<K, V>,
+  checkedChildren: boolean
+};
+
 const BALANCE_STATE = {
   UNBALANCED_RIGHT: 1,
   SLIGHTLY_UNBALANCED_RIGHT: 2,
@@ -53,29 +58,66 @@ function rotateRight<K, V>(node: Node<K, V>): Node<K, V> {
   return left
 }
 
-function findMin<K, V>(node: Node<K, V>): Node<K, V> {
-  return node.left ? findMin(node.left) : node
-}
-
 export function contains<K, V>(node: Node<K, V>, key: K): boolean {
   return !!find(node, key)
 }
 
-export function getSize<K, V>(node: Node<K, V> | null): number {
-  if (!node) {
-    return 0
+export function getSize<K, V>(root: Node<K, V> | null): number {
+  let size = 0;
+  const queue: Array<Node<K, V>> = [];
+
+  if (root !== null) {
+    queue.push(root);
   }
 
-  return 1 + getSize(node.left) + getSize(node.right)
+  while (queue.length > 0) {
+    const node = queue.shift() as Node<K, V>;
+    size++;
+
+    if (node.left !== null) {
+      queue.push(node.left);
+    }
+
+    if (node.right !== null) {
+      queue.push(node.right);
+    }
+  }
+
+  return size;
 }
 
-export function isBalanced<K, V>(node: Node<K, V> | null): boolean {
-  if (!node) {
-    return true
+export function isBalanced<K, V>(root: Node<K, V> | null): boolean {
+  const stack: StackNode<K, V>[] = [];
+
+  if (root !== null) {
+    stack.push({ node: root, checkedChildren: false });
   }
 
-  const heightDiff = Math.abs(getHeight(node.left) - getHeight(node.right))
-  return heightDiff <= 1 && isBalanced(node.left) && isBalanced(node.right)
+  while (stack.length > 0) {
+    const top = stack[stack.length - 1];
+
+    if (top.checkedChildren) {
+      const heightDiff = Math.abs(getHeight(top.node.left) - getHeight(top.node.right));
+
+      if (heightDiff > 1) {
+        return false;
+      }
+
+      stack.pop();
+    } else {
+      top.checkedChildren = true;
+
+      if (top.node.right !== null) {
+        stack.push({ node: top.node.right, checkedChildren: false });
+      }
+
+      if (top.node.left !== null) {
+        stack.push({ node: top.node.left, checkedChildren: false });
+      }
+    }
+  }
+
+  return true;
 }
 
 export function rangeSearch<K, V>(node: Node<K, V>, min: K, max: K): V {
@@ -172,20 +214,17 @@ export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
   return result as V
 }
 
-function getNodeByKey<K, V>(node: Node<K, V>, key: K): Node<K, V> | null {
-  if (!node) {
-    return null
+function getNodeByKey<K, V>(node: Node<K, V> | null, key: K): Node<K, V> | null {
+  while (node !== null) {
+    if (key < node.key) {
+      node = node.left;
+    } else if (key > node.key) {
+      node = node.right;
+    } else {
+      return node;
+    }
   }
-
-  if (node.key === key) {
-    return node
-  }
-
-  if (key < node.key) {
-    return node.left ? getNodeByKey(node.left, key) : null
-  }
-
-  return node.right ? getNodeByKey(node.right, key) : null
+  return null;
 }
 
 export function create<K, V>(key: K, value: V): Node<K, V> {
@@ -198,121 +237,161 @@ export function create<K, V>(key: K, value: V): Node<K, V> {
   }
 }
 
-export function insert<K, V>(node: Node<K, V>, key: K, value: V): Node<K, V> {
-  if (!node) {
-    return create(key, value)
+export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
+  let parent = null;
+  let current = root;
+
+  while (current !== null) {
+    parent = current;
+    if (key < current.key) {
+        current = current.left as Node<K, V>;
+    } else if (key > current.key) {
+        current = current.right as Node<K, V>;
+    } else {
+      // assuming value is an array here
+      (current.value as string[]) = (current.value as string[]).concat(value as string);
+      return root;
+    }
   }
 
-  if (key < node.key) {
-    node.left = insert(node.left as Node<K, V>, key, value)
-  } else if (key > node.key) {
-    node.right = insert(node.right as Node<K, V>, key, value)
+  const newNode = create(key, value);
+
+  if (!parent) {
+      root = newNode; // tree was empty
+  } else if (key < parent.key) {
+      parent.left = newNode;
   } else {
-    // eslint-disable-next-line @typescript-eslint/no-extra-semi
-    ;(node.value as string[]) = (node.value as string[]).concat(value as string)
-    return node
+      parent.right = newNode;
   }
 
-  const balanceFactor = getBalanceFactor(node)
+  current = newNode;
 
-  if (balanceFactor === BALANCE_STATE.UNBALANCED_LEFT) {
-    if (key < (node.left as Node<K, V>).key) {
-      node = rotateRight(node)
-    } else {
-      node.left = rotateLeft(node.left as Node<K, V>)
-      node = rotateRight(node)
+  while (parent) {
+    const balanceFactor = getBalanceFactor(parent);
+    
+    if (balanceFactor === BALANCE_STATE.UNBALANCED_LEFT) {
+        if (key < (parent.left as Node<K, V>).key) {
+            parent = rotateRight(parent);
+        } else {
+            parent.left = rotateLeft(parent.left as Node<K, V>);
+            parent = rotateRight(parent);
+        }
     }
-  }
 
-  if (balanceFactor === BALANCE_STATE.UNBALANCED_RIGHT) {
-    if (key > (node.right as Node<K, V>).key) {
-      node = rotateLeft(node)
-    } else {
-      node.right = rotateRight(node.right as Node<K, V>)
-      node = rotateLeft(node)
+    if (balanceFactor === BALANCE_STATE.UNBALANCED_RIGHT) {
+        if (key > (parent.right as Node<K, V>).key) {
+            parent = rotateLeft(parent);
+        } else {
+            parent.right = rotateRight(parent.right as Node<K, V>);
+            parent = rotateLeft(parent);
+        }
     }
+
+    if (parent == root) {
+        break;
+    }
+
+    current = parent;
+    parent = getNodeParent(root, current.key);
   }
 
-  return node
+  return root;
 }
 
-export function find<K, V>(node: Node<K, V>, key: K): V | null {
-  if (!node) {
-    return null
-  }
+function getNodeParent<K, V>(root: Node<K, V>, key: K): Node<K, V> | null {
+    let current = root;
+    let parent = null;
 
-  if (node.key === key) {
-    return node.value
-  }
+    while (current !== null) {
+        if (key < current.key) {
+            parent = current;
+            current = current.left as Node<K, V>;
+        } else if (key > current.key) {
+            parent = current;
+            current = current.right as Node<K, V>;
+        } else {
+            break;
+        }
+    }
 
-  if (key < node.key) {
-    return node.left ? find(node.left, key) : null
-  }
-
-  return node.right ? find(node.right, key) : null
+    return parent;
 }
 
-export function remove<K, V>(node: Node<K, V>, key: K): Node<K, V> | null {
+export function find<K, V>(root: Node<K, V>, key: K): V | null {
+  let node = root;
+
+  while (node) {
+    if (key < node.key) {
+      node = node.left as Node<K, V>;
+    } else if (key > node.key) {
+      node = node.right as Node<K, V>;
+    } else {
+      return node.value;
+    }
+  }
+
+  return null;
+}
+
+export function remove<K, V>(root: Node<K, V> | null, key: K): Node<K, V> | null {
+  let node = root;
+  let parentNode: Node<K, V> | null = null;
+
+  while (node && node.key !== key) {
+    parentNode = node;
+    if (key < node.key) {
+      node = node.left as Node<K, V>;
+    } else {
+      node = node.right as Node<K, V>;
+    }
+  }
+
   if (!node) {
-    return null
+    return null;
   }
 
-  if (key < node.key) {
-    node.left = remove(node.left as Node<K, V>, key)
-  } else if (key > node.key) {
-    node.right = remove(node.right as Node<K, V>, key)
+  if (!node.left && !node.right) {
+    if (!parentNode) {
+      // Node to be deleted is root
+      root = null;
+    } else {
+      if (parentNode.left === node) {
+        parentNode.left = null;
+      } else {
+        parentNode.right = null;
+      }
+    }
+  } else if (node.left && node.right) {
+    let minValueNode = node.right;
+    let minValueParent = node;
+
+    while (minValueNode.left) {
+      minValueParent = minValueNode;
+      minValueNode = minValueNode.left;
+    }
+
+    node.key = minValueNode.key;
+
+    if (minValueParent === node) {
+      minValueParent.right = minValueNode.right;
+    } else {
+      minValueParent.left = minValueNode.right;
+    }
   } else {
-    if (!node.left && !node.right) {
-      return null
-    }
+    const childNode = node.left ? node.left : node.right;
 
-    if (!node.left) {
-      return node.right as Node<K, V>
-    }
-
-    if (!node.right) {
-      return node.left as Node<K, V>
-    }
-
-    const temp = findMin(node.right as Node<K, V>)
-    node.key = temp.key
-    node.right = remove(node.right as Node<K, V>, temp.key)
-  }
-
-  const balanceFactor = getBalanceFactor(node)
-
-  const leftNode = node.left as Node<K, V>
-  const rightNode = node.right as Node<K, V>
-
-  if (balanceFactor === BALANCE_STATE.UNBALANCED_LEFT) {
-    if (
-      getBalanceFactor(leftNode) === BALANCE_STATE.BALANCED ||
-      getBalanceFactor(leftNode) === BALANCE_STATE.SLIGHTLY_UNBALANCED_LEFT
-    ) {
-      return rotateRight(node)
-    }
-
-    if (getBalanceFactor(leftNode) === BALANCE_STATE.SLIGHTLY_UNBALANCED_RIGHT) {
-      node.left = rotateLeft(leftNode)
-      return rotateRight(node)
+    if (!parentNode) {
+      root = childNode as Node<K, V>;
+    } else {
+      if (parentNode.left === node) {
+        parentNode.left = childNode;
+      } else {
+        parentNode.right = childNode;
+      }
     }
   }
 
-  if (balanceFactor === BALANCE_STATE.UNBALANCED_RIGHT) {
-    if (
-      getBalanceFactor(rightNode) === BALANCE_STATE.BALANCED ||
-      getBalanceFactor(rightNode) === BALANCE_STATE.SLIGHTLY_UNBALANCED_RIGHT
-    ) {
-      return rotateLeft(node)
-    }
-
-    if (getBalanceFactor(rightNode) === BALANCE_STATE.SLIGHTLY_UNBALANCED_LEFT) {
-      node.right = rotateRight(rightNode)
-      return rotateLeft(node)
-    }
-  }
-
-  return node
+  return root;
 }
 
 export function removeDocument<K>(root: Node<K, string[]>, id: string, key: K): void {
