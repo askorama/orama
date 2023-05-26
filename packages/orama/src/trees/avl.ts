@@ -373,7 +373,7 @@ export function remove<K, V>(root: Node<K, V> | undefined, key: K): Node<K, V> |
       minValueParent.left = minValueNode.right;
     }
   } else {
-    const childNode = node.left ? node.left : node.right;
+    const childNode = node.left ?? node.right;
 
     if (!parentNode) {
       root = childNode as Node<K, V>;
