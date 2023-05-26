@@ -25,35 +25,41 @@ t.only('create method', t => {
   })
 
   t.test('should throw if custom component is not a function', async t => {
-    await t.rejects(create({
-      schema: {},
-      components: {
-        validateSchema: {}
-      } as Components
-    }))
+    await t.rejects(
+      create({
+        schema: {},
+        components: {
+          validateSchema: {},
+        } as Components,
+      }),
+    )
 
     t.end()
   })
 
   t.test('should throw if some of custom component array is not a function', async t => {
-    await t.rejects(create({
-      schema: {},
-      components: {
-        afterInsert: [{}]
-      } as Components
-    }))
+    await t.rejects(
+      create({
+        schema: {},
+        components: {
+          afterInsert: [{}],
+        } as Components,
+      }),
+    )
 
     t.end()
   })
 
   t.test('should throw if custom tokenizer and language are specified together', async t => {
-    await t.rejects(create({
-      schema: {},
-      components: {
-        tokenizer: {},
-      } as Components,
-      language: 'en',
-    }))
+    await t.rejects(
+      create({
+        schema: {},
+        components: {
+          tokenizer: {},
+        } as Components,
+        language: 'en',
+      }),
+    )
 
     t.end()
   })

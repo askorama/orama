@@ -57,6 +57,20 @@ export interface BooleanFacetDefinition {
 
 export type FacetDefinition = StringFacetDefinition | NumberFacetDefinition | BooleanFacetDefinition
 
+export type ReduceFunction<T, R extends Result = Result> = (values: string[], acc: T, value: R, index: number) => T
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Reduce<T = any> = {
+  func: ReduceFunction<T>
+  getInitialValue: () => T
+}
+
+export type GroupByParams = {
+  property?: string
+  properties?: string[]
+  maxResult?: number
+  reduce?: Reduce
+}
+
 export type ComparisonOperator = {
   gt?: number
   gte?: number
@@ -179,6 +193,8 @@ export type SearchParams = {
    */
   facets?: Record<string, FacetDefinition>
 
+  groupBy?: GroupByParams
+
   /**
    * Filter the search results.
    * Full documentation: https://docs.oramasearch.com/usage/search/filters
@@ -273,6 +289,17 @@ export type FacetResult = Record<
   }
 >
 
+export type GroupResult =
+  | {
+      values: string[]
+      result: Result[]
+    }[]
+  | {
+      values: string[]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      result: any
+    }[]
+
 export type TokenScore = [string, number]
 
 export type TokenMap = Record<string, TokenScore[]>
@@ -314,6 +341,8 @@ export type Results = {
    * The facets results.
    */
   facets?: FacetResult
+
+  groups?: GroupResult
 }
 
 export type SingleCallbackComponent<A extends ProvidedTypes> = (

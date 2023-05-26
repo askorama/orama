@@ -266,14 +266,14 @@ t.test('insert method', t => {
           id: 'string',
           name: 'string',
           inner: {
-            name: 'string'
-          }
+            name: 'string',
+          },
         },
       })
 
       await t.resolves(insert(db, {}))
-      await t.resolves(insert(db, { id: 'foo'}))
-      await t.resolves(insert(db, { name: 'bar'}))
+      await t.resolves(insert(db, { id: 'foo' }))
+      await t.resolves(insert(db, { name: 'bar' }))
       await t.resolves(insert(db, { inner: {} }))
 
       t.end()
@@ -289,7 +289,7 @@ t.test('insert method', t => {
             string: 'string',
             number: 'number',
             boolean: 'boolean',
-          }
+          },
         },
       })
 
@@ -405,7 +405,7 @@ t.test('insert short prefixes, as in #327 and #328', t => {
 })
 
 t.test('insertMultiple method', t => {
-  t.test('should use the custom \'id\' function passed in the configuration object', async t => {
+  t.test("should use the custom 'id' function passed in the configuration object", async t => {
     const db = await create({
       schema: {
         id: 'string',
@@ -428,17 +428,14 @@ t.test('insertMultiple method', t => {
     t.end()
   })
 
-  t.test('should use the \'id\' field as index id if found in the document', async t => {
+  t.test("should use the 'id' field as index id if found in the document", async t => {
     const db = await create({
       schema: {
         name: 'string',
       },
     })
 
-    const ids = await insertMultiple(db, [
-      { name: 'John' },
-      { id: '02', name: 'Doe', },
-    ])
+    const ids = await insertMultiple(db, [{ name: 'John' }, { id: '02', name: 'Doe' }])
 
     t.ok(ids.includes('02'))
 
@@ -472,7 +469,6 @@ t.test('insertMultiple method', t => {
 
     await t.rejects(() => insertMultiple(db, wrongSchemaDocs as unknown as DataEvent[]))
   })
-
 
   t.end()
 })

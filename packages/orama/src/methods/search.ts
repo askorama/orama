@@ -1,6 +1,7 @@
 import { prioritizeTokenScores } from '../components/algorithms.js'
 import { getFacets } from '../components/facets.js'
 import { intersectFilteredIDs } from '../components/filters.js'
+import { getGroups } from '../components/groups.js'
 import { createError } from '../errors.js'
 import {
   BM25Params,
@@ -20,6 +21,7 @@ import {
   OpaqueDocumentStore,
 } from '../types.js'
 import { getNanosecondsTime, sortTokenScorePredicate } from '../utils.js'
+// import { getGroups } from '../components/groups.js'
 
 const defaultBM25Params: BM25Params = {
   k: 1.2,
@@ -246,7 +248,10 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   }
 
   const searchResult: Results = {
-    elapsed: (await orama.formatElapsedTime((await getNanosecondsTime()) - context.timeStart)) as ElapsedTime,
+    elapsed: {
+      raw: 0,
+      formatted: '',
+    },
     // We keep the hits array empty if it's a preflight request.
     hits: [],
     count: uniqueDocsArray.length,
@@ -261,6 +266,14 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
     const facets = await getFacets(orama, uniqueDocsArray, params.facets!)
     searchResult.facets = facets
   }
+
+  if (params.groupBy) {
+    searchResult.groups = await getGroups(orama, uniqueDocsArray, params.groupBy)
+  }
+
+  searchResult.elapsed = (await orama.formatElapsedTime(
+    (await getNanosecondsTime()) - context.timeStart,
+  )) as ElapsedTime
 
   return searchResult
 }

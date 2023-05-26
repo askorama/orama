@@ -2,13 +2,12 @@ import t from 'tap'
 import { Orama, create, getByID, insert, search } from '../src/index.js'
 
 t.test('search method', t => {
-
   t.test('with term', async t => {
     const [db, id1, id2, id3, id4] = await createSimpleDB()
 
     t.test('should return all the document on empty string', async t => {
       const result = await search(db, {
-        term: ''
+        term: '',
       })
 
       t.ok(result.elapsed)
@@ -17,11 +16,14 @@ t.test('search method', t => {
 
       for (const id of [id1, id2, id3, id4]) {
         const doc = await getByID(db, id)
-        t.strictSame(result.hits.find(d => d.id === id), {
-          id,
-          score: 0,
-          document: doc
-        })
+        t.strictSame(
+          result.hits.find(d => d.id === id),
+          {
+            id,
+            score: 0,
+            document: doc,
+          },
+        )
       }
 
       t.end()
@@ -32,39 +34,38 @@ t.test('search method', t => {
 
       for (const id of [id1, id2, id3, id4]) {
         const doc = await getByID(db, id)
-        t.strictSame(result.hits.find(d => d.id === id), {
-          id,
-          score: 0,
-          document: doc
-        })
+        t.strictSame(
+          result.hits.find(d => d.id === id),
+          {
+            id,
+            score: 0,
+            document: doc,
+          },
+        )
       }
-      
+
       t.end()
     })
 
     t.test('should filter the result based on "term" value', async t => {
       const { hits: allDocs } = await search(db, {})
-      const docIdsShouldNotMatch = allDocs
-        .filter(d => !/coffee/.test(d.document.name as string))
-        .map(d => d.id)
-      const docIdsShouldMatch = allDocs
-        .filter(d => /coffee/.test(d.document.name as string))
-        .map(d => d.id)
+      const docIdsShouldNotMatch = allDocs.filter(d => !/coffee/.test(d.document.name as string)).map(d => d.id)
+      const docIdsShouldMatch = allDocs.filter(d => /coffee/.test(d.document.name as string)).map(d => d.id)
 
       const result = await search(db, {
-        term: 'coffee'
+        term: 'coffee',
       })
 
       const matchedIds = result.hits.map(d => d.id)
       t.strictSame(new Set(docIdsShouldMatch), new Set(matchedIds))
       t.notOk(docIdsShouldNotMatch.find(id => matchedIds.includes(id)))
-      
+
       t.end()
     })
 
     t.test('should filter the result based on "term" value # 2', async t => {
       t.plan(8)
-    
+
       const db = await create({
         schema: {
           quote: 'string',
@@ -76,37 +77,37 @@ t.test('search method', t => {
           },
         },
       })
-    
+
       await insert(db, { quote: 'the quick, brown fox jumps over the lazy dog. What a fox!', author: 'John Doe' })
       await insert(db, { quote: 'Foxes are nice animals. But I prefer having a dog.', author: 'John Doe' })
       await insert(db, { quote: 'I like dogs. They are the best.', author: 'Jane Doe' })
       await insert(db, { quote: 'I like cats. They are the best.', author: 'Jane Doe' })
-    
+
       // Exact search
       const result1 = await search(db, { term: 'fox', exact: true })
       const result2 = await search(db, { term: 'dog', exact: true })
-    
+
       t.equal(result1.count, 2)
       t.equal(result2.count, 3)
-    
+
       // Prefix search
       const result3 = await search(db, { term: 'fox', exact: false })
       const result4 = await search(db, { term: 'dog', exact: false })
-    
+
       t.equal(result3.count, 2)
       t.equal(result4.count, 3)
-    
+
       // Typo-tolerant search
       const result5 = await search(db, { term: 'fx', tolerance: 1 })
       const result6 = await search(db, { term: 'dg', tolerance: 2 })
-    
+
       t.equal(result5.count, 2)
       t.equal(result6.count, 4)
-    
+
       // Long string search (Tests for https://github.com/OramaSearch/orama/issues/159 )
       const result7 = await search(db, { term: 'They are the best' })
       const result8 = await search(db, { term: 'Foxes are nice animals' })
-    
+
       t.equal(result7.count, 2)
       t.equal(result8.count, 2)
     })
@@ -142,9 +143,9 @@ t.test('search method', t => {
 
     t.test('should throw an error when searching in non-existing indices', async t => {
       t.plan(1)
-  
+
       const db = await create({ schema: { foo: 'string', baz: 'string' } })
-  
+
       await t.rejects(
         () =>
           search(db, {
@@ -169,7 +170,7 @@ t.test('search method', t => {
         },
       })
       const result = await search(db, {
-        term: 'all'
+        term: 'all',
       })
 
       t.equal(result.count, 0)
@@ -183,34 +184,37 @@ t.test('search method', t => {
   t.test('with exact', t => {
     t.test('should exact match', async t => {
       t.plan(4)
-  
+
       const db = await create({
         schema: {
           author: 'string',
           quote: 'string',
         },
       })
-  
+
       const id = await insert(db, {
         quote: 'Be yourself; everyone else is already taken.',
         author: 'Oscar Wilde',
       })
-  
+
       const partialSearch = await search(db, {
         term: 'alr',
         exact: true,
       })
-  
+
       t.equal(partialSearch.count, 0)
       t.strictSame(partialSearch.hits, [])
-  
+
       const exactSearch = await search(db, {
         term: 'already',
         exact: true,
       })
-  
+
       t.equal(exactSearch.count, 1)
-      t.strictSame(exactSearch.hits.map(d => d.id), [id])
+      t.strictSame(
+        exactSearch.hits.map(d => d.id),
+        [id],
+      )
     })
 
     t.end()
@@ -219,62 +223,62 @@ t.test('search method', t => {
   t.test('with tollerate', t => {
     t.test("shouldn't tolerate typos if set to 0", async t => {
       t.plan(1)
-  
+
       const db = await create({
         schema: {
           quote: 'string',
           author: 'string',
         },
       })
-  
+
       await insert(db, {
         quote:
           'Absolutely captivating creatures, seahorses seem like a product of myth and imagination rather than of nature.',
         author: 'Sara A. Lourie',
       })
-  
+
       const searchResult = await search(db, {
         term: 'seahrse',
         tolerance: 0,
       })
-  
+
       t.equal(searchResult.count, 0)
     })
-  
+
     t.test('should tolerate typos', async t => {
       t.plan(4)
-  
+
       const db = await create({
         schema: {
           quote: 'string',
           author: 'string',
         },
       })
-  
+
       const id1 = await insert(db, {
         quote:
           'Absolutely captivating creatures, seahorses seem like a product of myth and imagination rather than of nature.',
         author: 'Sara A. Lourie',
       })
-  
+
       const id2 = await insert(db, {
         quote: 'Seahorses look mythical, like dragons, but these magnificent shy creatures are real.',
         author: 'Jennifer Keats Curtis',
       })
-  
+
       const tolerantSearch = await search(db, {
         term: 'seahrse',
         tolerance: 2,
       })
-  
+
       t.equal(tolerantSearch.count, 2)
       t.strictSame(new Set(tolerantSearch.hits.map(d => d.id)), new Set([id1, id2]))
-  
+
       const moreTolerantSearch = await search(db, {
         term: 'sahrse',
         tolerance: 5,
       })
-  
+
       t.equal(moreTolerantSearch.count, 2)
       t.strictSame(new Set(tolerantSearch.hits.map(d => d.id)), new Set([id1, id2]))
     })
@@ -325,7 +329,7 @@ t.test('search method', t => {
 
   t.test('should correctly search without term', async t => {
     t.plan(4)
-  
+
     const db = await create({
       schema: {
         quote: 'string',
@@ -337,21 +341,21 @@ t.test('search method', t => {
         },
       },
     })
-  
+
     const docs = [
       { id: '0', quote: 'the quick, brown fox jumps over the lazy dog. What a fox!', author: 'John Doe' },
       { id: '1', quote: 'Foxes are nice animals. But I prefer having a dog.', author: 'John Doe' },
       { id: '2', quote: 'I like dogs. They are the best.', author: 'Jane Doe' },
     ]
-  
+
     await insert(db, docs[0])
     await insert(db, docs[1])
     await insert(db, docs[2])
-  
+
     // Exact search
     const result1 = await search(db, { exact: false })
     const result2 = await search(db, { exact: true })
-  
+
     t.equal(result1.count, 3)
     t.equal(result2.count, 3)
     t.strictSame(
@@ -363,10 +367,10 @@ t.test('search method', t => {
       docs,
     )
   })
-  
+
   t.test('should correctly search for data returning doc including with unindexed keys', async t => {
     t.plan(4)
-  
+
     const db = await create({
       schema: {
         quote: 'string',
@@ -376,7 +380,7 @@ t.test('search method', t => {
         tokenizer: { language: 'english', stemming: false },
       },
     })
-  
+
     const documentWithUnindexedField = {
       quote: 'I like cats. They are the best.',
       author: 'Jane Doe',
@@ -387,13 +391,13 @@ t.test('search method', t => {
       author: 'John Doe',
       nested: { unindexedNestedField: 'unindexedNestedValue' },
     }
-  
+
     await insert(db, documentWithNestedUnindexedField)
     await insert(db, documentWithUnindexedField)
-  
+
     const result1 = await search(db, { term: 'They are the best' })
     const result2 = await search(db, { term: 'Foxes are nice animals' })
-  
+
     t.equal(result1.count, 1)
     t.equal(result2.count, 1)
     t.same(result1.hits[0].document, documentWithUnindexedField)
@@ -544,7 +548,6 @@ t.test('search method', t => {
 
   t.end()
 })
-
 
 async function createSimpleDB(): Promise<[Orama, string, string, string, string]> {
   let i = 0

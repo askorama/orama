@@ -325,7 +325,7 @@ t.test('search with sortBy', t => {
 
       t.strictSame(
         result.hits.map(d => d.id),
-        [id5, id2, id1, id3, id4, id7, id6],
+        [id5, id2, id1, id3, id4, id6, id7],
       )
 
       const result2 = await search(db, {
@@ -337,7 +337,7 @@ t.test('search with sortBy', t => {
 
       t.strictSame(
         result2.hits.map(d => d.id),
-        [id5, id2, id1, id3, id4, id7, id6],
+        [id5, id2, id1, id3, id4, id6, id7],
       )
 
       t.end()
@@ -353,7 +353,7 @@ t.test('search with sortBy', t => {
 
       t.strictSame(
         result.hits.map(d => d.id),
-        [id4, id3, id1, id2, id5, id7, id6],
+        [id4, id3, id1, id2, id5, id6, id7],
       )
 
       t.end()
@@ -511,3 +511,82 @@ t.test('disabled', async t => {
 
   t.end()
 })
+
+t.only('search wth sortBy should be consistent ignoring the insert order', async t => {
+  const docs = [
+    { id: '5' },
+    { id: '2', number: 5 },
+    { id: '4', number: 10 },
+    { id: '0', number: -3 },
+    { id: '1', number: 2 },
+    { id: '3', number: 7 },
+  ]
+
+  let iters = 10
+  while (iters--) {
+    const db = await create({
+      schema: {
+        id: 'string',
+        number: 'number',
+      },
+    })
+
+    const d = shuffle([...docs])
+
+    await insertMultiple(db, d)
+    const result = await search(db, {
+      sortBy: {
+        property: 'number',
+      },
+    })
+
+    t.strictSame(
+      result.hits.map(d => d.id),
+      ['0', '1', '2', '3', '4', '5'],
+    )
+  }
+
+  iters = 10
+  while (iters--) {
+    const db = await create({
+      schema: {
+        id: 'string',
+        number: 'number',
+      },
+    })
+
+    const d = shuffle([...docs])
+
+    await insertMultiple(db, d)
+    const result = await search(db, {
+      sortBy: {
+        property: 'number',
+        order: 'DESC',
+      },
+    })
+
+    t.strictSame(
+      result.hits.map(d => d.id),
+      ['4', '3', '2', '1', '0', '5'],
+    )
+  }
+
+  t.end()
+})
+
+function shuffle(array) {
+  let currentIndex = array.length,
+    randomIndex
+
+  // While there remain elements to shuffle.
+  while (currentIndex != 0) {
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex)
+    currentIndex--
+
+    // And swap it with the current element.
+    ;[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]
+  }
+
+  return array
+}
