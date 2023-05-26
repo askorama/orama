@@ -284,7 +284,7 @@ export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
         parent = rotateLeft(parent);
     }
 
-    if (parent == root) {
+    if (parent === root) {
         break;
     }
 
