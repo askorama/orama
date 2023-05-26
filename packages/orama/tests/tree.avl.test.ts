@@ -21,7 +21,7 @@ t.test('AVL Tree', t => {
     const tree = create(1, 'foo')
     t.equal(getSize(tree), 1)
     t.equal(find(tree, 1), 'foo')
-    t.equal(find(tree, 4), null)
+    t.equal(find(tree, 4), undefined)
   })
 
   t.test('insert', t => {

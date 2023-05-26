@@ -1,8 +1,8 @@
 export type Node<K, V> = {
   key: K
   value: V
-  left: Node<K, V> | null
-  right: Node<K, V> | null
+  left: Node<K, V> | undefined
+  right: Node<K, V> | undefined
   height: number
 }
 
@@ -36,7 +36,7 @@ function getBalanceFactor<K, V>(node: Node<K, V>): number {
   }
 }
 
-function getHeight<K, V>(node: Node<K, V> | null): number {
+function getHeight<K, V>(node: Node<K, V> | undefined): number {
   return node ? node.height : -1
 }
 
@@ -62,11 +62,11 @@ export function contains<K, V>(node: Node<K, V>, key: K): boolean {
   return !!find(node, key)
 }
 
-export function getSize<K, V>(root: Node<K, V> | null): number {
+export function getSize<K, V>(root: Node<K, V> | undefined): number {
   let size = 0;
   const queue: Array<Node<K, V>> = [];
 
-  if (root !== null) {
+  if (root !== undefined) {
     queue.push(root);
   }
 
@@ -74,11 +74,11 @@ export function getSize<K, V>(root: Node<K, V> | null): number {
     const node = queue.shift() as Node<K, V>;
     size++;
 
-    if (node.left !== null) {
+    if (node.left !== undefined) {
       queue.push(node.left);
     }
 
-    if (node.right !== null) {
+    if (node.right !== undefined) {
       queue.push(node.right);
     }
   }
@@ -86,10 +86,10 @@ export function getSize<K, V>(root: Node<K, V> | null): number {
   return size;
 }
 
-export function isBalanced<K, V>(root: Node<K, V> | null): boolean {
+export function isBalanced<K, V>(root: Node<K, V> | undefined): boolean {
   const stack: StackNode<K, V>[] = [];
 
-  if (root !== null) {
+  if (root !== undefined) {
     stack.push({ node: root, checkedChildren: false });
   }
 
@@ -97,9 +97,9 @@ export function isBalanced<K, V>(root: Node<K, V> | null): boolean {
     const top = stack[stack.length - 1];
 
     if (top.checkedChildren) {
-      const heightDiff = Math.abs(getHeight(top.node.left) - getHeight(top.node.right));
+      const heightDiff = getHeight(top.node.left) - getHeight(top.node.right);
 
-      if (heightDiff > 1) {
+      if (heightDiff < -1 || heightDiff > 1) {
         return false;
       }
 
@@ -107,11 +107,11 @@ export function isBalanced<K, V>(root: Node<K, V> | null): boolean {
     } else {
       top.checkedChildren = true;
 
-      if (top.node.right !== null) {
+      if (top.node.right !== undefined) {
         stack.push({ node: top.node.right, checkedChildren: false });
       }
 
-      if (top.node.left !== null) {
+      if (top.node.left !== undefined) {
         stack.push({ node: top.node.left, checkedChildren: false });
       }
     }
@@ -214,8 +214,8 @@ export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
   return result as V
 }
 
-function getNodeByKey<K, V>(node: Node<K, V> | null, key: K): Node<K, V> | null {
-  while (node !== null) {
+function getNodeByKey<K, V>(node: Node<K, V> | undefined, key: K): Node<K, V> | undefined {
+  while (node !== undefined) {
     if (key < node.key) {
       node = node.left;
     } else if (key > node.key) {
@@ -224,24 +224,23 @@ function getNodeByKey<K, V>(node: Node<K, V> | null, key: K): Node<K, V> | null 
       return node;
     }
   }
-  return null;
 }
 
 export function create<K, V>(key: K, value: V): Node<K, V> {
   return {
     key,
     value,
-    left: null,
-    right: null,
+    left: undefined,
+    right: undefined,
     height: 0,
   }
 }
 
 export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
-  let parent = null;
+  let parent;
   let current = root;
 
-  while (current !== null) {
+  while (current !== undefined) {
     parent = current;
     if (key < current.key) {
         current = current.left as Node<K, V>;
@@ -270,21 +269,19 @@ export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
     const balanceFactor = getBalanceFactor(parent);
     
     if (balanceFactor === BALANCE_STATE.UNBALANCED_LEFT) {
-        if (key < (parent.left as Node<K, V>).key) {
-            parent = rotateRight(parent);
-        } else {
+        if (key >= (parent.left as Node<K, V>).key) {
             parent.left = rotateLeft(parent.left as Node<K, V>);
-            parent = rotateRight(parent);
         }
+
+        parent = rotateRight(parent);
     }
 
     if (balanceFactor === BALANCE_STATE.UNBALANCED_RIGHT) {
-        if (key > (parent.right as Node<K, V>).key) {
-            parent = rotateLeft(parent);
-        } else {
+        if (key <= (parent.right as Node<K, V>).key) {
             parent.right = rotateRight(parent.right as Node<K, V>);
-            parent = rotateLeft(parent);
         }
+
+        parent = rotateLeft(parent);
     }
 
     if (parent == root) {
@@ -298,11 +295,11 @@ export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
   return root;
 }
 
-function getNodeParent<K, V>(root: Node<K, V>, key: K): Node<K, V> | null {
+function getNodeParent<K, V>(root: Node<K, V>, key: K): Node<K, V> | undefined {
     let current = root;
-    let parent = null;
+    let parent;
 
-    while (current !== null) {
+    while (current !== undefined) {
         if (key < current.key) {
             parent = current;
             current = current.left as Node<K, V>;
@@ -317,7 +314,7 @@ function getNodeParent<K, V>(root: Node<K, V>, key: K): Node<K, V> | null {
     return parent;
 }
 
-export function find<K, V>(root: Node<K, V>, key: K): V | null {
+export function find<K, V>(root: Node<K, V>, key: K): V | undefined {
   let node = root;
 
   while (node) {
@@ -329,13 +326,11 @@ export function find<K, V>(root: Node<K, V>, key: K): V | null {
       return node.value;
     }
   }
-
-  return null;
 }
 
-export function remove<K, V>(root: Node<K, V> | null, key: K): Node<K, V> | null {
+export function remove<K, V>(root: Node<K, V> | undefined, key: K): Node<K, V> | undefined {
   let node = root;
-  let parentNode: Node<K, V> | null = null;
+  let parentNode: Node<K, V> | undefined;
 
   while (node && node.key !== key) {
     parentNode = node;
@@ -347,18 +342,18 @@ export function remove<K, V>(root: Node<K, V> | null, key: K): Node<K, V> | null
   }
 
   if (!node) {
-    return null;
+    return undefined;
   }
 
   if (!node.left && !node.right) {
     if (!parentNode) {
       // Node to be deleted is root
-      root = null;
+      root = undefined;
     } else {
       if (parentNode.left === node) {
-        parentNode.left = null;
+        parentNode.left = undefined;
       } else {
-        parentNode.right = null;
+        parentNode.right = undefined;
       }
     }
   } else if (node.left && node.right) {
