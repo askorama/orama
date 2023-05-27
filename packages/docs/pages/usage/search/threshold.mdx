@@ -27,7 +27,7 @@ What happens if I search for `"t-shirt"`?
 
 ```javascript
 const results = await search(db, {
-  title: 't-shirt',
+  term: 't-shirt',
 })
 
 // results.count = 4
@@ -39,7 +39,7 @@ Now, what happens if I search for `"regular fit"`?
 
 ```javascript
 const results = await search(db, {
-  title: 'regular fit',
+  term: 'regular fit',
 })
 
 // results.count = 4
@@ -63,7 +63,7 @@ By default, Orama sets the threshold to `1`. This means that all the results wil
 
 ```javascript
 const results = await search(db, {
-  title: 'slim fit',
+  term: 'slim fit',
 })
 ```
 
@@ -74,7 +74,7 @@ Considering the example above, it will work the following way:
 
 ```javascript
 const results = await search(db, {
-  title: 'slim fit',
+  term: 'slim fit',
   threshold: 0,
 })
 ```
@@ -88,7 +88,7 @@ You can boost the results depending on where a property is found using the [fiel
 
 ```javascript
 const results = await search(db, {
-  title: 'slim fit',
+  term: 'slim fit',
   threshold: 0.6,
 })
 ```
