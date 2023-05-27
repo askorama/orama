@@ -351,9 +351,9 @@ export function remove<K, V>(root: Node<K, V> | undefined, key: K): Node<K, V> |
       root = undefined;
     } else {
       if (parentNode.left === node) {
-        delete parentNode.left;
+        parentNode.left = undefined;
       } else {
-        delete parentNode.right;
+        parentNode.right = undefined;
       }
     }
   } else if (node.left && node.right) {
