@@ -11,14 +11,14 @@ import { create, insert, search } from '@orama/orama'
 
 const db = await create({
   schema: {
-    term: 'string',
+    title: 'string',
   }
 })
 
-await insert(db, { term: 'Blue t-shirt, slim fit' })
-await insert(db, { term: 'Blue t-shirt, regular fit' })
-await insert(db, { term: 'Red t-shirt, slim fit' })
-await insert(db, { term: 'Red t-shirt, oversize fit' })
+await insert(db, { title: 'Blue t-shirt, slim fit' })
+await insert(db, { title: 'Blue t-shirt, regular fit' })
+await insert(db, { title: 'Red t-shirt, slim fit' })
+await insert(db, { title: 'Red t-shirt, oversize fit' })
 ```
 
 As you can see, we're inserting 4 documents with a lot of common keywords.
@@ -27,7 +27,7 @@ What happens if I search for `"t-shirt"`?
 
 ```javascript
 const results = await search(db, {
-  term: 't-shirt',
+  title: 't-shirt',
 })
 
 // results.count = 4
@@ -39,7 +39,7 @@ Now, what happens if I search for `"regular fit"`?
 
 ```javascript
 const results = await search(db, {
-  term: 'regular fit',
+  title: 'regular fit',
 })
 
 // results.count = 4
@@ -63,7 +63,7 @@ By default, Orama sets the threshold to `1`. This means that all the results wil
 
 ```javascript
 const results = await search(db, {
-  term: 'slim fit',
+  title: 'slim fit',
 })
 ```
 
@@ -74,7 +74,7 @@ Considering the example above, it will work the following way:
 
 ```javascript
 const results = await search(db, {
-  term: 'slim fit',
+  title: 'slim fit',
   threshold: 0,
 })
 ```
@@ -88,7 +88,7 @@ You can boost the results depending on where a property is found using the [fiel
 
 ```javascript
 const results = await search(db, {
-  term: 'slim fit',
+  title: 'slim fit',
   threshold: 0.6,
 })
 ```
