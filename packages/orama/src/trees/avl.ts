@@ -248,7 +248,7 @@ export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
         current = current.right as Node<K, V>;
     } else {
       // assuming value is an array here
-      (current.value as string[]).push(...value as string);
+      (current.value as string[]).push(...value as string[]);
       return root;
     }
   }
