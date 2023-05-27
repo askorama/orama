@@ -66,7 +66,7 @@ export function getSize<K, V>(root: Node<K, V> | undefined): number {
   let size = 0;
   const queue: Array<Node<K, V>> = [];
 
-  if (root !== undefined) {
+  if (root) {
     queue.push(root);
   }
 
@@ -74,11 +74,11 @@ export function getSize<K, V>(root: Node<K, V> | undefined): number {
     const node = queue.shift() as Node<K, V>;
     size++;
 
-    if (node.left !== undefined) {
+    if (node.left) {
       queue.push(node.left);
     }
 
-    if (node.right !== undefined) {
+    if (node.right) {
       queue.push(node.right);
     }
   }
@@ -89,7 +89,7 @@ export function getSize<K, V>(root: Node<K, V> | undefined): number {
 export function isBalanced<K, V>(root: Node<K, V> | undefined): boolean {
   const stack: StackNode<K, V>[] = [];
 
-  if (root !== undefined) {
+  if (root) {
     stack.push({ node: root, checkedChildren: false });
   }
 
@@ -107,11 +107,11 @@ export function isBalanced<K, V>(root: Node<K, V> | undefined): boolean {
     } else {
       top.checkedChildren = true;
 
-      if (top.node.right !== undefined) {
+      if (top.node.right) {
         stack.push({ node: top.node.right, checkedChildren: false });
       }
 
-      if (top.node.left !== undefined) {
+      if (top.node.left) {
         stack.push({ node: top.node.left, checkedChildren: false });
       }
     }
@@ -215,7 +215,7 @@ export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
 }
 
 function getNodeByKey<K, V>(node: Node<K, V> | undefined, key: K): Node<K, V> | undefined {
-  while (node !== undefined) {
+  while (node) {
     if (key < node.key) {
       node = node.left;
     } else if (key > node.key) {
@@ -240,7 +240,7 @@ export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
   let parent;
   let current = root;
 
-  while (current !== undefined) {
+  while (current) {
     parent = current;
     if (key < current.key) {
         current = current.left as Node<K, V>;
@@ -299,7 +299,7 @@ function getNodeParent<K, V>(root: Node<K, V>, key: K): Node<K, V> | undefined {
     let current = root;
     let parent;
 
-    while (current !== undefined) {
+    while (current) {
         if (key < current.key) {
             parent = current;
             current = current.left as Node<K, V>;
@@ -342,7 +342,7 @@ export function remove<K, V>(root: Node<K, V> | undefined, key: K): Node<K, V> |
   }
 
   if (!node) {
-    return undefined;
+    return;
   }
 
   if (!node.left && !node.right) {
@@ -351,9 +351,9 @@ export function remove<K, V>(root: Node<K, V> | undefined, key: K): Node<K, V> |
       root = undefined;
     } else {
       if (parentNode.left === node) {
-        parentNode.left = undefined;
+        delete parentNode.left;
       } else {
-        parentNode.right = undefined;
+        delete parentNode.right;
       }
     }
   } else if (node.left && node.right) {
