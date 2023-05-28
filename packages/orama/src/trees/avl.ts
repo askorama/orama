@@ -87,33 +87,29 @@ export function getSize<K, V>(root: Node<K, V> | null): number {
 }
 
 export function isBalanced<K, V>(root: Node<K, V> | null): boolean {
-  const stack: StackNode<K, V>[] = [];
+  if (root === null)
+    return true;
 
-  if (root !== null) {
-    stack.push({ node: root, checkedChildren: false });
-  }
+  const stack: Node<K, V>[] = [root];
 
   while (stack.length > 0) {
-    const top = stack[stack.length - 1];
+    const node = stack.pop();
 
-    if (top.checkedChildren) {
-      const heightDiff = Math.abs(getHeight(top.node.left) - getHeight(top.node.right));
+    if (node === undefined)
+      return true;
 
-      if (heightDiff > 1) {
-        return false;
-      }
+    const heightDiff = getHeight(node.left) - getHeight(node.right);
 
-      stack.pop();
-    } else {
-      top.checkedChildren = true;
+    if (heightDiff > 1 || heightDiff < -1) {
+      return false;
+    }
 
-      if (top.node.right !== null) {
-        stack.push({ node: top.node.right, checkedChildren: false });
-      }
+    if (node.right !== null) {
+      stack.push(node.right);
+    }
 
-      if (top.node.left !== null) {
-        stack.push({ node: top.node.left, checkedChildren: false });
-      }
+    if (node.left !== null) {
+      stack.push(node.left);
     }
   }
 
