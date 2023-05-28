@@ -6,11 +6,6 @@ export type Node<K, V> = {
   height: number
 }
 
-type StackNode<K, V> = {
-  node: Node<K, V>,
-  checkedChildren: boolean
-};
-
 const BALANCE_STATE = {
   UNBALANCED_RIGHT: -2,
   SLIGHTLY_UNBALANCED_RIGHT: -1,
