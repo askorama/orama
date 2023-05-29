@@ -9,7 +9,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/commonjs.cjs"
+      "require": "./dist/commonjs.cjs",
+      "node": "./dist/commonjs.cjs"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js",
+      "require": "./dist/server-commonjs.cjs",
+      "node": "./dist/server-commonjs.cjs"
     }
   },
   "types": "./dist/index.d.ts",

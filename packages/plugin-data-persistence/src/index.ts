@@ -1,21 +1,11 @@
+import type { Orama, Schema } from '@orama/orama'
+import type { PersistenceFormat, Runtime } from './types.js'
 import { decode, encode } from '@msgpack/msgpack'
-import { create, load, Orama, save, Schema } from '@orama/orama'
+import { create, load, save } from '@orama/orama'
 // @ts-expect-error dpack does not expose types
 import * as dpack from 'dpack'
-import { FILESYSTEM_NOT_SUPPORTED_ON_RUNTIME, UNSUPPORTED_FORMAT } from './errors.js'
-
-export type Runtime = 'deno' | 'node' | 'bun' | 'browser' | 'unknown'
-
-export type PersistenceFormat = 'json' | 'dpack' | 'binary'
-
-export const DEFAULT_DB_NAME = `orama_bump_${+new Date()}`
-
-interface FileSystem {
-  cwd: () => string
-  resolve: (...paths: string[]) => string
-  readFile: (path: string, encoding?: string) => Promise<Buffer | string>
-  writeFile: (path: string, contents: Buffer | string, encoding?: string) => Promise<unknown>
-}
+import { UNSUPPORTED_FORMAT, METHOD_MOVED } from './errors.js'
+import { detectRuntime } from './utils.js'
 
 const hexFromMap: Record<string, number> = {
   0: 0,
@@ -36,26 +26,6 @@ const hexFromMap: Record<string, number> = {
   f: 15
 }
 const hexToMap = Object.keys(hexFromMap)
-
-let _fs: FileSystem
-
-function detectRuntime(): Runtime {
-  /* c8 ignore next 11 */
-  if (typeof process !== 'undefined' && process.versions !== undefined) {
-    return 'node'
-
-    // @ts-expect-error "Deno" global variable is defined in Deno only
-  } else if (typeof Deno !== 'undefined') {
-    return 'deno'
-    // @ts-expect-error "Bun" global variable is defined in Bun only
-  } else if (typeof Bun !== 'undefined') {
-    return 'bun'
-  } else if (typeof window !== 'undefined') {
-    return 'browser'
-  }
-
-  return 'unknown'
-}
 
 /* c8 ignore next 13 */
 function slowHexToBuffer(hex: string): Uint8Array {
@@ -78,78 +48,6 @@ function slowHexToString(bytes: Uint8Array): string {
   return Array.from(bytes || [])
     .map(b => hexToMap[b >> 4] + hexToMap[b & 15])
     .join('')
-}
-
-async function loadFileSystem(runtime: Runtime): Promise<FileSystem> {
-  switch (runtime) {
-    case 'node': {
-      const { readFile, writeFile } = await import('node:fs/promises')
-      const { resolve } = await import('node:path')
-
-      return {
-        cwd: process.cwd,
-        resolve,
-        readFile: readFile as FileSystem['readFile'],
-        writeFile: writeFile as FileSystem['writeFile']
-      }
-    }
-    /* c8 ignore next 13 */
-    case 'deno': {
-      // @ts-expect-error Deno allows TS imports
-      const { resolve } = await import('https://deno.land/std/path/mod.ts')
-
-      // @ts-expect-error Deno is only available in Deno
-      const { cwd, readTextFile: readFile, writeTextFile: writeFile } = Deno
-
-      return {
-        cwd: cwd as FileSystem['cwd'],
-        resolve: resolve as FileSystem['resolve'],
-        readFile: readFile as FileSystem['readFile'],
-        writeFile: writeFile as FileSystem['writeFile']
-      }
-    }
-    default:
-      throw new Error(FILESYSTEM_NOT_SUPPORTED_ON_RUNTIME(runtime))
-  }
-}
-
-async function getDefaultOutputFilename(format: PersistenceFormat, runtime: Runtime): Promise<string> {
-  if (!_fs) {
-    _fs = await loadFileSystem(runtime)
-  }
-
-  return _fs.resolve(_fs.cwd(), await getDefaultFileName(format, runtime))
-}
-
-export async function getDefaultFileName(format: PersistenceFormat, runtime?: Runtime): Promise<string> {
-  if (!runtime) {
-    runtime = detectRuntime()
-  }
-
-  let extension: string
-
-  switch (format) {
-    case 'json':
-      extension = 'json'
-      break
-    case 'dpack':
-      extension = 'dpack'
-      break
-    case 'binary':
-      extension = 'msp'
-  }
-
-  let dbName: string = DEFAULT_DB_NAME
-
-  /* c8 ignore next 3 */
-  if (runtime === 'deno') {
-    // @ts-expect-error Deno is only available in Deno
-    dbName = Deno.env.get('LYRA_DB_NAME') ?? DEFAULT_DB_NAME
-  } else {
-    dbName = process?.env?.LYRA_DB_NAME ?? DEFAULT_DB_NAME
-  }
-
-  return `${dbName}.${extension}`
 }
 
 export async function persist<T extends Schema>(
@@ -236,43 +134,14 @@ export async function persistToFile<T extends Schema>(
   format: PersistenceFormat = 'binary',
   path?: string,
   runtime?: Runtime
-): Promise<string> {
-  if (!runtime) {
-    runtime = detectRuntime()
-  }
-
-  if (!_fs) {
-    _fs = await loadFileSystem(runtime)
-  }
-
-  if (!path) {
-    path = await getDefaultOutputFilename(format, runtime)
-  }
-
-  const serialized = await persist(db, format, runtime)
-
-  await _fs.writeFile(path, serialized)
-
-  return path
+): Promise<never> {
+  throw new Error(METHOD_MOVED('persistToFile'))
 }
 
 export async function restoreFromFile<T extends Schema>(
   format: PersistenceFormat = 'binary',
   path?: string,
   runtime?: Runtime
-): Promise<Orama<T>> {
-  if (!runtime) {
-    runtime = detectRuntime()
-  }
-
-  if (!_fs) {
-    _fs = await loadFileSystem(runtime)
-  }
-
-  if (!path) {
-    path = await getDefaultOutputFilename(format, runtime)
-  }
-
-  const data = await _fs.readFile(path)
-  return restore(format, data, runtime)
+): Promise<never> {
+  throw new Error(METHOD_MOVED('restoreFromFile'))
 }

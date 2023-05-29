@@ -1,4 +1,4 @@
-import { Tab, Tabs } from 'nextra-theme-docs'
+import { Tab, Tabs, Callout } from 'nextra-theme-docs'
 
 # Data Persistence
 
@@ -62,23 +62,54 @@ await insert(originalInstance, {
 })
 ```
 
-## Persisting the database to disk
+## Persisting the database to disk (in-memory usage)
 
 Now we have a Orama instance containing three quotes. We can use the
 `plugin-data-persistence` plugin to save the database to a file:
 
 ```javascript copy
-import { persistToFile } from '@orama/plugin-data-persistence'
+import { persist } from '@orama/plugin-data-persistence'
+
+const JSONIndex = await persist(originalInstance, 'json')
+```
+
+## Restore the database from disk (in-memory usage)
+
+To restore the database from an in-memory snapshot (created via the `persist` function):
+
+```javascript copy
+import { search } from '@orama/orama'
+import { restore } from '@orama/plugin-data-persistence'
+
+const newInstance = await restore('json', JSONIndex)
+
+await search(persist, {
+  term: '...'
+})
+```
+
+## Persisting the database to disk (server usage)
+
+<Callout type="warning">
+  The following methods are meant for server-side usage only and will throw an exception when used on browsers and runtimes without
+  a Node.js-compatible `fs` module.
+</Callout>
+
+Now we have a Orama instance containing three quotes. We can use the
+`plugin-data-persistence` plugin to save the database to a file:
+
+```javascript copy
+import { persistToFile } from '@orama/plugin-data-persistence/server'
 
 const filePath = await persistToFile(originalInstance, 'binary', './quotes.msp')
 ```
 
-## Restore the database from disk
+## Restore the database from disk (server usage)
 
 To restore the database from the disk:
 
 ```javascript copy
-import { restoreFromFile } from '@orama/plugin-data-persistence'
+import { restoreFromFile } from '@orama/plugin-data-persistence/server'
 const db = await restoreFromFile('binary', filePath)
 ```
 
