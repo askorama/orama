@@ -143,29 +143,18 @@ export async function getGroups(orama: Orama, results: TokenScore[], by: GroupBy
   return res
 }
 
-function calculateCombination(arrs: ScalarSearchableValue[][]): ScalarSearchableValue[][] {
-  const result: ScalarSearchableValue[][] = []
-  const arrays = arrs.slice()
-  const array = arrays.shift()
-  if (array) {
-    for (const elem of array) {
-      result.push([elem])
+function calculateCombination(arrs: ScalarSearchableValue[][], index = 0): ScalarSearchableValue[][] {
+  if (index + 1 === arrs.length) return arrs[index].map(item => [item]);
+
+  const head = arrs[index];
+  const c = calculateCombination(arrs, index + 1);
+
+  const combinations = [];
+  for (const value of head) {
+    for (const combination of c) {
+      combinations.push([value, ...combination]);
     }
-  }
-  const arraysLength = arrays.length
-  for (let i = 0; i < arraysLength; i++) {
-    const array = arrays[i]
-    const arrayLength = array.length
-    const newResult = []
-    for (let j = 0; j < arrayLength; j++) {
-      const elem = array[j]
-      for (const r of result) {
-        newResult.push([...r, elem])
-      }
-    }
-    result.length = 0
-    result.push(...newResult)
   }
 
-  return result
+  return combinations;
 }
