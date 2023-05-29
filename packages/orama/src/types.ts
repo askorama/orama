@@ -60,7 +60,7 @@ export type FacetDefinition = StringFacetDefinition | NumberFacetDefinition | Bo
 export type ReduceFunction<T, R extends Result = Result> = (values: ScalarSearchableValue[], acc: T, value: R, index: number) => T
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Reduce<T = any> = {
-  func: ReduceFunction<T>
+  reducer: ReduceFunction<T>
   getInitialValue: (elementCount: number) => T
 }
 

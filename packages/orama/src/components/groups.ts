@@ -13,7 +13,7 @@ interface PropertyGroup {
 }
 
 const DEFAULT_REDUCE = {
-  func: (_: ScalarSearchableValue[], acc: unknown, res: Result, index: number) => {
+  reducer: (_: ScalarSearchableValue[], acc: unknown, res: Result, index: number) => {
     (acc as Result[])[index] = res
     return acc
   },
@@ -130,7 +130,7 @@ export async function getGroups(orama: Orama, results: TokenScore[], by: GroupBy
       }
     })
 
-    const func = reduce.func.bind(null, group.values)
+    const func = reduce.reducer.bind(null, group.values)
     const initialValue = reduce.getInitialValue(group.indexes.length)
     const aggregationValue = docs.reduce(func, initialValue)
 

@@ -207,7 +207,7 @@ t.test('search with groupBy', async t => {
       groupBy: {
         properties: ['type', 'design'],
         reduce: {
-          func: (_: ScalarSearchableValue[], acc: AggregationValue, item: Result) => {
+          reducer: (_: ScalarSearchableValue[], acc: AggregationValue, item: Result) => {
             const doc = item.document as Doc
             acc.type ||= doc.type
             acc.design ||= doc.design
