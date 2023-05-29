@@ -1,7 +1,8 @@
 import { create, insert, Orama, search } from '@orama/orama'
 import t from 'tap'
-import { UNSUPPORTED_FORMAT } from '../src/errors.js'
-import { persist, persistToFile, restore, restoreFromFile } from '../src/index.js'
+import { UNSUPPORTED_FORMAT, METHOD_MOVED } from '../src/errors.js'
+import { persist, restore, persistToFile as deprecatedPersistToFile, restoreFromFile as deprecatedRestoreFromFile } from '../src/index.js'
+import { persistToFile, restoreFromFile } from '../src/server.js'
 
 let _rm
 
@@ -394,4 +395,21 @@ t.test('errors', t => {
       await rm(path)
     }
   })
+})
+
+t.test('should throw an error when trying to use a deprecated method', async t => {
+  t.plan(2)
+  const db = await generateTestDBInstance()
+
+  try {
+    await deprecatedPersistToFile(db, 'binary')
+  } catch ({ message }) {
+    t.match(message, METHOD_MOVED('persistToFile'))
+  }
+
+  try {
+    await deprecatedRestoreFromFile('binary', 'path')
+  } catch ({ message }) {
+    t.match(message, METHOD_MOVED('restoreFromFile'))
+  }
 })
