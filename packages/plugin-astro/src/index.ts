@@ -18,8 +18,8 @@ interface AstroBuildDoneArgs {
   routes: RouteData[]
 }
 
-const isWindows = process.platform === 'win32'
-const joinPath = (isWindows ? path.win32 : path).join
+const isWindows = process.platform === 'win32';
+const joinPath = (isWindows ? path.win32 : path).join;
 
 export const defaultSchema: Schema = {
   path: 'string',
@@ -116,7 +116,7 @@ export function createPlugin(options: Record<string, OramaOptions>): AstroIntegr
         config = cfg
       },
       'astro:build:done': async function ({ pages, routes }: AstroBuildDoneArgs): Promise<void> {
-        const assetsDir = joinPath(config.outDir.pathname, 'assets').slice(isWindows ? 1 : 0)
+        const assetsDir = joinPath(config.outDir.pathname, 'assets').slice(isWindows ? 1 : 0);
         if (!existsSync(assetsDir)) {
           mkdirSync(assetsDir)
         }

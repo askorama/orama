@@ -202,9 +202,9 @@ t.test('serialization should support array as well', async t => {
 
   const doc = await getByID(db, docId)
   t.strictSame(doc, {
-    strings: ['Albus', 'Percival', 'Wulfric', 'Brian'],
-    num: [3, 5, 7, 35],
-    b: [true, true, true],
+    strings: [ 'Albus', 'Percival', 'Wulfric', 'Brian' ],
+    num: [ 3, 5, 7, 35 ],
+    b: [ true, true, true ]
   })
 })
 

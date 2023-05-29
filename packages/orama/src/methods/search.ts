@@ -22,7 +22,6 @@ import {
   SearchableValue,
 } from '../types.js'
 import { getNanosecondsTime, getNested, sortTokenScorePredicate } from '../utils.js'
-// import { getGroups } from '../components/groups.js'
 
 const defaultBM25Params: BM25Params = {
   k: 1.2,

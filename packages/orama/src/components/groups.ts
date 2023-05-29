@@ -23,16 +23,7 @@ const DEFAULT_REDUCE = {
 
 const ALLOWED_TYPES = ['string', 'number', 'boolean']
 
-export async function getGroups(orama: Orama, results: TokenScore[], by: GroupByParams): Promise<GroupResult> {
-  const groupBy = by!
-  const allIDs = results.map(([id]) => id)
-
-  // allDocs is already sorted by the sortBy algorithm
-  // We leverage on that to limit the number of documents returned
-  const allDocs = await orama.documentsStore.getMultiple(orama.data.docs, allIDs)
-  const allDocsLength = allDocs.length
-
-  const returnedCount = groupBy.maxResult || Number.MAX_SAFE_INTEGER
+export async function getGroups(orama: Orama, results: TokenScore[], groupBy: GroupByParams): Promise<GroupResult> {
   const properties = groupBy.properties
   const propertiesLength = properties.length
 
@@ -47,6 +38,14 @@ export async function getGroups(orama: Orama, results: TokenScore[], by: GroupBy
     }
   }
 
+  const allIDs = results.map(([id]) => id)
+
+  // allDocs is already sorted by the sortBy algorithm
+  // We leverage on that to limit the number of documents returned
+  const allDocs = await orama.documentsStore.getMultiple(orama.data.docs, allIDs)
+  const allDocsLength = allDocs.length
+
+  const returnedCount = groupBy.maxResult || Number.MAX_SAFE_INTEGER
 
   const listOfValues: ScalarSearchableValue[][] = []
 
