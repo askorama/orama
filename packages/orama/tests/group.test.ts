@@ -189,39 +189,47 @@ t.test('search with groupBy', async t => {
 
   t.test('with custom aggragator', async t => {
     interface Doc extends Document {
+      type: string
       design: string
       rank: number
+      color: string
       isPromoted: boolean
     }
     interface AggregationValue {
-      count: number
+      type: string
+      design: string
+      colors: string[]
+      ranks: number[]
+      isPromoted: boolean
     }
 
     const results = await search(db, {
       groupBy: {
-        properties: ['design', 'rank', 'isPromoted'],
+        properties: ['type', 'design'],
         reduce: {
           func: (_: string[], acc: AggregationValue, item: Result) => {
-            acc.count += (item.document as Doc).rank
+            const doc = item.document as Doc
+            acc.type ||= doc.type
+            acc.design ||= doc.design
+            acc.isPromoted ||= doc.isPromoted
+            acc.colors.push(doc.color)
+            acc.ranks.push(doc.rank)
             return acc
           },
-          getInitialValue: (): AggregationValue => ({ count: 0 }),
+          getInitialValue: (): AggregationValue => ({ type: '', design: '', colors: [], ranks: [], isPromoted: false }),
         },
       },
-      sortBy: (a, b) => {
-        return -(a[2] as { color: string }).color.localeCompare((b[2] as { color: string }).color)
-      },
+      sortBy: {
+        property: 'rank',
+        order: 'DESC',
+      }
     })
 
-    t.strictSame(results.groups!, [
-      { values: ['A', '3', 'true'], result: { count: 6 } },
-      { values: ['B', '4', 'true'], result: { count: 4 } },
-      { values: ['B', '5', 'true'], result: { count: 5 } },
-      { values: ['A', '4', 'false'], result: { count: 8 } },
-      { values: ['B', '4', 'false'], result: { count: 4 } },
-      { values: ['A', '5', 'false'], result: { count: 5 } },
-      { values: ['B', '5', 'false'], result: { count: 5 } },
-    ])
+    t.strictSame(new Set(results.groups!), new Set([
+      { values: ['t-shirt', 'B'], result: { type: 't-shirt', design: 'B', colors: ['gray', 'white', 'green', 'blue'], ranks: [5, 5, 4, 4], isPromoted: true } },
+      { values: ['t-shirt', 'A'], result: { type: 't-shirt', design: 'A', colors: ['green', 'red', 'blue'], ranks: [5, 4, 3], isPromoted: true } },
+      { values: ['sweatshirt', 'A'], result: { type: 'sweatshirt', design: 'A', colors: ['green', 'yellow'], ranks: [4, 3], isPromoted: true } },
+    ]))
 
     t.end()
   })
