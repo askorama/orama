@@ -6,34 +6,12 @@ export type Node<K, V> = {
   height: number
 }
 
-type StackNode<K, V> = {
-  node: Node<K, V>,
-  checkedChildren: boolean
-};
-
 const BALANCE_STATE = {
-  UNBALANCED_RIGHT: 1,
-  SLIGHTLY_UNBALANCED_RIGHT: 2,
-  BALANCED: 3,
-  SLIGHTLY_UNBALANCED_LEFT: 4,
-  UNBALANCED_LEFT: 5,
-}
-
-function getBalanceFactor<K, V>(node: Node<K, V>): number {
-  const heightDifference = getHeight(node.left) - getHeight(node.right)
-
-  switch (heightDifference) {
-    case -2:
-      return BALANCE_STATE.UNBALANCED_RIGHT
-    case -1:
-      return BALANCE_STATE.SLIGHTLY_UNBALANCED_RIGHT
-    case 1:
-      return BALANCE_STATE.SLIGHTLY_UNBALANCED_LEFT
-    case 2:
-      return BALANCE_STATE.UNBALANCED_LEFT
-    default:
-      return BALANCE_STATE.BALANCED
-  }
+  UNBALANCED_RIGHT: -2,
+  SLIGHTLY_UNBALANCED_RIGHT: -1,
+  BALANCED: 0,
+  SLIGHTLY_UNBALANCED_LEFT: 1,
+  UNBALANCED_LEFT: 2,
 }
 
 function getHeight<K, V>(node: Node<K, V> | null): number {
@@ -87,33 +65,29 @@ export function getSize<K, V>(root: Node<K, V> | null): number {
 }
 
 export function isBalanced<K, V>(root: Node<K, V> | null): boolean {
-  const stack: StackNode<K, V>[] = [];
+  if (root === null)
+    return true;
 
-  if (root !== null) {
-    stack.push({ node: root, checkedChildren: false });
-  }
+  const stack: Node<K, V>[] = [root];
 
   while (stack.length > 0) {
-    const top = stack[stack.length - 1];
+    const node = stack.pop();
 
-    if (top.checkedChildren) {
-      const heightDiff = Math.abs(getHeight(top.node.left) - getHeight(top.node.right));
+    if (node === undefined)
+      return true;
 
-      if (heightDiff > 1) {
-        return false;
-      }
+    const heightDiff = getHeight(node.left) - getHeight(node.right);
 
-      stack.pop();
-    } else {
-      top.checkedChildren = true;
+    if (heightDiff > 1 || heightDiff < -1) {
+      return false;
+    }
 
-      if (top.node.right !== null) {
-        stack.push({ node: top.node.right, checkedChildren: false });
-      }
+    if (node.right !== null) {
+      stack.push(node.right);
+    }
 
-      if (top.node.left !== null) {
-        stack.push({ node: top.node.left, checkedChildren: false });
-      }
+    if (node.left !== null) {
+      stack.push(node.left);
     }
   }
 
@@ -267,8 +241,8 @@ export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
   current = newNode;
 
   while (parent) {
-    const balanceFactor = getBalanceFactor(parent);
-    
+    const balanceFactor = getHeight(parent.left) - getHeight(parent.right)
+
     if (balanceFactor === BALANCE_STATE.UNBALANCED_LEFT) {
         if (key < (parent.left as Node<K, V>).key) {
             parent = rotateRight(parent);
