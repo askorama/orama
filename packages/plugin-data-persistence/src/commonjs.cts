@@ -1,6 +1,8 @@
 import type {
   persist as esmPersist,
   restore as esmRestore,
+  persistToFile as esmPersistToFile,
+  restoreFromFile as esmRestoreFromFile,
 } from './index.js'
 
 export interface OramaPluginDataPersistenceExport {
@@ -12,6 +14,8 @@ export type RequireCallback = (err: Error | undefined, orama?: OramaPluginDataPe
 
 let _esmRestore: typeof esmRestore
 let _esmPersist: typeof esmPersist
+let _esmRestoreFromFile: typeof esmRestoreFromFile
+let _esmPersistToFile: typeof esmPersistToFile
 
 export async function persist(...args: Parameters<typeof esmPersist>): ReturnType<typeof esmPersist> {
   if (!_esmPersist) {
@@ -29,6 +33,23 @@ export async function restore(...args: Parameters<typeof esmRestore>): ReturnTyp
   }
 
   return _esmRestore(...args)
+}
+
+export function persistToFile(...args: Parameters<typeof esmPersistToFile>): ReturnType<typeof esmPersistToFile> {
+  if (!_esmPersistToFile) {
+    const imported = require('./index.js')
+    _esmPersistToFile = imported.persistToFile
+  }
+
+  return _esmPersistToFile(...args)
+}
+
+export function restoreFromFile(...args: Parameters<typeof esmRestoreFromFile>): ReturnType<typeof esmRestoreFromFile> {
+  if (!_esmRestoreFromFile) {
+    const imported = require('./index.js')
+    _esmRestoreFromFile = imported.restoreFromFile
+  }
+  return _esmRestoreFromFile(...args)
 }
 
 export function requireOramaPluginDataPersistence(callback: RequireCallback): void {
