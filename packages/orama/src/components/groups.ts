@@ -12,6 +12,14 @@ interface PropertyGroup {
   >
 }
 
+const DEFAULT_REDUCE = {
+  func: (_: ScalarSearchableValue[], acc: unknown, res: Result, index: number) => {
+    (acc as Result[])[index] = res
+    return acc
+  },
+  getInitialValue: (length: number) => Array.from({ length }),
+}
+
 export async function getGroups(orama: Orama, results: TokenScore[], by: GroupByParams): Promise<GroupResult> {
   const groupBy = by!
   const allIDs = results.map(([id]) => id)
@@ -25,7 +33,7 @@ export async function getGroups(orama: Orama, results: TokenScore[], by: GroupBy
   const properties = groupBy.property ? [groupBy.property] : groupBy.properties || []
   const propertiesLength = properties.length
 
-  const values: string[][] = []
+  const listOfValues: ScalarSearchableValue[][] = []
 
   // We want to understand which documents have which values
   // and group them by the property and values
@@ -37,43 +45,44 @@ export async function getGroups(orama: Orama, results: TokenScore[], by: GroupBy
       perValue: {},
     }
 
+    const values: Set<ScalarSearchableValue> = new Set()
     for (let j = 0; j < allDocsLength; j++) {
       const doc = allDocs[j]
 
-      let value = await getNested<ScalarSearchableValue>(doc as object, groupByKey)
-      // TODO: should we consider undefined values?
+      const value = await getNested<ScalarSearchableValue>(doc as object, groupByKey)
+      // we don't want to consider undefined values
       if (typeof value === 'undefined') {
         continue
       }
-      if (typeof value === 'boolean') {
-        value = value ? 'true' : 'false'
-      }
-      if (typeof group.perValue[value] === 'undefined') {
-        group.perValue[value] = {
+      const keyValue = typeof value !== 'boolean' ? value : '' + value
+      if (typeof group.perValue[keyValue] === 'undefined') {
+        group.perValue[keyValue] = {
           indexes: [],
           count: 0,
         }
       }
-      if (group.perValue[value].count >= returnedCount) {
+      if (group.perValue[keyValue].count >= returnedCount) {
         // We stop early because for this value we react the limit
         continue
       }
 
       // We use the index to keep track of the original order
-      group.perValue[value].indexes.push(j)
-      group.perValue[value].count++
+      group.perValue[keyValue].indexes.push(j)
+      group.perValue[keyValue].count++
+
+      values.add(value)
     }
 
-    values.push(Object.keys(group.perValue))
+    listOfValues.push(Array.from(values))
 
     g[groupByKey] = group
   }
 
-  const combinations = calculateCombination(values)
+  const combinations = calculateCombination(listOfValues)
   const combinationsLength = combinations.length
 
   const groups: {
-    values: string[]
+    values: ScalarSearchableValue[]
     indexes: number[]
   }[] = []
   for (let i = 0; i < combinationsLength; i++) {
@@ -81,7 +90,7 @@ export async function getGroups(orama: Orama, results: TokenScore[], by: GroupBy
     const combinationLength = combination.length
 
     const group: {
-      values: string[]
+      values: ScalarSearchableValue[]
       indexes: number[]
     } = {
       values: [],
@@ -91,7 +100,7 @@ export async function getGroups(orama: Orama, results: TokenScore[], by: GroupBy
     for (let j = 0; j < combinationLength; j++) {
       const value = combination[j]
       const property = properties[j]
-      indexes.push(g[property].perValue[value].indexes)
+      indexes.push(g[property].perValue[typeof value !== 'boolean' ? value : '' + value].indexes)
       group.values.push(value)
     }
     // We leverage on the index to sort the results by the original order
@@ -110,15 +119,8 @@ export async function getGroups(orama: Orama, results: TokenScore[], by: GroupBy
   const groupsLength = groups.length
   for (let i = 0; i < groupsLength; i++) {
     const group = groups[i]
-    const groupIndexesLength = group.indexes.length
 
-    const reduce = groupBy.reduce || {
-      func: (_: string[], acc: unknown, res: Result, index: number) => {
-        (acc as Result[])[index] = res
-        return acc
-      },
-      getInitialValue: () => Array.from({ length: groupIndexesLength }),
-    }
+    const reduce = groupBy.reduce || DEFAULT_REDUCE
 
     const docs = group.indexes.map(index => {
       return {
@@ -129,7 +131,7 @@ export async function getGroups(orama: Orama, results: TokenScore[], by: GroupBy
     })
 
     const func = reduce.func.bind(null, group.values)
-    const initialValue = reduce.getInitialValue()
+    const initialValue = reduce.getInitialValue(group.indexes.length)
     const aggregationValue = docs.reduce(func, initialValue)
 
     res.push({
@@ -141,8 +143,8 @@ export async function getGroups(orama: Orama, results: TokenScore[], by: GroupBy
   return res
 }
 
-function calculateCombination(arrs: string[][]): string[][] {
-  const result: string[][] = []
+function calculateCombination(arrs: ScalarSearchableValue[][]): ScalarSearchableValue[][] {
+  const result: ScalarSearchableValue[][] = []
   const arrays = arrs.slice()
   const array = arrays.shift()
   if (array) {
@@ -164,5 +166,6 @@ function calculateCombination(arrs: string[][]): string[][] {
     result.length = 0
     result.push(...newResult)
   }
+
   return result
 }

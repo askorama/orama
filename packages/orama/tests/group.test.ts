@@ -1,5 +1,5 @@
 import t from 'tap'
-import { Document, GroupResult, Orama, Result, create, insertMultiple, search } from '../src/index.js'
+import { Document, GroupResult, Orama, Result, ScalarSearchableValue, create, insertMultiple, search } from '../src/index.js'
 
 t.test('search with groupBy', async t => {
   const [db] = await createDb()
@@ -99,13 +99,13 @@ t.test('search with groupBy', async t => {
       })
 
       compareGroupResults(t, results.groups!, [
-        { values: ['A', '3'], result: ['0', '7'] },
-        { values: ['A', '4'], result: ['2', '8'] },
-        { values: ['A', '5'], result: ['1'] },
+        { values: ['A', 3], result: ['0', '7'] },
+        { values: ['A', 4], result: ['2', '8'] },
+        { values: ['A', 5], result: ['1'] },
         // We don't generate empty groups
         // { values: ['B', '3'], result: [] },
-        { values: ['B', '4'], result: ['3', '4'] },
-        { values: ['B', '5'], result: ['5', '6'] },
+        { values: ['B', 4], result: ['3', '4'] },
+        { values: ['B', 5], result: ['5', '6'] },
       ])
 
       t.end()
@@ -123,11 +123,11 @@ t.test('search with groupBy', async t => {
       })
 
       compareGroupResults(t, results.groups!, [
-        { values: ['A', '3'], result: ['7', '0'] },
-        { values: ['A', '4'], result: ['8', '2'] },
-        { values: ['A', '5'], result: ['1'] },
-        { values: ['B', '4'], result: ['4', '3'] },
-        { values: ['B', '5'], result: ['6', '5'] },
+        { values: ['A', 3], result: ['7', '0'] },
+        { values: ['A', 4], result: ['8', '2'] },
+        { values: ['A', 5], result: ['1'] },
+        { values: ['B', 4], result: ['4', '3'] },
+        { values: ['B', 5], result: ['6', '5'] },
       ])
 
       t.end()
@@ -149,13 +149,13 @@ t.test('search with groupBy', async t => {
       })
 
       compareGroupResults(t, results.groups!, [
-        { values: ['A', '3', 'true'], result: ['0', '7'] },
-        { values: ['B', '4', 'true'], result: ['4'] },
-        { values: ['B', '5', 'true'], result: ['6'] },
-        { values: ['A', '4', 'false'], result: ['2', '8'] },
-        { values: ['A', '5', 'false'], result: ['1'] },
-        { values: ['B', '4', 'false'], result: ['3'] },
-        { values: ['B', '5', 'false'], result: ['5'] },
+        { values: ['A', 3, true], result: ['0', '7'] },
+        { values: ['B', 4, true], result: ['4'] },
+        { values: ['B', 5, true], result: ['6'] },
+        { values: ['A', 4, false], result: ['2', '8'] },
+        { values: ['A', 5, false], result: ['1'] },
+        { values: ['B', 4, false], result: ['3'] },
+        { values: ['B', 5, false], result: ['5'] },
       ])
 
       t.end()
@@ -172,13 +172,13 @@ t.test('search with groupBy', async t => {
       })
 
       compareGroupResults(t, results.groups!, [
-        { values: ['A', '3', 'true'], result: ['7', '0'] },
-        { values: ['B', '4', 'true'], result: ['4'] },
-        { values: ['B', '5', 'true'], result: ['6'] },
-        { values: ['A', '4', 'false'], result: ['2', '8'] },
-        { values: ['A', '5', 'false'], result: ['1'] },
-        { values: ['B', '4', 'false'], result: ['3'] },
-        { values: ['B', '5', 'false'], result: ['5'] },
+        { values: ['A', 3, true], result: ['7', '0'] },
+        { values: ['B', 4, true], result: ['4'] },
+        { values: ['B', 5, true], result: ['6'] },
+        { values: ['A', 4, false], result: ['2', '8'] },
+        { values: ['A', 5, false], result: ['1'] },
+        { values: ['B', 4, false], result: ['3'] },
+        { values: ['B', 5, false], result: ['5'] },
       ])
 
       t.end()
@@ -207,7 +207,7 @@ t.test('search with groupBy', async t => {
       groupBy: {
         properties: ['type', 'design'],
         reduce: {
-          func: (_: string[], acc: AggregationValue, item: Result) => {
+          func: (_: ScalarSearchableValue[], acc: AggregationValue, item: Result) => {
             const doc = item.document as Doc
             acc.type ||= doc.type
             acc.design ||= doc.design

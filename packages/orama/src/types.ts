@@ -57,11 +57,11 @@ export interface BooleanFacetDefinition {
 
 export type FacetDefinition = StringFacetDefinition | NumberFacetDefinition | BooleanFacetDefinition
 
-export type ReduceFunction<T, R extends Result = Result> = (values: string[], acc: T, value: R, index: number) => T
+export type ReduceFunction<T, R extends Result = Result> = (values: ScalarSearchableValue[], acc: T, value: R, index: number) => T
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Reduce<T = any> = {
   func: ReduceFunction<T>
-  getInitialValue: () => T
+  getInitialValue: (elementCount: number) => T
 }
 
 export type GroupByParams = {
@@ -291,11 +291,11 @@ export type FacetResult = Record<
 
 export type GroupResult =
   | {
-      values: string[]
+      values: ScalarSearchableValue[]
       result: Result[]
     }[]
   | {
-      values: string[]
+      values: ScalarSearchableValue[]
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       result: any
     }[]
