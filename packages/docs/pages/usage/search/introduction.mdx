@@ -244,3 +244,20 @@ When performing a search operation, the `elapsed` property will now return the f
 
 If you want to return all documents in the database, then you can omit the `term` in the search parameters.
 This kind of search might be slower than a regular search and all scores will be returned as `0`.
+
+## Distinct
+
+Orama can calculate distinct values letting you specify a unique key as follows:
+```javascript copy
+const results = await search(db, {
+  distinctOn: 'type',
+  sortBy: {
+    property: 'rank',
+    order: 'DESC',
+  }
+})
+```
+Using the property `distinctOn`, Orama returns only the first document for every property `type` value.
+The `results.hits` array will contain only the first documents for every property `type` value.
+
+NB: you can use this feature in combination with `sortBy`.

@@ -26,6 +26,8 @@ const errors = {
   CANNOT_SORT_BY_ARRAY: `Cannot configure sort for "%s" because it is an array (%s).`,
   UNABLE_TO_SORT_ON_UNKNOWN_FIELD: `Unable to sort on unknown field "%s". Allowed fields: %s`,
   SORT_DISABLED: `Sort is disabled. Please read the documentation at https://docs.oramasearch for more information.`,
+  UNKNOWN_GROUP_BY_PROPERTY: `Unknown groupBy property "%s".`,
+  INVALID_GROUP_BY_PROPERTY: `Invalid groupBy property "%s". Allowed types: "%s", but given "%s".`,
 }
 
 export type ErrorCode = keyof typeof errors

@@ -9,7 +9,7 @@ t.test('search with groupBy', async t => {
       const results = await search(db, {
         term: 't-shirt',
         groupBy: {
-          property: 'design',
+          properties: ['design'],
         },
         sortBy: {
           property: 'id',
@@ -29,7 +29,7 @@ t.test('search with groupBy', async t => {
       const results = await search(db, {
         term: 't-shirt',
         groupBy: {
-          property: 'design',
+          properties: ['design'],
         },
         sortBy: {
           property: 'id',
@@ -50,7 +50,7 @@ t.test('search with groupBy', async t => {
         term: 't-shirt',
         groupBy: {
           maxResult: 2,
-          property: 'design',
+          properties: ['design'],
         },
       })
 
@@ -67,7 +67,7 @@ t.test('search with groupBy', async t => {
         term: 't-shirt',
         groupBy: {
           maxResult: 2,
-          property: 'design',
+          properties: ['design'],
         },
         sortBy: {
           property: 'id',
@@ -234,6 +234,32 @@ t.test('search with groupBy', async t => {
     t.end()
   })
 
+  t.test('only scalar values are supported', async t => {
+    const db = await create({
+      schema: {
+        tags: 'string[]',
+      },
+    })
+
+    await t.rejects(search(db, {
+      groupBy: {
+        properties: ['unknown-property'],
+      },
+    }), {
+      message: 'Unknown groupBy property "unknown-property"',
+    })
+
+    await t.rejects(search(db, {
+      groupBy: {
+        properties: ['tags'],
+      },
+    }), {
+      message: 'Invalid groupBy property "tags". Allowed types: "string, number, boolean", but given "string[]"',
+    })
+
+    t.end()
+  })
+
   t.end()
 })
 
@@ -242,7 +268,7 @@ t.test('real test', async t => {
   const results = await search(db, {
     term: 't-shirt',
     groupBy: {
-      property: 'design',
+      properties: ['design'],
       maxResult: 1,
     },
     sortBy: {

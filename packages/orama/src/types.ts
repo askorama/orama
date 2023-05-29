@@ -65,8 +65,7 @@ export type Reduce<T = any> = {
 }
 
 export type GroupByParams = {
-  property?: string
-  properties?: string[]
+  properties: string[]
   maxResult?: number
   reduce?: Reduce
 }

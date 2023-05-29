@@ -1,3 +1,4 @@
+import { createError } from '../errors.js'
 import type { Orama, ScalarSearchableValue, TokenScore, GroupByParams, GroupResult, Result } from '../types.js'
 import { getNested, intersect } from '../utils.js'
 
@@ -20,6 +21,8 @@ const DEFAULT_REDUCE = {
   getInitialValue: (length: number) => Array.from({ length }),
 }
 
+const ALLOWED_TYPES = ['string', 'number', 'boolean']
+
 export async function getGroups(orama: Orama, results: TokenScore[], by: GroupByParams): Promise<GroupResult> {
   const groupBy = by!
   const allIDs = results.map(([id]) => id)
@@ -30,8 +33,20 @@ export async function getGroups(orama: Orama, results: TokenScore[], by: GroupBy
   const allDocsLength = allDocs.length
 
   const returnedCount = groupBy.maxResult || Number.MAX_SAFE_INTEGER
-  const properties = groupBy.property ? [groupBy.property] : groupBy.properties || []
+  const properties = groupBy.properties
   const propertiesLength = properties.length
+
+  const schemaProperties = await orama.index.getSearchablePropertiesWithTypes(orama.data.index)
+  for (let i = 0; i < propertiesLength; i++) {
+    const property = properties[i]
+    if (typeof schemaProperties[property] === 'undefined') {
+      throw createError('UNKNOWN_GROUP_BY_PROPERTY', property)
+    }
+    if (!ALLOWED_TYPES.includes(schemaProperties[property])) {
+      throw createError('INVALID_GROUP_BY_PROPERTY', property, ALLOWED_TYPES.join(', '), schemaProperties[property])
+    }
+  }
+
 
   const listOfValues: ScalarSearchableValue[][] = []
 
