@@ -193,6 +193,8 @@ export type SearchParams = {
    */
   facets?: Record<string, FacetDefinition>
 
+  distinctOn?: string
+
   groupBy?: GroupByParams
 
   /**

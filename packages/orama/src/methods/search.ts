@@ -19,8 +19,9 @@ import {
   CustomSorterFunctionItem,
   OpaqueIndex,
   OpaqueDocumentStore,
+  SearchableValue,
 } from '../types.js'
-import { getNanosecondsTime, sortTokenScorePredicate } from '../utils.js'
+import { getNanosecondsTime, getNested, sortTokenScorePredicate } from '../utils.js'
 // import { getGroups } from '../components/groups.js'
 
 const defaultBM25Params: BM25Params = {
@@ -100,7 +101,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
-  const { limit = 10, offset = 0, term, properties, threshold = 1 } = params
+  const { limit = 10, offset = 0, term, properties, threshold = 1, distinctOn } = params
   const isPreflight = params.preflight === true
 
   const { index, docs } = orama.data
@@ -140,9 +141,6 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
     tokens,
     await orama.documentsStore.count(docs),
   )
-  const results: Result[] = Array.from({
-    length: limit,
-  })
 
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
   const hasFilters = Object.keys(params.where ?? {}).length > 0
@@ -222,29 +220,11 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
     uniqueDocsArray = uniqueDocsArray.sort(sortTokenScorePredicate)
   }
 
-  const resultIDs: Set<string> = new Set()
-  if (!isPreflight) {
-    // We already have the list of ALL the document IDs containing the search terms.
-    // We loop over them starting from a positional value "offset" and ending at "offset + limit"
-    // to provide pagination capabilities to the search.
-    for (let i = offset; i < limit + offset; i++) {
-      const idAndScore = uniqueDocsArray[i]
-
-      // If there are no more results, just break the loop
-      if (typeof idAndScore === 'undefined') {
-        break
-      }
-
-      const [id, score] = idAndScore
-
-      if (!resultIDs.has(id)) {
-        // We retrieve the full document only AFTER making sure that we really want it.
-        // We never retrieve the full document preventively.
-        const fullDoc = await orama.documentsStore.get(docs, id)
-        results[i] = { id, score, document: fullDoc! }
-        resultIDs.add(id)
-      }
-    }
+  let results
+  if (!isPreflight && distinctOn) {
+    results = await fetchDocumentsWithDistinct(orama, uniqueDocsArray, offset, limit, distinctOn)
+  } else if (!isPreflight) {
+    results = await fetchDocuments(orama, uniqueDocsArray, offset, limit)
   }
 
   const searchResult: Results = {
@@ -257,7 +237,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
     count: uniqueDocsArray.length,
   }
 
-  if (!isPreflight) {
+  if (typeof results !== 'undefined') {
     searchResult.hits = results.filter(Boolean)
   }
 
@@ -276,4 +256,100 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
   )) as ElapsedTime
 
   return searchResult
+}
+
+async function fetchDocumentsWithDistinct(
+  orama: Orama,
+  uniqueDocsArray: [string, number][],
+  offset: number,
+  limit: number,
+  distinctOn: string,
+): Promise<Result[]> {
+  const docs = orama.data.docs
+
+  // Keep track which values we already seen
+  const values = new Map<SearchableValue, true>()
+
+  // We cannot know how many results we will have in the end,
+  // so we need cannot pre-allocate the array.
+  const results: Result[] = []
+
+  const resultIDs: Set<string> = new Set()
+  const uniqueDocsArrayLength = uniqueDocsArray.length
+  let count = 0
+  for (let i = 0; i < uniqueDocsArrayLength; i++) {
+    const idAndScore = uniqueDocsArray[i]
+
+    // If there are no more results, just break the loop
+    if (typeof idAndScore === 'undefined') {
+      continue
+    }
+
+    const [id, score] = idAndScore
+
+    if (resultIDs.has(id)) {
+      continue
+    }
+
+    const doc = await orama.documentsStore.get(docs, id)
+    const value = await getNested(doc as object, distinctOn)
+    if (typeof value === 'undefined' || values.has(value)) {
+      continue
+    }
+    values.set(value, true)
+
+    count++
+    // We shouldn't consider the document if it's not in the offset range
+    if (count <= offset) {
+      continue
+    }
+
+    results.push({ id, score, document: doc! })
+    resultIDs.add(id)
+
+    // reached the limit, break the loop
+    if (count >= offset + limit) {
+      break
+    }
+  }
+
+  return results
+}
+
+async function fetchDocuments(
+  orama: Orama,
+  uniqueDocsArray: [string, number][],
+  offset: number,
+  limit: number,
+): Promise<Result[]> {
+  const docs = orama.data.docs
+
+  const results: Result[] = Array.from({
+    length: limit,
+  })
+
+  const resultIDs: Set<string> = new Set()
+
+  // We already have the list of ALL the document IDs containing the search terms.
+  // We loop over them starting from a positional value "offset" and ending at "offset + limit"
+  // to provide pagination capabilities to the search.
+  for (let i = offset; i < limit + offset; i++) {
+    const idAndScore = uniqueDocsArray[i]
+
+    // If there are no more results, just break the loop
+    if (typeof idAndScore === 'undefined') {
+      break
+    }
+
+    const [id, score] = idAndScore
+
+    if (!resultIDs.has(id)) {
+      // We retrieve the full document only AFTER making sure that we really want it.
+      // We never retrieve the full document preventively.
+      const fullDoc = await orama.documentsStore.get(docs, id)
+      results[i] = { id, score, document: fullDoc! }
+      resultIDs.add(id)
+    }
+  }
+  return results
 }
