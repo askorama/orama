@@ -23,7 +23,7 @@ await insert(db, { title: 'Blue headphones' })
 await insert(db, { title: 'Yellow headphones' })
 
 const results = await search(db, {
-  query: 'headphones',
+  term: 'headphones',
   preflight: true
 })
 
