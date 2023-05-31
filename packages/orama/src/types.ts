@@ -194,8 +194,31 @@ export type SearchParams<T = Result[]> = {
    */
   facets?: FacetsParams
 
+  /**
+   * Distinct configuration
+   * Full documentation: https://docs.oramasearch.com/usage/search/introduction#distinct
+   *
+   * @example
+   * const results = await search(db, {
+   *  term: 'Headphones',
+   *  distinctOn: 'category.primary',
+   * })
+   */
   distinctOn?: string
 
+  /**
+   * Groups configuration
+   * Full documentation: https://docs.oramasearch.com/usage/search/grouping
+   *
+   * @example
+   * const results = await search(db, {
+   *  term: 'Headphones',
+   *  groupBy: {
+   *   properties: ['category.primary'],
+   *   maxResult: 10,
+   *  }
+   * })
+   */
   groupBy?: GroupByParams<T>
 
   /**
