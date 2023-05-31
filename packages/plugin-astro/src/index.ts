@@ -74,7 +74,7 @@ async function prepareOramaDb(
         ?.distURL?.pathname)?.slice(isWindows ? 1 : 0);
       return {
         pathname,
-        generatedFilePath: matchingPathname ?? `${basePath}${pathname}${isWindows ? "/" : "\\"}index.html`
+        generatedFilePath: matchingPathname ?? `${basePath}${pathname.replace(/\/+$/, '')}/index.html`
       }
     })
     .filter(({ generatedFilePath }) => !!generatedFilePath)
