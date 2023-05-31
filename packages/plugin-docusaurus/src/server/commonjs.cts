@@ -1,13 +1,16 @@
-import { LoadContext, Plugin } from '@docusaurus/types'
+import type { LoadContext, Plugin } from '@docusaurus/types'
+import type { PluginOptions } from '../types.js'
 
-type DocusaurusOramaPlugin = (docusaurusContext: LoadContext) => Plugin
+export type { SectionSchema, RawDataWithPositions, PluginOptions, PluginData } from '../types.js'
+
+export type DocusaurusOramaPlugin = (docusaurusContext: LoadContext, options: PluginOptions) => Plugin
 
 let _esmDocusaurusOramaPlugin: DocusaurusOramaPlugin
 
 // eslint-disable-next-line no-new-func, @typescript-eslint/no-implied-eval
 const importDynamic = new Function('modulePath', 'return import(modulePath)')
 
-async function docusaurusOramaPlugin(
+export default async function docusaurusOramaPlugin(
   ...args: Parameters<DocusaurusOramaPlugin>
 ): Promise<ReturnType<DocusaurusOramaPlugin>> {
   if (!_esmDocusaurusOramaPlugin) {
@@ -17,5 +20,3 @@ async function docusaurusOramaPlugin(
 
   return _esmDocusaurusOramaPlugin(...args)
 }
-
-module.exports = docusaurusOramaPlugin
