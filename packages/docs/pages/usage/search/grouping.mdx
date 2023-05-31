@@ -3,7 +3,7 @@
 Orama supports `groupBy` operations.
 That allows you to group results in groups calculating an aggregation on the item that belongs to the same bucket.
 
-```
+```javascript
 const results = await search(db, {
   term: 't-shirt',
   groupBy: {
@@ -21,7 +21,7 @@ By default, Orama doesn't limit the number of items inside a group.
 
 By default, Orama groups all the matched documents into an array.
 
-## Simple usage
+## Simple usage
 
 If we consider the following schema:
 
@@ -64,7 +64,7 @@ const results = await search(db, {
 ```
 
 If you want only the top-ranked document per `design`, you can specify the `maxResult`:
-```
+```javascript
 const results = await search(db, {
   term: 't-shirt',
   groupBy: {
@@ -108,7 +108,7 @@ The above query returns something like this:
 ```
 
 You can group on multiple properties as follows:
-```
+```javascript
 const results = await search(db, {
   term: 'red t-shirt',
   groupBy: {
@@ -121,10 +121,10 @@ const results = await search(db, {
 })
 ```
 
-## Custom reducer
+## Custom reducer
 Orama supports custom aggregator as follows:
 
-```
+```typescript
 // The document interface
 interface Doc extends Document {
   type: string
