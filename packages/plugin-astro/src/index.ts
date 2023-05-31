@@ -65,16 +65,16 @@ async function prepareOramaDb(
   })
 
   // All routes are in the same folder, we can use the first one to get the basePath
-  const basePath = routes[0].distURL?.pathname?.replace(/\/$/, '').split('dist/')[0] + 'dist/'
+  const basePath = (routes[0].distURL?.pathname?.replace(/\/$/, '').split('dist/')[0] + 'dist/').slice(isWindows ? 1 : 0);
   const pathsToBeIndexed = pages
     .filter(({ pathname }) => dbConfig.pathMatcher.test(pathname))
     .map(({ pathname }) => {
       // Some pages like 404 are generated as 404.html while others are usually pageName/index.html
-      const matchingPathname = routes.find(r => r.distURL?.pathname.endsWith(pathname.replace(/\/$/, '') + '.html'))
-        ?.distURL?.pathname
+      const matchingPathname = (routes.find(r => r.distURL?.pathname.endsWith(pathname.replace(/\/$/, '') + '.html'))
+        ?.distURL?.pathname)?.slice(isWindows ? 1 : 0);
       return {
         pathname,
-        generatedFilePath: matchingPathname ?? `${basePath}${pathname}index.html`
+        generatedFilePath: matchingPathname ?? `${basePath}${pathname}${isWindows ? "/" : "\\"}index.html`
       }
     })
     .filter(({ generatedFilePath }) => !!generatedFilePath)
