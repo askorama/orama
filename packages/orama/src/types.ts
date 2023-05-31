@@ -55,19 +55,21 @@ export interface BooleanFacetDefinition {
   false?: boolean
 }
 
+export type FacetsParams = Record<string, FacetDefinition>
+
 export type FacetDefinition = StringFacetDefinition | NumberFacetDefinition | BooleanFacetDefinition
 
-export type ReduceFunction<T, R extends Result = Result> = (values: ScalarSearchableValue[], acc: T, value: R, index: number) => T
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Reduce<T = any> = {
+export type ReduceFunction<T, R extends Result = Result> =
+  (values: ScalarSearchableValue[], acc: T, value: R, index: number) => T
+export type Reduce<T> = {
   reducer: ReduceFunction<T>
   getInitialValue: (elementCount: number) => T
 }
 
-export type GroupByParams = {
+export type GroupByParams<T> = {
   properties: string[]
   maxResult?: number
-  reduce?: Reduce
+  reduce?: Reduce<T>
 }
 
 export type ComparisonOperator = {
@@ -101,7 +103,7 @@ export type SorterParams = {
 
 export type SortByParams = SorterParams | CustomSorterFunction
 
-export type SearchParams = {
+export type SearchParams<T = Result[]> = {
   /**
    * The word to search.
    */
@@ -190,11 +192,11 @@ export type SearchParams = {
    *  }
    * });
    */
-  facets?: Record<string, FacetDefinition>
+  facets?: FacetsParams
 
   distinctOn?: string
 
-  groupBy?: GroupByParams
+  groupBy?: GroupByParams<T>
 
   /**
    * Filter the search results.
@@ -290,15 +292,10 @@ export type FacetResult = Record<
   }
 >
 
-export type GroupResult =
+export type GroupResult<T = Result[]> =
   | {
       values: ScalarSearchableValue[]
-      result: Result[]
-    }[]
-  | {
-      values: ScalarSearchableValue[]
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      result: any
+      result: T
     }[]
 
 export type TokenScore = [string, number]
@@ -307,13 +304,13 @@ export type TokenMap = Record<string, TokenScore[]>
 
 export type IndexMap = Record<string, TokenMap>
 
-export type SearchContext<I extends OpaqueIndex, D extends OpaqueDocumentStore> = {
+export type SearchContext<I extends OpaqueIndex, D extends OpaqueDocumentStore, AggValue = Result[]> = {
   timeStart: bigint
   tokenizer: Tokenizer
   index: IIndex<I>
   documentsStore: IDocumentsStore<D>
   language: string | undefined
-  params: SearchParams
+  params: SearchParams<AggValue>
   docsCount: number
   uniqueDocsIDs: Record<string, number>
   indexMap: IndexMap
@@ -325,7 +322,7 @@ export type ElapsedTime = {
   formatted: string
 }
 
-export type Results = {
+export type Results<AggValue = Result[]> = {
   /**
    * The number of all the matched documents.
    */
@@ -343,7 +340,7 @@ export type Results = {
    */
   facets?: FacetResult
 
-  groups?: GroupResult
+  groups?: GroupResult<AggValue>
 }
 
 export type SingleCallbackComponent<A extends ProvidedTypes> = (
@@ -412,22 +409,22 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   insertTokenScoreParameters(index: I, prop: string, id: string, tokens: string[], token: string): SyncOrAsyncValue
   removeDocumentScoreParameters(index: I, prop: string, id: string, docsCount: number): SyncOrAsyncValue
   removeTokenScoreParameters(index: I, prop: string, token: string): SyncOrAsyncValue
-  calculateResultScores<D extends OpaqueDocumentStore>(
-    context: SearchContext<I, D>,
+  calculateResultScores<D extends OpaqueDocumentStore, AggValue = Result[]>(
+    context: SearchContext<I, D, AggValue>,
     index: I,
     prop: string,
     term: string,
     ids: string[],
   ): SyncOrAsyncValue<TokenScore[]>
 
-  search<D extends OpaqueDocumentStore>(
-    context: SearchContext<I, D>,
+  search<D extends OpaqueDocumentStore, AggValue = Result[]>(
+    context: SearchContext<I, D, AggValue>,
     index: I,
     prop: string,
     term: string,
   ): SyncOrAsyncValue<TokenScore[]>
-  searchByWhereClause<D extends OpaqueDocumentStore>(
-    context: SearchContext<I, D>,
+  searchByWhereClause<D extends OpaqueDocumentStore, AggValue = Result[]>(
+    context: SearchContext<I, D, AggValue>,
     index: I,
     filters: Record<string, boolean | string | string[] | ComparisonOperator>,
   ): SyncOrAsyncValue<string[]>

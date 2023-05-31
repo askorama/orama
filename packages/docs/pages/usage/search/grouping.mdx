@@ -1,11 +1,11 @@
 # Grouping
 
-Orama supports groups.
+Orama supports `groupBy` operations.
 That allows you to group results in groups calculating an aggregation on the item that belongs to the same bucket.
 
 ```
 const results = await search(db, {
-  ... ,// the common search params property
+  term: 't-shirt',
   groupBy: {
     properties: ['design'], // required: property on which we want to group on
     maxResult: 1, // optional: for every group, how many results we want
@@ -110,6 +110,7 @@ The above query returns something like this:
 You can group on multiple properties as follows:
 ```
 const results = await search(db, {
+  term: 'red t-shirt',
   groupBy: {
     properties: ['design', 'rank', 'isPromoted'], // group on the combination of the values
   },
@@ -142,6 +143,7 @@ interface AggregationValue {
 }
 
 const results = await search(db, {
+  term: 'red t-shirt',
   groupBy: {
     properties: ['type', 'design'], // group on both properties
     reduce: {

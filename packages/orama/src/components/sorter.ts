@@ -169,19 +169,26 @@ async function sortBy(sorter: Sorter, docIds: [string, number][], by: SorterPara
   }
 
   docIds.sort((a, b) => {
-    const posA = s.docs[a[0]]
-    const posB = s.docs[b[0]]
-    if (typeof posA === 'undefined' && typeof posB === 'undefined') {
+    // This sort algorithm works leveraging on
+    // that s.docs is a map of docId -> position
+    // If a document is not indexed, it will be not present in the map
+    const indexOfA = s.docs[a[0]]
+    const indexOfB = s.docs[b[0]]
+    const isAIndexed = typeof indexOfA !== 'undefined'
+    const isBIndexed = typeof indexOfB !== 'undefined'
+
+    if (!isAIndexed && !isBIndexed) {
       return 0
     }
-    if (typeof posA === 'undefined') {
+    // unindexed documents are always at the end
+    if (!isAIndexed) {
       return 1
     }
-    if (typeof posB === 'undefined') {
+    if (!isBIndexed) {
       return -1
     }
 
-    return isDesc ? posB - posA : posA - posB
+    return isDesc ? indexOfB - indexOfA : indexOfA - indexOfB
   })
 
   return docIds

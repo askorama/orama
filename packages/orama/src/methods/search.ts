@@ -29,16 +29,16 @@ const defaultBM25Params: BM25Params = {
   d: 0.5,
 }
 
-async function createSearchContext<I extends OpaqueIndex, D extends OpaqueDocumentStore>(
+async function createSearchContext<I extends OpaqueIndex, D extends OpaqueDocumentStore, AggValue>(
   tokenizer: Tokenizer,
   index: IIndex<I>,
   documentsStore: IDocumentsStore<D>,
   language: string | undefined,
-  params: SearchParams,
+  params: SearchParams<AggValue>,
   properties: string[],
   tokens: string[],
   docsCount: number,
-): Promise<SearchContext<I, D>> {
+): Promise<SearchContext<I, D, AggValue>> {
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
   // const hasFilters = Object.keys(params.where ?? {}).length > 0;
   // let whereFiltersIDs: string[] = [];
@@ -96,7 +96,7 @@ async function createSearchContext<I extends OpaqueIndex, D extends OpaqueDocume
   }
 }
 
-export async function search(orama: Orama, params: SearchParams, language?: string): Promise<Results> {
+export async function search<AggValue = Result[]>(orama: Orama, params: SearchParams<AggValue>, language?: string): Promise<Results<AggValue>> {
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
@@ -226,7 +226,7 @@ export async function search(orama: Orama, params: SearchParams, language?: stri
     results = await fetchDocuments(orama, uniqueDocsArray, offset, limit)
   }
 
-  const searchResult: Results = {
+  const searchResult: Results<AggValue> = {
     elapsed: {
       raw: 0,
       formatted: '',
