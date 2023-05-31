@@ -292,19 +292,11 @@ function getNodeParent<K, V>(root: Node<K, V>, key: K): Node<K, V> | null {
 }
 
 export function find<K, V>(root: Node<K, V>, key: K): V | null {
-  let node = root;
-
-  while (node) {
-    if (key < node.key) {
-      node = node.left as Node<K, V>;
-    } else if (key > node.key) {
-      node = node.right as Node<K, V>;
-    } else {
-      return node.value;
-    }
+  const node = getNodeByKey(root, key)
+  if (!node) {
+    return null
   }
-
-  return null;
+  return node.value
 }
 
 export function remove<K, V>(root: Node<K, V> | null, key: K): Node<K, V> | null {

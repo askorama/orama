@@ -5,7 +5,6 @@ interface PropertySort<K> {
   docs: Record<string, number>
   orderedDocs: [string, K][]
   type: SortType
-  n: number
 }
 
 export interface Sorter extends OpaqueSorter {
@@ -58,7 +57,6 @@ function innerCreate(schema: Schema, sortableDeniedProperties: string[], prefix:
           docs: {},
           orderedDocs: [],
           type: type,
-          n: 0,
         }
         break
       case 'boolean[]':
@@ -105,7 +103,7 @@ async function insert(
   if (!sorter.enabled) {
     return
   }
-  const s = sorter.sorts[prop] as PropertySort<SortValue>
+  const s = sorter.sorts[prop]
 
   let predicate: (value: [string, SortValue]) => boolean
   switch (schemaType) {
@@ -170,35 +168,30 @@ async function sortBy(sorter: Sorter, docIds: [string, number][], by: SorterPara
     throw createError('UNABLE_TO_SORT_ON_UNKNOWN_FIELD', property, sorter.sortableProperties.join(', '))
   }
 
-  const docIdsLength = docIds.length
+  docIds.sort((a, b) => {
+    // This sort algorithm works leveraging on
+    // that s.docs is a map of docId -> position
+    // If a document is not indexed, it will be not present in the map
+    const indexOfA = s.docs[a[0]]
+    const indexOfB = s.docs[b[0]]
+    const isAIndexed = typeof indexOfA !== 'undefined'
+    const isBIndexed = typeof indexOfB !== 'undefined'
 
-  // Calculate how many documents aren't inside the sorter index.
-  // Used only for "DESC" sort.
-  let unsortableDocumentTotal = 0
-  if (isDesc) {
-    for (let i = 0; i < docIdsLength; i++) {
-      if (typeof s.docs[docIds[i][0]] === 'undefined') {
-        unsortableDocumentTotal++
-      }
+    if (!isAIndexed && !isBIndexed) {
+      return 0
     }
-  }
-
-  let unsortableDocumentCount = 0
-  const ret = new Array(docIdsLength)
-  for (let i = 0; i < docIdsLength; i++) {
-    const d = docIds[i]
-    let pos = s.docs[d[0]]
-    if (typeof pos === 'undefined') {
-      unsortableDocumentCount++
-      pos = docIdsLength - unsortableDocumentCount
-    } else if (isDesc) {
-      pos = docIdsLength - unsortableDocumentTotal - pos - 1
+    // unindexed documents are always at the end
+    if (!isAIndexed) {
+      return 1
+    }
+    if (!isBIndexed) {
+      return -1
     }
 
-    ret[pos] = d
-  }
+    return isDesc ? indexOfB - indexOfA : indexOfA - indexOfB
+  })
 
-  return ret
+  return docIds
 }
 
 async function getSortableProperties(sorter: Sorter): Promise<string[]> {

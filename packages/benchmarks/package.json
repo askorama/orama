@@ -3,9 +3,13 @@
   "version": "1.0.2",
   "private": true,
   "scripts": {
-    "run": "node ./typo-tolerant-search.js"
+    "bench:group": "node src/group.bench.js",
+    "bench:combination": "node src/combination.bench.js"
   },
   "dependencies": {
     "@orama/orama": "workspace:*"
+  },
+  "devDependencies": {
+    "benny": "^3.7.1"
   }
 }

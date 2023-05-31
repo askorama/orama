@@ -21,15 +21,15 @@ import {
 } from '../types.js'
 import { createSorter } from '../components/sorter.js'
 
-interface CreateArguments<A extends ProvidedTypes> {
+interface CreateArguments<P extends ProvidedTypes> {
   schema: Schema
   sort?: SorterConfig
   language?: string
-  components?: Components<A>
+  components?: Components<P>
   id?: string
 }
 
-function validateComponents<A extends ProvidedTypes>(components: Components<A>) {
+function validateComponents<P extends ProvidedTypes>(components: Components<P>) {
   const defaultComponents = {
     formatElapsedTime,
     getDocumentIndexId,
@@ -51,7 +51,7 @@ function validateComponents<A extends ProvidedTypes>(components: Components<A>) 
   }
 
   for (const rawKey of SINGLE_OR_ARRAY_COMPONENTS) {
-    const key = rawKey as keyof ArrayCallbackComponents<A>
+    const key = rawKey as keyof ArrayCallbackComponents<P>
 
     if (!components[key]) {
       components[key] = []
@@ -60,7 +60,7 @@ function validateComponents<A extends ProvidedTypes>(components: Components<A>) 
       components[key] = [components[key]]
     }
 
-    for (const fn of components[key] as unknown as SingleOrArrayCallbackComponents<A>[]) {
+    for (const fn of components[key] as unknown as SingleOrArrayCallbackComponents<P>[]) {
       if (typeof fn !== 'function') {
         throw createError('COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS', key)
       }
@@ -78,13 +78,13 @@ function validateComponents<A extends ProvidedTypes>(components: Components<A>) 
   }
 }
 
-export async function create<A extends ProvidedTypes>({
+export async function create<P extends ProvidedTypes>({
   schema,
   sort,
   language,
   components,
   id,
-}: CreateArguments<A>): Promise<Orama<A>> {
+}: CreateArguments<P>): Promise<Orama<P>> {
   if (!components) {
     components = {}
   }
