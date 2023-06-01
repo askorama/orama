@@ -36,7 +36,7 @@
     "dev": "swc --delete-dir-on-start -s -w --extensions .ts -d dist src",
     "build": "swc --delete-dir-on-start --extensions .ts -d dist src",
     "postbuild": "tsc -p . --emitDeclarationOnly",
-    "test:disabled": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
+    "test": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
     "lint": "eslint src --ext .js,.ts,.tsx,.cts"
   },
   "dependencies": {
