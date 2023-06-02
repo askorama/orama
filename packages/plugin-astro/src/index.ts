@@ -18,8 +18,8 @@ interface AstroBuildDoneArgs {
   routes: RouteData[]
 }
 
-const isWindows = process.platform === 'win32';
-const joinPath = (isWindows ? path.win32 : path).join;
+const isWindows = process.platform === 'win32'
+const joinPath = (isWindows ? path.win32 : path).join
 
 export const defaultSchema: Schema = {
   path: 'string',
@@ -65,13 +65,14 @@ async function prepareOramaDb(
   })
 
   // All routes are in the same folder, we can use the first one to get the basePath
-  const basePath = (routes[0].distURL?.pathname?.replace(/\/$/, '').split('dist/')[0] + 'dist/').slice(isWindows ? 1 : 0);
+  const baseUrl = routes[0].distURL?.pathname?.replace(/\/$/, '').split('dist/').at(0) as string
+  const basePath = `${baseUrl}dist/`.slice(isWindows ? 1 : 0)
   const pathsToBeIndexed = pages
     .filter(({ pathname }) => dbConfig.pathMatcher.test(pathname))
     .map(({ pathname }) => {
       // Some pages like 404 are generated as 404.html while others are usually pageName/index.html
       const matchingPathname = (routes.find(r => r.distURL?.pathname.endsWith(pathname.replace(/\/$/, '') + '.html'))
-        ?.distURL?.pathname)?.slice(isWindows ? 1 : 0);
+        ?.distURL?.pathname)?.slice(isWindows ? 1 : 0)
       return {
         pathname,
         generatedFilePath: matchingPathname ?? `${basePath}${pathname.replace(/\/+$/, '')}/index.html`
@@ -85,7 +86,7 @@ async function prepareOramaDb(
   })
 
   for (const { pathname, generatedFilePath } of pathsToBeIndexed) {
-    const htmlContent = readFileSync(generatedFilePath as string, { encoding: 'utf8' })
+    const htmlContent = readFileSync(generatedFilePath, { encoding: 'utf8' })
 
     const title = titleConverter(htmlContent) ?? ''
     const h1 = h1Converter(htmlContent) ?? ''
@@ -116,7 +117,7 @@ export function createPlugin(options: Record<string, OramaOptions>): AstroIntegr
         config = cfg
       },
       'astro:build:done': async function ({ pages, routes }: AstroBuildDoneArgs): Promise<void> {
-        const assetsDir = joinPath(config.outDir.pathname, 'assets').slice(isWindows ? 1 : 0);
+        const assetsDir = joinPath(config.outDir.pathname, 'assets').slice(isWindows ? 1 : 0)
         if (!existsSync(assetsDir)) {
           mkdirSync(assetsDir)
         }
