@@ -111,17 +111,9 @@ export async function create<P extends ProvidedTypes>({
     throw createError('NO_LANGUAGE_WITH_CUSTOM_TOKENIZER')
   }
 
-  if (!index) {
-    index = await createIndex()
-  }
-
-  if (!sorter) {
-    sorter = await createSorter()
-  }
-
-  if (!documentsStore) {
-    documentsStore = await createDocumentsStore()
-  }
+  index ||= await createIndex()
+  sorter ||= await createSorter()
+  documentsStore ||= await createDocumentsStore()
 
   // Validate all other components
   validateComponents(components)
