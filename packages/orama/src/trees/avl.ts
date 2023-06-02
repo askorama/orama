@@ -244,21 +244,18 @@ export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
     const balanceFactor = getHeight(parent.left) - getHeight(parent.right)
 
     if (balanceFactor === BALANCE_STATE.UNBALANCED_LEFT) {
-        if (key < (parent.left as Node<K, V>).key) {
-            parent = rotateRight(parent);
-        } else {
-            parent.left = rotateLeft(parent.left as Node<K, V>);
-            parent = rotateRight(parent);
-        }
+
+      if (key > (parent.left as Node<K, V>).key) {
+          parent.left = rotateLeft(parent.left as Node<K, V>);
+      }
+      parent = rotateRight(parent);
     }
 
     if (balanceFactor === BALANCE_STATE.UNBALANCED_RIGHT) {
-        if (key > (parent.right as Node<K, V>).key) {
-            parent = rotateLeft(parent);
-        } else {
+        if (key < (parent.right as Node<K, V>).key) {
             parent.right = rotateRight(parent.right as Node<K, V>);
-            parent = rotateLeft(parent);
         }
+        parent = rotateLeft(parent);
     }
 
     if (parent == root) {
