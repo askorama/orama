@@ -1,6 +1,6 @@
 {
   "name": "@orama/stemmers",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "module",
   "description": "Stemmers for Orama",
   "sideEffects": false,
