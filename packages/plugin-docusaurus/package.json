@@ -36,7 +36,8 @@
     "test": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
     "format": "prettier -w src",
     "lint": "eslint src --ext .js,.ts,.tsx,.cts",
-    "changelog": "auto-changelog -p"
+    "changelog": "auto-changelog -p",
+    "pack": "pnpm pack --pack-destination ../../dist"
   },
   "dependencies": {
     "@algolia/autocomplete-js": "^1.7.2",
