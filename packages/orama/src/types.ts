@@ -366,15 +366,22 @@ export type Results<AggValue = Result[]> = {
   groups?: GroupResult<AggValue>
 }
 
-export type SingleCallbackComponent<A extends ProvidedTypes> = (
-  orama: Orama<A>,
+export type SingleCallbackComponent<P extends ProvidedTypes> = (
+  orama: Orama<P>,
   id: string,
   doc?: Document,
 ) => SyncOrAsyncValue
 
-export type MultipleCallbackComponent<A extends ProvidedTypes> = (
-  orama: Orama<A>,
+export type MultipleCallbackComponent<P extends ProvidedTypes> = (
+  orama: Orama<P>,
   doc: Document[] | string[],
+) => SyncOrAsyncValue
+
+export type AfterSearch<P extends ProvidedTypes> = <AggValue>(
+  db: Orama<P>,
+  params: SearchParams<AggValue>,
+  language: string | undefined,
+  results: Results<AggValue>,
 ) => SyncOrAsyncValue
 
 export type IIndexInsertOrRemoveHookFunction<I extends OpaqueIndex = OpaqueIndex, R = void> = (
@@ -535,40 +542,42 @@ export interface FunctionComponents<S extends Schema = Schema> {
   formatElapsedTime(number: bigint): SyncOrAsyncValue<number | string | object | ElapsedTime>
 }
 
-export interface SingleOrArrayCallbackComponents<A extends ProvidedTypes> {
-  beforeInsert: SingleOrArray<SingleCallbackComponent<A>>
-  afterInsert: SingleOrArray<SingleCallbackComponent<A>>
-  beforeRemove: SingleOrArray<SingleCallbackComponent<A>>
-  afterRemove: SingleOrArray<SingleCallbackComponent<A>>
-  beforeUpdate: SingleOrArray<SingleCallbackComponent<A>>
-  afterUpdate: SingleOrArray<SingleCallbackComponent<A>>
-  beforeMultipleInsert: SingleOrArray<MultipleCallbackComponent<A>>
-  afterMultipleInsert: SingleOrArray<MultipleCallbackComponent<A>>
-  beforeMultipleRemove: SingleOrArray<MultipleCallbackComponent<A>>
-  afterMultipleRemove: SingleOrArray<MultipleCallbackComponent<A>>
-  beforeMultipleUpdate: SingleOrArray<MultipleCallbackComponent<A>>
-  afterMultipleUpdate: SingleOrArray<MultipleCallbackComponent<A>>
+export interface SingleOrArrayCallbackComponents<P extends ProvidedTypes> {
+  beforeInsert: SingleOrArray<SingleCallbackComponent<P>>
+  afterInsert: SingleOrArray<SingleCallbackComponent<P>>
+  beforeRemove: SingleOrArray<SingleCallbackComponent<P>>
+  afterRemove: SingleOrArray<SingleCallbackComponent<P>>
+  beforeUpdate: SingleOrArray<SingleCallbackComponent<P>>
+  afterUpdate: SingleOrArray<SingleCallbackComponent<P>>
+  afterSearch: SingleOrArray<AfterSearch<P>>
+  beforeMultipleInsert: SingleOrArray<MultipleCallbackComponent<P>>
+  afterMultipleInsert: SingleOrArray<MultipleCallbackComponent<P>>
+  beforeMultipleRemove: SingleOrArray<MultipleCallbackComponent<P>>
+  afterMultipleRemove: SingleOrArray<MultipleCallbackComponent<P>>
+  beforeMultipleUpdate: SingleOrArray<MultipleCallbackComponent<P>>
+  afterMultipleUpdate: SingleOrArray<MultipleCallbackComponent<P>>
 }
 
-export interface ArrayCallbackComponents<A extends ProvidedTypes> {
-  beforeInsert: SingleCallbackComponent<A>[]
-  afterInsert: SingleCallbackComponent<A>[]
-  beforeRemove: SingleCallbackComponent<A>[]
-  afterRemove: SingleCallbackComponent<A>[]
-  beforeUpdate: SingleCallbackComponent<A>[]
-  afterUpdate: SingleCallbackComponent<A>[]
-  beforeMultipleInsert: MultipleCallbackComponent<A>[]
-  afterMultipleInsert: MultipleCallbackComponent<A>[]
-  beforeMultipleRemove: MultipleCallbackComponent<A>[]
-  afterMultipleRemove: MultipleCallbackComponent<A>[]
-  beforeMultipleUpdate: MultipleCallbackComponent<A>[]
-  afterMultipleUpdate: MultipleCallbackComponent<A>[]
+export interface ArrayCallbackComponents<P extends ProvidedTypes> {
+  beforeInsert: SingleCallbackComponent<P>[]
+  afterInsert: SingleCallbackComponent<P>[]
+  beforeRemove: SingleCallbackComponent<P>[]
+  afterRemove: SingleCallbackComponent<P>[]
+  beforeUpdate: SingleCallbackComponent<P>[]
+  afterUpdate: SingleCallbackComponent<P>[]
+  afterSearch: AfterSearch<P>[]
+  beforeMultipleInsert: MultipleCallbackComponent<P>[]
+  afterMultipleInsert: MultipleCallbackComponent<P>[]
+  beforeMultipleRemove: MultipleCallbackComponent<P>[]
+  afterMultipleRemove: MultipleCallbackComponent<P>[]
+  beforeMultipleUpdate: MultipleCallbackComponent<P>[]
+  afterMultipleUpdate: MultipleCallbackComponent<P>[]
 }
 
-export type Components<A extends ProvidedTypes> = Partial<
-  ObjectComponents<A['Index'], A['DocumentStore'], A['Sorter']> &
+export type Components<P extends ProvidedTypes> = Partial<
+  ObjectComponents<P['Index'], P['DocumentStore'], P['Sorter']> &
     FunctionComponents &
-    SingleOrArrayCallbackComponents<A>
+    SingleOrArrayCallbackComponents<P>
 >
 
 export const kInsertions = Symbol('orama.insertions')
@@ -580,13 +589,13 @@ interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore, S extends O
   sorting: S
 }
 
-type Internals<A extends ProvidedTypes> = {
-  schema: A['Schema']
+type Internals<P extends ProvidedTypes> = {
+  schema: P['Schema']
   tokenizer: Tokenizer
-  index: IIndex<A['Index']>
-  documentsStore: IDocumentsStore<A['DocumentStore']>
-  sorter: ISorter<A['Sorter']>
-  data: Data<A['Index'], A['DocumentStore'], A['Sorter']>
+  index: IIndex<P['Index']>
+  documentsStore: IDocumentsStore<P['DocumentStore']>
+  sorter: ISorter<P['Sorter']>
+  data: Data<P['Index'], P['DocumentStore'], P['Sorter']>
   caches: Record<string, unknown>
   [kInsertions]: number | undefined
   [kRemovals]: number | undefined
@@ -612,10 +621,10 @@ type RequiredInner<T extends Partial<ProvidedTypes>> = {
 }
 
 export type Orama<
-  A extends Partial<ProvidedTypes> = {
+  P extends Partial<ProvidedTypes> = {
     Schema: Schema
     Index: OpaqueIndex
     DocumentStore: OpaqueDocumentStore
     Sorter: OpaqueSorter
   },
-> = FunctionComponents & ArrayCallbackComponents<RequiredInner<A>> & Internals<RequiredInner<A>> & OramaID
+> = FunctionComponents & ArrayCallbackComponents<RequiredInner<P>> & Internals<RequiredInner<P>> & OramaID
