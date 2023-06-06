@@ -37,7 +37,8 @@
     "build": "swc --delete-dir-on-start --extensions .ts -d dist src",
     "postbuild": "tsc -p . --emitDeclarationOnly",
     "test": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
-    "lint": "eslint src --ext .js,.ts,.tsx,.cts"
+    "lint": "eslint src --ext .js,.ts,.tsx,.cts",
+    "pack": "pnpm pack --pack-destination ../../dist"
   },
   "dependencies": {
     "@orama/orama": "workspace:*",
