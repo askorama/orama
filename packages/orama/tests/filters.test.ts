@@ -50,7 +50,43 @@ async function createSimpleDB() {
 }
 
 t.test('filters', t => {
-  t.plan(8)
+  t.plan(9)
+
+  t.test('should throw on unknown field', async t => {
+    const db = await createSimpleDB()
+
+    await t.rejects(search(db, {
+      term: 'coffee',
+      where: {
+        unknonwField: '5'
+      },
+    }), {
+      message: 'Unknown filter property "unknonwField"',
+      code: 'UNKNOWN_FILTER_PROPERTY',
+    })
+
+    await t.rejects(search(db, {
+      term: 'coffee',
+      where: {
+        unknonwField: { gt: '5' } as unknown as string
+      },
+    }), {
+      message: 'Unknown filter property "unknonwField"',
+      code: 'UNKNOWN_FILTER_PROPERTY',
+    })
+
+    await t.rejects(search(db, {
+      term: 'coffee',
+      where: {
+        unknonwField: true as unknown as string
+      },
+    }), {
+      message: 'Unknown filter property "unknonwField"',
+      code: 'UNKNOWN_FILTER_PROPERTY',
+    })
+
+    t.end()
+  })
 
   t.test('greater than', async t => {
     t.plan(2)

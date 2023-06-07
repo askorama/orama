@@ -402,6 +402,11 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
 
     if (typeof operation === 'boolean') {
       const idx = index.indexes[param] as BooleanIndex
+
+      if (typeof idx === 'undefined') {
+        throw createError('UNKNOWN_FILTER_PROPERTY', param)
+      }
+
       const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
       filtersMap[param].push(...filteredIDs)
       continue
@@ -409,6 +414,10 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
 
     if (typeof operation === 'string' || Array.isArray(operation)) {
       const idx = index.indexes[param] as RadixNode
+
+      if (typeof idx === 'undefined') {
+        throw createError('UNKNOWN_FILTER_PROPERTY', param)
+      }
 
       for (const raw of [operation].flat()) {
         const term = await context.tokenizer.tokenize(raw, context.language, param)
@@ -429,6 +438,10 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
     const operationValue = operation[operationOpt]
 
     const AVLNode = index.indexes[param] as AVLNode<number, string[]>
+
+    if (typeof AVLNode === 'undefined') {
+      throw createError('UNKNOWN_FILTER_PROPERTY', param)
+    }
 
     switch (operationOpt) {
       case 'gt': {
