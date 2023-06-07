@@ -1,5 +1,5 @@
 import t from 'tap'
-import { Orama, create, getByID, insert, search } from '../src/index.js'
+import { Orama, create, getByID, insert, insertMultiple, search } from '../src/index.js'
 
 t.test('search method', t => {
 
@@ -540,6 +540,38 @@ t.test('search method', t => {
     t.equal(resultAuthor.count, 1)
     t.equal(resultTag.count, 2)
     t.equal(resultQuotes.count, 3)
+  })
+
+  t.test('with afterSearchHook', t => {
+    t.test('should run afterSearch hook', async t => {
+      let called = 0
+      const db = await create({
+        schema: {
+          animal: 'string',
+        },
+        components: {
+          afterSearch: () => {
+            called++
+          },
+        },
+      })
+
+      await insertMultiple(db, [
+        { id: '0', animal: 'Quick brown fox' },
+        { id: '1', animal: 'Lazy dog' },
+        { id: '2', animal: 'Jumping penguin' },
+        { id: '3', animal: 'Fast chicken' },
+        { id: '4', animal: 'Fabolous ducks' },
+        { id: '5', animal: 'Fantastic horse' },
+      ])
+
+      await search(db, { term: 'f' })
+
+      t.equal(called, 1)
+
+      t.end()
+    })
+    t.end()
   })
 
   t.end()

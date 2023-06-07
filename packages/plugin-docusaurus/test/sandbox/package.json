@@ -1,6 +1,6 @@
 {
   "name": "@orama/plugin-docusaurus-sandbox",
-  "version": "1.0.0-beta.4",
+  "version": "@VERSION@",
   "private": true,
   "scripts": {
     "build": "exit 0",
@@ -10,9 +10,52 @@
     "@docusaurus/core": "^2.3.1",
     "@docusaurus/preset-classic": "^2.3.1",
     "@docusaurus/theme-common": "^2.2.0",
+    "@docusaurus/types": "^2.4.1",
     "@mdx-js/react": "^1.6.22",
-    "@orama/plugin-docusaurus": "./plugin.tgz",
+    "@orama/plugin-docusaurus": "^@VERSION@",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "@orama/orama": "@ROOT@/dist/orama-orama-@VERSION@.tgz",
+      "@orama/plugin-docusaurus": "@ROOT@/dist/orama-plugin-docusaurus-@VERSION@.tgz",
+      "@orama/plugin-match-highlight": "@ROOT@/dist/orama-plugin-match-highlight-@VERSION@.tgz",
+      "@orama/plugin-parsedoc": "@ROOT@/dist/orama-plugin-parsedoc-@VERSION@.tgz"
+    },
+    "packageExtensions": {
+      "@docusaurus/theme-live-codeblock": {
+        "peerDependencies": {
+          "@docusaurus/theme-common": "*"
+        },
+        "dependencies": {
+          "@docusaurus/theme-common": "*"
+        }
+      },
+      "@docusaurus/preset-classic": {
+        "peerDependencies": {
+          "@docusaurus/theme-common": "*"
+        },
+        "dependencies": {
+          "@docusaurus/theme-common": "*"
+        }
+      },
+      "@docusaurus/theme-classic": {
+        "peerDependencies": {
+          "@docusaurus/theme-common": "*"
+        },
+        "dependencies": {
+          "@docusaurus/theme-common": "*"
+        }
+      },
+      "@docusaurus/theme-search-algolia": {
+        "peerDependencies": {
+          "@docusaurus/theme-common": "*"
+        },
+        "dependencies": {
+          "@docusaurus/theme-common": "*"
+        }
+      }
+    }
   }
 }

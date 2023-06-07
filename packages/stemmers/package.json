@@ -1,6 +1,6 @@
 {
   "name": "@orama/stemmers",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "type": "module",
   "description": "Stemmers for Orama",
   "sideEffects": false,
@@ -155,8 +155,8 @@
   },
   "scripts": {
     "build": "node scripts/build.js",
-    "lint": "exit 0",
-    "test": "exit 0",
+    "lint": "exit 0;",
+    "test": "exit 0;",
     "ci": "npm run test"
   },
   "keywords": [

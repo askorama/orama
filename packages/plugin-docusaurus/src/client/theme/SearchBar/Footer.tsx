@@ -1,4 +1,5 @@
-import { OramaLogo } from './OramaLogo.js'
+import { ColorMode } from '@docusaurus/theme-common'
+import { OramaLogoDark, OramaLogoLight } from './OramaLogo.js'
 
 export type FooterTranslations = Partial<{
   selectText: string
@@ -12,6 +13,7 @@ export type FooterTranslations = Partial<{
 }>
 
 type FooterProps = Partial<{
+  colorMode: ColorMode
   translations: FooterTranslations
 }>
 
@@ -30,7 +32,7 @@ function CommandIcon(props: CommandIconProps): JSX.Element {
   )
 }
 
-export function Footer({ translations = {} }: FooterProps): JSX.Element {
+export function Footer({ colorMode, translations = {} }: FooterProps): JSX.Element {
   const {
     selectText = 'to select',
     selectKeyAriaLabel = 'Enter key',
@@ -75,9 +77,9 @@ export function Footer({ translations = {} }: FooterProps): JSX.Element {
           <span>{closeText}</span>
         </li>
       </ul>
-      <a className="aa-FooterSearchCredit" href={'http://oramajs.io'} target="_blank" rel="noopener noreferrer">
+      <a className="aa-FooterSearchCredit" href={'https://oramasearch.com'} target="_blank" rel="noopener noreferrer">
         <span>{searchByText}</span>
-        <OramaLogo />
+        {colorMode === 'dark' ? <OramaLogoDark /> : <OramaLogoLight />}
       </a>
     </footer>
   )

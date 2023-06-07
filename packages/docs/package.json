@@ -1,6 +1,6 @@
 {
   "name": "@orama/docs",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Documentation for Orama",
   "private": true,
   "main": "index.js",
@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@mdx-js/mdx": "^2.3.0",
     "@orama/orama": "workspace:*",
     "@orama/plugin-match-highlight": "workspace:*",
     "@orama/plugin-nextra": "workspace:*",
@@ -22,6 +23,7 @@
     "nextra-theme-docs": "^2.2.19",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-icons": "^4.8.0"
+    "react-icons": "^4.8.0",
+    "rehype-raw": "^6.1.1"
   }
 }

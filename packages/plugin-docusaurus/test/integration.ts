@@ -1,13 +1,17 @@
 import assert from 'node:assert'
 import { exec, ExecException } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import { cp, readFile, rm } from 'node:fs/promises'
+import { cp, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { chdir } from 'node:process'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
-import { getOrama } from '../src/client/theme/SearchBar/getOrama.js'
+import { gunzipSync } from 'node:zlib'
+import { create, load } from '@orama/orama'
+import { OramaWithHighlight, SearchResultWithHighlight, searchWithHighlight } from '@orama/plugin-match-highlight'
+import { schema } from '../src/types.js'
+import { INDEX_FILE } from '../src/shared.js'
 
 interface Execution {
   code: number
@@ -17,10 +21,14 @@ interface Execution {
 }
 
 const sandboxSource = fileURLToPath(new URL('./sandbox', import.meta.url))
-const sandbox = resolve(tmpdir(), `orama-plugin-docusaurus-${Date.now()}`)
+const sandbox = process.env.KEEP_SANDBOX ? '/tmp/orama-docusaurus-sandbox' : resolve(tmpdir(), `orama-plugin-docusaurus-${Date.now()}`)
 
 async function cleanup(): Promise<void> {
   await rm(sandbox, { force: true, recursive: true })
+}
+
+function search(database: OramaWithHighlight, term: string): Promise<SearchResultWithHighlight> {
+  return searchWithHighlight(database, { term, properties: ['sectionTitle', 'sectionContent', 'type'] })
 }
 
 async function execute(command: string, cwd?: string): Promise<Execution> {
@@ -50,20 +58,22 @@ async function execute(command: string, cwd?: string): Promise<Execution> {
 await cleanup()
 
 await test('plugin is able to generate orama DB at build time', async () => {
-  // Prepare the plugin
+  // Obtain general information
   const pluginInfo: Record<string, string> = JSON.parse(
     await readFile(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf-8')
   )
-  const pluginPath = fileURLToPath(new URL(`../orama-plugin-docusaurus-${pluginInfo.version}.tgz`, import.meta.url))
-  const packResult = await execute('pnpm pack')
-  assert.equal(packResult.code, 0)
+  const rootDir = dirname(fileURLToPath(new URL(`../..`, import.meta.url)))
+  const version = pluginInfo.version
 
   // Prepare the sandbox
+  const packageJsonPath = resolve(sandbox, 'package.json')
   await cp(sandboxSource, sandbox, { recursive: true })
-  await cp(pluginPath, resolve(sandbox, 'plugin.tgz'))
-  await rm(pluginPath)
-
   chdir(sandbox)
+  console.log(`Sandbox created in ${sandbox}`)
+
+  // Update dependencies location
+  const packageJson = await readFile(packageJsonPath, 'utf-8')
+  await writeFile(packageJsonPath, packageJson.replace(/@ROOT@/g, rootDir).replace(/@VERSION@/g, version), 'utf-8')
 
   // Install dependencies
   const installResult = await execute('pnpm install', sandbox)
@@ -74,37 +84,42 @@ await test('plugin is able to generate orama DB at build time', async () => {
   assert.equal(buildResult.code, 0)
 
   // The orama DBs have been generated
-  assert.ok(existsSync(resolve(sandbox, 'build/orama-search-index.json')))
+  assert.ok(existsSync(resolve(sandbox, `build/${INDEX_FILE.replace('@VERSION@', 'current')}`)))
 })
 
 await test('generated DBs have indexed pages content', async () => {
   // Loading "animals DB"
-  const rawData = await readFile(resolve(sandbox, 'build/orama-search-index.json'), 'utf8')
+  const rawCompressedData = await readFile(resolve(sandbox, `build/${INDEX_FILE.replace('@VERSION@', 'current')}`))
+  const rawData = gunzipSync(rawCompressedData).toString('utf-8')
   const data = JSON.parse(rawData)
 
-  const search = await getOrama('http://localhost/', data)
+  const database = (await create({ schema })) as OramaWithHighlight
+  await load(database, data)
+  database.data.positions = data.positions
 
   // Search results seem reasonable
-  const indexSearchResult = await search('index')
+  const indexSearchResult = await search(database, 'index')
   assert.ok(indexSearchResult.count === 1)
-  assert.ok(indexSearchResult.hits[0].document.pageRoute === 'http://localhost/')
+  assert.ok(indexSearchResult.hits[0].document.pageRoute === '/')
 
-  const catSearchResult = await search('cat')
+  const catSearchResult = await search(database, 'cat')
   assert.ok(catSearchResult.count === 1)
-  assert.ok(catSearchResult.hits[0].document.pageRoute === 'http://localhost/animals_cat')
+  assert.ok(catSearchResult.hits[0].document.pageRoute === '/animals_cat')
 
-  const dogSearchResult = await search('dog')
-  assert.ok(dogSearchResult.count === 4)
-  assert.ok(dogSearchResult.hits[0].document.pageRoute === 'http://localhost/animals_dog')
+  const dogSearchResult = await search(database, 'dog')
+  assert.ok(dogSearchResult.count === 2)
+  assert.ok(dogSearchResult.hits[0].document.pageRoute === '/animals_dog')
 
-  const domesticSearchResult = await search('domestic')
+  const domesticSearchResult = await search(database, 'domestic')
   assert.ok(domesticSearchResult.count === 2)
-  assert.ok(domesticSearchResult.hits[0].document.pageRoute === 'http://localhost/animals_cat')
-  assert.ok(domesticSearchResult.hits[1].document.pageRoute === 'http://localhost/animals_dog')
+  assert.ok(domesticSearchResult.hits[0].document.pageRoute === '/animals_cat')
+  assert.ok(domesticSearchResult.hits[1].document.pageRoute === '/animals_dog')
 
   // We do not have content about turtles
-  const turtleSearchResult = await search('turtle')
+  const turtleSearchResult = await search(database, 'turtle')
   assert.ok(turtleSearchResult.count === 0)
 })
 
-await cleanup()
+if(!process.env.KEEP_SANDBOX) {
+  await cleanup()
+}

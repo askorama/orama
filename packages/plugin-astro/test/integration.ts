@@ -2,7 +2,7 @@ import { create as createOramaDB, load as loadOramaDB, Schema, search } from '@o
 import assert from 'node:assert'
 import { exec, ExecException } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import { cp, readFile, rm } from 'node:fs/promises'
+import { cp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, resolve } from 'node:path'
 import { chdir } from 'node:process'
@@ -17,7 +17,7 @@ interface Execution {
 }
 
 const sandboxSource = fileURLToPath(new URL('./sandbox', import.meta.url))
-const sandbox = resolve(tmpdir(), `orama-plugin-astro-${Date.now()}`)
+const sandbox = process.env.KEEP_SANDBOX ? '/tmp/orama-astro-sandbox' : resolve(tmpdir(), `orama-plugin-astro-${Date.now()}`)
 
 async function cleanup(): Promise<void> {
   await rm(sandbox, { force: true, recursive: true })
@@ -50,20 +50,22 @@ async function execute(command: string, cwd?: string): Promise<Execution> {
 await cleanup()
 
 await test('plugin is able to generate orama DB at build time', async () => {
-  // Prepare the plugin
+  // Obtain general information
   const pluginInfo: Record<string, string> = JSON.parse(
-    await readFile(fileURLToPath(new URL(`../package.json`, import.meta.url)), 'utf-8')
+    await readFile(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf-8')
   )
-  const pluginPath = fileURLToPath(new URL(`../orama-plugin-astro-${pluginInfo.version}.tgz`, import.meta.url))
-  const packResult = await execute('pnpm pack')
-  assert.equal(packResult.code, 0)
+  const rootDir = dirname(fileURLToPath(new URL(`../..`, import.meta.url)))
+  const version = pluginInfo.version
 
   // Prepare the sandbox
+  const packageJsonPath = resolve(sandbox, 'package.json')
   await cp(sandboxSource, sandbox, { recursive: true })
-  await cp(pluginPath, resolve(sandbox, 'plugin.tgz'))
-  await rm(pluginPath)
-
   chdir(sandbox)
+  console.log(`Sandbox created in ${sandbox}`)
+
+  // Update dependencies location
+  const packageJson = await readFile(packageJsonPath, 'utf-8')
+  await writeFile(packageJsonPath, packageJson.replace(/@ROOT@/g, rootDir).replace(/@VERSION@/g, version), 'utf-8')
 
   // Install dependencies
   const installResult = await execute('pnpm install', sandbox)
@@ -129,4 +131,7 @@ await test('generated DBs have indexed pages content', async () => {
   assert.ok(dynamicTestMissingSearchResult.count === 0)
 })
 
-await cleanup()
+if(!process.env.KEEP_SANDBOX) {
+  await cleanup()
+}
+  
