@@ -34,7 +34,7 @@ export default {
     return <OramaLogo isDark={isDark} />
   },
   chat: {
-    link: ' https://orama.to/slack',
+    link: 'https://orama.to/slack',
     icon: <FaSlack style={{ width: 24, height: 24 }} />,
   },
   footer: {
