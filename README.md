@@ -7,7 +7,7 @@
   <a href="https://oramasearch.com?utm_source=github">Website</a> •
   <a href="https://oramasearch.com/blog?utm_source=github">Blog</a> •
   <a href="https://docs.oramasearch.com?utm_source=github">Documentation</a> •
-  <a href="https://join.slack.com/t/orama-community/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q">Slack</a>
+  <a href=" https://orama.to/slack">Slack</a>
 </h4>
 <br />
 <p align="center">
@@ -108,7 +108,8 @@ await insert(db, {
 
 await insert(db, {
   name: 'Smart LED Bulb',
-  description: 'Control the lighting in your home with this energy-efficient smart LED bulb, compatible with most smart home systems.',
+  description:
+    'Control the lighting in your home with this energy-efficient smart LED bulb, compatible with most smart home systems.',
   price: 24.99,
   meta: {
     rating: 4.3,
@@ -117,7 +118,8 @@ await insert(db, {
 
 await insert(db, {
   name: 'Portable Charger',
-  description: 'Never run out of power on-the-go with this compact and fast-charging portable charger for your devices.',
+  description:
+    'Never run out of power on-the-go with this compact and fast-charging portable charger for your devices.',
   price: 29.99,
   meta: {
     rating: 3.6,
