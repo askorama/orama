@@ -98,7 +98,11 @@ async function createSearchContext<I extends OpaqueIndex, D extends OpaqueDocume
   }
 }
 
-export async function search<AggValue = Result[]>(orama: Orama, params: SearchParams<AggValue>, language?: string): Promise<Results<AggValue>> {
+export async function search<AggValue = Result[]>(
+  orama: Orama,
+  params: SearchParams<AggValue>,
+  language?: string,
+): Promise<Results<AggValue>> {
   const timeStart = await getNanosecondsTime()
 
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)

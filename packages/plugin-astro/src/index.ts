@@ -71,8 +71,9 @@ async function prepareOramaDb(
     .filter(({ pathname }) => dbConfig.pathMatcher.test(pathname))
     .map(({ pathname }) => {
       // Some pages like 404 are generated as 404.html while others are usually pageName/index.html
-      const matchingPathname = (routes.find(r => r.distURL?.pathname.endsWith(pathname.replace(/\/$/, '') + '.html'))
-        ?.distURL?.pathname)?.slice(isWindows ? 1 : 0)
+      const matchingPathname = routes
+        .find(r => r.distURL?.pathname.endsWith(pathname.replace(/\/$/, '') + '.html'))
+        ?.distURL?.pathname?.slice(isWindows ? 1 : 0)
       return {
         pathname,
         generatedFilePath: matchingPathname ?? `${basePath}${pathname.replace(/\/+$/, '')}/index.html`

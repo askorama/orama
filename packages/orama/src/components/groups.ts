@@ -23,12 +23,16 @@ const DEFAULT_REDUCE: Reduce<Result[]> = {
     acc[index] = res
     return acc
   },
-  getInitialValue: (length) => Array.from({ length }),
+  getInitialValue: length => Array.from({ length }),
 }
 
 const ALLOWED_TYPES = ['string', 'number', 'boolean']
 
-export async function getGroups<AggValue>(orama: Orama, results: TokenScore[], groupBy: GroupByParams<AggValue>): Promise<GroupResult<AggValue>> {
+export async function getGroups<AggValue>(
+  orama: Orama,
+  results: TokenScore[],
+  groupBy: GroupByParams<AggValue>,
+): Promise<GroupResult<AggValue>> {
   const properties = groupBy.properties
   const propertiesLength = properties.length
 
@@ -156,17 +160,17 @@ export async function getGroups<AggValue>(orama: Orama, results: TokenScore[], g
 }
 
 function calculateCombination(arrs: ScalarSearchableValue[][], index = 0): ScalarSearchableValue[][] {
-  if (index + 1 === arrs.length) return arrs[index].map(item => [item]);
+  if (index + 1 === arrs.length) return arrs[index].map(item => [item])
 
-  const head = arrs[index];
-  const c = calculateCombination(arrs, index + 1);
+  const head = arrs[index]
+  const c = calculateCombination(arrs, index + 1)
 
-  const combinations = [];
+  const combinations = []
   for (const value of head) {
     for (const combination of c) {
-      combinations.push([value, ...combination]);
+      combinations.push([value, ...combination])
     }
   }
 
-  return combinations;
+  return combinations
 }

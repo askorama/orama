@@ -1,5 +1,14 @@
 import t from 'tap'
-import { Document, GroupResult, Orama, Result, ScalarSearchableValue, create, insertMultiple, search } from '../src/index.js'
+import {
+  Document,
+  GroupResult,
+  Orama,
+  Result,
+  ScalarSearchableValue,
+  create,
+  insertMultiple,
+  search,
+} from '../src/index.js'
 
 t.test('search with groupBy', async t => {
   const [db] = await createDb()
@@ -222,14 +231,38 @@ t.test('search with groupBy', async t => {
       sortBy: {
         property: 'rank',
         order: 'DESC',
-      }
+      },
     })
 
-    t.strictSame(new Set(results.groups!), new Set([
-      { values: ['t-shirt', 'B'], result: { type: 't-shirt', design: 'B', colors: ['gray', 'white', 'green', 'blue'], ranks: [5, 5, 4, 4], isPromoted: true } },
-      { values: ['t-shirt', 'A'], result: { type: 't-shirt', design: 'A', colors: ['green', 'red', 'blue'], ranks: [5, 4, 3], isPromoted: true } },
-      { values: ['sweatshirt', 'A'], result: { type: 'sweatshirt', design: 'A', colors: ['green', 'yellow'], ranks: [4, 3], isPromoted: true } },
-    ]))
+    t.strictSame(
+      new Set(results.groups!),
+      new Set([
+        {
+          values: ['t-shirt', 'B'],
+          result: {
+            type: 't-shirt',
+            design: 'B',
+            colors: ['gray', 'white', 'green', 'blue'],
+            ranks: [5, 5, 4, 4],
+            isPromoted: true,
+          },
+        },
+        {
+          values: ['t-shirt', 'A'],
+          result: {
+            type: 't-shirt',
+            design: 'A',
+            colors: ['green', 'red', 'blue'],
+            ranks: [5, 4, 3],
+            isPromoted: true,
+          },
+        },
+        {
+          values: ['sweatshirt', 'A'],
+          result: { type: 'sweatshirt', design: 'A', colors: ['green', 'yellow'], ranks: [4, 3], isPromoted: true },
+        },
+      ]),
+    )
 
     t.end()
   })
@@ -241,21 +274,27 @@ t.test('search with groupBy', async t => {
       },
     })
 
-    await t.rejects(search(db, {
-      groupBy: {
-        properties: ['unknown-property'],
+    await t.rejects(
+      search(db, {
+        groupBy: {
+          properties: ['unknown-property'],
+        },
+      }),
+      {
+        message: 'Unknown groupBy property "unknown-property"',
       },
-    }), {
-      message: 'Unknown groupBy property "unknown-property"',
-    })
+    )
 
-    await t.rejects(search(db, {
-      groupBy: {
-        properties: ['tags'],
+    await t.rejects(
+      search(db, {
+        groupBy: {
+          properties: ['tags'],
+        },
+      }),
+      {
+        message: 'Invalid groupBy property "tags". Allowed types: "string, number, boolean", but given "string[]"',
       },
-    }), {
-      message: 'Invalid groupBy property "tags". Allowed types: "string, number, boolean", but given "string[]"',
-    })
+    )
 
     t.end()
   })

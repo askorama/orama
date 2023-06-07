@@ -59,8 +59,12 @@ export type FacetsParams = Record<string, FacetDefinition>
 
 export type FacetDefinition = StringFacetDefinition | NumberFacetDefinition | BooleanFacetDefinition
 
-export type ReduceFunction<T, R extends Result = Result> =
-  (values: ScalarSearchableValue[], acc: T, value: R, index: number) => T
+export type ReduceFunction<T, R extends Result = Result> = (
+  values: ScalarSearchableValue[],
+  acc: T,
+  value: R,
+  index: number,
+) => T
 export type Reduce<T> = {
   reducer: ReduceFunction<T>
   getInitialValue: (elementCount: number) => T

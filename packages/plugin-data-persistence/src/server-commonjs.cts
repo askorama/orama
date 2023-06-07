@@ -1,7 +1,7 @@
 import type {
   getDefaultFileName as esmGetDefaultFileName,
   persistToFile as esmPersistToFile,
-  restoreFromFile as esmRestoreFromFile,
+  restoreFromFile as esmRestoreFromFile
 } from './server.js'
 
 export interface OramaPluginDataPersistenceExport {

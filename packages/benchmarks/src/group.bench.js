@@ -1,7 +1,6 @@
-
 const b = require('benny')
 const { setTimeout } = require('timers/promises')
-const { formattedEvents } = require("./utils/dataset")
+const { formattedEvents } = require('./utils/dataset')
 const { create, insertMultiple, search } = require('@orama/orama')
 
 async function createDb() {
@@ -51,8 +50,8 @@ b.suite(
       await search(db, {
         groupBy: {
           properties: ['date'],
-          maxResult: 1
-        }
+          maxResult: 1,
+        },
       })
     }
   }),

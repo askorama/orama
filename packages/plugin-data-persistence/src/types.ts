@@ -1,14 +1,6 @@
-export type Runtime = 
-  | 'deno'
-  | 'node'
-  | 'bun'
-  | 'browser'
-  | 'unknown'
+export type Runtime = 'deno' | 'node' | 'bun' | 'browser' | 'unknown'
 
-export type PersistenceFormat =
-  | 'json'
-  | 'dpack'
-  | 'binary'
+export type PersistenceFormat = 'json' | 'dpack' | 'binary'
 
 export interface FileSystem {
   cwd: () => string

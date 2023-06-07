@@ -1,7 +1,12 @@
 import { create, insert, Orama, search } from '@orama/orama'
 import t from 'tap'
 import { UNSUPPORTED_FORMAT, METHOD_MOVED } from '../src/errors.js'
-import { persist, restore, persistToFile as deprecatedPersistToFile, restoreFromFile as deprecatedRestoreFromFile } from '../src/index.js'
+import {
+  persist,
+  restore,
+  persistToFile as deprecatedPersistToFile,
+  restoreFromFile as deprecatedRestoreFromFile
+} from '../src/index.js'
 import { persistToFile, restoreFromFile } from '../src/server.js'
 
 let _rm

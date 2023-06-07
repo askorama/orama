@@ -2,7 +2,7 @@ import type {
   persist as esmPersist,
   restore as esmRestore,
   persistToFile as esmPersistToFile,
-  restoreFromFile as esmRestoreFromFile,
+  restoreFromFile as esmRestoreFromFile
 } from './index.js'
 
 export interface OramaPluginDataPersistenceExport {

@@ -60,16 +60,20 @@ t.test('updateMultiple', async t => {
       quote: 'What I cannot create, I do not understand',
     })
 
-    const [id1, id2] = await updateMultiple(db, [oldDocId1, oldDocId2], [
-      {
-        quote: 'He who is brave is free',
-        author: 'Seneca',
-      },
-      {
-        quote: 'You must be the change you wish to see in the world',
-        author: 'Mahatma Gandhi',
-      }
-    ])
+    const [id1, id2] = await updateMultiple(
+      db,
+      [oldDocId1, oldDocId2],
+      [
+        {
+          quote: 'He who is brave is free',
+          author: 'Seneca',
+        },
+        {
+          quote: 'You must be the change you wish to see in the world',
+          author: 'Mahatma Gandhi',
+        },
+      ],
+    )
 
     t.notOk(await getByID(db, oldDocId1))
     t.notOk(await getByID(db, oldDocId2))
@@ -92,9 +96,7 @@ t.test('updateMultiple', async t => {
       author: 'John Lennon',
     })
 
-    await t.rejects(updateMultiple(db, [oldDocId], [
-      { quote: 55 }
-    ]))
+    await t.rejects(updateMultiple(db, [oldDocId], [{ quote: 55 }]))
 
     t.ok(await getByID(db, oldDocId))
     t.equal(await count(db), 1)

@@ -15,10 +15,16 @@ t.test('remove method', t => {
 
     const cases = [
       { name: 'and is not searchable anymore for name', params: { term: doc1.name as string } },
-      { name: 'and is not searchable anymore for name - substr', params: { term: (doc1.name as string).substring(0, 5) } },
+      {
+        name: 'and is not searchable anymore for name - substr',
+        params: { term: (doc1.name as string).substring(0, 5) },
+      },
       { name: 'and is not searchable anymore for rating - number - eq', params: { where: { rating: { eq: 5 } } } },
       { name: 'and is not searchable anymore for price - number - eq', params: { where: { price: { eq: 900 } } } },
-      { name: 'and is not searchable anymore for meta.sales - number - eq', params: { where: { 'meta.sales': { eq: 100 } } } },
+      {
+        name: 'and is not searchable anymore for meta.sales - number - eq',
+        params: { where: { 'meta.sales': { eq: 100 } } },
+      },
     ]
     for (const c of cases) {
       const { name, params } = c
@@ -106,9 +112,9 @@ t.test('remove method', t => {
       const [db, id1] = await createSimpleDB()
       const doc = (await getByID(db, id1))!
       const id5 = await insert(db, { ...doc, id: undefined })
-  
+
       await remove(db, id1)
-  
+
       const searchResult1 = await search(db, {
         term: doc.name as string,
         exact: true,
@@ -118,9 +124,9 @@ t.test('remove method', t => {
 
       const searchResult2 = await search(db, {
         where: {
-          'meta.sales': { eq: (doc.meta as Record<string, number>).sales }
+          'meta.sales': { eq: (doc.meta as Record<string, number>).sales },
         },
-      })  
+      })
       t.ok(searchResult2.hits.find(d => d.id === id5))
 
       t.end()
@@ -130,9 +136,9 @@ t.test('remove method', t => {
       const [db, id1] = await createSimpleDB()
       const doc = (await getByID(db, id1))!
       const id5 = await insert(db, { ...doc, id: undefined })
-  
+
       await remove(db, id5)
-  
+
       const searchResult1 = await search(db, {
         term: doc.name as string,
         exact: true,
@@ -142,9 +148,9 @@ t.test('remove method', t => {
 
       const searchResult2 = await search(db, {
         where: {
-          'meta.sales': { eq: (doc.meta as Record<string, number>).sales }
+          'meta.sales': { eq: (doc.meta as Record<string, number>).sales },
         },
-      })  
+      })
       t.ok(searchResult2.hits.find(d => d.id === id1))
 
       t.end()
@@ -190,7 +196,7 @@ t.test('removeMultiple method', t => {
 
     let count = 0
     const intervalId = setInterval(() => {
-      count ++
+      count++
     }, 0)
 
     await removeMultiple(db, [id1, id2, id3, id4], 1)
@@ -208,15 +214,15 @@ t.test('removeMultiple method', t => {
         name: 'string',
       },
       components: {
-        beforeMultipleRemove: function() {
+        beforeMultipleRemove: function () {
           throw new Error('Kaboom')
-        }
+        },
       },
     })
     const id1 = await insert(db, { name: 'coffee' })
 
     await t.rejects(removeMultiple(db, [id1]), {
-      message: 'Kaboom'
+      message: 'Kaboom',
     })
 
     t.end()

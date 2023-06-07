@@ -1,5 +1,5 @@
 import nextra from 'nextra'
-import {nodeTypes} from '@mdx-js/mdx'
+import { nodeTypes } from '@mdx-js/mdx'
 import rehypeRaw from 'rehype-raw'
 
 const withNextra = nextra({
@@ -7,8 +7,8 @@ const withNextra = nextra({
   themeConfig: './theme.config.jsx',
   mdxOptions: {
     // See: https://github.com/mdx-js/mdx/issues/1820
-    rehypePlugins: [[rehypeRaw, { passThrough: nodeTypes }]]
-  }
+    rehypePlugins: [[rehypeRaw, { passThrough: nodeTypes }]],
+  },
 })
 
 export default withNextra()

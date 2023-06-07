@@ -1,4 +1,3 @@
-
 const b = require('benny')
 
 function calculateCombination_Current(arrs) {
@@ -29,99 +28,99 @@ function calculateCombination_Current(arrs) {
 }
 
 function calculateCombination_Recursive_Head(arrs) {
-  if (!arrs.length) return [];
-  if (arrs.length === 1) return arrs[0].map(item => [item]);
+  if (!arrs.length) return []
+  if (arrs.length === 1) return arrs[0].map(item => [item])
 
-  const [head, ...tail] = arrs;
-  const c = calculateCombination_Recursive_Head(tail);
+  const [head, ...tail] = arrs
+  const c = calculateCombination_Recursive_Head(tail)
 
-  const combinations = [];
+  const combinations = []
   for (const value of head) {
     for (const combination of c) {
-      combinations.push([value, ...combination]);
+      combinations.push([value, ...combination])
     }
   }
 
-  return combinations;
+  return combinations
 }
 
 function calculateCombination_Recursive_Head_Indexed(arrs, index = 0) {
-  if (index + 1 === arrs.length) return arrs[index].map(item => [item]);
+  if (index + 1 === arrs.length) return arrs[index].map(item => [item])
 
-  const head = arrs[index];
-  const c = calculateCombination_Recursive_Head_Indexed(arrs, index + 1);
+  const head = arrs[index]
+  const c = calculateCombination_Recursive_Head_Indexed(arrs, index + 1)
 
-  const combinations = [];
+  const combinations = []
   for (const value of head) {
     for (const combination of c) {
-      combinations.push([value, ...combination]);
+      combinations.push([value, ...combination])
     }
   }
 
-  return combinations;
+  return combinations
 }
 
 function calculateCombination_Recursive_Head_Indexed2(arrs, count, index = 0) {
-  if (index === count) return arrs[index].map(item => [item]);
+  if (index === count) return arrs[index].map(item => [item])
 
-  const head = arrs[index];
-  const c = calculateCombination_Recursive_Head_Indexed2(arrs, count, index + 1);
+  const head = arrs[index]
+  const c = calculateCombination_Recursive_Head_Indexed2(arrs, count, index + 1)
 
-  const combinations = [];
+  const combinations = []
   for (const value of head) {
     for (const combination of c) {
-      combinations.push([value, ...combination]);
+      combinations.push([value, ...combination])
     }
   }
 
-  return combinations;
+  return combinations
 }
 
 function calculateCombination_Recursive_Tail(arrs) {
-  if (!arrs.length) return [];
-  if (arrs.length === 1) return arrs[0].map(item => [item]);
+  if (!arrs.length) return []
+  if (arrs.length === 1) return arrs[0].map(item => [item])
 
-  const tail = arrs.pop();
-  const c = calculateCombination_Recursive_Tail(arrs);
+  const tail = arrs.pop()
+  const c = calculateCombination_Recursive_Tail(arrs)
 
-  const combinations = [];
+  const combinations = []
   for (const value of tail) {
     for (const combination of c) {
-      combinations.push([...combination, value]);
+      combinations.push([...combination, value])
     }
   }
 
-  return combinations;
+  return combinations
 }
 
 function calculateCombination_Recursive_Tail_Indexed(arrs, index) {
-  if (index === 0) return arrs[0].map(item => [item]);
+  if (index === 0) return arrs[0].map(item => [item])
 
-  const tail = arrs[index];
-  const c = calculateCombination_Recursive_Tail_Indexed(arrs, index - 1);
+  const tail = arrs[index]
+  const c = calculateCombination_Recursive_Tail_Indexed(arrs, index - 1)
 
-  const combinations = [];
+  const combinations = []
   for (const value of tail) {
     for (const combination of c) {
-      combinations.push([...combination, value]);
+      combinations.push([...combination, value])
     }
   }
 
-  return combinations;
+  return combinations
 }
 
 function* generateCombinations(arrs, currentCombination = [], index = 0) {
-  if(index < arrs.length) {
-    for(let val of arrs[index]) {
-      yield* generateCombinations(arrs, [...currentCombination, val], index + 1);
+  if (index < arrs.length) {
+    for (let val of arrs[index]) {
+      yield* generateCombinations(arrs, [...currentCombination, val], index + 1)
     }
   } else {
-    yield currentCombination;
+    yield currentCombination
   }
 }
 
 function calculateCombination_Generator(arrs) {
-  return [...generateCombinations(arrs)];
+  return [...generateCombinations(arrs)]
 }
 
 const combination = (desc, arrs) => {
@@ -164,7 +163,11 @@ const combination = (desc, arrs) => {
 }
 
 const main = async () => {
-  const deep = [['a', 'b', 'c', 'd', 'e'], ['f', 'g', 'h', 'i', 'j'], ['k', 'l', 'm', 'n', 'o']]
+  const deep = [
+    ['a', 'b', 'c', 'd', 'e'],
+    ['f', 'g', 'h', 'i', 'j'],
+    ['k', 'l', 'm', 'n', 'o'],
+  ]
   await combination('deep property', deep)
 
   const oneProperty = [['a'], ['b'], ['c']]
