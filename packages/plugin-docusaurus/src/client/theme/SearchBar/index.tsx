@@ -1,20 +1,21 @@
-import type { Result } from '@orama/orama'
-import type { Position } from '@orama/plugin-match-highlight'
 import { autocomplete } from '@algolia/autocomplete-js'
 import '@algolia/autocomplete-theme-classic/dist/theme.min.css'
+import { useLocation } from '@docusaurus/router'
 import { useColorMode } from '@docusaurus/theme-common'
+import useBaseUrl from '@docusaurus/useBaseUrl'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import { usePluginData } from '@docusaurus/useGlobalData'
 import useIsBrowser from '@docusaurus/useIsBrowser'
-import { createElement, Fragment, useEffect, useRef } from 'react'
+import { Result, create, load } from '@orama/orama'
+import type { OramaWithHighlight, Position } from '@orama/plugin-match-highlight'
+import { searchWithHighlight } from '@orama/plugin-match-highlight'
+import { ungzip } from 'pako'
+import { Fragment, createElement, useEffect, useMemo, useRef, useState } from 'react'
 import { render } from 'react-dom'
-import { PLUGIN_NAME } from '../../../shared.js'
-import { SectionSchema } from '../../../types.js'
+import { INDEX_FILE, PLUGIN_NAME } from '../../../shared.js'
+import { PluginData, RawDataWithPositions, schema } from '../../../types.js'
 import { Footer } from './Footer.js'
-import { getOrama } from './getOrama.js'
-import './search.css'
-
-type Hit = Result & { positions: Position }
+type Hit = Result & { position: Position }
 
 const templates = {
   item({ item }: { item: Hit }) {
@@ -36,19 +37,19 @@ const templates = {
 function snippet(item: Hit): JSX.Element {
   const PADDING = 20
   const PADDING_MARKER = '...'
-  const isBeginning = item.positions.start < PADDING
-  const isEnd = item.positions.start + item.positions.length > (item.document.sectionContent as string).length - PADDING
+  const isBeginning = item.position.start < PADDING
+  const isEnd = item.position.start + item.position.length > (item.document.sectionContent as string).length - PADDING
   const preMatch = (item.document.sectionContent as string).substring(
-    isBeginning ? 0 : item.positions.start - PADDING,
-    item.positions.start
+    isBeginning ? 0 : item.position.start - PADDING,
+    item.position.start
   )
   const match = (item.document.sectionContent as string).substring(
-    item.positions.start,
-    item.positions.start + item.positions.length
+    item.position.start,
+    item.position.start + item.position.length
   )
   const postMatch = (item.document.sectionContent as string).substring(
-    item.positions.start + item.positions.length,
-    item.positions.start + item.positions.length + PADDING
+    item.position.start + item.position.length,
+    item.position.start + item.position.length + PADDING
   )
   return (
     <p>
@@ -64,33 +65,55 @@ function snippet(item: Hit): JSX.Element {
 export default function SearchBar(): JSX.Element {
   const isBrowser = useIsBrowser()
   const { siteConfig } = useDocusaurusContext()
+  const location = useLocation()
   const containerRef = useRef(null)
   const { colorMode } = useColorMode()
-  const indexData = usePluginData(PLUGIN_NAME)
+  const { searchData, versions } = usePluginData(PLUGIN_NAME) as PluginData
+  const [database, setDatabase] = useState<OramaWithHighlight>()
+  const searchBaseUrl = useBaseUrl(INDEX_FILE)
+
+  const version = useMemo(() => {
+    if (!isBrowser) {
+      return undefined
+    }
+
+    const pathname = location.pathname
+
+    for (const v of versions) {
+      if (pathname.startsWith(v.path)) {
+        return v.name
+      }
+    }
+
+    return versions[0].name
+  }, [isBrowser, versions, location])
 
   useEffect(() => {
-    if (!containerRef.current || !isBrowser) {
+    if (!containerRef.current || !isBrowser || !database) {
       return undefined
     }
 
     const search = autocomplete({
+      placeholder: 'Search ...',
       container: containerRef.current,
       // @ts-expect-error render typing here is for preact, react also works
       renderer: { createElement, Fragment, render },
       openOnFocus: true,
       detachedMediaQuery: '', // always detached
-      async getSources({ query }): Promise<any> {
-        const orama = await getOrama(siteConfig.baseUrl, indexData)
-
+      async getSources({ query: term }): Promise<any> {
         return [
           {
             sourceId: 'orama',
             async getItems() {
-              const results = await orama(query)
+              const results = await searchWithHighlight(database, {
+                term,
+                properties: ['sectionTitle', 'sectionContent', 'type']
+              })
+
               const processed = results.hits.flatMap(hit =>
                 Object.values((hit as any).positions.sectionContent).flatMap(positions =>
                   (positions as any).map((position: Position) => ({
-                    ...hit.document,
+                    ...hit,
                     position
                   }))
                 )
@@ -98,8 +121,8 @@ export default function SearchBar(): JSX.Element {
 
               return processed
             },
-            getItemUrl({ item }: { item: SectionSchema }) {
-              return item.pageRoute
+            getItemUrl({ item }: { item: Hit }) {
+              return item.document.pageRoute
             },
             templates
           }
@@ -109,7 +132,16 @@ export default function SearchBar(): JSX.Element {
         render(
           <>
             <div className="aa-PanelLayout aa-Panel--scrollable">{sections}</div>
-            <Footer />
+            <Footer colorMode={colorMode} />
+          </>,
+          root
+        )
+      },
+      renderNoResults({ render, state }, root) {
+        render(
+          <>
+            {state.query && <div className="aa-NoResults">No results found.</div>}
+            <Footer colorMode={colorMode} />
           </>,
           root
         )
@@ -118,7 +150,42 @@ export default function SearchBar(): JSX.Element {
     return () => {
       search.destroy()
     }
-  }, [isBrowser, siteConfig, indexData])
+  }, [isBrowser, siteConfig, database, colorMode])
+
+  useEffect(() => {
+    async function loadDatabase(): Promise<void> {
+      let data: RawDataWithPositions
+      if (!searchData) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const searchResponse = await fetch(searchBaseUrl.replace('@VERSION@', version!))
+
+        if (searchResponse.status === 0) {
+          throw new Error(`Network error: ${await searchResponse.text()}`)
+        } else if (searchResponse.status !== 200) {
+          throw new Error(`HTTP error ${searchResponse.status}: ${await searchResponse.text()}`)
+        }
+
+        const deflated = ungzip(await searchResponse.arrayBuffer(), { to: 'string' })
+        data = JSON.parse(deflated)
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        data = searchData[version!]
+      }
+
+      const db = (await create({ schema })) as OramaWithHighlight
+      await load(db, data)
+      db.data.positions = data.positions
+      setDatabase(db)
+    }
+
+    if (!isBrowser || !version) {
+      return
+    }
+
+    loadDatabase().catch(error => {
+      console.error('Cannot load search index.', error)
+    })
+  }, [isBrowser, searchData, searchBaseUrl, version])
 
   useEffect(() => {
     colorMode === 'dark' ? document.body.classList.add(colorMode) : document.body.classList.remove('dark')
