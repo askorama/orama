@@ -9,9 +9,6 @@
       "dependsOn": ["build"],
       "inputs": ["packages/**/*.test.js", "packages/**/*.test.jsx", "packages/**/*.test.ts", "packages/**/*.test.tsx"]
     },
-    "pack": {
-      "dependsOn": ["build"]
-    },
     "lint": {},
     "deploy": {
       "dependsOn": ["^lint", "^build", "^test"]
@@ -44,20 +41,6 @@
         "^build"
       ],
       "outputs": ["dist/**"]
-    },
-    "@orama/plugin-astro#test": {
-      "dependsOn": [
-        "@orama/orama#pack",
-        "@orama/plugin-astro#pack"
-      ]
-    },
-    "@orama/plugin-docusaurus#test": {
-      "dependsOn": [
-        "@orama/orama#pack",
-        "@orama/plugin-match-highlight#pack",
-        "@orama/plugin-parsedoc#pack",
-        "@orama/plugin-docusaurus#pack"
-      ]
-    }
+    }    
   }
 }

@@ -10,8 +10,7 @@ import { fileURLToPath } from 'node:url'
 import { gunzipSync } from 'node:zlib'
 import { create, load } from '@orama/orama'
 import { OramaWithHighlight, SearchResultWithHighlight, searchWithHighlight } from '@orama/plugin-match-highlight'
-import { schema } from '../src/types.js'
-import { INDEX_FILE } from '../src/shared.js'
+import { schema, INDEX_FILE } from '../src/server/types.js'
 
 interface Execution {
   code: number

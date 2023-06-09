@@ -1,21 +1,23 @@
-import { ColorMode } from '@docusaurus/theme-common'
-import { OramaLogoDark, OramaLogoLight } from './OramaLogo.js'
+// @ts-expect-error Resolve at runtime
+import { OramaLogoDark, OramaLogoLight } from '@theme/OramaLogo'
 
-export type FooterTranslations = Partial<{
-  selectText: string
-  selectKeyAriaLabel: string
-  navigateText: string
-  navigateUpKeyAriaLabel: string
-  navigateDownKeyAriaLabel: string
-  closeText: string
-  closeKeyAriaLabel: string
-  searchByText: string
-}>
+import type { ColorMode } from '@docusaurus/theme-common'
 
-type FooterProps = Partial<{
-  colorMode: ColorMode
-  translations: FooterTranslations
-}>
+export interface SearchBarFooterTranslations {
+  selectText?: string
+  selectKeyAriaLabel?: string
+  navigateText?: string
+  navigateUpKeyAriaLabel?: string
+  navigateDownKeyAriaLabel?: string
+  closeText?: string
+  closeKeyAriaLabel?: string
+  searchByText?: string
+}
+
+interface SearchBarFooterProps {
+  colorMode?: ColorMode
+  translations?: SearchBarFooterTranslations
+}
 
 interface CommandIconProps {
   children: React.ReactNode
@@ -32,7 +34,7 @@ function CommandIcon(props: CommandIconProps): JSX.Element {
   )
 }
 
-export function Footer({ colorMode, translations = {} }: FooterProps): JSX.Element {
+export function SearchBarFooter({ colorMode, translations = {} }: SearchBarFooterProps): JSX.Element {
   const {
     selectText = 'to select',
     selectKeyAriaLabel = 'Enter key',
