@@ -1,5 +1,7 @@
+import { Result } from '@orama/orama'
+import type { Position } from '@orama/plugin-match-highlight'
+
 import type { Document, RawData, Schema } from '@orama/orama'
-import { Position } from '@orama/plugin-match-highlight'
 
 interface DocsVersion {
   name: string
@@ -20,9 +22,14 @@ export type RawDataWithPositions = RawData & { positions: Record<string, Record<
 export interface PluginOptions {}
 
 export interface PluginData {
-  searchData: Record<string, RawDataWithPositions>
+  searchData: Record<string, { data: ArrayBuffer }>
   versions: DocsVersion[]
 }
+
+export type Hit = Result & { position: Position }
+
+export const PLUGIN_NAME = '@orama/plugin-docusaurus'
+export const INDEX_FILE = 'orama-search-index-@VERSION@.json.gz'
 
 export const schema: Schema = {
   pageRoute: 'string',

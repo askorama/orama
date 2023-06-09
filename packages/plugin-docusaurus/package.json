@@ -22,6 +22,11 @@
       "types": "./dist/server/index.d.ts",
       "import": "./dist/server/index.js",
       "require": "./dist/server/commonjs.cjs"
+    },
+    "./types": {
+      "types": "./dist/server/types.d.ts",
+      "import": "./dist/server/types.js",
+      "require": "./dist/server/types.cjs"
     }
   },
   "types": "./dist/server/index.d.ts",
@@ -33,11 +38,11 @@
     "prebuild": "npm run lint",
     "build": "swc --delete-dir-on-start --extensions .ts,.tsx,.cts -d dist src",
     "postbuild": "sh scripts/postbuild.sh",
+    "pretest": "node ../../scripts/test-pack.mjs",
     "test": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
     "format": "prettier -w src",
     "lint": "eslint src --ext .js,.ts,.tsx,.cts",
-    "changelog": "auto-changelog -p",
-    "pack": "pnpm pack --pack-destination ../../dist"
+    "changelog": "auto-changelog -p"
   },
   "dependencies": {
     "@algolia/autocomplete-js": "^1.7.2",

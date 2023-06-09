@@ -197,3 +197,84 @@ the document will be indexed with the following `id`: `73cbcc79-2203-49b8-bb52-6
 To provide a custom ID for a document, see the [components](/internals/components) page.
 
 <Callout type="warning">If you try to insert two documents with the same ID, Orama will throw an error.</Callout>
+
+## Remote document storing
+
+By default Orama keeps a copy of the inserted document in memory (and in the serialized data) to speed up search performance.
+
+If this is not acceptable, you can provide a custom `documentsStore` components which will be responsible to store
+and fetch documents from another location (local or remote).
+
+The code example below is an example that implements a proxy: when a document is requested, the code finds it on a location of the filesystem. 
+We assume each document has an `id` field which disable Orama random ID generation.
+
+You can replace the file related operations with your custom code.
+
+```javascript copy
+import { readFile, readdir, writeFile, rm } from 'node:fs/promises'
+import { resolve } from 'node:path'
+import { create } from '@orama/orama'
+
+const ROOT_LOCATION = '/var/db/orama-example'
+
+async function getDocument(id) {
+  return JSON.parse(await readFile(resolve(ROOT_LOCATION, `${id}.json`), 'utf-8'))
+}
+
+async function listDocuments() {
+  const allFiles = await readdir(ROOT_LOCATION)
+
+  return allFiles.filter(id => id.endsWith('.json'))
+}
+
+const database = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+  },
+  components: {
+    // override partially the default documents store
+    documentsStore: {
+      create() {
+        return {}
+      },
+      load(raw) {
+        return {}
+      },
+      save(store) {
+        return {}
+      },
+      get(_, id) {
+        return getDocument(id)
+      },
+      getMultiple(_, ids) {
+        return Promise.all(
+          ids.map(async id => {
+            return JSON.parse(await getDocument(id))
+          }),
+        )
+      },
+      async getAll() {
+        const docs = await listDocuments()
+
+        return Promise.all(
+          docs.map(async id => {
+            return JSON.parse(await getDocument(id))
+          }),
+        )
+      },
+      store() {
+        // No-op
+      },
+      remove() {
+        // No-op
+      },
+      async count() {
+        const docs = await listDocuments()
+
+        return docs.count
+      },
+    },
+  },
+})
+```

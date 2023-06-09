@@ -5,19 +5,23 @@ import { documentsStore } from '@orama/orama/components'
 import { OramaWithHighlight, afterInsert as highlightAfterInsert } from '@orama/plugin-match-highlight'
 import type { DefaultSchemaElement, NodeContent } from '@orama/plugin-parsedoc'
 import { defaultHtmlSchema, populate } from '@orama/plugin-parsedoc'
-import { readFile, writeFile } from 'node:fs/promises'
+import { cp, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import { gzip as gzipCB } from 'node:zlib'
 import type { Configuration as WebpackConfiguration } from 'webpack'
-import { INDEX_FILE, PLUGIN_NAME } from '../shared.js'
-import { PluginOptions, RawDataWithPositions, SectionSchema, schema } from '../types.js'
-import { retrieveTranslationMessages } from './translationMessages.js'
 
-export type { PluginData, PluginOptions, RawDataWithPositions, SectionSchema } from '../types.js'
+import { retrieveTranslationMessages } from './translationMessages.js'
+import { INDEX_FILE, PLUGIN_NAME, PluginOptions, RawDataWithPositions, SectionSchema, schema } from './types.js'
+
+export type { PluginData, PluginOptions, RawDataWithPositions, SectionSchema } from './types.js'
 
 const gzip = promisify(gzipCB)
+
+function indexPath(outDir: string, version: string): string {
+  return resolve(outDir, INDEX_FILE.replace('@VERSION@', version))
+}
 
 function transformFn(node: NodeContent): NodeContent {
   switch (node.tag) {
@@ -93,7 +97,7 @@ async function generateDocument(
   return sections
 }
 
-async function buildDevSearchData(siteDir: string, allContent: any, version: string): Promise<RawDataWithPositions> {
+async function buildDevSearchData(siteDir: string, outDir: string, allContent: any, version: string): Promise<void> {
   const loadedVersion = allContent['docusaurus-plugin-content-docs']?.default?.loadedVersions?.find(
     (v: LoadedVersion) => v.versionName === version
   )
@@ -126,7 +130,7 @@ async function buildDevSearchData(siteDir: string, allContent: any, version: str
   const serialized = (await save(db)) as RawDataWithPositions
   serialized.positions = db.data.positions
 
-  return serialized
+  await writeFile(indexPath(outDir, version), await gzip(JSON.stringify(serialized)))
 }
 
 function getThemePath(): string {
@@ -134,7 +138,7 @@ function getThemePath(): string {
 }
 
 function docusaurusOramaPlugin(context: LoadContext, options: PluginOptions): Plugin {
-  const searchData: Record<string, RawDataWithPositions> = {}
+  let versions: string[] = []
 
   return {
     name: PLUGIN_NAME,
@@ -146,7 +150,7 @@ function docusaurusOramaPlugin(context: LoadContext, options: PluginOptions): Pl
       return retrieveTranslationMessages(context)
     },
     getClientModules() {
-      return [resolve(getThemePath(), 'SearchBar/style.css')]
+      return [resolve(getThemePath(), 'SearchBar/style.css'), resolve(getThemePath(), 'SearchBarFooter/style.css')]
     },
     configureWebpack(): WebpackConfiguration {
       return {
@@ -160,29 +164,36 @@ function docusaurusOramaPlugin(context: LoadContext, options: PluginOptions): Pl
     },
     async contentLoaded({ actions, allContent }) {
       const isDevelopment = process.env.NODE_ENV === 'development'
+      const loadedVersions = (allContent['docusaurus-plugin-content-docs']?.default as LoadedContent)?.loadedVersions
+      versions = loadedVersions.map(v => v.versionName)
 
-      const versions = (allContent['docusaurus-plugin-content-docs']?.default as LoadedContent)?.loadedVersions.map(
-        v => {
-          const { versionName: name, path } = v
-          return { name, path }
-        }
+      // Build all versions
+      await Promise.all(
+        versions.map(version => buildDevSearchData(context.siteDir, context.generatedFilesDir, allContent, version))
       )
 
-      for (const { name } of versions) {
-        const index = await buildDevSearchData(context.siteDir, allContent, name)
-        searchData[name] = index
+      for (const name of versions) {
+        await buildDevSearchData(context.siteDir, context.generatedFilesDir, allContent, name)
       }
 
-      actions.setGlobalData({ versions, searchData: isDevelopment ? searchData : undefined })
+      if (isDevelopment) {
+        actions.setGlobalData({
+          searchData: Object.fromEntries(
+            await Promise.all(
+              versions.map(async version => {
+                return [version, await readFile(indexPath(context.generatedFilesDir, version))]
+              })
+            )
+          )
+        })
+      } else {
+        actions.setGlobalData({ searchData: {} })
+      }
     },
     async postBuild({ outDir }: { outDir: string }) {
       await Promise.all(
-        Object.entries(searchData).map(async ([version, index]) => {
-          return writeFile(
-            resolve(outDir, INDEX_FILE.replace('@VERSION@', version)),
-            await gzip(JSON.stringify(index)),
-            'utf-8'
-          )
+        versions.map(async version => {
+          return cp(indexPath(context.generatedFilesDir, version), indexPath(outDir, version))
         })
       )
     }

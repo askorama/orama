@@ -1,7 +1,7 @@
 import type { LoadContext, Plugin } from '@docusaurus/types'
-import type { PluginOptions } from '../types.js'
+import { PluginOptions } from './types.js'
 
-export type { SectionSchema, RawDataWithPositions, PluginOptions, PluginData } from '../types.js'
+export type { PluginData, PluginOptions, RawDataWithPositions, SectionSchema } from './types.js'
 
 export type DocusaurusOramaPlugin = (docusaurusContext: LoadContext, options: PluginOptions) => Plugin
 
