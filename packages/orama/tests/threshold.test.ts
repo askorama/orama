@@ -27,10 +27,15 @@ t.test('should only return results with all the search terms (exact match)', asy
     term: 'slim fit',
     threshold: 0,
   })
+  const r4 = await search(db, {
+    term: 'fit slim',
+    threshold: 0,
+  })
 
   t.same(r1.count, 2)
   t.same(r2.count, 1)
   t.same(r3.count, 2)
+  t.same(r4.count, 2)
 })
 
 t.test('should only return results with all the search terms (exact match) on more complex schema', async t => {
