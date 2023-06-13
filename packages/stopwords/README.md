@@ -1,32 +1,43 @@
-# Orama Sto-words
+# Orama Stop-words
 
-Orama removes common stop-words for you, depending on the language parameter used during new instance creation.
-Right now, Orama supports 26 languages and stemmers out of the box:
+This package provides support for stop-words removal in 26 languages:
 
-As for now, Orama supports 12 languages when it comes to stop-words removal:
-
-- English
-- Italian
-- French
-- Spanish
-- Portugaise
-- Dutch
-- Swedish
-- Russian
-- Norwegian
-- German
+- Arabic
+- Armenian
+- Bulgarian
 - Danish
+- Dutch
+- English
 - Finnish
+- French
+- German
+- Greek
+- Hindi
+- Hungarian
+- Indonesian
+- Irish
+- Italian
+- Nepali
+- Norwegian
+- Portuguese
+- Romanian
+- Russian
+- Serbian
+- Slovenian
+- Spanish
+- Swedish
+- Turkish
+- Ukrainian
 
 ```js
 import { create } from '@orama/orama'
-import { stopwords } from '@orama/stopwords/italian'
+import { stopwords as italianStopwords } from '@orama/stopwords/italian'
 
 const db = create({
   schema: {
   components: {
     tokenizer: {
-      stopWords
+      stopwords: italianStopwords
     }
   }
 })
