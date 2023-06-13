@@ -81,14 +81,6 @@ async function main() {
   const packageJson = JSON.parse(await readFile(resolve(rootDir, 'package.json'), 'utf-8'))
   packageJson.exports = exports
   await writeFile(resolve(rootDir, 'package.json'), JSON.stringify(packageJson, null, 2))
-
-  // Copy the English stemmer to the Orama package
-  const englishStemmer = await readFile(resolve(rootDir, 'lib/en.js'), 'utf-8')
-  await writeFile(
-    resolve(rootDir, '../orama/src/components/tokenizer/english-stemmer.ts'),
-    `// eslint-disable-next-line @typescript-eslint/ban-ts-comment\n// @ts-nocheck\n\n${englishStemmer}`,
-    'utf-8',
-  )
 }
 
 await main()
