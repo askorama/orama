@@ -142,6 +142,9 @@ importers:
       '@orama/stemmers':
         specifier: workspace:*
         version: link:../stemmers
+      '@orama/stopwords':
+        specifier: workspace:*
+        version: link:../stopwords
       '@playwright/test':
         specifier: ^1.29.2
         version: 1.29.2

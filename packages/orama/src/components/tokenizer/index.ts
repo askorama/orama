@@ -2,7 +2,6 @@ import { createError } from '../../errors.js'
 import { Stemmer, Tokenizer, DefaultTokenizerConfig } from '../../types.js'
 import { replaceDiacritics } from './diacritics.js'
 import { Language, SPLITTERS, SUPPORTED_LANGUAGES } from './languages.js'
-import { stopWords as defaultStopWords } from './stop-words/index.js'
 import { stemmer as english } from './english-stemmer.js'
 
 interface DefaultTokenizer extends Tokenizer {
@@ -104,7 +103,7 @@ export async function createTokenizer(config: DefaultTokenizerConfig = {}): Prom
   let stopWords: string[] | undefined
 
   if (config.stopWords !== false) {
-    stopWords = defaultStopWords[config.language] ?? []
+    stopWords = []
 
     if (Array.isArray(config.stopWords)) {
       stopWords = config.stopWords
