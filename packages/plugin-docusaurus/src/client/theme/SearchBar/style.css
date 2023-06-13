@@ -5,6 +5,9 @@
 }
 
 .aa-DetachedSearchButton {
+  /* shadow and gradient are taken from docsearch */
+  --key-shadow: inset 0 -2px 0 0 #cdcde6, inset 0 0 1px 1px #fff, 0 1px 2px 1px rgba(30, 35, 90, 0.4);
+  --key-gradient: linear-gradient(-225deg, #d5dbe4, #f8f8f8);
   border-radius: 9999px;
   height: 36px;
   background: var(--ifm-color-emphasis-200);
@@ -15,6 +18,35 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0 1.5rem;
+}
+
+.aa-DetachedSearchButton kbd {
+  align-items: center;
+  background: var(--key-gradient);
+  border-radius: 2px;
+  box-shadow: var(--key-shadow);
+  display: flex;
+  height: 18px;
+  justify-content: center;
+  padding: 0 0 1px;
+  border: 0;
+  width: 20px;
+}
+
+.aa-DetachedSearchButton kbd:last-child {
+  margin-right: 0.5em;
+}
+
+.aa-DetachedSearchButton .aa-DetachedSearchButtonPlaceholder,
+.aa-DetachedSearchButton .aa-DetachedSearchButtonQuery {
+  flex: 1;
+  white-space: nowrap;
+}
+
+/* shadow and gradient are taken from docsearch */
+[data-theme='dark'] .aa-DetachedSearchButton {
+  --key-shadow: inset 0 -2px 0 0 #282d55, inset 0 0 1px 1px #51577d, 0 2px 2px 0 rgba(3, 4, 9, 0.3);
+  --key-gradient: linear-gradient(-26.5deg, #565872, #31355b);
 }
 
 .navbar .aa-DetachedSearchButton {

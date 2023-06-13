@@ -1,18 +1,16 @@
+import { ColorModeProvider } from '@docusaurus/theme-common/internal'
 // @ts-expect-error Resolve at runtime
 import { SearchBarFooter } from '@theme/SearchBarFooter'
 
-import type { ColorMode } from '@docusaurus/theme-common'
-
 export interface SearchNoResultsProps {
   query: string
-  colorMode?: ColorMode
 }
 
-export function SearchNoResults({ query, colorMode }: SearchNoResultsProps): JSX.Element {
+export function SearchNoResults({ query }: SearchNoResultsProps): JSX.Element {
   return (
-    <>
+    <ColorModeProvider>
       {query && <div className="aa-NoResults">No results found.</div>}
-      <SearchBarFooter colorMode={colorMode} />
-    </>
+      <SearchBarFooter />
+    </ColorModeProvider>
   )
 }
