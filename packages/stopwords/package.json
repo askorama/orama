@@ -1,0 +1,184 @@
+{
+  "name": "@orama/stopwords",
+  "version": "1.0.6",
+  "type": "module",
+  "description": "Stop-words for Orama",
+  "sideEffects": false,
+  "main": "./dist/en.cjs",
+  "types": "./dist/en.d.ts",
+  "exports": {
+    "./arabic": {
+      "types": "./dist/ar.d.ts",
+      "import": "./dist/ar.js",
+      "require": "./dist/ar.cjs"
+    },
+    "./armenian": {
+      "types": "./dist/am.d.ts",
+      "import": "./dist/am.js",
+      "require": "./dist/am.cjs"
+    },
+    "./bulgarian": {
+      "types": "./dist/bg.d.ts",
+      "import": "./dist/bg.js",
+      "require": "./dist/bg.cjs"
+    },
+    "./danish": {
+      "types": "./dist/dk.d.ts",
+      "import": "./dist/dk.js",
+      "require": "./dist/dk.cjs"
+    },
+    "./dutch": {
+      "types": "./dist/nl.d.ts",
+      "import": "./dist/nl.js",
+      "require": "./dist/nl.cjs"
+    },
+    "./english": {
+      "types": "./dist/en.d.ts",
+      "import": "./dist/en.js",
+      "require": "./dist/en.cjs"
+    },
+    "./finnish": {
+      "types": "./dist/fi.d.ts",
+      "import": "./dist/fi.js",
+      "require": "./dist/fi.cjs"
+    },
+    "./french": {
+      "types": "./dist/fr.d.ts",
+      "import": "./dist/fr.js",
+      "require": "./dist/fr.cjs"
+    },
+    "./german": {
+      "types": "./dist/de.d.ts",
+      "import": "./dist/de.js",
+      "require": "./dist/de.cjs"
+    },
+    "./greek": {
+      "types": "./dist/gr.d.ts",
+      "import": "./dist/gr.js",
+      "require": "./dist/gr.cjs"
+    },
+    "./hungarian": {
+      "types": "./dist/hu.d.ts",
+      "import": "./dist/hu.js",
+      "require": "./dist/hu.cjs"
+    },
+    "./indian": {
+      "types": "./dist/in.d.ts",
+      "import": "./dist/in.js",
+      "require": "./dist/in.cjs"
+    },
+    "./indonesian": {
+      "types": "./dist/id.d.ts",
+      "import": "./dist/id.js",
+      "require": "./dist/id.cjs"
+    },
+    "./irish": {
+      "types": "./dist/ie.d.ts",
+      "import": "./dist/ie.js",
+      "require": "./dist/ie.cjs"
+    },
+    "./italian": {
+      "types": "./dist/it.d.ts",
+      "import": "./dist/it.js",
+      "require": "./dist/it.cjs"
+    },
+    "./lithuanian": {
+      "types": "./dist/lt.d.ts",
+      "import": "./dist/lt.js",
+      "require": "./dist/lt.cjs"
+    },
+    "./nepali": {
+      "types": "./dist/np.d.ts",
+      "import": "./dist/np.js",
+      "require": "./dist/np.cjs"
+    },
+    "./norwegian": {
+      "types": "./dist/no.d.ts",
+      "import": "./dist/no.js",
+      "require": "./dist/no.cjs"
+    },
+    "./portuguese": {
+      "types": "./dist/pt.d.ts",
+      "import": "./dist/pt.js",
+      "require": "./dist/pt.cjs"
+    },
+    "./romanian": {
+      "types": "./dist/ro.d.ts",
+      "import": "./dist/ro.js",
+      "require": "./dist/ro.cjs"
+    },
+    "./russian": {
+      "types": "./dist/ru.d.ts",
+      "import": "./dist/ru.js",
+      "require": "./dist/ru.cjs"
+    },
+    "./serbian": {
+      "types": "./dist/rs.d.ts",
+      "import": "./dist/rs.js",
+      "require": "./dist/rs.cjs"
+    },
+    "./slovenian": {
+      "types": "./dist/ru.d.ts",
+      "import": "./dist/ru.js",
+      "require": "./dist/ru.cjs"
+    },
+    "./spanish": {
+      "types": "./dist/es.d.ts",
+      "import": "./dist/es.js",
+      "require": "./dist/es.cjs"
+    },
+    "./swedish": {
+      "types": "./dist/se.d.ts",
+      "import": "./dist/se.js",
+      "require": "./dist/se.cjs"
+    },
+    "./turkish": {
+      "types": "./dist/tr.d.ts",
+      "import": "./dist/tr.js",
+      "require": "./dist/tr.cjs"
+    },
+    "./ukrainian": {
+      "types": "./dist/uk.d.ts",
+      "import": "./dist/uk.js",
+      "require": "./dist/uk.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oramasearch/orama"
+  },
+  "bugs": {
+    "url": "https://github.com/oramasearch/orama"
+  },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "lint": "exit 0;",
+    "test": "exit 0;",
+    "ci": "npm run test"
+  },
+  "keywords": [
+    "full-text search",
+    "search",
+    "fuzzy search",
+    "typo-tolerant search",
+    "full-text",
+    "stemming",
+    "stopwords"
+  ],
+  "author": {
+    "name": "Michele Riva",
+    "email": "michele.riva@oramasearch.com",
+    "url": "https://github.com/MicheleRiva",
+    "author": true
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@swc/core": "^1.3.27"
+  },
+  "engines": {
+    "node": ">= 16.0.0"
+  }
+}
