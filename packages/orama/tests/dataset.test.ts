@@ -1,4 +1,5 @@
 import t from 'tap'
+import { stopwords as englishStopwords } from '@orama/stopwords/english'
 import { DocumentsStore } from '../src/components/documents-store.js'
 import { create, insertMultiple, remove, Results, search } from '../src/index.js'
 import dataset from './datasets/events.json' assert { type: 'json' }
@@ -45,6 +46,7 @@ t.test('orama.dataset', async t => {
     components: {
       tokenizer: {
         stemming: true,
+        stopWords: englishStopwords
       },
     },
   })

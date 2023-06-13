@@ -1,4 +1,4 @@
-export const dk = [
+export const stopwords = [
   'og',
   'i',
   'jeg',

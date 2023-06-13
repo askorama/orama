@@ -1,4 +1,4 @@
-export const fi = [
+export const stopwords = [
   'olla',
   'olen',
   'olet',

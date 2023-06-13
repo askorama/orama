@@ -1,4 +1,4 @@
-export const de = [
+export const stopwords = [
   'aber',
   'alle',
   'allem',

@@ -142,6 +142,9 @@ importers:
       '@orama/stemmers':
         specifier: workspace:*
         version: link:../stemmers
+      '@orama/stopwords':
+        specifier: workspace:*
+        version: link:../stopwords
       '@playwright/test':
         specifier: ^1.29.2
         version: 1.29.2
@@ -540,6 +543,12 @@ importers:
         version: 4.9.4
 
   packages/stemmers:
+    devDependencies:
+      '@swc/core':
+        specifier: ^1.3.27
+        version: 1.3.27
+
+  packages/stopwords:
     devDependencies:
       '@swc/core':
         specifier: ^1.3.27

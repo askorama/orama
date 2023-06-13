@@ -1,4 +1,4 @@
-export const se = [
+export const stopwords = [
   'och',
   'det',
   'att',

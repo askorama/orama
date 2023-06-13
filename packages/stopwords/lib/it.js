@@ -1,4 +1,4 @@
-export const it = [
+export const stopwords = [
   'ad',
   'al',
   'allo',

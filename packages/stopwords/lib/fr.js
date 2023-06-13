@@ -1,4 +1,4 @@
-export const fr = [
+export const stopwords = [
   'au',
   'aux',
   'avec',

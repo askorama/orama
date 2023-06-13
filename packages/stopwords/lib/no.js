@@ -1,4 +1,4 @@
-export const no = [
+export const stopwords = [
   'og',
   'i',
   'jeg',

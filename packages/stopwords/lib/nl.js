@@ -1,4 +1,4 @@
-export const nl = [
+export const stopwords = [
   'de',
   'en',
   'van',

@@ -1,4 +1,4 @@
-export const ru = [
+export const stopwords = [
   'и',
   'в',
   'во',

@@ -1,4 +1,4 @@
-export const pt = [
+export const stopwords = [
   'de',
   'a',
   'o',

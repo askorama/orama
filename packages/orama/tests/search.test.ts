@@ -1,4 +1,5 @@
 import t from 'tap'
+import { stopwords as englishStopwords } from '@orama/stopwords/english'
 import { Orama, create, getByID, insert, insertMultiple, search } from '../src/index.js'
 
 t.test('search method', t => {
@@ -74,6 +75,7 @@ t.test('search method', t => {
         components: {
           tokenizer: {
             stemming: true,
+            stopWords: englishStopwords,
           },
         },
       })
@@ -337,6 +339,7 @@ t.test('search method', t => {
       },
       components: {
         tokenizer: {
+          stopWords: englishStopwords,
           stemming: true,
         },
       },
@@ -377,7 +380,7 @@ t.test('search method', t => {
         author: 'string',
       },
       components: {
-        tokenizer: { language: 'english', stemming: false },
+        tokenizer: { language: 'english', stemming: false, stopWords: englishStopwords },
       },
     })
 
@@ -593,6 +596,9 @@ async function createSimpleDB(): Promise<[Orama, string, string, string, string]
       },
     },
     components: {
+      tokenizer: {
+        stopWords: englishStopwords,
+      },
       getDocumentIndexId(): string {
         return `__${++i}`
       },
