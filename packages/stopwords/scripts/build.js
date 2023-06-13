@@ -53,7 +53,7 @@ async function compile(lang, jsExtension, tsExtension, moduleType) {
   // Create the definition file
   await writeFile(
     resolve(destinationDir, `${lang}.d.${tsExtension}`),
-    'export declare function stemmer(word: string): string',
+    'export type stopwords = string[]',
     'utf-8',
   )
 }
