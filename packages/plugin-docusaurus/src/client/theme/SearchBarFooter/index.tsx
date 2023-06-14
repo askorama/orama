@@ -1,7 +1,7 @@
 // @ts-expect-error Resolve at runtime
 import { OramaLogoDark, OramaLogoLight } from '@theme/OramaLogo'
 
-import type { ColorMode } from '@docusaurus/theme-common'
+import { useColorMode } from '@docusaurus/theme-common'
 
 export interface SearchBarFooterTranslations {
   selectText?: string
@@ -15,7 +15,6 @@ export interface SearchBarFooterTranslations {
 }
 
 interface SearchBarFooterProps {
-  colorMode?: ColorMode
   translations?: SearchBarFooterTranslations
 }
 
@@ -34,7 +33,7 @@ function CommandIcon(props: CommandIconProps): JSX.Element {
   )
 }
 
-export function SearchBarFooter({ colorMode, translations = {} }: SearchBarFooterProps): JSX.Element {
+export function SearchBarFooter({ translations = {} }: SearchBarFooterProps): JSX.Element {
   const {
     selectText = 'to select',
     selectKeyAriaLabel = 'Enter key',
@@ -45,6 +44,8 @@ export function SearchBarFooter({ colorMode, translations = {} }: SearchBarFoote
     closeKeyAriaLabel = 'Escape key',
     searchByText = 'Search by'
   } = translations
+
+  const { colorMode } = useColorMode()
 
   return (
     <footer className="aa-Footer">

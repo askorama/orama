@@ -2,18 +2,17 @@
 import { SearchBarFooter } from '@theme/SearchBarFooter'
 
 import type { VNode } from '@algolia/autocomplete-js'
-import type { ColorMode } from '@docusaurus/theme-common'
+import { ColorModeProvider } from '@docusaurus/theme-common/internal'
 
 export interface SearchResultsProps {
   sections?: VNode[]
-  colorMode?: ColorMode
 }
 
-export function SearchResults({ sections, colorMode }: SearchResultsProps): JSX.Element {
+export function SearchResults({ sections }: SearchResultsProps): JSX.Element {
   return (
-    <>
+    <ColorModeProvider>
       <div className="aa-PanelLayout aa-Panel--scrollable">{sections}</div>
-      <SearchBarFooter colorMode={colorMode} />
-    </>
+      <SearchBarFooter />
+    </ColorModeProvider>
   )
 }

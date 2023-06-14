@@ -12,7 +12,7 @@ import { create, load } from '@orama/orama'
 import type { OramaWithHighlight, Position } from '@orama/plugin-match-highlight'
 import { searchWithHighlight } from '@orama/plugin-match-highlight'
 import { ungzip } from 'pako'
-import { Fragment, createElement, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { render } from 'react-dom'
 // @ts-expect-error Resolve at runtime
 import { SearchNoResults } from '@theme/SearchNoResults'
@@ -25,7 +25,7 @@ import { Hit, INDEX_FILE, PLUGIN_NAME, PluginData, RawDataWithPositions, schema 
 export default function SearchBar(): JSX.Element {
   const isBrowser = useIsBrowser()
   const { siteConfig } = useDocusaurusContext()
-  const containerRef = useRef(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const { colorMode } = useColorMode()
   const { searchData } = usePluginData(PLUGIN_NAME) as PluginData
   const [database, setDatabase] = useState<OramaWithHighlight>()
@@ -46,6 +46,21 @@ export default function SearchBar(): JSX.Element {
     // Fallback - Return the latest version or the first one existing
     return versions.find((v: GlobalVersion) => v.isLast) ?? versions[0]
   }, [isBrowser, activeVersion, preferredVersion, versions])
+
+  const onKeyDown = useCallback(
+    function (setIsOpen: (value: boolean) => void, event: KeyboardEvent) {
+      const isOpen = containerRef.current?.querySelector('[role="combobox"]')?.getAttribute('aria-expanded') === 'true'
+
+      if (
+        (event.key?.toLowerCase() === 'escape' && isOpen) ||
+        (event.key?.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey))
+      ) {
+        event.preventDefault()
+        setIsOpen(!isOpen)
+      }
+    },
+    [containerRef]
+  )
 
   useEffect(() => {
     if (!containerRef.current || !isBrowser || !database) {
@@ -98,10 +113,24 @@ export default function SearchBar(): JSX.Element {
         render(<SearchNoResults query={state.query} />, root)
       }
     })
+
+    const handler = onKeyDown.bind(null, search.setIsOpen)
+    window.addEventListener('keydown', handler)
+
+    // Move keyboard instructions at the end - Apparently this is only possible manually
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const button = containerRef.current.querySelector('.aa-DetachedSearchButton')!
+    const icons = containerRef.current.querySelectorAll('kbd')
+
+    for (const icon of Array.from(icons)) {
+      button.appendChild(icon.cloneNode(true))
+    }
+
     return () => {
+      window.removeEventListener('keydown', handler)
       search.destroy()
     }
-  }, [isBrowser, siteConfig, database, colorMode])
+  }, [isBrowser, siteConfig, database, colorMode, onKeyDown])
 
   useEffect(() => {
     async function loadDatabase(version: GlobalVersion): Promise<void> {
@@ -143,5 +172,13 @@ export default function SearchBar(): JSX.Element {
     colorMode === 'dark' ? document.body.classList.add(colorMode) : document.body.classList.remove('dark')
   }, [colorMode])
 
-  return <div ref={containerRef} />
+  return (
+    <div ref={containerRef}>
+      {/* We need to use a template here since apparently there is no easy way to customize the input box */}
+      <template>
+        <kbd>⌘</kbd>
+        <kbd>K</kbd>
+      </template>
+    </div>
+  )
 }
