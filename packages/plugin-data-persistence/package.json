@@ -26,7 +26,7 @@
   "scripts": {
     "dev": "swc --delete-dir-on-start -s -w --extensions .ts,.cts -d dist src",
     "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",
-    "postbuild": "tsc -p . --emitDeclarationOnly && tsc -p tsconfig.cjs.json --emitDeclarationOnly && mv dist/commonjs.js dist/commonjs.cjs && mv dist/commonjs.js.map dist/commonjs.cjs.map",
+    "postbuild": "sh scripts/postbuild.sh",
     "test": "c8 -c test/config/c8.json tap --rcfile=test/config/tap.yml test/*.test.ts"
   },
   "keywords": [
