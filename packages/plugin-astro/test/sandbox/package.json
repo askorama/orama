@@ -13,8 +13,8 @@
   },
   "pnpm": {
     "overrides": {
-      "@orama/orama": "@ROOT@/dist/orama-orama-@VERSION@.tgz",
-      "@orama/plugin-astro": "@ROOT@/dist/orama-plugin-astro-@VERSION@.tgz"
+      "@orama/orama": "@ROOT@/packages/plugin-astro/tmp/orama-orama-@VERSION@.tgz",
+      "@orama/plugin-astro": "@ROOT@/packages/plugin-astro/tmp/orama-plugin-astro-@VERSION@.tgz"
     }
   }
 }

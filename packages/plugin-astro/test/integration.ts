@@ -17,7 +17,7 @@ interface Execution {
 }
 
 const sandboxSource = fileURLToPath(new URL('./sandbox', import.meta.url))
-const sandbox = process.env.KEEP_SANDBOX
+const sandbox = process.env.KEEP_SANDBOX_ASTRO
   ? '/tmp/orama-astro-sandbox'
   : resolve(tmpdir(), `orama-plugin-astro-${Date.now()}`)
 
@@ -133,6 +133,6 @@ await test('generated DBs have indexed pages content', async () => {
   assert.ok(dynamicTestMissingSearchResult.count === 0)
 })
 
-if (!process.env.KEEP_SANDBOX) {
+if (!process.env.KEEP_SANDBOX_ASTRO) {
   await cleanup()
 }

@@ -20,7 +20,7 @@ interface Execution {
 }
 
 const sandboxSource = fileURLToPath(new URL('./sandbox', import.meta.url))
-const sandbox = process.env.KEEP_SANDBOX
+const sandbox = process.env.KEEP_SANDBOX_DOCUSAURUS
   ? '/tmp/orama-docusaurus-sandbox'
   : resolve(tmpdir(), `orama-plugin-docusaurus-${Date.now()}`)
 
@@ -121,6 +121,6 @@ await test('generated DBs have indexed pages content', async () => {
   assert.ok(turtleSearchResult.count === 0)
 })
 
-if (!process.env.KEEP_SANDBOX) {
+if (!process.env.KEEP_SANDBOX_DOCUSAURUS) {
   await cleanup()
 }

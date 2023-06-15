@@ -2,10 +2,11 @@
 .vscode/
 coverage/
 dist/
+tmp/
+**/tmp/
 node_modules/
 packages/plugin-docusaurus-sandbox/build
 playwright-report
 .dev
 .DS_Store
 .turbo
-rnr-v0.4.2-x86_64-unknown-linux-musl

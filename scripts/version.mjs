@@ -4,6 +4,8 @@ import { simpleGit } from 'simple-git'
 import { fileURLToPath } from 'url'
 import oramaPackage from '../packages/orama/package.json' assert { type: 'json' }
 
+const dryRun = process.env.DRY_RUN === 'true'
+const skipGit = process.env.SKIP_GIT === 'true'
 const skip = (process.env.SKIP ?? '').split(/\s*,\s*/).map(s => s.trim())
 
 const packages = [
@@ -12,8 +14,24 @@ const packages = [
   'plugin-data-persistence',
   'plugin-docusaurus',
   'plugin-match-highlight',
+  'plugin-nextra',
   'plugin-parsedoc',
+  'stemmers',
+  'stopwords',
 ].filter(p => !skip.includes(p))
+
+async function updatePackage(path, version) {
+  const packageJson = JSON.parse(await readFile(path))
+
+  console.log(
+    `\x1b[32mUpdating package \x1b[1m${packageJson.name}\x1b[22m from \x1b[1m${packageJson.version}\x1b[22m to version \x1b[1m${version}\x1b[22m ...\x1b[0m`,
+  )
+  packageJson.version = version
+
+  if (!dryRun) {
+    await writeFile(path, JSON.stringify(packageJson, null, 2), 'utf-8')
+  }
+}
 
 async function main() {
   if (!process.argv[2]) {
@@ -35,25 +53,16 @@ async function main() {
     process.exit(1)
   }
 
+  // Update the main package.json
+  await updatePackage(fileURLToPath(new URL(`../package.json`, import.meta.url)), version)
+
   // Perform the update
   for (const pkg of packages) {
-    const packageJsonPath = fileURLToPath(new URL(`../packages/${pkg}/package.json`, import.meta.url))
-    const packageJson = JSON.parse(await readFile(packageJsonPath))
-
-    console.log(
-      `\x1b[32mUpdating package \x1b[1m${packageJson.name}\x1b[22m from \x1b[1m${packageJson.version}\x1b[22m to version \x1b[1m${version}\x1b[22m ...\x1b[0m`,
-    )
-    packageJson.version = version
-
-    if (process.env.DRY_RUN) {
-      continue
-    }
-
-    await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8')
+    await updatePackage(fileURLToPath(new URL(`../packages/${pkg}/package.json`, import.meta.url)), version)
   }
 
   // Make the commit, including the tag
-  if (!process.env.DRY_RUN) {
+  if (!dryRun && !skipGit) {
     const git = simpleGit({ baseDir: fileURLToPath(new URL('..', import.meta.url)) })
     console.log(`\x1b[32mCommitting changes and creating a tag (pushing is left to you) ...\x1b[0m`)
     await git.commit(
