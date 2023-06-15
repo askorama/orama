@@ -18,10 +18,10 @@
   },
   "pnpm": {
     "overrides": {
-      "@orama/orama": "@ROOT@/dist/orama-orama-@VERSION@.tgz",
-      "@orama/plugin-docusaurus": "@ROOT@/dist/orama-plugin-docusaurus-@VERSION@.tgz",
-      "@orama/plugin-match-highlight": "@ROOT@/dist/orama-plugin-match-highlight-@VERSION@.tgz",
-      "@orama/plugin-parsedoc": "@ROOT@/dist/orama-plugin-parsedoc-@VERSION@.tgz"
+      "@orama/orama": "@ROOT@/packages/plugin-docusaurus/tmp/orama-orama-@VERSION@.tgz",
+      "@orama/plugin-docusaurus": "@ROOT@/packages/plugin-docusaurus/tmp/orama-plugin-docusaurus-@VERSION@.tgz",
+      "@orama/plugin-match-highlight": "@ROOT@/packages/plugin-docusaurus/tmp/orama-plugin-match-highlight-@VERSION@.tgz",
+      "@orama/plugin-parsedoc": "@ROOT@/packages/plugin-docusaurus/tmp/orama-plugin-parsedoc-@VERSION@.tgz"
     },
     "packageExtensions": {
       "@docusaurus/theme-live-codeblock": {
