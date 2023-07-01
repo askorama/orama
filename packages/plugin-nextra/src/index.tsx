@@ -1,8 +1,8 @@
 import type { Result } from '@orama/orama'
 import type { Position, SearchResultWithHighlight } from '@orama/plugin-match-highlight'
 import { searchWithHighlight } from '@orama/plugin-match-highlight'
+import { useRouter } from 'next/compat/router.js'
 import NextLink from 'next/link.js'
-import { useRouter } from 'next/router.js'
 import React, { useEffect, useRef, useState } from 'react'
 import { HighlightedDocument } from './components/HighlightedDocument.js'
 import { createOramaIndex, groupDocumentsBy } from './utils/index.js'
@@ -28,13 +28,19 @@ const defaultProps: OramaSearchProps = {
 }
 
 export function OramaSearch(props = defaultProps) {
+  const router = useRouter()
+
+  return router?.isReady ? <OramaSearchPlugin {...props} router={router} /> : null
+}
+
+function OramaSearchPlugin({router, ...props}) {
   const [, setIndexing] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [results, setResults] = useState<SearchResultWithHighlight>()
   const [groupedResults, setGroupedResults] = useState({})
   const [hasFocus, setHasFocus] = useState(false)
 
-  const { basePath, locale = 'en-US', asPath } = useRouter()
+  const { basePath, locale = 'en-US', asPath } = router
 
   const inputRef = useRef(null)
   const wrapperRef = useRef(null)
