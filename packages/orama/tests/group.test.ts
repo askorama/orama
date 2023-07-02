@@ -235,18 +235,8 @@ t.test('search with groupBy', async t => {
     })
 
     t.strictSame(
-      new Set(results.groups!),
-      new Set([
-        {
-          values: ['t-shirt', 'B'],
-          result: {
-            type: 't-shirt',
-            design: 'B',
-            colors: ['gray', 'white', 'green', 'blue'],
-            ranks: [5, 5, 4, 4],
-            isPromoted: true,
-          },
-        },
+      results.groups!,
+      [
         {
           values: ['t-shirt', 'A'],
           result: {
@@ -258,10 +248,20 @@ t.test('search with groupBy', async t => {
           },
         },
         {
+          values: ['t-shirt', 'B'],
+          result: {
+            type: 't-shirt',
+            design: 'B',
+            colors: ['white', 'gray',  'blue', 'green'],
+            ranks: [5, 5, 4, 4],
+            isPromoted: true,
+          },
+        },
+        {
           values: ['sweatshirt', 'A'],
           result: { type: 'sweatshirt', design: 'A', colors: ['green', 'yellow'], ranks: [4, 3], isPromoted: true },
         },
-      ]),
+      ],
     )
 
     t.end()
@@ -318,7 +318,7 @@ t.test('real test', async t => {
 
   compareGroupResults(t, results.groups!, [
     { values: ['A'], result: ['1'] },
-    { values: ['B'], result: ['6'] },
+    { values: ['B'], result: ['5'] },
   ])
 
   t.end()

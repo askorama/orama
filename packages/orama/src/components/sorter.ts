@@ -82,14 +82,42 @@ async function create(_: Orama, schema: Schema, config?: SorterConfig): Promise<
   return innerCreate(schema, (config || {}).unsortableProperties || [], '')
 }
 
-function stringSort(value: SortValue, language: string | undefined, d: [string, SortValue]): boolean {
-  return (d[1] as string).localeCompare(value as string, language) > 0
+function stringSort(value: SortValue, language: string | undefined, d: [string, SortValue]): number {
+  return (d[1] as string).localeCompare(value as string, language)
 }
-function numerSort(value: SortValue, d: [string, SortValue]): boolean {
-  return (d[1] as number) > (value as number)
+function numerSort(value: SortValue, d: [string, SortValue]): number {
+  return (d[1] as number) - (value as number)
 }
-function booleanSort(value: SortValue, d: [string, SortValue]): boolean {
-  return d[1] as boolean
+function booleanSort(value: SortValue, d: [string, SortValue]): number {
+  return d[1] as boolean ? 1 : -1;
+}
+
+function binarySearch<T>(myArray: T[], predicate: (value: T) => number): [number, number] {
+  let start = 0;
+  let end = myArray.length - 1;
+  let mid = 0;
+  let lastDirection = 0;
+
+  while (start <= end) {
+    mid = Math.floor((start + end) / 2);
+    lastDirection = predicate(myArray[mid]);
+
+    if (lastDirection === 0) {
+      return [mid, 0];
+    }
+
+    if (lastDirection > 0) {
+      end = mid - 1;
+    } else {
+      start = mid + 1;
+    }
+  }
+
+  if (lastDirection === 0) {
+    return [mid, 0];
+  }
+
+  return [mid, lastDirection < 0 ? 1 : -1];
 }
 
 async function insert(
@@ -105,7 +133,7 @@ async function insert(
   }
   const s = sorter.sorts[prop]
 
-  let predicate: (value: [string, SortValue]) => boolean
+  let predicate: (value: [string, SortValue]) => number
   switch (schemaType) {
     case 'string':
       predicate = stringSort.bind(null, value, language)
@@ -119,12 +147,29 @@ async function insert(
   }
 
   // Find the right position to insert the element
-  let index = s.orderedDocs.findIndex(predicate)
-  if (index === -1) {
-    index = s.orderedDocs.length
-    s.orderedDocs.push([id, value])
-  } else {
-    s.orderedDocs.splice(index, 0, [id, value])
+  const [lastPos, direction] = binarySearch(s.orderedDocs, predicate);
+  let index = lastPos;
+
+  if (direction === -1) {
+    if (lastPos === 0) {
+      s.orderedDocs.unshift([id, value]);
+    } else {
+      s.orderedDocs.splice(lastPos, 0, [id, value])
+    }
+  } else if (direction === 1) {
+    if ((s.orderedDocs.length - 1) === lastPos) {
+      index = s.orderedDocs.length
+      s.orderedDocs.push([id, value])
+    } else {
+      index = lastPos + 1
+      s.orderedDocs.splice(lastPos + 1, 0, [id, value])
+    }
+  } else if (direction === 0) {
+    if (lastPos === 0) {
+      s.orderedDocs.unshift([id, value]);
+    } else {
+      s.orderedDocs.splice(lastPos, 0, [id, value])
+    }
   }
   s.docs[id] = index
 
