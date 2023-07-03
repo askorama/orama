@@ -132,6 +132,11 @@
       "import": "./dist/se.js",
       "require": "./dist/se.cjs"
     },
+    "./tamil": {
+      "types": "./dist/ta.d.ts",
+      "import": "./dist/ta.js",
+      "require": "./dist/ta.cjs"
+    },
     "./turkish": {
       "types": "./dist/tr.d.ts",
       "import": "./dist/tr.js",

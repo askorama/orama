@@ -26,6 +26,7 @@ This package provides support for stop-words removal in 26 languages:
 - Slovenian
 - Spanish
 - Swedish
+- Tamil
 - Turkish
 - Ukrainian
 
