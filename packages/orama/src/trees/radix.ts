@@ -1,12 +1,9 @@
-import { syncBoundedLevenshtein } from '../components/levenshtein.js'
-import { Nullable } from '../types.js'
-import { getOwnProperty, syncUniqueId } from '../utils.js'
+import { syncBoundedLevenshtein } from "../components/levenshtein.js";
+import { getOwnProperty } from "../utils.js";
 
 export interface Node {
-  id: string
   key: string
   subWord: string
-  parent: Nullable<string>
   children: Record<string, Node>
   docs: string[]
   end: boolean
@@ -29,7 +26,6 @@ function serialize(this: Node): object {
 }
 
 function updateParent(node: Node, parent: Node): void {
-  node.parent = parent.id
   node.word = parent.word + node.subWord
 }
 
@@ -111,10 +107,8 @@ function getCommonPrefix(a: string, b: string) {
 
 export function create(end = false, subWord = '', key = ''): Node {
   const node = {
-    id: syncUniqueId(),
     key,
     subWord,
-    parent: null,
     children: {},
     docs: [],
     end,
