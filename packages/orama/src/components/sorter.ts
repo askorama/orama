@@ -1,15 +1,15 @@
-import { createError } from "../errors.js";
-import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from "../types.js";
+import { createError } from '../errors.js';
+import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from '../types.js';
 
 interface PropertySort<K> {
   docs: Record<string, number>
   orderedDocs: [string, K][]
-  type: SortType;
+  type: SortType
 }
 
 export interface Sorter extends OpaqueSorter {
-  language?: string;
-  isSorted: boolean;
+  language?: string
+  isSorted: boolean
   enabled: boolean
   sortableProperties: string[]
   sortablePropertiesWithTypes: Record<string, SortType>
@@ -261,6 +261,8 @@ export async function save<R = unknown>(sorter: Sorter): Promise<R> {
       enabled: false,
     } as unknown as R
   }
+
+  ensureIsSorted(sorter)
 
   return {
     sortableProperties: sorter.sortableProperties,
