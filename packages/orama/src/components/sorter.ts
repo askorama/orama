@@ -1,15 +1,15 @@
-import { createError } from '../errors.js'
-import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from '../types.js'
+import { createError } from "../errors.js";
+import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from "../types.js";
 
 interface PropertySort<K> {
   docs: Record<string, number>
   orderedDocs: [string, K][]
   type: SortType;
-  language?: string;
-  sorted: boolean;
 }
 
 export interface Sorter extends OpaqueSorter {
+  language?: string;
+  isSorted: boolean;
   enabled: boolean
   sortableProperties: string[]
   sortablePropertiesWithTypes: Record<string, SortType>
@@ -21,6 +21,8 @@ export type DefaultSorter = ISorter<Sorter>
 function innerCreate(schema: Schema, sortableDeniedProperties: string[], prefix: string): Sorter {
   const sorter: Sorter = {
     enabled: true,
+    isSorted: true,
+    language: undefined,
     sortableProperties: [],
     sortablePropertiesWithTypes: {},
     sorts: {},
@@ -59,7 +61,6 @@ function innerCreate(schema: Schema, sortableDeniedProperties: string[], prefix:
           docs: {},
           orderedDocs: [],
           type: type,
-          sorted: true,
         }
         break
       case 'boolean[]':
@@ -96,20 +97,30 @@ async function insert(
   if (!sorter.enabled) {
     return
   }
+
+  sorter.language = language
+  sorter.isSorted = false
+
   const s = sorter.sorts[prop]
 
-  s.language = language;
-  s.sorted = false;
   s.docs[id] = s.orderedDocs.length;
   s.orderedDocs.push([id, value]);
 }
 
 function ensureIsSorted(sorter: Sorter): void {
-  const props = Object.keys(sorter.sorts);
+  if (sorter.isSorted) {
+    return
+  }
 
-  for (const prop of props) {
+  if (!sorter.enabled) {
+    return
+  }
+
+  for (const prop of Object.keys(sorter.sorts)) {
     ensurePropertyIsSorted(sorter, prop);
   }
+
+  sorter.isSorted = true;
 }
 
 function stringSort(language: string | undefined, value: [string, SortValue], d: [string, SortValue]): number {
@@ -127,14 +138,10 @@ function booleanSort(value: [string, SortValue], d: [string, SortValue]): number
 function ensurePropertyIsSorted(sorter: Sorter, prop: string): void {
   const s = sorter.sorts[prop];
 
-  if (s.sorted) {
-    return;
-  }
-
   let predicate: (value: [string, SortValue], d: [string, SortValue]) => number
   switch (s.type) {
     case 'string':
-      predicate = stringSort.bind(null, s.language)
+      predicate = stringSort.bind(null, sorter.language)
       break
     case 'number':
       predicate = numberSort.bind(null)
@@ -152,8 +159,6 @@ function ensurePropertyIsSorted(sorter: Sorter, prop: string): void {
     const docId = s.orderedDocs[i][0]
     s.docs[docId] = i;
   }
-
-  s.sorted = true;
 }
 
 async function remove(sorter: Sorter, prop: string, id: string) {
@@ -188,7 +193,7 @@ async function sortBy(sorter: Sorter, docIds: [string, number][], by: SorterPara
     throw createError('UNABLE_TO_SORT_ON_UNKNOWN_FIELD', property, sorter.sortableProperties.join(', '))
   }
 
-  ensurePropertyIsSorted(sorter, property);
+  ensureIsSorted(sorter)
 
   docIds.sort((a, b) => {
     // This sort algorithm works leveraging on
@@ -245,6 +250,8 @@ export async function load<R = unknown>(raw: R): Promise<Sorter> {
     sortablePropertiesWithTypes: rawDocument.sortablePropertiesWithTypes,
     sorts: rawDocument.sorts,
     enabled: true,
+    isSorted: rawDocument.isSorted,
+    language: rawDocument.language,
   }
 }
 
@@ -260,6 +267,8 @@ export async function save<R = unknown>(sorter: Sorter): Promise<R> {
     sortablePropertiesWithTypes: sorter.sortablePropertiesWithTypes,
     sorts: sorter.sorts,
     enabled: sorter.enabled,
+    isSorted: sorter.isSorted,
+    language: sorter.language,
   } as R
 }
 
@@ -273,7 +282,5 @@ export async function createSorter(): Promise<DefaultSorter> {
     sortBy,
     getSortableProperties,
     getSortablePropertiesWithTypes,
-    ensureIsSorted,
-    ensurePropertyIsSorted,
   }
 }
