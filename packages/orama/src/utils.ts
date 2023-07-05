@@ -10,6 +10,25 @@ const second = BigInt(1e9)
 
 export const isServer = typeof window === 'undefined'
 
+/**
+ * This value can be increased up to 100_000
+ * But i don't know if this value change from nodejs to nodejs
+ * So I will keep a safer value here.
+ */
+export const MAX_ARGUMENT_FOR_STACK = 10_000;
+
+export function safeAddNewItems<T>(arr: T[], newArr: T[]): T[] {
+  // we need to use by apply because of issues like: https://github.com/oramasearch/orama/issues/301
+  // that issue is caused because scoreList can be huge
+  if (newArr.length < MAX_ARGUMENT_FOR_STACK) {
+    arr.push(...newArr)
+
+    return arr;
+  } else {
+    return arr.concat(newArr)
+  }
+}
+
 export function sprintf(template: string, ...args: (string | number)[]): string {
   return template.replace(
     /%(?:(?<position>\d+)\$)?(?<width>-?\d*\.?\d*)(?<type>[dfs])/g,
