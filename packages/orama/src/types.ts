@@ -1,4 +1,4 @@
-import { Language } from './components/tokenizer/languages.js';
+import { Language } from './components/tokenizer/languages.js'
 
 export type Nullable<T> = T | null
 

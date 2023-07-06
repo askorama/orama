@@ -1,5 +1,5 @@
-import { createError } from '../errors.js';
-import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from '../types.js';
+import { createError } from '../errors.js'
+import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from '../types.js'
 
 interface PropertySort<K> {
   docs: Map<string, number>
@@ -120,7 +120,8 @@ function ensureIsSorted(sorter: Sorter): void {
     return
   }
 
-  for (const prop of Object.keys(sorter.sorts)) {
+  const properties = Object.keys(sorter.sorts)
+  for (const prop of properties) {
     ensurePropertyIsSorted(sorter, prop);
   }
 
@@ -166,7 +167,8 @@ function ensurePropertyIsSorted(sorter: Sorter, prop: string): void {
 }
 
 function ensureOrderedDocsAreDeleted(sorter: Sorter): void {
-  for (const prop of Object.keys(sorter.sorts)) {
+  const properties = Object.keys(sorter.sorts)
+  for (const prop of properties) {
     ensureOrderedDocsAreDeletedByProperty(sorter, prop)
   }
 }
