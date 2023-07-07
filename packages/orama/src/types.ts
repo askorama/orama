@@ -593,6 +593,12 @@ interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore, S extends O
   sorting: S
 }
 
+export type IdStore = {
+  lastShort: string
+  originalToShort: Record<string, string>
+  shortToOriginal: Record<string, string>
+}
+
 type Internals<P extends ProvidedTypes> = {
   schema: P['Schema']
   tokenizer: Tokenizer
@@ -603,6 +609,7 @@ type Internals<P extends ProvidedTypes> = {
   caches: Record<string, unknown>
   [kInsertions]: number | undefined
   [kRemovals]: number | undefined
+  idStore: IdStore
 }
 
 type OramaID = {

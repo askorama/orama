@@ -24,6 +24,7 @@ import {
   SingleOrArray,
 } from '../types.js'
 import { createSorter } from '../components/sorter.js'
+import { createNewIdDatabase } from '../id-shortener.js'
 
 interface CreateArguments<P extends ProvidedTypes> {
   schema: Schema
@@ -174,6 +175,7 @@ export async function create<P extends ProvidedTypes>({
     afterMultipleUpdate,
     formatElapsedTime,
     id,
+    idStore: createNewIdDatabase(),
   } as Orama
 
   orama.data = {
