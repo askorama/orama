@@ -1,5 +1,5 @@
 import { syncBoundedLevenshtein } from "../components/levenshtein.js";
-import { InternalDocumentID } from "../components/internal-document-store.js";
+import { InternalDocumentID } from "../components/internal-document-id-store.js";
 import { getOwnProperty } from "../utils.js";
 
 export interface Node {

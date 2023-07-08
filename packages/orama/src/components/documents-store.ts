@@ -1,4 +1,4 @@
-import { InternalDocumentStore, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from "./internal-document-store.js";
+import { DocumentID, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from "./internal-document-id-store.js";
 import { Document, IDocumentsStore, OpaqueDocumentStore } from "../types.js";
 
 export interface DocumentsStore extends OpaqueDocumentStore {
@@ -23,7 +23,7 @@ export async function get(store: DocumentsStore, id: string): Promise<Document |
   return store.docs[internalId]
 }
 
-export async function getMultiple(store: DocumentsStore, ids: InternalDocumentStore[]): Promise<(Document | undefined)[]> {
+export async function getMultiple(store: DocumentsStore, ids: DocumentID[]): Promise<(Document | undefined)[]> {
   const found: (Document | undefined)[] = Array.from({ length: ids.length })
 
   for (let i = 0; i < ids.length; i++) {
@@ -38,7 +38,7 @@ export async function getAll(store: DocumentsStore): Promise<Record<string, Docu
   return store.docs as unknown as Record<string, Document>
 }
 
-export async function store(store: DocumentsStore, id: InternalDocumentStore, doc: Document): Promise<boolean> {
+export async function store(store: DocumentsStore, id: DocumentID, doc: Document): Promise<boolean> {
   const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id);
 
   if (typeof store.docs[internalId] !== 'undefined') {
@@ -51,7 +51,7 @@ export async function store(store: DocumentsStore, id: InternalDocumentStore, do
   return true
 }
 
-export async function remove(store: DocumentsStore, id: InternalDocumentStore): Promise<boolean> {
+export async function remove(store: DocumentsStore, id: DocumentID): Promise<boolean> {
   const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id);
 
   if (typeof store.docs[internalId] === 'undefined') {

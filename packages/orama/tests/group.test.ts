@@ -1,4 +1,5 @@
 import t from 'tap'
+import { inspect } from "util";
 import {
   Document,
   GroupResult,

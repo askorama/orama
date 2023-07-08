@@ -1,4 +1,4 @@
-import { InternalDocumentStore, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from "./internal-document-store.js";
+import { DocumentID, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from "./internal-document-id-store.js";
 import { createError } from "../errors.js";
 import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from "../types.js";
 
@@ -20,7 +20,7 @@ export type DefaultSorter = ISorter<Sorter>
 
 function innerCreate(orama: Orama, schema: Schema, sortableDeniedProperties: string[], prefix: string): Sorter {
   const sorter: Sorter = {
-    sharedInternalDocumentStore: orama.internalDocumentStore,
+    sharedInternalDocumentStore: orama.internalDocumentIDStore,
     enabled: true,
     sortableProperties: [],
     sortablePropertiesWithTypes: {},
@@ -143,7 +143,7 @@ async function insert(
   }
 }
 
-async function remove(sorter: Sorter, prop: string, id: InternalDocumentStore) {
+async function remove(sorter: Sorter, prop: string, id: DocumentID) {
   if (!sorter.enabled) {
     return
   }

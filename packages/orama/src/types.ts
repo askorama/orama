@@ -1,5 +1,5 @@
 import { Language } from "./components/tokenizer/languages.js";
-import { InternalDocumentStore, InternalDocumentID, InternalDocumentIDStore } from "./components/internal-document-store.js";
+import { DocumentID, InternalDocumentID, InternalDocumentIDStore } from "./components/internal-document-id-store.js";
 
 export type Nullable<T> = T | null
 
@@ -301,7 +301,7 @@ export type Result = {
   /**
    * The id of the document.
    */
-  id: InternalDocumentID
+  id: string;
   /**
    * The score of the document in the search.
    */
@@ -449,7 +449,7 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
     index: I,
     prop: string,
     term: string,
-    ids: InternalDocumentStore[],
+    ids: DocumentID[],
   ): SyncOrAsyncValue<TokenScore[]>
 
   search<D extends OpaqueDocumentStore, AggValue = Result[]>(
@@ -475,11 +475,11 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
   create<S extends Schema, I extends OpaqueIndex, So extends OpaqueSorter>(
     orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
   ): SyncOrAsyncValue<D>
-  get(store: D, id: InternalDocumentStore): SyncOrAsyncValue<Document | undefined>
-  getMultiple(store: D, ids: InternalDocumentStore[]): SyncOrAsyncValue<(Document | undefined)[]>
+  get(store: D, id: DocumentID): SyncOrAsyncValue<Document | undefined>
+  getMultiple(store: D, ids: DocumentID[]): SyncOrAsyncValue<(Document | undefined)[]>
   getAll(store: D): SyncOrAsyncValue<Record<string, Document>>
-  store(store: D, id: InternalDocumentStore, doc: Document): SyncOrAsyncValue<boolean>
-  remove(store: D, id: InternalDocumentStore): SyncOrAsyncValue<boolean>
+  store(store: D, id: DocumentID, doc: Document): SyncOrAsyncValue<boolean>
+  remove(store: D, id: DocumentID): SyncOrAsyncValue<boolean>
   count(store: D): SyncOrAsyncValue<number>
 
   load<R = unknown>(raw: R): SyncOrAsyncValue<D>
@@ -601,7 +601,7 @@ type Internals<P extends ProvidedTypes> = {
   documentsStore: IDocumentsStore<P['DocumentStore']>
   sorter: ISorter<P['Sorter']>
   data: Data<P['Index'], P['DocumentStore'], P['Sorter']>
-  internalDocumentStore: InternalDocumentIDStore
+  internalDocumentIDStore: InternalDocumentIDStore
   caches: Record<string, unknown>
   [kInsertions]: number | undefined
   [kRemovals]: number | undefined

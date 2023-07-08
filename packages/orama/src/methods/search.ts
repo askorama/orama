@@ -3,7 +3,7 @@ import { getFacets } from '../components/facets.js'
 import { intersectFilteredIDs } from '../components/filters.js'
 import { getGroups } from '../components/groups.js'
 import { runAfterSearch } from '../components/hooks.js'
-import { InternalDocumentID } from "../components/internal-document-store.js";
+import { getDocumentIdFromInternalId, InternalDocumentID } from "../components/internal-document-id-store.js";
 import { createError } from '../errors.js'
 import {
   BM25Params,
@@ -247,7 +247,12 @@ export async function search<AggValue = Result[]>(
   }
 
   if (typeof results !== 'undefined') {
-    searchResult.hits = results.filter(Boolean)
+    for (const result of results) {
+      if (!result) continue;
+
+      result.id = getDocumentIdFromInternalId(orama.internalDocumentIDStore, +result.id);
+      searchResult.hits.push(result);
+    }
   }
 
   if (shouldCalculateFacets) {
@@ -318,7 +323,7 @@ async function fetchDocumentsWithDistinct(
       continue
     }
 
-    results.push({ id, score, document: doc! })
+    results.push({ id: id.toString(), score, document: doc! })
     resultIDs.add(id)
 
     // reached the limit, break the loop
@@ -361,7 +366,7 @@ async function fetchDocuments(
       // We retrieve the full document only AFTER making sure that we really want it.
       // We never retrieve the full document preventively.
       const fullDoc = await orama.documentsStore.get(docs, id)
-      results[i] = { id, score, document: fullDoc! }
+      results[i] = { id: id.toString(), score, document: fullDoc! }
       resultIDs.add(id)
     }
   }

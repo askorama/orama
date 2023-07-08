@@ -1,4 +1,4 @@
-import { InternalDocumentStore, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from "./internal-document-store.js";
+import { DocumentID, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from "./internal-document-id-store.js";
 import { createError } from "../errors.js";
 import { create as avlCreate, find as avlFind, greaterThan as avlGreaterThan, insert as avlInsert, lessThan as avlLessThan, Node as AVLNode, rangeSearch as avlRangeSearch, removeDocument as avlRemoveDocument } from "../trees/avl.js";
 import { create as radixCreate, find as radixFind, insert as radixInsert, Node as RadixNode, removeDocumentByWord as radixRemoveDocument } from "../trees/radix.js";
@@ -100,7 +100,7 @@ export async function calculateResultScores<I extends OpaqueIndex, D extends Opa
   index: Index,
   prop: string,
   term: string,
-  ids: InternalDocumentStore[],
+  ids: DocumentID[],
 ): Promise<TokenScore[]> {
   const documentIDs = Array.from(ids)
 
@@ -143,7 +143,7 @@ export async function create(
 ): Promise<Index> {
   if (!index) {
     index = {
-      sharedInternalDocumentStore: orama.internalDocumentStore,
+      sharedInternalDocumentStore: orama.internalDocumentIDStore,
       indexes: {},
       searchableProperties: [],
       searchablePropertiesWithTypes: {},

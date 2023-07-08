@@ -1,4 +1,5 @@
 import t from 'tap'
+import { getInternalDocumentId } from '../src/components/internal-document-id-store.js';
 import type { Document } from '../src/types.js'
 import { Node as RadixNode } from '../src/trees/radix.js'
 import { create, insert, load, Result, save, search } from '../src/index.js'
@@ -63,8 +64,8 @@ t.test('Edge getters', t => {
 
     const { docs } = await save(db)
 
-    t.strictSame((docs as DocumentsStore).docs[Symbol.for(doc1)], { name: 'John', age: 30 })
-    t.strictSame((docs as DocumentsStore).docs[Symbol.for(doc2)], { name: 'Jane', age: 25 })
+    t.strictSame((docs as DocumentsStore).docs[getInternalDocumentId(db.internalDocumentIDStore, doc1)], { name: 'John', age: 30 })
+    t.strictSame((docs as DocumentsStore).docs[getInternalDocumentId(db.internalDocumentIDStore, doc2)], { name: 'Jane', age: 25 })
   })
 
   t.test('should correctly enable index setter', async t => {
