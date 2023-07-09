@@ -85,7 +85,7 @@ async function create(_: Orama, schema: Schema, config?: SorterConfig): Promise<
 function stringSort(value: SortValue, language: string | undefined, d: [string, SortValue]): boolean {
   return (d[1] as string).localeCompare(value as string, language) > 0
 }
-function numerSort(value: SortValue, d: [string, SortValue]): boolean {
+function numberSort(value: SortValue, d: [string, SortValue]): boolean {
   return (d[1] as number) > (value as number)
 }
 function booleanSort(value: SortValue, d: [string, SortValue]): boolean {
@@ -111,7 +111,7 @@ async function insert(
       predicate = stringSort.bind(null, value, language)
       break
     case 'number':
-      predicate = numerSort.bind(null, value)
+      predicate = numberSort.bind(null, value)
       break
     case 'boolean':
       predicate = booleanSort.bind(null, value)
@@ -128,7 +128,7 @@ async function insert(
   }
   s.docs[id] = index
 
-  // Increment position for the greather documents
+  // Increment position for the greater documents
   const orderedDocsLength = s.orderedDocs.length
   for (let i = index + 1; i < orderedDocsLength; i++) {
     const docId = s.orderedDocs[i][0]
@@ -145,7 +145,7 @@ async function remove(sorter: Sorter, prop: string, id: string) {
   const index = s.docs[id]
   delete s.docs[id]
 
-  // Decrement position for the greather documents
+  // Decrement position for the greater documents
   const orderedDocsLength = s.orderedDocs.length
   for (let i = index + 1; i < orderedDocsLength; i++) {
     const docId = s.orderedDocs[i][0]

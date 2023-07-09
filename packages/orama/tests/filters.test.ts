@@ -58,30 +58,30 @@ t.test('filters', t => {
     await t.rejects(search(db, {
       term: 'coffee',
       where: {
-        unknonwField: '5'
+        unknownField: '5'
       },
     }), {
-      message: 'Unknown filter property "unknonwField"',
+      message: 'Unknown filter property "unknownField"',
       code: 'UNKNOWN_FILTER_PROPERTY',
     })
 
     await t.rejects(search(db, {
       term: 'coffee',
       where: {
-        unknonwField: { gt: '5' } as unknown as string
+        unknownField: { gt: '5' } as unknown as string
       },
     }), {
-      message: 'Unknown filter property "unknonwField"',
+      message: 'Unknown filter property "unknownField"',
       code: 'UNKNOWN_FILTER_PROPERTY',
     })
 
     await t.rejects(search(db, {
       term: 'coffee',
       where: {
-        unknonwField: true as unknown as string
+        unknownField: true as unknown as string
       },
     }), {
-      message: 'Unknown filter property "unknonwField"',
+      message: 'Unknown filter property "unknownField"',
       code: 'UNKNOWN_FILTER_PROPERTY',
     })
 

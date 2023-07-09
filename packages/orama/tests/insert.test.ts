@@ -442,7 +442,7 @@ t.test('insertMultiple method', t => {
     t.end()
   })
 
-  t.test('should suport batch insert of documents', async t => {
+  t.test('should support batch insert of documents', async t => {
     t.plan(2)
 
     const db = await create({
