@@ -1,3 +1,4 @@
+import { Sorter } from './components/sorter.js'
 import { Language } from './components/tokenizer/languages.js'
 
 export type Nullable<T> = T | null
@@ -513,6 +514,9 @@ export interface ISorter<So extends OpaqueSorter = OpaqueSorter> {
 
   getSortableProperties(sorter: So): SyncOrAsyncValue<string[]>
   getSortablePropertiesWithTypes(sorter: So): SyncOrAsyncValue<Record<string, SortType>>
+
+  ensureIsSorted(sorter: So): void;
+  ensurePropertyIsSorted(sorter: So, prop: string): void;
 }
 
 export type Stemmer = (word: string) => string

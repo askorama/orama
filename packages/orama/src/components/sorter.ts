@@ -4,7 +4,9 @@ import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortT
 interface PropertySort<K> {
   docs: Record<string, number>
   orderedDocs: [string, K][]
-  type: SortType
+  type: SortType;
+  language?: string;
+  sorted: boolean;
 }
 
 export interface Sorter extends OpaqueSorter {
@@ -57,6 +59,7 @@ function innerCreate(schema: Schema, sortableDeniedProperties: string[], prefix:
           docs: {},
           orderedDocs: [],
           type: type,
+          sorted: true,
         }
         break
       case 'boolean[]':
@@ -82,16 +85,6 @@ async function create(_: Orama, schema: Schema, config?: SorterConfig): Promise<
   return innerCreate(schema, (config || {}).unsortableProperties || [], '')
 }
 
-function stringSort(value: SortValue, language: string | undefined, d: [string, SortValue]): boolean {
-  return (d[1] as string).localeCompare(value as string, language) > 0
-}
-function numberSort(value: SortValue, d: [string, SortValue]): boolean {
-  return (d[1] as number) > (value as number)
-}
-function booleanSort(value: SortValue, d: [string, SortValue]): boolean {
-  return d[1] as boolean
-}
-
 async function insert(
   sorter: Sorter,
   prop: string,
@@ -105,35 +98,62 @@ async function insert(
   }
   const s = sorter.sorts[prop]
 
-  let predicate: (value: [string, SortValue]) => boolean
-  switch (schemaType) {
+  s.language = language;
+  s.sorted = false;
+  s.docs[id] = s.orderedDocs.length;
+  s.orderedDocs.push([id, value]);
+}
+
+function ensureIsSorted(sorter: Sorter): void {
+  const props = Object.keys(sorter.sorts);
+
+  for (const prop of props) {
+    ensurePropertyIsSorted(sorter, prop);
+  }
+}
+
+function stringSort(language: string | undefined, value: [string, SortValue], d: [string, SortValue]): number {
+  return (value[1] as string).localeCompare(d[1] as string, language)
+}
+
+function numberSort(value: [string, SortValue], d: [string, SortValue]): number {
+  return (value[1] as number) - (d[1] as number)
+}
+
+function booleanSort(value: [string, SortValue], d: [string, SortValue]): number {
+  return d[1] as boolean ? -1 : 1
+}
+
+function ensurePropertyIsSorted(sorter: Sorter, prop: string): void {
+  const s = sorter.sorts[prop];
+
+  if (s.sorted) {
+    return;
+  }
+
+  let predicate: (value: [string, SortValue], d: [string, SortValue]) => number
+  switch (s.type) {
     case 'string':
-      predicate = stringSort.bind(null, value, language)
+      predicate = stringSort.bind(null, s.language)
       break
     case 'number':
-      predicate = numberSort.bind(null, value)
+      predicate = numberSort.bind(null)
       break
     case 'boolean':
-      predicate = booleanSort.bind(null, value)
+      predicate = booleanSort.bind(null)
       break
   }
 
-  // Find the right position to insert the element
-  let index = s.orderedDocs.findIndex(predicate)
-  if (index === -1) {
-    index = s.orderedDocs.length
-    s.orderedDocs.push([id, value])
-  } else {
-    s.orderedDocs.splice(index, 0, [id, value])
-  }
-  s.docs[id] = index
+  s.orderedDocs.sort(predicate);
 
-  // Increment position for the greater documents
-  const orderedDocsLength = s.orderedDocs.length
-  for (let i = index + 1; i < orderedDocsLength; i++) {
+  // Increment position for the greather documents
+  const orderedDocsLength = s.orderedDocs.length;
+  for (let i = 0; i < orderedDocsLength; i++) {
     const docId = s.orderedDocs[i][0]
-    s.docs[docId]++
+    s.docs[docId] = i;
   }
+
+  s.sorted = true;
 }
 
 async function remove(sorter: Sorter, prop: string, id: string) {
@@ -167,6 +187,8 @@ async function sortBy(sorter: Sorter, docIds: [string, number][], by: SorterPara
   if (!s) {
     throw createError('UNABLE_TO_SORT_ON_UNKNOWN_FIELD', property, sorter.sortableProperties.join(', '))
   }
+
+  ensurePropertyIsSorted(sorter, property);
 
   docIds.sort((a, b) => {
     // This sort algorithm works leveraging on
@@ -251,5 +273,7 @@ export async function createSorter(): Promise<DefaultSorter> {
     sortBy,
     getSortableProperties,
     getSortablePropertiesWithTypes,
+    ensureIsSorted,
+    ensurePropertyIsSorted,
   }
 }

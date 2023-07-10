@@ -17,6 +17,8 @@ t.test('search with sortBy', t => {
       {},
     ])
 
+    db.sorter.ensureIsSorted(db.data.sorting);
+
     t.test('should sort correctly - asc', async t => {
       const result = await search(db, {
         sortBy: {
