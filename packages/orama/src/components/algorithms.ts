@@ -39,7 +39,7 @@ export function prioritizeTokenScores(arrays: TokenScore[][], boost: number, thr
     return results.slice(0, shortestArrayLength)
   }
 
-  // If the theshold is between 0 and 1, we will return all the results that contains at least the threshold of search terms
+  // If the threshold is between 0 and 1, we will return all the results that contains at least the threshold of search terms
   // For example, if threshold is 0.5, we will return all the results that contains at least 50% of the search terms
   // (fuzzy match with a minimum threshold)
   const thresholdLength = Math.ceil((threshold * 100 * results.length) / 100)

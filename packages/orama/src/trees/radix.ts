@@ -213,7 +213,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams): FindRe
       // find the common prefix between two words ex: prime and primate = prim
       const commonPrefix = getCommonPrefix(edgeLabel, termSubstring)
       const commonPrefixLength = commonPrefix.length
-      // if the common prefix lenght is equal to edgeLabel lenght (the node subword) it means they are a match
+      // if the common prefix length is equal to edgeLabel length (the node subword) it means they are a match
       // if the common prefix is equal to the term means it is contained in the node
       if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
         // if tolerance is set we take the current node as the closest
@@ -221,7 +221,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams): FindRe
         return {}
       }
 
-      // skip the subword lenght and check the next divergent character
+      // skip the subword length and check the next divergent character
       i += rootChildCurrentChar.subWord.length - 1
       // navigate into the child node
       root = rootChildCurrentChar
