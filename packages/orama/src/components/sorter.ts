@@ -1,5 +1,5 @@
-import { createError } from '../errors.js'
-import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from '../types.js'
+import { createError } from '../errors.js';
+import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from '../types.js';
 
 interface PropertySort<K> {
   docs: Map<string, number>
@@ -11,8 +11,8 @@ interface PropertySort<K> {
 type SerializablePropertySort<K> = Omit<PropertySort<K>, 'orderedDocsToRemove' | 'docs'> & { docs: Record<string, number> } ;
 
 export interface Sorter extends OpaqueSorter {
-  language?: string
   isSorted: boolean
+  language: string;
   enabled: boolean
   sortableProperties: string[]
   sortablePropertiesWithTypes: Record<string, SortType>
@@ -21,11 +21,11 @@ export interface Sorter extends OpaqueSorter {
 
 export type DefaultSorter = ISorter<Sorter>
 
-function innerCreate(schema: Schema, sortableDeniedProperties: string[], prefix: string): Sorter {
+function innerCreate(orama: Orama, schema: Schema, sortableDeniedProperties: string[], prefix: string): Sorter {
   const sorter: Sorter = {
+    language: orama.tokenizer.language,
     enabled: true,
     isSorted: true,
-    language: undefined,
     sortableProperties: [],
     sortablePropertiesWithTypes: {},
     sorts: {},
@@ -41,7 +41,7 @@ function innerCreate(schema: Schema, sortableDeniedProperties: string[], prefix:
 
     if (typeActualType === 'object' && !Array.isArray(type)) {
       // Nested
-      const ret = innerCreate(type as Schema, sortableDeniedProperties, path)
+      const ret = innerCreate(orama, type as Schema, sortableDeniedProperties, path)
       sorter.sortableProperties.push(...ret.sortableProperties)
       sorter.sorts = {
         ...sorter.sorts,
@@ -80,14 +80,14 @@ function innerCreate(schema: Schema, sortableDeniedProperties: string[], prefix:
   return sorter
 }
 
-async function create(_: Orama, schema: Schema, config?: SorterConfig): Promise<Sorter> {
+async function create(orama: Orama, schema: Schema, config?: SorterConfig): Promise<Sorter> {
   const isSortEnabled = config?.enabled !== false
   if (!isSortEnabled) {
     return {
       disabled: true,
     } as unknown as Sorter
   }
-  return innerCreate(schema, (config || {}).unsortableProperties || [], '')
+  return innerCreate(orama, schema, (config || {}).unsortableProperties || [], '')
 }
 
 async function insert(
@@ -102,7 +102,6 @@ async function insert(
     return
   }
 
-  sorter.language = language
   sorter.isSorted = false
 
   const s = sorter.sorts[prop]
@@ -278,12 +277,12 @@ export async function load<R = unknown>(raw: R): Promise<Sorter> {
   }, {} as Record<string, PropertySort<string | number | boolean>>);
 
   return {
+    language: rawDocument.language,
     sortableProperties: rawDocument.sortableProperties,
     sortablePropertiesWithTypes: rawDocument.sortablePropertiesWithTypes,
     sorts,
     enabled: true,
     isSorted: rawDocument.isSorted,
-    language: rawDocument.language,
   }
 }
 
@@ -310,12 +309,12 @@ export async function save<R = unknown>(sorter: Sorter): Promise<R> {
   }, {} as Record<string, SerializablePropertySort<string | number | boolean>>);
 
   return {
+    language: sorter.language,
     sortableProperties: sorter.sortableProperties,
     sortablePropertiesWithTypes: sorter.sortablePropertiesWithTypes,
     sorts,
     enabled: sorter.enabled,
     isSorted: sorter.isSorted,
-    language: sorter.language,
   } as R
 }
 
