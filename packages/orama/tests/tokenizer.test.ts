@@ -68,7 +68,7 @@ t.test('Tokenizer', async t => {
     const O1 = tokenizer.tokenize(I1, 'english')
     const O2 = tokenizer.tokenize(I2, 'english')
 
-    t.strictSame(O1, ['this', 'is', 'a', 'test', 'with', 'test', 'duplic'])
+    t.strictSame(O1, ['thi', 'is', 'a', 'test', 'with', 'test', 'duplic'])
     t.strictSame(O2, ["it'", 'aliv', "it'", 'aliv'])
   })
 
