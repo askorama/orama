@@ -1,15 +1,15 @@
-import { DocumentID, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from "./internal-document-id-store.js";
-import { createError } from "../errors.js";
-import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from "../types.js";
+import { createError } from '../errors.js'
+import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from '../types.js'
+import { DocumentID, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from './internal-document-id-store.js'
 
 interface PropertySort<K> {
-  docs: Record<InternalDocumentID, number>;
+  docs: Record<InternalDocumentID, number>
   orderedDocs: [InternalDocumentID, K][]
   type: SortType
 }
 
 export interface Sorter extends OpaqueSorter {
-  sharedInternalDocumentStore: InternalDocumentIDStore;
+  sharedInternalDocumentStore: InternalDocumentIDStore
   enabled: boolean
   sortableProperties: string[]
   sortablePropertiesWithTypes: Record<string, SortType>
@@ -86,8 +86,8 @@ async function create(orama: Orama, schema: Schema, config?: SorterConfig): Prom
 }
 
 function stringSort(value: SortValue, language: string | undefined, d: [InternalDocumentID, SortValue]): boolean {
-  const d1Value = d[1] as string | symbol;
-  const dId = typeof d1Value === 'symbol' ? d1Value.description! : d1Value;
+  const d1Value = d[1] as string | symbol
+  const dId = typeof d1Value === 'symbol' ? d1Value.description! : d1Value
 
   return dId.localeCompare(value as string, language) > 0
 }
@@ -101,7 +101,7 @@ function booleanSort(value: SortValue, d: [InternalDocumentID, SortValue]): bool
 async function insert(
   sorter: Sorter,
   prop: string,
-  id: string,
+  id: DocumentID,
   value: SortValue,
   schemaType: SortType,
   language: string | undefined,
@@ -124,7 +124,7 @@ async function insert(
       break
   }
 
-  const internalId = getInternalDocumentId(sorter.sharedInternalDocumentStore, id);
+  const internalId = getInternalDocumentId(sorter.sharedInternalDocumentStore, id)
   // Find the right position to insert the element
   let index = s.orderedDocs.findIndex(predicate)
   if (index === -1) {
@@ -147,8 +147,8 @@ async function remove(sorter: Sorter, prop: string, id: DocumentID) {
   if (!sorter.enabled) {
     return
   }
-  const s = sorter.sorts[prop] as PropertySort<SortValue>;
-  const internalId = getInternalDocumentId(sorter.sharedInternalDocumentStore, id);
+  const s = sorter.sorts[prop] as PropertySort<SortValue>
+  const internalId = getInternalDocumentId(sorter.sharedInternalDocumentStore, id)
 
   const index = s.docs[internalId]
   delete s.docs[internalId]
@@ -163,7 +163,7 @@ async function remove(sorter: Sorter, prop: string, id: DocumentID) {
   s.orderedDocs.splice(index, 1)
 }
 
-async function sortBy(sorter: Sorter, docIds: [InternalDocumentID, number][], by: SorterParams): Promise<[InternalDocumentID, number][]> {
+async function sortBy(sorter: Sorter, docIds: [DocumentID, number][], by: SorterParams): Promise<[DocumentID, number][]> {
   if (!sorter.enabled) {
     throw createError('SORT_DISABLED')
   }
@@ -180,8 +180,8 @@ async function sortBy(sorter: Sorter, docIds: [InternalDocumentID, number][], by
     // This sort algorithm works leveraging on
     // that s.docs is a map of docId -> position
     // If a document is not indexed, it will be not present in the map
-    const indexOfA = s.docs[a[0]]
-    const indexOfB = s.docs[b[0]]
+    const indexOfA = s.docs[getInternalDocumentId(sorter.sharedInternalDocumentStore, a[0])]
+    const indexOfB = s.docs[getInternalDocumentId(sorter.sharedInternalDocumentStore, b[0])]
     const isAIndexed = typeof indexOfA !== 'undefined'
     const isBIndexed = typeof indexOfB !== 'undefined'
 

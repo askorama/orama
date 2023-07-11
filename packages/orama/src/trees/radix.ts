@@ -1,6 +1,6 @@
-import { syncBoundedLevenshtein } from "../components/levenshtein.js";
-import { InternalDocumentID } from "../components/internal-document-id-store.js";
-import { getOwnProperty } from "../utils.js";
+import { syncBoundedLevenshtein } from '../components/levenshtein.js'
+import { InternalDocumentID } from '../components/internal-document-id-store.js'
+import { getOwnProperty } from '../utils.js'
 
 export interface Node {
   key: string

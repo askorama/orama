@@ -1,8 +1,8 @@
-import { isArrayType } from "../components.js";
-import { runMultipleHook, runSingleHook } from "../components/hooks.js";
-import { trackInsertion } from "../components/sync-blocking-checker.js";
-import { createError } from "../errors.js";
-import { Document, Orama, SortValue } from "../types.js";
+import { isArrayType } from '../components.js'
+import { runMultipleHook, runSingleHook } from '../components/hooks.js'
+import { trackInsertion } from '../components/sync-blocking-checker.js'
+import { createError } from '../errors.js'
+import { Document, Orama, SortValue } from '../types.js'
 
 export async function insert(orama: Orama, doc: Document, language?: string, skipHooks?: boolean): Promise<string> {
   const errorProperty = await orama.validateSchema(doc, orama.schema)

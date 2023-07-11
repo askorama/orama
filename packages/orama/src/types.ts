@@ -1,5 +1,5 @@
-import { Language } from "./components/tokenizer/languages.js";
-import { DocumentID, InternalDocumentID, InternalDocumentIDStore } from "./components/internal-document-id-store.js";
+import { Language } from './components/tokenizer/languages.js'
+import { DocumentID, InternalDocumentID, InternalDocumentIDStore } from './components/internal-document-id-store.js'
 
 export type Nullable<T> = T | null
 
@@ -411,7 +411,7 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
     implementation: IIndex<I>,
     index: I,
     prop: string,
-    id: string,
+    id: DocumentID,
     value: SearchableValue,
     schemaType: SearchableType,
     language: string | undefined,
@@ -425,7 +425,7 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
     implementation: IIndex<I>,
     index: I,
     prop: string,
-    id: string,
+    id: DocumentID,
     value: SearchableValue,
     schemaType: SearchableType,
     language: string | undefined,
@@ -437,12 +437,12 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   insertDocumentScoreParameters(
     index: I,
     prop: string,
-    id: string,
+    id: DocumentID,
     tokens: string[],
     docsCount: number,
   ): SyncOrAsyncValue
-  insertTokenScoreParameters(index: I, prop: string, id: string, tokens: string[], token: string): SyncOrAsyncValue
-  removeDocumentScoreParameters(index: I, prop: string, id: string, docsCount: number): SyncOrAsyncValue
+  insertTokenScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], token: string): SyncOrAsyncValue
+  removeDocumentScoreParameters(index: I, prop: string, id: DocumentID, docsCount: number): SyncOrAsyncValue
   removeTokenScoreParameters(index: I, prop: string, token: string): SyncOrAsyncValue
   calculateResultScores<D extends OpaqueDocumentStore, AggValue = Result[]>(
     context: SearchContext<I, D, AggValue>,
@@ -477,7 +477,7 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
   ): SyncOrAsyncValue<D>
   get(store: D, id: DocumentID): SyncOrAsyncValue<Document | undefined>
   getMultiple(store: D, ids: DocumentID[]): SyncOrAsyncValue<(Document | undefined)[]>
-  getAll(store: D): SyncOrAsyncValue<Record<string, Document>>
+  getAll(store: D): SyncOrAsyncValue<Record<InternalDocumentID, Document>>
   store(store: D, id: DocumentID, doc: Document): SyncOrAsyncValue<boolean>
   remove(store: D, id: DocumentID): SyncOrAsyncValue<boolean>
   count(store: D): SyncOrAsyncValue<number>
@@ -500,17 +500,17 @@ export interface ISorter<So extends OpaqueSorter = OpaqueSorter> {
   insert: (
     sorter: So,
     prop: string,
-    id: string,
+    id: DocumentID,
     value: SortValue,
     schemaType: SortType,
     language: string | undefined,
   ) => SyncOrAsyncValue
-  remove: (sorter: So, prop: string, id: string) => SyncOrAsyncValue
+  remove: (sorter: So, prop: string, id: DocumentID) => SyncOrAsyncValue
 
   load<R = unknown>(raw: R): SyncOrAsyncValue<So>
   save<R = unknown>(sorter: So): SyncOrAsyncValue<R>
 
-  sortBy(sorter: So, docIds: [InternalDocumentID, number][], by: SorterParams): Promise<[InternalDocumentID, number][]>
+  sortBy(sorter: So, docIds: [DocumentID, number][], by: SorterParams): Promise<[DocumentID, number][]>
 
   getSortableProperties(sorter: So): SyncOrAsyncValue<string[]>
   getSortablePropertiesWithTypes(sorter: So): SyncOrAsyncValue<Record<string, SortType>>

@@ -1,5 +1,5 @@
-import { DocumentID, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from "./internal-document-id-store.js";
-import { Document, IDocumentsStore, OpaqueDocumentStore } from "../types.js";
+import { DocumentID, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from './internal-document-id-store.js';
+import { Document, IDocumentsStore, OpaqueDocumentStore } from '../types.js';
 
 export interface DocumentsStore extends OpaqueDocumentStore {
   sharedInternalDocumentStore: InternalDocumentIDStore;
@@ -17,7 +17,7 @@ export async function create(sharedInternalDocumentStore: InternalDocumentIDStor
   }
 }
 
-export async function get(store: DocumentsStore, id: string): Promise<Document | undefined> {
+export async function get(store: DocumentsStore, id: DocumentID): Promise<Document | undefined> {
   const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id);
 
   return store.docs[internalId]
@@ -34,8 +34,8 @@ export async function getMultiple(store: DocumentsStore, ids: DocumentID[]): Pro
   return found
 }
 
-export async function getAll(store: DocumentsStore): Promise<Record<string, Document>> {
-  return store.docs as unknown as Record<string, Document>
+export async function getAll(store: DocumentsStore): Promise<Record<InternalDocumentID, Document>> {
+  return store.docs as Record<InternalDocumentID, Document>;
 }
 
 export async function store(store: DocumentsStore, id: DocumentID, doc: Document): Promise<boolean> {

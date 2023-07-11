@@ -3,7 +3,7 @@ import { getFacets } from '../components/facets.js'
 import { intersectFilteredIDs } from '../components/filters.js'
 import { getGroups } from '../components/groups.js'
 import { runAfterSearch } from '../components/hooks.js'
-import { getDocumentIdFromInternalId, InternalDocumentID } from "../components/internal-document-id-store.js";
+import { getDocumentIdFromInternalId, getInternalDocumentId, InternalDocumentID } from '../components/internal-document-id-store.js';
 import { createError } from '../errors.js'
 import {
   BM25Params,
@@ -22,7 +22,7 @@ import {
   OpaqueIndex,
   OpaqueDocumentStore,
   SearchableValue, TokenScore
-} from "../types.js";
+} from '../types.js'
 import { getNanosecondsTime, getNested, sortTokenScorePredicate } from '../utils.js'
 
 const defaultBM25Params: BM25Params = {
@@ -153,7 +153,7 @@ export async function search<AggValue = Result[]>(
 
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
   const hasFilters = Object.keys(params.where ?? {}).length > 0
-  let whereFiltersIDs: number[] = []
+  let whereFiltersIDs: InternalDocumentID[] = []
 
   if (hasFilters) {
     whereFiltersIDs = await orama.index.searchByWhereClause(context, index, params.where!)
@@ -204,7 +204,7 @@ export async function search<AggValue = Result[]>(
 
   // Get unique doc IDs from uniqueDocsIDs map
   let uniqueDocsArray = Object.entries(context.uniqueDocsIDs)
-    .map(([id, score]) => [Number(id), score] as TokenScore);
+    .map(([id, score]) => [+id, score] as TokenScore)
 
   // If filters are enabled, we need to remove the IDs of the documents that don't match the filters.
   if (hasFilters) {
@@ -213,7 +213,7 @@ export async function search<AggValue = Result[]>(
 
   if (params.sortBy) {
     if (typeof params.sortBy === 'function') {
-      const ids = uniqueDocsArray.map(([id]) => id) as unknown as string[]
+      const ids = uniqueDocsArray.map(([id]) => id)
       const docs = await orama.documentsStore.getMultiple(orama.data.docs, ids)
       const docsWithIdAndScore: CustomSorterFunctionItem[] = docs.map((d, i) => [
         uniqueDocsArray[i][0],
@@ -224,6 +224,7 @@ export async function search<AggValue = Result[]>(
       uniqueDocsArray = docsWithIdAndScore.map(([id, score]) => [id, score])
     } else {
       uniqueDocsArray = await orama.sorter.sortBy(orama.data.sorting, uniqueDocsArray, params.sortBy)
+        .then(results => results.map(([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score]))
     }
   } else {
     uniqueDocsArray = uniqueDocsArray.sort(sortTokenScorePredicate)
@@ -248,10 +249,10 @@ export async function search<AggValue = Result[]>(
 
   if (typeof results !== 'undefined') {
     for (const result of results) {
-      if (!result) continue;
+      if (!result) continue
 
-      result.id = getDocumentIdFromInternalId(orama.internalDocumentIDStore, +result.id);
-      searchResult.hits.push(result);
+      result.id = getDocumentIdFromInternalId(orama.internalDocumentIDStore, +result.id)
+      searchResult.hits.push(result)
     }
   }
 

@@ -1,4 +1,6 @@
-export function intersectFilteredIDs(filtered: number[], lookedUp: [number, number][]): [number, number][] {
+import { InternalDocumentID } from './internal-document-id-store.js';
+
+export function intersectFilteredIDs(filtered: InternalDocumentID[], lookedUp: [InternalDocumentID, number][]): [InternalDocumentID, number][] {
   const map = new Map<number, boolean>()
   const result: [number, number][] = []
 
@@ -8,7 +10,7 @@ export function intersectFilteredIDs(filtered: number[], lookedUp: [number, numb
 
   for (const [id, score] of lookedUp) {
     if (map.has(id)) {
-      result.push([+id, score])
+      result.push([id, score])
       map.delete(id)
     }
   }
