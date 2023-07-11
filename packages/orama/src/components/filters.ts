@@ -1,6 +1,6 @@
-export function intersectFilteredIDs(filtered: string[], lookedUp: [string, number][]): [string, number][] {
-  const map = new Map<string, boolean>()
-  const result: [string, number][] = []
+export function intersectFilteredIDs(filtered: number[], lookedUp: [number, number][]): [number, number][] {
+  const map = new Map<number, boolean>()
+  const result: [number, number][] = []
 
   for (const id of filtered) {
     map.set(id, true)
@@ -8,7 +8,7 @@ export function intersectFilteredIDs(filtered: string[], lookedUp: [string, numb
 
   for (const [id, score] of lookedUp) {
     if (map.has(id)) {
-      result.push([id, score])
+      result.push([+id, score])
       map.delete(id)
     }
   }

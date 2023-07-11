@@ -19,7 +19,7 @@ type EventJson = {
 
 function removeVariadicData(res: Results): Omit<Results, 'elapsed'> {
   const hits = res.hits.map(h => {
-    h.id = ''
+    h.id = 1
     return h
   })
 

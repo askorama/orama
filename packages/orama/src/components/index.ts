@@ -1,64 +1,35 @@
-import { createError } from '../errors.js'
-import {
-  create as avlCreate,
-  find as avlFind,
-  greaterThan as avlGreaterThan,
-  insert as avlInsert,
-  lessThan as avlLessThan,
-  Node as AVLNode,
-  rangeSearch as avlRangeSearch,
-  removeDocument as avlRemoveDocument,
-} from '../trees/avl.js'
-import {
-  create as radixCreate,
-  find as radixFind,
-  insert as radixInsert,
-  Node as RadixNode,
-  removeDocumentByWord as radixRemoveDocument,
-} from '../trees/radix.js'
-import {
-  ArraySearchableType,
-  BM25Params,
-  ComparisonOperator,
-  IIndex,
-  OpaqueDocumentStore,
-  OpaqueIndex,
-  Orama,
-  ScalarSearchableType,
-  Schema,
-  SearchableType,
-  SearchableValue,
-  SearchContext,
-  Tokenizer,
-  TokenScore,
-} from '../types.js'
-import { intersect } from '../utils.js'
-import { BM25 } from './algorithms.js'
-import { getInnerType, isArrayType } from './defaults.js'
+import { createRecordWithToJson, DocumentID, getInternalDocumentId, InternalDocumentID } from "../document-id.js";
+import { createError } from "../errors.js";
+import { create as avlCreate, find as avlFind, greaterThan as avlGreaterThan, insert as avlInsert, lessThan as avlLessThan, Node as AVLNode, rangeSearch as avlRangeSearch, removeDocument as avlRemoveDocument } from "../trees/avl.js";
+import { create as radixCreate, find as radixFind, insert as radixInsert, Node as RadixNode, removeDocumentByWord as radixRemoveDocument } from "../trees/radix.js";
+import { ArraySearchableType, BM25Params, ComparisonOperator, IIndex, OpaqueDocumentStore, OpaqueIndex, Orama, ScalarSearchableType, Schema, SearchableType, SearchableValue, SearchContext, Tokenizer, TokenScore } from "../types.js";
+import { intersect } from "../utils.js";
+import { BM25 } from "./algorithms.js";
+import { getInnerType, isArrayType } from "./defaults.js";
 
 export type FrequencyMap = {
   [property: string]: {
-    [documentID: string]:
+    [documentID: InternalDocumentID]:
       | {
           [token: string]: number
         }
       | undefined
   }
-}
+};
 
 export type BooleanIndex = {
-  true: string[]
-  false: string[]
+  true: InternalDocumentID[]
+  false: InternalDocumentID[]
 }
 
 export interface Index extends OpaqueIndex {
-  indexes: Record<string, RadixNode | AVLNode<number, string[]> | BooleanIndex>
+  indexes: Record<string, RadixNode | AVLNode<number, InternalDocumentID[]> | BooleanIndex>
   searchableProperties: string[]
   searchablePropertiesWithTypes: Record<string, SearchableType>
   frequencies: FrequencyMap
   tokenOccurrences: Record<string, Record<string, number>>
   avgFieldLength: Record<string, number>
-  fieldLengths: Record<string, Record<string, number | undefined>>
+  fieldLengths: Record<string, Record<InternalDocumentID, number | undefined>>
 }
 
 export type DefaultIndex = IIndex<Index>
@@ -70,9 +41,11 @@ export async function insertDocumentScoreParameters(
   tokens: string[],
   docsCount: number,
 ): Promise<void> {
+  const internalId = getInternalDocumentId(id);
+
   index.avgFieldLength[prop] = ((index.avgFieldLength[prop] ?? 0) * (docsCount - 1) + tokens.length) / docsCount
-  index.fieldLengths[prop][id] = tokens.length
-  index.frequencies[prop][id] = {}
+  index.fieldLengths[prop][internalId] = tokens.length
+  index.frequencies[prop][internalId] = {}
 }
 
 export async function insertTokenScoreParameters(
@@ -90,9 +63,10 @@ export async function insertTokenScoreParameters(
     }
   }
 
+  const internalId = getInternalDocumentId(id);
   const tf = tokenFrequency / tokens.length
 
-  index.frequencies[prop][id]![token] = tf
+  index.frequencies[prop][internalId]![token] = tf
 
   if (!(token in index.tokenOccurrences[prop])) {
     index.tokenOccurrences[prop][token] = 0
@@ -108,10 +82,12 @@ export async function removeDocumentScoreParameters(
   id: string,
   docsCount: number,
 ): Promise<void> {
+  const internalId = getInternalDocumentId(id);
+
   index.avgFieldLength[prop] =
-    (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][id]!) / (docsCount - 1)
-  index.fieldLengths[prop][id] = undefined
-  index.frequencies[prop][id] = undefined
+    (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][internalId]!) / (docsCount - 1)
+  index.fieldLengths[prop][internalId] = undefined
+  index.frequencies[prop][internalId] = undefined
 }
 
 export async function removeTokenScoreParameters(index: Index, prop: string, token: string): Promise<void> {
@@ -123,7 +99,7 @@ export async function calculateResultScores<I extends OpaqueIndex, D extends Opa
   index: Index,
   prop: string,
   term: string,
-  ids: string[],
+  ids: DocumentID[],
 ): Promise<TokenScore[]> {
   const documentIDs = Array.from(ids)
 
@@ -141,19 +117,19 @@ export async function calculateResultScores<I extends OpaqueIndex, D extends Opa
   // Calculate TF-IDF value for each term, in each document, for each index.
   const documentIDsLength = documentIDs.length
   for (let k = 0; k < documentIDsLength; k++) {
-    const id = documentIDs[k]
-    const tf = oramaFrequencies?.[id]?.[term] ?? 0
+    const internalId = getInternalDocumentId(documentIDs[k]);
+    const tf = oramaFrequencies?.[internalId]?.[term] ?? 0
 
     const bm25 = BM25(
       tf,
       termOccurrences,
       context.docsCount,
-      fieldLengths[id]!,
+      fieldLengths[internalId]!,
       avgFieldLength,
       context.params.relevance! as Required<BM25Params>,
     )
 
-    scoreList.push([id, bm25])
+    scoreList.push([internalId, bm25])
   }
   return scoreList
 }
@@ -193,13 +169,13 @@ export async function create(
         break
       case 'number':
       case 'number[]':
-        index.indexes[path] = avlCreate<number, string[]>(0, [])
+        index.indexes[path] = avlCreate<number, InternalDocumentID[]>(0, [])
         break
       case 'string':
       case 'string[]':
         index.indexes[path] = radixCreate()
         index.avgFieldLength[path] = 0
-        index.frequencies[path] = {}
+        index.frequencies[path] = createRecordWithToJson<FrequencyMap[string][number]>();
         index.tokenOccurrences[path] = {}
         index.fieldLengths[path] = {}
         break
@@ -225,14 +201,16 @@ async function insertScalar(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<void> {
+  const internalId = getInternalDocumentId(id);
+
   switch (schemaType) {
     case 'boolean': {
       const booleanIndex = index.indexes[prop] as BooleanIndex
-      booleanIndex[value ? 'true' : 'false'].push(id)
+      booleanIndex[value ? 'true' : 'false'].push(internalId)
       break
     }
     case 'number':
-      avlInsert(index.indexes[prop] as AVLNode<number, string[]>, value as number, [id])
+      avlInsert(index.indexes[prop] as AVLNode<number, number[]>, value as number, [internalId])
       break
     case 'string': {
       const tokens = await tokenizer.tokenize(value as string, language, prop)
@@ -241,7 +219,7 @@ async function insertScalar(
       for (const token of tokens) {
         await implementation.insertTokenScoreParameters(index, prop, id, tokens, token)
 
-        radixInsert(index.indexes[prop] as RadixNode, token, id)
+        radixInsert(index.indexes[prop] as RadixNode, token, internalId)
       }
 
       break
@@ -294,14 +272,16 @@ async function removeScalar(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<boolean> {
+  const internalId = getInternalDocumentId(id);
+
   switch (schemaType) {
     case 'number': {
-      avlRemoveDocument(index.indexes[prop] as AVLNode<number, string[]>, id, value)
+      avlRemoveDocument(index.indexes[prop] as AVLNode<number, InternalDocumentID[]>, internalId, value)
       return true
     }
     case 'boolean': {
       const booleanKey = value ? 'true' : 'false'
-      const position = (index.indexes[prop] as BooleanIndex)[booleanKey].indexOf(id)
+      const position = (index.indexes[prop] as BooleanIndex)[booleanKey].indexOf(internalId)
 
       ;(index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].splice(position, 1)
       return true
@@ -313,7 +293,7 @@ async function removeScalar(
 
       for (const token of tokens) {
         await implementation.removeTokenScoreParameters(index, prop, token)
-        radixRemoveDocument(index.indexes[prop] as RadixNode, token, id)
+        radixRemoveDocument(index.indexes[prop] as RadixNode, token, internalId)
       }
 
       return true
@@ -371,7 +351,7 @@ export async function search<D extends OpaqueDocumentStore, AggValue>(
   const rootNode = index.indexes[prop] as RadixNode
   const { exact, tolerance } = context.params
   const searchResult = radixFind(rootNode, { term, exact, tolerance })
-  const ids = new Set<string>()
+  const ids = new Set<InternalDocumentID>()
 
   for (const key in searchResult) {
     for (const id of searchResult[key]) {
@@ -386,10 +366,10 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
   context: SearchContext<I, D, AggValue>,
   index: Index,
   filters: Record<string, boolean | ComparisonOperator>,
-): Promise<string[]> {
+): Promise<number[]> {
   const filterKeys = Object.keys(filters)
 
-  const filtersMap: Record<string, string[]> = filterKeys.reduce(
+  const filtersMap: Record<string, InternalDocumentID[]> = filterKeys.reduce(
     (acc, key) => ({
       [key]: [],
       ...acc,
@@ -437,7 +417,7 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
     const operationOpt = operationKeys[0] as keyof ComparisonOperator
     const operationValue = operation[operationOpt]
 
-    const AVLNode = index.indexes[param] as AVLNode<number, string[]>
+    const AVLNode = index.indexes[param] as AVLNode<number, InternalDocumentID[]>
 
     if (typeof AVLNode === 'undefined') {
       throw createError('UNKNOWN_FILTER_PROPERTY', param)
@@ -478,7 +458,7 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
   }
 
   // AND operation: calculate the intersection between all the IDs in filterMap
-  const result = intersect(Object.values(filtersMap)) as unknown as string[]
+  const result = intersect(Object.values(filtersMap))
 
   return result
 }

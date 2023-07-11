@@ -1,4 +1,5 @@
 import t from 'tap'
+import { getInternalDocumentId } from "../src/document-id.js";
 import { create, getByID, insert, insertMultiple, load, remove, save, search, update } from '../src/index.js'
 
 t.test('create should support array of string', async t => {
@@ -239,7 +240,7 @@ async function checkSearchTerm(t, db, term, expectedIds) {
   })
   t.equal(result.hits.length, expectedIds.length)
   t.equal(result.count, expectedIds.length)
-  t.strictSame(new Set(result.hits.map(h => h.id)), new Set(expectedIds))
+  t.strictSame(new Set(result.hits.map(h => h.id)), new Set(expectedIds.map(getInternalDocumentId)))
 }
 
 async function checkSearchWhere(t, db, key, where, expectedIds) {
@@ -250,7 +251,7 @@ async function checkSearchWhere(t, db, key, where, expectedIds) {
   })
   t.equal(result.hits.length, expectedIds.length)
   t.equal(result.count, expectedIds.length)
-  t.strictSame(new Set(result.hits.map(h => h.id)), new Set(expectedIds))
+  t.strictSame(new Set(result.hits.map(h => h.id)), new Set(expectedIds.map(getInternalDocumentId)))
 }
 
 async function checkSearchFacets(t: Tap.Test, db, key, facet, expectedFacet) {

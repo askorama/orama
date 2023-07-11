@@ -1,4 +1,5 @@
-import { Language } from './components/tokenizer/languages.js'
+import { Language } from "./components/tokenizer/languages.js";
+import { DocumentID, InternalDocumentID } from "./document-id.js";
 
 export type Nullable<T> = T | null
 
@@ -88,7 +89,7 @@ export type ComparisonOperator = {
 /**
  * A custom sorter function item as [id, score, document].
  */
-export type CustomSorterFunctionItem = [string, number, Document]
+export type CustomSorterFunctionItem = [InternalDocumentID, number, Document]
 
 export type CustomSorterFunction = (a: CustomSorterFunctionItem, b: CustomSorterFunctionItem) => number
 /**
@@ -300,7 +301,7 @@ export type Result = {
   /**
    * The id of the document.
    */
-  id: string
+  id: InternalDocumentID
   /**
    * The score of the document in the search.
    */
@@ -325,7 +326,7 @@ export type GroupResult<T = Result[]> =
       result: T
     }[]
 
-export type TokenScore = [string, number]
+export type TokenScore = [InternalDocumentID, number]
 
 export type TokenMap = Record<string, TokenScore[]>
 
@@ -339,7 +340,7 @@ export type SearchContext<I extends OpaqueIndex, D extends OpaqueDocumentStore, 
   language: string | undefined
   params: SearchParams<AggValue>
   docsCount: number
-  uniqueDocsIDs: Record<string, number>
+  uniqueDocsIDs: Record<number, number>
   indexMap: IndexMap
   docsIntersection: TokenMap
 }
@@ -448,7 +449,7 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
     index: I,
     prop: string,
     term: string,
-    ids: string[],
+    ids: DocumentID[],
   ): SyncOrAsyncValue<TokenScore[]>
 
   search<D extends OpaqueDocumentStore, AggValue = Result[]>(
@@ -461,7 +462,7 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
     context: SearchContext<I, D, AggValue>,
     index: I,
     filters: Record<string, boolean | string | string[] | ComparisonOperator>,
-  ): SyncOrAsyncValue<string[]>
+  ): SyncOrAsyncValue<InternalDocumentID[]>
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
   getSearchablePropertiesWithTypes(index: I): SyncOrAsyncValue<Record<string, SearchableType>>
@@ -474,11 +475,11 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
   create<S extends Schema, I extends OpaqueIndex, So extends OpaqueSorter>(
     orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
   ): SyncOrAsyncValue<D>
-  get(store: D, id: string): SyncOrAsyncValue<Document | undefined>
-  getMultiple(store: D, ids: string[]): SyncOrAsyncValue<(Document | undefined)[]>
+  get(store: D, id: DocumentID): SyncOrAsyncValue<Document | undefined>
+  getMultiple(store: D, ids: DocumentID[]): SyncOrAsyncValue<(Document | undefined)[]>
   getAll(store: D): SyncOrAsyncValue<Record<string, Document>>
-  store(store: D, id: string, doc: Document): SyncOrAsyncValue<boolean>
-  remove(store: D, id: string): SyncOrAsyncValue<boolean>
+  store(store: D, id: DocumentID, doc: Document): SyncOrAsyncValue<boolean>
+  remove(store: D, id: DocumentID): SyncOrAsyncValue<boolean>
   count(store: D): SyncOrAsyncValue<number>
 
   load<R = unknown>(raw: R): SyncOrAsyncValue<D>
@@ -509,7 +510,7 @@ export interface ISorter<So extends OpaqueSorter = OpaqueSorter> {
   load<R = unknown>(raw: R): SyncOrAsyncValue<So>
   save<R = unknown>(sorter: So): SyncOrAsyncValue<R>
 
-  sortBy(sorter: So, docIds: [string, number][], by: SorterParams): Promise<[string, number][]>
+  sortBy(sorter: So, docIds: [InternalDocumentID, number][], by: SorterParams): Promise<[InternalDocumentID, number][]>
 
   getSortableProperties(sorter: So): SyncOrAsyncValue<string[]>
   getSortablePropertiesWithTypes(sorter: So): SyncOrAsyncValue<Record<string, SortType>>

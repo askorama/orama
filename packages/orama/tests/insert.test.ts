@@ -190,17 +190,17 @@ t.test('insert method', t => {
       authors: 'author should be singular',
     })
 
-    t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 1)
+    t.equal(Object.getOwnPropertySymbols((db.data.docs as DocumentsStore).docs).length, 1)
 
     const docWithExtraKey = { quote: 'hello, world!', foo: { bar: 10 } }
 
     const insertedInfo = await insert(db, docWithExtraKey)
 
     t.ok(insertedInfo)
-    t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 2)
+    t.equal(Object.getOwnPropertySymbols((db.data.docs as DocumentsStore).docs).length, 2)
 
-    t.ok('foo' in (db.data.docs as DocumentsStore).docs[insertedInfo]!)
-    t.same(docWithExtraKey.foo, (db.data.docs as DocumentsStore).docs[insertedInfo]!.foo)
+    t.ok('foo' in (db.data.docs as DocumentsStore).docs[Symbol.for(insertedInfo)]!)
+    t.same(docWithExtraKey.foo, (db.data.docs as DocumentsStore).docs[Symbol.for(insertedInfo)]!.foo)
     t.notOk('foo' in (db.data.index as Index).indexes)
   })
 
@@ -241,16 +241,16 @@ t.test('insert method', t => {
       const insertedInfo = await insert(db, nestedExtraKeyDoc)
 
       t.ok(insertedInfo)
-      t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 1)
+      t.equal(Object.getOwnPropertySymbols((db.data.docs as DocumentsStore).docs).length, 1)
 
       t.same(
         nestedExtraKeyDoc.unexpectedProperty,
-        (db.data.docs as DocumentsStore).docs[insertedInfo]!.unexpectedProperty,
+        (db.data.docs as DocumentsStore).docs[Symbol.for(insertedInfo)]!.unexpectedProperty,
       )
 
       t.same(
         nestedExtraKeyDoc.tag.unexpectedNestedProperty,
-        ((db.data.docs as DocumentsStore).docs[insertedInfo]!.tag as unknown as Record<string, string>)
+        ((db.data.docs as DocumentsStore).docs[Symbol.for(insertedInfo)]!.tag as unknown as Record<string, string>)
           .unexpectedNestedProperty,
       )
 
@@ -462,7 +462,7 @@ t.test('insertMultiple method', t => {
 
     try {
       await insertMultiple(db, docs)
-      t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 4000)
+      t.equal(Object.getOwnPropertySymbols((db.data.docs as DocumentsStore).docs).length, 4000)
 
       // eslint-disable-next-line no-empty
     } catch (_e) {}

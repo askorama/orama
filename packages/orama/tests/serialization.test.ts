@@ -63,8 +63,8 @@ t.test('Edge getters', t => {
 
     const { docs } = await save(db)
 
-    t.strictSame((docs as DocumentsStore).docs[doc1], { name: 'John', age: 30 })
-    t.strictSame((docs as DocumentsStore).docs[doc2], { name: 'Jane', age: 25 })
+    t.strictSame((docs as DocumentsStore).docs[Symbol.for(doc1)], { name: 'John', age: 30 })
+    t.strictSame((docs as DocumentsStore).docs[Symbol.for(doc2)], { name: 'Jane', age: 25 })
   })
 
   t.test('should correctly enable index setter', async t => {

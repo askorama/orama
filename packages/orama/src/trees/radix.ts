@@ -1,14 +1,15 @@
 import { syncBoundedLevenshtein } from '../components/levenshtein.js'
+import { getInternalDocumentId, InternalDocumentID } from "../document-id.js";
 import { Nullable } from '../types.js'
 import { getOwnProperty, syncUniqueId } from '../utils.js'
 
 export interface Node {
-  id: string
+  id: InternalDocumentID
   key: string
   subWord: string
-  parent: Nullable<string>
+  parent: Nullable<InternalDocumentID>
   children: Record<string, Node>
-  docs: string[]
+  docs: InternalDocumentID[]
   end: boolean
   word: string
 }
@@ -19,7 +20,7 @@ type FindParams = {
   tolerance?: number
 }
 
-type FindResult = Record<string, string[]>
+type FindResult = Record<string, InternalDocumentID[]>
 
 /* c8 ignore next 5 */
 function serialize(this: Node): object {
@@ -33,11 +34,11 @@ function updateParent(node: Node, parent: Node): void {
   node.word = parent.word + node.subWord
 }
 
-function addDocument(node: Node, docID: string): void {
+function addDocument(node: Node, docID: InternalDocumentID): void {
   node.docs.push(docID)
 }
 
-function removeDocument(node: Node, docID: string): boolean {
+function removeDocument(node: Node, docID: InternalDocumentID): boolean {
   const index = node.docs.indexOf(docID)
 
   /* c8 ignore next 3 */
@@ -111,7 +112,7 @@ function getCommonPrefix(a: string, b: string) {
 
 export function create(end = false, subWord = '', key = ''): Node {
   const node = {
-    id: syncUniqueId(),
+    id: getInternalDocumentId(syncUniqueId()),
     key,
     subWord,
     parent: null,
@@ -125,7 +126,7 @@ export function create(end = false, subWord = '', key = ''): Node {
   return node
 }
 
-export function insert(root: Node, word: string, docId: string) {
+export function insert(root: Node, word: string, docId: InternalDocumentID) {
   for (let i = 0; i < word.length; i++) {
     const currentCharacter = word[i]
     const wordAtIndex = word.substring(i)
@@ -284,7 +285,7 @@ export function removeWord(root: Node, term: string): boolean {
   return false
 }
 
-export function removeDocumentByWord(root: Node, term: string, docID: string, exact = true): boolean {
+export function removeDocumentByWord(root: Node, term: string, docID: InternalDocumentID, exact = true): boolean {
   if (!term) {
     return true
   }

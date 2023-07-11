@@ -139,7 +139,7 @@ export function insertSortedValue(
 
 export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
   if (b[1] === a[1]) {
-    return a[0].localeCompare(b[0])
+    return a[0] - b[0]
   }
 
   return b[1] - a[1]

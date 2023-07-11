@@ -6,7 +6,7 @@ export function prioritizeTokenScores(arrays: TokenScore[][], boost: number, thr
     throw createError('INVALID_BOOST_VALUE')
   }
 
-  const tokenMap: Record<string, number> = {}
+  const tokenMap: Record<number, number> = {}
 
   const mapsLength = arrays.length
   for (let i = 0; i < mapsLength; i++) {
@@ -25,7 +25,9 @@ export function prioritizeTokenScores(arrays: TokenScore[][], boost: number, thr
     }
   }
 
-  const results = Object.entries(tokenMap).sort((a, b) => b[1] - a[1])
+  const results = Object.keys(tokenMap)
+    .map(key => [+key, tokenMap[+key]] as TokenScore)
+    .sort((a, b) => b[1] - a[1])
 
   // If threshold is 1, it means we will return all the results with at least one search term,
   // prioritizig the ones that contains more search terms (fuzzy match)

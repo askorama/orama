@@ -1,9 +1,10 @@
-import { createError } from '../errors.js'
-import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from '../types.js'
+import { createRecordWithToJson, DocumentID, getInternalDocumentId, InternalDocumentID } from "../document-id.js";
+import { createError } from "../errors.js";
+import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from "../types.js";
 
 interface PropertySort<K> {
-  docs: Record<string, number>
-  orderedDocs: [string, K][]
+  docs: Record<InternalDocumentID, number>;
+  orderedDocs: [InternalDocumentID, K][]
   type: SortType
 }
 
@@ -54,7 +55,7 @@ function innerCreate(schema: Schema, sortableDeniedProperties: string[], prefix:
         sorter.sortableProperties.push(path)
         sorter.sortablePropertiesWithTypes[path] = type
         sorter.sorts[path] = {
-          docs: {},
+          docs: createRecordWithToJson<number>(),
           orderedDocs: [],
           type: type,
         }
@@ -82,13 +83,16 @@ async function create(_: Orama, schema: Schema, config?: SorterConfig): Promise<
   return innerCreate(schema, (config || {}).unsortableProperties || [], '')
 }
 
-function stringSort(value: SortValue, language: string | undefined, d: [string, SortValue]): boolean {
-  return (d[1] as string).localeCompare(value as string, language) > 0
+function stringSort(value: SortValue, language: string | undefined, d: [InternalDocumentID, SortValue]): boolean {
+  const d1Value = d[1] as string | symbol;
+  const dId = typeof d1Value === 'symbol' ? d1Value.description! : d1Value;
+
+  return dId.localeCompare(value as string, language) > 0
 }
-function numberSort(value: SortValue, d: [string, SortValue]): boolean {
+function numberSort(value: SortValue, d: [InternalDocumentID, SortValue]): boolean {
   return (d[1] as number) > (value as number)
 }
-function booleanSort(value: SortValue, d: [string, SortValue]): boolean {
+function booleanSort(value: SortValue, d: [InternalDocumentID, SortValue]): boolean {
   return d[1] as boolean
 }
 
@@ -105,7 +109,7 @@ async function insert(
   }
   const s = sorter.sorts[prop]
 
-  let predicate: (value: [string, SortValue]) => boolean
+  let predicate: (value: [InternalDocumentID, SortValue]) => boolean
   switch (schemaType) {
     case 'string':
       predicate = stringSort.bind(null, value, language)
@@ -118,15 +122,16 @@ async function insert(
       break
   }
 
+  const internalId = getInternalDocumentId(id);
   // Find the right position to insert the element
   let index = s.orderedDocs.findIndex(predicate)
   if (index === -1) {
     index = s.orderedDocs.length
-    s.orderedDocs.push([id, value])
+    s.orderedDocs.push([internalId, value])
   } else {
-    s.orderedDocs.splice(index, 0, [id, value])
+    s.orderedDocs.splice(index, 0, [internalId, value])
   }
-  s.docs[id] = index
+  s.docs[internalId] = index
 
   // Increment position for the greater documents
   const orderedDocsLength = s.orderedDocs.length
@@ -136,14 +141,15 @@ async function insert(
   }
 }
 
-async function remove(sorter: Sorter, prop: string, id: string) {
+async function remove(sorter: Sorter, prop: string, id: DocumentID) {
   if (!sorter.enabled) {
     return
   }
-  const s = sorter.sorts[prop] as PropertySort<SortValue>
+  const s = sorter.sorts[prop] as PropertySort<SortValue>;
+  const internalId = getInternalDocumentId(id);
 
-  const index = s.docs[id]
-  delete s.docs[id]
+  const index = s.docs[internalId]
+  delete s.docs[internalId]
 
   // Decrement position for the greater documents
   const orderedDocsLength = s.orderedDocs.length
@@ -155,7 +161,7 @@ async function remove(sorter: Sorter, prop: string, id: string) {
   s.orderedDocs.splice(index, 1)
 }
 
-async function sortBy(sorter: Sorter, docIds: [string, number][], by: SorterParams): Promise<[string, number][]> {
+async function sortBy(sorter: Sorter, docIds: [InternalDocumentID, number][], by: SorterParams): Promise<[InternalDocumentID, number][]> {
   if (!sorter.enabled) {
     throw createError('SORT_DISABLED')
   }
