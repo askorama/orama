@@ -1,9 +1,29 @@
+import { Callout } from 'nextra-theme-docs'
+
 # Create a new Orama instance
 
-## Create
+We can create a new instance (from now on database) with an **indexing `schema`**.<br/>
+The schema represents **the searchable properties** of the document to be inserted.
 
-We can `create` a new instance (from now on database) with an **indexing `schema`**.<br/>
-The schema represents **the structure** of the document to be inserted.
+Not all properties need to be indexed, but only those that we want to be able to search for.
+
+Adding a property to the schema will make it searchable, but it will also increase the size of the database and overall insertion and search times.
+
+Therefore, you should only index the properties that you need to search for.
+
+## Schema properties and types
+
+The `schema` is an object where the keys are the property names and the values are the property types. \
+Orama supports the following types:
+
+| Type        | Description                                                                 | example                                                                     |
+| ----------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `string`    | A string of characters.                                                     | `'Hello world'`                                                             |
+| `number`    | A numeric value, either float or integer.                                   | `42`                                                                        |
+| `boolean`   | A boolean value.                                                            | `true`                                                                      |
+| `string[]`  | An array of strings.                                                        | `['red', 'green', 'blue']`                                                  |
+| `number[]`  | An array of numbers.                                                        | `[42, 91, 28.5]`                                                            |
+| `boolean[]` | An array of booleans.                                                       | `[true, false, false]`                                                      |
 
 A database can be as simple as:
 
@@ -45,23 +65,10 @@ const movieDB = await create({
     cast: {
       director: 'string',
       leading: 'string',
+      supporting: 'string[]',
     },
     year: 'number',
     isFavorite: 'boolean',
-  },
-})
-```
-
-## Multivalue fields
-
-Orama also supports arrays as fields as well.
-
-```javascript copy
-const db = await create({
-  schema: {
-    name: 'string[]',
-    numbers: 'number[]',
-    booleans: 'boolean[]',
   },
 })
 ```
