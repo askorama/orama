@@ -6,51 +6,12 @@
         "id": "",
         "score": 4.744426329679039,
         "document": {
-          "date": "1809/03/13",
-          "description": "Peninsular War",
-          "granularity": "year",
-          "categories": {
-            "first": "January/March",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.744426329679039,
-        "document": {
-          "date": "1867/12/02",
-          "description": "Paraguayan War.",
-          "granularity": "year",
-          "categories": {
-            "first": "Ongoing",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.744426329679039,
-        "document": {
           "date": "-89",
           "description": "Social War:",
           "granularity": "year",
           "categories": {
             "first": "By place",
             "second": "Roman Republic"
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.744426329679039,
-        "document": {
-          "date": "1914/12/24",
-          "description": " World War I:",
-          "granularity": "year",
-          "categories": {
-            "first": "December",
-            "second": ""
           }
         }
       },
@@ -131,12 +92,7 @@
             "second": "Roman Republic"
           }
         }
-      }
-    ]
-  },
-  "should perform paginate search-page-2": {
-    "count": 2357,
-    "hits": [
+      },
       {
         "id": "",
         "score": 4.744426329679039,
@@ -167,11 +123,216 @@
         "id": "",
         "score": 4.744426329679039,
         "document": {
+          "date": "1809/03/13",
+          "description": "Peninsular War",
+          "granularity": "year",
+          "categories": {
+            "first": "January/March",
+            "second": ""
+          }
+        }
+      }
+    ]
+  },
+  "should perform paginate search-page-2": {
+    "count": 2357,
+    "hits": [
+      {
+        "id": "",
+        "score": 4.744426329679039,
+        "document": {
+          "date": "1867/12/02",
+          "description": "Paraguayan War.",
+          "granularity": "year",
+          "categories": {
+            "first": "Ongoing",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.744426329679039,
+        "document": {
+          "date": "1914/12/24",
+          "description": " World War I:",
+          "granularity": "year",
+          "categories": {
+            "first": "December",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.744426329679039,
+        "document": {
           "date": "1950/02/14",
           "description": " Cold War:",
           "granularity": "year",
           "categories": {
             "first": "February",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "-86",
+          "description": "First Mithridatic War",
+          "granularity": "year",
+          "categories": {
+            "first": "By place",
+            "second": "Roman Republic"
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1447/07/15",
+          "description": "The Albanian-Venetian War of 1447-1448.",
+          "granularity": "year",
+          "categories": {
+            "first": "Date unknown",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1470/10/30",
+          "description": "Start of the Anglo-Hanseatic War.",
+          "granularity": "year",
+          "categories": {
+            "first": "Date unknown",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1522/12/20",
+          "description": "The Habsburg-Valois Wars begin.",
+          "granularity": "year",
+          "categories": {
+            "first": "Date unknown",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1558/01/22",
+          "description": " Beginning of the Livonian War.",
+          "granularity": "year",
+          "categories": {
+            "first": "January/June",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1728/10/20",
+          "description": "The Meerkat–Mongoose war.",
+          "granularity": "year",
+          "categories": {
+            "first": "In fiction",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1830/12/20",
+          "description": "The Java War ends.",
+          "granularity": "year",
+          "categories": {
+            "first": "Date unknown",
+            "second": ""
+          }
+        }
+      }
+    ]
+  },
+  "should perform paginate search-page-3": {
+    "count": 2357,
+    "hits": [
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1857/04/04",
+          "description": " End of the Anglo-Persian War.",
+          "granularity": "year",
+          "categories": {
+            "first": "April/June",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1861/04/27",
+          "description": " American Civil War:",
+          "granularity": "year",
+          "categories": {
+            "first": "April/June",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1879/01/11",
+          "description": " The Anglo-Zulu War begins.",
+          "granularity": "year",
+          "categories": {
+            "first": "January/March",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1919/02/14",
+          "description": " The Polish-Soviet War begins.",
+          "granularity": "year",
+          "categories": {
+            "first": "February",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1939/03/23",
+          "description": " The Slovak-Hungarian War begins.",
+          "granularity": "year",
+          "categories": {
+            "first": "March",
             "second": ""
           }
         }
@@ -238,167 +399,6 @@
           "categories": {
             "first": "By place",
             "second": "Europe"
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1043/10/31",
-          "description": "Rus'-Byzantine War (1043).",
-          "granularity": "year",
-          "categories": {
-            "first": "",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1447/07/15",
-          "description": "The Albanian-Venetian War of 1447-1448.",
-          "granularity": "year",
-          "categories": {
-            "first": "Date unknown",
-            "second": ""
-          }
-        }
-      }
-    ]
-  },
-  "should perform paginate search-page-3": {
-    "count": 2357,
-    "hits": [
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1470/10/30",
-          "description": "Start of the Anglo-Hanseatic War.",
-          "granularity": "year",
-          "categories": {
-            "first": "Date unknown",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1522/12/20",
-          "description": "The Habsburg-Valois Wars begin.",
-          "granularity": "year",
-          "categories": {
-            "first": "Date unknown",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1558/01/22",
-          "description": " Beginning of the Livonian War.",
-          "granularity": "year",
-          "categories": {
-            "first": "January/June",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1728/10/20",
-          "description": "The Meerkat–Mongoose war.",
-          "granularity": "year",
-          "categories": {
-            "first": "In fiction",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1830/12/20",
-          "description": "The Java War ends.",
-          "granularity": "year",
-          "categories": {
-            "first": "Date unknown",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1857/04/04",
-          "description": " End of the Anglo-Persian War.",
-          "granularity": "year",
-          "categories": {
-            "first": "April/June",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1861/04/27",
-          "description": " American Civil War:",
-          "granularity": "year",
-          "categories": {
-            "first": "April/June",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "-113",
-          "description": "War between the Celtiberians and the Romans.",
-          "granularity": "year",
-          "categories": {
-            "first": "By place",
-            "second": "Roman Republic"
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1879/01/11",
-          "description": " The Anglo-Zulu War begins.",
-          "granularity": "year",
-          "categories": {
-            "first": "January/March",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "-86",
-          "description": "First Mithridatic War",
-          "granularity": "year",
-          "categories": {
-            "first": "By place",
-            "second": "Roman Republic"
           }
         }
       }
