@@ -24,6 +24,8 @@ t.test('search with sortBy', t => {
         },
       })
 
+      console.log(result);
+
       t.strictSame(
         result.hits.map(d => d.id),
         [id5, id2, id1, id3, id4, id6],

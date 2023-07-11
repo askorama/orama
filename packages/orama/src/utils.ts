@@ -88,11 +88,6 @@ export async function uniqueId(): Promise<string> {
   return `${baseId}-${lastId++}`
 }
 
-// This is only used internally, keep in sync with the previous one
-export function syncUniqueId(): string {
-  return `${baseId}-${lastId++}`
-}
-
 export function getOwnProperty<T = unknown>(object: Record<string, T>, property: string): T | undefined {
   // Checks if `hasOwn` method is defined avoiding errors with older Node.js versions
   if (Object.hasOwn === undefined) {

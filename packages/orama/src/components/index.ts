@@ -1,4 +1,4 @@
-import { createRecordWithToJson, DocumentID, getInternalDocumentId, InternalDocumentID } from "../document-id.js";
+import { InternalDocumentStore, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from "./internal-document-store.js";
 import { createError } from "../errors.js";
 import { create as avlCreate, find as avlFind, greaterThan as avlGreaterThan, insert as avlInsert, lessThan as avlLessThan, Node as AVLNode, rangeSearch as avlRangeSearch, removeDocument as avlRemoveDocument } from "../trees/avl.js";
 import { create as radixCreate, find as radixFind, insert as radixInsert, Node as RadixNode, removeDocumentByWord as radixRemoveDocument } from "../trees/radix.js";
@@ -23,6 +23,7 @@ export type BooleanIndex = {
 }
 
 export interface Index extends OpaqueIndex {
+  sharedInternalDocumentStore: InternalDocumentIDStore
   indexes: Record<string, RadixNode | AVLNode<number, InternalDocumentID[]> | BooleanIndex>
   searchableProperties: string[]
   searchablePropertiesWithTypes: Record<string, SearchableType>
@@ -41,7 +42,7 @@ export async function insertDocumentScoreParameters(
   tokens: string[],
   docsCount: number,
 ): Promise<void> {
-  const internalId = getInternalDocumentId(id);
+  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id);
 
   index.avgFieldLength[prop] = ((index.avgFieldLength[prop] ?? 0) * (docsCount - 1) + tokens.length) / docsCount
   index.fieldLengths[prop][internalId] = tokens.length
@@ -63,7 +64,7 @@ export async function insertTokenScoreParameters(
     }
   }
 
-  const internalId = getInternalDocumentId(id);
+  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id);
   const tf = tokenFrequency / tokens.length
 
   index.frequencies[prop][internalId]![token] = tf
@@ -82,7 +83,7 @@ export async function removeDocumentScoreParameters(
   id: string,
   docsCount: number,
 ): Promise<void> {
-  const internalId = getInternalDocumentId(id);
+  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id);
 
   index.avgFieldLength[prop] =
     (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][internalId]!) / (docsCount - 1)
@@ -99,7 +100,7 @@ export async function calculateResultScores<I extends OpaqueIndex, D extends Opa
   index: Index,
   prop: string,
   term: string,
-  ids: DocumentID[],
+  ids: InternalDocumentStore[],
 ): Promise<TokenScore[]> {
   const documentIDs = Array.from(ids)
 
@@ -117,7 +118,7 @@ export async function calculateResultScores<I extends OpaqueIndex, D extends Opa
   // Calculate TF-IDF value for each term, in each document, for each index.
   const documentIDsLength = documentIDs.length
   for (let k = 0; k < documentIDsLength; k++) {
-    const internalId = getInternalDocumentId(documentIDs[k]);
+    const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, documentIDs[k]);
     const tf = oramaFrequencies?.[internalId]?.[term] ?? 0
 
     const bm25 = BM25(
@@ -142,6 +143,7 @@ export async function create(
 ): Promise<Index> {
   if (!index) {
     index = {
+      sharedInternalDocumentStore: orama.internalDocumentStore,
       indexes: {},
       searchableProperties: [],
       searchablePropertiesWithTypes: {},
@@ -175,7 +177,7 @@ export async function create(
       case 'string[]':
         index.indexes[path] = radixCreate()
         index.avgFieldLength[path] = 0
-        index.frequencies[path] = createRecordWithToJson<FrequencyMap[string][number]>();
+        index.frequencies[path] = {};
         index.tokenOccurrences[path] = {}
         index.fieldLengths[path] = {}
         break
@@ -201,7 +203,7 @@ async function insertScalar(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<void> {
-  const internalId = getInternalDocumentId(id);
+  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id);
 
   switch (schemaType) {
     case 'boolean': {
@@ -272,7 +274,7 @@ async function removeScalar(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<boolean> {
-  const internalId = getInternalDocumentId(id);
+  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id);
 
   switch (schemaType) {
     case 'number': {
@@ -471,7 +473,7 @@ export async function getSearchablePropertiesWithTypes(index: Index): Promise<Re
   return index.searchablePropertiesWithTypes
 }
 
-export async function load<R = unknown>(raw: R): Promise<Index> {
+export async function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Promise<Index> {
   const {
     indexes,
     searchableProperties,
@@ -483,6 +485,7 @@ export async function load<R = unknown>(raw: R): Promise<Index> {
   } = raw as Index
 
   return {
+    sharedInternalDocumentStore,
     indexes,
     searchableProperties,
     searchablePropertiesWithTypes,
@@ -515,7 +518,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
   } as R
 }
 
-export async function createIndex(): Promise<DefaultIndex> {
+export async function createIndex(sharedInternalDocumentStore: InternalDocumentIDStore): Promise<DefaultIndex> {
   return {
     create,
     insert,
@@ -529,7 +532,7 @@ export async function createIndex(): Promise<DefaultIndex> {
     searchByWhereClause,
     getSearchableProperties,
     getSearchablePropertiesWithTypes,
-    load,
+    load: load.bind(null, sharedInternalDocumentStore),
     save,
   }
 }

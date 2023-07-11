@@ -1,5 +1,5 @@
 import t from 'tap'
-import { getInternalDocumentId } from "../src/document-id.js";
+import { getInternalDocumentId } from "../src/components/internal-document-store.js";
 import { create, getByID, insert, insertMultiple, load, remove, save, search, update } from '../src/index.js'
 
 t.test('create should support array of string', async t => {

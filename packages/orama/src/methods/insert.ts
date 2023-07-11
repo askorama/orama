@@ -1,7 +1,6 @@
 import { isArrayType } from "../components.js";
 import { runMultipleHook, runSingleHook } from "../components/hooks.js";
 import { trackInsertion } from "../components/sync-blocking-checker.js";
-import { getInternalDocumentId, InternalDocumentID } from "../document-id.js";
 import { createError } from "../errors.js";
 import { Document, Orama, SortValue } from "../types.js";
 

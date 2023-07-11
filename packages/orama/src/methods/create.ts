@@ -3,6 +3,7 @@ import { createDocumentsStore } from '../components/documents-store.js'
 import { OBJECT_COMPONENTS, FUNCTION_COMPONENTS, SINGLE_OR_ARRAY_COMPONENTS } from '../components/hooks.js'
 import { createIndex } from '../components/index.js'
 import { createTokenizer } from '../components/tokenizer/index.js'
+import { createInternalDocumentIDStore, InternalDocumentStore, InternalDocumentID, InternalDocumentIDStore } from "../components/internal-document-store.js";
 import { createError } from '../errors.js'
 import { uniqueId } from '../utils.js'
 import {
@@ -120,9 +121,11 @@ export async function create<P extends ProvidedTypes>({
     throw createError('NO_LANGUAGE_WITH_CUSTOM_TOKENIZER')
   }
 
-  index ||= await createIndex()
-  sorter ||= await createSorter()
-  documentsStore ||= await createDocumentsStore()
+  const internalDocumentStore = createInternalDocumentIDStore();
+
+  index ||= await createIndex(internalDocumentStore)
+  sorter ||= await createSorter(internalDocumentStore)
+  documentsStore ||= await createDocumentsStore(internalDocumentStore)
 
   // Validate all other components
   validateComponents(components)
@@ -156,6 +159,7 @@ export async function create<P extends ProvidedTypes>({
     index,
     sorter,
     documentsStore,
+    internalDocumentStore,
     getDocumentProperties,
     getDocumentIndexId,
     validateSchema,

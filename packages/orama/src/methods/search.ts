@@ -3,7 +3,7 @@ import { getFacets } from '../components/facets.js'
 import { intersectFilteredIDs } from '../components/filters.js'
 import { getGroups } from '../components/groups.js'
 import { runAfterSearch } from '../components/hooks.js'
-import { InternalDocumentID } from "../document-id.js";
+import { InternalDocumentID } from "../components/internal-document-store.js";
 import { createError } from '../errors.js'
 import {
   BM25Params,

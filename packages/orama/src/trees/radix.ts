@@ -1,13 +1,10 @@
-import { syncBoundedLevenshtein } from '../components/levenshtein.js'
-import { getInternalDocumentId, InternalDocumentID } from "../document-id.js";
-import { Nullable } from '../types.js'
-import { getOwnProperty, syncUniqueId } from '../utils.js'
+import { syncBoundedLevenshtein } from "../components/levenshtein.js";
+import { InternalDocumentID } from "../components/internal-document-store.js";
+import { getOwnProperty } from "../utils.js";
 
 export interface Node {
-  id: InternalDocumentID
   key: string
   subWord: string
-  parent: Nullable<InternalDocumentID>
   children: Record<string, Node>
   docs: InternalDocumentID[]
   end: boolean
@@ -30,7 +27,6 @@ function serialize(this: Node): object {
 }
 
 function updateParent(node: Node, parent: Node): void {
-  node.parent = parent.id
   node.word = parent.word + node.subWord
 }
 
@@ -112,7 +108,6 @@ function getCommonPrefix(a: string, b: string) {
 
 export function create(end = false, subWord = '', key = ''): Node {
   const node = {
-    id: getInternalDocumentId(syncUniqueId()),
     key,
     subWord,
     parent: null,
