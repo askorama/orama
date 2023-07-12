@@ -110,7 +110,6 @@ export function create(end = false, subWord = '', key = ''): Node {
   const node = {
     key,
     subWord,
-    parent: null,
     children: {},
     docs: [],
     end,
