@@ -248,12 +248,7 @@ export async function search<AggValue = Result[]>(
   }
 
   if (typeof results !== 'undefined') {
-    for (const result of results) {
-      if (!result) continue
-
-      result.id = getDocumentIdFromInternalId(orama.internalDocumentIDStore, +result.id)
-      searchResult.hits.push(result)
-    }
+    searchResult.hits = results.filter(Boolean)
   }
 
   if (shouldCalculateFacets) {
@@ -324,7 +319,7 @@ async function fetchDocumentsWithDistinct(
       continue
     }
 
-    results.push({ id: id.toString(), score, document: doc! })
+    results.push({ id: getDocumentIdFromInternalId(orama.internalDocumentIDStore, id), score, document: doc! })
     resultIDs.add(id)
 
     // reached the limit, break the loop
@@ -367,7 +362,7 @@ async function fetchDocuments(
       // We retrieve the full document only AFTER making sure that we really want it.
       // We never retrieve the full document preventively.
       const fullDoc = await orama.documentsStore.get(docs, id)
-      results[i] = { id: id.toString(), score, document: fullDoc! }
+      results[i] = { id: getDocumentIdFromInternalId(orama.internalDocumentIDStore, id), score, document: fullDoc! }
       resultIDs.add(id)
     }
   }
