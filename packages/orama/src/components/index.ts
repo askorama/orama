@@ -491,9 +491,22 @@ export async function getSearchablePropertiesWithTypes(index: Index): Promise<Re
   return index.searchablePropertiesWithTypes
 }
 
+function loadNode(node: RadixNode): RadixNode {
+  const convertedNode = radixCreate(node.end, node.subWord, node.key, );
+
+  convertedNode.docs = node.docs;
+  convertedNode.word = node.word;
+
+  for (const childrenKey of Object.keys(node.children)) {
+    convertedNode.children[childrenKey] = loadNode(node.children[childrenKey]);
+  }
+
+  return convertedNode;
+}
+
 export async function load<R = unknown>(raw: R): Promise<Index> {
   const {
-    indexes,
+    indexes: rawIndexes,
     searchableProperties,
     searchablePropertiesWithTypes,
     frequencies,
@@ -501,6 +514,20 @@ export async function load<R = unknown>(raw: R): Promise<Index> {
     avgFieldLength,
     fieldLengths,
   } = raw as Index
+
+  const indexes: Index['indexes'] = {};
+
+  for (const prop of Object.keys(rawIndexes)) {
+    const value = rawIndexes[prop];
+
+    if (!('word' in value)) {
+      indexes[prop] = value;
+
+      continue;
+    }
+
+    indexes[prop] = loadNode(value);
+  }
 
   return {
     indexes,

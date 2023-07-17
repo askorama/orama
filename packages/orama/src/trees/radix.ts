@@ -1,13 +1,33 @@
-import { syncBoundedLevenshtein } from "../components/levenshtein.js";
-import { getOwnProperty } from "../utils.js";
+import { syncBoundedLevenshtein } from '../components/levenshtein.js';
+import { getOwnProperty } from '../utils.js';
 
-export interface Node {
-  key: string
-  subWord: string
-  children: Record<string, Node>
-  docs: string[]
-  end: boolean
-  word: string
+export class Node {
+  constructor(
+    key: string,
+    subWord: string,
+    end: boolean,
+  ) {
+    this.key = key
+    this.subWord = subWord
+    this.end = end
+  }
+
+  public key: string
+  public subWord: string
+  public children: Record<string, Node> = {}
+  public docs: string[] = []
+  public end: boolean
+  public word = ''
+
+  public toJSON(): object {
+    return {
+      word: this.word,
+      subWord: this.subWord,
+      children: this.children,
+      docs: this.docs,
+      end: this.end
+    }
+  }
 }
 
 type FindParams = {
@@ -17,13 +37,6 @@ type FindParams = {
 }
 
 type FindResult = Record<string, string[]>
-
-/* c8 ignore next 5 */
-function serialize(this: Node): object {
-  const { word, subWord, children, docs, end } = this
-
-  return { word, subWord, children, docs, end }
-}
 
 function updateParent(node: Node, parent: Node): void {
   node.word = parent.word + node.subWord
@@ -106,17 +119,7 @@ function getCommonPrefix(a: string, b: string) {
 }
 
 export function create(end = false, subWord = '', key = ''): Node {
-  const node = {
-    key,
-    subWord,
-    children: {},
-    docs: [],
-    end,
-    word: '',
-  }
-
-  Object.defineProperty(node, 'toJSON', { value: serialize })
-  return node
+  return new Node(key, subWord, end)
 }
 
 export function insert(root: Node, word: string, docId: string) {
