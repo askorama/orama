@@ -13,6 +13,8 @@ import { stemmer as russianStemmer } from '@orama/stemmers/russian'
 import { stemmer as spanishStemmer } from '@orama/stemmers/spanish'
 import { stemmer as swedishStemmer } from '@orama/stemmers/swedish'
 import { stemmer as ukrainianStemmer } from '@orama/stemmers/ukrainian'
+import { stemmer as tamilStemmer } from '@orama/stemmers/tamil'
+
 
 import { stopwords as bulgarianStopwords } from '@orama/stopwords/bulgarian'
 import { stopwords as danishStopwords } from '@orama/stopwords/danish'
@@ -28,11 +30,12 @@ import { stopwords as russianStopwords } from '@orama/stopwords/russian'
 import { stopwords as spanishStopwords } from '@orama/stopwords/spanish'
 import { stopwords as swedishStopwords } from '@orama/stopwords/swedish'
 import { stopwords as ukrainianStopwords } from '@orama/stopwords/ukrainian'
+import { stopwords as tamilStopwords } from '@orama/stopwords/tamil';
 
 import { createTokenizer } from '../src/components/tokenizer/index.js'
 
 t.test('Tokenizer', async t => {
-  t.plan(20)
+  t.plan(21)
 
   t.test('should tokenize and stem correctly in english', async t => {
     t.plan(2)
@@ -286,10 +289,32 @@ t.test('Tokenizer', async t => {
 
     const O1 = tokenizer.tokenize(I1)
     const O2 = tokenizer.tokenize(I2)
+    console.log(tokenizer)
+
 
     t.strictSame(O1, ['sovn', 'svar', 'ting', 'prov', 'mislyk'])
     t.strictSame(O2, ['bagt', 'smakag'])
   })
+
+  t.test('should tokenize and stem correctly in tamil', async t => {
+    t.plan(2);
+
+    const tokenizer = await createTokenizer({
+      language: 'tamil',
+      stemmer: tamilStemmer,
+      stopWords: tamilStopwords
+    });
+
+    const I1 = 'கதை';
+    const I2 = 'அவனிலா';
+
+    const O1 = tokenizer.tokenize(I1);
+    const O2 = tokenizer.tokenize(I2);
+
+    t.strictSame(O1, ['கத']); 
+    t.strictSame(O2, ['அவன', 'ல']);
+  })
+
 
   t.test('should tokenize and stem correctly in ukrainian', async t => {
     t.plan(2)
@@ -321,6 +346,8 @@ t.test('Tokenizer', async t => {
     t.strictSame(O2, ['има', 'първ', 'вероятност', 'да', 'се', 'случ', 'нещ', 'неочакван', 'док', 'изпълняват', 'тест'])
   })
 
+
+
   t.test('disable stemming', async t => {
     t.plan(2)
 
@@ -333,7 +360,7 @@ t.test('Tokenizer', async t => {
     const O2 = tokenizer.tokenize(I2)
 
     t.same(O1, ['quick', 'brown', 'fox', 'jumps', 'lazy', 'dog'])
-    t.same(O2, ['baked', 'cakes'])
+    t.same(O2, ['baked', 'cakes'])  
   })
 
   t.test('should validate options', async t => {

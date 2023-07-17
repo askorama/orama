@@ -56,7 +56,7 @@ export interface Index extends OpaqueIndex {
   searchableProperties: string[]
   searchablePropertiesWithTypes: Record<string, SearchableType>
   frequencies: FrequencyMap
-  tokenOccurrencies: Record<string, Record<string, number>>
+  tokenOccurrences: Record<string, Record<string, number>>
   avgFieldLength: Record<string, number>
   fieldLengths: Record<string, Record<string, number | undefined>>
 }
@@ -94,12 +94,12 @@ export async function insertTokenScoreParameters(
 
   index.frequencies[prop][id]![token] = tf
 
-  if (!(token in index.tokenOccurrencies[prop])) {
-    index.tokenOccurrencies[prop][token] = 0
+  if (!(token in index.tokenOccurrences[prop])) {
+    index.tokenOccurrences[prop][token] = 0
   }
 
   // increase a token counter that may not yet exist
-  index.tokenOccurrencies[prop][token] = (index.tokenOccurrencies[prop][token] ?? 0) + 1
+  index.tokenOccurrences[prop][token] = (index.tokenOccurrences[prop][token] ?? 0) + 1
 }
 
 export async function removeDocumentScoreParameters(
@@ -115,7 +115,7 @@ export async function removeDocumentScoreParameters(
 }
 
 export async function removeTokenScoreParameters(index: Index, prop: string, token: string): Promise<void> {
-  index.tokenOccurrencies[prop][token]--
+  index.tokenOccurrences[prop][token]--
 }
 
 export async function calculateResultScores<I extends OpaqueIndex, D extends OpaqueDocumentStore, AggValue>(
@@ -130,11 +130,11 @@ export async function calculateResultScores<I extends OpaqueIndex, D extends Opa
   // Exact fields for TF-IDF
   const avgFieldLength = index.avgFieldLength[prop]
   const fieldLengths = index.fieldLengths[prop]
-  const oramaOccurrencies = index.tokenOccurrencies[prop]
+  const oramaOccurrences = index.tokenOccurrences[prop]
   const oramaFrequencies = index.frequencies[prop]
 
-  // oramaOccurrencies[term] can be undefined, 0, string, or { [k: string]: number }
-  const termOccurrencies = typeof oramaOccurrencies[term] === 'number' ? oramaOccurrencies[term] ?? 0 : 0
+  // oramaOccurrences[term] can be undefined, 0, string, or { [k: string]: number }
+  const termOccurrences = typeof oramaOccurrences[term] === 'number' ? oramaOccurrences[term] ?? 0 : 0
 
   const scoreList: TokenScore[] = []
 
@@ -146,7 +146,7 @@ export async function calculateResultScores<I extends OpaqueIndex, D extends Opa
 
     const bm25 = BM25(
       tf,
-      termOccurrencies,
+      termOccurrences,
       context.docsCount,
       fieldLengths[id]!,
       avgFieldLength,
@@ -170,7 +170,7 @@ export async function create(
       searchableProperties: [],
       searchablePropertiesWithTypes: {},
       frequencies: {},
-      tokenOccurrencies: {},
+      tokenOccurrences: {},
       avgFieldLength: {},
       fieldLengths: {},
     }
@@ -200,7 +200,7 @@ export async function create(
         index.indexes[path] = radixCreate()
         index.avgFieldLength[path] = 0
         index.frequencies[path] = {}
-        index.tokenOccurrencies[path] = {}
+        index.tokenOccurrences[path] = {}
         index.fieldLengths[path] = {}
         break
       default:
@@ -363,7 +363,7 @@ export async function search<D extends OpaqueDocumentStore, AggValue>(
   prop: string,
   term: string,
 ): Promise<TokenScore[]> {
-  if (!(prop in index.tokenOccurrencies)) {
+  if (!(prop in index.tokenOccurrences)) {
     return []
   }
 
@@ -491,23 +491,50 @@ export async function getSearchablePropertiesWithTypes(index: Index): Promise<Re
   return index.searchablePropertiesWithTypes
 }
 
+function loadNode(node: RadixNode): RadixNode {
+  const convertedNode = radixCreate(node.end, node.subWord, node.key, );
+
+  convertedNode.docs = node.docs;
+  convertedNode.word = node.word;
+
+  for (const childrenKey of Object.keys(node.children)) {
+    convertedNode.children[childrenKey] = loadNode(node.children[childrenKey]);
+  }
+
+  return convertedNode;
+}
+
 export async function load<R = unknown>(raw: R): Promise<Index> {
   const {
-    indexes,
+    indexes: rawIndexes,
     searchableProperties,
     searchablePropertiesWithTypes,
     frequencies,
-    tokenOccurrencies,
+    tokenOccurrences,
     avgFieldLength,
     fieldLengths,
   } = raw as Index
+
+  const indexes: Index['indexes'] = {};
+
+  for (const prop of Object.keys(rawIndexes)) {
+    const value = rawIndexes[prop];
+
+    if (!('word' in value)) {
+      indexes[prop] = value;
+
+      continue;
+    }
+
+    indexes[prop] = loadNode(value);
+  }
 
   return {
     indexes,
     searchableProperties,
     searchablePropertiesWithTypes,
     frequencies,
-    tokenOccurrencies,
+    tokenOccurrences,
     avgFieldLength,
     fieldLengths,
   }
@@ -519,7 +546,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
     searchableProperties,
     searchablePropertiesWithTypes,
     frequencies,
-    tokenOccurrencies,
+    tokenOccurrences,
     avgFieldLength,
     fieldLengths,
   } = index
@@ -529,7 +556,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
     searchableProperties,
     searchablePropertiesWithTypes,
     frequencies,
-    tokenOccurrencies,
+    tokenOccurrences,
     avgFieldLength,
     fieldLengths,
   } as R

@@ -1,8 +1,7 @@
-import { syncBoundedLevenshtein } from '../components/levenshtein.js'
-import { Nullable } from '../types.js'
-import { getOwnProperty, syncUniqueId } from '../utils.js'
+import { syncBoundedLevenshtein } from '../components/levenshtein.js';
+import { getOwnProperty } from '../utils.js';
 
-export class Node implements Node {
+export class Node {
   constructor(
     key: string,
     subWord: string,
@@ -10,14 +9,11 @@ export class Node implements Node {
   ) {
     this.key = key
     this.subWord = subWord
-    this.key = key
     this.end = end
   }
 
-  public id: string = syncUniqueId()
   public key: string
   public subWord: string
-  public parent: Nullable<string> = null
   public children: Record<string, Node> = {}
   public docs: string[] = []
   public end: boolean
@@ -43,7 +39,6 @@ type FindParams = {
 type FindResult = Record<string, string[]>
 
 function updateParent(node: Node, parent: Node): void {
-  node.parent = parent.id
   node.word = parent.word + node.subWord
 }
 
@@ -215,7 +210,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams): FindRe
       // find the common prefix between two words ex: prime and primate = prim
       const commonPrefix = getCommonPrefix(edgeLabel, termSubstring)
       const commonPrefixLength = commonPrefix.length
-      // if the common prefix lenght is equal to edgeLabel lenght (the node subword) it means they are a match
+      // if the common prefix length is equal to edgeLabel length (the node subword) it means they are a match
       // if the common prefix is equal to the term means it is contained in the node
       if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
         // if tolerance is set we take the current node as the closest
@@ -223,7 +218,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams): FindRe
         return {}
       }
 
-      // skip the subword lenght and check the next divergent character
+      // skip the subword length and check the next divergent character
       i += rootChildCurrentChar.subWord.length - 1
       // navigate into the child node
       root = rootChildCurrentChar

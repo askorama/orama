@@ -174,18 +174,18 @@ To customize the index used by Orama, provide an object which has at least the f
   * `id`: The ID of the document being inserted.
   * `token`: The token.
 * `calculateResultScores`: A function that calculates the score for the results of the current search. It should be typically invoked within `search`. It receives the following arguments:
-  * `context`: A search context with various useful informations about the search.
+  * `context`: A search context with various useful information about the search.
   * `index`: The index.
   * `prop`: The property search. 
   * `term`: The term used to search.
   * `ids`: The list of documents IDs matched by the search.
 * `search`: A function that search documents int index data and returns matching IDs with scores. It receives the following arguments:
-  * `context`: A search context with various useful informations about the search.
+  * `context`: A search context with various useful information about the search.
   * `index`: The index.
   * `prop`: The property to search. 
   * `term`: The term to search.
-* `searchByWhereClause`: A function that searchs in boolean and numeric indexes and returns a list of matching IDs. It receives the following arguments:
-  * `context`: A search context with various useful informations about the search.
+* `searchByWhereClause`: A function that searches in boolean and numeric indexes and returns a list of matching IDs. It receives the following arguments:
+  * `context`: A search context with various useful information about the search.
   * `index`: The index.
   * `filters`: An object where keys are the properties to match and the values are search operators as described in the [filters](usage/search/filters) page.
 * `getSearchableProperties`: A function that returns a list of all searchable properties in the index. It receives the index as the only argument.
@@ -283,7 +283,7 @@ The sorter component is used to store the documents in Orama.
 
 To customize the documents sort used by Orama, provide an object which has at least the following properties:
 
-* `create`: A function that receives the schema and the configutation and returns a sorter.
+* `create`: A function that receives the schema and the configuration and returns a sorter.
 * `insert`: A function that inserts a new document in the sorter. It receives the following arguments:
   * `sorter`: The sorter returned by the `create` function.
   * `prop`: The property that it is currently considered.

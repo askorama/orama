@@ -21,6 +21,9 @@
 </p>
 
 [![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/%40orama%2Forama?label=Bundle%20Size&link=https%3A%2F%2Fbundlephobia.com%2Fpackage%2F%40orama%2Forama%40latest)
+[![Open Bounties](https://img.shields.io/endpoint?url=https%3A%2F%2Fconsole.algora.io%2Fapi%2Fshields%2Foramasearch%2Fbounties%3Fstatus%3Dopen)](https://console.algora.io/org/oramasearch/bounties?status=open)
+[![Rewarded Bounties](https://img.shields.io/endpoint?url=https%3A%2F%2Fconsole.algora.io%2Fapi%2Fshields%2Foramasearch%2Fbounties%3Fstatus%3Dcompleted)](https://console.algora.io/org/oramasearch/bounties?status=completed)
 
 # Join Orama's Slack channel
 

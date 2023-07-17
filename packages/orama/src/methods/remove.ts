@@ -23,7 +23,7 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
 
   for (const prop of indexableProperties) {
     const value = values[prop]
-    // The document doens't contain the key
+    // The document doesn't contain the key
     if (typeof value === 'undefined') {
       continue
     }
@@ -61,7 +61,7 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
   const sortableProperties = await orama.sorter.getSortableProperties(orama.data.sorting)
   const sortableValues = await orama.getDocumentProperties(doc, sortableProperties)
   for (const prop of sortableProperties) {
-    // The document doens't contain the key
+    // The document doesn't contain the key
     if (typeof sortableValues[prop] === 'undefined') {
       continue
     }

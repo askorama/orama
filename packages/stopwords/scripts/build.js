@@ -32,6 +32,7 @@ const stemmers = {
   slovenian: 'ru',
   spanish: 'es',
   swedish: 'se',
+  tamil: 'ta',
   turkish: 'tr',
   ukrainian: 'uk',
 }
