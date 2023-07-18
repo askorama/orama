@@ -2,7 +2,7 @@ import t from 'tap'
 import { create, insert, search } from '../src/index.js'
 
 t.test('should only return results with all the search terms (exact match)', async t => {
-  t.plan(3)
+  t.plan(4)
 
   const db = await create({
     schema: {
