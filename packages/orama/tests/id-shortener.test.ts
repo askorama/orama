@@ -11,7 +11,7 @@ t.test('follow sequence', t => {
   t.plan(3)
   t.equal(generateShortId(''), 'A')
   t.equal(generateShortId('A'), 'B')
-  t.equal(generateShortId(')'), ')A')
+  t.equal(generateShortId('~'), '~A')
 })
 
 t.test('create and retrieve key', t => {
