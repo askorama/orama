@@ -6,11 +6,8 @@ export function generateShortId(last: string) {
   if (last === '') {
     return characters[0]
   }
-
   const lastGeneratedIdLastIndex = last.length - 1
-
   const lastChar = last[lastGeneratedIdLastIndex]
-
   const charIndex = characters.indexOf(lastChar)
 
   if (charIndex === characters.length - 1) {
@@ -28,11 +25,8 @@ export function generateUniqueShortId(db: IdStore, original: string): string {
   }
 
   const newId = generateShortId(db.lastShort)
-
   db.originalToShort[original] = newId
-
   db.lastShort = newId
-
   db.shortToOriginal[newId] = original
 
   return newId
