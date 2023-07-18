@@ -1,6 +1,8 @@
-export function intersectFilteredIDs(filtered: string[], lookedUp: [string, number][]): [string, number][] {
-  const map = new Map<string, boolean>()
-  const result: [string, number][] = []
+import { InternalDocumentID } from './internal-document-id-store.js';
+
+export function intersectFilteredIDs(filtered: InternalDocumentID[], lookedUp: [InternalDocumentID, number][]): [InternalDocumentID, number][] {
+  const map = new Map<number, boolean>()
+  const result: [number, number][] = []
 
   for (const id of filtered) {
     map.set(id, true)

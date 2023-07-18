@@ -9,16 +9,16 @@ import {
 } from '../src/trees/radix.js'
 
 const phrases = [
-  { id: '1', doc: 'the quick, brown fox' },
-  { id: '2', doc: 'jumps over the lazy dog' },
-  { id: '3', doc: 'just in time!' },
-  { id: '4', doc: 'there is something wrong in there' },
-  { id: '5', doc: 'this is me' },
-  { id: '6', doc: 'thought it was sunday' },
-  { id: '7', doc: "let's try this trie" },
-  { id: '8', doc: 'primo' },
-  { id: '9', doc: 'primate' },
-  { id: '10', doc: 'prova' },
+  { id: 1, doc: 'the quick, brown fox' },
+  { id: 2, doc: 'jumps over the lazy dog' },
+  { id: 3, doc: 'just in time!' },
+  { id: 4, doc: 'there is something wrong in there' },
+  { id: 5, doc: 'this is me' },
+  { id: 6, doc: 'thought it was sunday' },
+  { id: 7, doc: "let's try this trie" },
+  { id: 8, doc: 'primo' },
+  { id: 9, doc: 'primate' },
+  { id: 10, doc: 'prova' },
 ]
 
 t.test('radix tree', t => {

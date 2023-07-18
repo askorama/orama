@@ -1,5 +1,6 @@
-import { syncBoundedLevenshtein } from '../components/levenshtein.js';
-import { getOwnProperty } from '../utils.js';
+import { syncBoundedLevenshtein } from '../components/levenshtein.js'
+import { InternalDocumentID } from '../components/internal-document-id-store.js'
+import { getOwnProperty } from '../utils.js'
 
 export class Node {
   constructor(
@@ -15,7 +16,7 @@ export class Node {
   public key: string
   public subWord: string
   public children: Record<string, Node> = {}
-  public docs: string[] = []
+  public docs: InternalDocumentID[] = []
   public end: boolean
   public word = ''
 
@@ -36,17 +37,17 @@ type FindParams = {
   tolerance?: number
 }
 
-type FindResult = Record<string, string[]>
+type FindResult = Record<string, InternalDocumentID[]>
 
 function updateParent(node: Node, parent: Node): void {
   node.word = parent.word + node.subWord
 }
 
-function addDocument(node: Node, docID: string): void {
+function addDocument(node: Node, docID: InternalDocumentID): void {
   node.docs.push(docID)
 }
 
-function removeDocument(node: Node, docID: string): boolean {
+function removeDocument(node: Node, docID: InternalDocumentID): boolean {
   const index = node.docs.indexOf(docID)
 
   /* c8 ignore next 3 */
@@ -122,7 +123,7 @@ export function create(end = false, subWord = '', key = ''): Node {
   return new Node(key, subWord, end)
 }
 
-export function insert(root: Node, word: string, docId: string) {
+export function insert(root: Node, word: string, docId: InternalDocumentID) {
   for (let i = 0; i < word.length; i++) {
     const currentCharacter = word[i]
     const wordAtIndex = word.substring(i)
@@ -281,7 +282,7 @@ export function removeWord(root: Node, term: string): boolean {
   return false
 }
 
-export function removeDocumentByWord(root: Node, term: string, docID: string, exact = true): boolean {
+export function removeDocumentByWord(root: Node, term: string, docID: InternalDocumentID, exact = true): boolean {
   if (!term) {
     return true
   }

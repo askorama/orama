@@ -355,7 +355,7 @@ export function remove<K, V>(root: Node<K, V> | null, key: K): Node<K, V> | null
   return root
 }
 
-export function removeDocument<K>(root: Node<K, string[]>, id: string, key: K): void {
+export function removeDocument<K, V>(root: Node<K, V[]>, id: V, key: K): void {
   const node = getNodeByKey(root, key)!
 
   if (node.value.length === 1) {

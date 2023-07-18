@@ -3,6 +3,7 @@ import { getFacets } from '../components/facets.js'
 import { intersectFilteredIDs } from '../components/filters.js'
 import { getGroups } from '../components/groups.js'
 import { runAfterSearch } from '../components/hooks.js'
+import { getDocumentIdFromInternalId, getInternalDocumentId, InternalDocumentID } from '../components/internal-document-id-store.js';
 import { createError } from '../errors.js'
 import {
   BM25Params,
@@ -20,7 +21,7 @@ import {
   CustomSorterFunctionItem,
   OpaqueIndex,
   OpaqueDocumentStore,
-  SearchableValue,
+  SearchableValue, TokenScore
 } from '../types.js'
 import { getNanosecondsTime, getNested, sortTokenScorePredicate } from '../utils.js'
 
@@ -152,7 +153,7 @@ export async function search<AggValue = Result[]>(
 
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
   const hasFilters = Object.keys(params.where ?? {}).length > 0
-  let whereFiltersIDs: string[] = []
+  let whereFiltersIDs: InternalDocumentID[] = []
 
   if (hasFilters) {
     whereFiltersIDs = await orama.index.searchByWhereClause(context, index, params.where!)
@@ -182,7 +183,6 @@ export async function search<AggValue = Result[]>(
       const uniqueDocsLength = uniqueDocs.length
       for (let i = 0; i < uniqueDocsLength; i++) {
         const [id, score] = uniqueDocs[i]
-
         const prevScore = context.uniqueDocsIDs[id]
         if (prevScore) {
           context.uniqueDocsIDs[id] = prevScore + score + 0.5
@@ -204,6 +204,7 @@ export async function search<AggValue = Result[]>(
 
   // Get unique doc IDs from uniqueDocsIDs map
   let uniqueDocsArray = Object.entries(context.uniqueDocsIDs)
+    .map(([id, score]) => [+id, score] as TokenScore)
 
   // If filters are enabled, we need to remove the IDs of the documents that don't match the filters.
   if (hasFilters) {
@@ -212,7 +213,7 @@ export async function search<AggValue = Result[]>(
 
   if (params.sortBy) {
     if (typeof params.sortBy === 'function') {
-      const ids: string[] = uniqueDocsArray.map(([id]) => id)
+      const ids = uniqueDocsArray.map(([id]) => id)
       const docs = await orama.documentsStore.getMultiple(orama.data.docs, ids)
       const docsWithIdAndScore: CustomSorterFunctionItem[] = docs.map((d, i) => [
         uniqueDocsArray[i][0],
@@ -223,6 +224,7 @@ export async function search<AggValue = Result[]>(
       uniqueDocsArray = docsWithIdAndScore.map(([id, score]) => [id, score])
     } else {
       uniqueDocsArray = await orama.sorter.sortBy(orama.data.sorting, uniqueDocsArray, params.sortBy)
+        .then(results => results.map(([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score]))
     }
   } else {
     uniqueDocsArray = uniqueDocsArray.sort(sortTokenScorePredicate)
@@ -273,7 +275,7 @@ export async function search<AggValue = Result[]>(
 
 async function fetchDocumentsWithDistinct(
   orama: Orama,
-  uniqueDocsArray: [string, number][],
+  uniqueDocsArray: [InternalDocumentID, number][],
   offset: number,
   limit: number,
   distinctOn: string,
@@ -287,7 +289,7 @@ async function fetchDocumentsWithDistinct(
   // so we need cannot pre-allocate the array.
   const results: Result[] = []
 
-  const resultIDs: Set<string> = new Set()
+  const resultIDs: Set<InternalDocumentID> = new Set()
   const uniqueDocsArrayLength = uniqueDocsArray.length
   let count = 0
   for (let i = 0; i < uniqueDocsArrayLength; i++) {
@@ -317,7 +319,7 @@ async function fetchDocumentsWithDistinct(
       continue
     }
 
-    results.push({ id, score, document: doc! })
+    results.push({ id: getDocumentIdFromInternalId(orama.internalDocumentIDStore, id), score, document: doc! })
     resultIDs.add(id)
 
     // reached the limit, break the loop
@@ -331,7 +333,7 @@ async function fetchDocumentsWithDistinct(
 
 async function fetchDocuments(
   orama: Orama,
-  uniqueDocsArray: [string, number][],
+  uniqueDocsArray: [InternalDocumentID, number][],
   offset: number,
   limit: number,
 ): Promise<Result[]> {
@@ -341,7 +343,7 @@ async function fetchDocuments(
     length: limit,
   })
 
-  const resultIDs: Set<string> = new Set()
+  const resultIDs: Set<InternalDocumentID> = new Set()
 
   // We already have the list of ALL the document IDs containing the search terms.
   // We loop over them starting from a positional value "offset" and ending at "offset + limit"
@@ -360,7 +362,7 @@ async function fetchDocuments(
       // We retrieve the full document only AFTER making sure that we really want it.
       // We never retrieve the full document preventively.
       const fullDoc = await orama.documentsStore.get(docs, id)
-      results[i] = { id, score, document: fullDoc! }
+      results[i] = { id: getDocumentIdFromInternalId(orama.internalDocumentIDStore, id), score, document: fullDoc! }
       resultIDs.add(id)
     }
   }

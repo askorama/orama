@@ -1,4 +1,5 @@
 import t from 'tap'
+import { getInternalDocumentId } from '../src/components/internal-document-id-store.js';
 import { insert, insertMultiple, create, search, Document } from '../src/index.js'
 import { DocumentsStore } from '../src/components/documents-store.js'
 import { Index } from '../src/components/index.js'
@@ -199,8 +200,8 @@ t.test('insert method', t => {
     t.ok(insertedInfo)
     t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 2)
 
-    t.ok('foo' in (db.data.docs as DocumentsStore).docs[insertedInfo]!)
-    t.same(docWithExtraKey.foo, (db.data.docs as DocumentsStore).docs[insertedInfo]!.foo)
+    t.ok('foo' in (db.data.docs as DocumentsStore).docs[getInternalDocumentId(db.internalDocumentIDStore, insertedInfo)]!)
+    t.same(docWithExtraKey.foo, (db.data.docs as DocumentsStore).docs[getInternalDocumentId(db.internalDocumentIDStore, insertedInfo)]!.foo)
     t.notOk('foo' in (db.data.index as Index).indexes)
   })
 
@@ -245,12 +246,12 @@ t.test('insert method', t => {
 
       t.same(
         nestedExtraKeyDoc.unexpectedProperty,
-        (db.data.docs as DocumentsStore).docs[insertedInfo]!.unexpectedProperty,
+        (db.data.docs as DocumentsStore).docs[getInternalDocumentId(db.internalDocumentIDStore, insertedInfo)]!.unexpectedProperty,
       )
 
       t.same(
         nestedExtraKeyDoc.tag.unexpectedNestedProperty,
-        ((db.data.docs as DocumentsStore).docs[insertedInfo]!.tag as unknown as Record<string, string>)
+        ((db.data.docs as DocumentsStore).docs[getInternalDocumentId(db.internalDocumentIDStore, insertedInfo)]!.tag as unknown as Record<string, string>)
           .unexpectedNestedProperty,
       )
 
