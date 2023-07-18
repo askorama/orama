@@ -1,6 +1,6 @@
 import { IdStore } from './types.js'
 
-const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()'
+const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,-./:;<=>?@[]^_`{|}~';
 
 export function generateShortId(last: string) {
   if (last === '') {
@@ -21,8 +21,10 @@ export function generateShortId(last: string) {
 }
 
 export function generateUniqueShortId(db: IdStore, original: string): string {
-  if (Object.hasOwn(db.originalToShort, original)) {
-    return db.originalToShort[original]
+
+  const existing = db.originalToShort[original]
+  if (existing) {
+    return existing
   }
 
   const newId = generateShortId(db.lastShort)
