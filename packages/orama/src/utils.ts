@@ -17,15 +17,22 @@ export const isServer = typeof window === 'undefined'
  */
 export const MAX_ARGUMENT_FOR_STACK = 10_000;
 
-export function safeAddNewItems<T>(arr: T[], newArr: T[]): T[] {
-  // we need to use by apply because of issues like: https://github.com/oramasearch/orama/issues/301
-  // that issue is caused because scoreList can be huge
+/**
+ * This method is needed to used because of issues like: https://github.com/oramasearch/orama/issues/301
+ * that issue is caused because the array that is pushed is huge (>100k)
+ * 
+ * @example
+ * ```ts
+ * safeArrayPush(myArray, [1, 2])
+ * ```
+ */
+export function safeArrayPush<T>(arr: T[], newArr: T[]): void {
   if (newArr.length < MAX_ARGUMENT_FOR_STACK) {
     arr.push(...newArr)
-
-    return arr;
   } else {
-    return arr.concat(newArr)
+    for (let i = 0; i < newArr.length; i += MAX_ARGUMENT_FOR_STACK) {
+      arr.push(...newArr.slice(i, i + MAX_ARGUMENT_FOR_STACK))
+    }
   }
 }
 

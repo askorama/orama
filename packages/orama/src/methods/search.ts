@@ -28,7 +28,7 @@ import {
   InternalDocumentID,
 } from '../components/internal-document-id-store.js'
 import { createError } from '../errors.js'
-import { getNanosecondsTime, getNested, sortTokenScorePredicate, safeAddNewItems } from "../utils.js";
+import { getNanosecondsTime, getNested, sortTokenScorePredicate, safeAddNewItems, safeArrayPush } from '../utils.js';
 
 const defaultBM25Params: BM25Params = {
   k: 1.2,
@@ -179,7 +179,7 @@ export async function search<AggValue = Result[]>(
         // Lookup
         const scoreList = await orama.index.search(context, index, prop, term)
 
-        context.indexMap[prop][term] = safeAddNewItems(context.indexMap[prop][term], scoreList);
+        safeArrayPush(context.indexMap[prop][term], scoreList);
       }
 
       const docIds = context.indexMap[prop]

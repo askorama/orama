@@ -1,3 +1,5 @@
+import { safeArrayPush } from '../utils.js'
+
 export type Node<K, V> = {
   key: K
   value: V
@@ -111,7 +113,7 @@ export function rangeSearch<K, V>(node: Node<K, V>, min: K, max: K): V {
     }
 
     if (node.key >= min && node.key <= max) {
-      result.push(...(node.value as V[]))
+      safeArrayPush(result, node.value as V[]);
     }
 
     if (node.key < max) {
@@ -139,11 +141,11 @@ export function greaterThan<K, V>(node: Node<K, V>, key: K, inclusive = false): 
     }
 
     if (inclusive && node.key >= key) {
-      result.push(...(node.value as V[]))
+      safeArrayPush(result, node.value as V[]);
     }
 
     if (!inclusive && node.key > key) {
-      result.push(...(node.value as V[]))
+      safeArrayPush(result, node.value as V[]);
     }
 
     traverse(node.left as Node<K, V>)
@@ -170,11 +172,11 @@ export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
     }
 
     if (inclusive && node.key <= key) {
-      result.push(...(node.value as V[]))
+      safeArrayPush(result, node.value as V[]);
     }
 
     if (!inclusive && node.key < key) {
-      result.push(...(node.value as V[]))
+      safeArrayPush(result, node.value as V[]);
     }
 
     traverse(node.left as Node<K, V>)
