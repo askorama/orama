@@ -360,6 +360,10 @@ export function remove<K, V>(root: Node<K, V> | null, key: K): Node<K, V> | null
 export function removeDocument<K, V>(root: Node<K, V[]>, id: V, key: K): void {
   const node = getNodeByKey(root, key)!
 
+  if (!node) {
+    return
+  }
+
   if (node.value.length === 1) {
     remove(root, key)
     return
