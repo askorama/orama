@@ -12,6 +12,16 @@ t.test("it should throw for non-object json schema", async t => {
     t.throws(() => schemaFromJson(jsonSchema), Error, 'Provided JSON schema must be an object type');
 })
 
+t.test("it should return empty object for missing properties", async t => {
+    const jsonSchema = {
+        type: 'object',
+    } as const
+
+    const oramaSchema = schemaFromJson(jsonSchema)
+
+    t.same(oramaSchema, {})
+})
+
 t.test("it should convert type string", async t => {
     const jsonSchema = {
         type: 'object',
