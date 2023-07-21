@@ -1,15 +1,9 @@
-import type { JSONSchema4 } from 'json-schema';
 import type { Schema } from '@orama/orama';
+import type { JSONSchema4 } from 'json-schema';
 
 const assertTypeObject = (jsonSchema: JSONSchema4) => {
     if (jsonSchema.type !== 'object') {
-        throw new Error('Provided schema must be an object type');
-    }
-}
-
-const assertProperties = (jsonSchema: JSONSchema4) => {
-    if (!jsonSchema.properties) {
-        throw new Error('Provided must have properties');
+        throw new Error('Provided JSON schema must be an object type');
     }
 }
 
@@ -33,13 +27,13 @@ const extractOramaType = (jsonSchema: JSONSchema4) => {
 export const schemaFromJson = (jsonSchema: JSONSchema4) => {
     assertTypeObject(jsonSchema)
 
-    assertProperties(jsonSchema)
-
     const oramaSchema: Schema = {}
 
-    for (const [propertyName, propertyDefinition] of Object.entries(jsonSchema.properties!)) {
+    for (const [propertyName, propertyDefinition] of Object.entries(jsonSchema.properties || {})) {
         if (isSupportedByOrama(propertyDefinition)) {
             oramaSchema[propertyName] = extractOramaType(propertyDefinition)
         }
     }
+
+    return oramaSchema;
 }

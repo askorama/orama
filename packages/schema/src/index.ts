@@ -1,3 +1,3 @@
-import { schemaFromJson } from './jsonSchema'
+import { schemaFromJson } from './jsonSchema.js'
 
 export { schemaFromJson }
