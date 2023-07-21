@@ -228,3 +228,23 @@ t.test("it should convert all types", async t => {
         myBooleanArray: 'boolean[]'
     })
 })
+
+t.test("it should skip unknown types", async t => {
+    const jsonSchema = {
+        type: 'object',
+        properties: {
+            myBoolean: {
+                type: 'boolean'
+            },
+            myObject: {
+                type: 'object'
+            }
+        }
+    } as const
+
+    const oramaSchema = schemaFromJson(jsonSchema)
+
+    t.same(oramaSchema, {
+        myBoolean: 'boolean'
+    })
+})
