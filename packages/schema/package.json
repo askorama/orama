@@ -1,6 +1,6 @@
 {
   "name": "@orama/schema",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Schema utilities for Orama",
   "keywords": [
     "orama",
@@ -41,6 +41,7 @@
   "devDependencies": {
     "@swc/cli": "^0.1.59",
     "@swc/core": "^1.3.27",
+    "@types/json-schema": "^7.0.12",
     "@types/node": "^18.11.18",
     "@types/tap": "^15.0.7",
     "c8": "^7.12.0",
