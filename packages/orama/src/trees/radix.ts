@@ -3,11 +3,7 @@ import { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getOwnProperty } from '../utils.js'
 
 export class Node {
-  constructor(
-    key: string,
-    subWord: string,
-    end: boolean,
-  ) {
+  constructor(key: string, subWord: string, end: boolean) {
     this.key = key
     this.subWord = subWord
     this.end = end
@@ -26,7 +22,7 @@ export class Node {
       subWord: this.subWord,
       children: this.children,
       docs: this.docs,
-      end: this.end
+      end: this.end,
     }
   }
 }

@@ -1,4 +1,5 @@
 import { Callout } from 'nextra-theme-docs'
+import Link from 'next/link'
 
 # Components
 
@@ -139,7 +140,10 @@ The index component is used to perform the indexing and searching of documents i
 
 To customize the index used by Orama, provide an object which has at least the following properties:
 
-* `create`: A function that receives an Orama instance and a schema and returns an index.
+* `create`: A function that creates a new index. It receives the following arguments:
+  * `orama`: The Orama instance.
+  * `mapper`: The documents IDs mapper (see <Link href="#internal-components">Internal components</Link> section below).
+  * `schema`: The documents schema.
 * `insert`: A function that inserts a new document in the index. It receives the following arguments:
   * `implementation`: The current index implementation.
   * `index`: The index.
@@ -190,7 +194,7 @@ To customize the index used by Orama, provide an object which has at least the f
   * `filters`: An object where keys are the properties to match and the values are search operators as described in the [filters](usage/search/filters) page.
 * `getSearchableProperties`: A function that returns a list of all searchable properties in the index. It receives the index as the only argument.
 * `getSearchablePropertiesWithTypes`: A function that returns an object where keys are the searchable properties in the index and the values are the type of the index for a property. It receives the index as the only argument.
-* `load`: A function that deserializes an index from a JavaScript object. It receives a JavaScript object as its only argument and must return an index.
+* `load`: A function that deserializes an index from a JavaScript object. It receives The documents IDs mapper and a JavaScript object as its only argument and must return an index.
 * `save`: A function that serializes the index into a JavaScript object. It receives the index as the only argument and must return a JavaScript object.
 
 The following functions are optional:
@@ -216,7 +220,7 @@ const movieDB = await create({
     // This index will only customize the deserialization
     index: {
       ...index,
-      load(raw) {
+      load(documentsIdsMapper, raw) {
         // Do something here
       }
     }
@@ -230,10 +234,14 @@ The documentsStore component is used to store the documents in Orama.
 
 To customize the documents store used by Orama, provide an object which has at least the following properties:
 
-* `create`: A function that receives an Orama instance and a schema and returns a documents store.
+* `create`: A function that creates a new document store. It receives the following arguments:
+  * `orama`: The Orama instance.
+  * `mapper`: The documents IDs mapper (see <Link href="#internal-components">Internal components</Link> section below).
 * `get`: A function that returns a document from the store. It receives the following arguments:
   * The documents store.
   * The ID of the document to get.
+* `getAll`: A function that returns all documents from the store. Note that the IDs in the returned object are the mapped IDs from the mapper component. It receives the following arguments:
+  * The documents store.
 * `getMultiple`: A function that returns multiple documents from the store. It receives the following arguments:
   * The documents store.
   * A list of IDs of the documents to get.
@@ -247,7 +255,7 @@ To customize the documents store used by Orama, provide an object which has at l
   * The documents store.
   * The ID of the new document to remove.
 * `count`: A function that returns the count of the documents currently stored. It receives the current documents store as the only argument.
-* `load`: A function that deserializes a documents store from a JavaScript object. It receives a JavaScript object as its only argument and must return a documents store.
+* `load`: A function that deserializes a documents store from a JavaScript object. It receives The documents IDs mapper and a JavaScript object as its only argument and must return a documents store.
 * `save`: A function that serializes the documents store into a JavaScript object. It receives the current documents store as the only argument and must return a JavaScript object.
 
 For the more formal interface information, look for the `IDocumentsStore` interface in `src/types.ts` in Orama's source code.
@@ -283,7 +291,10 @@ The sorter component is used to store the documents in Orama.
 
 To customize the documents sort used by Orama, provide an object which has at least the following properties:
 
-* `create`: A function that receives the schema and the configuration and returns a sorter.
+* `create`: A function that creates a new sorter. It receives the following arguments:
+  * `mapper`: The documents IDs mapper (see <Link href="#internal-components">Internal components</Link> section below).
+  * `schema`: The documents schema.
+  * `configuration`: The sorter configuration.
 * `insert`: A function that inserts a new document in the sorter. It receives the following arguments:
   * `sorter`: The sorter returned by the `create` function.
   * `prop`: The property that it is currently considered.
@@ -301,7 +312,7 @@ To customize the documents sort used by Orama, provide an object which has at le
   * `by`: The SortParamets specified during the search
 * `getSortableProperties`: A function that returns a list of all sortable properties in the sorter. It receives the index as the only argument.
 * `getSortablePropertiesWithTypes`: A function that returns an object where keys are the sortable properties in the sorter and the values are the type of the sort for a property. It receives the index as the only argument.
-* `load`: A function that deserializes an sort from a JavaScript object. It receives a JavaScript object as its only argument and must return an sort.
+* `load`: A function that deserializes an sort from a JavaScript object. It receives The documents IDs mapper and a JavaScript object as its only argument and must return an sort.
 * `save`: A function that serializes the sorter into a JavaScript object. It receives the sorter as the only argument and must return a JavaScript object.
 
 ```javascript
@@ -602,6 +613,21 @@ The function will receive the following arguments:
 * The list of new document IDs that have been updated.
 
 <Callout type="warning">`afterUpdate` will still be invoked for each document.</Callout>
+
+## Internal components
+
+### Documents IDs mapper
+
+In order to improve performance, Orama uses an internal ID for each document. The documents IDs mapper component is used to maintain link between the user document ID and the Orama document ID.
+
+This component is internal and cannot be replaced by the developer. The component is passed to the customizable components (like `documentsStore`) and must be treated as a opaque object.
+
+When writing or reading documents in the `data` section of The Orama instance, such as `orama.data.index`, make sure you always use a internal ID.
+
+Orama exports two helpers which will help dealing with this operations:
+
+* `getInternalDocumentId`: A function that receives a documents mapper object and an external document ID and returns an internal document ID.
+* `getDocumentIdFromInternalId`: A function that receives a documents mapper object and an internal document ID and returns an external document ID.
 
 ## Extending Orama
 

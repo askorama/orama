@@ -1,7 +1,7 @@
 import type { Orama, ScalarSearchableValue, TokenScore, GroupByParams, GroupResult, Result, Reduce } from '../types.js'
 import { createError } from '../errors.js'
 import { getNested, intersect } from '../utils.js'
-import { getDocumentIdFromInternalId } from './internal-document-id-store.js';
+import { getDocumentIdFromInternalId } from './internal-document-id-store.js'
 
 interface PropertyGroup {
   property: string

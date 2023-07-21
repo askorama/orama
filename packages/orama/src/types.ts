@@ -301,7 +301,7 @@ export type Result = {
   /**
    * The id of the document.
    */
-  id: string;
+  id: string
   /**
    * The score of the document in the search.
    */
@@ -403,6 +403,7 @@ export type IIndexInsertOrRemoveHookFunction<I extends OpaqueIndex = OpaqueIndex
 export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   create<S extends Schema, D extends OpaqueDocumentStore, So extends OpaqueSorter>(
     orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
+    sharedInternalDocumentStore: InternalDocumentIDStore,
     schema: Schema,
   ): SyncOrAsyncValue<I>
 
@@ -467,13 +468,14 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
   getSearchablePropertiesWithTypes(index: I): SyncOrAsyncValue<Record<string, SearchableType>>
 
-  load<R = unknown>(raw: R): SyncOrAsyncValue<I>
+  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): SyncOrAsyncValue<I>
   save<R = unknown>(index: I): SyncOrAsyncValue<R>
 }
 
 export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentStore> {
   create<S extends Schema, I extends OpaqueIndex, So extends OpaqueSorter>(
     orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
+    sharedInternalDocumentStore: InternalDocumentIDStore,
   ): SyncOrAsyncValue<D>
   get(store: D, id: DocumentID): SyncOrAsyncValue<Document | undefined>
   getMultiple(store: D, ids: DocumentID[]): SyncOrAsyncValue<(Document | undefined)[]>
@@ -482,7 +484,7 @@ export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentS
   remove(store: D, id: DocumentID): SyncOrAsyncValue<boolean>
   count(store: D): SyncOrAsyncValue<number>
 
-  load<R = unknown>(raw: R): SyncOrAsyncValue<D>
+  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): SyncOrAsyncValue<D>
   save<R = unknown>(store: D): SyncOrAsyncValue<R>
 }
 
@@ -494,6 +496,7 @@ export interface SorterConfig {
 export interface ISorter<So extends OpaqueSorter = OpaqueSorter> {
   create<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
     orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
+    sharedInternalDocumentStore: InternalDocumentIDStore,
     schema: Schema,
     sorterConfig?: SorterConfig,
   ): SyncOrAsyncValue<So>
@@ -507,7 +510,7 @@ export interface ISorter<So extends OpaqueSorter = OpaqueSorter> {
   ) => SyncOrAsyncValue
   remove: (sorter: So, prop: string, id: DocumentID) => SyncOrAsyncValue
 
-  load<R = unknown>(raw: R): SyncOrAsyncValue<So>
+  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): SyncOrAsyncValue<So>
   save<R = unknown>(sorter: So): SyncOrAsyncValue<R>
 
   sortBy(sorter: So, docIds: [DocumentID, number][], by: SorterParams): Promise<[DocumentID, number][]>

@@ -1,15 +1,20 @@
-import { DocumentID, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from './internal-document-id-store.js';
-import { Document, IDocumentsStore, OpaqueDocumentStore } from '../types.js';
+import {
+  DocumentID,
+  getInternalDocumentId,
+  InternalDocumentID,
+  InternalDocumentIDStore,
+} from './internal-document-id-store.js'
+import { Document, IDocumentsStore, OpaqueDocumentStore, Orama } from '../types.js'
 
 export interface DocumentsStore extends OpaqueDocumentStore {
-  sharedInternalDocumentStore: InternalDocumentIDStore;
-  docs: Record<InternalDocumentID, Document | undefined>,
+  sharedInternalDocumentStore: InternalDocumentIDStore
+  docs: Record<InternalDocumentID, Document | undefined>
   count: number
 }
 
 export type DefaultDocumentsStore = IDocumentsStore<DocumentsStore>
 
-export async function create(sharedInternalDocumentStore: InternalDocumentIDStore): Promise<DocumentsStore> {
+export async function create(_: Orama, sharedInternalDocumentStore: InternalDocumentIDStore): Promise<DocumentsStore> {
   return {
     sharedInternalDocumentStore,
     docs: {},
@@ -18,7 +23,7 @@ export async function create(sharedInternalDocumentStore: InternalDocumentIDStor
 }
 
 export async function get(store: DocumentsStore, id: DocumentID): Promise<Document | undefined> {
-  const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id);
+  const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id)
 
   return store.docs[internalId]
 }
@@ -35,11 +40,11 @@ export async function getMultiple(store: DocumentsStore, ids: DocumentID[]): Pro
 }
 
 export async function getAll(store: DocumentsStore): Promise<Record<InternalDocumentID, Document>> {
-  return store.docs as Record<InternalDocumentID, Document>;
+  return store.docs as Record<InternalDocumentID, Document>
 }
 
 export async function store(store: DocumentsStore, id: DocumentID, doc: Document): Promise<boolean> {
-  const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id);
+  const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id)
 
   if (typeof store.docs[internalId] !== 'undefined') {
     return false
@@ -52,7 +57,7 @@ export async function store(store: DocumentsStore, id: DocumentID, doc: Document
 }
 
 export async function remove(store: DocumentsStore, id: DocumentID): Promise<boolean> {
-  const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id);
+  const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id)
 
   if (typeof store.docs[internalId] === 'undefined') {
     return false
@@ -68,7 +73,10 @@ export async function count(store: DocumentsStore): Promise<number> {
   return store.count
 }
 
-export async function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Promise<DocumentsStore> {
+export async function load<R = unknown>(
+  sharedInternalDocumentStore: InternalDocumentIDStore,
+  raw: R,
+): Promise<DocumentsStore> {
   const rawDocument = raw as DocumentsStore
 
   return {
@@ -85,16 +93,16 @@ export async function save<R = unknown>(store: DocumentsStore): Promise<R> {
   } as R
 }
 
-export async function createDocumentsStore(sharedInternalDocumentStore: InternalDocumentIDStore): Promise<DefaultDocumentsStore> {
+export async function createDocumentsStore(): Promise<DefaultDocumentsStore> {
   return {
-    create: create.bind(null, sharedInternalDocumentStore),
+    create,
     get,
     getMultiple,
     getAll,
     store,
     remove,
     count,
-    load: load.bind(null, sharedInternalDocumentStore),
+    load,
     save,
   }
 }

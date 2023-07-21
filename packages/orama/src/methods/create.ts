@@ -123,9 +123,9 @@ export async function create<P extends ProvidedTypes>({
 
   const internalDocumentStore = createInternalDocumentIDStore()
 
-  index ||= await createIndex(internalDocumentStore)
-  sorter ||= await createSorter(internalDocumentStore)
-  documentsStore ||= await createDocumentsStore(internalDocumentStore)
+  index ||= await createIndex()
+  sorter ||= await createSorter()
+  documentsStore ||= await createDocumentsStore()
 
   // Validate all other components
   validateComponents(components)
@@ -181,9 +181,9 @@ export async function create<P extends ProvidedTypes>({
   } as Orama
 
   orama.data = {
-    index: await orama.index.create(orama, schema),
-    docs: await orama.documentsStore.create(orama),
-    sorting: await orama.sorter.create(orama, schema, sort),
+    index: await orama.index.create(orama, internalDocumentStore, schema),
+    docs: await orama.documentsStore.create(orama, internalDocumentStore),
+    sorting: await orama.sorter.create(orama, internalDocumentStore, schema, sort),
   }
 
   return orama

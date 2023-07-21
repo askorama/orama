@@ -131,5 +131,5 @@ export const stopwords = [
   'zbog',
   'želeo',
   'želi',
-  'znati'
+  'znati',
 ]

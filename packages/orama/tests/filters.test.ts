@@ -55,35 +55,44 @@ t.test('filters', t => {
   t.test('should throw on unknown field', async t => {
     const db = await createSimpleDB()
 
-    await t.rejects(search(db, {
-      term: 'coffee',
-      where: {
-        unknownField: '5'
+    await t.rejects(
+      search(db, {
+        term: 'coffee',
+        where: {
+          unknownField: '5',
+        },
+      }),
+      {
+        message: 'Unknown filter property "unknownField"',
+        code: 'UNKNOWN_FILTER_PROPERTY',
       },
-    }), {
-      message: 'Unknown filter property "unknownField"',
-      code: 'UNKNOWN_FILTER_PROPERTY',
-    })
+    )
 
-    await t.rejects(search(db, {
-      term: 'coffee',
-      where: {
-        unknownField: { gt: '5' } as unknown as string
+    await t.rejects(
+      search(db, {
+        term: 'coffee',
+        where: {
+          unknownField: { gt: '5' } as unknown as string,
+        },
+      }),
+      {
+        message: 'Unknown filter property "unknownField"',
+        code: 'UNKNOWN_FILTER_PROPERTY',
       },
-    }), {
-      message: 'Unknown filter property "unknownField"',
-      code: 'UNKNOWN_FILTER_PROPERTY',
-    })
+    )
 
-    await t.rejects(search(db, {
-      term: 'coffee',
-      where: {
-        unknownField: true as unknown as string
+    await t.rejects(
+      search(db, {
+        term: 'coffee',
+        where: {
+          unknownField: true as unknown as string,
+        },
+      }),
+      {
+        message: 'Unknown filter property "unknownField"',
+        code: 'UNKNOWN_FILTER_PROPERTY',
       },
-    }), {
-      message: 'Unknown filter property "unknownField"',
-      code: 'UNKNOWN_FILTER_PROPERTY',
-    })
+    )
 
     t.end()
   })

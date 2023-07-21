@@ -33,7 +33,7 @@ export function OramaSearch(props = defaultProps) {
   return router?.isReady ? <OramaSearchPlugin {...props} router={router} /> : null
 }
 
-function OramaSearchPlugin({router, ...props}) {
+function OramaSearchPlugin({ router, ...props }) {
   const [, setIndexing] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [results, setResults] = useState<SearchResultWithHighlight>()

@@ -1,6 +1,6 @@
 import { createError } from '../errors.js'
 import { TokenScore, BM25Params } from '../types.js'
-import { InternalDocumentID } from './internal-document-id-store.js';
+import { InternalDocumentID } from './internal-document-id-store.js'
 
 export function prioritizeTokenScores(arrays: TokenScore[][], boost: number, threshold = 1): TokenScore[] {
   if (boost === 0) {
@@ -20,9 +20,9 @@ export function prioritizeTokenScores(arrays: TokenScore[][], boost: number, thr
       const oldScore = tokenMap.get(token)
 
       if (oldScore !== undefined) {
-        tokenMap.set(token, oldScore *  1.5 + boostScore)
+        tokenMap.set(token, oldScore * 1.5 + boostScore)
       } else {
-        tokenMap.set(token, boostScore);
+        tokenMap.set(token, boostScore)
       }
     }
   }
@@ -30,11 +30,10 @@ export function prioritizeTokenScores(arrays: TokenScore[][], boost: number, thr
   const tokenScores: TokenScore[] = []
 
   for (const tokenStore of tokenMap.entries()) {
-    tokenScores.push(tokenStore);
+    tokenScores.push(tokenStore)
   }
 
-  const results = tokenScores
-    .sort((a, b) => b[1] - a[1])
+  const results = tokenScores.sort((a, b) => b[1] - a[1])
 
   // If threshold is 1, it means we will return all the results with at least one search term,
   // prioritizig the ones that contains more search terms (fuzzy match)

@@ -43,5 +43,5 @@ export const stopwords = [
   'ում',
   'պիտի',
   'վրա',
-  'և'
+  'և',
 ]
