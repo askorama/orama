@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -406,6 +406,37 @@ importers:
       webpack:
         specifier: ^5.75.0
         version: 5.75.0(@swc/core@1.3.27)
+
+  packages/plugin-jsonschema:
+    dependencies:
+      '@orama/orama':
+        specifier: workspace:*
+        version: link:../orama
+    devDependencies:
+      '@swc/cli':
+        specifier: ^0.1.59
+        version: 0.1.59(@swc/core@1.3.27)
+      '@swc/core':
+        specifier: ^1.3.27
+        version: 1.3.27
+      '@types/tap':
+        specifier: ^15.0.7
+        version: 15.0.7
+      c8:
+        specifier: ^7.12.0
+        version: 7.12.0
+      tap:
+        specifier: ^16.3.0
+        version: 16.3.4(typescript@5.0.3)
+      tap-mocha-reporter:
+        specifier: ^5.0.3
+        version: 5.0.3
+      tsx:
+        specifier: ^3.12.2
+        version: 3.12.2
+      typescript:
+        specifier: ^5.0.3
+        version: 5.0.3
 
   packages/plugin-match-highlight:
     dependencies:
@@ -2603,7 +2634,7 @@ packages:
       react-router-config: 5.1.1(react-router@5.3.4)(react@17.0.2)
       react-router-dom: 5.3.4(react@17.0.2)
       rtl-detect: 1.0.4
-      semver: 7.3.8
+      semver: 7.5.0
       serve-handler: 6.1.5
       shelljs: 0.8.5
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.75.0)
@@ -4746,7 +4777,7 @@ packages:
       debug: 4.3.4
       globby: 11.1.0
       is-glob: 4.0.3
-      semver: 7.3.8
+      semver: 7.5.0
       tsutils: 3.21.0(typescript@4.9.4)
       typescript: 4.9.4
     transitivePeerDependencies:
@@ -4767,7 +4798,7 @@ packages:
       debug: 4.3.4
       globby: 11.1.0
       is-glob: 4.0.3
-      semver: 7.3.8
+      semver: 7.5.0
       tsutils: 3.21.0(typescript@4.9.4)
       typescript: 4.9.4
     transitivePeerDependencies:
@@ -4788,7 +4819,7 @@ packages:
       debug: 4.3.4
       globby: 11.1.0
       is-glob: 4.0.3
-      semver: 7.3.8
+      semver: 7.5.0
       tsutils: 3.21.0(typescript@4.9.4)
       typescript: 4.9.4
     transitivePeerDependencies:
@@ -4812,7 +4843,7 @@ packages:
       eslint: 8.32.0
       eslint-scope: 5.1.1
       eslint-utils: 3.0.0(eslint@8.32.0)
-      semver: 7.3.8
+      semver: 7.5.0
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -4835,7 +4866,7 @@ packages:
       '@typescript-eslint/typescript-estree': 5.59.9(typescript@4.9.4)
       eslint: 8.32.0
       eslint-scope: 5.1.1
-      semver: 7.3.8
+      semver: 7.5.0
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -5797,7 +5828,7 @@ packages:
   /builtins@5.0.1:
     resolution: {integrity: sha512-qwVpFEHNfhYJIzNRBvd2C1kyo6jz3ZSMPyyuR47OPdiKWlbYnZNyDWuyR175qDnAJLiCo5fBBqPb3RiXgWlkOQ==}
     dependencies:
-      semver: 7.3.8
+      semver: 7.5.0
     dev: true
 
   /bundle-name@3.0.0:
@@ -6342,7 +6373,7 @@ packages:
     dev: false
 
   /concat-map@0.0.1:
-    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
 
   /config-chain@1.1.13:
     resolution: {integrity: sha512-qj+f8APARXHrM0hraqXYb2/bOVSV4PvJQlNZ/DVj0QrmNM2q2euizkeuVckQ57J+W0mRH6Hvi+k50M4Jul2VRQ==}
@@ -6585,7 +6616,7 @@ packages:
       postcss-modules-scope: 3.0.0(postcss@8.4.24)
       postcss-modules-values: 4.0.0(postcss@8.4.24)
       postcss-value-parser: 4.2.0
-      semver: 7.3.8
+      semver: 7.5.0
       webpack: 5.75.0(@swc/core@1.3.27)
     dev: false
 
@@ -8492,7 +8523,7 @@ packages:
       memfs: 3.5.3
       minimatch: 3.1.2
       schema-utils: 2.7.0
-      semver: 7.3.8
+      semver: 7.5.0
       tapable: 1.1.3
       typescript: 4.9.4
       webpack: 5.75.0(@swc/core@1.3.27)
@@ -11781,7 +11812,7 @@ packages:
     dependencies:
       hosted-git-info: 4.1.0
       is-core-module: 2.12.1
-      semver: 7.3.8
+      semver: 7.5.0
       validate-npm-package-license: 3.0.4
     dev: true
 
@@ -12546,7 +12577,7 @@ packages:
       jiti: 1.18.2
       klona: 2.0.6
       postcss: 8.4.24
-      semver: 7.3.8
+      semver: 7.5.0
       webpack: 5.75.0(@swc/core@1.3.27)
     dev: false
 
@@ -14219,7 +14250,6 @@ packages:
     hasBin: true
     dependencies:
       lru-cache: 6.0.0
-    dev: true
 
   /send@0.18.0:
     resolution: {integrity: sha512-qqWzuOjSFOuqPjFe4NOsMLafToQQwBSOEpS+FwEt3A2V3vKubTquT3vmLTQpFgMXp8AlFWFuP1qKaJZOtPpVXg==}
@@ -14991,6 +15021,57 @@ packages:
       tcompare: 5.0.7
       ts-node: 10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@4.9.4)
       typescript: 4.9.4
+      which: 2.0.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+    bundledDependencies:
+      - ink
+      - treport
+      - '@types/react'
+      - '@isaacs/import-jsx'
+      - react
+
+  /tap@16.3.4(typescript@5.0.3):
+    resolution: {integrity: sha512-SAexdt2ZF4XBgye6TPucFI2y7VE0qeFXlXucJIV1XDPCs+iJodk0MYacr1zR6Ycltzz7PYg8zrblDXKbAZM2LQ==}
+    engines: {node: '>=12'}
+    hasBin: true
+    peerDependencies:
+      coveralls: ^3.1.1
+      flow-remove-types: '>=2.112.0'
+      ts-node: '>=8.5.2'
+      typescript: '>=3.7.2'
+    peerDependenciesMeta:
+      coveralls:
+        optional: true
+      flow-remove-types:
+        optional: true
+      ts-node:
+        optional: true
+      typescript:
+        optional: true
+    dependencies:
+      chokidar: 3.5.3
+      findit: 2.0.0
+      foreground-child: 2.0.0
+      fs-exists-cached: 1.0.0
+      glob: 7.2.3
+      isexe: 2.0.0
+      istanbul-lib-processinfo: 2.0.3
+      jackspeak: 1.4.2
+      libtap: 1.4.1
+      minipass: 3.3.6
+      mkdirp: 1.0.4
+      nyc: 15.1.0
+      opener: 1.5.2
+      rimraf: 3.0.2
+      signal-exit: 3.0.7
+      source-map-support: 0.5.21
+      tap-mocha-reporter: 5.0.3
+      tap-parser: 11.0.2
+      tap-yaml: 1.0.2
+      tcompare: 5.0.7
+      typescript: 5.0.3
       which: 2.0.2
     transitivePeerDependencies:
       - supports-color
@@ -15784,7 +15865,7 @@ packages:
       is-yarn-global: 0.3.0
       latest-version: 5.1.0
       pupa: 2.1.1
-      semver: 7.3.8
+      semver: 7.5.0
       semver-diff: 3.1.1
       xdg-basedir: 4.0.0
     dev: false
