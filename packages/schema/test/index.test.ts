@@ -246,8 +246,8 @@ t.test("it should skip unknown types", async t => {
             myBoolean: {
                 type: 'boolean'
             },
-            myObject: {
-                type: 'object'
+            myAny: {
+                type: 'any'
             }
         }
     } as const
@@ -256,5 +256,33 @@ t.test("it should skip unknown types", async t => {
 
     t.same(oramaSchema, {
         myBoolean: 'boolean'
+    })
+})
+
+t.test("it should convert nested objects", async t => {
+    const jsonSchema = {
+        type: 'object',
+        properties: {
+            myBoolean: {
+                type: 'boolean'
+            },
+            myObject: {
+                type: 'object',
+                properties: {
+                    myString: {
+                        type: 'string'
+                    }
+                }
+            }
+        }
+    } as const
+
+    const oramaSchema = schemaFromJson(jsonSchema)
+
+    t.same(oramaSchema, {
+        myBoolean: 'boolean',
+        myObject: {
+            myString: 'string'
+        }
     })
 })

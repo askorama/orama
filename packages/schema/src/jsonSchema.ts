@@ -1,8 +1,10 @@
 import type { Schema, SearchableType } from '@orama/orama';
 import type { JSONSchema4 } from 'json-schema';
 
+const isJsonObject = (jsonSchema: JSONSchema4) => jsonSchema.type === 'object'
+
 const assertTypeObject = (jsonSchema: JSONSchema4) => {
-    if (jsonSchema.type !== 'object') {
+    if (!isJsonObject(jsonSchema)) {
         throw new Error('Provided JSON schema must be an object type');
     }
 }
@@ -34,6 +36,8 @@ export const schemaFromJson = (jsonSchema: JSONSchema4) => {
     for (const [propertyName, propertyDefinition] of Object.entries(jsonSchema.properties || {})) {
         if (isSupportedByOrama(propertyDefinition)) {
             oramaSchema[propertyName] = extractOramaType(propertyDefinition)
+        } else if (isJsonObject(propertyDefinition)) {
+            oramaSchema[propertyName] = schemaFromJson(propertyDefinition)
         }
     }
 
