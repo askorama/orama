@@ -107,5 +107,5 @@ export const stopwords = [
   'ó',
   'ón',
   'óna',
-  'ónár'
+  'ónár',
 ]

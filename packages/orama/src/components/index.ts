@@ -35,7 +35,12 @@ import {
 import { intersect } from '../utils.js'
 import { BM25 } from './algorithms.js'
 import { getInnerType, isArrayType } from './defaults.js'
-import { DocumentID, getInternalDocumentId, InternalDocumentID, InternalDocumentIDStore } from './internal-document-id-store.js'
+import {
+  DocumentID,
+  getInternalDocumentId,
+  InternalDocumentID,
+  InternalDocumentIDStore,
+} from './internal-document-id-store.js'
 
 export type FrequencyMap = {
   [property: string]: {
@@ -167,13 +172,14 @@ export async function calculateResultScores<I extends OpaqueIndex, D extends Opa
 
 export async function create(
   orama: Orama<{ Index: DefaultIndex }>,
+  sharedInternalDocumentStore: InternalDocumentIDStore,
   schema: Schema,
   index?: Index,
   prefix = '',
 ): Promise<Index> {
   if (!index) {
     index = {
-      sharedInternalDocumentStore: orama.internalDocumentIDStore,
+      sharedInternalDocumentStore,
       indexes: {},
       searchableProperties: [],
       searchablePropertiesWithTypes: {},
@@ -190,7 +196,7 @@ export async function create(
 
     if (typeActualType === 'object' && !Array.isArray(type)) {
       // Nested
-      create(orama, type as Schema, index, path)
+      create(orama, sharedInternalDocumentStore, type as Schema, index, path)
       continue
     }
 
@@ -504,16 +510,16 @@ export async function getSearchablePropertiesWithTypes(index: Index): Promise<Re
 }
 
 function loadNode(node: RadixNode): RadixNode {
-  const convertedNode = radixCreate(node.end, node.subWord, node.key);
+  const convertedNode = radixCreate(node.end, node.subWord, node.key)
 
-  convertedNode.docs = node.docs;
-  convertedNode.word = node.word;
+  convertedNode.docs = node.docs
+  convertedNode.word = node.word
 
   for (const childrenKey of Object.keys(node.children)) {
-    convertedNode.children[childrenKey] = loadNode(node.children[childrenKey]);
+    convertedNode.children[childrenKey] = loadNode(node.children[childrenKey])
   }
 
-  return convertedNode;
+  return convertedNode
 }
 
 export async function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Promise<Index> {
@@ -527,18 +533,18 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
     fieldLengths,
   } = raw as Index
 
-  const indexes: Index['indexes'] = {};
+  const indexes: Index['indexes'] = {}
 
   for (const prop of Object.keys(rawIndexes)) {
-    const value = rawIndexes[prop];
+    const value = rawIndexes[prop]
 
     if (!('word' in value)) {
-      indexes[prop] = value;
+      indexes[prop] = value
 
-      continue;
+      continue
     }
 
-    indexes[prop] = loadNode(value);
+    indexes[prop] = loadNode(value)
   }
 
   return {
@@ -575,7 +581,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
   } as R
 }
 
-export async function createIndex(sharedInternalDocumentStore: InternalDocumentIDStore): Promise<DefaultIndex> {
+export async function createIndex(): Promise<DefaultIndex> {
   return {
     create,
     insert,
@@ -589,7 +595,7 @@ export async function createIndex(sharedInternalDocumentStore: InternalDocumentI
     searchByWhereClause,
     getSearchableProperties,
     getSearchablePropertiesWithTypes,
-    load: load.bind(null, sharedInternalDocumentStore),
+    load,
     save,
   }
 }

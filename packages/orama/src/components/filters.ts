@@ -1,6 +1,9 @@
-import { InternalDocumentID } from './internal-document-id-store.js';
+import { InternalDocumentID } from './internal-document-id-store.js'
 
-export function intersectFilteredIDs(filtered: InternalDocumentID[], lookedUp: [InternalDocumentID, number][]): [InternalDocumentID, number][] {
+export function intersectFilteredIDs(
+  filtered: InternalDocumentID[],
+  lookedUp: [InternalDocumentID, number][],
+): [InternalDocumentID, number][] {
   const map = new Map<number, boolean>()
   const result: [number, number][] = []
 

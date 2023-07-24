@@ -52,11 +52,7 @@ async function compile(lang, jsExtension, tsExtension, moduleType) {
   await writeFile(resolve(destinationDir, `${lang}.${jsExtension}.map`), minified.map, 'utf-8')
 
   // Create the definition file
-  await writeFile(
-    resolve(destinationDir, `${lang}.d.${tsExtension}`),
-    'export type stopwords = string[]',
-    'utf-8',
-  )
+  await writeFile(resolve(destinationDir, `${lang}.d.${tsExtension}`), 'export type stopwords = string[]', 'utf-8')
 }
 
 async function main() {
