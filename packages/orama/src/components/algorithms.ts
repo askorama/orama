@@ -59,7 +59,7 @@ export function prioritizeTokenScores(
 
   // Find the index of the last result with all keywords.
   // Note that since score is multipled by 1.5 any time the token is encountered in results it means
-  // that tokenMap and tokenKeywords should always have the same order.
+  // that tokenScores and tokenKeywordsCount should always have the same order.
   const keywordsPerToken = tokenKeywordsCount.sort((a, b) => b[1] - a[1])
 
   let lastTokenWithAllKeywords: number | undefined = undefined
