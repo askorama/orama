@@ -164,7 +164,9 @@ export async function search<AggValue = Result[]>(
     whereFiltersIDs = await orama.index.searchByWhereClause(context, index, params.where!)
   }
 
-  if (tokens.length) {
+  const tokensLength = tokens.length
+
+  if (tokensLength) {
     // Now it's time to loop over all the indices and get the documents IDs for every single term
     const indexesLength = propertiesToSearch.length
     for (let i = 0; i < indexesLength; i++) {
@@ -182,7 +184,7 @@ export async function search<AggValue = Result[]>(
 
       const docIds = context.indexMap[prop]
       const vals = Object.values(docIds)
-      context.docsIntersection[prop] = prioritizeTokenScores(vals, params?.boost?.[prop] ?? 1, threshold)
+      context.docsIntersection[prop] = prioritizeTokenScores(vals, params?.boost?.[prop] ?? 1, threshold, tokensLength)
       const uniqueDocs = context.docsIntersection[prop]
 
       const uniqueDocsLength = uniqueDocs.length
