@@ -51,9 +51,8 @@ async function execute(command, args, cwd) {
 }
 
 async function main() {
-  await execute('turbo', 'build')
-  await execute('turbo', 'test')
-  await cp('README.md', 'packages/orama/README.md')
+  await execute('pnpm', 'build')
+  await execute('pnpm', 'test')
 
   for (const pkg of packages) {
     const cwd = resolve(rootDir, 'packages', pkg)
