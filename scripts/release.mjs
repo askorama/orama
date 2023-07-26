@@ -3,13 +3,17 @@ import { cp } from 'node:fs/promises'
 import { resolve, relative } from 'node:path'
 
 const rootDir = process.cwd()
+
 const packages = [
   'orama',
   'plugin-astro',
   'plugin-data-persistence',
   'plugin-docusaurus',
   'plugin-match-highlight',
+  'plugin-nextra',
   'plugin-parsedoc',
+  'stemmers',
+  'stopwords'
 ]
 
 function step(message) {
