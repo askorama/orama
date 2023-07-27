@@ -1,13 +1,19 @@
 import { createError } from '../errors.js'
 import { TokenScore, BM25Params } from '../types.js'
-import { InternalDocumentID } from './internal-document-id-store.js';
+import { InternalDocumentID } from './internal-document-id-store.js'
 
-export function prioritizeTokenScores(arrays: TokenScore[][], boost: number, threshold = 1): TokenScore[] {
+export function prioritizeTokenScores(
+  arrays: TokenScore[][],
+  boost: number,
+  threshold = 1,
+  keywordsCount: number,
+): TokenScore[] {
   if (boost === 0) {
     throw createError('INVALID_BOOST_VALUE')
   }
 
-  const tokenMap = new Map<InternalDocumentID, number>()
+  const tokenScoresMap = new Map<InternalDocumentID, number>()
+  const tokenKeywordsCountMap = new Map<InternalDocumentID, number>()
 
   const mapsLength = arrays.length
   for (let i = 0; i < mapsLength; i++) {
@@ -17,24 +23,25 @@ export function prioritizeTokenScores(arrays: TokenScore[][], boost: number, thr
     for (let j = 0; j < entriesLength; j++) {
       const [token, score] = arr[j]
       const boostScore = score * boost
-      const oldScore = tokenMap.get(token)
+      const oldScore = tokenScoresMap.get(token)
 
       if (oldScore !== undefined) {
-        tokenMap.set(token, oldScore *  1.5 + boostScore)
+        tokenScoresMap.set(token, oldScore * 1.5 + boostScore)
+        tokenKeywordsCountMap.set(token, tokenKeywordsCountMap.get(token)! + 1)
       } else {
-        tokenMap.set(token, boostScore);
+        tokenScoresMap.set(token, boostScore)
+        tokenKeywordsCountMap.set(token, 1)
       }
     }
   }
 
   const tokenScores: TokenScore[] = []
 
-  for (const tokenStore of tokenMap.entries()) {
-    tokenScores.push(tokenStore);
+  for (const tokenScoreEntry of tokenScoresMap.entries()) {
+    tokenScores.push(tokenScoreEntry)
   }
 
-  const results = tokenScores
-    .sort((a, b) => b[1] - a[1])
+  const results = tokenScores.sort((a, b) => b[1] - a[1])
 
   // If threshold is 1, it means we will return all the results with at least one search term,
   // prioritizig the ones that contains more search terms (fuzzy match)
@@ -42,16 +49,47 @@ export function prioritizeTokenScores(arrays: TokenScore[][], boost: number, thr
     return results
   }
 
+  // Prepare keywords count tracking for threshold handling
+  const allResults = results.length
+  const tokenKeywordsCount: [InternalDocumentID, number][] = []
+
+  for (const tokenKeywordsCountEntry of tokenKeywordsCountMap.entries()) {
+    tokenKeywordsCount.push(tokenKeywordsCountEntry)
+  }
+
+  // Find the index of the last result with all keywords.
+  // Note that since score is multipled by 1.5 any time the token is encountered in results it means
+  // that tokenScores and tokenKeywordsCount should always have the same order.
+  const keywordsPerToken = tokenKeywordsCount.sort((a, b) => b[1] - a[1])
+
+  let lastTokenWithAllKeywords: number | undefined = undefined
+  for (let i = 0; i < allResults; i++) {
+    if (keywordsPerToken[i][1] === keywordsCount) {
+      lastTokenWithAllKeywords = i
+    } else {
+      break
+    }
+  }
+
+  // If no results had all the keywords, either bail out earlier or normalize
+  if (typeof lastTokenWithAllKeywords === 'undefined') {
+    if (threshold === 0) {
+      return []
+    }
+
+    lastTokenWithAllKeywords = 0
+  }
+
   // If threshold is 0, it means we will only return all the results that contains ALL the search terms (exact match)
   if (threshold === 0) {
-    const shortestArrayLength = Math.min(...arrays.map(arr => arr.length))
-    return results.slice(0, shortestArrayLength)
+    return results.slice(0, lastTokenWithAllKeywords + 1)
   }
 
   // If the threshold is between 0 and 1, we will return all the results that contains at least the threshold of search terms
   // For example, if threshold is 0.5, we will return all the results that contains at least 50% of the search terms
   // (fuzzy match with a minimum threshold)
-  const thresholdLength = Math.ceil((threshold * 100 * results.length) / 100)
+  const thresholdLength =
+    lastTokenWithAllKeywords + Math.ceil((threshold * 100 * (results.length - lastTokenWithAllKeywords)) / 100)
 
   return results.slice(0, results.length + thresholdLength)
 }

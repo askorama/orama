@@ -1,4 +1,4 @@
-import { Orama } from '../types.js';
+import { Orama } from '../types.js'
 
 export type DocumentID = string | number
 export type InternalDocumentID = number
@@ -38,7 +38,7 @@ export function load(orama: Orama, raw: unknown): void {
 }
 
 export function getInternalDocumentId(store: InternalDocumentIDStore, id: DocumentID): InternalDocumentID {
-  if (typeof id === "string") {
+  if (typeof id === 'string') {
     const internalId = store.idToInternalId.get(id)
 
     if (internalId) {
@@ -67,4 +67,3 @@ export function getDocumentIdFromInternalId(store: InternalDocumentIDStore, inte
 
   return store.internalIdToId[internalId - 1]
 }
-

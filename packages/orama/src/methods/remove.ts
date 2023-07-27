@@ -1,5 +1,9 @@
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
-import { DocumentID, getDocumentIdFromInternalId, getInternalDocumentId } from '../components/internal-document-id-store.js';
+import {
+  DocumentID,
+  getDocumentIdFromInternalId,
+  getInternalDocumentId,
+} from '../components/internal-document-id-store.js'
 import { trackRemoval } from '../components/sync-blocking-checker.js'
 import { Orama } from '../types.js'
 
@@ -12,7 +16,10 @@ export async function remove(orama: Orama, id: DocumentID, language?: string, sk
     return false
   }
 
-  const docId = getDocumentIdFromInternalId(orama.internalDocumentIDStore, getInternalDocumentId(orama.internalDocumentIDStore, id))
+  const docId = getDocumentIdFromInternalId(
+    orama.internalDocumentIDStore,
+    getInternalDocumentId(orama.internalDocumentIDStore, id),
+  )
   const docsCount = await orama.documentsStore.count(docs)
 
   if (!skipHooks) {
@@ -57,7 +64,16 @@ export async function remove(orama: Orama, id: DocumentID, language?: string, sk
     ) {
       result = false
     }
-    await orama.index.afterRemove?.(orama.data.index, prop, docId, value, schemaType, language, orama.tokenizer, docsCount)
+    await orama.index.afterRemove?.(
+      orama.data.index,
+      prop,
+      docId,
+      value,
+      schemaType,
+      language,
+      orama.tokenizer,
+      docsCount,
+    )
   }
 
   const sortableProperties = await orama.sorter.getSortableProperties(orama.data.sorting)
@@ -96,7 +112,12 @@ export async function removeMultiple(
 
   const docIdsForHooks = skipHooks
     ? []
-    : ids.map(id => getDocumentIdFromInternalId(orama.internalDocumentIDStore, getInternalDocumentId(orama.internalDocumentIDStore, id)))
+    : ids.map(id =>
+        getDocumentIdFromInternalId(
+          orama.internalDocumentIDStore,
+          getInternalDocumentId(orama.internalDocumentIDStore, id),
+        ),
+      )
 
   if (!skipHooks) {
     await runMultipleHook(orama.beforeMultipleRemove, orama, docIdsForHooks)

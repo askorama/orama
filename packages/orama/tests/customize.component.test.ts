@@ -1,7 +1,6 @@
 import t from 'tap'
 import { ISorter, OpaqueSorter, Orama, create, insert, load, remove, save, search } from '../src/index.js'
 import {
-  internalDocumentIDStore as defaultInternalDocumentIDStore,
   sorter as defaultSorter,
   documentsStore as defaultDocumentsStore,
   index as defaultIndex,
@@ -10,8 +9,7 @@ import { DefaultSorter, Sorter } from '../src/components/sorter.js'
 
 t.test('index', t => {
   t.test('should allow custom component', async t => {
-    const internalDocumentIdStore = defaultInternalDocumentIDStore.createInternalDocumentIDStore()
-    const index = await defaultIndex.createIndex(internalDocumentIdStore)
+    const index = await defaultIndex.createIndex()
     const db = await create({
       schema: {
         number: 'number',
@@ -39,8 +37,7 @@ t.test('index', t => {
 
 t.test('documentStore', t => {
   t.test('should allow custom component', async t => {
-    const internalDocumentIdStore = defaultInternalDocumentIDStore.createInternalDocumentIDStore()
-    const store = await defaultDocumentsStore.createDocumentsStore(internalDocumentIdStore)
+    const store = await defaultDocumentsStore.createDocumentsStore()
     const db = await create({
       schema: {
         number: 'number',
@@ -53,8 +50,8 @@ t.test('documentStore', t => {
           get(s, id) {
             return store.get(s, id)
           },
-          create(s) {
-            return store.create(s)
+          create(o, internalDocumentIdStore, s) {
+            return store.create(o, internalDocumentIdStore, s)
           },
           remove(s, id) {
             return store.remove(s, id)
@@ -62,8 +59,8 @@ t.test('documentStore', t => {
           save(s) {
             return store.save(s)
           },
-          load(s) {
-            return store.load(s)
+          load(internalDocumentIdStore, s) {
+            return store.load(s, internalDocumentIdStore)
           },
           getMultiple(s, ids) {
             return store.getMultiple(s, ids)
@@ -87,8 +84,7 @@ t.test('documentStore', t => {
   })
 
   t.test('should allow custom component - partially', async t => {
-    const internalDocumentIdStore = defaultInternalDocumentIDStore.createInternalDocumentIDStore()
-    const store = await defaultDocumentsStore.createDocumentsStore(internalDocumentIdStore)
+    const store = await defaultDocumentsStore.createDocumentsStore()
     const db = await create({
       schema: {
         number: 'number',
@@ -116,8 +112,7 @@ t.test('documentStore', t => {
 
 t.test('sorter', t => {
   t.test('should allow custom component', async t => {
-    const internalDocumentIdStore = defaultInternalDocumentIDStore.createInternalDocumentIDStore()
-    const s = await defaultSorter.createSorter(internalDocumentIdStore)
+    const s = await defaultSorter.createSorter()
     const order: string[] = []
     const db = await create({
       schema: {
@@ -129,9 +124,9 @@ t.test('sorter', t => {
             order.push('sortBy')
             return s.sortBy(sort, docIds, by)
           },
-          async create(schema, config) {
+          async create(orama, internalDocumentIdStore, schema, config) {
             order.push('create')
-            return s.create(schema, config)
+            return s.create(orama, internalDocumentIdStore, schema, config)
           },
           async insert(sort, prop, id, value, schemaType, language) {
             order.push('insert')
@@ -141,9 +136,9 @@ t.test('sorter', t => {
             order.push('remove')
             return s.remove(sort, prop, id)
           },
-          async load(raw) {
+          async load(internalDocumentIdStore, raw) {
             order.push('load')
-            return s.load(raw)
+            return s.load(internalDocumentIdStore, raw)
           },
           async save(sort) {
             order.push('save')
@@ -170,8 +165,7 @@ t.test('sorter', t => {
   })
 
   t.test('should allow custom component - partially', async t => {
-    const internalDocumentIdStore = defaultInternalDocumentIDStore.createInternalDocumentIDStore()
-    const s = await defaultSorter.createSorter(internalDocumentIdStore)
+    const s = await defaultSorter.createSorter()
     const order: string[] = []
     const db = await create({
       schema: {
@@ -209,9 +203,9 @@ t.test('sorter', t => {
       async sortBy(sort, docIds, by) {
         return this.sorter.sortBy(sort.storage, docIds, by)
       }
-      async create(orama, schema, config) {
+      async create(orama, internalDocumentIdStore, schema, config) {
         return {
-          storage: await this.sorter.create(orama, schema, config),
+          storage: await this.sorter.create(orama, internalDocumentIdStore, schema, config),
         }
       }
       async insert(sort: SorterStorage, prop, id, value, schemaType, language) {
@@ -220,9 +214,9 @@ t.test('sorter', t => {
       async remove(sort: SorterStorage, prop, id) {
         return this.sorter.remove(sort.storage, prop, id)
       }
-      async load(raw) {
+      async load(internalDocumentIdStore, raw) {
         return {
-          storage: await this.sorter.load(raw),
+          storage: await this.sorter.load(internalDocumentIdStore, raw),
         }
       }
       async save<R = unknown>(sort) {
@@ -236,13 +230,12 @@ t.test('sorter', t => {
       }
     }
 
-    const internalDocumentIdStore = defaultInternalDocumentIDStore.createInternalDocumentIDStore()
     const db: Orama<{ Sorter: MyCustomSorter }> = await create({
       schema: {
         number: 'number',
       },
       components: {
-        sorter: new MyCustomSorter(await defaultSorter.createSorter(internalDocumentIdStore)),
+        sorter: new MyCustomSorter(await defaultSorter.createSorter()),
       },
     })
     const id = await insert(db, { number: 1 })

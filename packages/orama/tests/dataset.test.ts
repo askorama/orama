@@ -46,7 +46,7 @@ t.test('orama.dataset', async t => {
     components: {
       tokenizer: {
         stemming: true,
-        stopWords: englishStopwords
+        stopWords: englishStopwords,
       },
     },
   })
