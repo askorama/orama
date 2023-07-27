@@ -41,5 +41,5 @@ export const schemaFromJson = async (jsonSchema: JSONSchema4): Promise<Schema> =
         }
     }
 
-    return Promise.resolve(oramaSchema);
+    return oramaSchema;
 }

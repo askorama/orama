@@ -1,11 +1,12 @@
 {
-  "name": "@orama/schema",
+  "name": "@orama/plugin-json-schema",
   "version": "0.0.1",
   "description": "Schema utilities for Orama",
   "keywords": [
     "orama",
     "search",
-    "schema"
+    "schema",
+    "json"
   ],
   "license": "MIT",
   "repository": {
