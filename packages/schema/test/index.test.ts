@@ -17,7 +17,7 @@ t.test("it should return empty object for missing properties", async t => {
         type: 'object',
     } as const
 
-    const oramaSchema = schemaFromJson(jsonSchema)
+    const oramaSchema = await schemaFromJson(jsonSchema)
 
     t.same(oramaSchema, {})
 })
@@ -32,7 +32,7 @@ t.test("it should convert type string", async t => {
         }
     } as const
 
-    const oramaSchema = schemaFromJson(jsonSchema)
+    const oramaSchema = await schemaFromJson(jsonSchema)
 
     t.same(oramaSchema, {
         myString: 'string'
@@ -49,7 +49,7 @@ t.test("it should convert type number", async t => {
         }
     } as const
 
-    const oramaSchema = schemaFromJson(jsonSchema)
+    const oramaSchema = await schemaFromJson(jsonSchema)
 
     t.same(oramaSchema, {
         myNumber: 'number'
@@ -67,7 +67,7 @@ t.test("it should convert type boolean", async t => {
         }
     } as const
 
-    const oramaSchema = schemaFromJson(jsonSchema)
+    const oramaSchema = await schemaFromJson(jsonSchema)
 
     t.same(oramaSchema, {
         myBoolean: 'boolean'
@@ -90,7 +90,7 @@ t.test("it should convert all types", async t => {
         }
     } as const
 
-    const oramaSchema = schemaFromJson(jsonSchema)
+    const oramaSchema = await schemaFromJson(jsonSchema)
 
     t.same(oramaSchema, {
         myString: 'string',
@@ -112,7 +112,7 @@ t.test("it should convert type string[]", async t => {
         }
     } as const
 
-    const oramaSchema = schemaFromJson(jsonSchema)
+    const oramaSchema = await schemaFromJson(jsonSchema)
 
     t.same(oramaSchema, {
         myStringArray: 'string[]'
@@ -132,7 +132,7 @@ t.test("it should convert type number[]", async t => {
         }
     } as const
 
-    const oramaSchema = schemaFromJson(jsonSchema)
+    const oramaSchema = await schemaFromJson(jsonSchema)
 
     t.same(oramaSchema, {
         myNumberArray: 'number[]'
@@ -152,7 +152,7 @@ t.test("it should convert type boolean[]", async t => {
         }
     } as const
 
-    const oramaSchema = schemaFromJson(jsonSchema)
+    const oramaSchema = await schemaFromJson(jsonSchema)
 
     t.same(oramaSchema, {
         myBooleanArray: 'boolean[]'
@@ -184,7 +184,7 @@ t.test("it should convert type array", async t => {
         }
     } as const
 
-    const oramaSchema = schemaFromJson(jsonSchema)
+    const oramaSchema = await schemaFromJson(jsonSchema)
 
     t.same(oramaSchema, {
         myStringArray: 'string[]',
@@ -227,7 +227,7 @@ t.test("it should convert all types", async t => {
         }
     } as const
 
-    const oramaSchema = schemaFromJson(jsonSchema)
+    const oramaSchema = await schemaFromJson(jsonSchema)
 
     t.same(oramaSchema, {
         myString: 'string',
@@ -252,7 +252,7 @@ t.test("it should skip unknown types", async t => {
         }
     } as const
 
-    const oramaSchema = schemaFromJson(jsonSchema)
+    const oramaSchema = await schemaFromJson(jsonSchema)
 
     t.same(oramaSchema, {
         myBoolean: 'boolean'
@@ -277,7 +277,7 @@ t.test("it should convert nested objects", async t => {
         }
     } as const
 
-    const oramaSchema = schemaFromJson(jsonSchema)
+    const oramaSchema = await schemaFromJson(jsonSchema)
 
     t.same(oramaSchema, {
         myBoolean: 'boolean',

@@ -28,7 +28,7 @@ const extractOramaType = (jsonSchema: JSONSchema4): SearchableType => {
     return oramaType as SearchableType
 }
 
-export const schemaFromJson = (jsonSchema: JSONSchema4) => {
+export const schemaFromJson = async (jsonSchema: JSONSchema4): Promise<Schema> => {
     assertTypeObject(jsonSchema)
 
     const oramaSchema: Schema = {}
@@ -37,9 +37,9 @@ export const schemaFromJson = (jsonSchema: JSONSchema4) => {
         if (isSupportedByOrama(propertyDefinition)) {
             oramaSchema[propertyName] = extractOramaType(propertyDefinition)
         } else if (isJsonObject(propertyDefinition)) {
-            oramaSchema[propertyName] = schemaFromJson(propertyDefinition)
+            oramaSchema[propertyName] = await schemaFromJson(propertyDefinition)
         }
     }
 
-    return oramaSchema;
+    return Promise.resolve(oramaSchema);
 }
