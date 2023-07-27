@@ -9,7 +9,7 @@ t.test("it should throw for non-object json schema", async t => {
         }
     } as const
 
-    t.throws(() => schemaFromJson(jsonSchema), Error, 'Provided JSON schema must be an object type');
+    t.rejects(() => schemaFromJson(jsonSchema), Error, 'Provided JSON schema must be an object type');
 })
 
 t.test("it should return empty object for missing properties", async t => {

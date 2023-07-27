@@ -1,0 +1,47 @@
+import { Tab, Tabs } from 'nextra-theme-docs'
+
+# JSON Schema plugin
+
+[JSON Schema](https://json-schema.org/) is a declarative language that allows you to annotate and validate JSON documents.
+
+Orama provides its own official plugin to convert JSON Schema to Orama schema.
+
+## Installation
+
+You can install the plugin using any major Node.js package manager:
+
+<Tabs items={['npm', 'yarn', 'pnpm']}>
+  <Tab>
+    ```bash copy 
+    npm install @orama/plugin-json-schema
+    ```
+  </Tab>
+  <Tab>
+    ```bash copy 
+    yarn add @orama/plugin-json-schema
+    ```
+  </Tab>
+  <Tab>
+    ```bash copy 
+    pnpm add @orama/plugin-json-schema
+    ```
+  </Tab>
+</Tabs>
+
+
+## Usage
+
+When you configure Orama, you'll also import the `schemaFromJson` function from this plguin:
+
+```js
+import { create } from '@orama/orama'
+import { schemaFromJson } from '@orama/plugin-json-schema'
+
+const jsonSchema = { ... }
+
+const db = await create({
+  schema: schemaFromJson(jsonSchema),
+})
+```
+
+And that's it! The Orama plugin will do the rest for you.
