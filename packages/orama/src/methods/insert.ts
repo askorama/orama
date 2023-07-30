@@ -53,6 +53,10 @@ async function innerInsert(orama: Orama, doc: Document, language?: string, skipH
       continue
     }
 
+    if (expectedType === 'enum' && (actualType === 'string' || actualType === 'number')) {
+      continue
+    }
+
     if (actualType !== expectedType) {
       throw createError('INVALID_DOCUMENT_PROPERTY', key, expectedType, actualType)
     }

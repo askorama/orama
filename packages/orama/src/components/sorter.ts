@@ -85,6 +85,7 @@ function innerCreate(
             type: type,
           }
           break
+        case 'enum':
         case 'boolean[]':
         case 'number[]':
         case 'string[]':
