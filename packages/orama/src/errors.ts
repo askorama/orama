@@ -31,7 +31,7 @@ const errors = {
   UNKNOWN_FILTER_PROPERTY: `Unknown filter property "%s".`,
   INVALID_VECTOR_SIZE: `Vector size must be a number greater than 0. Got "%s" instead.`,
   INVALID_VECTOR_VALUE: `Vector value must be a number greater than 0. Got "%s" instead.`,
-  WRONG_VECTOR_SIZE: `Vector size must be %s. Got a vector of %s dimensions instead.`
+  INVALID_INPUT_VECTOR: `Property "%s" was declared as a %s-dimentional vector, but got a %s-dimentional vector instead.\nInput vectors must be of the size declared in the schema, as calculating similarity between vectors of different sizes can lead to unexpected results.`,
 }
 
 export type ErrorCode = keyof typeof errors

@@ -35,10 +35,9 @@ export async function validateSchema<S extends Schema = Schema>(doc: Document, s
     const typeOfType = typeof type
 
     if (isVectorType(type as string)) {
-      // TODO: validate vector size
-      if (!Array.isArray(value)) {
-        // TODO: run actual validation
-        return undefined
+      const vectorSize = getVectorSize(type as string)
+      if (!Array.isArray(value) || value.length !== vectorSize) {
+        throw createError('INVALID_INPUT_VECTOR', prop, vectorSize, (value as number[]).length)
       }
       continue
     }

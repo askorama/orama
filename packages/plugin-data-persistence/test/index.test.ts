@@ -1,4 +1,4 @@
-import { create, insert, Orama, search } from '@orama/orama'
+import { create, insert, Orama, search, searchVector } from '@orama/orama'
 import t from 'tap'
 import { UNSUPPORTED_FORMAT, METHOD_MOVED } from '../src/errors.js'
 import {
@@ -122,7 +122,7 @@ t.test('binary persistence', t => {
     await rm(path)
   })
 
-  t.test('should generate a persistence file on the disk using LYRA_DB_NAME env', async t => {
+  t.test('should generate a persistence file on the disk using ORAMA_DB_NAME env', async t => {
     t.plan(3)
 
     let currentOramaDBNameValue: string | undefined
@@ -130,13 +130,13 @@ t.test('binary persistence', t => {
     // @ts-expect-error Deno is only available in Deno
     if (typeof Deno !== 'undefined') {
       // @ts-expect-error Deno is only available in Deno
-      currentOramaDBNameValue = Deno.env.get('LYRA_DB_NAME')
+      currentOramaDBNameValue = Deno.env.get('ORAMA_DB_NAME')
 
       // @ts-expect-error Deno is only available in Deno
-      Deno.env.set('LYRA_DB_NAME', 'example_db_dump')
+      Deno.env.set('ORAMA_DB_NAME', 'example_db_dump')
     } else {
-      currentOramaDBNameValue = process.env.LYRA_DB_NAME
-      process.env.LYRA_DB_NAME = 'example_db_dump'
+      currentOramaDBNameValue = process.env.ORAMA_DB_NAME
+      process.env.ORAMA_DB_NAME = 'example_db_dump'
     }
 
     const db = await generateTestDBInstance()
@@ -174,16 +174,16 @@ t.test('binary persistence', t => {
       // @ts-expect-error Deno is only available in Deno
       if (typeof Deno !== 'undefined') {
         // @ts-expect-error Deno is only available in Deno
-        Deno.env.set('LYRA_DB_NAME', currentOramaDBNameValue)
+        Deno.env.set('ORAMA_DB_NAME', currentOramaDBNameValue)
       } else {
-        process.env.LYRA_DB_NAME = currentOramaDBNameValue
+        process.env.ORAMA_DB_NAME = currentOramaDBNameValue
       }
     }
   })
 })
 
 t.test('json persistence', t => {
-  t.plan(2)
+  t.plan(3)
 
   t.test('should generate a persistence file on the disk with random name and json format', async t => {
     t.plan(2)
@@ -214,6 +214,43 @@ t.test('json persistence', t => {
     // Queries on the loaded database should match the original database
     t.same(q1.hits, qp1.hits)
     t.same(q2.hits, qp2.hits)
+
+    // Clean up
+    await rm(path)
+  })
+
+  t.test('should generate a persistence file on the disk with support for vectors', async t => {
+    t.plan(1)
+
+    const db1 = await create({
+      schema: {
+        text: 'string',
+        vector: 'vector[5]'
+      }
+    })
+
+    await insert(db1, { text: 'vector 1', vector: [1, 0, 0, 0, 0] })
+    await insert(db1, { text: 'vector 2', vector: [1, 1, 0, 0, 0] })
+    await insert(db1, { text: 'vector 3', vector: [0, 0, 0, 0, 0] })
+
+    // Persist database on disk in json format
+    const path = await persistToFile(db1, 'json', 'test.json')
+
+    // Load database from disk in json format
+    const db2 = await restoreFromFile('json', 'test.json')
+
+    const qp1 = await searchVector(db1, {
+      vector: [1, 0, 0, 0, 0],
+      property: 'vector'
+    })
+
+    const qp2 = await searchVector(db2, {
+      vector: [1, 0, 0, 0, 0],
+      property: 'vector'
+    })
+
+    // Queries on the loaded database should match the original database
+    t.same(qp1.hits, qp2.hits)
 
     // Clean up
     await rm(path)

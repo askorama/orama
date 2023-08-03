@@ -22,7 +22,7 @@ export async function searchVector(orama: Orama, params: SearchVectorParams): Pr
   const vectors = vectorIndex.vectors as Record<string, [Magnitude, VectorType]>
 
   if (vector.length !== vectorSize) {
-    throw createError('WRONG_VECTOR_SIZE', vectorSize, vector.length)
+    throw createError('INVALID_INPUT_VECTOR', property, vectorSize, vector.length)
   }
 
   if (!(vector instanceof Float32Array)) {

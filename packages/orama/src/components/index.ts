@@ -1,20 +1,20 @@
 import type {
-ArraySearchableType,
-BM25Params,
-ComparisonOperator,
-IIndex,
-Magnitude,
-OpaqueDocumentStore,
-OpaqueIndex,
-Orama,
-ScalarSearchableType,
-Schema,
-SearchableType,
-SearchableValue,
-SearchContext,
-Tokenizer,
-TokenScore,
-VectorType,
+  ArraySearchableType,
+  BM25Params,
+  ComparisonOperator,
+  IIndex,
+  Magnitude,
+  OpaqueDocumentStore,
+  OpaqueIndex,
+  Orama,
+  ScalarSearchableType,
+  Schema,
+  SearchableType,
+  SearchableValue,
+  SearchContext,
+  Tokenizer,
+  TokenScore,
+  VectorType,
 } from '../types.js'
 import { createError } from '../errors.js'
 import {
@@ -586,8 +586,17 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
     indexes[prop] = loadNode(value)
   }
 
-  for (const prop of Object.keys(rawVectorIndexes)) {
-    // TODO: load vector indexes, convert arrays into Float32Arrays
+  for (const idx of Object.keys(rawVectorIndexes)) {
+    const vectors = rawVectorIndexes[idx].vectors
+
+    for (const vec in vectors) {
+      vectors[vec] = [vectors[vec][0], new Float32Array(vectors[vec][1])]
+    }
+
+    vectorIndexes[idx] = {
+      size: rawVectorIndexes[idx].size,
+      vectors,
+    }
   }
 
   return {
@@ -615,9 +624,24 @@ export async function save<R = unknown>(index: Index): Promise<R> {
     fieldLengths,
   } = index
 
+  const vectorIndexesAsArrays: Index['vectorIndexes'] = {}
+
+  for (const idx of Object.keys(vectorIndexes)) {
+    const vectors = vectorIndexes[idx].vectors
+    
+    for (const vec in vectors) {
+      vectors[vec] = [vectors[vec][0], Array.from(vectors[vec][1]) as unknown as Float32Array]
+    }
+
+    vectorIndexesAsArrays[idx] = {
+      size: vectorIndexes[idx].size,
+      vectors
+    }
+  }
+
   return {
     indexes,
-    vectorIndexes,
+    vectorIndexes: vectorIndexesAsArrays,
     searchableProperties,
     searchablePropertiesWithTypes,
     frequencies,
