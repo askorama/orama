@@ -11,7 +11,7 @@
 </h4>
 <br />
 <p align="center">
-  A resilient, innovative and open-source search experience to achieve <br />
+  A resilient, innovative and open-source full-text and vector search experience to achieve <br />
   seamless integration with your infrastructure and data
 </p>
 <br />
@@ -29,10 +29,11 @@
 
 If you need more info, help, or want to provide general feedback on Orama, join
 the
-[Orama Slack channel](https://join.slack.com/t/orama-community/shared_invite/zt-1gzvj0mmt-yJhJ6pnrSGuwqPmPx9uO5Q)
+[Orama Slack channel](https://orama.to/slack)
 
 # Highlighted features
 
+- [Vector Search](https://docs.oramasearch.com/usage/search/vectors)
 - [Search filters](https://docs.oramasearch.com/usage/search/filters)
 - [Facets](https://docs.oramasearch.com/usage/search/facets)
 - [Fields Boosting](https://docs.oramasearch.com/usage/search/fields-boosting)
@@ -78,13 +79,14 @@ Orama is quite simple to use. The first thing to do is to create a new database
 instance and set an indexing schema:
 
 ```js
-import { create, insert, remove, search } from '@orama/orama'
+import { create, insert, remove, search, searchVector } from '@orama/orama'
 
 const db = await create({
   schema: {
     name: 'string',
     description: 'string',
     price: 'number',
+    embedding: 'vector[1536]', // Vector size must be expressed during schema initialization
     meta: {
       rating: 'number',
     },
@@ -104,6 +106,7 @@ await insert(db, {
   name: 'Wireless Headphones',
   description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
   price: 99.99,
+  embedding: [...],
   meta: {
     rating: 4.5,
   },
@@ -113,6 +116,7 @@ await insert(db, {
   name: 'Smart LED Bulb',
   description: 'Control the lighting in your home with this energy-efficient smart LED bulb, compatible with most smart home systems.',
   price: 24.99,
+  embedding: [...],
   meta: {
     rating: 4.3,
   },
@@ -122,6 +126,7 @@ await insert(db, {
   name: 'Portable Charger',
   description: 'Never run out of power on-the-go with this compact and fast-charging portable charger for your devices.',
   price: 29.99,
+  embedding: [...],
   meta: {
     rating: 3.6,
   },
@@ -196,6 +201,15 @@ Result:
   ],
   count: 1
 }
+```
+
+If you want to perform a vector search, you can use the `searchVector` function:
+
+```js
+const searchResult = await searchVector(db, {
+  vector: [...], // OpenAI embedding or similar vector to be used as an input
+  property: 'embedding' // Property to search through. Mandatory for vector search
+})
 ```
 
 # Usage with CommonJS
