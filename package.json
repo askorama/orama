@@ -44,7 +44,7 @@
     "husky": "^8.0.2",
     "lint-staged": "^13.1.0",
     "prettier": "^2.8.1",
-    "semver": "^7.3.8",
+    "semver": "^7.5.2",
     "simple-git": "^3.17.0",
     "tap": "^16.3.2",
     "tap-mocha-reporter": "^5.0.3",
