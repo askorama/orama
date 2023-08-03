@@ -1,15 +1,4 @@
-import { prioritizeTokenScores } from '../components/algorithms.js'
-import { getFacets } from '../components/facets.js'
-import { intersectFilteredIDs } from '../components/filters.js'
-import { getGroups } from '../components/groups.js'
-import { runAfterSearch } from '../components/hooks.js'
-import {
-  getDocumentIdFromInternalId,
-  getInternalDocumentId,
-  InternalDocumentID,
-} from '../components/internal-document-id-store.js'
-import { createError } from '../errors.js'
-import {
+import type {
   BM25Params,
   IndexMap,
   Orama,
@@ -28,6 +17,17 @@ import {
   SearchableValue,
   TokenScore,
 } from '../types.js'
+import { prioritizeTokenScores } from '../components/algorithms.js'
+import { getFacets } from '../components/facets.js'
+import { intersectFilteredIDs } from '../components/filters.js'
+import { getGroups } from '../components/groups.js'
+import { runAfterSearch } from '../components/hooks.js'
+import {
+  getDocumentIdFromInternalId,
+  getInternalDocumentId,
+  InternalDocumentID,
+} from '../components/internal-document-id-store.js'
+import { createError } from '../errors.js'
 import { getNanosecondsTime, getNested, sortTokenScorePredicate } from '../utils.js'
 
 const defaultBM25Params: BM25Params = {

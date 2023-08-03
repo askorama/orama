@@ -22,12 +22,16 @@ export interface Schema extends Record<string, SearchableType | Schema> {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Document extends Record<string, SearchableValue | Document | unknown> {}
 
+export type Magnitude = number
+export type Vector = `vector[${number}]`
+export type VectorType = Float32Array
+
 export type ScalarSearchableType = 'string' | 'number' | 'boolean'
-export type ArraySearchableType = 'string[]' | 'number[]' | 'boolean[]'
+export type ArraySearchableType = 'string[]' | 'number[]' | 'boolean[]' | Vector
 export type SearchableType = ScalarSearchableType | ArraySearchableType
 
 export type ScalarSearchableValue = string | number | boolean
-export type ArraySearchableValue = string[] | number[] | boolean[]
+export type ArraySearchableValue = string[] | number[] | boolean[] | VectorType
 export type SearchableValue = ScalarSearchableValue | ArraySearchableValue
 
 export type SortType = 'string' | 'number' | 'boolean'

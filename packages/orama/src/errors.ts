@@ -29,6 +29,9 @@ const errors = {
   UNKNOWN_GROUP_BY_PROPERTY: `Unknown groupBy property "%s".`,
   INVALID_GROUP_BY_PROPERTY: `Invalid groupBy property "%s". Allowed types: "%s", but given "%s".`,
   UNKNOWN_FILTER_PROPERTY: `Unknown filter property "%s".`,
+  INVALID_VECTOR_SIZE: `Vector size must be a number greater than 0. Got "%s" instead.`,
+  INVALID_VECTOR_VALUE: `Vector value must be a number greater than 0. Got "%s" instead.`,
+  WRONG_VECTOR_SIZE: `Vector size must be %s. Got a vector of %s dimensions instead.`
 }
 
 export type ErrorCode = keyof typeof errors

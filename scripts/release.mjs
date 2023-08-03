@@ -1,5 +1,4 @@
 import { spawn } from 'node:child_process'
-import { cp } from 'node:fs/promises'
 import { resolve, relative } from 'node:path'
 
 const rootDir = process.cwd()
