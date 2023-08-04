@@ -3,6 +3,7 @@ export { count, getByID } from './methods/docs.js'
 export { insert, insertMultiple } from './methods/insert.js'
 export { remove, removeMultiple } from './methods/remove.js'
 export { search } from './methods/search.js'
+export { searchVector } from './methods/search-vector.js'
 export { load, save } from './methods/serialization.js'
 export { update, updateMultiple } from './methods/update.js'
 

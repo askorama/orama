@@ -118,9 +118,9 @@ export async function getDefaultFileName(format: PersistenceFormat, runtime?: Ru
   /* c8 ignore next 3 */
   if (runtime === 'deno') {
     // @ts-expect-error Deno is only available in Deno
-    dbName = Deno.env.get('LYRA_DB_NAME') ?? DEFAULT_DB_NAME
+    dbName = Deno.env.get('ORAMA_DB_NAME') ?? DEFAULT_DB_NAME
   } else {
-    dbName = process?.env?.LYRA_DB_NAME ?? DEFAULT_DB_NAME
+    dbName = process?.env?.ORAMA_DB_NAME ?? DEFAULT_DB_NAME
   }
 
   return `${dbName}.${extension}`

@@ -1,4 +1,4 @@
-import { isArrayType } from '../components.js'
+import { isArrayType, isVectorType } from '../components.js'
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { trackInsertion } from '../components/sync-blocking-checker.js'
 import { createError } from '../errors.js'
@@ -43,6 +43,11 @@ async function innerInsert(orama: Orama, doc: Document, language?: string, skipH
 
     const actualType = typeof value
     const expectedType = indexablePropertiesWithTypes[key]
+
+    if (isVectorType(expectedType) && Array.isArray(value)) {
+      // @todo: Validate vector type. It should be of a given length and contain only floats.
+      continue
+    }
 
     if (isArrayType(expectedType) && Array.isArray(value)) {
       continue

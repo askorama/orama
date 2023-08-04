@@ -1,3 +1,21 @@
+import type {
+  ArraySearchableType,
+  BM25Params,
+  ComparisonOperator,
+  IIndex,
+  Magnitude,
+  OpaqueDocumentStore,
+  OpaqueIndex,
+  Orama,
+  ScalarSearchableType,
+  Schema,
+  SearchableType,
+  SearchableValue,
+  SearchContext,
+  Tokenizer,
+  TokenScore,
+  VectorType,
+} from '../types.js'
 import { createError } from '../errors.js'
 import {
   create as avlCreate,
@@ -16,31 +34,16 @@ import {
   Node as RadixNode,
   removeDocumentByWord as radixRemoveDocument,
 } from '../trees/radix.js'
-import {
-  ArraySearchableType,
-  BM25Params,
-  ComparisonOperator,
-  IIndex,
-  OpaqueDocumentStore,
-  OpaqueIndex,
-  Orama,
-  ScalarSearchableType,
-  Schema,
-  SearchableType,
-  SearchableValue,
-  SearchContext,
-  Tokenizer,
-  TokenScore,
-} from '../types.js'
 import { intersect } from '../utils.js'
 import { BM25 } from './algorithms.js'
-import { getInnerType, isArrayType } from './defaults.js'
+import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
 import {
   DocumentID,
   getInternalDocumentId,
   InternalDocumentID,
   InternalDocumentIDStore,
 } from './internal-document-id-store.js'
+import { getMagnitude } from './cosine-similarity.js'
 
 export type FrequencyMap = {
   [property: string]: {
@@ -57,9 +60,17 @@ export type BooleanIndex = {
   false: InternalDocumentID[]
 }
 
+export type VectorIndex = {
+  size: number
+  vectors: {
+    [docID: string]: [Magnitude, VectorType]
+  }
+}
+
 export interface Index extends OpaqueIndex {
   sharedInternalDocumentStore: InternalDocumentIDStore
   indexes: Record<string, RadixNode | AVLNode<number, InternalDocumentID[]> | BooleanIndex>
+  vectorIndexes: Record<string, VectorIndex>
   searchableProperties: string[]
   searchablePropertiesWithTypes: Record<string, SearchableType>
   frequencies: FrequencyMap
@@ -181,6 +192,7 @@ export async function create(
     index = {
       sharedInternalDocumentStore,
       indexes: {},
+      vectorIndexes: {},
       searchableProperties: [],
       searchablePropertiesWithTypes: {},
       frequencies: {},
@@ -200,29 +212,38 @@ export async function create(
       continue
     }
 
-    switch (type) {
-      case 'boolean':
-      case 'boolean[]':
-        index.indexes[path] = { true: [], false: [] }
-        break
-      case 'number':
-      case 'number[]':
-        index.indexes[path] = avlCreate<number, InternalDocumentID[]>(0, [])
-        break
-      case 'string':
-      case 'string[]':
-        index.indexes[path] = radixCreate()
-        index.avgFieldLength[path] = 0
-        index.frequencies[path] = {}
-        index.tokenOccurrences[path] = {}
-        index.fieldLengths[path] = {}
-        break
-      default:
-        throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : (type as unknown as string), path)
-    }
+    if (isVectorType(type as string)) {
+      index.searchableProperties.push(path)
+      index.searchablePropertiesWithTypes[path] = (type as SearchableType)
+      index.vectorIndexes[path] = {
+        size: getVectorSize(type as string),
+        vectors: {},
+      }
+    } else {
+      switch (type) {
+        case 'boolean':
+        case 'boolean[]':
+          index.indexes[path] = { true: [], false: [] }
+          break
+        case 'number':
+        case 'number[]':
+          index.indexes[path] = avlCreate<number, InternalDocumentID[]>(0, [])
+          break
+        case 'string':
+        case 'string[]':
+          index.indexes[path] = radixCreate()
+          index.avgFieldLength[path] = 0
+          index.frequencies[path] = {}
+          index.tokenOccurrences[path] = {}
+          index.fieldLengths[path] = {}
+          break
+        default:
+          throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : (type as unknown as string), path)
+      }
 
-    index.searchableProperties.push(path)
-    index.searchablePropertiesWithTypes[path] = type
+      index.searchableProperties.push(path)
+      index.searchablePropertiesWithTypes[path] = type
+    }
   }
 
   return index
@@ -276,6 +297,11 @@ export async function insert(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<void> {
+
+  if (isVectorType(schemaType)) {
+    return insertVector(index, prop, value as number[] | Float32Array, id)
+  }
+
   if (!isArrayType(schemaType)) {
     return insertScalar(
       implementation,
@@ -297,6 +323,17 @@ export async function insert(
   for (let i = 0; i < elementsLength; i++) {
     await insertScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer, docsCount)
   }
+}
+
+function insertVector(index: Index, prop: string, value: number[] | VectorType, id: DocumentID): void {
+  if (!(value instanceof Float32Array)) {
+    value = new Float32Array(value)
+  }
+  
+  const size = index.vectorIndexes[prop].size
+  const magnitude = getMagnitude(value, size)
+
+  index.vectorIndexes[prop].vectors[id] = [magnitude, value]
 }
 
 async function removeScalar(
@@ -525,6 +562,7 @@ function loadNode(node: RadixNode): RadixNode {
 export async function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Promise<Index> {
   const {
     indexes: rawIndexes,
+    vectorIndexes: rawVectorIndexes,
     searchableProperties,
     searchablePropertiesWithTypes,
     frequencies,
@@ -534,6 +572,7 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
   } = raw as Index
 
   const indexes: Index['indexes'] = {}
+  const vectorIndexes: Index['vectorIndexes'] = {}
 
   for (const prop of Object.keys(rawIndexes)) {
     const value = rawIndexes[prop]
@@ -547,9 +586,23 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
     indexes[prop] = loadNode(value)
   }
 
+  for (const idx of Object.keys(rawVectorIndexes)) {
+    const vectors = rawVectorIndexes[idx].vectors
+
+    for (const vec in vectors) {
+      vectors[vec] = [vectors[vec][0], new Float32Array(vectors[vec][1])]
+    }
+
+    vectorIndexes[idx] = {
+      size: rawVectorIndexes[idx].size,
+      vectors,
+    }
+  }
+
   return {
     sharedInternalDocumentStore,
     indexes,
+    vectorIndexes,
     searchableProperties,
     searchablePropertiesWithTypes,
     frequencies,
@@ -562,6 +615,7 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
 export async function save<R = unknown>(index: Index): Promise<R> {
   const {
     indexes,
+    vectorIndexes,
     searchableProperties,
     searchablePropertiesWithTypes,
     frequencies,
@@ -570,8 +624,24 @@ export async function save<R = unknown>(index: Index): Promise<R> {
     fieldLengths,
   } = index
 
+  const vectorIndexesAsArrays: Index['vectorIndexes'] = {}
+
+  for (const idx of Object.keys(vectorIndexes)) {
+    const vectors = vectorIndexes[idx].vectors
+    
+    for (const vec in vectors) {
+      vectors[vec] = [vectors[vec][0], Array.from(vectors[vec][1]) as unknown as Float32Array]
+    }
+
+    vectorIndexesAsArrays[idx] = {
+      size: vectorIndexes[idx].size,
+      vectors
+    }
+  }
+
   return {
     indexes,
+    vectorIndexes: vectorIndexesAsArrays,
     searchableProperties,
     searchablePropertiesWithTypes,
     frequencies,

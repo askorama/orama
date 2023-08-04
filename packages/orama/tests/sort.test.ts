@@ -512,7 +512,7 @@ t.test('disabled', async t => {
   t.end()
 })
 
-t.only('search with sortBy should be consistent ignoring the insert order', async t => {
+t.test('search with sortBy should be consistent ignoring the insert order', async t => {
   const docs = [
     { id: '5' },
     { id: '2', number: 5 },

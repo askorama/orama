@@ -1,5 +1,6 @@
 import { createError } from '../errors.js'
 import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from '../types.js'
+import { isVectorType } from './defaults.js'
 import {
   DocumentID,
   getInternalDocumentId,
@@ -70,26 +71,28 @@ function innerCreate(
       continue
     }
 
-    switch (type) {
-      case 'boolean':
-      case 'number':
-      case 'string':
-        sorter.sortableProperties.push(path)
-        sorter.sortablePropertiesWithTypes[path] = type
-        sorter.sorts[path] = {
-          docs: new Map(),
-          orderedDocsToRemove: new Map(),
-          orderedDocs: [],
-          type: type,
-        }
-        break
-      case 'boolean[]':
-      case 'number[]':
-      case 'string[]':
-        // We don't allow to sort by arrays
-        continue
-      default:
-        throw createError('INVALID_SORT_SCHEMA_TYPE', Array.isArray(type) ? 'array' : (type as unknown as string), path)
+    if (!isVectorType(type as string)) {
+      switch (type) {
+        case 'boolean':
+        case 'number':
+        case 'string':
+          sorter.sortableProperties.push(path)
+          sorter.sortablePropertiesWithTypes[path] = type
+          sorter.sorts[path] = {
+            docs: new Map(),
+            orderedDocsToRemove: new Map(),
+            orderedDocs: [],
+            type: type,
+          }
+          break
+        case 'boolean[]':
+        case 'number[]':
+        case 'string[]':
+          // We don't allow to sort by arrays
+          continue
+        default:
+          throw createError('INVALID_SORT_SCHEMA_TYPE', Array.isArray(type) ? 'array' : (type as unknown as string), path)
+      }
     }
   }
 
