@@ -13,7 +13,7 @@ If you need more info, help, or want to provide general feedback on Orama, join 
 
 # Highlighted features
 
-- [Vector Search](https://docs.oramasearch.com/usage/search/vectors)
+- [Vector Search](https://docs.oramasearch.com/usage/search/vector-search)
 - [Search filters](https://docs.oramasearch.com/usage/search/filters)
 - [Facets](https://docs.oramasearch.com/usage/search/facets)
 - [Fields Boosting](https://docs.oramasearch.com/usage/search/fields-boosting)

@@ -18,14 +18,15 @@ If you want to learn more and see real-world examples, check out [this blog post
 The `schema` is an object where the keys are the property names and the values are the property types. \
 Orama supports the following types:
 
-| Type        | Description                                                                 | example                                                                     |
-| ----------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `string`    | A string of characters.                                                     | `'Hello world'`                                                             |
-| `number`    | A numeric value, either float or integer.                                   | `42`                                                                        |
-| `boolean`   | A boolean value.                                                            | `true`                                                                      |
-| `string[]`  | An array of strings.                                                        | `['red', 'green', 'blue']`                                                  |
-| `number[]`  | An array of numbers.                                                        | `[42, 91, 28.5]`                                                            |
-| `boolean[]` | An array of booleans.                                                       | `[true, false, false]`                                                      |
+| Type             | Description                                                                 | example                                                                     |
+| ---------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `string`         | A string of characters.                                                     | `'Hello world'`                                                             |
+| `number`         | A numeric value, either float or integer.                                   | `42`                                                                        |
+| `boolean`        | A boolean value.                                                            | `true`                                                                      |
+| `string[]`       | An array of strings.                                                        | `['red', 'green', 'blue']`                                                  |
+| `number[]`       | An array of numbers.                                                        | `[42, 91, 28.5]`                                                            |
+| `boolean[]`      | An array of booleans.                                                       | `[true, false, false]`                                                      |
+| `vector[<size>]` | A vector of numbers to perform vector search on.                            | `[0.403, 0.192, 0.830]`                                                               |
 
 A database can be as simple as:
 
@@ -74,6 +75,29 @@ const movieDB = await create({
   },
 })
 ```
+
+## Vector properties
+
+Since version `1.2.0`, Orama supports vector search. \
+To run vector queries, you first need to initialize a vector property in the schema:
+
+```javascript copy
+const db = await create({
+  schema: {
+    title: 'string',
+    embedding: 'vector[384]',
+  }
+})
+```
+
+Please note that the size of the vector **must** be specified in the schema. \
+The size of the vector is the number of elements that the vector contains, so make sure to specify the correct size, as performing search on vectors of different sizes will result in unpredictable and mostly wrong results.
+
+If you're using vector properties to search through embeddings, we highly recommend using [HuggingFace's](https://huggingface.co/) `gte-small` model, which has a vector size of `384`.
+
+There is a great article written by Supabase explaining why it might be a better option than OpenAI's `text-embedding-ada-002` model: [https://supabase.com/blog/fewer-dimensions-are-better-pgvector](https://supabase.com/blog/fewer-dimensions-are-better-pgvector).
+
+For performance reasons, we recommend using one vector property per database, even though it's possible to have multiple vector properties in the same Orama instance.
 
 ## Instance ID
 

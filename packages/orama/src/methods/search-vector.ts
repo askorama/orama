@@ -43,7 +43,6 @@ export async function searchVector(orama: Orama, params: SearchVectorParams): Pr
     const doc = (orama.data.docs as any).docs[originalID]
 
     if (doc) {
-      // TODO: manage multiple vector properties
       if (!includeVectors) {
         doc[property] = null
       }
