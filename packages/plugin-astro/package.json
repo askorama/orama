@@ -1,7 +1,7 @@
 {
   "name": "@orama/plugin-astro",
   "description": "An Astro integration for Orama",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "keywords": [
     "astro",
     "astro-component",
