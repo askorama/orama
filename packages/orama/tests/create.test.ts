@@ -2,7 +2,7 @@ import t from 'tap'
 import { create } from '../src/methods/create.js'
 import { Components } from '../src/types.js'
 
-t.only('create method', t => {
+t.test('create method', t => {
   t.test('should provide an unique ID for the instance', async t => {
     t.plan(3)
 
