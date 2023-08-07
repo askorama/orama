@@ -14,6 +14,7 @@ export interface SectionSchema extends Document {
   pageRoute: string
   sectionTitle: string
   version: string
+  hash: string
 }
 
 export type RawDataWithPositions = RawData & { positions: Record<string, Record<string, Record<string, Position[]>>> }

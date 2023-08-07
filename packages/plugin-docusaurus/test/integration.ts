@@ -101,7 +101,7 @@ await test('generated DBs have indexed pages content', async () => {
   // Search results seem reasonable
   const indexSearchResult = await search(database, 'index')
   assert.ok(indexSearchResult.count === 1)
-  assert.ok(indexSearchResult.hits[0].document.pageRoute === '/')
+  assert.ok(indexSearchResult.hits[0].document.pageRoute === '/#main')
 
   const catSearchResult = await search(database, 'cat')
   assert.ok(catSearchResult.count === 1)
@@ -109,12 +109,12 @@ await test('generated DBs have indexed pages content', async () => {
 
   const dogSearchResult = await search(database, 'dog')
   assert.ok(dogSearchResult.count === 2)
-  assert.ok(dogSearchResult.hits[0].document.pageRoute === '/animals_dog')
+  assert.ok(dogSearchResult.hits[0].document.pageRoute === '/animals_dog#dog')
 
   const domesticSearchResult = await search(database, 'domestic')
   assert.ok(domesticSearchResult.count === 2)
   assert.ok(domesticSearchResult.hits[0].document.pageRoute === '/animals_cat')
-  assert.ok(domesticSearchResult.hits[1].document.pageRoute === '/animals_dog')
+  assert.ok(domesticSearchResult.hits[1].document.pageRoute === '/animals_dog#dog')
 
   // We do not have content about turtles
   const turtleSearchResult = await search(database, 'turtle')

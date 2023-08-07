@@ -3,8 +3,9 @@ import type { LoadContext, Plugin } from '@docusaurus/types'
 import { create, insertMultiple, save } from '@orama/orama'
 import { documentsStore } from '@orama/orama/components'
 import { OramaWithHighlight, afterInsert as highlightAfterInsert } from '@orama/plugin-match-highlight'
-import type { DefaultSchemaElement, NodeContent } from '@orama/plugin-parsedoc'
+import type { DefaultSchemaElement, NodeContent, PopulateFnContext } from '@orama/plugin-parsedoc'
 import { defaultHtmlSchema, populate } from '@orama/plugin-parsedoc'
+import * as githubSlugger from 'github-slugger'
 import { cp, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -23,7 +24,9 @@ function indexPath(outDir: string, version: string): string {
   return resolve(outDir, INDEX_FILE.replace('@VERSION@', version))
 }
 
-function transformFn(node: NodeContent): NodeContent {
+function transformFn(node: NodeContent, context: PopulateFnContext): NodeContent {
+  let raw
+
   switch (node.tag) {
     case 'strong':
     case 'a':
@@ -34,10 +37,30 @@ function transformFn(node: NodeContent): NodeContent {
     case 'b':
     case 'p':
     case 'ul':
-      return { ...node, raw: `<p>${node.content}</p>` }
-    default:
-      return node
+      raw = `<p>${node.content}</p>`
+      break
+    case 'h1':
+    case 'h2':
+    case 'h3':
+    case 'h4':
+    case 'h5':
+    case 'h6':
+      context.lastLink = node.properties?.id ?? githubSlugger.slug(node.content)
+      break
   }
+
+  const transformed = {
+    ...node,
+    additionalProperties: {
+      hash: context.lastLink
+    }
+  }
+
+  if (raw) {
+    transformed.raw = raw
+  }
+
+  return transformed
 }
 
 function defaultToSectionSchema(
@@ -46,7 +69,7 @@ function defaultToSectionSchema(
   sectionTitle: string,
   version: string
 ): SectionSchema {
-  const { content, type } = node
+  const { content, type, properties } = node
 
   if (!sectionTitle) {
     sectionTitle = (pageRoute.split('/').pop() ?? '')
@@ -58,6 +81,7 @@ function defaultToSectionSchema(
 
   return {
     pageRoute,
+    hash: (properties?.hash as string) ?? '',
     sectionTitle: pageRoute ? sectionTitle : 'Home',
     sectionContent: content,
     type,
@@ -91,6 +115,10 @@ async function generateDocument(
   for (const section of sections) {
     if (!section.pageRoute.startsWith('/')) {
       section.pageRoute = '/' + section.pageRoute
+    }
+
+    if (section.hash) {
+      section.pageRoute += `#${section.hash}`
     }
   }
 
