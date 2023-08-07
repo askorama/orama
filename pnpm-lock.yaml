@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -309,6 +309,9 @@ importers:
       '@orama/plugin-parsedoc':
         specifier: workspace:*
         version: link:../plugin-parsedoc
+      github-slugger:
+        specifier: ^2.0.0
+        version: 2.0.0
       pako:
         specifier: ^2.1.0
         version: 2.1.0

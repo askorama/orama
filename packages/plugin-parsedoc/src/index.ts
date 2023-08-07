@@ -29,9 +29,12 @@ export interface DefaultSchemaElement extends Document {
   properties?: Properties
 }
 
+export type PopulateFnContext = Record<string, any>
+
 interface PopulateFromGlobOptions {
   transformFn?: TransformFn
   mergeStrategy?: MergeStrategy
+  context?: PopulateFnContext
 }
 
 type PopulateOptions = PopulateFromGlobOptions & { basePath?: string }
@@ -54,12 +57,11 @@ const populateFromFile = async (db: Orama, filename: string, options?: PopulateF
   return populate(db, data, fileType, { ...options, basePath: `${filename}/` })
 }
 
-export const populate = async (
-  db: Orama,
+export const parseFile = async (
   data: Buffer | string,
   fileType: FileType,
   options?: PopulateOptions
-): Promise<string[]> => {
+): Promise<DefaultSchemaElement[]> => {
   const records: DefaultSchemaElement[] = []
   switch (fileType) {
     case 'md':
@@ -80,13 +82,34 @@ export const populate = async (
       return fileType
     /* c8 ignore stop */
   }
-  return insertMultiple(db, records)
+
+  return records
+}
+
+export const populate = async (
+  db: Orama,
+  data: Buffer | string,
+  fileType: FileType,
+  options?: PopulateOptions
+): Promise<string[]> => {
+  return insertMultiple(db, await parseFile(data, fileType, options))
 }
 
 function rehypeOrama(records: DefaultSchemaElement[], options?: PopulateOptions): (tree: Root) => void {
+  if (!options) {
+    options = {}
+  }
+
   return (tree: Root) => {
     tree.children.forEach((child, i) => {
-      visitChildren(child, tree, `${options?.basePath /* c8 ignore next */ ?? ''}root[${i}]`, records, options)
+      visitChildren(
+        child,
+        tree,
+        `${options?.basePath /* c8 ignore next */ ?? ''}root[${i}]`,
+        records,
+        options!,
+        structuredClone(options?.context ?? {})
+      )
     })
   }
 }
@@ -96,7 +119,8 @@ function visitChildren(
   parent: Parent,
   path: string,
   records: DefaultSchemaElement[],
-  options?: PopulateOptions
+  options: PopulateOptions,
+  context: PopulateFnContext
 ): void {
   if (node.type === 'text') {
     addRecords(
@@ -105,23 +129,24 @@ function visitChildren(
       path,
       (parent as Element).properties,
       records,
-      options?.mergeStrategy ?? 'merge'
+      options.mergeStrategy ?? 'merge'
     )
     return
   }
 
   if (!('tagName' in node)) return
 
-  const transformedNode = typeof options?.transformFn === 'function' ? applyTransform(node, options.transformFn) : node
+  const transformedNode =
+    typeof options?.transformFn === 'function' ? applyTransform(node, options.transformFn, context) : node
 
   transformedNode.children.forEach((child, i) => {
-    visitChildren(child, transformedNode, `${path}.${transformedNode.tagName}[${i}]`, records, options)
+    visitChildren(child, transformedNode, `${path}.${transformedNode.tagName}[${i}]`, records, options, context)
   })
 }
 
-function applyTransform(node: Element, transformFn: TransformFn): Element {
+function applyTransform(node: Element, transformFn: TransformFn, context: PopulateFnContext): Element {
   const preparedNode = prepareNode(node)
-  const transformedNode = transformFn(preparedNode)
+  const transformedNode = transformFn(preparedNode, context)
   return applyChanges(node, transformedNode)
 }
 
@@ -134,14 +159,19 @@ function prepareNode(node: Element): NodeContent {
 }
 
 function applyChanges(node: Element, transformedNode: NodeContent): Element {
+  let changed = node
+
   if (toHtml(node) !== transformedNode.raw) {
-    return fromHtml(transformedNode.raw, { fragment: true }).children[0] as Element
+    changed = fromHtml(transformedNode.raw, { fragment: true }).children[0] as Element
+  } else {
+    node.tagName = transformedNode.tag
+    if (toString(node) !== transformedNode.content) {
+      changed = fromString(node, transformedNode.content)
+    }
   }
-  node.tagName = transformedNode.tag
-  if (toString(node) !== transformedNode.content) {
-    return fromString(node, transformedNode.content)
-  }
-  return node
+
+  changed.properties = { ...changed.properties, ...transformedNode.additionalProperties }
+  return changed
 }
 
 function addRecords(
@@ -203,6 +233,7 @@ export interface NodeContent {
   raw: string
   content: string
   properties?: Properties
+  additionalProperties?: Properties
 }
 
-export type TransformFn = (node: NodeContent) => NodeContent
+export type TransformFn = (node: NodeContent, context: PopulateFnContext) => NodeContent
