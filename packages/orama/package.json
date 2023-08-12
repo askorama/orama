@@ -1,8 +1,8 @@
 {
   "name": "@orama/orama",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "type": "module",
-  "description": "Next generation full-text search engine, written in TypeScript",
+  "description": "Next generation full-text and vector search engine, written in TypeScript",
   "sideEffects": false,
   "main": "./dist/cjs/index.cjs",
   "exports": {
@@ -46,6 +46,9 @@
   },
   "keywords": [
     "full-text search",
+    "vector search",
+    "vector database",
+    "vectors",
     "search",
     "fuzzy search",
     "typo-tolerant search",
@@ -58,6 +61,11 @@
     "author": true
   },
   "contributors": [
+    {
+      "name": "Tommaso Allevi",
+      "email": "tommaso.allevi@oramasearch.com",
+      "url": "https://github.com/allevo"
+    },
     {
       "name": "Paolo Insogna",
       "email": "paolo.insogna@oramasearch.com",
