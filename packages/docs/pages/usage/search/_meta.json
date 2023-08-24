@@ -1,5 +1,6 @@
 {
   "introduction": "Searching with Orama",
+  "vector-search": "Vector Search",
   "fields-boosting": "Fields boosting",
   "facets": "Facets",
   "filters": "Filters",

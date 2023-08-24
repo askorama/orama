@@ -1,6 +1,6 @@
 {
   "name": "@orama/stopwords",
-  "version": "1.0.8",
+  "version": "1.2.1",
   "type": "module",
   "description": "Stop-words for Orama",
   "sideEffects": false,
@@ -131,6 +131,11 @@
       "types": "./dist/se.d.ts",
       "import": "./dist/se.js",
       "require": "./dist/se.cjs"
+    },
+    "./tamil": {
+      "types": "./dist/ta.d.ts",
+      "import": "./dist/ta.js",
+      "require": "./dist/ta.cjs"
     },
     "./turkish": {
       "types": "./dist/tr.d.ts",

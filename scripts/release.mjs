@@ -1,15 +1,18 @@
 import { spawn } from 'node:child_process'
-import { cp } from 'node:fs/promises'
 import { resolve, relative } from 'node:path'
 
 const rootDir = process.cwd()
+
 const packages = [
   'orama',
   'plugin-astro',
   'plugin-data-persistence',
   'plugin-docusaurus',
   'plugin-match-highlight',
+  'plugin-nextra',
   'plugin-parsedoc',
+  'stemmers',
+  'stopwords'
 ]
 
 function step(message) {
@@ -47,9 +50,8 @@ async function execute(command, args, cwd) {
 }
 
 async function main() {
-  await execute('turbo', 'build')
-  await execute('turbo', 'test')
-  await cp('README.md', 'packages/orama/README.md')
+  await execute('pnpm', 'build')
+  await execute('pnpm', 'test')
 
   for (const pkg of packages) {
     const cwd = resolve(rootDir, 'packages', pkg)

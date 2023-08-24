@@ -196,7 +196,7 @@ t.test('search with groupBy', async t => {
     t.end()
   })
 
-  t.test('with custom aggragator', async t => {
+  t.test('with custom aggregator', async t => {
     interface Doc extends Document {
       type: string
       design: string

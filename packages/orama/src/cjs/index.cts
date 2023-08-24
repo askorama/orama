@@ -3,6 +3,7 @@ import type { count as esmCount, getByID as esmGetByID } from '../methods/docs.j
 import type { insert as esmInsert, insertMultiple as esminsertMultiple } from '../methods/insert.js'
 import type { remove as esmRemove, removeMultiple as esmRemoveMultiple } from '../methods/remove.js'
 import type { search as esmSearch } from '../methods/search.js'
+import type { searchVector as esmSearchVector } from '../methods/search-vector.js'
 import type { load as esmLoad, save as esmSave } from '../methods/serialization.js'
 import type { update as esmUpdate, updateMultiple as esmUpdateMultiple } from '../methods/update.js'
 
@@ -18,6 +19,7 @@ let _esmSave: typeof esmSave
 let _esmSearch: typeof esmSearch
 let _esmUpdate: typeof esmUpdate
 let _esmUpdateMultiple: typeof esmUpdateMultiple
+let _esmSearchVector: typeof esmSearchVector
 
 export async function count(...args: Parameters<typeof esmCount>): ReturnType<typeof esmCount> {
   if (!_esmCount) {
@@ -131,6 +133,17 @@ export async function updateMultiple(
   }
 
   return _esmUpdateMultiple(...args)
+}
+
+export async function searchVector(
+  ...args: Parameters<typeof esmSearchVector>
+): ReturnType<typeof esmSearchVector> {
+  if (!_esmSearchVector) {
+    const imported = await import('../methods/search-vector.js')
+    _esmSearchVector = imported.searchVector
+  }
+
+  return _esmSearchVector(...args)
 }
 
 export * as components from './components/defaults.cjs'

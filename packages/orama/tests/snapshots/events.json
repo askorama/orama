@@ -6,51 +6,12 @@
         "id": "",
         "score": 4.744426329679039,
         "document": {
-          "date": "1809/03/13",
-          "description": "Peninsular War",
-          "granularity": "year",
-          "categories": {
-            "first": "January/March",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.744426329679039,
-        "document": {
-          "date": "1867/12/02",
-          "description": "Paraguayan War.",
-          "granularity": "year",
-          "categories": {
-            "first": "Ongoing",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.744426329679039,
-        "document": {
           "date": "-89",
           "description": "Social War:",
           "granularity": "year",
           "categories": {
             "first": "By place",
             "second": "Roman Republic"
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.744426329679039,
-        "document": {
-          "date": "1914/12/24",
-          "description": " World War I:",
-          "granularity": "year",
-          "categories": {
-            "first": "December",
-            "second": ""
           }
         }
       },
@@ -131,12 +92,7 @@
             "second": "Roman Republic"
           }
         }
-      }
-    ]
-  },
-  "should perform paginate search-page-2": {
-    "count": 2357,
-    "hits": [
+      },
       {
         "id": "",
         "score": 4.744426329679039,
@@ -167,6 +123,50 @@
         "id": "",
         "score": 4.744426329679039,
         "document": {
+          "date": "1809/03/13",
+          "description": "Peninsular War",
+          "granularity": "year",
+          "categories": {
+            "first": "January/March",
+            "second": ""
+          }
+        }
+      }
+    ]
+  },
+  "should perform paginate search-page-2": {
+    "count": 2357,
+    "hits": [
+      {
+        "id": "",
+        "score": 4.744426329679039,
+        "document": {
+          "date": "1867/12/02",
+          "description": "Paraguayan War.",
+          "granularity": "year",
+          "categories": {
+            "first": "Ongoing",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.744426329679039,
+        "document": {
+          "date": "1914/12/24",
+          "description": " World War I:",
+          "granularity": "year",
+          "categories": {
+            "first": "December",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.744426329679039,
+        "document": {
           "date": "1950/02/14",
           "description": " Cold War:",
           "granularity": "year",
@@ -180,12 +180,25 @@
         "id": "",
         "score": 4.087300377720357,
         "document": {
-          "date": "2003/02/05",
-          "description": "War in Darfur begins.",
+          "date": "-113",
+          "description": "War between the Celtiberians and the Romans.",
           "granularity": "year",
           "categories": {
-            "first": "February",
-            "second": ""
+            "first": "By place",
+            "second": "Roman Republic"
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "-86",
+          "description": "First Mithridatic War",
+          "granularity": "year",
+          "categories": {
+            "first": "By place",
+            "second": "Roman Republic"
           }
         }
       },
@@ -253,7 +266,12 @@
             "second": ""
           }
         }
-      },
+      }
+    ]
+  },
+  "should perform paginate search-page-3": {
+    "count": 2357,
+    "hits": [
       {
         "id": "",
         "score": 4.087300377720357,
@@ -266,12 +284,7 @@
             "second": ""
           }
         }
-      }
-    ]
-  },
-  "should perform paginate search-page-3": {
-    "count": 2357,
-    "hits": [
+      },
       {
         "id": "",
         "score": 4.087300377720357,
@@ -367,19 +380,6 @@
         "id": "",
         "score": 4.087300377720357,
         "document": {
-          "date": "-113",
-          "description": "War between the Celtiberians and the Romans.",
-          "granularity": "year",
-          "categories": {
-            "first": "By place",
-            "second": "Roman Republic"
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
           "date": "1879/01/11",
           "description": " The Anglo-Zulu War begins.",
           "granularity": "year",
@@ -393,12 +393,12 @@
         "id": "",
         "score": 4.087300377720357,
         "document": {
-          "date": "-86",
-          "description": "First Mithridatic War",
+          "date": "1919/02/14",
+          "description": " The Polish-Soviet War begins.",
           "granularity": "year",
           "categories": {
-            "first": "By place",
-            "second": "Roman Republic"
+            "first": "February",
+            "second": ""
           }
         }
       }

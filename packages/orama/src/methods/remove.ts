@@ -1,8 +1,13 @@
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
+import {
+  DocumentID,
+  getDocumentIdFromInternalId,
+  getInternalDocumentId,
+} from '../components/internal-document-id-store.js'
 import { trackRemoval } from '../components/sync-blocking-checker.js'
 import { Orama } from '../types.js'
 
-export async function remove(orama: Orama, id: string, language?: string, skipHooks?: boolean): Promise<boolean> {
+export async function remove(orama: Orama, id: DocumentID, language?: string, skipHooks?: boolean): Promise<boolean> {
   let result = true
   const { index, docs } = orama.data
 
@@ -11,10 +16,14 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
     return false
   }
 
+  const docId = getDocumentIdFromInternalId(
+    orama.internalDocumentIDStore,
+    getInternalDocumentId(orama.internalDocumentIDStore, id),
+  )
   const docsCount = await orama.documentsStore.count(docs)
 
   if (!skipHooks) {
-    await runSingleHook(orama.beforeRemove, orama, id)
+    await runSingleHook(orama.beforeRemove, orama, docId)
   }
 
   const indexableProperties = await orama.index.getSearchableProperties(index)
@@ -23,7 +32,7 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
 
   for (const prop of indexableProperties) {
     const value = values[prop]
-    // The document doens't contain the key
+    // The document doesn't contain the key
     if (typeof value === 'undefined') {
       continue
     }
@@ -33,7 +42,7 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
     await orama.index.beforeRemove?.(
       orama.data.index,
       prop,
-      id,
+      docId,
       value,
       schemaType,
       language,
@@ -55,13 +64,22 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
     ) {
       result = false
     }
-    await orama.index.afterRemove?.(orama.data.index, prop, id, value, schemaType, language, orama.tokenizer, docsCount)
+    await orama.index.afterRemove?.(
+      orama.data.index,
+      prop,
+      docId,
+      value,
+      schemaType,
+      language,
+      orama.tokenizer,
+      docsCount,
+    )
   }
 
   const sortableProperties = await orama.sorter.getSortableProperties(orama.data.sorting)
   const sortableValues = await orama.getDocumentProperties(doc, sortableProperties)
   for (const prop of sortableProperties) {
-    // The document doens't contain the key
+    // The document doesn't contain the key
     if (typeof sortableValues[prop] === 'undefined') {
       continue
     }
@@ -70,7 +88,7 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
   }
 
   if (!skipHooks) {
-    await runSingleHook(orama.afterRemove, orama, id)
+    await runSingleHook(orama.afterRemove, orama, docId)
   }
 
   await orama.documentsStore.remove(orama.data.docs, id)
@@ -81,7 +99,7 @@ export async function remove(orama: Orama, id: string, language?: string, skipHo
 
 export async function removeMultiple(
   orama: Orama,
-  ids: string[],
+  ids: DocumentID[],
   batchSize?: number,
   language?: string,
   skipHooks?: boolean,
@@ -92,8 +110,17 @@ export async function removeMultiple(
     batchSize = 1000
   }
 
+  const docIdsForHooks = skipHooks
+    ? []
+    : ids.map(id =>
+        getDocumentIdFromInternalId(
+          orama.internalDocumentIDStore,
+          getInternalDocumentId(orama.internalDocumentIDStore, id),
+        ),
+      )
+
   if (!skipHooks) {
-    await runMultipleHook(orama.beforeMultipleRemove, orama, ids)
+    await runMultipleHook(orama.beforeMultipleRemove, orama, docIdsForHooks)
   }
 
   await new Promise<void>((resolve, reject) => {
@@ -123,7 +150,7 @@ export async function removeMultiple(
   })
 
   if (!skipHooks) {
-    await runMultipleHook(orama.afterMultipleRemove, orama, ids)
+    await runMultipleHook(orama.afterMultipleRemove, orama, docIdsForHooks)
   }
 
   return result

@@ -2,7 +2,7 @@ import t from 'tap'
 import { create, insert, search } from '../src/index.js'
 
 t.test('should only return results with all the search terms (exact match)', async t => {
-  t.plan(3)
+  t.plan(4)
 
   const db = await create({
     schema: {
@@ -14,6 +14,7 @@ t.test('should only return results with all the search terms (exact match)', asy
   await insert(db, { title: 'Blue t-shirt oversize fit' })
   await insert(db, { title: 'Red t-shirt v-neck cut' })
   await insert(db, { title: 'Colored t-shirt slim fit' })
+  await insert(db, { title: 'Red t-shirt slim fit' })
 
   const r1 = await search(db, {
     term: 'blue t-shirt',
@@ -27,10 +28,15 @@ t.test('should only return results with all the search terms (exact match)', asy
     term: 'slim fit',
     threshold: 0,
   })
+  const r4 = await search(db, {
+    term: 'red fit',
+    threshold: 0,
+  })
 
   t.same(r1.count, 2)
-  t.same(r2.count, 1)
-  t.same(r3.count, 2)
+  t.same(r2.count, 2)
+  t.same(r3.count, 3)
+  t.same(r4.count, 1)
 })
 
 t.test('should only return results with all the search terms (exact match) on more complex schema', async t => {
@@ -88,7 +94,7 @@ t.test('should only return results with all the search terms (exact match) on mo
   t.same(r1.count, 2)
   t.same(r2.count, 1)
   t.same(r3.count, 2)
-  t.same(r4.count, 2)
+  t.same(r4.count, 1)
 })
 
 t.test('should return all the results if threshold is 1', async t => {

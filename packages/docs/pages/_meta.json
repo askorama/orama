@@ -3,6 +3,10 @@
     "type": "menu",
     "title": "Search Features",
     "items": {
+      "vector-search": {
+        "title": "Vector Search",
+        "href": "/usage/search/vector-search"
+      },
       "typo-tolerance": {
         "title": "Typo Tolerance",
         "href": "/usage/search/introduction#typo-tolerance"

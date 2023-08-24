@@ -1,6 +1,6 @@
 {
   "name": "@orama/plugin-docusaurus",
-  "version": "1.0.8",
+  "version": "1.2.1",
   "description": "Docusaurus plugin for local search powered by orama",
   "keywords": [
     "orama",
@@ -51,6 +51,7 @@
     "@orama/orama": "workspace:*",
     "@orama/plugin-match-highlight": "workspace:*",
     "@orama/plugin-parsedoc": "workspace:*",
+    "github-slugger": "^2.0.0",
     "pako": "^2.1.0",
     "vfile-message": "^3.1.3"
   },

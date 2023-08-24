@@ -34,6 +34,14 @@ export async function validateSchema<S extends Schema = Schema>(doc: Document, s
 
     const typeOfType = typeof type
 
+    if (isVectorType(type as string)) {
+      const vectorSize = getVectorSize(type as string)
+      if (!Array.isArray(value) || value.length !== vectorSize) {
+        throw createError('INVALID_INPUT_VECTOR', prop, vectorSize, (value as number[]).length)
+      }
+      continue
+    }
+
     if (typeOfType === 'string' && isArrayType(type as SearchableType)) {
       if (!Array.isArray(value)) {
         return prop
@@ -78,14 +86,34 @@ const IS_ARRAY_TYPE: Record<SearchableType, boolean> = {
   'number[]': true,
   'boolean[]': true,
 }
+
 const INNER_TYPE: Record<ArraySearchableType, ScalarSearchableType> = {
   'string[]': 'string',
   'number[]': 'number',
   'boolean[]': 'boolean',
 }
-export function isArrayType(type: SearchableType) {
+
+export function isVectorType(type: string): boolean {
+  return /^vector\[\d+\]$/.test(type)
+}
+
+export function isArrayType(type: SearchableType): boolean {
   return IS_ARRAY_TYPE[type]
 }
+
 export function getInnerType(type: ArraySearchableType): ScalarSearchableType {
   return INNER_TYPE[type]
+}
+
+export function getVectorSize(type: string): number {
+  const size = Number(type.slice(7, -1))
+
+  switch (true) {
+    case isNaN(size):
+      throw createError('INVALID_VECTOR_VALUE', type)
+    case size <= 0:
+      throw createError('INVALID_VECTOR_SIZE', type)
+    default:
+      return size
+  }
 }

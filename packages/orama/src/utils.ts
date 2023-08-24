@@ -88,11 +88,6 @@ export async function uniqueId(): Promise<string> {
   return `${baseId}-${lastId++}`
 }
 
-// This is only used internally, keep in sync with the previous one
-export function syncUniqueId(): string {
-  return `${baseId}-${lastId++}`
-}
-
 export function getOwnProperty<T = unknown>(object: Record<string, T>, property: string): T | undefined {
   // Checks if `hasOwn` method is defined avoiding errors with older Node.js versions
   if (Object.hasOwn === undefined) {
@@ -139,7 +134,7 @@ export function insertSortedValue(
 
 export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
   if (b[1] === a[1]) {
-    return a[0].localeCompare(b[0])
+    return a[0] - b[0]
   }
 
   return b[1] - a[1]

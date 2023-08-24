@@ -3,6 +3,7 @@ import { createDocumentsStore } from '../components/documents-store.js'
 import { OBJECT_COMPONENTS, FUNCTION_COMPONENTS, SINGLE_OR_ARRAY_COMPONENTS } from '../components/hooks.js'
 import { createIndex } from '../components/index.js'
 import { createTokenizer } from '../components/tokenizer/index.js'
+import { createInternalDocumentIDStore } from '../components/internal-document-id-store.js'
 import { createError } from '../errors.js'
 import { uniqueId } from '../utils.js'
 import {
@@ -120,6 +121,8 @@ export async function create<P extends ProvidedTypes>({
     throw createError('NO_LANGUAGE_WITH_CUSTOM_TOKENIZER')
   }
 
+  const internalDocumentStore = createInternalDocumentIDStore()
+
   index ||= await createIndex()
   sorter ||= await createSorter()
   documentsStore ||= await createDocumentsStore()
@@ -156,6 +159,7 @@ export async function create<P extends ProvidedTypes>({
     index,
     sorter,
     documentsStore,
+    internalDocumentIDStore: internalDocumentStore,
     getDocumentProperties,
     getDocumentIndexId,
     validateSchema,
@@ -177,9 +181,9 @@ export async function create<P extends ProvidedTypes>({
   } as Orama
 
   orama.data = {
-    index: await orama.index.create(orama, schema),
-    docs: await orama.documentsStore.create(orama),
-    sorting: await orama.sorter.create(orama, schema, sort),
+    index: await orama.index.create(orama, internalDocumentStore, schema),
+    docs: await orama.documentsStore.create(orama, internalDocumentStore),
+    sorting: await orama.sorter.create(orama, internalDocumentStore, schema, sort),
   }
 
   return orama

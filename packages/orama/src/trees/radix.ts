@@ -1,16 +1,30 @@
 import { syncBoundedLevenshtein } from '../components/levenshtein.js'
-import { Nullable } from '../types.js'
-import { getOwnProperty, syncUniqueId } from '../utils.js'
+import { InternalDocumentID } from '../components/internal-document-id-store.js'
+import { getOwnProperty } from '../utils.js'
 
-export interface Node {
-  id: string
-  key: string
-  subWord: string
-  parent: Nullable<string>
-  children: Record<string, Node>
-  docs: string[]
-  end: boolean
-  word: string
+export class Node {
+  constructor(key: string, subWord: string, end: boolean) {
+    this.key = key
+    this.subWord = subWord
+    this.end = end
+  }
+
+  public key: string
+  public subWord: string
+  public children: Record<string, Node> = {}
+  public docs: InternalDocumentID[] = []
+  public end: boolean
+  public word = ''
+
+  public toJSON(): object {
+    return {
+      word: this.word,
+      subWord: this.subWord,
+      children: this.children,
+      docs: this.docs,
+      end: this.end,
+    }
+  }
 }
 
 type FindParams = {
@@ -19,25 +33,17 @@ type FindParams = {
   tolerance?: number
 }
 
-type FindResult = Record<string, string[]>
-
-/* c8 ignore next 5 */
-function serialize(this: Node): object {
-  const { word, subWord, children, docs, end } = this
-
-  return { word, subWord, children, docs, end }
-}
+type FindResult = Record<string, InternalDocumentID[]>
 
 function updateParent(node: Node, parent: Node): void {
-  node.parent = parent.id
   node.word = parent.word + node.subWord
 }
 
-function addDocument(node: Node, docID: string): void {
+function addDocument(node: Node, docID: InternalDocumentID): void {
   node.docs.push(docID)
 }
 
-function removeDocument(node: Node, docID: string): boolean {
+function removeDocument(node: Node, docID: InternalDocumentID): boolean {
   const index = node.docs.indexOf(docID)
 
   /* c8 ignore next 3 */
@@ -110,22 +116,10 @@ function getCommonPrefix(a: string, b: string) {
 }
 
 export function create(end = false, subWord = '', key = ''): Node {
-  const node = {
-    id: syncUniqueId(),
-    key,
-    subWord,
-    parent: null,
-    children: {},
-    docs: [],
-    end,
-    word: '',
-  }
-
-  Object.defineProperty(node, 'toJSON', { value: serialize })
-  return node
+  return new Node(key, subWord, end)
 }
 
-export function insert(root: Node, word: string, docId: string) {
+export function insert(root: Node, word: string, docId: InternalDocumentID) {
   for (let i = 0; i < word.length; i++) {
     const currentCharacter = word[i]
     const wordAtIndex = word.substring(i)
@@ -213,7 +207,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams): FindRe
       // find the common prefix between two words ex: prime and primate = prim
       const commonPrefix = getCommonPrefix(edgeLabel, termSubstring)
       const commonPrefixLength = commonPrefix.length
-      // if the common prefix lenght is equal to edgeLabel lenght (the node subword) it means they are a match
+      // if the common prefix length is equal to edgeLabel length (the node subword) it means they are a match
       // if the common prefix is equal to the term means it is contained in the node
       if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
         // if tolerance is set we take the current node as the closest
@@ -221,7 +215,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams): FindRe
         return {}
       }
 
-      // skip the subword lenght and check the next divergent character
+      // skip the subword length and check the next divergent character
       i += rootChildCurrentChar.subWord.length - 1
       // navigate into the child node
       root = rootChildCurrentChar
@@ -284,7 +278,7 @@ export function removeWord(root: Node, term: string): boolean {
   return false
 }
 
-export function removeDocumentByWord(root: Node, term: string, docID: string, exact = true): boolean {
+export function removeDocumentByWord(root: Node, term: string, docID: InternalDocumentID, exact = true): boolean {
   if (!term) {
     return true
   }
