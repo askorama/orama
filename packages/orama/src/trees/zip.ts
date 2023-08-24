@@ -9,7 +9,7 @@ interface Node<V = unknown> {
   rank: number
 }
 
-function randomRank (maxAttempts: number = 32): number {
+function randomRank (maxAttempts = 32): number {
   let heads = 0
 
   for (let i = 0; i < maxAttempts; i++) {
