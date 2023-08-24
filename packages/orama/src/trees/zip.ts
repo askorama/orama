@@ -223,3 +223,31 @@ function merge<V> (left: Nullable<Node<V>>, right: Nullable<Node<V>>): Nullable<
 
   return left
 }
+
+export function removeDocument<V> (root: Node<V[]>, id: V, key: number): void {
+  const node = getNodeByKey(root, key)
+
+  if (node == null) return
+
+  if (node.value.length === 1 && node.value[0] === id) {
+    remove(root, key)
+  } else {
+    const index = node.value.indexOf(id)
+    if (index !== -1) {
+      node.value.splice(index, 1)
+    }
+  }
+}
+
+function getNodeByKey<V> (root: Nullable<Node<V>>, key: number): Nullable<Node<V>> {
+  let currentNode: Nullable<Node<V>> = root
+
+  while (currentNode !== null) {
+    if (currentNode.key === key) {
+      return currentNode
+    }
+    currentNode = (currentNode.key < key) ? currentNode.right : currentNode.left
+  }
+
+  return null
+}
