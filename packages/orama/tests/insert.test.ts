@@ -321,7 +321,7 @@ t.test('insert method', t => {
         { boolean: {} },
         { boolean: [] },
       ]
-      invalidDocuments.push(...invalidDocuments.map(d => ({ inner: { ...d } })))
+      invalidDocuments.concat(invalidDocuments.map(d => ({ inner: { ...d } })))
       for (const doc of invalidDocuments) {
         await t.rejects(insert(db, doc as Document))
       }

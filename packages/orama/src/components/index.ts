@@ -443,12 +443,13 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
   filters: Record<string, boolean | ComparisonOperator>,
 ): Promise<number[]> {
   const filterKeys = Object.keys(filters)
-
   const filtersMap: Record<string, InternalDocumentID[]> = filterKeys.reduce(
-    (acc, key) => ({
-      [key]: [],
-      ...acc,
-    }),
+    (acc, key) => 
+      Object.assign(
+        acc, {
+          [key]: [],
+        }
+      ),
     {},
   )
 
@@ -463,7 +464,7 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
       }
 
       const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
-      filtersMap[param].push(...filteredIDs)
+      filtersMap[param].concat(filteredIDs)
       continue
     }
 
@@ -477,7 +478,9 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
       for (const raw of [operation].flat()) {
         const term = await context.tokenizer.tokenize(raw, context.language, param)
         const filteredIDsResults = radixFind(idx, { term: term[0], exact: true })
-        filtersMap[param].push(...Object.values(filteredIDsResults).flat())
+
+        const filteredIDs = Object.values(filteredIDsResults).flat()
+        filtersMap[param].concat(filteredIDs)
       }
 
       continue
@@ -501,33 +504,33 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
     switch (operationOpt) {
       case 'gt': {
         const filteredIDs = avlGreaterThan(AVLNode, operationValue, false)
-        filtersMap[param].push(...filteredIDs)
+        filtersMap[param].concat(filteredIDs)
         break
       }
       case 'gte': {
         const filteredIDs = avlGreaterThan(AVLNode, operationValue, true)
-        filtersMap[param].push(...filteredIDs)
+        filtersMap[param].concat(filteredIDs)
         break
       }
       case 'lt': {
         const filteredIDs = avlLessThan(AVLNode, operationValue, false)
-        filtersMap[param].push(...filteredIDs)
+        filtersMap[param].concat(filteredIDs)
         break
       }
       case 'lte': {
         const filteredIDs = avlLessThan(AVLNode, operationValue, true)
-        filtersMap[param].push(...filteredIDs)
+        filtersMap[param].concat(filteredIDs)
         break
       }
       case 'eq': {
         const filteredIDs = avlFind(AVLNode, operationValue) ?? []
-        filtersMap[param].push(...filteredIDs)
+        filtersMap[param].concat(filteredIDs)
         break
       }
       case 'between': {
         const [min, max] = operationValue as number[]
         const filteredIDs = avlRangeSearch(AVLNode, min, max)
-        filtersMap[param].push(...filteredIDs)
+        filtersMap[param].concat(filteredIDs)
       }
     }
   }
