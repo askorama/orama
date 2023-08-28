@@ -179,7 +179,7 @@ export async function search<AggValue = Result[]>(
         // Lookup
         const scoreList = await orama.index.search(context, index, prop, term)
 
-        context.indexMap[prop][term].concat(scoreList)
+        context.indexMap[prop][term] = context.indexMap[prop][term].concat(scoreList)
       }
 
       const docIds = context.indexMap[prop]

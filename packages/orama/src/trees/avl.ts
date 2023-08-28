@@ -99,7 +99,7 @@ export function rangeSearch<K, V>(node: Node<K, V>, min: K, max: K): V {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const result: V[] = []
+  let result: V[] = []
 
   function traverse(node: Node<K, V>) {
     if (!node) {
@@ -111,7 +111,7 @@ export function rangeSearch<K, V>(node: Node<K, V>, min: K, max: K): V {
     }
 
     if (node.key >= min && node.key <= max) {
-      result.concat(node.value as V[])
+      result = result.concat(node.value as V[])
     }
 
     if (node.key < max) {
@@ -131,7 +131,7 @@ export function greaterThan<K, V>(node: Node<K, V>, key: K, inclusive = false): 
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const result: V[] = []
+  let result: V[] = []
 
   function traverse(node: Node<K, V>) {
     if (!node) {
@@ -139,11 +139,11 @@ export function greaterThan<K, V>(node: Node<K, V>, key: K, inclusive = false): 
     }
 
     if (inclusive && node.key >= key) {
-      result.concat((node.value as V[]))
+      result = result.concat((node.value as V[]))
     }
 
     if (!inclusive && node.key > key) {
-      result.concat((node.value as V[]))
+      result = result.concat((node.value as V[]))
     }
 
     traverse(node.left as Node<K, V>)
@@ -162,7 +162,7 @@ export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const result: V[] = []
+  let result: V[] = []
 
   function traverse(node: Node<K, V>) {
     if (!node) {
@@ -170,11 +170,11 @@ export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
     }
 
     if (inclusive && node.key <= key) {
-      result.concat((node.value as V[]))
+      result = result.concat((node.value as V[]))
     }
 
     if (!inclusive && node.key < key) {
-      result.concat((node.value as V[]))
+      result = result.concat((node.value as V[]))
     }
 
     traverse(node.left as Node<K, V>)

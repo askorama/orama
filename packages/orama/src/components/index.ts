@@ -464,7 +464,7 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
       }
 
       const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
-      filtersMap[param].concat(filteredIDs)
+      filtersMap[param] = filtersMap[param].concat(filteredIDs)
       continue
     }
 
@@ -480,7 +480,7 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
         const filteredIDsResults = radixFind(idx, { term: term[0], exact: true })
 
         const filteredIDs = Object.values(filteredIDsResults).flat()
-        filtersMap[param].concat(filteredIDs)
+        filtersMap[param] = filtersMap[param].concat(filteredIDs)
       }
 
       continue
@@ -504,33 +504,33 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
     switch (operationOpt) {
       case 'gt': {
         const filteredIDs = avlGreaterThan(AVLNode, operationValue, false)
-        filtersMap[param].concat(filteredIDs)
+        filtersMap[param] = filtersMap[param].concat(filteredIDs)
         break
       }
       case 'gte': {
         const filteredIDs = avlGreaterThan(AVLNode, operationValue, true)
-        filtersMap[param].concat(filteredIDs)
+        filtersMap[param] = filtersMap[param].concat(filteredIDs)
         break
       }
       case 'lt': {
         const filteredIDs = avlLessThan(AVLNode, operationValue, false)
-        filtersMap[param].concat(filteredIDs)
+        filtersMap[param] = filtersMap[param].concat(filteredIDs)
         break
       }
       case 'lte': {
         const filteredIDs = avlLessThan(AVLNode, operationValue, true)
-        filtersMap[param].concat(filteredIDs)
+        filtersMap[param] = filtersMap[param].concat(filteredIDs)
         break
       }
       case 'eq': {
         const filteredIDs = avlFind(AVLNode, operationValue) ?? []
-        filtersMap[param].concat(filteredIDs)
+        filtersMap[param] = filtersMap[param].concat(filteredIDs)
         break
       }
       case 'between': {
         const [min, max] = operationValue as number[]
         const filteredIDs = avlRangeSearch(AVLNode, min, max)
-        filtersMap[param].concat(filteredIDs)
+        filtersMap[param] = filtersMap[param].concat(filteredIDs)
       }
     }
   }
