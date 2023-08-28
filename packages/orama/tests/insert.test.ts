@@ -302,7 +302,7 @@ t.test('insert method', t => {
         },
       })
 
-      const invalidDocuments: Array<object> = [
+      let invalidDocuments: Array<object> = [
         { string: null },
         { string: 42 },
         { string: true },
@@ -321,7 +321,7 @@ t.test('insert method', t => {
         { boolean: {} },
         { boolean: [] },
       ]
-      invalidDocuments.concat(invalidDocuments.map(d => ({ inner: { ...d } })))
+      invalidDocuments = invalidDocuments.concat(invalidDocuments.map(d => ({ inner: { ...d } })))
       for (const doc of invalidDocuments) {
         await t.rejects(insert(db, doc as Document))
       }
