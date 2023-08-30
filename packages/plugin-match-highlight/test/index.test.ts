@@ -1,6 +1,12 @@
 import { create, insert } from '@orama/orama'
 import t from 'tap'
-import { afterInsert, OramaWithHighlight, searchWithHighlight } from '../src/index.js'
+import {
+  afterInsert,
+  loadWithHighlight,
+  OramaWithHighlight,
+  saveWithHighlight,
+  searchWithHighlight
+} from '../src/index.js'
 
 t.test('it should store the position of tokens', async t => {
   const schema = {
@@ -75,5 +81,25 @@ t.test('should work with texts containing constructor and __proto__ properties',
 
   t.same(results.hits[0].positions, {
     text: { constructor: [{ start: 0, length: 11 }] }
+  })
+})
+
+t.test('should correctly save and load data with positions', async t => {
+  const schema = {
+    text: 'string'
+  } as const
+
+  const originalDB = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight
+
+  const id = await insert(originalDB, { text: 'hello world' })
+
+  const DBData = await saveWithHighlight(originalDB)
+
+  const newDB = (await create({ schema, components: { afterInsert } })) as OramaWithHighlight
+
+  await loadWithHighlight(newDB, DBData)
+
+  t.same(newDB.data.positions[id], {
+    text: { hello: [{ start: 0, length: 5 }], world: [{ start: 6, length: 5 }] }
   })
 })

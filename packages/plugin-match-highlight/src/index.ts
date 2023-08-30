@@ -1,4 +1,16 @@
-import { Document, Language, Orama, Result, Results, Schema, search, SearchParams } from '@orama/orama'
+import {
+  RawData,
+  Document,
+  Language,
+  Orama,
+  Result,
+  Results,
+  Schema,
+  search,
+  load,
+  SearchParams,
+  save
+} from '@orama/orama'
 
 export interface Position {
   start: number
@@ -11,6 +23,10 @@ export type OramaWithHighlight = Orama & {
 
 export type SearchResultWithHighlight = Results & {
   hits: (Result & { positions: Position[] })[]
+}
+
+export type RawDataWithPositions = RawData & {
+  positions: Record<string, Record<string, Record<string, Position[]>>>
 }
 
 export async function afterInsert(orama: Orama | OramaWithHighlight, id: string): Promise<void> {
@@ -93,4 +109,18 @@ export async function searchWithHighlight(
 
   // @ts-ignore
   return result
+}
+
+export async function saveWithHighlight(orama: Orama): Promise<RawDataWithPositions> {
+  const data = await save(orama)
+
+  return {
+    ...data,
+    positions: (orama as OramaWithHighlight).data.positions
+  }
+}
+
+export async function loadWithHighlight(orama: OramaWithHighlight, raw: RawDataWithPositions): Promise<void> {
+  await load(orama, raw)
+  orama.data.positions = raw.positions
 }
