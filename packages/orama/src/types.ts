@@ -530,6 +530,7 @@ export type DefaultTokenizerConfig = {
   stemming?: boolean
   stemmer?: Stemmer
   stemmerSkipProperties?: string | string[]
+  tokenizeSkipProperties?: string | string[]
   stopWords?: boolean | string[] | ((stopWords: string[]) => string[] | Promise<string[]>)
   allowDuplicates?: boolean
 }
