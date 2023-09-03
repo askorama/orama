@@ -476,8 +476,10 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
 
       for (const raw of [operation].flat()) {
         const term = await context.tokenizer.tokenize(raw, context.language, param)
-        const filteredIDsResults = radixFind(idx, { term: term[0], exact: true })
-        filtersMap[param].push(...Object.values(filteredIDsResults).flat())
+        for (const t of term) {
+          const filteredIDsResults = radixFind(idx, { term: t, exact: true })
+          filtersMap[param].push(...Object.values(filteredIDsResults).flat())
+        }
       }
 
       continue
