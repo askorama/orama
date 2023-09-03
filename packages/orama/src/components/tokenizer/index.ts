@@ -7,6 +7,7 @@ import { stemmer as english } from './english-stemmer.js'
 interface DefaultTokenizer extends Tokenizer {
   language: Language
   stemmer?: Stemmer
+  tokenizeSkipProperties: Set<string>
   stemmerSkipProperties: Set<string>
   stopWords?: string[]
   allowDuplicates: boolean
@@ -58,12 +59,18 @@ function tokenize(this: DefaultTokenizer, input: string, language?: string, prop
     return [input]
   }
 
-  const splitRule = SPLITTERS[this.language]
-  const tokens = input
-    .toLowerCase()
-    .split(splitRule)
-    .map(this.normalizeToken.bind(this, prop ?? ''))
-    .filter(Boolean)
+  let tokens: string[]
+  if (prop && this.tokenizeSkipProperties.has(prop)) {
+    tokens = [this.normalizeToken.bind(this, prop ?? '')(input)]
+  } else {
+    const splitRule = SPLITTERS[this.language]
+    tokens = input
+      .toLowerCase()
+      .split(splitRule)
+      .map(this.normalizeToken.bind(this, prop ?? ''))
+      .filter(Boolean)
+  }
+
   const trimTokens = trim(tokens)
 
   if (!this.allowDuplicates) {
@@ -131,6 +138,7 @@ export async function createTokenizer(config: DefaultTokenizerConfig = {}): Prom
     language: config.language,
     stemmer,
     stemmerSkipProperties: new Set(config.stemmerSkipProperties ? [config.stemmerSkipProperties].flat() : []),
+    tokenizeSkipProperties: new Set(config.tokenizeSkipProperties ? [config.tokenizeSkipProperties].flat() : []),
     stopWords,
     allowDuplicates: Boolean(config.allowDuplicates),
     normalizeToken,

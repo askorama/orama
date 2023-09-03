@@ -214,7 +214,7 @@ export async function create(
 
     if (isVectorType(type as string)) {
       index.searchableProperties.push(path)
-      index.searchablePropertiesWithTypes[path] = (type as SearchableType)
+      index.searchablePropertiesWithTypes[path] = type as SearchableType
       index.vectorIndexes[path] = {
         size: getVectorSize(type as string),
         vectors: {},
@@ -297,7 +297,6 @@ export async function insert(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<void> {
-
   if (isVectorType(schemaType)) {
     return insertVector(index, prop, value as number[] | Float32Array, id)
   }
@@ -329,7 +328,7 @@ function insertVector(index: Index, prop: string, value: number[] | VectorType, 
   if (!(value instanceof Float32Array)) {
     value = new Float32Array(value)
   }
-  
+
   const size = index.vectorIndexes[prop].size
   const magnitude = getMagnitude(value, size)
 
@@ -630,14 +629,14 @@ export async function save<R = unknown>(index: Index): Promise<R> {
 
   for (const idx of Object.keys(vectorIndexes)) {
     const vectors = vectorIndexes[idx].vectors
-    
+
     for (const vec in vectors) {
       vectors[vec] = [vectors[vec][0], Array.from(vectors[vec][1]) as unknown as Float32Array]
     }
 
     vectorIndexesAsArrays[idx] = {
       size: vectorIndexes[idx].size,
-      vectors
+      vectors,
     }
   }
 
