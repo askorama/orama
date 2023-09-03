@@ -83,7 +83,7 @@ import { restore } from '@orama/plugin-data-persistence'
 
 const newInstance = await restore('json', JSONIndex)
 
-await search(persist, {
+await search(newInstance, {
   term: '...'
 })
 ```
