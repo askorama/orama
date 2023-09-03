@@ -9,15 +9,9 @@ interface Node<V = unknown> {
   rank: number
 }
 
-function randomRank (maxAttempts = 32): number {
-  let heads = 0
-
-  for (let i = 0; i < maxAttempts; i++) {
-    if (Math.random() >= 0.5) break
-    heads += 1
-  }
-
-  return heads
+function randomRank(): number {
+  const r = Math.random()
+  return Math.floor(Math.log(1 - r) / Math.log(1 - 0.5))
 }
 
 export function create<V> (key: number, value: V): Node<V> {
