@@ -4,7 +4,9 @@ import type { Orama } from '@orama/orama'
 import type {
   afterInsert as esmAfterInsert,
   OramaWithHighlight,
-  searchWithHighlight as esmSearchWithHighlight
+  searchWithHighlight as esmSearchWithHighlight,
+  saveWithHighlight as esmSaveWithHighlight,
+  loadWithHighlight as esmLoadWithHighlight
   // @ts-expect-error Ignore broken resolution - This errors when using tsconfig.cjs.json
 } from './index.js'
 
@@ -17,6 +19,8 @@ export type RequireCallback = (err: Error | undefined, orama?: OramaPluginMatchH
 
 let _esmAfterInsert: typeof esmAfterInsert
 let _esmSearchWithHighlight: typeof esmSearchWithHighlight
+let _esmSaveWithHighlight: typeof saveWithHighlight
+let _esmLoadWithHighlight: typeof loadWithHighlight
 
 export async function afterInsert(
   this: Orama | OramaWithHighlight,
@@ -39,6 +43,28 @@ export async function searchWithHighlight(
   }
 
   return _esmSearchWithHighlight(...args)
+}
+
+export async function saveWithHighlight(
+  ...args: Parameters<typeof esmSaveWithHighlight>
+): ReturnType<typeof esmSaveWithHighlight> {
+  if (!_esmSaveWithHighlight) {
+    const imported = await import('./index.js')
+    _esmSaveWithHighlight = imported.saveWithHighlight
+  }
+
+  return _esmSaveWithHighlight(...args)
+}
+
+export async function loadWithHighlight(
+  ...args: Parameters<typeof esmLoadWithHighlight>
+): ReturnType<typeof esmLoadWithHighlight> {
+  if (!_esmLoadWithHighlight) {
+    const imported = await import('./index.js')
+    _esmLoadWithHighlight = imported.loadWithHighlight
+  }
+
+  return _esmLoadWithHighlight(...args)
 }
 
 export function requireOramaPluginMatchHighlight(callback: RequireCallback): void {
