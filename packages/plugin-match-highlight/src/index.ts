@@ -1,9 +1,13 @@
 import {
+  AnyDocument, AnyOrama,
+  Language,
   RawData,
+  Result, Results,
+  SearchParams, TypedDocument,
   load,
-  save
+  save,
+  search
 } from '@orama/orama'
-import { AnyDocument, AnyOrama, Document, Language, Result, Results, search, SearchParams, TypedDocument } from '@orama/orama'
 
 export interface Position {
   start: number
@@ -36,20 +40,20 @@ export async function afterInsert<T extends AnyOrama>(orama: T, id: string): Pro
 
 const wordRegEx = /[\p{L}0-9_'-]+/gimu
 
-async function recursivePositionInsertion<T extends AnyOrama>(
+async function recursivePositionInsertion<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: OramaWithHighlight<T>,
-  doc: Document,
+  doc: ResultDocument,
   id: string,
   prefix = '',
   schema: T['schema'] = orama.schema
 ): Promise<void> {
   orama.data.positions[id] = Object.create(null)
-  for (const key of Object.keys(doc)) {
+  for (const key of Object.keys(doc as object) as Array<keyof ResultDocument>) {
     const isNested = typeof doc[key] === 'object'
     const isSchemaNested = typeof schema[key] === 'object'
-    const propName = `${prefix}${key}`
+    const propName = `${prefix}${String(key)}`
     if (isNested && key in schema && isSchemaNested) {
-      recursivePositionInsertion(orama, doc[key] as Document, id, propName + '.', schema[key])
+      recursivePositionInsertion(orama, doc[key], id, propName + '.', schema[key])
     }
     if (!(typeof doc[key] === 'string' && key in schema && !isSchemaNested)) {
       continue

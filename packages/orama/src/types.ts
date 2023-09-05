@@ -58,6 +58,9 @@ export type PartialSchemaDeep<T> = {
   [K in keyof T]?: PartialSchemaDeepObject<T[K]>
 }
 
+/**
+ * @deprecated
+ */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Document extends Record<string, SearchableValue | Document | unknown> {}
 
@@ -566,7 +569,7 @@ export interface IDocumentsStore<D extends AnyDocumentStore = AnyDocumentStore> 
   get(store: D, id: DocumentID): SyncOrAsyncValue<AnyDocument | undefined>
   getMultiple(store: D, ids: DocumentID[]): SyncOrAsyncValue<(AnyDocument | undefined)[]>
   getAll(store: D): SyncOrAsyncValue<Record<InternalDocumentID, AnyDocument>>
-  store(store: D, id: DocumentID, doc: Document): SyncOrAsyncValue<boolean>
+  store(store: D, id: DocumentID, doc: AnyDocument): SyncOrAsyncValue<boolean>
   remove(store: D, id: DocumentID): SyncOrAsyncValue<boolean>
   count(store: D): SyncOrAsyncValue<number>
 
@@ -639,9 +642,9 @@ export interface ObjectComponents<I, D, So> {
 }
 
 export interface FunctionComponents<S> {
-  validateSchema(doc: Document, schema: S): SyncOrAsyncValue<string | undefined>
-  getDocumentIndexId(doc: Document): SyncOrAsyncValue<string>
-  getDocumentProperties(doc: Document, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>
+  validateSchema(doc: AnyDocument, schema: S): SyncOrAsyncValue<string | undefined>
+  getDocumentIndexId(doc: AnyDocument): SyncOrAsyncValue<string>
+  getDocumentProperties(doc: AnyDocument, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>
   formatElapsedTime(number: bigint): SyncOrAsyncValue<number | string | object | ElapsedTime>
 }
 

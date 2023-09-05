@@ -1,14 +1,13 @@
 import t from 'tap'
-import { getInternalDocumentId } from '../src/components/internal-document-id-store.js'
-import type { Document } from '../src/types.js'
-import { Node as RadixNode } from '../src/trees/radix.js'
-import { create, insert, load, Result, save, search } from '../src/index.js'
-import { contains as trieContains } from '../src/trees/radix.js'
-import { Index } from '../src/components/index.js'
 import { DocumentsStore } from '../src/components/documents-store.js'
+import { Index } from '../src/components/index.js'
+import { getInternalDocumentId } from '../src/components/internal-document-id-store.js'
+import { Result, create, insert, load, save, search } from '../src/index.js'
+import { Node as RadixNode, contains as trieContains } from '../src/trees/radix.js'
+import type { AnyDocument } from '../src/types.js'
 
-function extractOriginalDoc(result: Result[]): Document[] {
-  return result.map(({ document }: Result) => document)
+function extractOriginalDoc(result: Result<AnyDocument>[]): AnyDocument[] {
+  return result.map(({ document }: AnyDocument) => document)
 }
 
 t.test('Edge getters', t => {

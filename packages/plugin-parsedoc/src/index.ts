@@ -1,4 +1,4 @@
-import { AnyDocument, AnyOrama, Document, insertMultiple } from '@orama/orama'
+import { AnyDocument, AnyOrama, insertMultiple } from '@orama/orama'
 import glob from 'glob'
 import { Content, Element, Parent, Properties, Root } from 'hast'
 import { fromHtml } from 'hast-util-from-html'
@@ -22,7 +22,7 @@ export const defaultHtmlSchema = {
   path: 'string'
 } as const
 
-export interface DefaultSchemaElement extends Document {
+export interface DefaultSchemaElement extends AnyDocument {
   type: string
   content: string
   path: string

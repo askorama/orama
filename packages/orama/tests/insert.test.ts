@@ -2,7 +2,7 @@ import t from 'tap'
 import { DocumentsStore } from '../src/components/documents-store.js'
 import { Index } from '../src/components/index.js'
 import { getInternalDocumentId } from '../src/components/internal-document-id-store.js'
-import { Document, create, insert, insertMultiple, search } from '../src/index.js'
+import { AnyDocument, create, insert, insertMultiple, search } from '../src/index.js'
 import dataset from './datasets/events.json' assert { type: 'json' }
 
 t.test('insert method', t => {
@@ -322,7 +322,7 @@ t.test('insert method', t => {
       ]
       invalidDocuments.push(...invalidDocuments.map(d => ({ inner: { ...d } })))
       for (const doc of invalidDocuments) {
-        await t.rejects(insert(db, doc as Document))
+        await t.rejects(insert(db, doc))
       }
 
       t.end()
@@ -481,7 +481,7 @@ t.test('insertMultiple method', t => {
   t.end()
 })
 
-interface BaseDataEvent extends Document {
+interface BaseDataEvent extends AnyDocument {
   description: string
   lang: string
   category1: string

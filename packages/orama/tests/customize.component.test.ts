@@ -8,10 +8,10 @@ import { DocumentsStore } from '../src/components/documents-store.js'
 import { DocumentID, InternalDocumentIDStore } from '../src/components/internal-document-id-store.js'
 import { Sorter } from '../src/components/sorter.js'
 import {
+  AnyDocument,
   AnyDocumentStore,
   AnyOrama,
   AnySorterStore,
-  Document,
   IDocumentsStore,
   ISorter,
   SyncOrAsyncValue,
@@ -296,7 +296,7 @@ t.test('sorter', t => {
       getAll(store: DocStorage): SyncOrAsyncValue<Record<number, any>> {
         return this.doc.getAll(store.storage)
       }
-      store(store: DocStorage, id: DocumentID, doc: Document): SyncOrAsyncValue<boolean> {
+      store(store: DocStorage, id: DocumentID, doc: AnyDocument): SyncOrAsyncValue<boolean> {
         return this.doc.store(store.storage, id, doc)
       }
       remove(store: DocStorage, id: DocumentID): SyncOrAsyncValue<boolean> {
