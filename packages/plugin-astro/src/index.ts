@@ -1,4 +1,4 @@
-import type { AnyOrama, Orama, Schema, SearchParams } from '@orama/orama'
+import type { AnyOrama, Orama, SearchParams } from '@orama/orama'
 import { create as createOramaDB, insert as insertIntoOramaDB, save as saveOramaDB } from '@orama/orama'
 import type { AstroConfig, AstroIntegration, RouteData } from 'astro'
 import { compile } from 'html-to-text'

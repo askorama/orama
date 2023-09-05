@@ -3,7 +3,7 @@ import { create, insertMultiple } from '@orama/orama'
 import type { SearchResultWithHighlight } from '@orama/plugin-match-highlight'
 import { afterInsert as highlightAfterInsertHook } from '@orama/plugin-match-highlight'
 
-export type NextraOrama = Orama<typeof defaultSchema, any, any, any>
+export type NextraOrama = Orama<typeof defaultSchema>
 
 type HighlightedHits = SearchResultWithHighlight<NextraOrama>['hits']
 

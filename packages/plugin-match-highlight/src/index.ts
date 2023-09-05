@@ -1,6 +1,5 @@
 import {
   RawData,
-  Orama,
   load,
   save
 } from '@orama/orama'
@@ -23,7 +22,7 @@ export type RawDataWithPositions = RawData & {
   positions: Record<string, Record<string, Record<string, Position[]>>>
 }
 
-export async function afterInsert<T extends AnyOrama>(orama: T | OramaWithHighlight<T>, id: string): Promise<void> {
+export async function afterInsert<T extends AnyOrama>(orama: T, id: string): Promise<void> {
   if (!('positions' in orama.data)) {
     Object.assign(orama.data, { positions: {} })
   }
@@ -89,7 +88,7 @@ export async function searchWithHighlight<T extends AnyOrama, ResultDocument = T
   const hits = result.hits.map((hit: AnyDocument) =>
     Object.assign(hit, {
       positions: Object.fromEntries(
-        Object.entries(orama.data.positions[hit.id]).map(([propName, tokens]) => [
+        Object.entries<any>(orama.data.positions[hit.id]).map(([propName, tokens]) => [
           propName,
           Object.fromEntries(
             Object.entries(tokens).filter(([token]) => queryTokens.find(queryToken => token.startsWith(queryToken)))

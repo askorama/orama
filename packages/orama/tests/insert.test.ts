@@ -1,8 +1,8 @@
 import t from 'tap'
-import { getInternalDocumentId } from '../src/components/internal-document-id-store.js'
-import { insert, insertMultiple, create, search, Document } from '../src/index.js'
 import { DocumentsStore } from '../src/components/documents-store.js'
 import { Index } from '../src/components/index.js'
+import { getInternalDocumentId } from '../src/components/internal-document-id-store.js'
+import { Document, create, insert, insertMultiple, search } from '../src/index.js'
 import dataset from './datasets/events.json' assert { type: 'json' }
 
 t.test('insert method', t => {
