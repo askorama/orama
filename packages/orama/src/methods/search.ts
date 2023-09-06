@@ -28,7 +28,7 @@ import {
   InternalDocumentID,
 } from '../components/internal-document-id-store.js'
 import { createError } from '../errors.js'
-import { getNanosecondsTime, getNested, sortTokenScorePredicate, safeAddNewItems, safeArrayPush } from '../utils.js';
+import { getNanosecondsTime, getNested, sortTokenScorePredicate, safeArrayPush } from '../utils.js';
 
 const defaultBM25Params: BM25Params = {
   k: 1.2,
