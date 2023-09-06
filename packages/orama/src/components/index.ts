@@ -75,19 +75,24 @@ export type VectorIndex = {
   }
 }
 
-export type Tree = {
-  type: 'radix'
-  node: RadixNode
-} | {
-  type: 'avl'
-  node: AVLNode<number, InternalDocumentID[]>
-} | {
-  type: 'bool'
-  node: BooleanIndex
-} | {
-  type: 'flat'
-  node: FlatTree
+export const enum TreeType {
+  AVL,
+  Radix,
+  Bool,
+  Flat,
 }
+
+export type TTree<T = TreeType, N = unknown> = {
+  type: T,
+  node: N
+}
+
+export type Tree =
+  | TTree<TreeType.Radix, RadixNode>
+  | TTree<TreeType.AVL,   AVLNode<number, InternalDocumentID[]>>
+  | TTree<TreeType.Bool,  BooleanIndex>
+  | TTree<TreeType.Flat,  FlatTree>
+
 
 export interface Index extends OpaqueIndex {
   sharedInternalDocumentStore: InternalDocumentIDStore
@@ -245,22 +250,22 @@ export async function create(
       switch (type) {
         case 'boolean':
         case 'boolean[]':
-          index.indexes[path] = { type: 'bool', node: { true: [], false: [] } }
+          index.indexes[path] = { type: TreeType.Bool, node: { true: [], false: [] } }
           break
         case 'number':
         case 'number[]':
-          index.indexes[path] = { type: 'avl', node: avlCreate<number, InternalDocumentID[]>(0, []) }
+          index.indexes[path] = { type: TreeType.AVL, node: avlCreate<number, InternalDocumentID[]>(0, []) }
           break
         case 'string':
         case 'string[]':
-          index.indexes[path] = { type: 'radix', node: radixCreate() }
+          index.indexes[path] = { type: TreeType.Radix, node: radixCreate() }
           index.avgFieldLength[path] = 0
           index.frequencies[path] = {}
           index.tokenOccurrences[path] = {}
           index.fieldLengths[path] = {}
           break
         case 'enum':
-          index.indexes[path] = { type: 'flat', node: flatCreate() }
+          index.indexes[path] = { type: TreeType.Flat, node: flatCreate() }
           break
         default:
           throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : (type as unknown as string), path)
@@ -289,14 +294,14 @@ async function insertScalar(
 
   const { type, node } = index.indexes[prop]
   switch (type) {
-    case 'bool': {
+    case TreeType.Bool: {
       node[value ? 'true' : 'false'].push(internalId)
       break
     }
-    case 'avl':
+    case TreeType.AVL:
       avlInsert(node, value as number, [internalId])
       break
-    case 'radix': {
+    case TreeType.Radix: {
       const tokens = await tokenizer.tokenize(value as string, language, prop)
       await implementation.insertDocumentScoreParameters(index, prop, internalId, tokens, docsCount)
 
@@ -308,7 +313,7 @@ async function insertScalar(
 
       break
     }
-    case 'flat': {
+    case TreeType.Flat: {
       flatInsert(node, value as ScalarSearchableType, internalId)
       break
     }
@@ -379,18 +384,18 @@ async function removeScalar(
 
   const { type, node } = index.indexes[prop]
   switch (type) {
-    case 'avl': {
+    case TreeType.AVL: {
       avlRemoveDocument(node, internalId, value as number)
       return true
     }
-    case 'bool': {
+    case TreeType.Bool: {
       const booleanKey = value ? 'true' : 'false'
       const position = node[booleanKey].indexOf(internalId)
 
       node[value ? 'true' : 'false'].splice(position, 1)
       return true
     }
-    case 'radix': {
+    case TreeType.Radix: {
       const tokens = await tokenizer.tokenize(value as string, language, prop)
 
       await implementation.removeDocumentScoreParameters(index, prop, id, docsCount)
@@ -402,7 +407,7 @@ async function removeScalar(
 
       return true
     }
-    case 'flat': {
+    case TreeType.Flat: {
       flatRemoveDocument(node, internalId, value as ScalarSearchableType)
       return true
     }
@@ -456,7 +461,7 @@ export async function search<D extends OpaqueDocumentStore, AggValue>(
   }
 
   const { node, type } = index.indexes[prop]
-  if (type !== 'radix') {
+  if (type !== TreeType.Radix) {
     throw createError('WRONG_SEARCH_PROPERTY_TYPE', prop)
   }
 
@@ -497,14 +502,14 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
 
     const { node, type } = index.indexes[param]
 
-    if (type === 'bool') {
+    if (type === TreeType.Bool) {
       const idx = node
       const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
       safeArrayPush(filtersMap[param], filteredIDs);
       continue
     }
 
-    if (type === 'radix' && (typeof operation === 'string' || Array.isArray(operation))) {
+    if (type === TreeType.Radix && (typeof operation === 'string' || Array.isArray(operation))) {
       for (const raw of [operation].flat()) {
         const term = await context.tokenizer.tokenize(raw, context.language, param)
         for (const t of term) {
@@ -521,13 +526,12 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
       throw createError('INVALID_FILTER_OPERATION', operationKeys.length)
     }
 
-    if (type === 'flat') {
+    if (type === TreeType.Flat) {
       filtersMap[param].push(...flatFilter(node, operation as EnumComparisonOperator))
       continue
     }
 
-
-    if (type === 'avl') {
+    if (type === TreeType.AVL) {
       const operationOpt = operationKeys[0] as keyof ComparisonOperator
       const operationValue = (operation as ComparisonOperator)[operationOpt]
       let filteredIDs = [];
@@ -619,22 +623,22 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
   for (const prop of Object.keys(rawIndexes)) {
     const { node, type } = rawIndexes[prop]
 
-    if (type === 'radix') {
-      indexes[prop] = {
-        type: 'radix',
-        node: loadRadixNode(node)
-      }
-      continue
+    switch (type) {
+      case TreeType.Radix: 
+        indexes[prop] = {
+          type: TreeType.Radix,
+          node: loadRadixNode(node)
+        }
+        break
+      case TreeType.Flat:
+        indexes[prop] = {
+          type: TreeType.Flat,
+          node: loadFlatNode(node)
+        }
+        break
+      default:
+        indexes[prop] = rawIndexes[prop]
     }
-    if (type === 'flat') {
-      indexes[prop] = {
-        type: 'flat',
-        node: loadFlatNode(node)
-      }
-      continue
-    }
-
-    indexes[prop] = rawIndexes[prop]
   }
 
   for (const idx of Object.keys(rawVectorIndexes)) {
@@ -694,12 +698,12 @@ export async function save<R = unknown>(index: Index): Promise<R> {
   const savedIndexes: any = {}
   for (const name of Object.keys(indexes)) {
     const {type, node} = indexes[name]
-    if (type !== 'flat') {
+    if (type !== TreeType.Flat) {
       savedIndexes[name] = indexes[name]
       continue
     }
     savedIndexes[name] = {
-      type: 'flat',
+      type: TreeType.Flat,
       node: saveFlatNode(node)
     }
   }
