@@ -1,5 +1,5 @@
 import { InternalDocumentID } from "../components/internal-document-id-store.js"
-import { EnumComparisonOperator, ScalarSearchableValue } from "../types.js"
+import { EnumComparisonOperator, Nullable, ScalarSearchableValue } from "../types.js"
 
 export interface FlatTree {
   numberToDocumentId: Map<ScalarSearchableValue, InternalDocumentID[]>
@@ -20,11 +20,11 @@ export function insert(root: FlatTree, key: ScalarSearchableValue, value: Intern
   return root
 }
 
-export function find(root: FlatTree, key: ScalarSearchableValue): InternalDocumentID[] | null {
+export function find(root: FlatTree, key: ScalarSearchableValue): Nullable<InternalDocumentID[]> {
   return root.numberToDocumentId.get(key) ?? null
 }
 
-export function remove(root: FlatTree | null, key: ScalarSearchableValue): FlatTree | null {
+export function remove(root: Nullable<FlatTree>, key: ScalarSearchableValue): Nullable<FlatTree> {
   if (root) {
     root.numberToDocumentId.delete(key)
   }
@@ -42,7 +42,7 @@ export function contains(node: FlatTree, key: ScalarSearchableValue): boolean {
   return !!find(node, key)
 }
 
-export function getSize(root: FlatTree | null): number {
+export function getSize(root: Nullable<FlatTree>): number {
   let size = 0
   for (const [, value] of root?.numberToDocumentId ?? []) {
     size += value.length

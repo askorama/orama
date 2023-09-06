@@ -624,7 +624,7 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
     const { node, type } = rawIndexes[prop]
 
     switch (type) {
-      case TreeType.Radix: 
+      case TreeType.Radix:
         indexes[prop] = {
           type: TreeType.Radix,
           node: loadRadixNode(node)
