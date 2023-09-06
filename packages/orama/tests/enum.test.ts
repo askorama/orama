@@ -121,13 +121,14 @@ t.test('enum', async t => {
     ])
 
     const dump = await save(db1)
+    const dump2 = JSON.parse(JSON.stringify(dump))
 
     const db2 = await create({
       schema: {
         categoryId: 'enum',
       },
     })
-    await load(db2, dump)
+    await load(db2, dump2)
 
     const result1 = await search(db2, {
       term: '',

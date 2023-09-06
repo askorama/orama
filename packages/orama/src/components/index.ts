@@ -578,17 +578,27 @@ export async function getSearchablePropertiesWithTypes(index: Index): Promise<Re
   return index.searchablePropertiesWithTypes
 }
 
-function loadNode(node: RadixNode): RadixNode {
+function loadRadixNode(node: RadixNode): RadixNode {
   const convertedNode = radixCreate(node.end, node.subWord, node.key)
 
   convertedNode.docs = node.docs
   convertedNode.word = node.word
 
   for (const childrenKey of Object.keys(node.children)) {
-    convertedNode.children[childrenKey] = loadNode(node.children[childrenKey])
+    convertedNode.children[childrenKey] = loadRadixNode(node.children[childrenKey])
   }
 
   return convertedNode
+}
+
+function loadFlatNode(node: unknown): FlatTree {
+  return {
+    numberToDocumentId: new Map(node as [ScalarSearchableType, InternalDocumentID[]][]),
+  }
+}
+
+function saveFlatNode(node: FlatTree): unknown {
+  return Array.from(node.numberToDocumentId.entries())
 }
 
 export async function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Promise<Index> {
@@ -609,15 +619,22 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
   for (const prop of Object.keys(rawIndexes)) {
     const { node, type } = rawIndexes[prop]
 
-    if (type !== 'radix') {
-      indexes[prop] = rawIndexes[prop]
+    if (type === 'radix') {
+      indexes[prop] = {
+        type: 'radix',
+        node: loadRadixNode(node)
+      }
+      continue
+    }
+    if (type === 'flat') {
+      indexes[prop] = {
+        type: 'flat',
+        node: loadFlatNode(node)
+      }
       continue
     }
 
-    indexes[prop] = {
-      type: 'radix',
-      node: loadNode(node)
-    }
+    indexes[prop] = rawIndexes[prop]
   }
 
   for (const idx of Object.keys(rawVectorIndexes)) {
@@ -673,8 +690,22 @@ export async function save<R = unknown>(index: Index): Promise<R> {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const savedIndexes: any = {}
+  for (const name of Object.keys(indexes)) {
+    const {type, node} = indexes[name]
+    if (type !== 'flat') {
+      savedIndexes[name] = indexes[name]
+      continue
+    }
+    savedIndexes[name] = {
+      type: 'flat',
+      node: saveFlatNode(node)
+    }
+  }
+
   return {
-    indexes,
+    indexes: savedIndexes,
     vectorIndexes: vectorIndexesAsArrays,
     searchableProperties,
     searchablePropertiesWithTypes,
