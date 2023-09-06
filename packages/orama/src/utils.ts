@@ -10,6 +10,32 @@ const second = BigInt(1e9)
 
 export const isServer = typeof window === 'undefined'
 
+/**
+ * This value can be increased up to 100_000
+ * But i don't know if this value change from nodejs to nodejs
+ * So I will keep a safer value here.
+ */
+export const MAX_ARGUMENT_FOR_STACK = 65535;
+
+/**
+ * This method is needed to used because of issues like: https://github.com/oramasearch/orama/issues/301
+ * that issue is caused because the array that is pushed is huge (>100k)
+ *
+ * @example
+ * ```ts
+ * safeArrayPush(myArray, [1, 2])
+ * ```
+ */
+export function safeArrayPush<T>(arr: T[], newArr: T[]): void {
+  if (newArr.length < MAX_ARGUMENT_FOR_STACK) {
+    Array.prototype.push.apply(arr, newArr)
+  } else {
+    for (let i = 0; i < newArr.length; i += MAX_ARGUMENT_FOR_STACK) {
+      Array.prototype.push.apply(arr, newArr.slice(i, i + MAX_ARGUMENT_FOR_STACK))
+    }
+  }
+}
+
 export function sprintf(template: string, ...args: (string | number)[]): string {
   return template.replace(
     /%(?:(?<position>\d+)\$)?(?<width>-?\d*\.?\d*)(?<type>[dfs])/g,

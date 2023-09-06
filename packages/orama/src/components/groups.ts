@@ -1,6 +1,6 @@
 import type { Orama, ScalarSearchableValue, TokenScore, GroupByParams, GroupResult, Result, Reduce } from '../types.js'
 import { createError } from '../errors.js'
-import { getNested, intersect } from '../utils.js'
+import { getNested, intersect, safeArrayPush } from '../utils.js'
 import { getDocumentIdFromInternalId } from './internal-document-id-store.js'
 
 interface PropertyGroup {
@@ -169,7 +169,11 @@ function calculateCombination(arrs: ScalarSearchableValue[][], index = 0): Scala
   const combinations = []
   for (const value of head) {
     for (const combination of c) {
-      combinations.push([value, ...combination])
+      const result = [value];
+
+      safeArrayPush(result, combination)
+
+      combinations.push(result)
     }
   }
 

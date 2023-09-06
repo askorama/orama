@@ -34,7 +34,7 @@ import {
   Node as RadixNode,
   removeDocumentByWord as radixRemoveDocument,
 } from '../trees/radix.js'
-import { intersect } from '../utils.js'
+import { intersect, safeArrayPush } from '../utils.js';
 import { BM25 } from './algorithms.js'
 import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
 import {
@@ -462,7 +462,7 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
       }
 
       const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
-      filtersMap[param].push(...filteredIDs)
+      safeArrayPush(filtersMap[param], filteredIDs);
       continue
     }
 
@@ -477,8 +477,7 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
         const term = await context.tokenizer.tokenize(raw, context.language, param)
         for (const t of term) {
           const filteredIDsResults = radixFind(idx, { term: t, exact: true })
-          filtersMap[param].push(...Object.values(filteredIDsResults).flat())
-        }
+          safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())}
       }
 
       continue
@@ -499,38 +498,37 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
       throw createError('UNKNOWN_FILTER_PROPERTY', param)
     }
 
+    let filteredIDs = [];
+
     switch (operationOpt) {
       case 'gt': {
-        const filteredIDs = avlGreaterThan(AVLNode, operationValue, false)
-        filtersMap[param].push(...filteredIDs)
+        filteredIDs = avlGreaterThan(AVLNode, operationValue, false)
         break
       }
       case 'gte': {
-        const filteredIDs = avlGreaterThan(AVLNode, operationValue, true)
-        filtersMap[param].push(...filteredIDs)
+        filteredIDs = avlGreaterThan(AVLNode, operationValue, true)
         break
       }
       case 'lt': {
-        const filteredIDs = avlLessThan(AVLNode, operationValue, false)
-        filtersMap[param].push(...filteredIDs)
+        filteredIDs = avlLessThan(AVLNode, operationValue, false)
         break
       }
       case 'lte': {
-        const filteredIDs = avlLessThan(AVLNode, operationValue, true)
-        filtersMap[param].push(...filteredIDs)
+        filteredIDs = avlLessThan(AVLNode, operationValue, true)
         break
       }
       case 'eq': {
-        const filteredIDs = avlFind(AVLNode, operationValue) ?? []
-        filtersMap[param].push(...filteredIDs)
+        filteredIDs = avlFind(AVLNode, operationValue) ?? []
         break
       }
       case 'between': {
         const [min, max] = operationValue as number[]
-        const filteredIDs = avlRangeSearch(AVLNode, min, max)
-        filtersMap[param].push(...filteredIDs)
+        filteredIDs = avlRangeSearch(AVLNode, min, max)
+        break
       }
     }
+
+    safeArrayPush(filtersMap[param], filteredIDs)
   }
 
   // AND operation: calculate the intersection between all the IDs in filterMap
