@@ -94,6 +94,7 @@ export type ComparisonOperator = {
 export type EnumComparisonOperator = {
   eq?: string | number | boolean
   in?: (string | number | boolean)[]
+  nin?: (string | number | boolean)[]
 }
 
 /**

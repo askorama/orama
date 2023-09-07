@@ -53,16 +53,7 @@ const harryPotterId = await insert(movieDB, {
 });
 ```
 
-## Batch insertion
-
-Most of the `insert` function internals are synchronous, so inserting a large
-number of documents in a loop could potentially block the event loop. If you
-have a lot of records, we suggest using the `insertMultiple` function.
-
-You can pass a third, optional, parameter to change the batch size (default:
-`1000`). We recommend keeping this number as low as possible to avoid blocking
-the event loop. The `batchSize` refers to the maximum number of `insert`
-operations to perform before yielding the event loop.
+If you have a lot of records, we suggest using the `insertMultiple` function as following:
 
 ```javascript copy
 const docs = [
@@ -89,82 +80,49 @@ const docs = [
   },
 ];
 
+await insertMultiple(movieDB, docs);
+```
+
+Inserting a large number of documents in a loop could potentially block the event loop.
+Instead `insertMultiple` handles this case better.
+
+You can pass a third, optional, parameter to change the batch size (default:
+`1000`). We recommend keeping this number as low as possible to avoid blocking
+the event loop. The `batchSize` refers to the maximum number of `insert`
+operations to perform before yielding the event loop.
+
+```javascript
 await insertMultiple(movieDB, docs, 500);
 ```
 
-## Unsearchable fields
+## Validation rules
 
-When working on large datasets, it is common to have documents with a large
-number of properties, and maybe some of them are not even relevant for any
-search purpose.
+Defining the schema at database creation time, Orama validates all the inserted documents following those rules:
+- throw an error if a field has an unexpected type
+- allow missing fields or fields set to `undefined`
+- allow extra fields ignoring them
 
-With that being said, let's consider the following schema:
+So the following document will be accepted:
 
 ```javascript copy
-import { create } from '@orama/orama'
+import { create, insert } from '@orama/orama'
 
-const db = await create({
+const movieDB = await create({
   schema: {
-    author: 'string',
-    quote: 'string',
-    favorite: 'boolean', // <-- unsearchable, can be used as filter
-    tags: 'string[]',
+    title: 'string',
+    year: 'number',
   },
 })
+
+await insert(movieDB, {
+  title: 'The prestige',
+  // `year` field is missing but it's ok
+  // year: 2006,
+  // Extra fields `director` and `isFavorite` will not be indexed
+  director: 'Christopher Nolan',
+  isFavorite: true,
+});
 ```
-
-Why does Orama need to know that a given property is of a certain type if is not
-searchable?
-
-The main reason for Orama to know types is because we're experimenting with the
-possibility of performing filtering operations depending on booleans, numbers,
-etc.
-
-It is possible to rewrite the schema definition above as follows:
-
-```javascript copy
-import { create } from '@orama/orama'
-
-const db = await create({
-  schema: {
-    author: 'string',
-    quote: 'string',
-  },
-})
-```
-
-and still, be able to insert documents like:
-
-```javascript copy
-{
-  'author': 'Rumi',
-  'quote': 'Patience is the key to joy',
-  'isFavorite': true,
-  'tags': ['inspirational', 'deep']
-}
-```
-
-or even documents with different shapes:
-
-```javascript copy
-[
-  {
-    author: 'Rumi',
-    quote: 'Patience is the key to joy',
-    isFavorite: true,
-    tags: ['inspirational', 'deep'],
-  },
-  {
-    author: 'Rumi',
-    quote: 'Grace comes to forgive and then forgive again',
-    score: 10,
-    link: null,
-  },
-]
-```
-
-of course, it will only be possible to perform search operations on **known properties**, in that case, `author` and `quote`, which will always need to be
-of type `string` (as stated during the schema definition).
 
 ## Custom document IDs
 

@@ -73,6 +73,22 @@ export function filter(root: FlatTree, operation: EnumComparisonOperator): Inter
       }
       return result
     }
+    case 'nin': {
+      const value = operation[operationType]!
+      const result: InternalDocumentID[] = []
+
+      const keys = root.numberToDocumentId.keys()
+      for (const key of keys) {
+        if (value.includes(key)) {
+          continue
+        }
+        const ids = root.numberToDocumentId.get(key)
+        if (ids) {
+          result.push(...ids)
+        }
+      }
+      return result
+    }
   }
 
   throw new Error('Invalid operation')

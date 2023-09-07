@@ -6,6 +6,7 @@ Orama provides a simple search interface that allows you to search through your 
 
 ## Searching with Orama
 
+By default, Orama uses all the string properties to perform the search.
 Let's say we have a database that contains some elements:
 
 ```javascript copy
@@ -46,18 +47,79 @@ await insert(movieDB, {
 });
 ```
 
-We can now search for one (or multiple) documents as easily as:
+We can now search for documents as easily as:
 
 ```javascript copy
 const searchResult = await search(movieDB, {
   term: 'Harry',
-  properties: '*',
 })
 ```
 
-### Search properties
+If you want to return all documents in the database, then you can omit the `term` in the search parameters.
 
-The `properties` property defines in which property to run our query.
+## What does the `search` method return?
+
+Now that we have learned how to perform **searches** on a Orama database, we can
+briefly analyze the response that Orama gives us back.
+
+Let's say we have run the following query:
+
+```javascript copy
+const searchResult = await search(movieDB, {
+  term: 'Cris',
+  properties: ['director'],
+  tolerance: 1,
+})
+```
+
+Whether the document was found or not, Orama gives back an `object` with the
+following properties:
+
+```javascript copy
+{
+  elapsed: {
+    raw: 181208,
+    formatted: '181μs',
+  },
+  count: 2,
+  hits: [
+    {
+      id: '37149225-243',
+      score: 0.23856062735983122,
+      document: {
+        title: 'Harry Potter and the Philosopher\'s Stone',
+        director: 'Chris Columbus',
+        plot: 'Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.',
+        year: 2001,
+        isFavorite: false
+      }
+    },
+    {
+      id: '37149225-5',
+      score: 0.21267890323564321,
+      document: {
+        title: 'The prestige',
+        director: 'Christopher Nolan',
+        plot: 'Two friends and fellow magicians become bitter enemies after a sudden tragedy. As they devote themselves to this rivalry, they make sacrifices that bring them fame but with terrible consequences.',
+        year: 2006,
+        isFavorite: true
+      }
+    }
+  ]
+}
+```
+
+| Property  | Type     | Description                                                                                                         |
+| --------- | -------- | ------------------------------------------------------------------------------------------------------------------- |
+| `elapsed` | `object` | Time taken to execute the query. <br /> Returns an object with the following shape: <br />` { raw: number, formatted: string } ` |
+| `hits`    | `object` | Array of results containing result score (from `0` to `1` based on relevance), Orama's ID, and original document.   |
+| `count`   | `number` | Number of total results.                                                                                            |
+
+In case of missing or empty `term`, all scores will be returned as `0`.
+
+## Search on specific properties
+
+The `properties` property defines in which properties to run our query.
 
 ```javascript copy
 const searchResult = await search(movieDB, {
@@ -98,6 +160,10 @@ We are now searching for all the documents that contain **`exactly`** the word
 
 > Without the `exact` property, for example, the term `Christopher Nolan` would
 > be returned as well, as it contains the word `Chris`.
+
+<Callout type="warning">
+  `exact` doesn't work together with the `tolerance` parameter. `exact` will have priority.
+</Callout>
 
 ## Typo tolerance
 
@@ -158,63 +224,24 @@ We are searching for all the documents that contains the term `Chris` in the
   By default, Orama limits the search results to `10`, without any offset (so, `0` as offset value).
 </Callout>
 
-## What does the `search` method return?
+## Distinct
 
-Now that we have learned how to perform **searches** on a Orama database, we can
-briefly analyze the response that Orama gives us back.
-
-Let's say we have run the following query:
-
+Orama can calculate distinct values letting you specify a unique key as follows:
 ```javascript copy
-const searchResult = await search(movieDB, {
-  term: 'Cris',
-  properties: ['director'],
-  tolerance: 1,
+const results = await search(db, {
+  distinctOn: 'type',
+  sortBy: {
+    property: 'rank',
+    order: 'DESC',
+  }
 })
 ```
+Using the property `distinctOn`, Orama returns only the first document for every property `type` value.
+The `results.hits` array will contain only the first documents for every property `type` value.
 
-Whether the document was found or not, Orama gives back an `object` with the
-following properties:
+NB: you can use this feature in combination with `sortBy`.
 
-```javascript copy
-{
-  elapsed: {
-    raw: 181208,
-    formatted: '181μs',
-  },
-  count: 2,
-  hits: [
-    {
-      id: '37149225-243',
-      score: 0.23856062735983122,
-      document: {
-        title: 'Harry Potter and the Philosopher\'s Stone',
-        director: 'Chris Columbus',
-        plot: 'Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.',
-        year: 2001,
-        isFavorite: false
-      }
-    },
-    {
-      id: '37149225-5',
-      score: 0.21267890323564321,
-      document: {
-        title: 'The prestige',
-        director: 'Christopher Nolan',
-        plot: 'Two friends and fellow magicians become bitter enemies after a sudden tragedy. As they devote themselves to this rivalry, they make sacrifices that bring them fame but with terrible consequences.',
-        year: 2006,
-        isFavorite: true
-      }
-    }
-  ]
-}
-```
-
-| Property  | Type     | Description                                                                                                         |
-| --------- | -------- | ------------------------------------------------------------------------------------------------------------------- |
-| `elapsed` | `object` | Time taken to execute the query. <br /> Returns an object with the following shape: <br />` { raw: number, formatted: string } ` |
-| `hits`    | `object` | Array of results containing result score (from `0` to `1` based on relevance), Orama's ID, and original document.   |
-| `count`   | `number` | Number of total results.                                                                                            |
+## `elapsed` property customization
 
 You can always customize the behavior of the `elapsed` property by using the `formatElapsedTime` component when creating a new Orama instance:
 
@@ -241,23 +268,3 @@ When performing a search operation, the `elapsed` property will now return the f
   hits: [...]
 }
 ```
-
-If you want to return all documents in the database, then you can omit the `term` in the search parameters.
-This kind of search might be slower than a regular search and all scores will be returned as `0`.
-
-## Distinct
-
-Orama can calculate distinct values letting you specify a unique key as follows:
-```javascript copy
-const results = await search(db, {
-  distinctOn: 'type',
-  sortBy: {
-    property: 'rank',
-    order: 'DESC',
-  }
-})
-```
-Using the property `distinctOn`, Orama returns only the first document for every property `type` value.
-The `results.hits` array will contain only the first documents for every property `type` value.
-
-NB: you can use this feature in combination with `sortBy`.

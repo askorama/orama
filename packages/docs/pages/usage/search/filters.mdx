@@ -2,12 +2,64 @@
 
 You can use the `filters` interface to filter the search results.
 
-Filters are available for numeric, boolean and string properties.
+Filters are available for numeric, boolean, string and enum properties.
+Depends on the type of the property, you can use different operators.
+
+## String operators
 
 On string properties it perform an exact matching on tokens so it is advised to disable stemming for the properties
 you want to use filters on (when using the default tokenizer you can provide the `stemmerSkipProperties` configuration property).
 
 If we consider the following schema:
+
+```javascript copy
+const db = await create({
+  schema: {
+    title: 'string',
+    tag: 'string'
+  },
+  components: {
+    tokenizer: {
+      stemming: true,
+      stemmerSkipProperties: ['tag']
+    }
+  }
+})
+
+const results = await search(db, {
+  term: 'prestige',
+  where: {
+    'tag': 'new',
+  },
+})
+```
+
+The `results` will contain all documents that contain the word `prestige` in the `title` property and have `tags` property equal to `new`.
+
+You can also specify a list of string, in this case it will return all documents that contain at least one of the values provided:
+
+```javascript copy
+const results = await search(db, {
+  term: 'prestige',
+  where: {
+    'tag': ['favorite', 'new'],
+  },
+})
+```
+
+## Number operators
+
+The number properties support the following operators:
+
+| Operator  | Description                    | Example                           |
+| --------- | ------------------------------ | --------------------------------- |
+| `gt`      | Greater than                   | `year: { gt: 2000 }`              |
+| `gte`     | Greater than or equal to       | `year: { gte: 2000 }`             |
+| `lt`      | Less than                      | `year: { lt: 2000 }`              |
+| `lte`     | Less than or equal to          | `year: { lte: 2000 }`             |
+| `eq`      | Equal to                       | `year: { eq: 2000 }`              |
+| `between` | Between two values (inclusive) | `year: { between: [2000, 2008] }` |
+
 
 ```javascript copy
 const db = await create({
@@ -29,11 +81,7 @@ const db = await create({
     }
   }
 })
-```
 
-We will be able to filter the search results by using the `where` property on numeric properties only:
-
-```javascript copy
 const results = await search(db, {
   term: 'prestige',
   where: {
@@ -43,26 +91,14 @@ const results = await search(db, {
     'meta.rating': {
       between: [5, 10],
     },
-    'meta.favorite': true,
-    length: {
-      gt: 60,
+    'meta.length': {
+      lte: 60,
     }
   },
 })
 ```
 
-## Filters operators
-
-As for now, the following operators are available for numeric properties:
-
-| Operator  | Description                    | Example                           |
-| --------- | ------------------------------ | --------------------------------- |
-| `gt`      | Greater than                   | `year: { gt: 2000 }`              |
-| `gte`     | Greater than or equal to       | `year: { gte: 2000 }`             |
-| `lt`      | Less than                      | `year: { lt: 2000 }`              |
-| `lte`     | Less than or equal to          | `year: { lte: 2000 }`             |
-| `eq`      | Equal to                       | `year: { eq: 2000 }`              |
-| `between` | Between two values (inclusive) | `year: { between: [2000, 2008] }` |
+## Boolean operators
 
 For boolean properties, you can simply set the property to `true` or `false`:
 
@@ -75,24 +111,12 @@ const results = await search(db, {
 })
 ```
 
-For string properties, you can specify a single string:
+## Enum operators
 
-```javascript copy
-const results = await search(db, {
-  term: 'prestige',
-  where: {
-    'meta.tags': 'new',
-  },
-})
-```
+The numeric properties support the following operators:
 
-You can also specify a list of string, in this case it will return all documents that contain at least one of the values provided:
-
-```javascript copy
-const results = await search(db, {
-  term: 'prestige',
-  where: {
-    'meta.tags': ['favorite', 'new'],
-  },
-})
-```
+| Operator  | Description                        | Example                                 |
+| --------- | ------------------------------     | ---------------------------------       |
+| `eq`      | Equal to                           | `genre: { eq: 'drama' }`                |
+| `in`      | Contained in the given array       | `genre: { in: ['drama', 'horror'] }`    |
+| `nin`     | Not contained in the given array   | `genre: { nin: ['commedy'] }`           |

@@ -13,7 +13,7 @@ Orama is a fast, batteries-included, full-text and vector search engine entirely
   title="YouTube video player"
   frameBorder="0"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-  allowfullScreen>
+  allowFullScreen>
 </iframe>
 <br />
 
@@ -93,6 +93,40 @@ Or import it directly in a browser module:
   </body>
 </html>
 ```
+
+## Basic usage
+
+```ts copy
+import { create, search, insert } from '@orama/orama'
+
+const db = await create({
+  schema: {
+    name: 'string',
+    description: 'string',
+    price: 'number',
+    meta: {
+      rating: 'number',
+    },
+  },
+})
+
+await insert(db, {
+  name: 'Wireless Headphones',
+  description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
+  price: 99.99,
+  meta: {
+    rating: 4.5,
+  },
+})
+
+const searchResult = await search(db, {
+  term: 'headphones',
+})
+
+console.log(searchResult.hits.map((hit) => hit.document))
+```
+
+For more information, check out the [Usage](/usage/create) section.
 
 # CommonJS Imports
 

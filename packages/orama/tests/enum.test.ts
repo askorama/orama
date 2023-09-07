@@ -1,9 +1,9 @@
 import t from 'tap'
-import { ScalarSearchableValue, create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
+import { ScalarSearchableValue, count, create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
 
 t.test('enum', async t => {
 
-  t.test('search', async t => {
+  t.test('filter', async t => {
     const db = await create({
       schema: {
         categoryId: 'enum',
@@ -19,6 +19,8 @@ t.test('enum', async t => {
       { categoryId: 3 },
       { categoryId: "5" },
     ])
+    const documentCount = await count(db)
+    const allIds = [c1, c11, c2, c3, c5]
 
     const tests: {value: ScalarSearchableValue, expected: string[] }[] = [
       { value: 1, expected: [c1, c11] },
@@ -27,10 +29,11 @@ t.test('enum', async t => {
       { value: '5', expected: [c5] },
       { value: 'unknown', expected: [] },
     ]
+    
 
     t.test('eq operator', async t => {
       for (const { value, expected } of tests) {
-        t.test(`search for ${value}`, async t => {
+        t.test(`eq: ${value}`, async t => {
           const result = await search(db, {
             term: '',
             where: {
@@ -47,7 +50,7 @@ t.test('enum', async t => {
 
     t.test('in operator', async t => {
       for (const { value, expected } of tests) {
-        t.test(`search for [${value}]`, async t => {
+        t.test(`in: [${value}]`, async t => {
           const result = await search(db, {
             term: '',
             where: {
@@ -61,7 +64,7 @@ t.test('enum', async t => {
         })
       }
 
-      t.test(`search for [1, 3, "5", 'unknown']`, async t => {
+      t.test(`in: [1, 3, "5", 'unknown']`, async t => {
         const result = await search(db, {
           term: '',
           where: {
@@ -70,6 +73,47 @@ t.test('enum', async t => {
         })
         t.equal(result.hits.length, 4)
         t.strictSame(result.hits.map(h => h.id), [c1, c11, c3, c5])
+
+        t.end()
+      })
+    })
+
+    t.test('nin operator', async t => {
+      for (const { value, expected } of tests) {
+        t.test(`nin: [${value}]`, async t => {
+          const result = await search(db, {
+            term: '',
+            where: {
+              categoryId: { nin: [value] },
+            }
+          })
+          t.equal(result.hits.length, documentCount - expected.length)
+          t.strictSame(result.hits.map(h => h.id), allIds.filter(id => expected.includes(id) === false))
+        })
+      }
+
+      t.test(`nin: [1, 3, "5", 'unknown']`, async t => {
+        const result = await search(db, {
+          term: '',
+          where: {
+            categoryId: { nin: [1, 3, "5", 'unknown'] },
+          }
+        })
+        t.equal(result.hits.length, 1)
+        t.strictSame(result.hits.map(h => h.id), [c2])
+
+        t.end()
+      })
+
+      t.test(`nin: [1, 2, 3, "5", 'unknown']`, async t => {
+        const result = await search(db, {
+          term: '',
+          where: {
+            categoryId: { nin: [1, 2, 3, "5", 'unknown'] },
+          }
+        })
+        t.equal(result.hits.length, 0)
+        t.strictSame(result.hits.map(h => h.id), [])
 
         t.end()
       })
