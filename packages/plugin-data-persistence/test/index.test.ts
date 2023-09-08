@@ -24,23 +24,27 @@ async function generateTestDBInstance(): Promise<Orama<any>> {
   const db = await create({
     schema: {
       quote: 'string',
-      author: 'string'
+      author: 'string',
+      genre: 'enum'
     }
   })
 
   await insert(db, {
     quote: 'I am a great programmer',
-    author: 'Bill Gates'
+    author: 'Bill Gates',
+    genre: 'tech'
   })
 
   await insert(db, {
     quote: 'Be yourself; everyone else is already taken.',
-    author: 'Oscar Wilde'
+    author: 'Oscar Wilde',
+    genre: 'life'
   })
 
   await insert(db, {
     quote: "I have not failed. I've just found 10,000 ways that won't work.",
-    author: 'Thomas A. Edison'
+    author: 'Thomas A. Edison',
+    genre: 'tech'
   })
 
   await insert(db, {
@@ -180,6 +184,30 @@ t.test('binary persistence', t => {
       }
     }
   })
+
+  t.test('should continue to work with `enum`', async t => {
+    t.plan(2)
+
+    const db = await generateTestDBInstance()
+    const q1 = await search(db, {
+      where: {
+        genre: { eq: 'way' }
+      }
+    })
+
+    const path = await persistToFile(db, 'binary', 'test.dpack')
+    const db2 = await restoreFromFile('binary', 'test.dpack')
+
+    const qp1 = await search(db2, {
+      where: {
+        genre: { eq: 'way' }
+      }
+    })
+
+    t.same(q1.hits, qp1.hits)
+
+    await rm(path)
+  })
 })
 
 t.test('json persistence', t => {
@@ -289,6 +317,30 @@ t.test('json persistence', t => {
     // Clean up
     await rm(path)
   })
+
+  t.test('should continue to work with `enum`', async t => {
+    t.plan(2)
+
+    const db = await generateTestDBInstance()
+    const q1 = await search(db, {
+      where: {
+        genre: { eq: 'way' }
+      }
+    })
+
+    const path = await persistToFile(db, 'json', 'test.json')
+    const db2 = await restoreFromFile('json', 'test.json')
+
+    const qp1 = await search(db2, {
+      where: {
+        genre: { eq: 'way' }
+      }
+    })
+
+    t.same(q1.hits, qp1.hits)
+
+    await rm(path)
+  })
 })
 
 t.test('dpack persistence', t => {
@@ -359,6 +411,30 @@ t.test('dpack persistence', t => {
     t.same(q2.hits, qp2.hits)
 
     // Clean up
+    await rm(path)
+  })
+
+  t.test('should continue to work with `enum`', async t => {
+    t.plan(2)
+
+    const db = await generateTestDBInstance()
+    const q1 = await search(db, {
+      where: {
+        genre: { eq: 'way' }
+      }
+    })
+
+    const path = await persistToFile(db, 'dpack', 'test.dpack')
+    const db2 = await restoreFromFile('dpack', 'test.dpack')
+
+    const qp1 = await search(db2, {
+      where: {
+        genre: { eq: 'way' }
+      }
+    })
+
+    t.same(q1.hits, qp1.hits)
+
     await rm(path)
   })
 })
