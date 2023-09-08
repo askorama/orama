@@ -33,8 +33,8 @@ Plugin usage depends on the runtime that you are using, even though the goal is 
 The plugin exports `afterInsertHook`, which will be the hook used by Orama to add positions, and `searchWithHighlight` which wraps the original Orama's `search` function to return positions alongside docs.
 
 ```typescript copy
-import { afterInsert as highlightAfterInsert, searchWithHighlight } from '@orama/plugin-match-highlight'
 import { create, insert } from '@orama/orama'
+import { afterInsert as highlightAfterInsert, searchWithHighlight } from '@orama/plugin-match-highlight'
 
 // Create a new Orama instance
 const db = await create({
@@ -78,6 +78,31 @@ This will add the `positions` property to each `hit`:
     }
   ]
 }
+```
+
+# Saving Database State with Highlights
+
+Orama exposes a `save` method, which is used to persist it's state either in-memory or on disk. \
+By default, it doesn't save the highlights exposed by this plugin. If you need them, you can easily handle this case by using the `saveWithHighlight` and `loadWithHighlight` functions:
+
+```js
+import { create, insert } from '@orama/orama'
+import { afterInsert as highlightAfterInsert, saveWithHighlight, loadWithHighlight } from '@orama/plugin-match-highlight'
+
+const db = await create({
+  schema: {
+    text: 'string'
+  },
+  components: {
+    afterInsert: [highlightAfterInsert]
+  }
+})
+
+await insert(db, { text: 'hello world' })
+
+const savedDB = await saveWithHighlight(db)
+
+const restoredDB = await loadWithHighlight(savedDB)
 ```
 
 # CommonJS Imports
