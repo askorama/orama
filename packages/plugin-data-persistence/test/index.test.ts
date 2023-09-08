@@ -56,7 +56,7 @@ async function generateTestDBInstance(): Promise<Orama<any>> {
 }
 
 t.test('binary persistence', t => {
-  t.plan(3)
+  t.plan(4)
 
   t.test('should generate a persistence file on the disk with random name', async t => {
     t.plan(2)
@@ -186,7 +186,7 @@ t.test('binary persistence', t => {
   })
 
   t.test('should continue to work with `enum`', async t => {
-    t.plan(2)
+    t.plan(1)
 
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
@@ -211,7 +211,7 @@ t.test('binary persistence', t => {
 })
 
 t.test('json persistence', t => {
-  t.plan(3)
+  t.plan(4)
 
   t.test('should generate a persistence file on the disk with random name and json format', async t => {
     t.plan(2)
@@ -319,7 +319,7 @@ t.test('json persistence', t => {
   })
 
   t.test('should continue to work with `enum`', async t => {
-    t.plan(2)
+    t.plan(1)
 
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
@@ -344,7 +344,7 @@ t.test('json persistence', t => {
 })
 
 t.test('dpack persistence', t => {
-  t.plan(2)
+  t.plan(3)
 
   t.test('should generate a persistence file on the disk with random name and dpack format', async t => {
     t.plan(2)
@@ -415,7 +415,7 @@ t.test('dpack persistence', t => {
   })
 
   t.test('should continue to work with `enum`', async t => {
-    t.plan(2)
+    t.plan(1)
 
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
