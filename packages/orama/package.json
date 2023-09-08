@@ -20,6 +20,11 @@
       "types": "./dist/components.d.ts",
       "import": "./dist/components.js",
       "require": "./dist/cjs/components.cjs"
+    },
+    "./trees": {
+      "types": "./dist/trees.d.ts",
+      "import": "./dist/trees.js",
+      "require": "./dist/cjs/trees.cjs"
     }
   },
   "types": "./dist/index.d.ts",
