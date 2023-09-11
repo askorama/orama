@@ -51,7 +51,7 @@ const db = await create({
 await insert(db, { text: 'hello world' })
 
 // Use the plugin's searchWithHighlight function to query the database
-const results = await searchWithHighlight(db, 'hello')
+const results = await searchWithHighlight(db, { term: 'hello' })
 ```
 
 This will add the `positions` property to each `hit`:
