@@ -2,6 +2,7 @@ import type {
   ArraySearchableType,
   BM25Params,
   ComparisonOperator,
+  EnumComparisonOperator,
   IIndex,
   Magnitude,
   OpaqueDocumentStore,
@@ -34,7 +35,13 @@ import {
   Node as RadixNode,
   removeDocumentByWord as radixRemoveDocument,
 } from '../trees/radix.js'
-import { intersect, safeArrayPush } from '../utils.js';
+import {
+  create as flatCreate,
+  insert as flatInsert,
+  removeDocument as flatRemoveDocument,
+  filter as flatFilter,
+} from '../trees/flat.js'
+import { intersect, safeArrayPush } from '../utils.js'
 import { BM25 } from './algorithms.js'
 import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
 import {
@@ -44,6 +51,7 @@ import {
   InternalDocumentIDStore,
 } from './internal-document-id-store.js'
 import { getMagnitude } from './cosine-similarity.js'
+import { FlatTree } from '../trees/flat.js'
 
 export type FrequencyMap = {
   [property: string]: {
@@ -67,9 +75,27 @@ export type VectorIndex = {
   }
 }
 
+export type TreeType =
+  | 'AVL'
+  | 'Radix'
+  | 'Bool'
+  | 'Flat'
+
+export type TTree<T = TreeType, N = unknown> = {
+  type: T,
+  node: N
+}
+
+export type Tree =
+  | TTree<'Radix', RadixNode>
+  | TTree<'AVL',   AVLNode<number, InternalDocumentID[]>>
+  | TTree<'Bool',  BooleanIndex>
+  | TTree<'Flat',  FlatTree>
+
+
 export interface Index extends OpaqueIndex {
   sharedInternalDocumentStore: InternalDocumentIDStore
-  indexes: Record<string, RadixNode | AVLNode<number, InternalDocumentID[]> | BooleanIndex>
+  indexes: Record<string, Tree>
   vectorIndexes: Record<string, VectorIndex>
   searchableProperties: string[]
   searchablePropertiesWithTypes: Record<string, SearchableType>
@@ -223,19 +249,22 @@ export async function create(
       switch (type) {
         case 'boolean':
         case 'boolean[]':
-          index.indexes[path] = { true: [], false: [] }
+          index.indexes[path] = { type: 'Bool', node: { true: [], false: [] } }
           break
         case 'number':
         case 'number[]':
-          index.indexes[path] = avlCreate<number, InternalDocumentID[]>(0, [])
+          index.indexes[path] = { type: 'AVL', node: avlCreate<number, InternalDocumentID[]>(0, []) }
           break
         case 'string':
         case 'string[]':
-          index.indexes[path] = radixCreate()
+          index.indexes[path] = { type: 'Radix', node: radixCreate() }
           index.avgFieldLength[path] = 0
           index.frequencies[path] = {}
           index.tokenOccurrences[path] = {}
           index.fieldLengths[path] = {}
+          break
+        case 'enum':
+          index.indexes[path] = { type: 'Flat', node: flatCreate() }
           break
         default:
           throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : (type as unknown as string), path)
@@ -262,25 +291,29 @@ async function insertScalar(
 ): Promise<void> {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
-  switch (schemaType) {
-    case 'boolean': {
-      const booleanIndex = index.indexes[prop] as BooleanIndex
-      booleanIndex[value ? 'true' : 'false'].push(internalId)
+  const { type, node } = index.indexes[prop]
+  switch (type) {
+    case 'Bool': {
+      node[value ? 'true' : 'false'].push(internalId)
       break
     }
-    case 'number':
-      avlInsert(index.indexes[prop] as AVLNode<number, number[]>, value as number, [internalId])
+    case 'AVL':
+      avlInsert(node, value as number, [internalId])
       break
-    case 'string': {
+    case 'Radix': {
       const tokens = await tokenizer.tokenize(value as string, language, prop)
       await implementation.insertDocumentScoreParameters(index, prop, internalId, tokens, docsCount)
 
       for (const token of tokens) {
         await implementation.insertTokenScoreParameters(index, prop, internalId, tokens, token)
 
-        radixInsert(index.indexes[prop] as RadixNode, token, internalId)
+        radixInsert(node, token, internalId)
       }
 
+      break
+    }
+    case 'Flat': {
+      flatInsert(node, value as ScalarSearchableType, internalId)
       break
     }
   }
@@ -348,28 +381,33 @@ async function removeScalar(
 ): Promise<boolean> {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
-  switch (schemaType) {
-    case 'number': {
-      avlRemoveDocument(index.indexes[prop] as AVLNode<number, InternalDocumentID[]>, internalId, value)
+  const { type, node } = index.indexes[prop]
+  switch (type) {
+    case 'AVL': {
+      avlRemoveDocument(node, internalId, value as number)
       return true
     }
-    case 'boolean': {
+    case 'Bool': {
       const booleanKey = value ? 'true' : 'false'
-      const position = (index.indexes[prop] as BooleanIndex)[booleanKey].indexOf(internalId)
+      const position = node[booleanKey].indexOf(internalId)
 
-      ;(index.indexes[prop] as BooleanIndex)[value ? 'true' : 'false'].splice(position, 1)
+      node[value ? 'true' : 'false'].splice(position, 1)
       return true
     }
-    case 'string': {
+    case 'Radix': {
       const tokens = await tokenizer.tokenize(value as string, language, prop)
 
       await implementation.removeDocumentScoreParameters(index, prop, id, docsCount)
 
       for (const token of tokens) {
         await implementation.removeTokenScoreParameters(index, prop, token)
-        radixRemoveDocument(index.indexes[prop] as RadixNode, token, internalId)
+        radixRemoveDocument(node, token, internalId)
       }
 
+      return true
+    }
+    case 'Flat': {
+      flatRemoveDocument(node, internalId, value as ScalarSearchableType)
       return true
     }
   }
@@ -421,10 +459,13 @@ export async function search<D extends OpaqueDocumentStore, AggValue>(
     return []
   }
 
-  // Performa the search
-  const rootNode = index.indexes[prop] as RadixNode
+  const { node, type } = index.indexes[prop]
+  if (type !== 'Radix') {
+    throw createError('WRONG_SEARCH_PROPERTY_TYPE', prop)
+  }
+
   const { exact, tolerance } = context.params
-  const searchResult = radixFind(rootNode, { term, exact, tolerance })
+  const searchResult = radixFind(node, { term, exact, tolerance })
   const ids = new Set<InternalDocumentID>()
 
   for (const key in searchResult) {
@@ -439,7 +480,7 @@ export async function search<D extends OpaqueDocumentStore, AggValue>(
 export async function searchByWhereClause<I extends OpaqueIndex, D extends OpaqueDocumentStore, AggValue>(
   context: SearchContext<I, D, AggValue>,
   index: Index,
-  filters: Record<string, boolean | ComparisonOperator>,
+  filters: Record<string, boolean | ComparisonOperator | EnumComparisonOperator>,
 ): Promise<number[]> {
   const filterKeys = Object.keys(filters)
 
@@ -454,29 +495,24 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
   for (const param of filterKeys) {
     const operation = filters[param]
 
-    if (typeof operation === 'boolean') {
-      const idx = index.indexes[param] as BooleanIndex
+    if (typeof index.indexes[param] === 'undefined') {
+      throw createError('UNKNOWN_FILTER_PROPERTY', param)
+    }
 
-      if (typeof idx === 'undefined') {
-        throw createError('UNKNOWN_FILTER_PROPERTY', param)
-      }
+    const { node, type } = index.indexes[param]
 
+    if (type === 'Bool') {
+      const idx = node
       const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
       safeArrayPush(filtersMap[param], filteredIDs);
       continue
     }
 
-    if (typeof operation === 'string' || Array.isArray(operation)) {
-      const idx = index.indexes[param] as RadixNode
-
-      if (typeof idx === 'undefined') {
-        throw createError('UNKNOWN_FILTER_PROPERTY', param)
-      }
-
+    if (type === 'Radix' && (typeof operation === 'string' || Array.isArray(operation))) {
       for (const raw of [operation].flat()) {
         const term = await context.tokenizer.tokenize(raw, context.language, param)
         for (const t of term) {
-          const filteredIDsResults = radixFind(idx, { term: t, exact: true })
+          const filteredIDsResults = radixFind(node, { term: t, exact: true })
           safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())}
       }
 
@@ -489,46 +525,46 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
       throw createError('INVALID_FILTER_OPERATION', operationKeys.length)
     }
 
-    const operationOpt = operationKeys[0] as keyof ComparisonOperator
-    const operationValue = operation[operationOpt]
-
-    const AVLNode = index.indexes[param] as AVLNode<number, InternalDocumentID[]>
-
-    if (typeof AVLNode === 'undefined') {
-      throw createError('UNKNOWN_FILTER_PROPERTY', param)
+    if (type === 'Flat') {
+      filtersMap[param].push(...flatFilter(node, operation as EnumComparisonOperator))
+      continue
     }
 
-    let filteredIDs = [];
+    if (type === 'AVL') {
+      const operationOpt = operationKeys[0] as keyof ComparisonOperator
+      const operationValue = (operation as ComparisonOperator)[operationOpt]
+      let filteredIDs = [];
 
-    switch (operationOpt) {
-      case 'gt': {
-        filteredIDs = avlGreaterThan(AVLNode, operationValue, false)
-        break
+      switch (operationOpt) {
+        case 'gt': {
+          filteredIDs = avlGreaterThan(node, operationValue, false)
+          break
+        }
+        case 'gte': {
+          filteredIDs = avlGreaterThan(node, operationValue, true)
+          break
+        }
+        case 'lt': {
+          filteredIDs = avlLessThan(node, operationValue, false)
+          break
+        }
+        case 'lte': {
+          filteredIDs = avlLessThan(node, operationValue, true)
+          break
+        }
+        case 'eq': {
+          filteredIDs = avlFind(node, operationValue) ?? []
+          break
+        }
+        case 'between': {
+          const [min, max] = operationValue as number[]
+          filteredIDs = avlRangeSearch(node, min, max)
+          break
+        }
       }
-      case 'gte': {
-        filteredIDs = avlGreaterThan(AVLNode, operationValue, true)
-        break
-      }
-      case 'lt': {
-        filteredIDs = avlLessThan(AVLNode, operationValue, false)
-        break
-      }
-      case 'lte': {
-        filteredIDs = avlLessThan(AVLNode, operationValue, true)
-        break
-      }
-      case 'eq': {
-        filteredIDs = avlFind(AVLNode, operationValue) ?? []
-        break
-      }
-      case 'between': {
-        const [min, max] = operationValue as number[]
-        filteredIDs = avlRangeSearch(AVLNode, min, max)
-        break
-      }
+
+      safeArrayPush(filtersMap[param], filteredIDs)
     }
-
-    safeArrayPush(filtersMap[param], filteredIDs)
   }
 
   // AND operation: calculate the intersection between all the IDs in filterMap
@@ -545,17 +581,27 @@ export async function getSearchablePropertiesWithTypes(index: Index): Promise<Re
   return index.searchablePropertiesWithTypes
 }
 
-function loadNode(node: RadixNode): RadixNode {
+function loadRadixNode(node: RadixNode): RadixNode {
   const convertedNode = radixCreate(node.end, node.subWord, node.key)
 
   convertedNode.docs = node.docs
   convertedNode.word = node.word
 
   for (const childrenKey of Object.keys(node.children)) {
-    convertedNode.children[childrenKey] = loadNode(node.children[childrenKey])
+    convertedNode.children[childrenKey] = loadRadixNode(node.children[childrenKey])
   }
 
   return convertedNode
+}
+
+function loadFlatNode(node: unknown): FlatTree {
+  return {
+    numberToDocumentId: new Map(node as [ScalarSearchableType, InternalDocumentID[]][]),
+  }
+}
+
+function saveFlatNode(node: FlatTree): unknown {
+  return Array.from(node.numberToDocumentId.entries())
 }
 
 export async function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Promise<Index> {
@@ -574,15 +620,24 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
   const vectorIndexes: Index['vectorIndexes'] = {}
 
   for (const prop of Object.keys(rawIndexes)) {
-    const value = rawIndexes[prop]
+    const { node, type } = rawIndexes[prop]
 
-    if (!('word' in value)) {
-      indexes[prop] = value
-
-      continue
+    switch (type) {
+      case 'Radix':
+        indexes[prop] = {
+          type: 'Radix',
+          node: loadRadixNode(node)
+        }
+        break
+      case 'Flat':
+        indexes[prop] = {
+          type: 'Flat',
+          node: loadFlatNode(node)
+        }
+        break
+      default:
+        indexes[prop] = rawIndexes[prop]
     }
-
-    indexes[prop] = loadNode(value)
   }
 
   for (const idx of Object.keys(rawVectorIndexes)) {
@@ -638,8 +693,22 @@ export async function save<R = unknown>(index: Index): Promise<R> {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const savedIndexes: any = {}
+  for (const name of Object.keys(indexes)) {
+    const {type, node} = indexes[name]
+    if (type !== 'Flat') {
+      savedIndexes[name] = indexes[name]
+      continue
+    }
+    savedIndexes[name] = {
+      type: 'Flat',
+      node: saveFlatNode(node)
+    }
+  }
+
   return {
-    indexes,
+    indexes: savedIndexes,
     vectorIndexes: vectorIndexesAsArrays,
     searchableProperties,
     searchablePropertiesWithTypes,
