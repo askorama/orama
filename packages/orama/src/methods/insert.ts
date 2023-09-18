@@ -63,7 +63,7 @@ async function innerInsert<T extends AnyOrama>(
       continue
     }
 
-    if (expectedType === 'enum' && (actualType === 'string' || actualType === 'number')) {
+    if ((expectedType === 'enum' || expectedType === 'enum[]') && (actualType === 'string' || actualType === 'number')) {
       continue
     }
 

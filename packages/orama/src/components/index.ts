@@ -1,3 +1,22 @@
+import type {
+  AnyIndexStore,
+  AnyOrama,
+  ArraySearchableType,
+  BM25Params,
+  ComparisonOperator,
+  EnumArrComparisonOperator,
+  EnumComparisonOperator,
+  IIndex,
+  ScalarSearchableType,
+  SearchableType,
+  SearchableValue,
+  SearchContext,
+  Tokenizer,
+  TokenScore,
+  TypedDocument,
+  VectorIndex,
+  VectorType,
+} from '../types.js'
 import { createError } from '../errors.js'
 import {
   create as avlCreate,
@@ -12,6 +31,7 @@ import {
 import {
   create as flatCreate,
   filter as flatFilter,
+  filterArr as flatFilterArr,
   insert as flatInsert,
   removeDocument as flatRemoveDocument,
   FlatTree,
@@ -23,24 +43,7 @@ import {
   Node as RadixNode,
   removeDocumentByWord as radixRemoveDocument,
 } from '../trees/radix.js'
-import type {
-  AnyIndexStore,
-  AnyOrama,
-  ArraySearchableType,
-  BM25Params,
-  ComparisonOperator,
-  EnumComparisonOperator,
-  IIndex,
-  ScalarSearchableType,
-  SearchableType,
-  SearchableValue,
-  SearchContext,
-  Tokenizer,
-  TokenScore,
-  TypedDocument,
-  VectorIndex,
-  VectorType
-} from '../types.js'
+
 import { intersect, safeArrayPush } from '../utils.js'
 import { BM25 } from './algorithms.js'
 import { getMagnitude } from './cosine-similarity.js'
@@ -76,6 +79,7 @@ export type TreeType =
 export type TTree<T = TreeType, N = unknown> = {
   type: T,
   node: N
+  isArray: boolean
 }
 
 export type Tree =
@@ -234,25 +238,27 @@ export async function create<T extends AnyOrama, TSchema extends T['schema']>(
         vectors: {},
       }
     } else {
+      const isArray = /\[/.test(type as string)
       switch (type) {
         case 'boolean':
         case 'boolean[]':
-          index.indexes[path] = { type: 'Bool', node: { true: [], false: [] } }
+          index.indexes[path] = { type: 'Bool', node: { true: [], false: [] }, isArray }
           break
         case 'number':
         case 'number[]':
-          index.indexes[path] = { type: 'AVL', node: avlCreate<number, InternalDocumentID[]>(0, []) }
+          index.indexes[path] = { type: 'AVL', node: avlCreate<number, InternalDocumentID[]>(0, []), isArray }
           break
         case 'string':
         case 'string[]':
-          index.indexes[path] = { type: 'Radix', node: radixCreate() }
+          index.indexes[path] = { type: 'Radix', node: radixCreate(), isArray }
           index.avgFieldLength[path] = 0
           index.frequencies[path] = {}
           index.tokenOccurrences[path] = {}
           index.fieldLengths[path] = {}
           break
         case 'enum':
-          index.indexes[path] = { type: 'Flat', node: flatCreate() }
+        case 'enum[]':
+          index.indexes[path] = { type: 'Flat', node: flatCreate(), isArray }
           break
         default:
           throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type, path)
@@ -468,7 +474,7 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
 export async function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   context: SearchContext<T, ResultDocument>,
   index: Index,
-  filters: Record<string, boolean | ComparisonOperator | EnumComparisonOperator>,
+  filters: Record<string, boolean | ComparisonOperator | EnumComparisonOperator | EnumArrComparisonOperator>,
 ): Promise<number[]> {
   const filterKeys = Object.keys(filters)
 
@@ -487,7 +493,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
       throw createError('UNKNOWN_FILTER_PROPERTY', param)
     }
 
-    const { node, type } = index.indexes[param]
+    const { node, type, isArray } = index.indexes[param]
 
     if (type === 'Bool') {
       const idx = node
@@ -514,7 +520,11 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
     }
 
     if (type === 'Flat') {
-      filtersMap[param].push(...flatFilter(node, operation as EnumComparisonOperator))
+      if (isArray) {
+        filtersMap[param].push(...flatFilterArr(node, operation as EnumArrComparisonOperator))
+      } else {
+        filtersMap[param].push(...flatFilter(node, operation as EnumComparisonOperator))
+      }
       continue
     }
 
@@ -608,19 +618,21 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
   const vectorIndexes: Index['vectorIndexes'] = {}
 
   for (const prop of Object.keys(rawIndexes)) {
-    const { node, type } = rawIndexes[prop]
+    const { node, type, isArray } = rawIndexes[prop]
 
     switch (type) {
       case 'Radix':
         indexes[prop] = {
           type: 'Radix',
-          node: loadRadixNode(node)
+          node: loadRadixNode(node),
+          isArray
         }
         break
       case 'Flat':
         indexes[prop] = {
           type: 'Flat',
-          node: loadFlatNode(node)
+          node: loadFlatNode(node),
+          isArray
         }
         break
       default:
@@ -684,14 +696,15 @@ export async function save<R = unknown>(index: Index): Promise<R> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const savedIndexes: any = {}
   for (const name of Object.keys(indexes)) {
-    const {type, node} = indexes[name]
+    const {type, node, isArray} = indexes[name]
     if (type !== 'Flat') {
       savedIndexes[name] = indexes[name]
       continue
     }
     savedIndexes[name] = {
       type: 'Flat',
-      node: saveFlatNode(node)
+      node: saveFlatNode(node),
+      isArray,
     }
   }
 
