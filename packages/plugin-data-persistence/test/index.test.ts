@@ -25,38 +25,42 @@ async function generateTestDBInstance() {
     schema: {
       quote: 'string',
       author: 'string',
-      genre: 'enum'
+      genre: 'enum',
+      colors: 'enum[]',
     }
   })
 
   await insert(db, {
     quote: 'I am a great programmer',
     author: 'Bill Gates',
-    genre: 'tech'
+    genre: 'tech',
+    colors: ['red', 'blue']
   })
 
   await insert(db, {
     quote: 'Be yourself; everyone else is already taken.',
     author: 'Oscar Wilde',
-    genre: 'life'
+    genre: 'life',
+    colors: ['red', 'green']
   })
 
   await insert(db, {
     quote: "I have not failed. I've just found 10,000 ways that won't work.",
     author: 'Thomas A. Edison',
-    genre: 'tech'
+    genre: 'tech',
+    colors: ['red', 'blue']
   })
 
   await insert(db, {
     quote: 'The only way to do great work is to love what you do.',
-    author: 'Steve Jobs'
+    author: 'Steve Jobs',
   })
 
   return db
 }
 
 t.test('binary persistence', t => {
-  t.plan(4)
+  t.plan(5)
 
   t.test('should generate a persistence file on the disk with random name', async t => {
     t.plan(2)
@@ -208,10 +212,34 @@ t.test('binary persistence', t => {
 
     await rm(path)
   })
+
+  t.test('should continue to work with `enum[]`', async t => {
+    t.plan(1)
+
+    const db = await generateTestDBInstance()
+    const q1 = await search(db, {
+      where: {
+        colors: { intersects: ['green'] }
+      }
+    })
+
+    const path = await persistToFile(db, 'binary', 'test.dpack')
+    const db2 = await restoreFromFile('binary', 'test.dpack')
+
+    const qp1 = await search(db2, {
+      where: {
+        colors: { intersects: ['green'] }
+      }
+    })
+
+    t.same(q1.hits, qp1.hits)
+
+    await rm(path)
+  })
 })
 
 t.test('json persistence', t => {
-  t.plan(4)
+  t.plan(5)
 
   t.test('should generate a persistence file on the disk with random name and json format', async t => {
     t.plan(2)
@@ -341,10 +369,34 @@ t.test('json persistence', t => {
 
     await rm(path)
   })
+
+  t.test('should continue to work with `enum[]`', async t => {
+    t.plan(1)
+
+    const db = await generateTestDBInstance()
+    const q1 = await search(db, {
+      where: {
+        colors: { intersects: ['green'] }
+      }
+    })
+
+    const path = await persistToFile(db, 'json', 'test.json')
+    const db2 = await restoreFromFile('json', 'test.json')
+
+    const qp1 = await search(db2, {
+      where: {
+        colors: { intersects: ['green'] }
+      }
+    })
+
+    t.same(q1.hits, qp1.hits)
+
+    await rm(path)
+  })
 })
 
 t.test('dpack persistence', t => {
-  t.plan(3)
+  t.plan(4)
 
   t.test('should generate a persistence file on the disk with random name and dpack format', async t => {
     t.plan(2)
@@ -430,6 +482,30 @@ t.test('dpack persistence', t => {
     const qp1 = await search(db2, {
       where: {
         genre: { eq: 'way' }
+      }
+    })
+
+    t.same(q1.hits, qp1.hits)
+
+    await rm(path)
+  })
+
+  t.test('should continue to work with `enum[]`', async t => {
+    t.plan(1)
+
+    const db = await generateTestDBInstance()
+    const q1 = await search(db, {
+      where: {
+        colors: { intersects: ['green'] }
+      }
+    })
+
+    const path = await persistToFile(db, 'dpack', 'test.dpack')
+    const db2 = await restoreFromFile('dpack', 'test.dpack')
+
+    const qp1 = await search(db2, {
+      where: {
+        colors: { intersects: ['green'] }
       }
     })
 
