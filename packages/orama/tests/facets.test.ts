@@ -160,35 +160,6 @@ t.test('facets', t => {
     t.same(results.facets?.price.values['6-8'], 1)
   })
 
-  t.test('', async t => {
-
-    const db = await create({
-      schema: {
-        foo: 'number',
-      },
-    })
-
-    await insertMultiple(db, [
-      { foo: 1 },
-      { foo: 2 },
-      { foo: 3 },
-      { foo: 4 },
-    ])
-
-
-    const results = await search(db, {
-      term: '',
-      facets: {
-        foo: {},
-      },
-    })
-
-    console.log(results)
-
-
-    t.end()
-  })
-
   t.test('should work with `enum` and `enum[]`', async t => {
 
     const db = await create({
