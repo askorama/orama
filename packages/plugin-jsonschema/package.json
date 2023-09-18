@@ -1,0 +1,50 @@
+{
+  "name": "@orama/plugin-jsonschema",
+  "version": "1.1.0",
+  "description": "Orama plugin to convert from jsonschema to Oramas schema format",
+  "keywords": [
+    "orama",
+    "jsonschema"
+  ],
+  "license": "Apache-2.0",
+  "main": "./dist/index.js",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/oramasearch/orama/issues"
+  },
+  "homepage": "https://github.com/oramasearch/orama#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oramasearch/orama.git"
+  },
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",
+    "postbuild": "tsc -p . --emitDeclarationOnly",
+    "lint": "eslint src --ext .js,.ts,.cts",
+    "test": "c8 -c test/config/c8.json tap --rcfile=test/config/tap.yml test/*.test.ts"
+  },
+  "dependencies": {
+    "@orama/orama": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "lint-staged": {
+    "*.{ts, tsx}": "eslint ./src --cache --fix"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.1.59",
+    "@swc/core": "^1.3.27",
+    "@types/tap": "^15.0.7",
+    "c8": "^7.12.0",
+    "tap": "^16.3.0",
+    "tap-mocha-reporter": "^5.0.3",
+    "tsx": "^3.12.2",
+    "typescript": "^5.0.3"
+  }
+}
