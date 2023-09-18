@@ -1,3 +1,4 @@
+import { createError } from '../errors.js'
 import type {
   AnyOrama,
   FacetResult,
@@ -75,19 +76,23 @@ export async function getFacets<T extends AnyOrama>(
           break
         }
         case 'boolean':
+        case 'enum':
         case 'string': {
-          calculateBooleanOrStringFacet(facets[facet].values, facetValue as string | boolean, propertyType)
+          calculateBooleanStringOrEnumFacet(facets[facet].values, facetValue as string | boolean | number, propertyType)
           break
         }
         case 'boolean[]':
+        case 'enum[]':
         case 'string[]': {
           const alreadyInsertedValues = new Set<string>()
           const innerType = propertyType === 'boolean[]' ? 'boolean' : 'string'
-          for (const v of facetValue as Array<string | boolean>) {
-            calculateBooleanOrStringFacet(facets[facet].values, v, innerType, alreadyInsertedValues)
+          for (const v of facetValue as Array<string | boolean | number>) {
+            calculateBooleanStringOrEnumFacet(facets[facet].values, v, innerType, alreadyInsertedValues)
           }
           break
         }
+        default:
+          throw createError('FACET_NOT_SUPPORTED', propertyType)
       }
     }
   }
@@ -137,10 +142,10 @@ function calculateNumberFacet(
   }
 }
 
-function calculateBooleanOrStringFacet(
+function calculateBooleanStringOrEnumFacet(
   values: Record<string, number>,
-  facetValue: string | boolean,
-  propertyType: 'string' | 'boolean',
+  facetValue: string | boolean | number,
+  propertyType: 'string' | 'boolean' | 'enum',
   alreadyInsertedValues?: Set<string>,
 ) {
   // String or boolean based facets
