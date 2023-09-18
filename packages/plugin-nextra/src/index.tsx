@@ -89,6 +89,21 @@ function OramaSearchPlugin({ router, ...props }) {
     }
   }, [])
 
+  useEffect(() => {
+    const onKeyDownHandler = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault()
+        inputRef.current?.focus()
+        setHasFocus(true)
+      }
+    }
+    window.addEventListener('keydown', onKeyDownHandler)
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDownHandler)
+    }
+  }, [])
+
   // If the path changes, we close the search box
   useEffect(() => {
     setHasFocus(false)
