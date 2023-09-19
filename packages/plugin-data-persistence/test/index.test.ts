@@ -219,7 +219,7 @@ t.test('binary persistence', t => {
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
       where: {
-        colors: { intersects: ['green'] }
+        colors: { containsAll: ['green'] }
       }
     })
 
@@ -228,7 +228,7 @@ t.test('binary persistence', t => {
 
     const qp1 = await search(db2, {
       where: {
-        colors: { intersects: ['green'] }
+        colors: { containsAll: ['green'] }
       }
     })
 
@@ -376,7 +376,7 @@ t.test('json persistence', t => {
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
       where: {
-        colors: { intersects: ['green'] }
+        colors: { containsAll: ['green'] }
       }
     })
 
@@ -385,7 +385,7 @@ t.test('json persistence', t => {
 
     const qp1 = await search(db2, {
       where: {
-        colors: { intersects: ['green'] }
+        colors: { containsAll: ['green'] }
       }
     })
 
@@ -496,7 +496,7 @@ t.test('dpack persistence', t => {
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
       where: {
-        colors: { intersects: ['green'] }
+        colors: { containsAll: ['green'] }
       }
     })
 
@@ -505,7 +505,7 @@ t.test('dpack persistence', t => {
 
     const qp1 = await search(db2, {
       where: {
-        colors: { intersects: ['green'] }
+        colors: { containsAll: ['green'] }
       }
     })
 
