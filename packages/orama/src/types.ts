@@ -149,6 +149,27 @@ export type EnumArrComparisonOperator = {
   containsAll ?: (string | number | boolean)[]
 }
 
+export type Operator<Value> = Value extends 'string'
+  ? (string | string[])
+  : Value extends 'string[]'
+  ? (string | string[])
+  : Value extends 'boolean'
+  ? boolean
+  : Value extends 'boolean[]'
+  ? boolean
+  : Value extends 'number'
+  ? ComparisonOperator
+  : Value extends 'number[]'
+  ? ComparisonOperator
+  : Value extends 'enum'
+  ? EnumComparisonOperator
+  : Value extends 'enum[]'
+  ? EnumArrComparisonOperator
+  : never
+export type WhereCondition<TSchema> = {
+  [key in keyof TSchema]?: Operator<TSchema[key]>
+}
+
 /**
  * A custom sorter function item as [id, score, document].
  */
@@ -312,7 +333,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    *  }
    * });
    */
-  where?: Partial<Record<LiteralUnion<T['schema']>, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator | EnumArrComparisonOperator>>
+  where?: Partial<WhereCondition<T['schema']>>
 
   /**
    * Threshold to use for refining the search results.
@@ -560,7 +581,7 @@ export interface IIndex<I extends AnyIndexStore> {
   searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
     context: SearchContext<T, ResultDocument>,
     index: I,
-    filters: Partial<Record<LiteralUnion<T['schema']>, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator | EnumArrComparisonOperator>>,
+    filters: Partial<WhereCondition<T['schema']>>,
   ): SyncOrAsyncValue<InternalDocumentID[]>
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
