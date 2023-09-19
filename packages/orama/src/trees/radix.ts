@@ -4,25 +4,31 @@ import { getOwnProperty } from '../utils.js'
 
 export class Node {
   constructor(key: string, subWord: string, end: boolean) {
-    this.key = key
-    this.subWord = subWord
-    this.end = end
+    this.k = key
+    this.s = subWord
+    this.e = end
   }
 
-  public key: string
-  public subWord: string
-  public children: Record<string, Node> = {}
-  public docs: InternalDocumentID[] = []
-  public end: boolean
-  public word = ''
+  // Node key
+  public k: string
+  // Node subword
+  public s: string
+  // Node children
+  public c: Record<string, Node> = {}
+  // Node documents
+  public d: InternalDocumentID[] = []
+  // Node end
+  public e: boolean
+  // Node word
+  public w = ''
 
   public toJSON(): object {
     return {
-      word: this.word,
-      subWord: this.subWord,
-      children: this.children,
-      docs: this.docs,
-      end: this.end,
+      w: this.w,
+      s: this.s,
+      c: this.c,
+      d: this.d,
+      e: this.e,
     }
   }
 }
@@ -36,69 +42,69 @@ type FindParams = {
 type FindResult = Record<string, InternalDocumentID[]>
 
 function updateParent(node: Node, parent: Node): void {
-  node.word = parent.word + node.subWord
+  node.w = parent.w + node.s
 }
 
 function addDocument(node: Node, docID: InternalDocumentID): void {
-  node.docs.push(docID)
+  node.d.push(docID)
 }
 
 function removeDocument(node: Node, docID: InternalDocumentID): boolean {
-  const index = node.docs.indexOf(docID)
+  const index = node.d.indexOf(docID)
 
   /* c8 ignore next 3 */
   if (index === -1) {
     return false
   }
 
-  node.docs.splice(index, 1)
+  node.d.splice(index, 1)
 
   return true
 }
 
 function findAllWords(node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
-  if (node.end) {
-    const { word, docs: docIDs } = node
+  if (node.e) {
+    const { w, d: docIDs } = node
 
-    if (exact && word !== term) {
+    if (exact && w !== term) {
       return {}
     }
 
     // always check in own property to prevent access to inherited properties
     // fix https://github.com/OramaSearch/orama/issues/137
-    if (!getOwnProperty(output, word)) {
+    if (!getOwnProperty(output, w)) {
       if (tolerance) {
         // computing the absolute difference of letters between the term and the word
-        const difference = Math.abs(term.length - word.length)
+        const difference = Math.abs(term.length - w.length)
 
         // if the tolerance is set, check whether the edit distance is within tolerance.
         // In that case, we don't need to add the word to the output
-        if (difference <= tolerance && syncBoundedLevenshtein(term, word, tolerance).isBounded) {
-          output[word] = []
+        if (difference <= tolerance && syncBoundedLevenshtein(term, w, tolerance).isBounded) {
+          output[w] = []
         }
       } else {
         // prevent default tolerance not set
-        output[word] = []
+        output[w] = []
       }
     }
 
-    // check if _output[word] exists and then add the doc to it
+    // check if _output[w] exists and then add the doc to it
     // always check in own property to prevent access to inherited properties
     // fix https://github.com/OramaSearch/orama/issues/137
-    if (getOwnProperty(output, word) && docIDs.length) {
-      const docs = new Set(output[word])
+    if (getOwnProperty(output, w) && docIDs.length) {
+      const docs = new Set(output[w])
 
       const docIDsLength = docIDs.length
       for (let i = 0; i < docIDsLength; i++) {
         docs.add(docIDs[i])
       }
-      output[word] = Array.from(docs)
+      output[w] = Array.from(docs)
     }
   }
 
   // recursively search the children
-  for (const character of Object.keys(node.children)) {
-    findAllWords(node.children[character], output, term, exact, tolerance)
+  for (const character of Object.keys(node.c)) {
+    findAllWords(node.c[character], output, term, exact, tolerance)
   }
   return output
 }
@@ -123,10 +129,10 @@ export function insert(root: Node, word: string, docId: InternalDocumentID) {
   for (let i = 0; i < word.length; i++) {
     const currentCharacter = word[i]
     const wordAtIndex = word.substring(i)
-    const rootChildCurrentChar = root.children[currentCharacter]
+    const rootChildCurrentChar = root.c[currentCharacter]
 
     if (rootChildCurrentChar) {
-      const edgeLabel = rootChildCurrentChar.subWord
+      const edgeLabel = rootChildCurrentChar.s
       const edgeLabelLength = edgeLabel.length
 
       const commonPrefix = getCommonPrefix(edgeLabel, wordAtIndex)
@@ -135,7 +141,7 @@ export function insert(root: Node, word: string, docId: InternalDocumentID) {
       // the wordAtIndex matches exactly with an existing child node
       if (edgeLabel === wordAtIndex) {
         addDocument(rootChildCurrentChar, docId)
-        rootChildCurrentChar.end = true
+        rootChildCurrentChar.e = true
         return
       }
 
@@ -143,13 +149,13 @@ export function insert(root: Node, word: string, docId: InternalDocumentID) {
       // the wordAtIndex is completely contained in the child node subword
       if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
         const newNode = create(true, wordAtIndex, currentCharacter) // Create a new node with end set to true
-        newNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar
+        newNode.c[edgeLabelAtCommonPrefix] = rootChildCurrentChar
 
-        const newNodeChild = newNode.children[edgeLabelAtCommonPrefix]
-        newNodeChild.subWord = edgeLabel.substring(commonPrefixLength)
-        newNodeChild.key = edgeLabelAtCommonPrefix
+        const newNodeChild = newNode.c[edgeLabelAtCommonPrefix]
+        newNodeChild.s = edgeLabel.substring(commonPrefixLength)
+        newNodeChild.k = edgeLabelAtCommonPrefix
 
-        root.children[currentCharacter] = newNode
+        root.c[currentCharacter] = newNode
 
         updateParent(newNode, root)
         updateParent(newNodeChild, newNode)
@@ -160,18 +166,18 @@ export function insert(root: Node, word: string, docId: InternalDocumentID) {
       // the wordAtIndex is partially contained in the child node subword
       if (commonPrefixLength < edgeLabelLength && commonPrefixLength < wordAtIndex.length) {
         const inbetweenNode = create(false, commonPrefix, currentCharacter)
-        inbetweenNode.children[edgeLabelAtCommonPrefix] = rootChildCurrentChar
-        root.children[currentCharacter] = inbetweenNode
+        inbetweenNode.c[edgeLabelAtCommonPrefix] = rootChildCurrentChar
+        root.c[currentCharacter] = inbetweenNode
 
-        const inbetweenNodeChild = inbetweenNode.children[edgeLabelAtCommonPrefix]
-        inbetweenNodeChild.subWord = edgeLabel.substring(commonPrefixLength)
-        inbetweenNodeChild.key = edgeLabelAtCommonPrefix
+        const inbetweenNodeChild = inbetweenNode.c[edgeLabelAtCommonPrefix]
+        inbetweenNodeChild.s = edgeLabel.substring(commonPrefixLength)
+        inbetweenNodeChild.k = edgeLabelAtCommonPrefix
 
         const wordAtCommonPrefix = wordAtIndex[commonPrefixLength]
         const newNode = create(true, word.substring(i + commonPrefixLength), wordAtCommonPrefix)
         addDocument(newNode, docId)
 
-        inbetweenNode.children[wordAtCommonPrefix] = newNode
+        inbetweenNode.c[wordAtCommonPrefix] = newNode
 
         updateParent(inbetweenNode, root)
         updateParent(newNode, inbetweenNode)
@@ -188,7 +194,7 @@ export function insert(root: Node, word: string, docId: InternalDocumentID) {
       const newNode = create(true, wordAtIndex, currentCharacter)
       addDocument(newNode, docId)
 
-      root.children[currentCharacter] = newNode
+      root.c[currentCharacter] = newNode
       updateParent(newNode, root)
       return
     }
@@ -199,9 +205,9 @@ export function find(root: Node, { term, exact, tolerance }: FindParams): FindRe
   // find the closest node to the term
   for (let i = 0; i < term.length; i++) {
     const character = term[i]
-    if (character in root.children) {
-      const rootChildCurrentChar = root.children[character]
-      const edgeLabel = rootChildCurrentChar.subWord
+    if (character in root.c) {
+      const rootChildCurrentChar = root.c[character]
+      const edgeLabel = rootChildCurrentChar.s
       const termSubstring = term.substring(i)
 
       // find the common prefix between two words ex: prime and primate = prim
@@ -216,7 +222,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams): FindRe
       }
 
       // skip the subword length and check the next divergent character
-      i += rootChildCurrentChar.subWord.length - 1
+      i += rootChildCurrentChar.s.length - 1
       // navigate into the child node
       root = rootChildCurrentChar
     } else {
@@ -235,9 +241,9 @@ export function contains(root: Node, term: string): boolean {
   for (let i = 0; i < term.length; i++) {
     const character = term[i]
 
-    if (character in root.children) {
-      const rootChildrenChar = root.children[character]
-      const edgeLabel = rootChildrenChar.subWord
+    if (character in root.c) {
+      const rootChildrenChar = root.c[character]
+      const edgeLabel = rootChildrenChar.s
       const termSubstring = term.substring(i)
       const commonPrefix = getCommonPrefix(edgeLabel, termSubstring)
       const commonPrefixLength = commonPrefix.length
@@ -245,7 +251,7 @@ export function contains(root: Node, term: string): boolean {
       if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
         return false
       }
-      i += rootChildrenChar.subWord.length - 1
+      i += rootChildrenChar.s.length - 1
       root = rootChildrenChar
     } else {
       return false
@@ -262,12 +268,12 @@ export function removeWord(root: Node, term: string): boolean {
   for (let i = 0; i < term.length; i++) {
     const character = term[i]
     const parent = root
-    if (character in root.children) {
-      i += root.children[character].subWord.length - 1
-      root = root.children[character]
+    if (character in root.c) {
+      i += root.c[character].s.length - 1
+      root = root.c[character]
 
-      if (Object.keys(root.children).length === 0) {
-        delete parent.children[root.key]
+      if (Object.keys(root.c).length === 0) {
+        delete parent.c[root.k]
         return true
       }
     } else {
@@ -285,12 +291,12 @@ export function removeDocumentByWord(root: Node, term: string, docID: InternalDo
 
   for (let i = 0; i < term.length; i++) {
     const character = term[i]
-    if (character in root.children) {
-      const rootChildCurrentChar = root.children[character]
-      i += rootChildCurrentChar.subWord.length - 1
+    if (character in root.c) {
+      const rootChildCurrentChar = root.c[character]
+      i += rootChildCurrentChar.s.length - 1
       root = rootChildCurrentChar
 
-      if (exact && root.word !== term) {
+      if (exact && root.w !== term) {
         // Do nothing if the exact condition is not met.
       } else {
         removeDocument(root, docID)

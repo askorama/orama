@@ -580,13 +580,13 @@ export async function getSearchablePropertiesWithTypes(index: Index): Promise<Re
 }
 
 function loadRadixNode(node: RadixNode): RadixNode {
-  const convertedNode = radixCreate(node.end, node.subWord, node.key)
+  const convertedNode = radixCreate(node.e, node.s, node.k)
 
-  convertedNode.docs = node.docs
-  convertedNode.word = node.word
+  convertedNode.d = node.d
+  convertedNode.w = node.w
 
-  for (const childrenKey of Object.keys(node.children)) {
-    convertedNode.children[childrenKey] = loadRadixNode(node.children[childrenKey])
+  for (const childrenKey of Object.keys(node.c)) {
+    convertedNode.c[childrenKey] = loadRadixNode(node.c[childrenKey])
   }
 
   return convertedNode
