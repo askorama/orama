@@ -178,6 +178,22 @@ In the search result, `boolean` facets will be returned as an `object` with the 
 }
 ```
 
+### Enum facets
+
+If a property is specified as `enum` in the schema, no configuration is required.
+In the search result, `enum` facets will be returned as an `object` with the following properties:
+
+```js
+{
+  count: 9,            // Total number of values
+  values: {
+    'Action': 4,        // Number of documents that have this value
+    'Adventure': 3,     // Number of documents that have this value
+    'Comedy': 2,        // Number of documents that have this value
+  }
+}
+```
+
 ### How facets works on array fields
 
 Orama treats each array element as a single element of the facet:
@@ -209,3 +225,4 @@ const results = await search(db, {
   }
 }
 ```
+

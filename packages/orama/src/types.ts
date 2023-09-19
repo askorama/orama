@@ -24,6 +24,8 @@ export type SchemaTypes<Value> = Value extends 'string'
   ? number[]
   : Value extends 'enum'
   ? string | number
+  : Value extends 'enum[]'
+  ? (string | number)[]
   : // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Value extends `vector[${number}]`
   ? number[]
@@ -71,7 +73,7 @@ export type Vector = `vector[${number}]`
 export type VectorType = Float32Array
 
 export type ScalarSearchableType = 'string' | 'number' | 'boolean' | 'enum'
-export type ArraySearchableType = 'string[]' | 'number[]' | 'boolean[]' | Vector
+export type ArraySearchableType = 'string[]' | 'number[]' | 'boolean[]' | 'enum[]' | Vector
 
 export type SearchableType = ScalarSearchableType | ArraySearchableType
 
@@ -141,6 +143,10 @@ export type EnumComparisonOperator = {
   eq?: string | number | boolean
   in?: (string | number | boolean)[]
   nin?: (string | number | boolean)[]
+}
+
+export type EnumArrComparisonOperator = {
+  containsAll ?: (string | number | boolean)[]
 }
 
 /**
@@ -306,7 +312,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    *  }
    * });
    */
-  where?: Partial<Record<LiteralUnion<T['schema']>, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator>>
+  where?: Partial<Record<LiteralUnion<T['schema']>, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator | EnumArrComparisonOperator>>
 
   /**
    * Threshold to use for refining the search results.
@@ -554,7 +560,7 @@ export interface IIndex<I extends AnyIndexStore> {
   searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
     context: SearchContext<T, ResultDocument>,
     index: I,
-    filters: Partial<Record<LiteralUnion<T['schema']>, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator>>,
+    filters: Partial<Record<LiteralUnion<T['schema']>, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator | EnumArrComparisonOperator>>,
   ): SyncOrAsyncValue<InternalDocumentID[]>
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>

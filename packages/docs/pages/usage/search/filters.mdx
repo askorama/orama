@@ -113,10 +113,19 @@ const results = await search(db, {
 
 ## Enum operators
 
-The numeric properties support the following operators:
+The enum properties support the following operators:
 
 | Operator  | Description                        | Example                                 |
 | --------- | ------------------------------     | ---------------------------------       |
 | `eq`      | Equal to                           | `genre: { eq: 'drama' }`                |
 | `in`      | Contained in the given array       | `genre: { in: ['drama', 'horror'] }`    |
 | `nin`     | Not contained in the given array   | `genre: { nin: ['commedy'] }`           |
+
+
+## Enum[] operators
+
+The enum properties support the following operators:
+
+| Operator           | Description                             | Example                                            |
+| ---------          | ------------------------------          | ---------------------------------                  |
+| `containsAll`      | Contains all the given values           | `genre: { containsAll: ['comedy', 'action'] }`     |

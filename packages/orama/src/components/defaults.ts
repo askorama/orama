@@ -46,6 +46,15 @@ export async function validateSchema<T extends AnyOrama, ResultDocument extends 
     if (type === 'enum' && (typeof value === 'string' || typeof value === 'number')) {
       continue
     }
+    if (type === 'enum[]' && Array.isArray(value)) {
+      const valueLength = value.length
+      for (let i = 0; i < valueLength; i++) {
+        if (typeof value[i] !== 'string' && typeof value[i] !== 'number') {
+          return prop + '.' + i
+        }
+      }
+      continue
+    }
 
     if (isVectorType(type)) {
       const vectorSize = getVectorSize(type)
@@ -100,12 +109,14 @@ const IS_ARRAY_TYPE: Record<SearchableType, boolean> = {
   'string[]': true,
   'number[]': true,
   'boolean[]': true,
+  'enum[]': true,
 }
 
 const INNER_TYPE: Record<ArraySearchableType, ScalarSearchableType> = {
   'string[]': 'string',
   'number[]': 'number',
   'boolean[]': 'boolean',
+  'enum[]': 'enum',
 }
 
 export function isVectorType(type: unknown): type is Vector {

@@ -83,6 +83,9 @@ function innerCreate<T extends AnyOrama>(
           }
           break
         case 'enum':
+          // We don't allow to sort by enums
+          continue
+        case 'enum[]':
         case 'boolean[]':
         case 'number[]':
         case 'string[]':

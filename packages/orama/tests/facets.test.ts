@@ -1,9 +1,7 @@
 import t from 'tap'
-import { create, insert, search } from '../src/index.js'
+import { create, insert, insertMultiple, search } from '../src/index.js'
 
 t.test('facets', t => {
-  t.plan(2)
-
   t.test('should generate correct facets', async t => {
     t.plan(6)
 
@@ -161,4 +159,63 @@ t.test('facets', t => {
     t.same(results.facets?.price.values['4-6'], 2)
     t.same(results.facets?.price.values['6-8'], 1)
   })
+
+  t.test('should work with `enum` and `enum[]`', async t => {
+
+    const db = await create({
+      schema: {
+        category: 'enum',
+        colors: 'enum[]',
+      },
+    })
+
+    await insertMultiple(db, [
+      {
+        category: 't-shirt',
+        colors: ['red', 'green', 'blue']
+      },
+      {
+        category: 'sweatshirt',
+        colors: ['red', 'green', 'orange']
+      },
+      {
+        category: 'jeans',
+        colors: ['white', 'black', 'blue']
+      },
+    ])
+
+    const results = await search(db, {
+      term: '',
+      facets: {
+        category: {},
+        colors: {},
+      },
+    })
+
+    t.strictSame(results.facets, {
+      category: {
+        count: 3,
+        values: {
+          't-shirt': 1,
+          'sweatshirt': 1,
+          'jeans': 1,
+        }
+      },
+      colors: {
+        count: 6,
+        values: {
+          'red': 2,
+          'green': 2,
+          'blue': 2,
+          'orange': 1,
+          'white': 1,
+          'black': 1,
+        }
+      }
+    })
+
+    t.end()
+  })
+
+  t.end()
 })

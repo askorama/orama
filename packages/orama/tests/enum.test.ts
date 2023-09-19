@@ -250,3 +250,213 @@ t.test('enum', async t => {
 
   t.end()
 })
+
+t.test('enum[]', async t => {
+
+  t.test('filter', async t => {
+    const db = await create({
+      schema: {
+        tags: 'enum[]',
+      },
+    })
+
+    const cGreenBlue = await insert(db, {
+      tags: ['green', 'blue'],
+    })
+    const [cGreen, cBlue, cWhite] = await insertMultiple(db, [
+      { tags: ['green'] },
+      { tags: ['blue'] },
+      { tags: ['white'] },
+    ])
+
+    const testsContainsAll = [
+      { values: ['green'], expected: [cGreenBlue, cGreen] },
+      { values: ['blue'], expected: [cGreenBlue, cBlue] },
+      { values: ['white'], expected: [cWhite] },
+      { values: ['unknown'], expected: [] },
+      { values: ['green', 'blue'], expected: [cGreenBlue] },
+      { values: ['blue', 'green'], expected: [cGreenBlue] },
+      { values: ['green', 'blue', 'white'], expected: [] },
+      { values: ['white', 'unknown'], expected: [] },
+      { values: [], expected: [] },
+    ]
+    t.test('containsAll', async t => {
+      for (const { values, expected } of testsContainsAll) {
+        t.test(`"${values}"`, async t => {
+          const result = await search(db, {
+            term: '',
+            where: {
+              tags: { containsAll: values },
+            }
+          })
+          t.equal(result.hits.length, expected.length)
+          t.strictSame(result.hits.map(h => h.id), expected)
+
+          t.end()
+        })
+      }
+    })
+
+    t.test('eq operator shouldn\'t allowed', async t => {
+      await t.rejects(search(db, {
+        term: '',
+        where: {
+          tags: { eq: 'green' },
+        }
+      }), 'aa')
+
+      t.end()
+    })
+
+    t.test('in operator shouldn\'t allowed', async t => {
+      await t.rejects(search(db, {
+        term: '',
+        where: {
+          tags: { in: ['green'] },
+        }
+      }), 'aa')
+
+      t.end()
+    })
+
+    t.test('in operator shouldn\'t allowed', async t => {
+      await t.rejects(search(db, {
+        term: '',
+        where: {
+          tags: { nin: ['green'] },
+        }
+      }), 'aa')
+
+      t.end()
+    })
+
+    t.end()
+  })
+
+  t.test(`remove document works fine`, async t => {
+    const db = await create({
+      schema: {
+        tags: 'enum[]',
+      },
+    })
+    const c1 = await insert(db, { tags: ['green', 'blue'] })
+    const c11 = await insert(db, { tags: ['blue', 'green'] })
+
+    const result1 = await search(db, {
+      term: '',
+      where: { tags: { containsAll: ['green', 'blue'] }, }
+    })
+    t.equal(result1.hits.length, 2)
+    t.strictSame(result1.hits.map(h => h.id), [c1, c11])
+
+    await remove(db, c1)
+
+    const result2 = await search(db, {
+      term: '',
+      where: { tags: { containsAll: ['green', 'blue'] }, }
+    })
+    t.equal(result2.hits.length, 1)
+    t.strictSame(result2.hits.map(h => h.id), [c11])
+
+    t.end()
+  })
+
+  t.test(`still serializable`, async t => {
+    const db1 = await create({
+      schema: {
+        tags: 'enum[]',
+      },
+    })
+    const [c1, c11] = await insertMultiple(db1, [
+      { tags: ['green'] },
+      { tags: ['green', 'blue'] },
+      { tags: ['orange'] },
+      { tags: ['purple'] },
+      { tags: ['black'] },
+    ])
+
+    const dump = await save(db1)
+
+    const db2 = await create({
+      schema: {
+        tags: 'enum[]',
+      },
+    })
+    await load(db2, dump)
+
+    const result1 = await search(db2, {
+      term: '',
+      where: {
+        tags: { containsAll: ['green'] },
+      }
+    })
+    t.equal(result1.hits.length, 2)
+    t.strictSame(result1.hits.map(h => h.id), [c1, c11])
+
+    const result2 = await search(db2, {
+      term: '',
+      where: {
+        tags: { containsAll: [] },
+      }
+    })
+    t.equal(result2.hits.length, 0)
+    t.strictSame(result2.hits.map(h => h.id), [])
+
+    t.end()
+  })
+
+  t.test(`complex example`, async t => {
+    const filmDb = await create({
+      schema: {
+        title: 'string',
+        year: 'number',
+        tags: 'enum[]',
+      },
+    })
+    const [, , , c4] = await insertMultiple(filmDb, [
+      { title: 'The Shawshank Redemption', year: 1994, tags: ['drama', 'crime'] },
+      { title: 'The Godfather', year: 1972, tags: ['drama', 'crime'] },
+      { title: 'The Dark Knight', year: 2008, tags: ['action', 'adventure'] },
+      { title: 'Schindler\'s List', year: 1993, tags: ['war', 'drama '] },
+      { title: 'The Lord of the Rings: The Return of the King', year: 2003, tags: ['fantasy', 'adventure'] },
+    ])
+
+    const result1 = await search(filmDb, {
+      term: 'l',
+    })
+    t.equal(result1.hits.length, 2)
+
+    const result2 = await search(filmDb, {
+      term: 'l',
+      where: {
+        tags: { containsAll: ['war'] },
+      }
+    })
+    t.equal(result2.hits.length, 1)
+    t.strictSame(result2.hits.map(h => h.id), [c4])
+
+    const result3 = await search(filmDb, {
+      term: 'l',
+      where: {
+        year: { gt: 2000 },
+        tags: { containsAll: ['war'] },
+      }
+    })
+    t.equal(result3.hits.length, 0)
+    t.strictSame(result3.hits.map(h => h.id), [])
+
+    const result4 = await search(filmDb, {
+      term: 'l',
+      where: {
+        year: { lte: 2000 },
+        tags: { containsAll: ['war'] },
+      }
+    })
+    t.equal(result4.hits.length, 1)
+    t.strictSame(result4.hits.map(h => h.id), [c4])
+
+    t.end()
+  })
+
+  t.end()
+})

@@ -1,3 +1,4 @@
+import { createError } from '../errors.js'
 import type {
   AnyOrama,
   FacetResult,
@@ -9,6 +10,8 @@ import type {
   TokenScore,
 } from '../types.js'
 import { getNested } from '../utils.js'
+
+type FacetValue = string | boolean | number
 
 function sortingPredicate(order: FacetSorting = 'desc', a: [string, number], b: [string, number]) {
   if (order.toLowerCase() === 'asc') {
@@ -75,19 +78,23 @@ export async function getFacets<T extends AnyOrama>(
           break
         }
         case 'boolean':
+        case 'enum':
         case 'string': {
-          calculateBooleanOrStringFacet(facets[facet].values, facetValue as string | boolean, propertyType)
+          calculateBooleanStringOrEnumFacet(facets[facet].values, facetValue as FacetValue, propertyType)
           break
         }
         case 'boolean[]':
+        case 'enum[]':
         case 'string[]': {
           const alreadyInsertedValues = new Set<string>()
           const innerType = propertyType === 'boolean[]' ? 'boolean' : 'string'
-          for (const v of facetValue as Array<string | boolean>) {
-            calculateBooleanOrStringFacet(facets[facet].values, v, innerType, alreadyInsertedValues)
+          for (const v of facetValue as Array<FacetValue>) {
+            calculateBooleanStringOrEnumFacet(facets[facet].values, v, innerType, alreadyInsertedValues)
           }
           break
         }
+        default:
+          throw createError('FACET_NOT_SUPPORTED', propertyType)
       }
     }
   }
@@ -137,10 +144,10 @@ function calculateNumberFacet(
   }
 }
 
-function calculateBooleanOrStringFacet(
+function calculateBooleanStringOrEnumFacet(
   values: Record<string, number>,
-  facetValue: string | boolean,
-  propertyType: 'string' | 'boolean',
+  facetValue: FacetValue,
+  propertyType: 'string' | 'boolean' | 'enum',
   alreadyInsertedValues?: Set<string>,
 ) {
   // String or boolean based facets

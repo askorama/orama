@@ -1,5 +1,6 @@
 import { InternalDocumentID } from "../components/internal-document-id-store.js"
-import { EnumComparisonOperator, Nullable, ScalarSearchableValue } from "../types.js"
+import { EnumArrComparisonOperator, EnumComparisonOperator, Nullable, ScalarSearchableValue } from "../types.js"
+import { intersect } from "../utils.js"
 
 export interface FlatTree {
   numberToDocumentId: Map<ScalarSearchableValue, InternalDocumentID[]>
@@ -88,6 +89,25 @@ export function filter(root: FlatTree, operation: EnumComparisonOperator): Inter
         }
       }
       return result
+    }
+  }
+
+  throw new Error('Invalid operation')
+}
+
+export function filterArr(root: FlatTree, operation: EnumArrComparisonOperator): InternalDocumentID[] {
+  const operationKeys = Object.keys(operation)
+
+  if (operationKeys.length !== 1) {
+    throw new Error('Invalid operation')
+  }
+
+  const operationType = operationKeys[0] as keyof EnumArrComparisonOperator
+  switch (operationType) {
+    case 'containsAll': {
+      const values = operation[operationType]!
+      const ids = values.map((value) => root.numberToDocumentId.get(value) ?? [])
+      return intersect(ids)
     }
   }
 
