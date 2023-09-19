@@ -251,7 +251,6 @@ t.test('enum', async t => {
   t.end()
 })
 
-
 t.test('enum[]', async t => {
 
   t.test('filter', async t => {
@@ -270,46 +269,24 @@ t.test('enum[]', async t => {
       { tags: ['white'] },
     ])
 
-    const testsContains = [
-      { value: 'green', expected: [cGreenBlue, cGreen] },
-      { value: 'blue', expected: [cGreenBlue, cBlue] },
-      { value: 'white', expected: [cWhite] },
-      { value: 'unknown', expected: [] },
-    ]
-    t.test('contains', async t => {
-      for (const { value, expected } of testsContains) {
-        t.test(`contains: "${value}"`, async t => {
-          const result = await search(db, {
-            term: '',
-            where: {
-              tags: { contains: value },
-            }
-          })
-          t.equal(result.hits.length, expected.length)
-          t.strictSame(result.hits.map(h => h.id), expected)
-
-          t.end()
-        })
-      }
-    })
-
-    const testsIntersects = [
+    const testsContainsAll = [
       { values: ['green'], expected: [cGreenBlue, cGreen] },
       { values: ['blue'], expected: [cGreenBlue, cBlue] },
       { values: ['white'], expected: [cWhite] },
       { values: ['unknown'], expected: [] },
-      { values: ['green', 'blue', 'white'], expected: [cGreenBlue, cGreen, cBlue, cWhite] },
-      { values: ['green', 'blue', 'white', 'unknown'], expected: [cGreenBlue, cGreen, cBlue, cWhite] },
-      { values: ['white', 'unknown'], expected: [cWhite] },
+      { values: ['green', 'blue'], expected: [cGreenBlue] },
+      { values: ['blue', 'green'], expected: [cGreenBlue] },
+      { values: ['green', 'blue', 'white'], expected: [] },
+      { values: ['white', 'unknown'], expected: [] },
       { values: [], expected: [] },
     ]
-    t.test('intersects', async t => {
-      for (const { values, expected } of testsIntersects) {
-        t.test(`intersects: "${values}"`, async t => {
+    t.test('containsAll', async t => {
+      for (const { values, expected } of testsContainsAll) {
+        t.test(`"${values}"`, async t => {
           const result = await search(db, {
             term: '',
             where: {
-              tags: { intersects: values },
+              tags: { containsAll: values },
             }
           })
           t.equal(result.hits.length, expected.length)
@@ -362,12 +339,12 @@ t.test('enum[]', async t => {
         tags: 'enum[]',
       },
     })
-    const c1 = await insert(db, { tags: ['green'] })
-    const c11 = await insert(db, { tags: ['blue'] })
+    const c1 = await insert(db, { tags: ['green', 'blue'] })
+    const c11 = await insert(db, { tags: ['blue', 'green'] })
 
     const result1 = await search(db, {
       term: '',
-      where: { tags: { intersects: ['green', 'blue'] }, }
+      where: { tags: { containsAll: ['green', 'blue'] }, }
     })
     t.equal(result1.hits.length, 2)
     t.strictSame(result1.hits.map(h => h.id), [c1, c11])
@@ -376,7 +353,7 @@ t.test('enum[]', async t => {
 
     const result2 = await search(db, {
       term: '',
-      where: { tags: { intersects: ['green', 'blue'] }, }
+      where: { tags: { containsAll: ['green', 'blue'] }, }
     })
     t.equal(result2.hits.length, 1)
     t.strictSame(result2.hits.map(h => h.id), [c11])
@@ -390,7 +367,7 @@ t.test('enum[]', async t => {
         tags: 'enum[]',
       },
     })
-    const [c1, c11, c2, c3, c5] = await insertMultiple(db1, [
+    const [c1, c11] = await insertMultiple(db1, [
       { tags: ['green'] },
       { tags: ['green', 'blue'] },
       { tags: ['orange'] },
@@ -410,7 +387,7 @@ t.test('enum[]', async t => {
     const result1 = await search(db2, {
       term: '',
       where: {
-        tags: { contains: 'green' },
+        tags: { containsAll: ['green'] },
       }
     })
     t.equal(result1.hits.length, 2)
@@ -419,11 +396,11 @@ t.test('enum[]', async t => {
     const result2 = await search(db2, {
       term: '',
       where: {
-        tags: { intersects: ['green', 'blue', 'orange', 'purple', 'black'] },
+        tags: { containsAll: [] },
       }
     })
-    t.equal(result2.hits.length, 5)
-    t.strictSame(result2.hits.map(h => h.id), [c1, c11, c2, c3, c5])
+    t.equal(result2.hits.length, 0)
+    t.strictSame(result2.hits.map(h => h.id), [])
 
     t.end()
   })
@@ -452,7 +429,7 @@ t.test('enum[]', async t => {
     const result2 = await search(filmDb, {
       term: 'l',
       where: {
-        tags: { contains: 'war' },
+        tags: { containsAll: ['war'] },
       }
     })
     t.equal(result2.hits.length, 1)
@@ -462,7 +439,7 @@ t.test('enum[]', async t => {
       term: 'l',
       where: {
         year: { gt: 2000 },
-        tags: { contains: 'war' },
+        tags: { containsAll: ['war'] },
       }
     })
     t.equal(result3.hits.length, 0)
@@ -472,7 +449,7 @@ t.test('enum[]', async t => {
       term: 'l',
       where: {
         year: { lte: 2000 },
-        tags: { contains: 'war' },
+        tags: { containsAll: ['war'] },
       }
     })
     t.equal(result4.hits.length, 1)

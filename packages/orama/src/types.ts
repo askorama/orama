@@ -24,6 +24,8 @@ export type SchemaTypes<Value> = Value extends 'string'
   ? number[]
   : Value extends 'enum'
   ? string | number
+  : Value extends 'enum[]'
+  ? (string | number)[]
   : // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Value extends `vector[${number}]`
   ? number[]
@@ -144,8 +146,7 @@ export type EnumComparisonOperator = {
 }
 
 export type EnumArrComparisonOperator = {
-  contains?: string | number | boolean,
-  intersects ?: (string | number | boolean)[]
+  containsAll ?: (string | number | boolean)[]
 }
 
 /**
