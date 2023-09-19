@@ -11,6 +11,8 @@ import type {
 } from '../types.js'
 import { getNested } from '../utils.js'
 
+type FacetValue = string | boolean | number
+
 function sortingPredicate(order: FacetSorting = 'desc', a: [string, number], b: [string, number]) {
   if (order.toLowerCase() === 'asc') {
     return a[1] - b[1]
@@ -78,7 +80,7 @@ export async function getFacets<T extends AnyOrama>(
         case 'boolean':
         case 'enum':
         case 'string': {
-          calculateBooleanStringOrEnumFacet(facets[facet].values, facetValue as string | boolean | number, propertyType)
+          calculateBooleanStringOrEnumFacet(facets[facet].values, facetValue as FacetValue, propertyType)
           break
         }
         case 'boolean[]':
@@ -86,7 +88,7 @@ export async function getFacets<T extends AnyOrama>(
         case 'string[]': {
           const alreadyInsertedValues = new Set<string>()
           const innerType = propertyType === 'boolean[]' ? 'boolean' : 'string'
-          for (const v of facetValue as Array<string | boolean | number>) {
+          for (const v of facetValue as Array<FacetValue>) {
             calculateBooleanStringOrEnumFacet(facets[facet].values, v, innerType, alreadyInsertedValues)
           }
           break
@@ -144,7 +146,7 @@ function calculateNumberFacet(
 
 function calculateBooleanStringOrEnumFacet(
   values: Record<string, number>,
-  facetValue: string | boolean | number,
+  facetValue: FacetValue,
   propertyType: 'string' | 'boolean' | 'enum',
   alreadyInsertedValues?: Set<string>,
 ) {
