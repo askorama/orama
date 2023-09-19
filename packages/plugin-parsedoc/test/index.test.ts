@@ -1,10 +1,9 @@
-import { create, Orama, search } from '@orama/orama'
-import { documentStore } from '@orama/orama/components'
+import { AnyDocument, AnyOrama, create, search } from '@orama/orama'
 import t from 'tap'
-import { defaultHtmlSchema as schema, populateFromGlob } from '../src/index.js'
+import { populateFromGlob, defaultHtmlSchema as schema } from '../src/index.js'
 
-function getDocs(orama: Orama): Document[] {
-  return Object.values((orama.data.docs as documentStore.DefaultDocumentStore).docs)
+function getDocs<T extends AnyOrama>(orama: T): AnyDocument[] {
+  return Object.values(orama.data.docs.docs)
 }
 
 t.test('it should store the values', async t => {

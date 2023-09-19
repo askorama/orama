@@ -12,10 +12,10 @@ module.exports = {
   },
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['import'],
+  // plugins: ['import'],
   extends: [
     'plugin:import/typescript',
-    'standard-with-typescript',
+    // 'standard-with-typescript',
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'react-app'

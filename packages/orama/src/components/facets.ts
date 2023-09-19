@@ -1,10 +1,9 @@
 import type {
+  AnyOrama,
   FacetResult,
   FacetSorting,
   FacetsParams,
   NumberFacetDefinition,
-  Orama,
-  Schema,
   SearchableValue,
   StringFacetDefinition,
   TokenScore,
@@ -19,10 +18,10 @@ function sortingPredicate(order: FacetSorting = 'desc', a: [string, number], b: 
   }
 }
 
-export async function getFacets<S extends Schema>(
-  orama: Orama<{ Schema: S }>,
+export async function getFacets<T extends AnyOrama>(
+  orama: T,
   results: TokenScore[],
-  facetsConfig: FacetsParams,
+  facetsConfig: FacetsParams<T>,
 ): Promise<FacetResult> {
   const facets: FacetResult = {}
   const allIDs = results.map(([id]) => id)
@@ -38,7 +37,7 @@ export async function getFacets<S extends Schema>(
     // TODO: Revisit this once components land
     if (properties[facet] === 'number') {
       const { ranges } = facetsConfig[facet] as NumberFacetDefinition
-      const tmp = []
+      const tmp: [string, number][] = []
       for (const range of ranges) {
         tmp.push([`${range.from}-${range.to}`, 0])
       }

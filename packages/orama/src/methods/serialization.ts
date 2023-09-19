@@ -1,5 +1,5 @@
 import { Language } from '../index.js'
-import { Orama } from '../types.js'
+import { AnyOrama } from '../types.js'
 
 export interface RawData {
   internalDocumentIDStore: unknown
@@ -9,7 +9,7 @@ export interface RawData {
   language: Language
 }
 
-export async function load(orama: Orama, raw: RawData): Promise<void> {
+export async function load<T extends AnyOrama>(orama: T, raw: RawData): Promise<void> {
   orama.internalDocumentIDStore.load(orama, raw.internalDocumentIDStore)
   orama.data.index = await orama.index.load(orama.internalDocumentIDStore, raw.index)
   orama.data.docs = await orama.documentsStore.load(orama.internalDocumentIDStore, raw.docs)
@@ -17,7 +17,7 @@ export async function load(orama: Orama, raw: RawData): Promise<void> {
   orama.tokenizer.language = raw.language
 }
 
-export async function save(orama: Orama): Promise<RawData> {
+export async function save<T extends AnyOrama>(orama: T): Promise<RawData> {
   return {
     internalDocumentIDStore: orama.internalDocumentIDStore.save(orama.internalDocumentIDStore),
     index: await orama.index.save(orama.data.index),

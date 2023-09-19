@@ -5,9 +5,9 @@ import {
   getInternalDocumentId,
 } from '../components/internal-document-id-store.js'
 import { trackRemoval } from '../components/sync-blocking-checker.js'
-import { Orama } from '../types.js'
+import { AnyOrama } from '../types.js'
 
-export async function remove(orama: Orama, id: DocumentID, language?: string, skipHooks?: boolean): Promise<boolean> {
+export async function remove<T extends AnyOrama>(orama: T, id: DocumentID, language?: string, skipHooks?: boolean): Promise<boolean> {
   let result = true
   const { index, docs } = orama.data
 
@@ -97,8 +97,8 @@ export async function remove(orama: Orama, id: DocumentID, language?: string, sk
   return result
 }
 
-export async function removeMultiple(
-  orama: Orama,
+export async function removeMultiple<T extends AnyOrama>(
+  orama: T,
   ids: DocumentID[],
   batchSize?: number,
   language?: string,

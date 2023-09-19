@@ -1,7 +1,8 @@
 import { Result } from '@orama/orama'
 import { Position } from '@orama/plugin-match-highlight'
+import { SectionSchema } from '../../../server/types.js'
 
-type Hit = Result & { position: Position }
+type Hit = Result<SectionSchema> & { position: Position }
 
 interface SearchResultProps {
   hit: Hit

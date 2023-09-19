@@ -1,7 +1,7 @@
 import t from 'tap'
 import { stopwords as englishStopwords } from '@orama/stopwords/english'
 import { DocumentsStore } from '../src/components/documents-store.js'
-import { create, insertMultiple, remove, Results, search } from '../src/index.js'
+import { AnyDocument, create, insertMultiple, remove, Results, search } from '../src/index.js'
 import dataset from './datasets/events.json' assert { type: 'json' }
 import snapshots from './snapshots/events.json' assert { type: 'json' }
 
@@ -17,7 +17,7 @@ type EventJson = {
   }
 }
 
-function removeVariadicData(res: Results): Omit<Results, 'elapsed'> {
+function removeVariadicData(res: Results<AnyDocument>): Omit<Results<AnyDocument>, 'elapsed'> {
   const hits = res.hits.map(h => {
     h.id = ''
     return h

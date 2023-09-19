@@ -1,6 +1,6 @@
 import t from 'tap'
 import { Index } from '../src/components/index.js'
-import { remove, create, insert, getByID, search, Orama, SearchParams, removeMultiple, count } from '../src/index.js'
+import { SearchParams, TypedDocument, count, create, getByID, insert, remove, removeMultiple, search } from '../src/index.js'
 
 t.test('remove method', t => {
   t.test('removes the given document', async t => {
@@ -14,10 +14,10 @@ t.test('remove method', t => {
     t.notOk(await getByID(db, id1))
 
     const cases = [
-      { name: 'and is not searchable anymore for name', params: { term: doc1.name as string } },
+      { name: 'and is not searchable anymore for name', params: { term: doc1.name } },
       {
         name: 'and is not searchable anymore for name - substr',
-        params: { term: (doc1.name as string).substring(0, 5) },
+        params: { term: doc1.name.substring(0, 5) },
       },
       { name: 'and is not searchable anymore for rating - number - eq', params: { where: { rating: { eq: 5 } } } },
       { name: 'and is not searchable anymore for price - number - eq', params: { where: { price: { eq: 900 } } } },
@@ -29,7 +29,7 @@ t.test('remove method', t => {
     for (const c of cases) {
       const { name, params } = c
       t.test(name, async t => {
-        const result = await search(db, params as SearchParams)
+        const result = await search(db, params as SearchParams<typeof db, TypedDocument<typeof db>>)
         const hitIds = result.hits.map(d => d.id)
         t.equal(hitIds.includes(id1), false)
 
@@ -253,7 +253,7 @@ t.test('should remove a document and update index field length', async t => {
   t.same((db.data.index as Index).avgFieldLength, avgFieldLength)
 })
 
-async function createSimpleDB(): Promise<[Orama, string, string, string, string]> {
+async function createSimpleDB() {
   let i = 0
   const db = await create({
     schema: {
@@ -307,5 +307,5 @@ async function createSimpleDB(): Promise<[Orama, string, string, string, string]
     },
   })
 
-  return [db, id1, id2, id3, id4]
+  return [db, id1, id2, id3, id4] as const
 }

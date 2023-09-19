@@ -57,8 +57,8 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
   }
 
   let i = 0
-  const row = []
-  const characterCodeCache = []
+  const row: number[] = []
+  const characterCodeCache: number[] = []
 
   while (i < tolerance) {
     characterCodeCache[i] = b.charCodeAt(startIdx + i)

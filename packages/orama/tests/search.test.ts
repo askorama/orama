@@ -1,6 +1,6 @@
 import t from 'tap'
 import { stopwords as englishStopwords } from '@orama/stopwords/english'
-import { Orama, create, getByID, insert, insertMultiple, search } from '../src/index.js'
+import { create, getByID, insert, insertMultiple, search } from '../src/index.js'
 
 t.test('search method', t => {
   t.test('with term', async t => {
@@ -584,7 +584,7 @@ t.test('search method', t => {
   t.end()
 })
 
-async function createSimpleDB(): Promise<[Orama, string, string, string, string]> {
+async function createSimpleDB() {
   let i = 0
   const db = await create({
     schema: {
@@ -641,5 +641,5 @@ async function createSimpleDB(): Promise<[Orama, string, string, string, string]
     },
   })
 
-  return [db, id1, id2, id3, id4]
+  return [db, id1, id2, id3, id4] as const
 }

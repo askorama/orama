@@ -1,11 +1,11 @@
-import type { Result } from '@orama/orama'
+import type { Result, TypedDocument } from '@orama/orama'
 import type { Position, SearchResultWithHighlight } from '@orama/plugin-match-highlight'
 import { searchWithHighlight } from '@orama/plugin-match-highlight'
 import { useRouter } from 'next/compat/router.js'
 import NextLink from 'next/link.js'
 import React, { useEffect, useRef, useState } from 'react'
 import { HighlightedDocument } from './components/HighlightedDocument.js'
-import { createOramaIndex, groupDocumentsBy } from './utils/index.js'
+import { NextraOrama, createOramaIndex, groupDocumentsBy } from './utils/index.js'
 
 export type OramaSearchProps = {
   limitResults: number
@@ -36,7 +36,7 @@ export function OramaSearch(props = defaultProps) {
 function OramaSearchPlugin({ router, ...props }) {
   const [, setIndexing] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [results, setResults] = useState<SearchResultWithHighlight>()
+  const [results, setResults] = useState<SearchResultWithHighlight<TypedDocument<NextraOrama>>>()
   const [groupedResults, setGroupedResults] = useState({})
   const [hasFocus, setHasFocus] = useState(false)
 
@@ -166,7 +166,11 @@ function OramaSearchPlugin({ router, ...props }) {
                               <NextLink.default href={document.url}>
                                 <div className="excerpt nx-mt-1 nx-text-sm nx-leading-[1.35rem] nx-text-gray-600 dark:nx-text-gray-400 contrast-more:dark:nx-text-gray-50">
                                   <HighlightedDocument
-                                    hit={{ document, positions } as Result & { positions: Position[] }}
+                                    hit={
+                                      { document, positions } as Result<TypedDocument<NextraOrama>> & {
+                                        positions: Position[]
+                                      }
+                                    }
                                   />
                                 </div>
                               </NextLink.default>

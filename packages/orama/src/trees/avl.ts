@@ -212,19 +212,18 @@ export function create<K, V>(key: K, value: V): Node<K, V> {
 }
 
 export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
-  let parent = null
-  let current = root
+  let parent: Node<K, V> | null = null
+  let current: Node<K, V> | null = root
 
   while (current !== null) {
     parent = current
     if (key < current.key) {
-      current = current.left as Node<K, V>
+      current = current.left
     } else if (key > current.key) {
-      current = current.right as Node<K, V>
+      current = current.right
     } else {
       // assuming value is an array here
-      // eslint-disable-next-line @typescript-eslint/no-extra-semi
-      ;(current.value as string[]) = (current.value as string[]).concat(value as string)
+      (current.value as string[]) = (current.value as string[]).concat(value as string);
       return root
     }
   }
@@ -270,16 +269,16 @@ export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
 }
 
 function getNodeParent<K, V>(root: Node<K, V>, key: K): Node<K, V> | null {
-  let current = root
-  let parent = null
+  let current: Node<K, V> | null = root
+  let parent: Node<K, V> | null = null
 
   while (current !== null) {
     if (key < current.key) {
       parent = current
-      current = current.left as Node<K, V>
+      current = current.left
     } else if (key > current.key) {
       parent = current
-      current = current.right as Node<K, V>
+      current = current.right
     } else {
       break
     }

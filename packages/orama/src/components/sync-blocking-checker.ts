@@ -1,4 +1,4 @@
-import { kInsertions, kRemovals, Orama } from '../types.js'
+import { AnyOrama, kInsertions, kRemovals } from '../types.js'
 
 // Web platforms don't have process. React-Native doesn't have process.emitWarning.
 const warn =
@@ -7,7 +7,7 @@ const warn =
     console.warn(`[WARNING] [${options.code}] ${message}`)
   }
 
-export function trackInsertion(orama: Orama): void {
+export function trackInsertion<T extends AnyOrama>(orama: T): void {
   if (typeof orama[kInsertions] !== 'number') {
     queueMicrotask(() => {
       orama[kInsertions] = undefined
@@ -28,7 +28,7 @@ export function trackInsertion(orama: Orama): void {
   }
 }
 
-export function trackRemoval(orama: Orama): void {
+export function trackRemoval<T extends AnyOrama>(orama: T): void {
   if (typeof orama[kRemovals] !== 'number') {
     queueMicrotask(() => {
       orama[kRemovals] = undefined

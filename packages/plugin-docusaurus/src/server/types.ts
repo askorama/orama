@@ -1,14 +1,14 @@
 import { Result } from '@orama/orama'
 import type { Position } from '@orama/plugin-match-highlight'
 
-import type { Document, RawData, Schema } from '@orama/orama'
+import type { AnyDocument, AnySchema, RawData } from '@orama/orama'
 
 interface DocsVersion {
   name: string
   path: string
 }
 
-export interface SectionSchema extends Document {
+export interface SectionSchema extends AnyDocument {
   type: string
   sectionContent: string
   pageRoute: string
@@ -27,15 +27,15 @@ export interface PluginData {
   versions: DocsVersion[]
 }
 
-export type Hit = Result & { position: Position }
+export type Hit = Result<SectionSchema> & { position: Position }
 
 export const PLUGIN_NAME = '@orama/plugin-docusaurus'
 export const INDEX_FILE = 'orama-search-index-@VERSION@.json.gz'
 
-export const schema: Schema = {
+export const schema = {
   pageRoute: 'string',
   sectionTitle: 'string',
   sectionContent: 'string',
   type: 'string',
   version: 'string'
-}
+} satisfies AnySchema

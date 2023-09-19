@@ -1,4 +1,4 @@
-import type { Document, SearchableValue, TokenScore } from './types.js'
+import type { AnyDocument, SearchableValue, TokenScore } from './types.js'
 
 const baseId = Date.now().toString().slice(5)
 let lastId = 0
@@ -206,7 +206,7 @@ export function intersect<T>(arrays: ReadonlyArray<T>[]): T[] {
   })
 }
 
-export async function getDocumentProperties(doc: Document, paths: string[]): Promise<Record<string, SearchableValue>> {
+export async function getDocumentProperties(doc: AnyDocument, paths: string[]): Promise<Record<string, SearchableValue>> {
   const properties: Record<string, SearchableValue> = {}
 
   const pathsLength = paths.length
@@ -214,10 +214,10 @@ export async function getDocumentProperties(doc: Document, paths: string[]): Pro
     const path = paths[i]
     const pathTokens = path.split('.')
 
-    let current: SearchableValue | Document | undefined = doc
+    let current: SearchableValue | AnyDocument | undefined = doc
     const pathTokensLength = pathTokens.length
     for (let j = 0; j < pathTokensLength; j++) {
-      current = (current as Document)[pathTokens[j]!] as Document | SearchableValue
+      current = (current as AnyDocument)[pathTokens[j]!] as AnyDocument | SearchableValue
 
       // We found an object but we were supposed to be done
       if (typeof current === 'object' && !Array.isArray(current) && current !== null && j === pathTokensLength - 1) {
@@ -239,17 +239,17 @@ export async function getDocumentProperties(doc: Document, paths: string[]): Pro
 }
 
 export async function getNested<T = SearchableValue>(obj: object, path: string): Promise<T | undefined> {
-  const props = await getDocumentProperties(obj as Document, [path])
+  const props = await getDocumentProperties(obj as AnyDocument, [path])
 
   return props[path] as T | undefined
 }
 
-export function flattenObject(obj: object, prefix = ''): Document {
-  const result: Document = {}
+export function flattenObject(obj: object, prefix = ''): AnyDocument {
+  const result: AnyDocument = {}
 
   for (const key in obj) {
     const prop = `${prefix}${key}`
-    const objKey = (obj as Document)[key]
+    const objKey = (obj as AnyDocument)[key]
 
     if (typeof objKey === 'object' && objKey !== null) {
       Object.assign(result, flattenObject(objKey, `${prop}.`))

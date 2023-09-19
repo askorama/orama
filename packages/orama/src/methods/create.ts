@@ -1,40 +1,38 @@
 import { formatElapsedTime, getDocumentIndexId, getDocumentProperties, validateSchema } from '../components/defaults.js'
-import { createDocumentsStore } from '../components/documents-store.js'
-import { OBJECT_COMPONENTS, FUNCTION_COMPONENTS, SINGLE_OR_ARRAY_COMPONENTS } from '../components/hooks.js'
-import { createIndex } from '../components/index.js'
-import { createTokenizer } from '../components/tokenizer/index.js'
+import { DocumentsStore, createDocumentsStore } from '../components/documents-store.js'
+import { FUNCTION_COMPONENTS, OBJECT_COMPONENTS, SINGLE_OR_ARRAY_COMPONENTS } from '../components/hooks.js'
+import { Index, createIndex } from '../components/index.js'
 import { createInternalDocumentIDStore } from '../components/internal-document-id-store.js'
+import { Sorter, createSorter } from '../components/sorter.js'
+import { createTokenizer } from '../components/tokenizer/index.js'
 import { createError } from '../errors.js'
-import { uniqueId } from '../utils.js'
 import {
+  AfterSearch,
   ArrayCallbackComponents,
   Components,
-  Orama,
-  Schema,
   FunctionComponents,
-  SingleOrArrayCallbackComponents,
-  Tokenizer,
-  SorterConfig,
-  OpaqueIndex,
-  OpaqueDocumentStore,
-  OpaqueSorter,
-  ProvidedTypes,
-  AfterSearch,
-  SingleCallbackComponent,
+  IDocumentsStore,
+  IIndex,
+  ISorter,
   MultipleCallbackComponent,
+  Orama,
+  SingleCallbackComponent,
   SingleOrArray,
+  SingleOrArrayCallbackComponents,
+  SorterConfig,
+  Tokenizer
 } from '../types.js'
-import { createSorter } from '../components/sorter.js'
+import { uniqueId } from '../utils.js'
 
-interface CreateArguments<P extends ProvidedTypes> {
-  schema: Schema
+interface CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter> {
+  schema: OramaSchema,
   sort?: SorterConfig
   language?: string
-  components?: Components<P>
+  components?: Components<Orama<OramaSchema, TIndex, TDocumentStore, TSorter>, OramaSchema, TIndex, TDocumentStore, TSorter>
   id?: string
 }
 
-function validateComponents<P extends ProvidedTypes>(components: Components<P>) {
+function validateComponents<OramaSchema, TIndex, TDocumentStore, TSorter, TOrama extends Orama<OramaSchema, TIndex, TDocumentStore, TSorter>>(components: Components<TOrama, OramaSchema, TIndex, TDocumentStore, TSorter>) {
   const defaultComponents = {
     formatElapsedTime,
     getDocumentIndexId,
@@ -43,7 +41,7 @@ function validateComponents<P extends ProvidedTypes>(components: Components<P>) 
   }
 
   for (const rawKey of FUNCTION_COMPONENTS) {
-    const key = rawKey as keyof FunctionComponents
+    const key = rawKey as keyof FunctionComponents<OramaSchema>
 
     if (components[key]) {
       if (typeof components[key] !== 'function') {
@@ -56,12 +54,12 @@ function validateComponents<P extends ProvidedTypes>(components: Components<P>) 
   }
 
   for (const rawKey of SINGLE_OR_ARRAY_COMPONENTS) {
-    const key = rawKey as keyof ArrayCallbackComponents<P>
+    const key = rawKey as keyof ArrayCallbackComponents<TOrama>
 
     const component:
-      | SingleOrArray<AfterSearch<P>>
-      | SingleOrArray<SingleCallbackComponent<P>>
-      | SingleOrArray<MultipleCallbackComponent<P>>
+      | SingleOrArray<AfterSearch<TOrama>>
+      | SingleOrArray<SingleCallbackComponent<TOrama>>
+      | SingleOrArray<MultipleCallbackComponent<TOrama>>
       | undefined = components[key]
     if (!component) {
       components[key] = []
@@ -70,7 +68,7 @@ function validateComponents<P extends ProvidedTypes>(components: Components<P>) 
       components[key] = [components[key]]
     }
 
-    for (const fn of components[key] as unknown as SingleOrArrayCallbackComponents<P>[]) {
+    for (const fn of components[key] as unknown as SingleOrArrayCallbackComponents<TOrama>[]) {
       if (typeof fn !== 'function') {
         throw createError('COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS', key)
       }
@@ -88,13 +86,17 @@ function validateComponents<P extends ProvidedTypes>(components: Components<P>) 
   }
 }
 
-export async function create<P extends ProvidedTypes>({
+export async function create<
+  const OramaSchema,
+  TIndex = IIndex<Index>, 
+  TDocumentStore = IDocumentsStore<DocumentsStore>, 
+  TSorter = ISorter<Sorter>> ({
   schema,
   sort,
   language,
   components,
   id,
-}: CreateArguments<P>): Promise<Orama<P>> {
+}: CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter>): Promise<Orama<OramaSchema, TIndex, TDocumentStore, TSorter>> {
   if (!components) {
     components = {}
   }
@@ -104,9 +106,9 @@ export async function create<P extends ProvidedTypes>({
   }
 
   let tokenizer = components.tokenizer as Tokenizer
-  let index: OpaqueIndex | undefined = components.index
-  let documentsStore: OpaqueDocumentStore | undefined = components.documentsStore
-  let sorter: OpaqueSorter | undefined = components.sorter
+  let index: TIndex | undefined = components.index
+  let documentsStore: TDocumentStore | undefined = components.documentsStore
+  let sorter: TSorter | undefined = components.sorter
 
   if (!tokenizer) {
     // Use the default tokenizer
@@ -123,9 +125,9 @@ export async function create<P extends ProvidedTypes>({
 
   const internalDocumentStore = createInternalDocumentIDStore()
 
-  index ||= await createIndex()
-  sorter ||= await createSorter()
-  documentsStore ||= await createDocumentsStore()
+  index ||= await createIndex() as TIndex
+  sorter ||= await createSorter() as TSorter
+  documentsStore ||= await createDocumentsStore() as TDocumentStore
 
   // Validate all other components
   validateComponents(components)
@@ -178,7 +180,7 @@ export async function create<P extends ProvidedTypes>({
     afterMultipleUpdate,
     formatElapsedTime,
     id,
-  } as Orama
+  } as unknown as Orama<OramaSchema, TIndex, TDocumentStore, TSorter>
 
   orama.data = {
     index: await orama.index.create(orama, internalDocumentStore, schema),

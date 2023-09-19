@@ -1,16 +1,16 @@
+import { AnyOrama, TypedDocument, create, load } from '@orama/orama'
+import { OramaWithHighlight, SearchResultWithHighlight, searchWithHighlight } from '@orama/plugin-match-highlight'
 import assert from 'node:assert'
 import { exec, ExecException } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import { cp, readdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, resolve } from 'node:path'
 import { chdir } from 'node:process'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { gunzipSync } from 'node:zlib'
-import { create, load } from '@orama/orama'
-import { OramaWithHighlight, SearchResultWithHighlight, searchWithHighlight } from '@orama/plugin-match-highlight'
-import { schema, INDEX_FILE } from '../src/server/types.js'
+import { INDEX_FILE, schema } from '../src/server/types.js'
 
 interface Execution {
   code: number
@@ -28,7 +28,7 @@ async function cleanup(): Promise<void> {
   await rm(sandbox, { force: true, recursive: true })
 }
 
-function search(database: OramaWithHighlight, term: string): Promise<SearchResultWithHighlight> {
+function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(database: OramaWithHighlight<T>, term: string): Promise<SearchResultWithHighlight<ResultDocument>> {
   return searchWithHighlight(database, { term, properties: ['sectionTitle', 'sectionContent', 'type'] })
 }
 
@@ -94,7 +94,8 @@ await test('generated DBs have indexed pages content', async () => {
   const rawData = gunzipSync(rawCompressedData).toString('utf-8')
   const data = JSON.parse(rawData)
 
-  const database = (await create({ schema })) as OramaWithHighlight
+  const _database = await create({ schema })
+  const database = _database as OramaWithHighlight<typeof _database>;
   await load(database, data)
   database.data.positions = data.positions
 

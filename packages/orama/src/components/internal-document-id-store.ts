@@ -1,4 +1,4 @@
-import { Orama } from '../types.js'
+import { AnyOrama } from '../types.js'
 
 export type DocumentID = string | number
 export type InternalDocumentID = number
@@ -7,7 +7,7 @@ export type InternalDocumentIDStore = {
   idToInternalId: Map<string, number>
   internalIdToId: string[]
   save: (store: InternalDocumentIDStore) => unknown
-  load: (orama: Orama, raw: unknown) => void
+  load: <T extends AnyOrama>(orama: T, raw: unknown) => void
 }
 
 export function createInternalDocumentIDStore(): InternalDocumentIDStore {
@@ -25,7 +25,7 @@ export function save(store: InternalDocumentIDStore): unknown {
   }
 }
 
-export function load(orama: Orama, raw: unknown): void {
+export function load<T extends AnyOrama>(orama: T, raw: unknown): void {
   const { internalIdToId } = raw as InternalDocumentIDStore
 
   orama.internalDocumentIDStore.idToInternalId.clear()

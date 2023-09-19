@@ -86,25 +86,25 @@ await test('plugin is able to generate orama DB at build time', async () => {
 await test('generated DBs have indexed pages content', async () => {
   // Loading "animals DB"
   const rawAnimalsData = await readFile(resolve(sandbox, 'dist/assets/oramaDB_animals.json'), 'utf8')
-  const animalsData = JSON.parse(rawAnimalsData) as Schema
+  const animalsData = JSON.parse(rawAnimalsData)
   const animalsDB = await createOramaDB({ schema: { _: 'string' } })
   await loadOramaDB(animalsDB, animalsData as any)
 
   // Loading "games DB"
   const rawGamesData = await readFile(resolve(sandbox, 'dist/assets/oramaDB_games.json'), 'utf8')
-  const gamesData = JSON.parse(rawGamesData) as Schema
+  const gamesData = JSON.parse(rawGamesData)
   const gamesDB = await createOramaDB({ schema: { _: 'string' } })
   await loadOramaDB(gamesDB, gamesData as any)
 
   // Loading "dynamic DB"
   const rawDynamicData = await readFile(resolve(sandbox, 'dist/assets/oramaDB_dynamic.json'), 'utf8')
-  const dynamicData = JSON.parse(rawDynamicData) as Schema
+  const dynamicData = JSON.parse(rawDynamicData)
   const dynamicDB = await createOramaDB({ schema: { _: 'string' } })
   await loadOramaDB(dynamicDB, dynamicData as any)
 
   // Loading "allSite DB"
   const rawAllSiteData = await readFile(resolve(sandbox, 'dist/assets/oramaDB_allSite.json'), 'utf8')
-  const allSiteData = JSON.parse(rawAllSiteData) as Schema
+  const allSiteData = JSON.parse(rawAllSiteData)
   const allSiteDB = await createOramaDB({ schema: { _: 'string' } })
   await loadOramaDB(allSiteDB, allSiteData as any)
 

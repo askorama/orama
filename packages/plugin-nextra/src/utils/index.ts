@@ -1,16 +1,11 @@
-import type { SearchResultWithHighlight } from '@orama/plugin-match-highlight'
-import type { Orama } from '@orama/orama'
+import type { Orama, TypedDocument } from '@orama/orama'
 import { create, insertMultiple } from '@orama/orama'
+import type { SearchResultWithHighlight } from '@orama/plugin-match-highlight'
 import { afterInsert as highlightAfterInsertHook } from '@orama/plugin-match-highlight'
 
-type HighlightedHits = SearchResultWithHighlight['hits']
+export type NextraOrama = Orama<typeof defaultSchema>
 
-type OramaDoc = {
-  id: string
-  title: string
-  url: string
-  content: string
-}
+type HighlightedHits = SearchResultWithHighlight<NextraOrama>['hits']
 
 export function groupDocumentsBy(arr: HighlightedHits, key: string) {
   return arr.reduce((acc, current) => {
@@ -25,17 +20,19 @@ export function groupDocumentsBy(arr: HighlightedHits, key: string) {
   }, {})
 }
 
-export async function createOramaIndex(basePath, locale): Promise<Orama> {
+const defaultSchema = {
+  id: 'string',
+  title: 'string',
+  url: 'string',
+  content: 'string',
+} as const
+
+export async function createOramaIndex(basePath, locale): Promise<NextraOrama> {
   const response = await fetch(`${basePath}/_next/static/chunks/nextra-data-${locale}.json`)
   const data = await response.json()
 
   const index = await create({
-    schema: {
-      id: 'string',
-      title: 'string',
-      url: 'string',
-      content: 'string',
-    },
+    schema: defaultSchema,
     components: {
       afterInsert: [highlightAfterInsertHook],
       tokenizer: {
@@ -45,7 +42,7 @@ export async function createOramaIndex(basePath, locale): Promise<Orama> {
   })
 
   const paths = Object.keys(data)
-  const documents: OramaDoc[] = []
+  const documents: TypedDocument<NextraOrama>[] = []
 
   for (const path of paths) {
     const url = path

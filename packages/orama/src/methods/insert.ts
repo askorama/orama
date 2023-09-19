@@ -2,9 +2,14 @@ import { isArrayType, isVectorType } from '../components.js'
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { trackInsertion } from '../components/sync-blocking-checker.js'
 import { createError } from '../errors.js'
-import { Document, Orama, SortValue } from '../types.js'
+import { AnyOrama, PartialSchemaDeep, SortValue, TypedDocument } from '../types.js'
 
-export async function insert(orama: Orama, doc: Document, language?: string, skipHooks?: boolean): Promise<string> {
+export async function insert<T extends AnyOrama>(
+  orama: T,
+  doc: PartialSchemaDeep<TypedDocument<T>>,
+  language?: string,
+  skipHooks?: boolean,
+): Promise<string> {
   const errorProperty = await orama.validateSchema(doc, orama.schema)
   if (errorProperty) {
     throw createError('SCHEMA_VALIDATION_FAILURE', errorProperty)
@@ -13,7 +18,12 @@ export async function insert(orama: Orama, doc: Document, language?: string, ski
   return innerInsert(orama, doc, language, skipHooks)
 }
 
-async function innerInsert(orama: Orama, doc: Document, language?: string, skipHooks?: boolean): Promise<string> {
+async function innerInsert<T extends AnyOrama>(
+  orama: T,
+  doc: PartialSchemaDeep<TypedDocument<T>>,
+  language?: string,
+  skipHooks?: boolean,
+): Promise<string> {
   const { index, docs } = orama.data
 
   const id = await orama.getDocumentIndexId(doc)
@@ -29,7 +39,7 @@ async function innerInsert(orama: Orama, doc: Document, language?: string, skipH
   const docsCount = await orama.documentsStore.count(docs)
 
   if (!skipHooks) {
-    await runSingleHook(orama.beforeInsert, orama, id, doc)
+    await runSingleHook(orama.beforeInsert, orama, id, doc as TypedDocument<T>)
   }
 
   const indexableProperties = await orama.index.getSearchableProperties(index)
@@ -117,7 +127,7 @@ async function innerInsert(orama: Orama, doc: Document, language?: string, skipH
   }
 
   if (!skipHooks) {
-    await runSingleHook(orama.afterInsert, orama, id, doc)
+    await runSingleHook(orama.afterInsert, orama, id, doc as TypedDocument<T>)
   }
 
   trackInsertion(orama)
@@ -125,15 +135,15 @@ async function innerInsert(orama: Orama, doc: Document, language?: string, skipH
   return id
 }
 
-export async function insertMultiple(
-  orama: Orama,
-  docs: Document[],
+export async function insertMultiple<T extends AnyOrama>(
+  orama: T,
+  docs: PartialSchemaDeep<TypedDocument<T>>[],
   batchSize?: number,
   language?: string,
   skipHooks?: boolean,
 ): Promise<string[]> {
   if (!skipHooks) {
-    await runMultipleHook(orama.beforeMultipleInsert, orama, docs)
+    await runMultipleHook(orama.beforeMultipleInsert, orama, docs as TypedDocument<T>[])
   }
 
   // Validate all documents before the insertion
@@ -148,9 +158,9 @@ export async function insertMultiple(
   return innerInsertMultiple(orama, docs, batchSize, language, skipHooks)
 }
 
-export async function innerInsertMultiple(
-  orama: Orama,
-  docs: Document[],
+export async function innerInsertMultiple<T extends AnyOrama>(
+  orama: T,
+  docs: PartialSchemaDeep<TypedDocument<T>>[],
   batchSize?: number,
   language?: string,
   skipHooks?: boolean,
@@ -186,7 +196,7 @@ export async function innerInsertMultiple(
   })
 
   if (!skipHooks) {
-    await runMultipleHook(orama.afterMultipleInsert, orama, docs)
+    await runMultipleHook(orama.afterMultipleInsert, orama, docs as TypedDocument<T>[])
   }
 
   return ids

@@ -1,13 +1,13 @@
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { createError } from '../errors.js'
-import { Document, Orama } from '../types.js'
+import { AnyOrama, PartialSchemaDeep, TypedDocument } from '../types.js'
 import { innerInsertMultiple, insert } from './insert.js'
 import { remove, removeMultiple } from './remove.js'
 
-export async function update(
-  orama: Orama,
+export async function update<T extends AnyOrama>(
+  orama: T,
   id: string,
-  doc: Document,
+  doc: PartialSchemaDeep<TypedDocument<T>>,
   language?: string,
   skipHooks?: boolean,
 ): Promise<string> {
@@ -25,10 +25,10 @@ export async function update(
   return newId
 }
 
-export async function updateMultiple(
-  orama: Orama,
+export async function updateMultiple<T extends AnyOrama>(
+  orama: T,
   ids: string[],
-  docs: Document[],
+  docs: PartialSchemaDeep<TypedDocument<T>>[],
   batchSize?: number,
   language?: string,
   skipHooks?: boolean,

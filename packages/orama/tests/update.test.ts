@@ -96,7 +96,7 @@ t.test('updateMultiple', async t => {
       author: 'John Lennon',
     })
 
-    await t.rejects(updateMultiple(db, [oldDocId], [{ quote: 55 }]))
+    await t.rejects(updateMultiple(db, [oldDocId], [{ quote: 55 }] as any))
 
     t.ok(await getByID(db, oldDocId))
     t.equal(await count(db), 1)

@@ -1,15 +1,15 @@
-import type { Orama, Schema } from '@orama/orama'
-import type { Runtime, PersistenceFormat, FileSystem } from './types.js'
-import { persist, restore } from './index.js'
+import type { AnyOrama } from '@orama/orama'
 import { FILESYSTEM_NOT_SUPPORTED_ON_RUNTIME } from './errors.js'
+import { persist, restore } from './index.js'
+import type { FileSystem, PersistenceFormat, Runtime } from './types.js'
 import { detectRuntime } from './utils.js'
 
 export const DEFAULT_DB_NAME = `orama_bump_${+new Date()}`
 
 let _fs: FileSystem
 
-export async function persistToFile<T extends Schema>(
-  db: Orama<{ Schema: T }>,
+export async function persistToFile<T extends AnyOrama>(
+  db: T,
   format: PersistenceFormat = 'binary',
   path?: string,
   runtime?: Runtime
@@ -33,11 +33,11 @@ export async function persistToFile<T extends Schema>(
   return path
 }
 
-export async function restoreFromFile<T extends Schema>(
+export async function restoreFromFile<T extends AnyOrama>(
   format: PersistenceFormat = 'binary',
   path?: string,
   runtime?: Runtime
-): Promise<Orama<T>> {
+): Promise<T> {
   if (!runtime) {
     runtime = detectRuntime()
   }

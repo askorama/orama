@@ -1,9 +1,11 @@
+import { TypedDocument } from '@orama/orama'
 import type { Position, SearchResultWithHighlight } from '@orama/plugin-match-highlight'
 import React from 'react'
+import { NextraOrama } from '../utils/index.js'
 
 type HighlightedDocumentProps = {
   trim?: number
-  hit: SearchResultWithHighlight['hits'][0]
+  hit: SearchResultWithHighlight<TypedDocument<NextraOrama>>['hits'][0]
 }
 
 export function HighlightedDocument({ hit, trim = 200 }: HighlightedDocumentProps) {
@@ -36,11 +38,11 @@ export function HighlightedDocument({ hit, trim = 200 }: HighlightedDocumentProp
     for (const property in hit.positions) {
       if (hit.positions[property]) {
         const positionsArray = Object.values(hit.positions[property]).flat()
-        highlightedDocument[property] = getHighlightedText(highlightedDocument[property] as string, positionsArray)
+        highlightedDocument[property] = getHighlightedText(highlightedDocument[property], positionsArray)
       }
     }
 
-    highlightedDocument.content = trimContent(highlightedDocument.content as string, trim)
+    highlightedDocument.content = trimContent(highlightedDocument.content, trim)
 
     return highlightedDocument
   }

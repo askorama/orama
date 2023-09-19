@@ -1,4 +1,4 @@
-import { Document, insertMultiple, Orama } from '@orama/orama'
+import { AnyDocument, AnyOrama, insertMultiple } from '@orama/orama'
 import glob from 'glob'
 import { Content, Element, Parent, Properties, Root } from 'hast'
 import { fromHtml } from 'hast-util-from-html'
@@ -22,7 +22,7 @@ export const defaultHtmlSchema = {
   path: 'string'
 } as const
 
-export interface DefaultSchemaElement extends Document {
+export interface DefaultSchemaElement extends AnyDocument {
   type: string
   content: string
   path: string
@@ -42,16 +42,20 @@ type PopulateOptions = PopulateFromGlobOptions & { basePath?: string }
 type FileType = 'html' | 'md'
 const asyncGlob = promisify(glob)
 
-export const populateFromGlob = async (
-  db: Orama,
+export async function populateFromGlob<T extends AnyOrama>(
+  db: T,
   pattern: string,
   options?: PopulateFromGlobOptions
-): Promise<void> => {
+): Promise<void> {
   const files = await asyncGlob(pattern)
   await Promise.all(files.map(async filename => populateFromFile(db, filename, options)))
 }
 
-const populateFromFile = async (db: Orama, filename: string, options?: PopulateFromGlobOptions): Promise<string[]> => {
+async function populateFromFile<T extends AnyOrama>(
+  db: T,
+  filename: string,
+  options?: PopulateFromGlobOptions
+): Promise<string[]> {
   const data = await readFile(filename)
   const fileType = filename.slice(filename.lastIndexOf('.') + 1) as FileType
   return populate(db, data, fileType, { ...options, basePath: `${filename}/` })
@@ -86,13 +90,13 @@ export const parseFile = async (
   return records
 }
 
-export const populate = async (
-  db: Orama,
+export async function populate<T extends AnyOrama>(
+  db: T,
   data: Buffer | string,
   fileType: FileType,
   options?: PopulateOptions
-): Promise<string[]> => {
-  return insertMultiple(db, await parseFile(data, fileType, options))
+): Promise<string[]> {
+  return insertMultiple(db, await parseFile(data, fileType, options) as AnyDocument)
 }
 
 function rehypeOrama(records: DefaultSchemaElement[], options?: PopulateOptions): (tree: Root) => void {

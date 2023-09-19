@@ -62,7 +62,7 @@ export function remove<V> (root: Nullable<Node<V>>, key: number): Nullable<Node<
   }
 
   const [left, mid] = split(root, key)
-  const [toDelete, right] = split(mid, key + 1)
+  const [, right] = split(mid, key + 1)
   const newRoot = merge(left, right)
 
   return newRoot

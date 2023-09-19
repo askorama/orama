@@ -1,24 +1,68 @@
-import { Language } from './components/tokenizer/languages.js'
+import { DocumentsStore } from './components/documents-store.js'
+import { Index } from './components/index.js'
 import { DocumentID, InternalDocumentID, InternalDocumentIDStore } from './components/internal-document-id-store.js'
+import { Sorter } from './components/sorter.js'
+import { Language } from './components/tokenizer/languages.js'
 
 export type Nullable<T> = T | null
 
 export type SingleOrArray<T> = T | T[]
 
-export type SyncOrAsyncValue<T = void> = T | Promise<T>
+export type SyncOrAsyncValue<T = void> = T | PromiseLike<T>
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface OpaqueIndex {}
+export type SchemaTypes<Value> = Value extends 'string'
+  ? string
+  : Value extends 'string[]'
+  ? string[]
+  : Value extends 'boolean'
+  ? boolean
+  : Value extends 'boolean[]'
+  ? boolean[]
+  : Value extends 'number'
+  ? number
+  : Value extends 'number[]'
+  ? number[]
+  : Value extends 'enum'
+  ? string | number
+  : // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Value extends `vector[${number}]`
+  ? number[]
+  : Value extends object
+  ? { [Key in keyof Value]: SchemaTypes<Value[Key]> } & {
+      [otherKeys: PropertyKey]: any
+    }
+  : never
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface OpaqueDocumentStore {}
+export type Schema<TSchema> = TSchema extends AnySchema
+  ? InternalTypedDocument<{
+      -readonly [Key in keyof TSchema]: SchemaTypes<TSchema[Key]>
+    }>
+  : never
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface OpaqueSorter {}
+export type AnyDocument = InternalTypedDocument<any>
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Schema extends Record<string, SearchableType | Schema> {}
+export type InternalTypedDocument<TSchema extends object> = { id: DocumentID } & TSchema & {
+    [otherKeys: PropertyKey]: any
+  }
+export type TypedDocument<T extends AnyOrama> = T['typeSchema']
 
+export type AnySchema = {
+  [key: PropertyKey]: SearchableType | AnySchema
+}
+
+export type PartialSchemaDeepObject<T> = T extends object
+  ? {
+      [K in keyof T]?: T[K]
+    }
+  : T
+
+export type PartialSchemaDeep<T> = {
+  [K in keyof T]?: PartialSchemaDeepObject<T[K]>
+}
+
+/**
+ * @deprecated
+ */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Document extends Record<string, SearchableValue | Document | unknown> {}
 
@@ -37,6 +81,13 @@ export type SearchableValue = ScalarSearchableValue | ArraySearchableValue
 
 export type SortType = 'string' | 'number' | 'boolean'
 export type SortValue = string | number | boolean
+
+export type VectorIndex = {
+  size: number
+  vectors: {
+    [docID: string]: [Magnitude, VectorType]
+  }
+}
 
 export type BM25Params = {
   k?: number
@@ -61,25 +112,20 @@ export interface BooleanFacetDefinition {
   false?: boolean
 }
 
-export type FacetsParams = Record<string, FacetDefinition>
+export type FacetsParams<T extends AnyOrama> = Partial<Record<LiteralUnion<T['schema']>, FacetDefinition>>
 
 export type FacetDefinition = StringFacetDefinition | NumberFacetDefinition | BooleanFacetDefinition
 
-export type ReduceFunction<T, R extends Result = Result> = (
-  values: ScalarSearchableValue[],
-  acc: T,
-  value: R,
-  index: number,
-) => T
-export type Reduce<T> = {
-  reducer: ReduceFunction<T>
+export type ReduceFunction<T, R> = (values: ScalarSearchableValue[], acc: T, value: R, index: number) => T
+export type Reduce<T, R = AnyDocument> = {
+  reducer: ReduceFunction<T, R>
   getInitialValue: (elementCount: number) => T
 }
 
-export type GroupByParams<T> = {
-  properties: string[]
+export type GroupByParams<T extends AnyOrama, ResultDocument> = {
+  properties: LiteralUnion<T['schema']>[]
   maxResult?: number
-  reduce?: Reduce<T>
+  reduce?: Reduce<ResultDocument>
 }
 
 export type ComparisonOperator = {
@@ -100,26 +146,31 @@ export type EnumComparisonOperator = {
 /**
  * A custom sorter function item as [id, score, document].
  */
-export type CustomSorterFunctionItem = [InternalDocumentID, number, Document]
+export type CustomSorterFunctionItem<ResultDocument> = [InternalDocumentID, number, ResultDocument]
 
-export type CustomSorterFunction = (a: CustomSorterFunctionItem, b: CustomSorterFunctionItem) => number
+export type CustomSorterFunction<ResultDocument> = (
+  a: CustomSorterFunctionItem<ResultDocument>,
+  b: CustomSorterFunctionItem<ResultDocument>,
+) => number
+// thanks to https://github.com/sindresorhus/type-fest/blob/main/source/literal-union.d.ts
+export type LiteralUnion<T> = (keyof T extends string ? keyof T : never) | (string & Record<never, never>)
 /**
  * Define which properties to sort for.
  */
-export type SorterParams = {
+export type SorterParams<T extends AnyOrama> = {
   /**
    * The key of the document used to sort the result.
    */
-  property: string
+  property: LiteralUnion<T['schema']>;
   /**
    * Whether to sort the result in ascending or descending order.
    */
   order?: 'ASC' | 'DESC'
 }
 
-export type SortByParams = SorterParams | CustomSorterFunction
+export type SortByParams<T extends AnyOrama, ResultDocument> = SorterParams<T> | CustomSorterFunction<ResultDocument>
 
-export type SearchParams<T = Result[]> = {
+export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> = {
   /**
    * The word to search.
    */
@@ -127,7 +178,7 @@ export type SearchParams<T = Result[]> = {
   /**
    * The properties of the document to search in.
    */
-  properties?: '*' | string[]
+  properties?: '*' | LiteralUnion<T['schema']>[]
   /**
    * The number of matched documents to return.
    */
@@ -139,7 +190,7 @@ export type SearchParams<T = Result[]> = {
   /**
    * The key of the document used to sort the result.
    */
-  sortBy?: SortByParams
+  sortBy?: SortByParams<T, ResultDocument>
   /**
    * Whether to match the term exactly.
    */
@@ -186,7 +237,7 @@ export type SearchParams<T = Result[]> = {
    *
    * // In that case, the score of the 'title' property will be multiplied by 2.
    */
-  boost?: Record<string, number>
+  boost?: Partial<Record<LiteralUnion<T['schema']>, number>>
   /**
    * Facets configuration
    * Full documentation: https://docs.oramasearch.com/usage/search/facets
@@ -208,7 +259,7 @@ export type SearchParams<T = Result[]> = {
    *  }
    * });
    */
-  facets?: FacetsParams
+  facets?: FacetsParams<T>
 
   /**
    * Distinct configuration
@@ -220,7 +271,7 @@ export type SearchParams<T = Result[]> = {
    *  distinctOn: 'category.primary',
    * })
    */
-  distinctOn?: string
+  distinctOn?: LiteralUnion<T['schema']>
 
   /**
    * Groups configuration
@@ -235,7 +286,7 @@ export type SearchParams<T = Result[]> = {
    *  }
    * })
    */
-  groupBy?: GroupByParams<T>
+  groupBy?: GroupByParams<T, ResultDocument>
 
   /**
    * Filter the search results.
@@ -255,7 +306,7 @@ export type SearchParams<T = Result[]> = {
    *  }
    * });
    */
-  where?: Record<string, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator>
+  where?: Partial<Record<LiteralUnion<T['schema']>, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator>>
 
   /**
    * Threshold to use for refining the search results.
@@ -308,7 +359,7 @@ export type SearchParams<T = Result[]> = {
   preflight?: boolean
 }
 
-export type Result = {
+export type Result<Document> = {
   /**
    * The id of the document.
    */
@@ -331,10 +382,10 @@ export type FacetResult = Record<
   }
 >
 
-export type GroupResult<T = Result[]> =
+export type GroupResult<Document> =
   | {
       values: ScalarSearchableValue[]
-      result: T
+      result: Result<Document>[]
     }[]
 
 export type TokenScore = [InternalDocumentID, number]
@@ -343,13 +394,13 @@ export type TokenMap = Record<string, TokenScore[]>
 
 export type IndexMap = Record<string, TokenMap>
 
-export type SearchContext<I extends OpaqueIndex, D extends OpaqueDocumentStore, AggValue = Result[]> = {
+export type SearchContext<T extends AnyOrama, ResultDocument = TypedDocument<T>> = {
   timeStart: bigint
   tokenizer: Tokenizer
-  index: IIndex<I>
-  documentsStore: IDocumentsStore<D>
+  index: T['index']
+  documentsStore: T['documentsStore']
   language: string | undefined
-  params: SearchParams<AggValue>
+  params: SearchParams<T, ResultDocument>
   docsCount: number
   uniqueDocsIDs: Record<number, number>
   indexMap: IndexMap
@@ -361,7 +412,7 @@ export type ElapsedTime = {
   formatted: string
 }
 
-export type Results<AggValue = Result[]> = {
+export type Results<Document> = {
   /**
    * The number of all the matched documents.
    */
@@ -369,7 +420,7 @@ export type Results<AggValue = Result[]> = {
   /**
    * An array of matched documents taking `limit` and `offset` into account.
    */
-  hits: Result[]
+  hits: Result<Document>[]
   /**
    * The time taken to search.
    */
@@ -379,29 +430,53 @@ export type Results<AggValue = Result[]> = {
    */
   facets?: FacetResult
 
-  groups?: GroupResult<AggValue>
+  groups?: GroupResult<Document>
 }
 
-export type SingleCallbackComponent<P extends ProvidedTypes> = (
-  orama: Orama<P>,
+/**
+ * Sometimes {@link doc} will not have the correct type; in these cases,
+ * you can simply create a new variable and convert it to the correct type like:
+ *
+ * @example```ts
+ * const fixedType = doc as MyType;
+ * ```
+ */
+export type SingleCallbackComponent<T extends AnyOrama> = (
+  orama: T,
   id: string,
-  doc?: Document,
+  doc?: TypedDocument<T>,
 ) => SyncOrAsyncValue
 
-export type MultipleCallbackComponent<P extends ProvidedTypes> = (
-  orama: Orama<P>,
-  doc: Document[] | string[],
+/**
+ * Sometimes {@link doc} will not have the correct type; in these cases,
+ * you can simply create a new variable and convert it to the correct type like:
+ *
+ * @example```ts
+ * const fixedType = doc as MyType;
+ * ```
+ */
+export type MultipleCallbackComponent<T extends AnyOrama> = (
+  orama: T,
+  doc: TypedDocument<T>[] | string[],
 ) => SyncOrAsyncValue
 
-export type AfterSearch<P extends ProvidedTypes> = <AggValue>(
-  db: Orama<P>,
-  params: SearchParams<AggValue>,
+/**
+ * Sometimes {@link results} will not have the correct type; in these cases,
+ * you can simply create a new variable and convert it to the correct type like:
+ *
+ * @example```ts
+ * const fixedType = results as Results<MyType>;
+ * ```
+ */
+export type AfterSearch<T extends AnyOrama, ResultDocument extends TypedDocument<T> = TypedDocument<T>> = (
+  db: T,
+  params: SearchParams<T, ResultDocument>,
   language: string | undefined,
-  results: Results<AggValue>,
+  results: Results<ResultDocument>,
 ) => SyncOrAsyncValue
 
-export type IIndexInsertOrRemoveHookFunction<I extends OpaqueIndex = OpaqueIndex, R = void> = (
-  index: I,
+export type IIndexInsertOrRemoveHookFunction = <R = void>(
+  index: AnyIndexStore,
   prop: string,
   id: string,
   value: SearchableValue,
@@ -411,17 +486,23 @@ export type IIndexInsertOrRemoveHookFunction<I extends OpaqueIndex = OpaqueIndex
   docsCount: number,
 ) => SyncOrAsyncValue<R>
 
-export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
-  create<S extends Schema, D extends OpaqueDocumentStore, So extends OpaqueSorter>(
-    orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
-    sharedInternalDocumentStore: InternalDocumentIDStore,
-    schema: Schema,
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface AnyIndexStore {
+  vectorIndexes: Record<string, VectorIndex>
+}
+export type AnyIndex = IIndex<AnyIndexStore>
+
+export interface IIndex<I extends AnyIndexStore> {
+  create<T extends AnyOrama>(
+    orama: T,
+    sharedInternalDocumentStore: T['internalDocumentIDStore'],
+    schema: T['schema'],
   ): SyncOrAsyncValue<I>
 
-  beforeInsert?: IIndexInsertOrRemoveHookFunction<I>
-  insert: (
-    implementation: IIndex<I>,
-    index: I,
+  beforeInsert?: IIndexInsertOrRemoveHookFunction
+  insert: <T extends I>(
+    implementation: IIndex<T>,
+    index: T,
     prop: string,
     id: DocumentID,
     value: SearchableValue,
@@ -430,12 +511,12 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
     tokenizer: Tokenizer,
     docsCount: number,
   ) => SyncOrAsyncValue
-  afterInsert?: IIndexInsertOrRemoveHookFunction<I>
+  afterInsert?: IIndexInsertOrRemoveHookFunction
 
-  beforeRemove?: IIndexInsertOrRemoveHookFunction<I>
-  remove: (
-    implementation: IIndex<I>,
-    index: I,
+  beforeRemove?: IIndexInsertOrRemoveHookFunction
+  remove: <T extends I>(
+    implementation: IIndex<T>,
+    index: T,
     prop: string,
     id: DocumentID,
     value: SearchableValue,
@@ -444,7 +525,7 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
     tokenizer: Tokenizer,
     docsCount: number,
   ) => SyncOrAsyncValue<boolean>
-  afterRemove?: IIndexInsertOrRemoveHookFunction<I>
+  afterRemove?: IIndexInsertOrRemoveHookFunction
 
   insertDocumentScoreParameters(
     index: I,
@@ -456,24 +537,24 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   insertTokenScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], token: string): SyncOrAsyncValue
   removeDocumentScoreParameters(index: I, prop: string, id: DocumentID, docsCount: number): SyncOrAsyncValue
   removeTokenScoreParameters(index: I, prop: string, token: string): SyncOrAsyncValue
-  calculateResultScores<D extends OpaqueDocumentStore, AggValue = Result[]>(
-    context: SearchContext<I, D, AggValue>,
+  calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+    context: SearchContext<T, ResultDocument>,
     index: I,
     prop: string,
     term: string,
     ids: DocumentID[],
   ): SyncOrAsyncValue<TokenScore[]>
 
-  search<D extends OpaqueDocumentStore, AggValue = Result[]>(
-    context: SearchContext<I, D, AggValue>,
+  search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+    context: SearchContext<T, ResultDocument>,
     index: I,
     prop: string,
     term: string,
   ): SyncOrAsyncValue<TokenScore[]>
-  searchByWhereClause<D extends OpaqueDocumentStore, AggValue = Result[]>(
-    context: SearchContext<I, D, AggValue>,
+  searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+    context: SearchContext<T, ResultDocument>,
     index: I,
-    filters: Record<string, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator>,
+    filters: Partial<Record<LiteralUnion<T['schema']>, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator>>,
   ): SyncOrAsyncValue<InternalDocumentID[]>
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
@@ -483,15 +564,16 @@ export interface IIndex<I extends OpaqueIndex = OpaqueIndex> {
   save<R = unknown>(index: I): SyncOrAsyncValue<R>
 }
 
-export interface IDocumentsStore<D extends OpaqueDocumentStore = OpaqueDocumentStore> {
-  create<S extends Schema, I extends OpaqueIndex, So extends OpaqueSorter>(
-    orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
-    sharedInternalDocumentStore: InternalDocumentIDStore,
-  ): SyncOrAsyncValue<D>
-  get(store: D, id: DocumentID): SyncOrAsyncValue<Document | undefined>
-  getMultiple(store: D, ids: DocumentID[]): SyncOrAsyncValue<(Document | undefined)[]>
-  getAll(store: D): SyncOrAsyncValue<Record<InternalDocumentID, Document>>
-  store(store: D, id: DocumentID, doc: Document): SyncOrAsyncValue<boolean>
+export interface AnyDocumentStore {
+  docs: Record<InternalDocumentID, AnyDocument>
+}
+
+export interface IDocumentsStore<D extends AnyDocumentStore = AnyDocumentStore> {
+  create<T extends AnyOrama>(orama: T, sharedInternalDocumentStore: InternalDocumentIDStore): SyncOrAsyncValue<D>
+  get(store: D, id: DocumentID): SyncOrAsyncValue<AnyDocument | undefined>
+  getMultiple(store: D, ids: DocumentID[]): SyncOrAsyncValue<(AnyDocument | undefined)[]>
+  getAll(store: D): SyncOrAsyncValue<Record<InternalDocumentID, AnyDocument>>
+  store(store: D, id: DocumentID, doc: AnyDocument): SyncOrAsyncValue<boolean>
   remove(store: D, id: DocumentID): SyncOrAsyncValue<boolean>
   count(store: D): SyncOrAsyncValue<number>
 
@@ -504,27 +586,35 @@ export interface SorterConfig {
   unsortableProperties?: string[]
 }
 
-export interface ISorter<So extends OpaqueSorter = OpaqueSorter> {
-  create<S extends Schema, I extends OpaqueIndex, D extends OpaqueDocumentStore>(
-    orama: Orama<{ Schema: S; Index: I; DocumentStore: D; Sorter: So }>,
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface AnySorterStore {}
+export type AnySorter = ISorter<AnySorterStore>
+
+export interface ISorter<So extends AnySorterStore> {
+  create<T extends AnyOrama>(
+    orama: T,
     sharedInternalDocumentStore: InternalDocumentIDStore,
-    schema: Schema,
+    schema: T['schema'],
     sorterConfig?: SorterConfig,
   ): SyncOrAsyncValue<So>
-  insert: (
-    sorter: So,
+  insert: <T extends So>(
+    sorter: T,
     prop: string,
     id: DocumentID,
     value: SortValue,
     schemaType: SortType,
     language: string | undefined,
   ) => SyncOrAsyncValue
-  remove: (sorter: So, prop: string, id: DocumentID) => SyncOrAsyncValue
+  remove: <T extends So>(sorter: T, prop: string, id: DocumentID) => SyncOrAsyncValue
 
   load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): SyncOrAsyncValue<So>
   save<R = unknown>(sorter: So): SyncOrAsyncValue<R>
 
-  sortBy(sorter: So, docIds: [DocumentID, number][], by: SorterParams): Promise<[DocumentID, number][]>
+  sortBy<T extends AnyOrama>(
+    sorter: So,
+    docIds: [DocumentID, number][],
+    by: SorterParams<T>,
+  ): Promise<[DocumentID, number][]>
 
   getSortableProperties(sorter: So): SyncOrAsyncValue<string[]>
   getSortablePropertiesWithTypes(sorter: So): SyncOrAsyncValue<Record<string, SortType>>
@@ -548,74 +638,156 @@ export interface Tokenizer {
   tokenize: (raw: string, language?: string, prop?: string) => SyncOrAsyncValue<string[]>
 }
 
-export interface ObjectComponents<I extends OpaqueIndex, D extends OpaqueDocumentStore, So extends OpaqueSorter> {
+export interface ObjectComponents<I, D, So> {
   tokenizer: Tokenizer | DefaultTokenizerConfig
   index: I
   documentsStore: D
   sorter: So
 }
 
-export interface FunctionComponents<S extends Schema = Schema> {
-  validateSchema(doc: Document, schema: S): SyncOrAsyncValue<string | undefined>
-  getDocumentIndexId(doc: Document): SyncOrAsyncValue<string>
-  getDocumentProperties(doc: Document, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>
+export interface FunctionComponents<S> {
+  validateSchema(doc: AnyDocument, schema: S): SyncOrAsyncValue<string | undefined>
+  getDocumentIndexId(doc: AnyDocument): SyncOrAsyncValue<string>
+  getDocumentProperties(doc: AnyDocument, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>
   formatElapsedTime(number: bigint): SyncOrAsyncValue<number | string | object | ElapsedTime>
 }
 
-export interface SingleOrArrayCallbackComponents<P extends ProvidedTypes> {
-  beforeInsert: SingleOrArray<SingleCallbackComponent<P>>
-  afterInsert: SingleOrArray<SingleCallbackComponent<P>>
-  beforeRemove: SingleOrArray<SingleCallbackComponent<P>>
-  afterRemove: SingleOrArray<SingleCallbackComponent<P>>
-  beforeUpdate: SingleOrArray<SingleCallbackComponent<P>>
-  afterUpdate: SingleOrArray<SingleCallbackComponent<P>>
-  afterSearch: SingleOrArray<AfterSearch<P>>
-  beforeMultipleInsert: SingleOrArray<MultipleCallbackComponent<P>>
-  afterMultipleInsert: SingleOrArray<MultipleCallbackComponent<P>>
-  beforeMultipleRemove: SingleOrArray<MultipleCallbackComponent<P>>
-  afterMultipleRemove: SingleOrArray<MultipleCallbackComponent<P>>
-  beforeMultipleUpdate: SingleOrArray<MultipleCallbackComponent<P>>
-  afterMultipleUpdate: SingleOrArray<MultipleCallbackComponent<P>>
+export interface SingleOrArrayCallbackComponents<T extends AnyOrama> {
+  /**
+   * More details {@link SingleCallbackComponent}
+   */
+  beforeInsert: SingleOrArray<SingleCallbackComponent<T>>
+  /**
+   * More details {@link SingleCallbackComponent}
+   */
+  afterInsert: SingleOrArray<SingleCallbackComponent<T>>
+  /**
+   * More details {@link SingleCallbackComponent}
+   */
+  beforeRemove: SingleOrArray<SingleCallbackComponent<T>>
+  /**
+   * More details {@link SingleCallbackComponent}
+   */
+  afterRemove: SingleOrArray<SingleCallbackComponent<T>>
+  /**
+   * More details {@link SingleCallbackComponent}
+   */
+  beforeUpdate: SingleOrArray<SingleCallbackComponent<T>>
+  /**
+   * More details {@link SingleCallbackComponent}
+   */
+  afterUpdate: SingleOrArray<SingleCallbackComponent<T>>
+  /**
+   * More details {@link AfterSearch}
+   */
+  afterSearch: SingleOrArray<AfterSearch<T>>
+  /**
+   * More details {@link MultipleCallbackComponent}
+   */
+  beforeMultipleInsert: SingleOrArray<MultipleCallbackComponent<T>>
+  /**
+   * More details {@link MultipleCallbackComponent}
+   */
+  afterMultipleInsert: SingleOrArray<MultipleCallbackComponent<T>>
+  /**
+   * More details {@link MultipleCallbackComponent}
+   */
+  beforeMultipleRemove: SingleOrArray<MultipleCallbackComponent<T>>
+  /**
+   * More details {@link MultipleCallbackComponent}
+   */
+  afterMultipleRemove: SingleOrArray<MultipleCallbackComponent<T>>
+  /**
+   * More details {@link MultipleCallbackComponent}
+   */
+  beforeMultipleUpdate: SingleOrArray<MultipleCallbackComponent<T>>
+  /**
+   * More details {@link MultipleCallbackComponent}
+   */
+  afterMultipleUpdate: SingleOrArray<MultipleCallbackComponent<T>>
 }
 
-export interface ArrayCallbackComponents<P extends ProvidedTypes> {
-  beforeInsert: SingleCallbackComponent<P>[]
-  afterInsert: SingleCallbackComponent<P>[]
-  beforeRemove: SingleCallbackComponent<P>[]
-  afterRemove: SingleCallbackComponent<P>[]
-  beforeUpdate: SingleCallbackComponent<P>[]
-  afterUpdate: SingleCallbackComponent<P>[]
-  afterSearch: AfterSearch<P>[]
-  beforeMultipleInsert: MultipleCallbackComponent<P>[]
-  afterMultipleInsert: MultipleCallbackComponent<P>[]
-  beforeMultipleRemove: MultipleCallbackComponent<P>[]
-  afterMultipleRemove: MultipleCallbackComponent<P>[]
-  beforeMultipleUpdate: MultipleCallbackComponent<P>[]
-  afterMultipleUpdate: MultipleCallbackComponent<P>[]
+export interface ArrayCallbackComponents<T extends AnyOrama> {
+  /**
+   * More details {@link SingleCallbackComponent}
+   */
+  beforeInsert: SingleCallbackComponent<T>[]
+  /**
+   * More details {@link SingleCallbackComponent}
+   */
+  afterInsert: SingleCallbackComponent<T>[]
+  /**
+   * More details {@link SingleCallbackComponent}
+   */
+  beforeRemove: SingleCallbackComponent<T>[]
+  /**
+   * More details {@link SingleCallbackComponent}
+   */
+  afterRemove: SingleCallbackComponent<T>[]
+  /**
+   * More details {@link SingleCallbackComponent}
+   */
+  beforeUpdate: SingleCallbackComponent<T>[]
+  /**
+   * More details {@link SingleCallbackComponent}
+   */
+  afterUpdate: SingleCallbackComponent<T>[]
+  /**
+   * More details {@link AfterSearch}
+   */
+  afterSearch: AfterSearch<T>[]
+  /**
+   * More details {@link MultipleCallbackComponent}
+   */
+  beforeMultipleInsert: MultipleCallbackComponent<T>[]
+  /**
+   * More details {@link MultipleCallbackComponent}
+   */
+  afterMultipleInsert: MultipleCallbackComponent<T>[]
+  /**
+   * More details {@link MultipleCallbackComponent}
+   */
+  beforeMultipleRemove: MultipleCallbackComponent<T>[]
+  /**
+   * More details {@link MultipleCallbackComponent}
+   */
+  afterMultipleRemove: MultipleCallbackComponent<T>[]
+  /**
+   * More details {@link MultipleCallbackComponent}
+   */
+  beforeMultipleUpdate: MultipleCallbackComponent<T>[]
+  /**
+   * More details {@link MultipleCallbackComponent}
+   */
+  afterMultipleUpdate: MultipleCallbackComponent<T>[]
 }
 
-export type Components<P extends ProvidedTypes> = Partial<
-  ObjectComponents<P['Index'], P['DocumentStore'], P['Sorter']> &
-    FunctionComponents &
-    SingleOrArrayCallbackComponents<P>
+export type Components<T extends AnyOrama, TSchema, TIndex, TDocumentStore, TSorter> = Partial<
+  ObjectComponents<TIndex, TDocumentStore, TSorter> & FunctionComponents<TSchema> & SingleOrArrayCallbackComponents<T>
 >
 
 export const kInsertions = Symbol('orama.insertions')
 export const kRemovals = Symbol('orama.removals')
 
-interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore, S extends OpaqueSorter> {
-  index: I
-  docs: D
-  sorting: S
-}
+export type PickIfExtends<T, TExtends, TDefault> = T extends TExtends ? T : TDefault
 
-type Internals<P extends ProvidedTypes> = {
-  schema: P['Schema']
+type Internals<
+  TSchema,
+  TIndex extends AnyIndexStore,
+  TDocumentStore extends AnyDocumentStore,
+  TSorter extends AnySorterStore,
+> = {
+  schema: TSchema
+  typeSchema: Schema<TSchema>
   tokenizer: Tokenizer
-  index: IIndex<P['Index']>
-  documentsStore: IDocumentsStore<P['DocumentStore']>
-  sorter: ISorter<P['Sorter']>
-  data: Data<P['Index'], P['DocumentStore'], P['Sorter']>
+  index: IIndex<TIndex>
+  documentsStore: IDocumentsStore<TDocumentStore>
+  sorter: ISorter<TSorter>
+  data: {
+    index: TIndex
+    docs: TDocumentStore
+    sorting: TSorter
+  }
   internalDocumentIDStore: InternalDocumentIDStore
   caches: Record<string, unknown>
   [kInsertions]: number | undefined
@@ -626,26 +798,37 @@ type OramaID = {
   id: string
 }
 
-export type ProvidedTypes = {
-  Schema: Schema
-  Index: OpaqueIndex
-  DocumentStore: OpaqueDocumentStore
-  Sorter: OpaqueSorter
-}
+export type ExtractSchema<T> = T extends { schema: infer RawSchema } ? Schema<RawSchema> : never
 
-type RequiredInner<T extends Partial<ProvidedTypes>> = {
-  [Key in keyof ProvidedTypes]: Key extends keyof ProvidedTypes
-    ? ProvidedTypes[Key]
-    : Key extends keyof T
-    ? T[Key]
+export type AnyGeneric<T> = T[]
+export type AnyGenericIndex<T> = T extends IIndex<infer TStore>
+  ? TStore extends AnyIndexStore
+    ? TStore
     : never
-}
+  : AnyIndexStore
+export type AnyGenericDocumentStore<T> = T extends IDocumentsStore<infer TStore>
+  ? TStore extends AnyDocumentStore
+    ? TStore
+    : never
+  : AnyDocumentStore
+export type AnyGenericSorter<T> = T extends ISorter<infer TSorter>
+  ? TSorter extends AnySorterStore
+    ? TSorter
+    : never
+  : AnySorterStore
 
-export type Orama<
-  P extends Partial<ProvidedTypes> = {
-    Schema: Schema
-    Index: OpaqueIndex
-    DocumentStore: OpaqueDocumentStore
-    Sorter: OpaqueSorter
-  },
-> = FunctionComponents & ArrayCallbackComponents<RequiredInner<P>> & Internals<RequiredInner<P>> & OramaID
+export type PickInferGeneric<T, Default> = T extends AnyGeneric<infer Generic>
+  ? Generic extends Default
+    ? Generic
+    : never
+  : never
+
+export type Orama<TSchema, TIndex = IIndex<Index>, TDocumentStore = IDocumentsStore<DocumentsStore>, TSorter = ISorter<Sorter>> = FunctionComponents<TSchema> &
+  Internals<TSchema, AnyGenericIndex<TIndex>, AnyGenericDocumentStore<TDocumentStore>, AnyGenericSorter<TSorter>> &
+  ArrayCallbackComponents<any> &
+  OramaID
+
+export type AnyOrama<TSchema = any> = FunctionComponents<TSchema> &
+  Internals<TSchema, AnyIndexStore, AnyDocumentStore, AnySorterStore> &
+  ArrayCallbackComponents<any> &
+  OramaID

@@ -1,20 +1,21 @@
+import { AnyDocument, AnyDocumentStore, AnyOrama, IDocumentsStore, TypedDocument } from '../types.js'
 import {
   DocumentID,
-  getInternalDocumentId,
   InternalDocumentID,
   InternalDocumentIDStore,
+  getInternalDocumentId,
 } from './internal-document-id-store.js'
-import { Document, IDocumentsStore, OpaqueDocumentStore, Orama } from '../types.js'
 
-export interface DocumentsStore extends OpaqueDocumentStore {
+export interface DocumentsStore extends AnyDocumentStore {
   sharedInternalDocumentStore: InternalDocumentIDStore
-  docs: Record<InternalDocumentID, Document | undefined>
+  docs: Record<InternalDocumentID, AnyDocument>
   count: number
 }
 
-export type DefaultDocumentsStore = IDocumentsStore<DocumentsStore>
-
-export async function create(_: Orama, sharedInternalDocumentStore: InternalDocumentIDStore): Promise<DocumentsStore> {
+export async function create<T extends AnyOrama>(
+  _: T,
+  sharedInternalDocumentStore: InternalDocumentIDStore,
+): Promise<DocumentsStore> {
   return {
     sharedInternalDocumentStore,
     docs: {},
@@ -22,14 +23,20 @@ export async function create(_: Orama, sharedInternalDocumentStore: InternalDocu
   }
 }
 
-export async function get(store: DocumentsStore, id: DocumentID): Promise<Document | undefined> {
+export async function get<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+  store: DocumentsStore,
+  id: DocumentID,
+): Promise<ResultDocument | undefined> {
   const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id)
 
   return store.docs[internalId]
 }
 
-export async function getMultiple(store: DocumentsStore, ids: DocumentID[]): Promise<(Document | undefined)[]> {
-  const found: (Document | undefined)[] = Array.from({ length: ids.length })
+export async function getMultiple<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+  store: DocumentsStore,
+  ids: DocumentID[],
+): Promise<(ResultDocument | undefined)[]> {
+  const found: (ResultDocument | undefined)[] = Array.from({ length: ids.length })
 
   for (let i = 0; i < ids.length; i++) {
     const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, ids[i])
@@ -39,11 +46,17 @@ export async function getMultiple(store: DocumentsStore, ids: DocumentID[]): Pro
   return found
 }
 
-export async function getAll(store: DocumentsStore): Promise<Record<InternalDocumentID, Document>> {
-  return store.docs as Record<InternalDocumentID, Document>
+export async function getAll<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+  store: DocumentsStore,
+): Promise<Record<InternalDocumentID, ResultDocument>> {
+  return store.docs
 }
 
-export async function store(store: DocumentsStore, id: DocumentID, doc: Document): Promise<boolean> {
+export async function store(
+  store: DocumentsStore,
+  id: DocumentID,
+  doc: AnyDocument,
+): Promise<boolean> {
   const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id)
 
   if (typeof store.docs[internalId] !== 'undefined') {
@@ -56,7 +69,10 @@ export async function store(store: DocumentsStore, id: DocumentID, doc: Document
   return true
 }
 
-export async function remove(store: DocumentsStore, id: DocumentID): Promise<boolean> {
+export async function remove(
+  store: DocumentsStore,
+  id: DocumentID,
+): Promise<boolean> {
   const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id)
 
   if (typeof store.docs[internalId] === 'undefined') {
@@ -69,7 +85,9 @@ export async function remove(store: DocumentsStore, id: DocumentID): Promise<boo
   return true
 }
 
-export async function count(store: DocumentsStore): Promise<number> {
+export async function count(
+  store: DocumentsStore,
+): Promise<number> {
   return store.count
 }
 
@@ -93,7 +111,7 @@ export async function save<R = unknown>(store: DocumentsStore): Promise<R> {
   } as R
 }
 
-export async function createDocumentsStore(): Promise<DefaultDocumentsStore> {
+export async function createDocumentsStore(): Promise<IDocumentsStore<DocumentsStore>> {
   return {
     create,
     get,
