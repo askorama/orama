@@ -1,12 +1,18 @@
 import { Nullable } from '../types.js'
 
 interface Node<V = unknown> {
-  left: Nullable<Node<V>>
-  right: Nullable<Node<V>>
-  parent: Nullable<Node<V>>
-  key: number
-  value: V
-  rank: number
+  // Left child
+  l: Nullable<Node<V>>
+  // Right child
+  r: Nullable<Node<V>>
+  // Parent node
+  p: Nullable<Node<V>>
+  // Node key
+  k: number
+  // Node value
+  v: V
+  // Node rank
+  n: number
 }
 
 function randomRank(): number {
@@ -16,12 +22,12 @@ function randomRank(): number {
 
 export function create<V> (key: number, value: V): Node<V> {
   return {
-    value,
-    key,
-    rank: randomRank(),
-    left: null,
-    right: null,
-    parent: null
+    v: value,
+    k: key,
+    n: randomRank(),
+    l: null,
+    r: null,
+    p: null
   }
 }
 
@@ -36,24 +42,24 @@ export function insert<V> (root: Node<V>, key: number, value: V): void {
 
   while (currentNode != null) {
     parent = currentNode
-    if (key < currentNode.key) {
-      currentNode = currentNode.left
-    } else if (key > currentNode.key) {
-      currentNode = currentNode.right
+    if (key < currentNode.k) {
+      currentNode = currentNode.l
+    } else if (key > currentNode.k) {
+      currentNode = currentNode.r
     } else {
-      currentNode.value = value
+      currentNode.v = value
       return
     }
   }
 
-  if ((parent != null) && key < parent.key) {
-    parent.left = newNode
+  if ((parent != null) && key < parent.k) {
+    parent.l = newNode
   } else {
     if (parent != null) {
-      parent.right = newNode
+      parent.r = newNode
     }
   }
-  newNode.parent = parent
+  newNode.p = parent
 }
 
 export function remove<V> (root: Nullable<Node<V>>, key: number): Nullable<Node<V>> {
@@ -72,10 +78,10 @@ export function find<V> (root: Nullable<Node<V>>, key: number): Nullable<V> {
   let currentNode: Nullable<Node<V>> = root
 
   while (currentNode !== null) {
-    if (currentNode.key === key) {
-      return currentNode.value
+    if (currentNode.k === key) {
+      return currentNode.v
     }
-    currentNode = (currentNode.key < key) ? currentNode.right : currentNode.left
+    currentNode = (currentNode.k < key) ? currentNode.r : currentNode.l
   }
 
   return null
@@ -93,15 +99,15 @@ export function rangeSearch<V> (root: Nullable<Node<V>>, min: number, max: numbe
   while (currentNode !== null || stack.length > 0) {
     while (currentNode !== null) {
       stack.push(currentNode)
-      currentNode = currentNode.left
+      currentNode = currentNode.l
     }
 
     currentNode = stack.pop()!
-    if (currentNode.key >= min && currentNode.key <= max) {
-      results.push(currentNode.value)
+    if (currentNode.k >= min && currentNode.k <= max) {
+      results.push(currentNode.v)
     }
 
-    currentNode = currentNode.right
+    currentNode = currentNode.r
   }
 
   return results
@@ -115,15 +121,15 @@ export function greaterThan<V> (root: Nullable<Node<V>>, key: number): V[] {
   while (currentNode !== null || stack.length > 0) {
     while (currentNode !== null) {
       stack.push(currentNode)
-      currentNode = currentNode.left
+      currentNode = currentNode.l
     }
 
     currentNode = stack.pop()!
-    if (currentNode.key > key) {
-      results.push(currentNode.value)
+    if (currentNode.k > key) {
+      results.push(currentNode.v)
     }
 
-    currentNode = currentNode.right
+    currentNode = currentNode.r
   }
 
   return results
@@ -137,15 +143,15 @@ export function lessThan<V> (root: Nullable<Node<V>>, key: number): V[] {
   while (currentNode !== null || stack.length > 0) {
     while (currentNode !== null) {
       stack.push(currentNode)
-      currentNode = currentNode.left
+      currentNode = currentNode.l
     }
 
     currentNode = stack.pop()!
-    if (currentNode.key < key) {
-      results.push(currentNode.value)
+    if (currentNode.k < key) {
+      results.push(currentNode.v)
     }
 
-    currentNode = currentNode.right
+    currentNode = currentNode.r
   }
 
   return results
@@ -159,12 +165,12 @@ export function getSize<V> (root: Nullable<Node<V>>): number {
   while (currentNode !== null || stack.length > 0) {
     while (currentNode !== null) {
       stack.push(currentNode)
-      currentNode = currentNode.left
+      currentNode = currentNode.l
     }
 
     currentNode = stack.pop()!
     count++
-    currentNode = currentNode.right
+    currentNode = currentNode.r
   }
 
   return count
@@ -178,26 +184,26 @@ function split<V> (root: Nullable<Node<V>>, key: number): [Nullable<Node<V>>, Nu
   let currentNode = root
 
   while (currentNode !== null) {
-    if (currentNode.key < key) {
+    if (currentNode.k < key) {
       if (leftTail != null) {
-        leftTail.right = currentNode
-        currentNode.parent = leftTail
+        leftTail.r = currentNode
+        currentNode.p = leftTail
       } else {
         left = currentNode
       }
       leftTail = currentNode
-      currentNode = currentNode.right
-      leftTail.right = null
+      currentNode = currentNode.r
+      leftTail.r = null
     } else {
       if (rightTail != null) {
-        rightTail.left = currentNode
-        currentNode.parent = rightTail
+        rightTail.l = currentNode
+        currentNode.p = rightTail
       } else {
         right = currentNode
       }
       rightTail = currentNode
-      currentNode = currentNode.left
-      rightTail.left = null
+      currentNode = currentNode.l
+      rightTail.l = null
     }
   }
   return [left, right]
@@ -208,12 +214,12 @@ function merge<V> (left: Nullable<Node<V>>, right: Nullable<Node<V>>): Nullable<
   if (right == null) return left
 
   let currentNode: Nullable<Node<V>> = left
-  while (currentNode.right !== null) {
-    currentNode = currentNode.right
+  while (currentNode.r !== null) {
+    currentNode = currentNode.r
   }
 
-  currentNode.right = right
-  right.parent = currentNode
+  currentNode.r = right
+  right.p = currentNode
 
   return left
 }
@@ -223,12 +229,12 @@ export function removeDocument<V> (root: Node<V[]>, id: V, key: number): void {
 
   if (node == null) return
 
-  if (node.value.length === 1 && node.value[0] === id) {
+  if (node.v.length === 1 && node.v[0] === id) {
     remove(root, key)
   } else {
-    const index = node.value.indexOf(id)
+    const index = node.v.indexOf(id)
     if (index !== -1) {
-      node.value.splice(index, 1)
+      node.v.splice(index, 1)
     }
   }
 }
@@ -237,10 +243,10 @@ function getNodeByKey<V> (root: Nullable<Node<V>>, key: number): Nullable<Node<V
   let currentNode: Nullable<Node<V>> = root
 
   while (currentNode !== null) {
-    if (currentNode.key === key) {
+    if (currentNode.k === key) {
       return currentNode
     }
-    currentNode = (currentNode.key < key) ? currentNode.right : currentNode.left
+    currentNode = (currentNode.k < key) ? currentNode.r : currentNode.l
   }
 
   return null
