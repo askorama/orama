@@ -1,5 +1,5 @@
 import t from 'tap'
-import { ScalarSearchableValue, count, create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
+import { EnumArrComparisonOperator, ScalarSearchableValue, count, create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
 
 t.test('enum', async t => {
 
@@ -301,7 +301,7 @@ t.test('enum[]', async t => {
       await t.rejects(search(db, {
         term: '',
         where: {
-          tags: { eq: 'green' },
+          tags: { eq: 'green' } as EnumArrComparisonOperator,
         }
       }), 'aa')
 
@@ -312,7 +312,7 @@ t.test('enum[]', async t => {
       await t.rejects(search(db, {
         term: '',
         where: {
-          tags: { in: ['green'] },
+          tags: { in: ['green'] } as EnumArrComparisonOperator,
         }
       }), 'aa')
 
@@ -323,7 +323,7 @@ t.test('enum[]', async t => {
       await t.rejects(search(db, {
         term: '',
         where: {
-          tags: { nin: ['green'] },
+          tags: { nin: ['green'] } as EnumArrComparisonOperator,
         }
       }), 'aa')
 

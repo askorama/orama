@@ -16,6 +16,7 @@ import type {
   TypedDocument,
   VectorIndex,
   VectorType,
+  WhereCondition,
 } from '../types.js'
 import { createError } from '../errors.js'
 import {
@@ -474,7 +475,7 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
 export async function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   context: SearchContext<T, ResultDocument>,
   index: Index,
-  filters: Record<string, boolean | ComparisonOperator | EnumComparisonOperator | EnumArrComparisonOperator>,
+  filters: Partial<WhereCondition<T['schema']>>,
 ): Promise<number[]> {
   const filterKeys = Object.keys(filters)
 
@@ -487,7 +488,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
   )
 
   for (const param of filterKeys) {
-    const operation = filters[param]
+    const operation = filters[param]!
 
     if (typeof index.indexes[param] === 'undefined') {
       throw createError('UNKNOWN_FILTER_PROPERTY', param)
