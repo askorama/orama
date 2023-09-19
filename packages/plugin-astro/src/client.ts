@@ -1,11 +1,11 @@
-import type { Orama, RawData } from '@orama/orama'
+import type { AnyOrama, RawData } from '@orama/orama'
 import { create as createOramaDB, load as loadOramaDB } from '@orama/orama'
 
-const dbs: Record<string, Orama> = {}
+const dbs: Record<string, AnyOrama> = {}
 
-export async function getOramaDB(dbName: string): Promise<Orama> {
+export async function getOramaDB<T extends AnyOrama>(dbName: string): Promise<T> {
   if (dbName in dbs) {
-    return dbs[dbName]
+    return dbs[dbName] as T
   }
 
   const db = await createOramaDB({ schema: { _: 'string' } })
@@ -16,7 +16,7 @@ export async function getOramaDB(dbName: string): Promise<Orama> {
   await loadOramaDB(db, dbData)
   dbs[dbName] = db
 
-  return db
+  return db as unknown as T
 }
 
 export { search } from '@orama/orama'

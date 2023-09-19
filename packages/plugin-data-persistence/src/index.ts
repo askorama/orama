@@ -1,10 +1,10 @@
-import type { Orama, Schema } from '@orama/orama'
-import type { PersistenceFormat, Runtime } from './types.js'
 import { decode, encode } from '@msgpack/msgpack'
+import type { AnyOrama } from '@orama/orama'
 import { create, load, save } from '@orama/orama'
+import type { PersistenceFormat, Runtime } from './types.js'
 // @ts-expect-error dpack does not expose types
 import * as dpack from 'dpack'
-import { UNSUPPORTED_FORMAT, METHOD_MOVED } from './errors.js'
+import { METHOD_MOVED, UNSUPPORTED_FORMAT } from './errors.js'
 import { detectRuntime } from './utils.js'
 
 const hexFromMap: Record<string, number> = {
@@ -50,8 +50,8 @@ function slowHexToString(bytes: Uint8Array): string {
     .join('')
 }
 
-export async function persist<T extends Schema>(
-  db: Orama<{ Schema: T }>,
+export async function persist<T extends AnyOrama>(
+  db: T,
   format: PersistenceFormat = 'binary',
   runtime?: Runtime
 ): Promise<string | Buffer> {
@@ -88,11 +88,11 @@ export async function persist<T extends Schema>(
   return serialized
 }
 
-export async function restore<T extends Schema>(
+export async function restore<T extends AnyOrama>(
   format: PersistenceFormat,
   data: string | Buffer,
   runtime?: Runtime
-): Promise<Orama<T>> {
+): Promise<T> {
   if (!runtime) {
     runtime = detectRuntime()
   }
@@ -126,11 +126,11 @@ export async function restore<T extends Schema>(
 
   await load(db, deserialized)
 
-  return db as unknown as Orama<T>
+  return db as unknown as T
 }
 
-export async function persistToFile<T extends Schema>(
-  db: Orama<{ Schema: T }>,
+export async function persistToFile<T extends AnyOrama>(
+  db: T,
   format: PersistenceFormat = 'binary',
   path?: string,
   runtime?: Runtime
@@ -138,7 +138,7 @@ export async function persistToFile<T extends Schema>(
   throw new Error(METHOD_MOVED('persistToFile'))
 }
 
-export async function restoreFromFile<T extends Schema>(
+export async function restoreFromFile<T extends AnyOrama>(
   format: PersistenceFormat = 'binary',
   path?: string,
   runtime?: Runtime

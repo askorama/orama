@@ -17,5 +17,6 @@ module.exports = {
     "import/extensions": [2, "always", { ignorePackages: true }], // This is required for proper ESM use
     "@typescript-eslint/no-non-null-assertion": 0,
     "no-async-promise-executor": 0,
+    "@typescript-eslint/no-explicit-any": "off"
   },
 };

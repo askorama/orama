@@ -1,22 +1,3 @@
-import type {
-  ArraySearchableType,
-  BM25Params,
-  ComparisonOperator,
-  EnumComparisonOperator,
-  IIndex,
-  Magnitude,
-  OpaqueDocumentStore,
-  OpaqueIndex,
-  Orama,
-  ScalarSearchableType,
-  Schema,
-  SearchableType,
-  SearchableValue,
-  SearchContext,
-  Tokenizer,
-  TokenScore,
-  VectorType,
-} from '../types.js'
 import { createError } from '../errors.js'
 import {
   create as avlCreate,
@@ -29,20 +10,40 @@ import {
   removeDocument as avlRemoveDocument,
 } from '../trees/avl.js'
 import {
+  create as flatCreate,
+  filter as flatFilter,
+  insert as flatInsert,
+  removeDocument as flatRemoveDocument,
+  FlatTree,
+} from '../trees/flat.js'
+import {
   create as radixCreate,
   find as radixFind,
   insert as radixInsert,
   Node as RadixNode,
   removeDocumentByWord as radixRemoveDocument,
 } from '../trees/radix.js'
-import {
-  create as flatCreate,
-  insert as flatInsert,
-  removeDocument as flatRemoveDocument,
-  filter as flatFilter,
-} from '../trees/flat.js'
+import type {
+  AnyIndexStore,
+  AnyOrama,
+  ArraySearchableType,
+  BM25Params,
+  ComparisonOperator,
+  EnumComparisonOperator,
+  IIndex,
+  ScalarSearchableType,
+  SearchableType,
+  SearchableValue,
+  SearchContext,
+  Tokenizer,
+  TokenScore,
+  TypedDocument,
+  VectorIndex,
+  VectorType
+} from '../types.js'
 import { intersect, safeArrayPush } from '../utils.js'
 import { BM25 } from './algorithms.js'
+import { getMagnitude } from './cosine-similarity.js'
 import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
 import {
   DocumentID,
@@ -50,8 +51,6 @@ import {
   InternalDocumentID,
   InternalDocumentIDStore,
 } from './internal-document-id-store.js'
-import { getMagnitude } from './cosine-similarity.js'
-import { FlatTree } from '../trees/flat.js'
 
 export type FrequencyMap = {
   [property: string]: {
@@ -66,13 +65,6 @@ export type FrequencyMap = {
 export type BooleanIndex = {
   true: InternalDocumentID[]
   false: InternalDocumentID[]
-}
-
-export type VectorIndex = {
-  size: number
-  vectors: {
-    [docID: string]: [Magnitude, VectorType]
-  }
 }
 
 export type TreeType =
@@ -92,8 +84,7 @@ export type Tree =
   | TTree<'Bool',  BooleanIndex>
   | TTree<'Flat',  FlatTree>
 
-
-export interface Index extends OpaqueIndex {
+export interface Index extends AnyIndexStore {
   sharedInternalDocumentStore: InternalDocumentIDStore
   indexes: Record<string, Tree>
   vectorIndexes: Record<string, VectorIndex>
@@ -104,8 +95,6 @@ export interface Index extends OpaqueIndex {
   avgFieldLength: Record<string, number>
   fieldLengths: Record<string, Record<InternalDocumentID, number | undefined>>
 }
-
-export type DefaultIndex = IIndex<Index>
 
 export async function insertDocumentScoreParameters(
   index: Index,
@@ -167,8 +156,8 @@ export async function removeTokenScoreParameters(index: Index, prop: string, tok
   index.tokenOccurrences[prop][token]--
 }
 
-export async function calculateResultScores<I extends OpaqueIndex, D extends OpaqueDocumentStore, AggValue>(
-  context: SearchContext<I, D, AggValue>,
+export async function calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+  context: SearchContext<T, ResultDocument>,
   index: Index,
   prop: string,
   term: string,
@@ -207,10 +196,10 @@ export async function calculateResultScores<I extends OpaqueIndex, D extends Opa
   return scoreList
 }
 
-export async function create(
-  orama: Orama<{ Index: DefaultIndex }>,
-  sharedInternalDocumentStore: InternalDocumentIDStore,
-  schema: Schema,
+export async function create<T extends AnyOrama, TSchema extends T['schema']>(
+  orama: T,
+  sharedInternalDocumentStore: T['internalDocumentIDStore'],
+  schema: TSchema,
   index?: Index,
   prefix = '',
 ): Promise<Index> {
@@ -228,21 +217,20 @@ export async function create(
     }
   }
 
-  for (const [prop, type] of Object.entries(schema)) {
-    const typeActualType = typeof type
+  for (const [prop, type] of Object.entries<SearchableType>(schema)) {
     const path = `${prefix}${prefix ? '.' : ''}${prop}`
 
-    if (typeActualType === 'object' && !Array.isArray(type)) {
+    if (typeof type === 'object' && !Array.isArray(type)) {
       // Nested
-      create(orama, sharedInternalDocumentStore, type as Schema, index, path)
+      create(orama, sharedInternalDocumentStore, type, index, path)
       continue
     }
 
-    if (isVectorType(type as string)) {
+    if (isVectorType(type)) {
       index.searchableProperties.push(path)
-      index.searchablePropertiesWithTypes[path] = type as SearchableType
+      index.searchablePropertiesWithTypes[path] = type
       index.vectorIndexes[path] = {
-        size: getVectorSize(type as string),
+        size: getVectorSize(type),
         vectors: {},
       }
     } else {
@@ -267,7 +255,7 @@ export async function create(
           index.indexes[path] = { type: 'Flat', node: flatCreate() }
           break
         default:
-          throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : (type as unknown as string), path)
+          throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type, path)
       }
 
       index.searchableProperties.push(path)
@@ -320,7 +308,7 @@ async function insertScalar(
 }
 
 export async function insert(
-  implementation: DefaultIndex,
+  implementation: IIndex<Index>,
   index: Index,
   prop: string,
   id: DocumentID,
@@ -414,7 +402,7 @@ async function removeScalar(
 }
 
 export async function remove(
-  implementation: DefaultIndex,
+  implementation: IIndex<Index>,
   index: Index,
   prop: string,
   id: DocumentID,
@@ -449,8 +437,8 @@ export async function remove(
   return true
 }
 
-export async function search<D extends OpaqueDocumentStore, AggValue>(
-  context: SearchContext<Index, D, AggValue>,
+export async function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+  context: SearchContext<T, ResultDocument>,
   index: Index,
   prop: string,
   term: string,
@@ -477,8 +465,8 @@ export async function search<D extends OpaqueDocumentStore, AggValue>(
   return context.index.calculateResultScores(context, index, prop, term, Array.from(ids))
 }
 
-export async function searchByWhereClause<I extends OpaqueIndex, D extends OpaqueDocumentStore, AggValue>(
-  context: SearchContext<I, D, AggValue>,
+export async function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+  context: SearchContext<T, ResultDocument>,
   index: Index,
   filters: Record<string, boolean | ComparisonOperator | EnumComparisonOperator>,
 ): Promise<number[]> {
@@ -533,7 +521,7 @@ export async function searchByWhereClause<I extends OpaqueIndex, D extends Opaqu
     if (type === 'AVL') {
       const operationOpt = operationKeys[0] as keyof ComparisonOperator
       const operationValue = (operation as ComparisonOperator)[operationOpt]
-      let filteredIDs = [];
+      let filteredIDs: InternalDocumentID[] = [];
 
       switch (operationOpt) {
         case 'gt': {
@@ -719,7 +707,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
   } as R
 }
 
-export async function createIndex(): Promise<DefaultIndex> {
+export async function createIndex(): Promise<IIndex<Index>> {
   return {
     create,
     insert,

@@ -1,9 +1,9 @@
 import * as t from 'tap'
-import { Orama, create, getByID, insert, search } from '../src/index.js'
+import { Orama, create, insert, search } from '../src/index.js'
 
 t.test('tokenizeSkipProperties', t => {
   t.test('skipProperties', async t => {
-    const [db, id1, id2, id3, id4] = await createSimpleDB(true)
+    const [db, id1] = await createSimpleDB(true)
 
     const result = await search(db, {
       where: {
@@ -21,7 +21,7 @@ t.test('tokenizeSkipProperties', t => {
   })
 
   t.test('noSkipProperties', async t => {
-    const [db, id1, id2, id3, id4] = await createSimpleDB(false)
+    const [db, id1, id2, , id4] = await createSimpleDB(false)
 
     const result = await search(db, {
       where: {
@@ -43,8 +43,16 @@ t.test('tokenizeSkipProperties', t => {
   t.end()
 })
 
-async function createSimpleDB(skipProperties: boolean): Promise<[Orama, string, string, string, string]> {
-  let db: Orama
+async function createSimpleDB(skipProperties: boolean) {
+  let db: Orama<{
+    name: 'string'
+    rating: 'number'
+    price: 'number'
+    meta: {
+      sales: 'number'
+      finish: 'string'
+    }
+  }>
   if (skipProperties) {
     db = await create({
       schema: {
@@ -116,5 +124,5 @@ async function createSimpleDB(skipProperties: boolean): Promise<[Orama, string, 
     },
   })
 
-  return [db, id1, id2, id3, id4]
+  return [db, id1, id2, id3, id4] as const
 }

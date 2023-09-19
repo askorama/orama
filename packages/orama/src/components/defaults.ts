@@ -1,6 +1,15 @@
 import { createError } from '../errors.js'
-import { ArraySearchableType, Document, ElapsedTime, ScalarSearchableType, Schema, SearchableType } from '../types.js'
-import { uniqueId, formatNanoseconds } from '../utils.js'
+import {
+  AnyDocument,
+  AnyOrama,
+  ArraySearchableType,
+  ElapsedTime,
+  ScalarSearchableType,
+  SearchableType,
+  TypedDocument,
+  Vector
+} from '../types.js'
+import { formatNanoseconds, uniqueId } from '../utils.js'
 
 export { getDocumentProperties } from '../utils.js'
 
@@ -11,7 +20,7 @@ export async function formatElapsedTime(n: bigint): Promise<ElapsedTime> {
   }
 }
 
-export async function getDocumentIndexId(doc: Document): Promise<string> {
+export async function getDocumentIndexId(doc: AnyDocument): Promise<string> {
   if (doc.id) {
     if (typeof doc.id !== 'string') {
       throw createError('DOCUMENT_ID_MUST_BE_STRING', typeof doc.id)
@@ -23,34 +32,34 @@ export async function getDocumentIndexId(doc: Document): Promise<string> {
   return await uniqueId()
 }
 
-export async function validateSchema<S extends Schema = Schema>(doc: Document, schema: S): Promise<string | undefined> {
+export async function validateSchema<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+  doc: ResultDocument,
+  schema: T['schema'],
+): Promise<string | undefined> {
   for (const [prop, type] of Object.entries(schema)) {
     const value = doc[prop]
-    const typeOfValue = typeof value
 
-    if (typeOfValue === 'undefined') {
+    if (typeof value === 'undefined') {
       continue
     }
 
-    if (type === 'enum' && (typeOfValue === 'string' || typeOfValue === 'number')) {
+    if (type === 'enum' && (typeof value === 'string' || typeof value === 'number')) {
       continue
     }
 
-    const typeOfType = typeof type
-
-    if (isVectorType(type as string)) {
-      const vectorSize = getVectorSize(type as string)
+    if (isVectorType(type)) {
+      const vectorSize = getVectorSize(type)
       if (!Array.isArray(value) || value.length !== vectorSize) {
-        throw createError('INVALID_INPUT_VECTOR', prop, vectorSize, (value as number[]).length)
+        throw createError('INVALID_INPUT_VECTOR', prop, vectorSize, value.length)
       }
       continue
     }
 
-    if (typeOfType === 'string' && isArrayType(type as SearchableType)) {
+    if (isArrayType(type)) {
       if (!Array.isArray(value)) {
         return prop
       }
-      const expectedType = getInnerType(type as ArraySearchableType)
+      const expectedType = getInnerType(type)
 
       const valueLength = value.length
       for (let i = 0; i < valueLength; i++) {
@@ -62,19 +71,20 @@ export async function validateSchema<S extends Schema = Schema>(doc: Document, s
       continue
     }
 
-    if (typeOfType === 'object') {
-      if (!value || typeOfValue !== 'object') {
+    if (typeof type === 'object') {
+      if (!value || typeof value !== 'object') {
         return prop
       }
 
-      const subProp = await validateSchema(value as Document, type as Schema)
+      // using as ResultDocument is not exactly right but trying to be type-safe here is not useful
+      const subProp = await validateSchema(value as ResultDocument, type)
       if (subProp) {
         return prop + '.' + subProp
       }
       continue
     }
 
-    if (typeOfValue !== type) {
+    if (typeof value !== type) {
       return prop
     }
   }
@@ -98,12 +108,12 @@ const INNER_TYPE: Record<ArraySearchableType, ScalarSearchableType> = {
   'boolean[]': 'boolean',
 }
 
-export function isVectorType(type: string): boolean {
-  return /^vector\[\d+\]$/.test(type)
+export function isVectorType(type: unknown): type is Vector {
+  return typeof type === 'string' && /^vector\[\d+\]$/.test(type)
 }
 
-export function isArrayType(type: SearchableType): boolean {
-  return IS_ARRAY_TYPE[type]
+export function isArrayType(type: unknown): type is ArraySearchableType {
+  return typeof type === 'string' && IS_ARRAY_TYPE[type]
 }
 
 export function getInnerType(type: ArraySearchableType): ScalarSearchableType {

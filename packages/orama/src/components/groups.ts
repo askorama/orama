@@ -1,6 +1,6 @@
-import type { Orama, ScalarSearchableValue, TokenScore, GroupByParams, GroupResult, Result, Reduce } from '../types.js'
 import { createError } from '../errors.js'
 import { getNested, intersect, safeArrayPush } from '../utils.js'
+import type { AnyDocument, AnyOrama, GroupByParams, GroupResult, Reduce, Result, ScalarSearchableValue, TokenScore, TypedDocument } from '../types.js'
 import { getDocumentIdFromInternalId } from './internal-document-id-store.js'
 
 interface PropertyGroup {
@@ -19,7 +19,7 @@ interface Group {
   indexes: number[]
 }
 
-const DEFAULT_REDUCE: Reduce<Result[]> = {
+const DEFAULT_REDUCE: Reduce<Result<AnyDocument>[]> = {
   reducer: (_, acc, res, index) => {
     acc[index] = res
     return acc
@@ -29,11 +29,11 @@ const DEFAULT_REDUCE: Reduce<Result[]> = {
 
 const ALLOWED_TYPES = ['string', 'number', 'boolean']
 
-export async function getGroups<AggValue>(
-  orama: Orama,
+export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+  orama: T,
   results: TokenScore[],
-  groupBy: GroupByParams<AggValue>,
-): Promise<GroupResult<AggValue>> {
+  groupBy: GroupByParams<ResultDocument>,
+): Promise<GroupResult<ResultDocument>> {
   const properties = groupBy.properties
   const propertiesLength = properties.length
 
@@ -133,11 +133,11 @@ export async function getGroups<AggValue>(
   }
 
   const groupsLength = groups.length
-  const res: GroupResult<AggValue> = Array.from({ length: groupsLength })
+  const res: GroupResult<ResultDocument> = Array.from({ length: groupsLength })
   for (let i = 0; i < groupsLength; i++) {
     const group = groups[i]
 
-    const reduce = (groupBy.reduce || DEFAULT_REDUCE) as Reduce<AggValue>
+    const reduce = (groupBy.reduce || DEFAULT_REDUCE) as Reduce<Result<ResultDocument>[]>
 
     const docs = group.indexes.map(index => {
       return {
@@ -166,7 +166,7 @@ function calculateCombination(arrs: ScalarSearchableValue[][], index = 0): Scala
   const head = arrs[index]
   const c = calculateCombination(arrs, index + 1)
 
-  const combinations = []
+  const combinations: ScalarSearchableValue[][] = []
   for (const value of head) {
     for (const combination of c) {
       const result = [value];

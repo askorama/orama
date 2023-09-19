@@ -8,7 +8,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import { usePluginData } from '@docusaurus/useGlobalData'
 import useIsBrowser from '@docusaurus/useIsBrowser'
-import { create, load } from '@orama/orama'
+import { create, load, AnyDocument } from '@orama/orama'
 import type { OramaWithHighlight, Position } from '@orama/plugin-match-highlight'
 import { searchWithHighlight } from '@orama/plugin-match-highlight'
 import { ungzip } from 'pako'
@@ -28,7 +28,7 @@ export default function SearchBar(): JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null)
   const { colorMode } = useColorMode()
   const { searchData } = usePluginData(PLUGIN_NAME) as PluginData
-  const [database, setDatabase] = useState<OramaWithHighlight>()
+  const [database, setDatabase] = useState<OramaWithHighlight<AnyDocument>>()
   const searchBaseUrl = useBaseUrl(INDEX_FILE)
   const versions = useVersions(undefined)
   const activeVersion = useActiveVersion(undefined)
@@ -153,7 +153,8 @@ export default function SearchBar(): JSX.Element {
       const deflated = ungzip(buffer, { to: 'string' })
       const data: RawDataWithPositions = JSON.parse(deflated)
 
-      const db = (await create({ schema })) as OramaWithHighlight
+      const _db = await create({ schema })
+      const db = _db as OramaWithHighlight<typeof _db>;
       await load(db, data)
       db.data.positions = data.positions
       setDatabase(db)

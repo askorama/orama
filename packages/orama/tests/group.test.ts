@@ -1,13 +1,9 @@
 import t from 'tap'
 import {
-  Document,
   GroupResult,
-  Orama,
-  Result,
-  ScalarSearchableValue,
   create,
   insertMultiple,
-  search,
+  search
 } from '../src/index.js'
 
 t.test('search with groupBy', async t => {
@@ -197,13 +193,6 @@ t.test('search with groupBy', async t => {
   })
 
   t.test('with custom aggregator', async t => {
-    interface Doc extends Document {
-      type: string
-      design: string
-      rank: number
-      color: string
-      isPromoted: boolean
-    }
     interface AggregationValue {
       type: string
       design: string
@@ -212,12 +201,12 @@ t.test('search with groupBy', async t => {
       isPromoted: boolean
     }
 
-    const results = await search(db, {
+    const results = await search<typeof db, AggregationValue>(db, {
       groupBy: {
         properties: ['type', 'design'],
         reduce: {
-          reducer: (_: ScalarSearchableValue[], acc: AggregationValue, item: Result) => {
-            const doc = item.document as Doc
+          reducer: (_, acc, item) => {
+            const doc = item.document
             acc.type ||= doc.type
             acc.design ||= doc.design
             acc.isPromoted ||= doc.isPromoted
@@ -225,7 +214,7 @@ t.test('search with groupBy', async t => {
             acc.ranks.push(doc.rank)
             return acc
           },
-          getInitialValue: (): AggregationValue => ({ type: '', design: '', colors: [], ranks: [], isPromoted: false }),
+          getInitialValue: () => ({ type: '', design: '', colors: [], ranks: [], isPromoted: false }),
         },
       },
       sortBy: {
@@ -324,7 +313,7 @@ t.test('real test', async t => {
   t.end()
 })
 
-function compareGroupResults(t: Tap.Test, groups: GroupResult, expected) {
+function compareGroupResults(t: Tap.Test, groups: GroupResult<any>, expected) {
   // We don't care about the order of the groups
   t.strictSame(
     new Set(
@@ -337,7 +326,7 @@ function compareGroupResults(t: Tap.Test, groups: GroupResult, expected) {
   )
 }
 
-async function createDb(): Promise<[Orama, string[]]> {
+async function createDb() {
   const db = await create({
     schema: {
       id: 'string',
@@ -361,5 +350,5 @@ async function createDb(): Promise<[Orama, string[]]> {
     { id: '8', type: 'sweatshirt', design: 'A', color: 'green', rank: 4, isPromoted: false },
   ])
 
-  return [db, ids]
+  return [db, ids] as const
 }

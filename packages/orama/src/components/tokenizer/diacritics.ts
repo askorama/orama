@@ -204,7 +204,7 @@ function replaceChar(charCode: number): number {
 }
 
 export function replaceDiacritics(str: string): string {
-  const stringCharCode = []
+  const stringCharCode: number[] = []
   for (let idx = 0; idx < str.length; idx++) {
     stringCharCode[idx] = replaceChar(str.charCodeAt(idx))
   }

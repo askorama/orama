@@ -20,7 +20,6 @@ t.test('insert method', t => {
       term: 'quick',
       properties: ['example'],
     })
-
     t.ok(ex1Insert)
     t.equal(ex1Search.count, 1)
     t.type(ex1Search.elapsed.raw, 'number')
@@ -188,26 +187,26 @@ t.test('insert method', t => {
     })
     await insert(db, {
       quote: 'hello, world!',
-      authors: 'author should be singular',
+      author: 'author should be singular',
     })
 
-    t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 1)
+    t.equal(Object.keys(db.data.docs.docs).length, 1)
 
-    const docWithExtraKey = { quote: 'hello, world!', foo: { bar: 10 } }
+    const docWithExtraKey = { quote: 'hello, world!', author: '3', foo: { bar: 10 } }
 
     const insertedInfo = await insert(db, docWithExtraKey)
 
     t.ok(insertedInfo)
-    t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 2)
+    t.equal(Object.keys(db.data.docs.docs).length, 2)
 
     t.ok(
-      'foo' in (db.data.docs as DocumentsStore).docs[getInternalDocumentId(db.internalDocumentIDStore, insertedInfo)]!,
+      'foo' in db.data.docs.docs[getInternalDocumentId(db.internalDocumentIDStore, insertedInfo)]!,
     )
     t.same(
       docWithExtraKey.foo,
-      (db.data.docs as DocumentsStore).docs[getInternalDocumentId(db.internalDocumentIDStore, insertedInfo)]!.foo,
+      db.data.docs.docs[getInternalDocumentId(db.internalDocumentIDStore, insertedInfo)]!.foo,
     )
-    t.notOk('foo' in (db.data.index as Index).indexes)
+    t.notOk('foo' in (db.data.index as unknown as Index).indexes)
   })
 
   t.test(

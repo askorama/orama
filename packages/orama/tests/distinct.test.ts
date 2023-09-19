@@ -1,5 +1,5 @@
 import t from 'tap'
-import { Orama, create, insertMultiple, search } from '../src/index.js'
+import { create, insertMultiple, search } from '../src/index.js'
 
 t.test('search with distinct', async t => {
   const [db, ids] = await createDb()
@@ -75,7 +75,7 @@ t.test('search with distinct', async t => {
   t.end()
 })
 
-async function createDb(): Promise<[Orama, string[]]> {
+async function createDb() {
   const db = await create({
     schema: {
       id: 'string',
@@ -97,5 +97,5 @@ async function createDb(): Promise<[Orama, string[]]> {
     { id: '6', type: 't-shirt', design: 'D', color: 'white', rank: 2, isPromoted: true },
   ])
 
-  return [db, ids]
+  return [db, ids] as const
 }

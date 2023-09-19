@@ -1,5 +1,5 @@
 // @ts-expect-error Ignore broken resolution - This errors when using tsconfig.cjs.json
-import type { Orama } from '@orama/orama'
+import type { AnyOrama } from '@orama/orama'
 
 import type {
   afterInsert as esmAfterInsert,
@@ -22,8 +22,8 @@ let _esmSearchWithHighlight: typeof esmSearchWithHighlight
 let _esmSaveWithHighlight: typeof saveWithHighlight
 let _esmLoadWithHighlight: typeof loadWithHighlight
 
-export async function afterInsert(
-  this: Orama | OramaWithHighlight,
+export async function afterInsert<T extends AnyOrama>(
+  this: T | OramaWithHighlight<T>,
   ...args: Parameters<typeof esmAfterInsert>
 ): ReturnType<typeof esmAfterInsert> {
   if (!_esmAfterInsert) {

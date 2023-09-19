@@ -1,7 +1,6 @@
 import type { LoadedContent, LoadedVersion } from '@docusaurus/plugin-content-docs'
 import type { LoadContext, Plugin } from '@docusaurus/types'
 import { create, insertMultiple, save } from '@orama/orama'
-import { documentsStore } from '@orama/orama/components'
 import { OramaWithHighlight, afterInsert as highlightAfterInsert } from '@orama/plugin-match-highlight'
 import type { DefaultSchemaElement, NodeContent, PopulateFnContext } from '@orama/plugin-parsedoc'
 import { defaultHtmlSchema, populate } from '@orama/plugin-parsedoc'
@@ -106,9 +105,9 @@ async function generateDocument(
   await populate(db, data, fileType as 'html' | 'md', { transformFn })
 
   // Convert all the documents to a
-  const sections = Object.values((db.data.docs as documentsStore.DocumentsStore).docs)
+  const sections = Object.values(db.data.docs.docs)
     .map(node => {
-      return defaultToSectionSchema(node as DefaultSchemaElement, permalink.slice(1), title, version)
+      return defaultToSectionSchema(node, permalink.slice(1), title, version)
     })
     .filter(isIndexable)
 
@@ -146,12 +145,13 @@ async function buildDevSearchData(siteDir: string, outDir: string, allContent: a
   ].flat()
 
   // Create the Orama database and then serialize it
-  const db = (await create({
+  const _db = await create({
     schema,
     components: {
       afterInsert: [highlightAfterInsert]
     }
-  })) as OramaWithHighlight
+  })
+  const db = _db as OramaWithHighlight<typeof _db>
 
   await insertMultiple(db, documents)
 

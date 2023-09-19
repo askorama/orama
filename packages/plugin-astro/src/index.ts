@@ -1,4 +1,4 @@
-import type { Orama, Schema, SearchParams } from '@orama/orama'
+import type { AnyOrama, Orama, Schema, SearchParams } from '@orama/orama'
 import { create as createOramaDB, insert as insertIntoOramaDB, save as saveOramaDB } from '@orama/orama'
 import type { AstroConfig, AstroIntegration, RouteData } from 'astro'
 import { compile } from 'html-to-text'
@@ -21,12 +21,12 @@ interface AstroBuildDoneArgs {
 const isWindows = process.platform === 'win32'
 const joinPath = (isWindows ? path.win32 : path).join
 
-export const defaultSchema: Schema = {
+export const defaultSchema = {
   path: 'string',
   title: 'string',
   h1: 'string',
   content: 'string'
-}
+} as const
 
 export type PageIndexSchema = typeof defaultSchema
 
@@ -41,7 +41,7 @@ export interface OramaOptions {
   caseSensitive?: boolean
   pathMatcher: RegExp
   contentSelectors?: string[]
-  searchOptions?: Omit<SearchParams, 'term'> | undefined
+  searchOptions?: Omit<SearchParams<AnyOrama, any>, 'term'> | undefined
 }
 
 const PKG_NAME = '@orama/plugin-astro'
@@ -57,7 +57,7 @@ async function prepareOramaDb(
   dbConfig: OramaOptions,
   pages: AstroPage[],
   routes: RouteData[]
-): Promise<Orama<{ Schema: PageIndexSchema }>> {
+): Promise<Orama<PageIndexSchema, any, any, any>> {
   const contentConverter = compile({
     baseElements: {
       selectors: dbConfig.contentSelectors?.length ? dbConfig.contentSelectors : ['body']

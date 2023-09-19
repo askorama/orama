@@ -1,9 +1,9 @@
-import { Document, Orama } from '../types.js'
+import { AnyOrama, TypedDocument } from '../types.js'
 
-export function getByID(db: Orama, id: string): Promise<Document | undefined> {
-  return db.documentsStore.get(db.data.docs, id) as Promise<Document | undefined>
+export function getByID<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(db: T, id: string): Promise<ResultDocument | undefined> {
+  return db.documentsStore.get(db.data.docs, id) as Promise<ResultDocument | undefined>
 }
 
-export function count(db: Orama): Promise<number> {
+export function count<T extends AnyOrama>(db: T): Promise<number> {
   return db.documentsStore.count(db.data.docs) as Promise<number>
 }

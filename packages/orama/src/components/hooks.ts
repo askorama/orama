@@ -1,13 +1,12 @@
 import {
   AfterSearch,
-  Document,
+  AnyOrama,
   MultipleCallbackComponent,
-  Orama,
-  ProvidedTypes,
   Results,
   SearchParams,
   SingleCallbackComponent,
-} from '../types.js'
+  TypedDocument
+} from '../types.js';
 
 export const OBJECT_COMPONENTS = ['tokenizer', 'index', 'documentsStore', 'sorter']
 
@@ -34,11 +33,11 @@ export const SINGLE_OR_ARRAY_COMPONENTS = [
   'afterMultipleUpdate',
 ]
 
-export async function runSingleHook<P extends ProvidedTypes>(
-  hooks: SingleCallbackComponent<P>[],
-  orama: Orama<P>,
+export async function runSingleHook<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+  hooks: SingleCallbackComponent<T>[],
+  orama: T,
   id: string,
-  doc?: Document,
+  doc?: ResultDocument,
 ): Promise<void> {
   const hooksLength = hooks.length
   for (let i = 0; i < hooksLength; i++) {
@@ -46,10 +45,10 @@ export async function runSingleHook<P extends ProvidedTypes>(
   }
 }
 
-export async function runMultipleHook<P extends ProvidedTypes>(
-  hooks: MultipleCallbackComponent<P>[],
-  orama: Orama<P>,
-  docsOrIds: Document[] | string[],
+export async function runMultipleHook<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+  hooks: MultipleCallbackComponent<T>[],
+  orama: T,
+  docsOrIds: ResultDocument[] | string[],
 ): Promise<void> {
   const hooksLength = hooks.length
   for (let i = 0; i < hooksLength; i++) {
@@ -57,12 +56,12 @@ export async function runMultipleHook<P extends ProvidedTypes>(
   }
 }
 
-export async function runAfterSearch<P extends ProvidedTypes, AggValue>(
-  hooks: AfterSearch<P>[],
-  db: Orama<P>,
-  params: SearchParams<AggValue>,
+export async function runAfterSearch<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+  hooks: AfterSearch<T, ResultDocument>[],
+  db: T,
+  params: SearchParams<T, ResultDocument>,
   language: string | undefined,
-  results: Results<AggValue>,
+  results: Results<ResultDocument>,
 ): Promise<void> {
   const hooksLength = hooks.length
   for (let i = 0; i < hooksLength; i++) {

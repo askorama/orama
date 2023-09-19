@@ -1,12 +1,12 @@
-import { createError } from '../errors.js'
-import { ISorter, OpaqueSorter, Orama, Schema, SorterConfig, SorterParams, SortType, SortValue } from '../types.js'
-import { isVectorType } from './defaults.js'
+import { createError } from '../errors.js';
+import { AnyOrama, AnySorterStore, ISorter, SearchableType, SortType, SortValue, SorterConfig, SorterParams } from '../types.js';
+import { isVectorType } from './defaults.js';
 import {
   DocumentID,
-  getInternalDocumentId,
   InternalDocumentID,
   InternalDocumentIDStore,
-} from './internal-document-id-store.js'
+  getInternalDocumentId,
+} from './internal-document-id-store.js';
 
 interface PropertySort<K> {
   docs: Map<InternalDocumentID, number>
@@ -19,7 +19,7 @@ type SerializablePropertySort<K> = Omit<PropertySort<K>, 'orderedDocsToRemove' |
   docs: Record<string, number>
 }
 
-export interface Sorter extends OpaqueSorter {
+export interface Sorter extends AnySorterStore {
   sharedInternalDocumentStore: InternalDocumentIDStore
   isSorted: boolean
   language: string
@@ -29,12 +29,10 @@ export interface Sorter extends OpaqueSorter {
   sorts: Record<string, PropertySort<number | string | boolean>>
 }
 
-export type DefaultSorter = ISorter<Sorter>
-
-function innerCreate(
-  orama: Orama,
+function innerCreate<T extends AnyOrama>(
+  orama: T,
   sharedInternalDocumentStore: InternalDocumentIDStore,
-  schema: Schema,
+  schema: T['schema'],
   sortableDeniedProperties: string[],
   prefix: string,
 ): Sorter {
@@ -48,17 +46,16 @@ function innerCreate(
     sorts: {},
   }
 
-  for (const [prop, type] of Object.entries(schema)) {
-    const typeActualType = typeof type
+  for (const [prop, type] of Object.entries<SearchableType>(schema)) {
     const path = `${prefix}${prefix ? '.' : ''}${prop}`
 
     if (sortableDeniedProperties.includes(path)) {
       continue
     }
 
-    if (typeActualType === 'object' && !Array.isArray(type)) {
+    if (typeof type === 'object' && !Array.isArray(type)) {
       // Nested
-      const ret = innerCreate(orama, sharedInternalDocumentStore, type as Schema, sortableDeniedProperties, path)
+      const ret = innerCreate(orama, sharedInternalDocumentStore, type, sortableDeniedProperties, path)
       sorter.sortableProperties.push(...ret.sortableProperties)
       sorter.sorts = {
         ...sorter.sorts,
@@ -71,7 +68,7 @@ function innerCreate(
       continue
     }
 
-    if (!isVectorType(type as string)) {
+    if (!isVectorType(type)) {
       switch (type) {
         case 'boolean':
         case 'number':
@@ -92,7 +89,7 @@ function innerCreate(
           // We don't allow to sort by arrays
           continue
         default:
-          throw createError('INVALID_SORT_SCHEMA_TYPE', Array.isArray(type) ? 'array' : (type as unknown as string), path)
+          throw createError('INVALID_SORT_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type, path)
       }
     }
   }
@@ -100,10 +97,10 @@ function innerCreate(
   return sorter
 }
 
-async function create(
-  orama: Orama,
+async function create<T extends AnyOrama>(
+  orama: T,
   sharedInternalDocumentStore: InternalDocumentIDStore,
-  schema: Schema,
+  schema: T['schema'],
   config?: SorterConfig,
 ): Promise<Sorter> {
   const isSortEnabled = config?.enabled !== false
@@ -219,10 +216,10 @@ async function remove(sorter: Sorter, prop: string, id: DocumentID) {
   s.orderedDocsToRemove.set(internalId, true)
 }
 
-async function sortBy(
+async function sortBy<T extends AnyOrama>(
   sorter: Sorter,
   docIds: [DocumentID, number][],
-  by: SorterParams,
+  by: SorterParams<T>,
 ): Promise<[DocumentID, number][]> {
   if (!sorter.enabled) {
     throw createError('SORT_DISABLED')
@@ -347,7 +344,7 @@ export async function save<R = unknown>(sorter: Sorter): Promise<R> {
   } as R
 }
 
-export async function createSorter(): Promise<DefaultSorter> {
+export async function createSorter(): Promise<ISorter<Sorter>> {
   return {
     create,
     insert,
