@@ -23,7 +23,7 @@ export type SchemaTypes<Value> = Value extends 'string'
   : Value extends 'number[]'
   ? number[]
   : // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Value extends `vector[${infer Size extends number}]`
+  Value extends `vector[${number}]`
   ? number[]
   : Value extends object
   ? { [Key in keyof Value]: SchemaTypes<Value[Key]> } & {
@@ -110,7 +110,7 @@ export interface BooleanFacetDefinition {
   false?: boolean
 }
 
-export type FacetsParams = Record<string, FacetDefinition>
+export type FacetsParams<T extends AnyOrama> = Partial<Record<LiteralUnion<T['schema']>, FacetDefinition>>
 
 export type FacetDefinition = StringFacetDefinition | NumberFacetDefinition | BooleanFacetDefinition
 
@@ -120,10 +120,10 @@ export type Reduce<T, R = AnyDocument> = {
   getInitialValue: (elementCount: number) => T
 }
 
-export type GroupByParams<T> = {
-  properties: string[]
+export type GroupByParams<T extends AnyOrama, ResultDocument> = {
+  properties: LiteralUnion<T['schema']>[]
   maxResult?: number
-  reduce?: Reduce<T>
+  reduce?: Reduce<ResultDocument>
 }
 
 export type ComparisonOperator = {
@@ -150,6 +150,8 @@ export type CustomSorterFunction<ResultDocument> = (
   a: CustomSorterFunctionItem<ResultDocument>,
   b: CustomSorterFunctionItem<ResultDocument>,
 ) => number
+// thanks to https://github.com/sindresorhus/type-fest/blob/main/source/literal-union.d.ts
+export type LiteralUnion<T> = (keyof T extends string ? keyof T : never) | (string & Record<never, never>)
 /**
  * Define which properties to sort for.
  */
@@ -157,7 +159,7 @@ export type SorterParams<T extends AnyOrama> = {
   /**
    * The key of the document used to sort the result.
    */
-  property: keyof T['schema'] extends string ? keyof T['schema'] : string;
+  property: LiteralUnion<T['schema']>;
   /**
    * Whether to sort the result in ascending or descending order.
    */
@@ -174,7 +176,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
   /**
    * The properties of the document to search in.
    */
-  properties?: '*' | string[]
+  properties?: '*' | LiteralUnion<T['schema']>[]
   /**
    * The number of matched documents to return.
    */
@@ -233,7 +235,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    *
    * // In that case, the score of the 'title' property will be multiplied by 2.
    */
-  boost?: Record<string, number>
+  boost?: Partial<Record<LiteralUnion<T['schema']>, number>>
   /**
    * Facets configuration
    * Full documentation: https://docs.oramasearch.com/usage/search/facets
@@ -255,7 +257,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    *  }
    * });
    */
-  facets?: FacetsParams
+  facets?: FacetsParams<T>
 
   /**
    * Distinct configuration
@@ -267,7 +269,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    *  distinctOn: 'category.primary',
    * })
    */
-  distinctOn?: string
+  distinctOn?: LiteralUnion<T['schema']>
 
   /**
    * Groups configuration
@@ -282,7 +284,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    *  }
    * })
    */
-  groupBy?: GroupByParams<ResultDocument>
+  groupBy?: GroupByParams<T, ResultDocument>
 
   /**
    * Filter the search results.
@@ -302,7 +304,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    *  }
    * });
    */
-  where?: Record<string, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator>
+  where?: Partial<Record<LiteralUnion<T['schema']>, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator>>
 
   /**
    * Threshold to use for refining the search results.
@@ -550,7 +552,7 @@ export interface IIndex<I extends AnyIndexStore> {
   searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
     context: SearchContext<T, ResultDocument>,
     index: I,
-    filters: Record<string, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator>,
+    filters: Partial<Record<LiteralUnion<T['schema']>, boolean | string | string[] | ComparisonOperator | EnumComparisonOperator>>,
   ): SyncOrAsyncValue<InternalDocumentID[]>
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>

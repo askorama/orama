@@ -1,5 +1,5 @@
 import t from 'tap'
-import { CustomSorterFunctionItem, create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
+import { create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
 
 t.test('search with sortBy', t => {
   t.test('on number', async t => {
@@ -368,7 +368,7 @@ t.test('search with sortBy', t => {
         number: 'number',
       },
     })
-    await t.rejects(search(db, { sortBy: { property: 'foobar' } }))
+    await t.rejects(search(db, { sortBy: { property: 'foobar' } as any }))
 
     t.end()
   })
@@ -388,9 +388,6 @@ t.test('search with sortBy', t => {
   })
 
   t.test('should allow custom function', async t => {
-    interface Doc {
-      string?: string
-    }
     const db = await create({
       schema: {
         string: 'string',
@@ -406,8 +403,8 @@ t.test('search with sortBy', t => {
     ])
 
     const result = await search(db, {
-      sortBy: (a: CustomSorterFunctionItem, b: CustomSorterFunctionItem) => {
-        return ((a[2] as unknown as Doc).string || '').localeCompare((b[2] as unknown as Doc).string || '')
+      sortBy: (a, b) => {
+        return (a[2].string || '').localeCompare(b[2].string || '')
       },
     })
 

@@ -83,7 +83,7 @@ async function recursivePositionInsertion<T extends AnyOrama, ResultDocument = T
 }
 
 export async function searchWithHighlight<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-  orama: OramaWithHighlight<T>,
+  orama: T,
   params: SearchParams<T, ResultDocument>,
   language?: Language
 ): Promise<SearchResultWithHighlight<ResultDocument>> {
@@ -92,7 +92,7 @@ export async function searchWithHighlight<T extends AnyOrama, ResultDocument = T
   const hits = result.hits.map((hit: AnyDocument) =>
     Object.assign(hit, {
       positions: Object.fromEntries(
-        Object.entries<any>(orama.data.positions[hit.id]).map(([propName, tokens]) => [
+        Object.entries<any>((orama as OramaWithHighlight<T>).data.positions[hit.id]).map(([propName, tokens]) => [
           propName,
           Object.fromEntries(
             Object.entries(tokens).filter(([token]) => queryTokens.find(queryToken => token.startsWith(queryToken)))

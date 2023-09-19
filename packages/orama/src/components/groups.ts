@@ -32,7 +32,7 @@ const ALLOWED_TYPES = ['string', 'number', 'boolean']
 export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
   results: TokenScore[],
-  groupBy: GroupByParams<ResultDocument>,
+  groupBy: GroupByParams<T, ResultDocument>,
 ): Promise<GroupResult<ResultDocument>> {
   const properties = groupBy.properties
   const propertiesLength = properties.length

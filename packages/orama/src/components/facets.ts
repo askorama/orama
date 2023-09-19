@@ -21,7 +21,7 @@ function sortingPredicate(order: FacetSorting = 'desc', a: [string, number], b: 
 export async function getFacets<T extends AnyOrama>(
   orama: T,
   results: TokenScore[],
-  facetsConfig: FacetsParams,
+  facetsConfig: FacetsParams<T>,
 ): Promise<FacetResult> {
   const facets: FacetResult = {}
   const allIDs = results.map(([id]) => id)

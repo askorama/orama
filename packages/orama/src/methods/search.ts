@@ -16,6 +16,7 @@ import type {
   CustomSorterFunctionItem,
   ElapsedTime,
   IndexMap,
+  LiteralUnion,
   Result,
   Results,
   SearchContext,
@@ -132,8 +133,8 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
 
   if (properties && properties !== '*') {
     for (const prop of properties) {
-      if (!propertiesToSearch.includes(prop)) {
-        throw createError('UNKNOWN_INDEX', prop, propertiesToSearch.join(', '))
+      if (!propertiesToSearch.includes(prop as string)) {
+        throw createError('UNKNOWN_INDEX', prop as string, propertiesToSearch.join(', '))
       }
     }
 
@@ -284,7 +285,7 @@ async function fetchDocumentsWithDistinct<T extends AnyOrama, ResultDocument ext
   uniqueDocsArray: [InternalDocumentID, number][],
   offset: number,
   limit: number,
-  distinctOn: string,
+  distinctOn: LiteralUnion<T['schema']>,
 ): Promise<Result<ResultDocument>[]> {
   const docs = orama.data.docs
 
