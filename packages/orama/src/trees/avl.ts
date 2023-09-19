@@ -2,10 +2,15 @@ import { Nullable } from '../types.js'
 import { safeArrayPush } from '../utils.js'
 
 export type Node<K, V> = {
+  // Node key
   k: K
+  // Node value
   v: V
+  // Left child node
   l: Nullable<Node<K, V>>
+  // Right child node
   r: Nullable<Node<K, V>>
+  // Tree height from this node
   h: number
 }
 
