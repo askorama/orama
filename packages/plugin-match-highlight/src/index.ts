@@ -8,6 +8,7 @@ import {
   save,
   search
 } from '@orama/orama'
+import { boundedLevenshtein } from '@orama/orama/internals';
 
 export interface Position {
   start: number
@@ -89,20 +90,39 @@ export async function searchWithHighlight<T extends AnyOrama, ResultDocument = T
 ): Promise<SearchResultWithHighlight<ResultDocument>> {
   const result = await search(orama, params, language)
   const queryTokens: string[] = await orama.tokenizer.tokenize(params.term ?? '', language)
-  const hits = result.hits.map((hit: AnyDocument) =>
-    Object.assign(hit, {
-      positions: Object.fromEntries(
-        Object.entries<any>((orama as OramaWithHighlight<T>).data.positions[hit.id]).map(([propName, tokens]) => [
-          propName,
-          Object.fromEntries(
-            Object.entries(tokens).filter(([token]) => queryTokens.find(queryToken => token.startsWith(queryToken)))
-          )
-        ])
-      )
-    })
-  )
 
-  result.hits = hits
+  let hitsWithPosition = []
+  for (const hit of result.hits) {
+    const hitPositions = Object.entries<any>((orama as OramaWithHighlight<T>).data.positions[hit.id])
+
+    let hits: AnyDocument[] = []
+    for (const [propName, tokens] of hitPositions) {
+      const matchWithSearchTokens = []
+
+      const tokenEntries = Object.entries(tokens)
+      for (const tokenEntry of tokenEntries) {
+        const [token] = tokenEntry
+
+        for (const queryToken of queryTokens) {
+          if (params.tolerance) {
+            const distance = await boundedLevenshtein(token, queryToken, params.tolerance)
+            if (distance.isBounded) {
+              matchWithSearchTokens.push(tokenEntry)
+              break
+            }
+          } else if (token.startsWith(queryToken)) {
+            matchWithSearchTokens.push(tokenEntry)
+            break
+          }
+        }
+      }
+      hits.push([propName, Object.fromEntries(matchWithSearchTokens)])
+    }
+
+    hitsWithPosition.push(Object.assign(hit, { positions: Object.fromEntries(hits) }))
+  }
+
+  result.hits = hitsWithPosition
 
   // @ts-ignore
   return result
