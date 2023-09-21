@@ -68,6 +68,33 @@ t.test('should retrieve positions', async t => {
     t.same(results.hits[0].positions, { text: { hello: [{ start: 0, length: 5 }] } });
 });
 
+t.test('should retrieve positions also with typo, if tolerance is used', async t => {
+    const schema = {
+        title: 'string',
+        summary: 'string',
+        id: 'string',
+        slug: 'string'
+    } as const
+  
+    const db = await create({ schema, components: { afterInsert } })
+  
+    await insert(db, {
+        title: 'Introduction to React',
+        summary: 'React is a popular JavaScript library for building user interfaces, primarily for single-page applications. By utilizing a component-based architecture, it allows developers to build reusable UI components and manage the state of an application seamlessly. This introduction covers its core philosophies, JSX, and the virtual DOM.',
+        id: '1a2b3c',
+        slug: 'introduction-to-react'
+    })
+  
+    const results = await searchWithHighlight(db, { term: 'reat', tolerance: 1 })
+    
+    t.same(results.hits[0].positions, { 
+        title: { react: [{ start: 16, length: 5 } ] },
+        summary: { react: [ { start: 0, length: 5 } ] },
+        id: {},
+        slug: {}
+    })
+});
+
 t.test('should work with texts containing constructor and __proto__ properties', async t => {
     const schema = {
         text: 'string',
