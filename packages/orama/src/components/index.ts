@@ -376,6 +376,11 @@ async function removeScalar(
 ): Promise<boolean> {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
+  if (isVectorType(schemaType)) {
+    delete index.vectorIndexes[prop].vectors[id]
+    return true
+  }
+
   const { type, node } = index.indexes[prop]
   switch (type) {
     case 'AVL': {

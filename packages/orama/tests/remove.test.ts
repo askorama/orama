@@ -253,6 +253,33 @@ t.test('should remove a document and update index field length', async t => {
   t.same((db.data.index as Index).avgFieldLength, avgFieldLength)
 })
 
+// Test cases for issue https://github.com/oramasearch/orama/issues/486
+t.test('should correctly remove documents with vector properties', async t => {
+  t.plan(2)
+
+  const db = await create({
+    schema: {
+      name: 'string',
+      vector: 'vector[10]',
+    }
+  })
+
+  const id1 = await insert(db, {
+    name: 'coffee maker',
+    vector: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  })
+
+  const id2 = await insert(db, {
+    name: 'better coffee maker',
+    vector: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  })
+
+  await remove(db, id1)
+
+  t.notOk(await getByID(db, id1))
+  t.ok(await getByID(db, id2))
+})
+
 async function createSimpleDB() {
   let i = 0
   const db = await create({
