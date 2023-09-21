@@ -1,6 +1,6 @@
 {
   "name": "@orama/stopwords",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "type": "module",
   "description": "Stop-words for Orama",
   "sideEffects": false,
