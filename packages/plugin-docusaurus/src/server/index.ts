@@ -23,7 +23,7 @@ function indexPath(outDir: string, version: string): string {
   return resolve(outDir, INDEX_FILE.replace('@VERSION@', version))
 }
 
-function transformFn(node: NodeContent, context: PopulateFnContext): NodeContent {
+export function transformFn(node: NodeContent, context: PopulateFnContext): NodeContent {
   let raw
 
   switch (node.tag) {
@@ -62,7 +62,7 @@ function transformFn(node: NodeContent, context: PopulateFnContext): NodeContent
   return transformed
 }
 
-function defaultToSectionSchema(
+export function defaultToSectionSchema(
   node: DefaultSchemaElement,
   pageRoute: string,
   sectionTitle: string,
