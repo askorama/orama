@@ -164,20 +164,25 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
 
   const tokensLength = tokens.length
 
-  if (tokensLength) {
+  if (tokensLength || (properties && properties.length > 0)) {
     // Now it's time to loop over all the indices and get the documents IDs for every single term
     const indexesLength = propertiesToSearch.length
     for (let i = 0; i < indexesLength; i++) {
       const prop = propertiesToSearch[i]
 
-      const tokensLength = tokens.length
-      for (let j = 0; j < tokensLength; j++) {
-        const term = tokens[j]
+      if (tokensLength !== 0) {
+        for (let j = 0; j < tokensLength; j++) {
+          const term = tokens[j]
 
-        // Lookup
-        const scoreList = await orama.index.search(context, index, prop, term)
+          // Lookup
+          const scoreList = await orama.index.search(context, index, prop, term)
 
-        safeArrayPush(context.indexMap[prop][term], scoreList);
+          safeArrayPush(context.indexMap[prop][term], scoreList);
+        }
+      } else {
+        context.indexMap[prop][''] = []
+        const scoreList = await orama.index.search(context, index, prop, '')
+        safeArrayPush(context.indexMap[prop][''], scoreList);
       }
 
       const docIds = context.indexMap[prop]
