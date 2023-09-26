@@ -1,6 +1,6 @@
 {
   "name": "@orama/orama",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "type": "module",
   "description": "Next generation full-text and vector search engine, written in TypeScript",
   "sideEffects": false,

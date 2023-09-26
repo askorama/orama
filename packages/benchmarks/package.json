@@ -1,6 +1,6 @@
 {
   "name": "benchmarks",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "private": true,
   "scripts": {
     "bench:group": "node src/group.bench.js",
