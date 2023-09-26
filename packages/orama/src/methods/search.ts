@@ -171,7 +171,6 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
       const prop = propertiesToSearch[i]
 
       if (tokensLength !== 0) {
-        const tokensLength = tokens.length
         for (let j = 0; j < tokensLength; j++) {
           const term = tokens[j]
 
