@@ -581,7 +581,7 @@ t.test('search method', t => {
     t.end()
   })
 
-  t.test('should return all the document on empty string', async t => {
+  t.test('should return all the documents that contains the property on empty search', async t => {
     const db = await create({
       schema: {
         animal: 'string',
@@ -589,7 +589,7 @@ t.test('search method', t => {
     })
 
     await insertMultiple(db, [
-      { },
+      { animal: 'foo' },
       { },
       { },
       { },
@@ -602,7 +602,7 @@ t.test('search method', t => {
       properties: ['animal']
     })
 
-    t.equal(result.count, 0)
+    t.equal(result.count, 1)
 
     t.end()
   })
