@@ -164,7 +164,7 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
 
   const tokensLength = tokens.length
 
-  if (tokensLength) {
+  if (tokensLength || (properties && properties.length > 0)) {
     // Now it's time to loop over all the indices and get the documents IDs for every single term
     const indexesLength = propertiesToSearch.length
     for (let i = 0; i < indexesLength; i++) {

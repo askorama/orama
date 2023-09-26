@@ -581,6 +581,32 @@ t.test('search method', t => {
     t.end()
   })
 
+  t.test('should return all the document on empty string', async t => {
+    const db = await create({
+      schema: {
+        animal: 'string',
+      }
+    })
+
+    await insertMultiple(db, [
+      { },
+      { },
+      { },
+      { },
+      { },
+      { },
+    ])
+
+    const result = await search(db, {
+      term: '',
+      properties: ['animal']
+    })
+
+    t.equal(result.count, 0)
+
+    t.end()
+  })
+
   t.end()
 })
 
