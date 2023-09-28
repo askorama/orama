@@ -20,7 +20,7 @@ export type OramaWithHighlight<T extends AnyOrama> = T & {
 }
 
 export type SearchResultWithHighlight<ResultDocument> = Results<ResultDocument> & {
-  hits: (Result<ResultDocument> & { positions: Position[] })[]
+  hits: (Result<ResultDocument> & { positions: Record<string, Record<string, Position[]>> })[]
 }
 
 export type RawDataWithPositions = RawData & {
