@@ -146,6 +146,11 @@
       "types": "./dist/uk.d.ts",
       "import": "./dist/uk.js",
       "require": "./dist/uk.cjs"
+    },
+    "./sanskrit": {
+      "types": "./dist/sk.d.ts",
+      "import": "./dist/sk.js",
+      "require": "./dist/sk.cjs"
     }
   },
   "files": [
