@@ -19,7 +19,7 @@ If you need more info, help, or want to provide general feedback on Orama, join 
 - [Fields Boosting](https://docs.oramasearch.com/usage/search/fields-boosting)
 - [Typo tolerance](https://docs.oramasearch.com/usage/search/introduction#typo-tolerance)
 - [Exact match](https://docs.oramasearch.com/usage/search/introduction#exact-match)
-- [Stemming and tokenization in 26 languages](https://docs.oramasearch.com/text-analysis/stemming)
+- [Stemming and tokenization in 28 languages](https://docs.oramasearch.com/text-analysis/stemming)
 
 # Installation
 

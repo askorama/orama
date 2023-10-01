@@ -1,6 +1,6 @@
 # Orama Stop-words
 
-This package provides support for stop-words removal in 26 languages:
+This package provides support for stop-words removal in 28 languages:
 
 - Arabic
 - Armenian
@@ -22,6 +22,7 @@ This package provides support for stop-words removal in 26 languages:
 - Portuguese
 - Romanian
 - Russian
+- Sanskrit
 - Serbian
 - Slovenian
 - Spanish
