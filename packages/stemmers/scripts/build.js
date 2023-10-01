@@ -35,6 +35,7 @@ const stemmers = {
   tamil: 'ta',
   turkish: 'tr',
   ukrainian: 'uk',
+  sanskrit: 'sk',
 }
 
 async function compile(lang, jsExtension, tsExtension, moduleType) {

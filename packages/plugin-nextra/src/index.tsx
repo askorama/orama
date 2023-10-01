@@ -168,7 +168,7 @@ function OramaSearchPlugin({ router, ...props }) {
                                   <HighlightedDocument
                                     hit={
                                       { document, positions } as Result<TypedDocument<NextraOrama>> & {
-                                        positions: Position[]
+                                        positions: Record<string, Record<string, Position[]>>
                                       }
                                     }
                                   />
