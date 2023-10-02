@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert, searchByRadius } from '../src/trees/bkd.js'
+import { create, insert, searchByRadius, searchByPolygon } from '../src/trees/bkd.js'
 
 const coordinates = [
   {
@@ -87,5 +87,46 @@ t.only('searchByRadius', t => {
     // Should return the coordinates of all the California locations as they're outside the radius.
     t.same(searchByRadius(tree.root, { lat: 42.9195535, lon: -70.9817219 }, 10_000, false, null), coordinatePoints)
 
+  })
+})
+
+t.only('searchInsidePolygon', t => {
+  t.plan(1)
+
+  t.only('should return all points inside a given polygon', t => {
+    t.plan(1)
+
+    const tree = create()
+    const coordinatePoints = coordinates.map(({ lat, lon }) => ({ lat, lon }))
+
+    for (const point of coordinatePoints) {
+      insert(tree, point)
+    }
+
+    const polygon = [
+      {
+        lon: -122.5305176,
+        lat: 37.8247008,
+      },
+      {
+        lon: -122.5212479,
+        lat: 37.7253794
+      },
+      {
+        lon: -122.3574829,
+        lat: 37.7509009
+      },
+      {
+        lon: -122.3866653,
+        lat: 37.8371743
+      },
+      {
+        lon: -122.5305176,
+        lat: 37.8247008,
+      },
+    ]
+
+    // Should return the coordinates of all the California locations as they're outside the polygon
+    t.same(searchByPolygon(tree.root, polygon, true), coordinatePoints)
   })
 })

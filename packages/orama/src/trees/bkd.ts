@@ -86,12 +86,11 @@ export function searchByRadius (
 
   while (stack.length > 0) {
     const { node, depth } = stack.pop() as { node: Node, depth: number }
-    if (node == null) continue
+    if (node === null) continue
 
     const dist = haversineDistance(center, node.point)
 
     if (inclusive ? dist <= radius : dist > radius) {
-      console.log('Adding point:', node.point)
       result.push(node.point)
     }
 
@@ -138,7 +137,7 @@ function blockIntersectsCircle (node: Node, center: Point, radius: number): bool
   return distance <= radius
 }
 
-export function searchInsidePolygon (root: Nullable<Node>, polygon: Point[], inclusive = true): Point[] {
+export function searchByPolygon (root: Nullable<Node>, polygon: Point[], inclusive = true): Point[] {
   const stack: SearchTask[] = [{ node: root, depth: 0 }]
   const result: Point[] = []
 
@@ -171,13 +170,12 @@ export function searchInsidePolygon (root: Nullable<Node>, polygon: Point[], inc
 
 function isPointInPolygon (polygon: Point[], point: Point): boolean {
   let isInside = false
-  const polygonLength = polygon.length
-
-  for (let i = 0, j = polygonLength - 1; i < polygonLength; j = i++) {
+  const x = point.lon; const y = point.lat
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
     const xi = polygon[i].lon; const yi = polygon[i].lat
     const xj = polygon[j].lon; const yj = polygon[j].lat
 
-    const intersect = ((yi > point.lat) !== (yj > point.lat)) && (point.lon < (xj - xi) * (point.lat - yi) / (yj - yi) + xi)
+    const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)
     if (intersect) isInside = !isInside
   }
 
