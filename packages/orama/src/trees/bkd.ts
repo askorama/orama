@@ -24,6 +24,7 @@ interface SearchTask {
 }
 
 const K = 2 // 2D points
+const EARTH_RADIUS = 6371000 // meters
 
 export function create (points: Point[]): MaybeNode {
   if (points.length === 0) {
@@ -153,7 +154,9 @@ export function searchByRadius (
     let left = diff <= 0
     let right = diff >= 0
 
-    if (Math.abs(diff) <= radius) {
+    const diffInMeters = haversineDistance(center, node.point)
+
+    if (Math.abs(diffInMeters) <= radius) {
       left = true
       right = true
     }
@@ -166,7 +169,7 @@ export function searchByRadius (
       stack.push({ node: node.right, depth: nextDepth })
     }
 
-    const dist = distance(center, node.point)
+    const dist = haversineDistance(center, node.point)
     if (inclusive ? dist <= radius : dist > radius) {
       result.push(node.point)
     }
@@ -254,4 +257,24 @@ function distance (a: Point, b: Point): number {
   const dx = a.x - b.x
   const dy = a.y - b.y
   return Math.sqrt(dx * dx + dy * dy)
+}
+
+function haversineDistance (coord1: Point, coord2: Point): number {
+  const R = EARTH_RADIUS
+  const lat1Rad = toRadians(coord1.y)
+  const lat2Rad = toRadians(coord2.y)
+  const deltaLat = toRadians(coord2.y - coord1.y)
+  const deltaLon = toRadians(coord2.x - coord1.x)
+
+  const a =
+    Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+    Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2)
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+  return R * c
+}
+
+function toRadians (degrees: number): number {
+  return degrees * Math.PI / 180
 }
