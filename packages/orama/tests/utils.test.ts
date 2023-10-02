@@ -1,8 +1,8 @@
 import t from 'tap'
-import { formatBytes, formatNanoseconds, getOwnProperty, getNested, flattenObject } from '../src/utils.js'
+import { formatBytes, formatNanoseconds, getOwnProperty, getNested, flattenObject, parseDistance } from '../src/utils.js'
 
 t.test('utils', t => {
-  t.plan(5)
+  t.plan(6)
 
   t.test('should correctly format bytes', async t => {
     t.plan(9)
@@ -111,5 +111,23 @@ t.test('utils', t => {
 
     t.equal((flattened as Record<string, string>).foo, 'bar')
     t.equal(flattened['nested.nested2.nested3.bar'], 'baz')
+  })
+
+  t.test('should parse distance', t => {
+    t.plan(11)
+
+    t.equal(parseDistance('1km'), 1000)
+    t.equal(parseDistance('1.5km'), 1500)
+    t.equal(parseDistance('23m'), 23)
+    t.equal(parseDistance('11.5m'), 11.5)
+    t.equal(parseDistance('1cm'), 0.01)
+    t.equal(parseDistance('32.5cm'), 0.325)
+    t.equal(parseDistance('8mi'), 12874.752)
+    t.equal(parseDistance('91yd'), 83.21039999999999)
+    t.equal(parseDistance('1ft'), 0.3048)
+    t.equal(parseDistance('1.5ft'), 0.45720000000000005)
+
+    // @ts-expect-error - error case
+    t.throws(() => parseDistance('1'), new Error('Invalid distance suffix ""'))
   })
 })

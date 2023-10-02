@@ -1,4 +1,5 @@
 import type { AnyDocument, SearchableValue, TokenScore } from './types.js'
+import { createError } from './errors.js'
 
 const baseId = Date.now().toString().slice(5)
 let lastId = 0
@@ -258,4 +259,36 @@ export function flattenObject(obj: object, prefix = ''): AnyDocument {
     }
   }
   return result
+}
+
+type DistanceSuffixes =
+  | 'cm'
+  | 'm'
+  | 'km'
+  | 'ft'
+  | 'yd'
+  | 'mi'
+
+export type Distance = `${number}${DistanceSuffixes}`
+
+export function parseDistance(distance: Distance): number {
+  const value = parseFloat(distance)
+  const suffix = distance.slice(value.toString().length)
+
+  switch (suffix) {
+    case 'cm':
+      return value / 100
+    case 'm':
+      return value
+    case 'km':
+      return value * 1000
+    case 'ft':
+      return value * 0.3048
+    case 'yd':
+      return value * 0.9144
+    case 'mi':
+      return value * 1609.344
+    default:
+      throw new Error(createError('INVALID_DISTANCE_SUFFIX', suffix).message)
+  }
 }
