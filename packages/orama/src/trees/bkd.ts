@@ -1,3 +1,5 @@
+import type { Nullable } from '../types.js'
+
 export interface Point {
   x: number
   y: number
@@ -8,6 +10,8 @@ export interface Node {
   left?: Node
   right?: Node
 }
+
+export type SortGeoPoints = Nullable<'asc' | 'desc' | 'ASC' | 'DESC'>
 
 type MaybeNode = Node | undefined
 
@@ -137,7 +141,8 @@ export function searchByRadius (
   root: MaybeNode,
   center: Point,
   radius: number,
-  inclusive = true
+  inclusive = true,
+  sort: SortGeoPoints
 ): Point[] {
   const stack: SearchTask[] = [{ node: root, depth: 0 }]
   const result: Point[] = []
@@ -175,33 +180,14 @@ export function searchByRadius (
     }
   }
 
-  return result
-}
-
-export function searchOutsideRadius (root: MaybeNode, center: Point, radius: number): Point[] {
-  const stack: SearchTask[] = [{ node: root, depth: 0 }]
-  const result: Point[] = []
-
-  while (stack.length > 0) {
-    const task = stack.pop()
-    if ((task == null) || (task.node == null)) continue
-
-    const { node, depth } = task
-    const axis = depth % K
-    const diff = axis === 0 ? center.x - node.point.x : center.y - node.point.y
-    const nextDepth = depth + 1
-
-    if (diff > radius && (node.left != null)) {
-      stack.push({ node: node.left, depth: nextDepth })
-    }
-
-    if (diff < -radius && (node.right != null)) {
-      stack.push({ node: node.right, depth: nextDepth })
-    }
-
-    if (distance(center, node.point) > radius) {
-      result.push(node.point)
-    }
+  if (sort) {
+    return result.sort((a, b) => {
+      if (sort.toLowerCase() === 'asc') {
+        return haversineDistance(center, a) - haversineDistance(center, b)
+      } else {
+        return haversineDistance(center, b) - haversineDistance(center, a)
+      }
+    })
   }
 
   return result
@@ -243,7 +229,7 @@ function isPointInPolygon (polygon: Point[], point: Point): boolean {
   const polygonLength = polygon.length
 
   for (let i = 0, j = polygonLength - 1; i < polygonLength; j = i++) {
-    const xi = polygon[i].x; const yi = polygon[i].y
+    const xi = polygon[i].x;const yi = polygon[i].y
     const xj = polygon[j].x; const yj = polygon[j].y
 
     const intersect = ((yi > point.y) !== (yj > point.y)) && (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi)
@@ -253,14 +239,7 @@ function isPointInPolygon (polygon: Point[], point: Point): boolean {
   return isInside
 }
 
-function distance (a: Point, b: Point): number {
-  const dx = a.x - b.x
-  const dy = a.y - b.y
-  return Math.sqrt(dx * dx + dy * dy)
-}
-
 function haversineDistance (coord1: Point, coord2: Point): number {
-  const R = EARTH_RADIUS
   const lat1Rad = toRadians(coord1.y)
   const lat2Rad = toRadians(coord2.y)
   const deltaLat = toRadians(coord2.y - coord1.y)
@@ -272,7 +251,7 @@ function haversineDistance (coord1: Point, coord2: Point): number {
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
-  return R * c
+  return EARTH_RADIUS * c
 }
 
 function toRadians (degrees: number): number {
