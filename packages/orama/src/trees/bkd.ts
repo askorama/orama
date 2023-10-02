@@ -1,144 +1,81 @@
 import type { Nullable } from '../types.js'
 
 export interface Point {
-  x: number
-  y: number
+  lon: number
+  lat: number
 }
 
 export interface Node {
   point: Point
   left?: Node
   right?: Node
+  parent?: Node
 }
 
 export type SortGeoPoints = Nullable<'asc' | 'desc' | 'ASC' | 'DESC'>
 
-type MaybeNode = Node | undefined
-
-interface InsertTask {
-  points: Point[]
-  depth: number
-  parent?: Node
-  direction?: 'left' | 'right'
-}
-
 interface SearchTask {
-  node: MaybeNode
+  node: Nullable<Node>
   depth: number
 }
 
 const K = 2 // 2D points
 const EARTH_RADIUS = 6371000 // meters
 
-export function create (points: Point[]): MaybeNode {
-  if (points.length === 0) {
-    return undefined
-  }
-
-  const stack: InsertTask[] = [{
-    points,
-    depth: 0
-  }]
-
-  let root: MaybeNode
-
-  while (stack.length > 0) {
-    const task = stack.pop()
-    if (task == null) {
-      continue
-    }
-
-    const { points, depth, parent, direction } = task
-
-    const axis = depth % K
-    points.sort((a, b) => (axis === 0 ? a.x - b.x : a.y - b.y))
-    const median = Math.floor(points.length / 2)
-    const node: Node = { point: points[median] }
-
-    if ((parent != null) && direction) {
-      parent[direction] = node
-    } else {
-      root = node
-    }
-
-    if (points.slice(0, median).length > 0) {
-      stack.push({
-        points: points.slice(0, median),
-        depth: depth + 1,
-        parent: node,
-        direction: 'left'
-      })
-    }
-
-    if (points.slice(median + 1).length > 0) {
-      stack.push({
-        points: points.slice(median + 1),
-        depth: depth + 1,
-        parent: node,
-        direction: 'right'
-      })
-    }
-  }
-
-  return root
+export function create (): { root: Nullable<Node> } {
+  return { root: null }
 }
 
-export function insert (root: MaybeNode, point: Point): Node {
+export function insert (tree: { root: Nullable<Node> }, point: Point): void {
   const newNode: Node = { point }
-  if (root == null) {
-    return newNode
+
+  if (tree.root == null) {
+    tree.root = newNode
+    return
   }
 
-  let node: MaybeNode = root
+  let node: Nullable<Node> = tree.root
   let depth = 0
-  let parent: Node
 
-  while (node) {
-    parent = node
+  while (node !== null) {
     const axis = depth % K
 
-    let nextNode: MaybeNode
-
     if (axis === 0) {
-      if (point.x < node.point.x) {
-        nextNode = node.left
+      if (point.lon < node.point.lon) {
+        if (node.left == null) {
+          node.left = newNode
+          return
+        }
+        node = node.left
       } else {
-        nextNode = node.right
+        if (node.right == null) {
+          node.right = newNode
+          return
+        }
+        node = node.right
       }
     } else {
-      if (point.y < node.point.y) {
-        nextNode = node.left
+      if (point.lat < node.point.lat) {
+        if (node.left == null) {
+          node.left = newNode
+          return
+        }
+        node = node.left
       } else {
-        nextNode = node.right
+        if (node.right == null) {
+          node.right = newNode
+          return
+        }
+        node = node.right
       }
     }
 
-    if (nextNode == null) break
-
-    node = nextNode
     depth++
   }
-
-  const axis = depth % K
-  if (axis === 0) {
-    if (point.x < parent!.point.x) {
-      parent!.left = newNode
-    } else {
-      parent!.right = newNode
-    }
-  } else {
-    if (point.y < parent!.point.y) {
-      parent!.left = newNode
-    } else {
-      parent!.right = newNode
-    }
-  }
-
-  return root
 }
 
 export function searchByRadius (
-  root: MaybeNode,
+  root: Nullable<Node>,
   center: Point,
   radius: number,
   inclusive = true,
@@ -153,7 +90,7 @@ export function searchByRadius (
 
     const { node, depth } = task
     const axis = depth % K
-    const diff = axis === 0 ? center.x - node.point.x : center.y - node.point.y
+    const diff = axis === 0 ? center.lon - node.point.lon : center.lat - node.point.lat
     const nextDepth = depth + 1
 
     let left = diff <= 0
@@ -180,7 +117,7 @@ export function searchByRadius (
     }
   }
 
-  if (sort) {
+  if (sort !== null) {
     return result.sort((a, b) => {
       if (sort.toLowerCase() === 'asc') {
         return haversineDistance(center, a) - haversineDistance(center, b)
@@ -193,7 +130,7 @@ export function searchByRadius (
   return result
 }
 
-export function searchInsidePolygon (root: MaybeNode, polygon: Point[], inclusive = true): Point[] {
+export function searchInsidePolygon (root: Nullable<Node>, polygon: Point[], inclusive = true): Point[] {
   const stack: SearchTask[] = [{ node: root, depth: 0 }]
   const result: Point[] = []
 
@@ -229,10 +166,10 @@ function isPointInPolygon (polygon: Point[], point: Point): boolean {
   const polygonLength = polygon.length
 
   for (let i = 0, j = polygonLength - 1; i < polygonLength; j = i++) {
-    const xi = polygon[i].x;const yi = polygon[i].y
-    const xj = polygon[j].x; const yj = polygon[j].y
+    const xi = polygon[i].lon; const yi = polygon[i].lat
+    const xj = polygon[j].lon; const yj = polygon[j].lat
 
-    const intersect = ((yi > point.y) !== (yj > point.y)) && (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi)
+    const intersect = ((yi > point.lat) !== (yj > point.lat)) && (point.lon < (xj - xi) * (point.lat - yi) / (yj - yi) + xi)
     if (intersect) isInside = !isInside
   }
 
@@ -240,10 +177,10 @@ function isPointInPolygon (polygon: Point[], point: Point): boolean {
 }
 
 function haversineDistance (coord1: Point, coord2: Point): number {
-  const lat1Rad = toRadians(coord1.y)
-  const lat2Rad = toRadians(coord2.y)
-  const deltaLat = toRadians(coord2.y - coord1.y)
-  const deltaLon = toRadians(coord2.x - coord1.x)
+  const lat1Rad = toRadians(coord1.lat)
+  const lat2Rad = toRadians(coord2.lat)
+  const deltaLat = toRadians(coord2.lat - coord1.lat)
+  const deltaLon = toRadians(coord2.lon - coord1.lon)
 
   const a =
     Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
