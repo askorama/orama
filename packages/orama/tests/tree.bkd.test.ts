@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert } from '../src/trees/bkd.js'
+import { create, insert, searchByRadius } from '../src/trees/bkd.js'
 
 const coordinates = [
   {
@@ -62,5 +62,30 @@ t.only('insert', t => {
         },
       }
     })
+  })
+})
+
+t.only('searchByRadius', t => {
+  t.plan(1)
+
+  t.only('should return all points within a given radius', t => {
+    t.plan(3)
+
+    const tree = create()
+    const coordinatePoints = coordinates.map(({ lat, lon }) => ({ lat, lon }))
+
+    for (const point of coordinatePoints) {
+      insert(tree, point)
+    }
+
+    // Should return the coordinates of the Golden Gate Bridge. Additional properties not implemented yet.
+    t.same(searchByRadius(tree.root, { lat: 37.7909625, lon: -122.4700284 }, 5_000, true, null), [ { lat: 37.8207190397588, lon: -122.47838916631231 } ])
+    
+    // Should return nothing as the center is on the east side.
+    t.same(searchByRadius(tree.root, { lat: 42.9195535, lon: -70.9817219 }, 10_000, true, null), [])
+
+    // Should return the coordinates of all the California locations as they're outside the radius.
+    t.same(searchByRadius(tree.root, { lat: 42.9195535, lon: -70.9817219 }, 10_000, false, null), coordinatePoints)
+
   })
 })

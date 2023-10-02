@@ -20,7 +20,7 @@ interface SearchTask {
 }
 
 const K = 2 // 2D points
-const EARTH_RADIUS = 6371000 // meters
+const EARTH_RADIUS = 6371e3 // meters
 
 export function create (): { root: Nullable<Node> } {
   return { root: null }
@@ -75,59 +75,67 @@ export function insert (tree: { root: Nullable<Node> }, point: Point): void {
 }
 
 export function searchByRadius (
-  root: Nullable<Node>,
+  node: Nullable<Node>,
   center: Point,
   radius: number,
   inclusive = true,
-  sort: SortGeoPoints
+  sort: SortGeoPoints = null
 ): Point[] {
-  const stack: SearchTask[] = [{ node: root, depth: 0 }]
+  const stack: Array<{ node: Nullable<Node>, depth: number }> = [{ node, depth: 0 }]
   const result: Point[] = []
 
   while (stack.length > 0) {
-    const task = stack.pop()
-    if (task == null || task.node == null) continue
-
-    const { node, depth } = task
-    const axis = depth % K
-    const diff = axis === 0 ? center.lon - node.point.lon : center.lat - node.point.lat
-    const nextDepth = depth + 1
-
-    let left = diff <= 0
-    let right = diff >= 0
-
-    const diffInMeters = haversineDistance(center, node.point)
-
-    if (Math.abs(diffInMeters) <= radius) {
-      left = true
-      right = true
-    }
-
-    if (left && node.left != null) {
-      stack.push({ node: node.left, depth: nextDepth })
-    }
-
-    if (right && node.right != null) {
-      stack.push({ node: node.right, depth: nextDepth })
-    }
+    const { node, depth } = stack.pop() as { node: Node, depth: number }
+    if (node == null) continue
 
     const dist = haversineDistance(center, node.point)
+
     if (inclusive ? dist <= radius : dist > radius) {
+      console.log('Adding point:', node.point)
       result.push(node.point)
+    }
+
+    if (node.left != null && blockIntersectsCircle(node.left, center, radius)) {
+      stack.push({ node: node.left, depth: depth + 1 })
+    }
+    if (node.right != null && blockIntersectsCircle(node.right, center, radius)) {
+      stack.push({ node: node.right, depth: depth + 1 })
     }
   }
 
   if (sort !== null) {
-    return result.sort((a, b) => {
-      if (sort.toLowerCase() === 'asc') {
-        return haversineDistance(center, a) - haversineDistance(center, b)
-      } else {
-        return haversineDistance(center, b) - haversineDistance(center, a)
-      }
+    result.sort((a, b) => {
+      const distA = haversineDistance(center, a)
+      const distB = haversineDistance(center, b)
+      return sort.toLowerCase() === 'asc' ? distA - distB : distB - distA
     })
   }
 
   return result
+}
+
+function closestPointInBlock (node: Node, center: Point): Point {
+  let closestLat, closestLon
+
+  if (center.lat < node.point.lat) {
+    closestLat = node.point.lat
+  } else {
+    closestLat = center.lat
+  }
+
+  if (center.lon < node.point.lon) {
+    closestLon = node.point.lon
+  } else {
+    closestLon = center.lon
+  }
+
+  return { lat: closestLat, lon: closestLon }
+}
+
+function blockIntersectsCircle (node: Node, center: Point, radius: number): boolean {
+  const closest = closestPointInBlock(node, center)
+  const distance = haversineDistance(center, closest)
+  return distance <= radius
 }
 
 export function searchInsidePolygon (root: Nullable<Node>, polygon: Point[], inclusive = true): Point[] {
@@ -176,21 +184,16 @@ function isPointInPolygon (polygon: Point[], point: Point): boolean {
   return isInside
 }
 
-function haversineDistance (coord1: Point, coord2: Point): number {
-  const lat1Rad = toRadians(coord1.lat)
-  const lat2Rad = toRadians(coord2.lat)
-  const deltaLat = toRadians(coord2.lat - coord1.lat)
-  const deltaLon = toRadians(coord2.lon - coord1.lon)
+function haversineDistance (coord1, coord2): number {
+  const lat1 = coord1.lat * (Math.PI / 180)
+  const lat2 = coord2.lat * (Math.PI / 180)
+  const deltaLat = (coord2.lat - coord1.lat) * (Math.PI / 180)
+  const deltaLon = (coord2.lon - coord1.lon) * (Math.PI / 180)
 
-  const a =
-    Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-    Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2)
-
+  const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+            Math.cos(lat1) * Math.cos(lat2) *
+            Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2)
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
   return EARTH_RADIUS * c
-}
-
-function toRadians (degrees: number): number {
-  return degrees * Math.PI / 180
 }
