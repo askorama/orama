@@ -94,7 +94,7 @@ t.only('searchInsidePolygon', t => {
   t.plan(1)
 
   t.only('should return all points inside a given polygon', t => {
-    t.plan(1)
+    t.plan(2)
 
     const tree = create()
     const coordinatePoints = coordinates.map(({ lat, lon }) => ({ lat, lon }))
@@ -128,5 +128,8 @@ t.only('searchInsidePolygon', t => {
 
     // Should return the coordinates of all the California locations as they're outside the polygon
     t.same(searchByPolygon(tree.root, polygon, true), coordinatePoints)
+
+    // Should return nothing as all the coordinates are outside the polygon, and the search is not inclusive
+    t.same(searchByPolygon(tree.root, polygon, false), [])
   })
 })

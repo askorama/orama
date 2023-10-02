@@ -97,7 +97,9 @@ export type BM25Params = {
   d?: number
 }
 
-export type FacetSorting = 'asc' | 'desc' | 'ASC' | 'DESC'
+export type GenericSorting = 'asc' | 'desc' | 'ASC' | 'DESC'
+
+export type FacetSorting = GenericSorting
 
 export interface StringFacetDefinition {
   limit?: number

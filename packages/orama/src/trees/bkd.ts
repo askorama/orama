@@ -1,4 +1,4 @@
-import type { Nullable } from '../types.js'
+import type { Nullable, GenericSorting } from '../types.js'
 
 export interface Point {
   lon: number
@@ -12,7 +12,7 @@ export interface Node {
   parent?: Node
 }
 
-export type SortGeoPoints = Nullable<'asc' | 'desc' | 'ASC' | 'DESC'>
+export type SortGeoPoints = Nullable<GenericSorting>
 
 interface SearchTask {
   node: Nullable<Node>
@@ -20,7 +20,7 @@ interface SearchTask {
 }
 
 const K = 2 // 2D points
-const EARTH_RADIUS = 6371e3 // meters
+const EARTH_RADIUS = 6371e3 // Earth radius in meters
 
 export function create (): { root: Nullable<Node> } {
   return { root: null }
