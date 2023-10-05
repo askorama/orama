@@ -47,7 +47,8 @@
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
     "test:smoke": "tap --rcfile=tests/config/tap.yml tests/smoke/*.test.ts",
-    "ci": "npm run build && npm run test:ci && npm run test:smoke"
+    "test:types": "tsc --emitDeclarationOnly; tsd --files tests/type/",
+    "ci": "npm run build && npm run test:ci && npm run test:types"
   },
   "keywords": [
     "full-text search",
@@ -98,6 +99,7 @@
     "tap-mocha-reporter": "^5.0.3",
     "tape": "^5.6.1",
     "tcompare": "^6.0.0",
+    "tsd": "^0.29.0",
     "tsx": "^3.12.1",
     "typescript": "^5.0.0",
     "vite": "^4.1.4"

@@ -138,7 +138,7 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
       }
     }
 
-    propertiesToSearch = propertiesToSearch.filter((prop: string) => properties.includes(prop))
+    propertiesToSearch = propertiesToSearch.filter((prop: string) => (properties as string[]).includes(prop))
   }
 
   // Create the search context and the results
