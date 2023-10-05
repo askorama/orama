@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { expectType, expectAssignable, expectNotAssignable } from 'tsd'
-import type { SearchParams, Orama, Schema } from '../../src/types.d.ts'
-import { create, search } from '../../src/index.js'
+import { expectAssignable, expectNotAssignable } from 'tsd'
+import type { SearchParams, Orama } from '../../src/types.d.ts'
 
 const movieSchema = {
   title: 'string',
@@ -13,13 +12,6 @@ const movieSchema = {
     foo: 'string'
   }
 } as const
-type MovieSchema = Schema<typeof movieSchema>
-
-const movieDBP = create({
-  schema: movieSchema,
-})
-expectType<Promise<Orama<typeof movieSchema>>>(movieDBP)
-const movieDB: Orama<typeof movieSchema> = await movieDBP
 
 // Test search properties type
 {
@@ -30,4 +22,11 @@ const movieDB: Orama<typeof movieSchema> = await movieDBP
   expectAssignable<MovieSearchParamsProperties>(['meta.foo'])
   expectNotAssignable<MovieSearchParamsProperties>(['meta.unknown'])
   expectNotAssignable<MovieSearchParamsProperties>(['unknown'])
+
+  // Test search properties type with unknown schema
+  {
+    type MovieSearchParamsProperties = SearchParams<Orama<any>>['properties']
+    expectAssignable<MovieSearchParamsProperties>('*')
+    expectAssignable<MovieSearchParamsProperties>(['title'])
+  }
 }

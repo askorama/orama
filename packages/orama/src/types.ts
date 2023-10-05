@@ -224,7 +224,7 @@ export type SorterParams<T extends AnyOrama> = {
 
 
 export type FlattenSchema<T extends AnyOrama> = Flatten<T['schema']>
-export type FlattenSchemaProperty<T extends AnyOrama> = keyof FlattenSchema<T>
+export type FlattenSchemaProperty<T extends AnyOrama> = T['schema'] extends object ? keyof FlattenSchema<T> : string
 
 export type SortByParams<T extends AnyOrama, ResultDocument> = SorterParams<T> | CustomSorterFunction<ResultDocument>
 
