@@ -7,6 +7,7 @@ import {
   InternalDocumentIDStore,
   getInternalDocumentId,
 } from './internal-document-id-store.js';
+import { safeArrayPush } from "../utils.js";
 
 interface PropertySort<K> {
   docs: Map<InternalDocumentID, number>
@@ -56,7 +57,7 @@ function innerCreate<T extends AnyOrama>(
     if (typeof type === 'object' && !Array.isArray(type)) {
       // Nested
       const ret = innerCreate(orama, sharedInternalDocumentStore, type, sortableDeniedProperties, path)
-      sorter.sortableProperties.push(...ret.sortableProperties)
+      safeArrayPush(sorter.sortableProperties, ret.sortableProperties);
       sorter.sorts = {
         ...sorter.sorts,
         ...ret.sorts,
