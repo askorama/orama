@@ -30,8 +30,4 @@ const movieDB: Orama<typeof movieSchema> = await movieDBP
   expectAssignable<MovieSearchParamsProperties>(['meta.foo'])
   expectNotAssignable<MovieSearchParamsProperties>(['meta.unknown'])
   expectNotAssignable<MovieSearchParamsProperties>(['unknown'])
-
-  search(movieDB, {
-    properties: ['unknown'] as unknown as MovieSearchParamsProperties,
-  })
 }
