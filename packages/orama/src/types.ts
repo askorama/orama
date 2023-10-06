@@ -13,28 +13,29 @@ export type SyncOrAsyncValue<T = void> = T | PromiseLike<T>
 // Given a type T, return a new type with:
 // - the concatenation of nested properties as key
 // - the type of the nested property as value
-export type Flatten<T extends object> = object extends T
+type Flatten<T extends object> = object extends T
   ? object
   : {
-      [K in keyof T]-?: (
-        x: NonNullable<T[K]> extends infer V
+    [K in keyof T]-?: (
+      // Create a function as argument:
+      // - Pick<T, K> if the value is not an object (not run recursion)
+      // - { [key concatenation]: function calculated by recursion }
+      // - never is the value is an array
+      x: NonNullable<T[K]> extends infer V
           ? V extends object
             ? V extends readonly any[]
-              ? Pick<T, K>
+              ? never // Orama schema doens't allow array as value
               : Flatten<V> extends infer FV
               ? {
-                  [P in keyof FV as `${Extract<K, string | number>}.${Extract<P, string | number>}`]: FV[P]
+                  [P in keyof FV as `${Extract<K, string>}.${Extract<P, string>}`]: FV[P]
                 }
-              : never
+              : never // Never happen: it is needed due to `extends` typescript syntax
             : Pick<T, K>
-          : never,
+          : never, // Never happen: it is needed due to typescript syntax
       ) => void
-    } extends Record<keyof T, (y: infer O) => void>
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ? O extends infer U
-    ? { [K in keyof O]: O[K] }
-    : never
-  : never
+  } extends Record<keyof T, (y: infer O) => void>
+  ? O // Return the type of the function argument
+  : never // Never happen: it is needed due to typescript syntax
 
 
 export type SchemaTypes<Value> = Value extends 'string'
@@ -225,6 +226,8 @@ export type SorterParams<T extends AnyOrama> = {
 
 export type FlattenSchema<T extends AnyOrama> = Flatten<T['schema']>
 export type FlattenSchemaProperty<T extends AnyOrama> = T['schema'] extends object ? keyof FlattenSchema<T> : string
+export type FlattenSchemaProperties<T extends AnyOrama> = FlattenSchemaProperty<T>[]
+export type OnlyStrings<T extends any[]> = T[number] extends infer V ? V extends string ? V : never : never
 
 export type SortByParams<T extends AnyOrama, ResultDocument> = SorterParams<T> | CustomSorterFunction<ResultDocument>
 
@@ -236,7 +239,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
   /**
    * The properties of the document to search in.
    */
-  properties?: '*' | FlattenSchemaProperty<T>[]
+  properties?: '*' | FlattenSchemaProperties<T>
   /**
    * The number of matched documents to return.
    */
@@ -295,7 +298,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    *
    * // In that case, the score of the 'title' property will be multiplied by 2.
    */
-  boost?: Partial<Record<LiteralUnion<T['schema']>, number>>
+  boost?: Partial<Record<OnlyStrings<FlattenSchemaProperties<T>>, number>>
   /**
    * Facets configuration
    * Full documentation: https://docs.oramasearch.com/usage/search/facets

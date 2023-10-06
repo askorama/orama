@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { expectAssignable, expectNotAssignable } from 'tsd'
+import { expectAssignable, expectNotAssignable, expectNotType } from 'tsd'
 import type { SearchParams, Orama } from '../../src/types.d.ts'
 
 const movieSchema = {
@@ -28,5 +28,25 @@ const movieSchema = {
     type MovieSearchParamsProperties = SearchParams<Orama<any>>['properties']
     expectAssignable<MovieSearchParamsProperties>('*')
     expectAssignable<MovieSearchParamsProperties>(['title'])
+  }
+}
+
+// Test boost
+{
+  type MovieSearchParamsBoost = SearchParams<Orama<typeof movieSchema>>['boost']
+
+  expectAssignable<MovieSearchParamsBoost>(undefined)
+  expectAssignable<MovieSearchParamsBoost>({})
+  expectAssignable<MovieSearchParamsBoost>({ title: 1 })
+  expectAssignable<MovieSearchParamsBoost>({ 'meta.foo': 1 })
+  expectNotAssignable<MovieSearchParamsBoost>({ 'unknown': 1 })
+  expectNotAssignable<MovieSearchParamsBoost>({ 'meta.unknown': 1 })
+
+  // Test search boost type with unknown schema
+  {
+    type MovieSearchParamsBoost = SearchParams<Orama<any>>['boost']
+    expectAssignable<MovieSearchParamsBoost>(undefined)
+    expectAssignable<MovieSearchParamsBoost>({})
+    expectAssignable<MovieSearchParamsBoost>({ title: 1 })
   }
 }
