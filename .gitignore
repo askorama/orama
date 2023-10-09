@@ -10,3 +10,4 @@ playwright-report
 .dev
 .DS_Store
 .turbo
+.idea/
