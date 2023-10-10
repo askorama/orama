@@ -527,9 +527,9 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
 
     if (type === 'Flat') {
       if (isArray) {
-        filtersMap[param].push(...flatFilterArr(node, operation as EnumArrComparisonOperator))
+        safeArrayPush(filtersMap[param], flatFilterArr(node, operation as EnumArrComparisonOperator))
       } else {
-        filtersMap[param].push(...flatFilter(node, operation as EnumComparisonOperator))
+        safeArrayPush(filtersMap[param], flatFilter(node, operation as EnumComparisonOperator))
       }
       continue
     }

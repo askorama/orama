@@ -10,6 +10,33 @@ export type SingleOrArray<T> = T | T[]
 
 export type SyncOrAsyncValue<T = void> = T | PromiseLike<T>
 
+// Given a type T, return a new type with:
+// - the concatenation of nested properties as key
+// - the type of the nested property as value
+export type Flatten<T extends object> = object extends T
+  ? object
+  : {
+      [K in keyof T]-?: (
+        x: NonNullable<T[K]> extends infer V
+          ? V extends object
+            ? V extends readonly any[]
+              ? Pick<T, K>
+              : Flatten<V> extends infer FV
+              ? {
+                  [P in keyof FV as `${Extract<K, string | number>}.${Extract<P, string | number>}`]: FV[P]
+                }
+              : never
+            : Pick<T, K>
+          : never,
+      ) => void
+    } extends Record<keyof T, (y: infer O) => void>
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ? O extends infer U
+    ? { [K in keyof O]: O[K] }
+    : never
+  : never
+
+
 export type SchemaTypes<Value> = Value extends 'string'
   ? string
   : Value extends 'string[]'
@@ -197,6 +224,10 @@ export type SorterParams<T extends AnyOrama> = {
   order?: 'ASC' | 'DESC'
 }
 
+
+export type FlattenSchema<T extends AnyOrama> = Flatten<T['schema']>
+export type FlattenSchemaProperty<T extends AnyOrama> = T['schema'] extends object ? keyof FlattenSchema<T> : string
+
 export type SortByParams<T extends AnyOrama, ResultDocument> = SorterParams<T> | CustomSorterFunction<ResultDocument>
 
 export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> = {
@@ -207,7 +238,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
   /**
    * The properties of the document to search in.
    */
-  properties?: '*' | LiteralUnion<T['schema']>[]
+  properties?: '*' | FlattenSchemaProperty<T>[]
   /**
    * The number of matched documents to return.
    */

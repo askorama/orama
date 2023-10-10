@@ -152,7 +152,7 @@ t.test('search method', t => {
         () =>
           search(db, {
             term: 'foo',
-            properties: ['bar'],
+            properties: ['bar'] as unknown as ('foo' | 'baz')[],
           }),
         {
           code: 'UNKNOWN_INDEX',
@@ -416,7 +416,7 @@ t.test('search method', t => {
       () =>
         search(db, {
           term: 'foo',
-          properties: ['bar'],
+          properties: ['bar'] as unknown as ('foo' | 'baz')[],
         }),
       {
         code: 'UNKNOWN_INDEX',
