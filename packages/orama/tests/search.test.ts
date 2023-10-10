@@ -6,6 +6,38 @@ t.test('search method', t => {
   t.test('with term', async t => {
     const [db, id1, id2, id3, id4] = await createSimpleDB()
 
+    //https://github.com/oramasearch/orama/issues/480
+    //following testcase pass only if issue 480 is fixed.
+    t.test('should correctly match with tolerance . even if prefix doesnt match.', async t => { 
+      t.plan(2)
+
+      const db = await create({
+        schema: {
+          name: 'string',
+        },
+        components: {
+          tokenizer: {
+            stemming: true,
+            stopWords: englishStopwords,
+          },
+        },
+      })
+
+      await insert(db, { name:"Chris "})
+      await insert(db, { name:"Craig"})
+      await insert(db, { name:"Chxy"}) //create h node in radix tree.
+      await insert(db, { name:"Crxy"}) //create r node in radix tree.
+
+      //issue 480 says following will not match because the prefix "Cr" exists so prefix Ch is not searched.
+      const result1 = await search(db, { term: 'Cris', tolerance: 1 })
+      //should match "Craig" even if prefix "Ca" exists.
+      const result2 = await search(db, { term: 'Caig', tolerance: 1 })
+
+      t.equal(result1.count, 1)
+      t.equal(result2.count, 1)
+     
+    })
+
     t.test('should return all the document on empty string', async t => {
       const result = await search(db, {
         term: '',
