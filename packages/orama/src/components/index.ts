@@ -47,6 +47,7 @@ import {
 import {
   create as bkdCreate,
   insert as bkdInsert,
+  removeDocByID as bkdRemoveDocByID,
   RootNode as BKDNode,
   Point as BKDGeoPoint,
 } from '../trees/bkd.js'
@@ -340,6 +341,7 @@ export async function insert(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<void> {
+
   if (isVectorType(schemaType)) {
     return insertVector(index, prop, value as number[] | Float32Array, id)
   }
@@ -426,7 +428,7 @@ async function removeScalar(
       return true
     }
     case 'BKD': {
-      throw new Error(`BKD not implemented`)
+      bkdRemoveDocByID(node, value as unknown as BKDGeoPoint, internalId)
       return false
     }
   }

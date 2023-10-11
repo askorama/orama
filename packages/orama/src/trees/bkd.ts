@@ -47,7 +47,8 @@ export function insert (tree: RootNode, point: Point, docIDs: InternalDocumentID
     // Check if the current node's point matches the new point
     if (node.point.lon === point.lon && node.point.lat === point.lat) {
       // Merge the new docIDs with the existing ones and remove duplicates
-      node.docIDs = Array.from(new Set([...(node.docIDs || []), ...docIDs || []]))
+      const newDocIDs = node.docIDs || []
+      node.docIDs = Array.from(new Set([...newDocIDs, ...docIDs || []]))
       // Exit since the docIDs have been merged
       return
     }
@@ -187,6 +188,7 @@ export function getDocIDsByCoordinates (tree: RootNode, point: Point): Nullable<
   while (node !== null) {
     // Check if the current node's point matches the provided point
     if (node.point.lon === point.lon && node.point.lat === point.lat) {
+      // prettier-ignore
       return node.docIDs || null
     }
 
