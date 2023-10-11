@@ -1,7 +1,8 @@
-import { isArrayType, isVectorType } from '../components.js'
+import { isArrayType, isGeoPointType, isVectorType } from '../components.js'
 import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { trackInsertion } from '../components/sync-blocking-checker.js'
 import { createError } from '../errors.js'
+import { Point } from '../trees/bkd.js'
 import { AnyOrama, PartialSchemaDeep, SortValue, TypedDocument } from '../types.js'
 
 export async function insert<T extends AnyOrama>(
@@ -53,6 +54,10 @@ async function innerInsert<T extends AnyOrama>(
 
     const actualType = typeof value
     const expectedType = indexablePropertiesWithTypes[key]
+
+    if (isGeoPointType(expectedType) && typeof value === 'object' && typeof (value as Point).lon === 'number' && typeof (value as Point).lat === 'number') {
+      continue
+    }
 
     if (isVectorType(expectedType) && Array.isArray(value)) {
       // @todo: Validate vector type. It should be of a given length and contain only floats.

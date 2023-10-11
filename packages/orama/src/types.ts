@@ -3,6 +3,7 @@ import { Index } from './components/index.js'
 import { DocumentID, InternalDocumentID, InternalDocumentIDStore } from './components/internal-document-id-store.js'
 import { Sorter } from './components/sorter.js'
 import { Language } from './components/tokenizer/languages.js'
+import { Point } from './trees/bkd.js'
 
 export type Nullable<T> = T | null
 
@@ -53,6 +54,8 @@ export type SchemaTypes<Value> = Value extends 'string'
   ? string | number
   : Value extends 'enum[]'
   ? (string | number)[]
+  : Value extends 'geopoint'
+  ? Point
   : // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Value extends `vector[${number}]`
   ? number[]
@@ -104,7 +107,7 @@ export type ArraySearchableType = 'string[]' | 'number[]' | 'boolean[]' | 'enum[
 
 export type SearchableType = ScalarSearchableType | ArraySearchableType
 
-export type ScalarSearchableValue = string | number | boolean
+export type ScalarSearchableValue = string | number | boolean | Point
 export type ArraySearchableValue = string[] | number[] | boolean[] | VectorType
 export type SearchableValue = ScalarSearchableValue | ArraySearchableValue
 

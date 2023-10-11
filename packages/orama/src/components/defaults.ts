@@ -43,6 +43,10 @@ export async function validateSchema<T extends AnyOrama, ResultDocument extends 
       continue
     }
 
+    if (type === 'geopoint' && (typeof value === 'object' && typeof value.lon === 'number' && typeof value.lat === 'number')) {
+      continue
+    }
+
     if (type === 'enum' && (typeof value === 'string' || typeof value === 'number')) {
       continue
     }
@@ -118,6 +122,10 @@ const INNER_TYPE: Record<ArraySearchableType, ScalarSearchableType> = {
   'number[]': 'number',
   'boolean[]': 'boolean',
   'enum[]': 'enum',
+}
+
+export function isGeoPointType(type: unknown) {
+  return typeof type === 'string' && type === 'geopoint'
 }
 
 export function isVectorType(type: unknown): type is Vector {

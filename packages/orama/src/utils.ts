@@ -221,8 +221,15 @@ export async function getDocumentProperties(doc: AnyDocument, paths: string[]): 
       current = (current as AnyDocument)[pathTokens[j]!] as AnyDocument | SearchableValue
 
       // We found an object but we were supposed to be done
-      if (typeof current === 'object' && !Array.isArray(current) && current !== null && j === pathTokensLength - 1) {
-        current = undefined
+      if (typeof current === 'object') {
+        if ('lat' in current && 'lon' in current && typeof current.lat === 'number' && typeof current.lon === 'number') {
+          current = properties[path] = current as SearchableValue
+          break
+        }
+
+        if (!Array.isArray(current) && current !== null && j === pathTokensLength - 1) {
+          current = undefined
+        }
         break
       } else if ((current === null || typeof current !== 'object') && j < pathTokensLength - 1) {
         // We can't recurse anymore but we were supposed to

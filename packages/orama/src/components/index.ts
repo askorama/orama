@@ -326,6 +326,7 @@ async function insertScalar(
     }
     case 'BKD': {
       bkdInsert(node, value as unknown as BKDGeoPoint, [internalId])
+      break
     }
   }
 }
