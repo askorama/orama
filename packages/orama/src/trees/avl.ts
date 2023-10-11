@@ -1,7 +1,7 @@
 import { Nullable } from '../types.js'
 import { safeArrayPush } from '../utils.js'
 
-export type Node<K, V> = {
+export interface Node<K, V> {
   // Node key
   k: K
   // Node value
@@ -19,14 +19,14 @@ const BALANCE_STATE = {
   SLIGHTLY_UNBALANCED_RIGHT: -1,
   BALANCED: 0,
   SLIGHTLY_UNBALANCED_LEFT: 1,
-  UNBALANCED_LEFT: 2,
+  UNBALANCED_LEFT: 2
 }
 
-function getHeight<K, V>(node: Nullable<Node<K, V>>): number {
-  return node ? node.h : -1
+function getHeight<K, V> (node: Nullable<Node<K, V>>): number {
+  return (node != null) ? node.h : -1
 }
 
-function rotateLeft<K, V>(node: Node<K, V>): Node<K, V> {
+function rotateLeft<K, V> (node: Node<K, V>): Node<K, V> {
   const right = node.r as Node<K, V>
   node.r = right.l
   right.l = node
@@ -35,7 +35,7 @@ function rotateLeft<K, V>(node: Node<K, V>): Node<K, V> {
   return right
 }
 
-function rotateRight<K, V>(node: Node<K, V>): Node<K, V> {
+function rotateRight<K, V> (node: Node<K, V>): Node<K, V> {
   const left = node.l as Node<K, V>
   node.l = left.r
   left.r = node
@@ -44,11 +44,11 @@ function rotateRight<K, V>(node: Node<K, V>): Node<K, V> {
   return left
 }
 
-export function contains<K, V>(node: Node<K, V>, key: K): boolean {
+export function contains<K, V> (node: Node<K, V>, key: K): boolean {
   return !!find(node, key)
 }
 
-export function getSize<K, V>(root: Nullable<Node<K, V>>): number {
+export function getSize<K, V> (root: Nullable<Node<K, V>>): number {
   let size = 0
   const queue: Array<Node<K, V>> = []
 
@@ -72,10 +72,10 @@ export function getSize<K, V>(root: Nullable<Node<K, V>>): number {
   return size
 }
 
-export function isBalanced<K, V>(root: Nullable<Node<K, V>>): boolean {
+export function isBalanced<K, V> (root: Nullable<Node<K, V>>): boolean {
   if (root === null) return true
 
-  const stack: Node<K, V>[] = [root]
+  const stack: Array<Node<K, V>> = [root]
 
   while (stack.length > 0) {
     const node = stack.pop()
@@ -100,16 +100,14 @@ export function isBalanced<K, V>(root: Nullable<Node<K, V>>): boolean {
   return true
 }
 
-export function rangeSearch<K, V>(node: Node<K, V>, min: K, max: K): V {
+export function rangeSearch<K, V> (node: Node<K, V>, min: K, max: K): V {
   if (!node) {
     return [] as unknown as V
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   const result: V[] = []
 
-  function traverse(node: Node<K, V>) {
+  function traverse (node: Node<K, V>) {
     if (!node) {
       return
     }
@@ -119,7 +117,7 @@ export function rangeSearch<K, V>(node: Node<K, V>, min: K, max: K): V {
     }
 
     if (node.k >= min && node.k <= max) {
-      safeArrayPush(result, node.v as V[]);
+      safeArrayPush(result, node.v as V[])
     }
 
     if (node.k < max) {
@@ -132,26 +130,24 @@ export function rangeSearch<K, V>(node: Node<K, V>, min: K, max: K): V {
   return result as V
 }
 
-export function greaterThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
+export function greaterThan<K, V> (node: Node<K, V>, key: K, inclusive = false): V {
   if (!node) {
     return [] as unknown as V
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   const result: V[] = []
 
-  function traverse(node: Node<K, V>) {
+  function traverse (node: Node<K, V>) {
     if (!node) {
       return
     }
 
     if (inclusive && node.k >= key) {
-      safeArrayPush(result, node.v as V[]);
+      safeArrayPush(result, node.v as V[])
     }
 
     if (!inclusive && node.k > key) {
-      safeArrayPush(result, node.v as V[]);
+      safeArrayPush(result, node.v as V[])
     }
 
     traverse(node.l as Node<K, V>)
@@ -163,26 +159,24 @@ export function greaterThan<K, V>(node: Node<K, V>, key: K, inclusive = false): 
   return result as V
 }
 
-export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
+export function lessThan<K, V> (node: Node<K, V>, key: K, inclusive = false): V {
   if (!node) {
     return [] as unknown as V
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   const result: V[] = []
 
-  function traverse(node: Node<K, V>) {
+  function traverse (node: Node<K, V>) {
     if (!node) {
       return
     }
 
     if (inclusive && node.k <= key) {
-      safeArrayPush(result, node.v as V[]);
+      safeArrayPush(result, node.v as V[])
     }
 
     if (!inclusive && node.k < key) {
-      safeArrayPush(result, node.v as V[]);
+      safeArrayPush(result, node.v as V[])
     }
 
     traverse(node.l as Node<K, V>)
@@ -194,7 +188,7 @@ export function lessThan<K, V>(node: Node<K, V>, key: K, inclusive = false): V {
   return result as V
 }
 
-function getNodeByKey<K, V>(node: Nullable<Node<K, V>>, key: K): Nullable<Node<K, V>> {
+function getNodeByKey<K, V> (node: Nullable<Node<K, V>>, key: K): Nullable<Node<K, V>> {
   while (node !== null) {
     if (key < node.k) {
       node = node.l
@@ -207,17 +201,17 @@ function getNodeByKey<K, V>(node: Nullable<Node<K, V>>, key: K): Nullable<Node<K
   return null
 }
 
-export function create<K, V>(key: K, value: V): Node<K, V> {
+export function create<K, V> (key: K, value: V): Node<K, V> {
   return {
     k: key,
     v: value,
     l: null,
     r: null,
-    h: 0,
+    h: 0
   }
 }
 
-export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
+export function insert<K, V> (root: Node<K, V>, key: K, value: V): Node<K, V> {
   let parent: Nullable<Node<K, V>> = null
   let current: Nullable<Node<K, V>> = root
 
@@ -229,14 +223,14 @@ export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
       current = current.r
     } else {
       // assuming value is an array here
-      (current.v as string[]) = (current.v as string[]).concat(value as string);
+      (current.v as string[]) = (current.v as string[]).concat(value as string)
       return root
     }
   }
 
   const newNode = create(key, value)
 
-  if (!parent) {
+  if (parent == null) {
     root = newNode // tree was empty
   } else if (key < parent.k) {
     parent.l = newNode
@@ -246,7 +240,7 @@ export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
 
   current = newNode
 
-  while (parent) {
+  while (parent != null) {
     const balanceFactor = getHeight(parent.l) - getHeight(parent.r)
 
     if (balanceFactor === BALANCE_STATE.UNBALANCED_LEFT) {
@@ -274,7 +268,7 @@ export function insert<K, V>(root: Node<K, V>, key: K, value: V): Node<K, V> {
   return root
 }
 
-function getNodeParent<K, V>(root: Node<K, V>, key: K): Nullable<Node<K, V>> {
+function getNodeParent<K, V> (root: Node<K, V>, key: K): Nullable<Node<K, V>> {
   let current: Nullable<Node<K, V>> = root
   let parent: Nullable<Node<K, V>> = null
 
@@ -293,19 +287,19 @@ function getNodeParent<K, V>(root: Node<K, V>, key: K): Nullable<Node<K, V>> {
   return parent
 }
 
-export function find<K, V>(root: Node<K, V>, key: K): V | null {
+export function find<K, V> (root: Node<K, V>, key: K): V | null {
   const node = getNodeByKey(root, key)
-  if (!node) {
+  if (node == null) {
     return null
   }
   return node.v
 }
 
-export function remove<K, V>(root: Nullable<Node<K, V>>, key: K): Nullable<Node<K, V>> {
+export function remove<K, V> (root: Nullable<Node<K, V>>, key: K): Nullable<Node<K, V>> {
   let node = root
   let parentNode: Nullable<Node<K, V>> = null
 
-  while (node && node.k !== key) {
+  while ((node != null) && node.k !== key) {
     parentNode = node
     if (key < node.k) {
       node = node.l as Node<K, V>
@@ -314,12 +308,12 @@ export function remove<K, V>(root: Nullable<Node<K, V>>, key: K): Nullable<Node<
     }
   }
 
-  if (!node) {
+  if (node == null) {
     return null
   }
 
-  if (!node.l && !node.r) {
-    if (!parentNode) {
+  if ((node.l == null) && (node.r == null)) {
+    if (parentNode == null) {
       // Node to be deleted is root
       root = null
     } else {
@@ -329,11 +323,11 @@ export function remove<K, V>(root: Nullable<Node<K, V>>, key: K): Nullable<Node<
         parentNode.r = null
       }
     }
-  } else if (node.l && node.r) {
+  } else if ((node.l != null) && (node.r != null)) {
     let minValueNode = node.r
     let minValueParent = node
 
-    while (minValueNode.l) {
+    while (minValueNode.l != null) {
       minValueParent = minValueNode
       minValueNode = minValueNode.l
     }
@@ -346,9 +340,9 @@ export function remove<K, V>(root: Nullable<Node<K, V>>, key: K): Nullable<Node<
       minValueParent.l = minValueNode.r
     }
   } else {
-    const childNode = node.l ? node.l : node.r
+    const childNode = (node.l != null) ? node.l : node.r
 
-    if (!parentNode) {
+    if (parentNode == null) {
       root = childNode as Node<K, V>
     } else {
       if (parentNode.l === node) {
@@ -362,7 +356,7 @@ export function remove<K, V>(root: Nullable<Node<K, V>>, key: K): Nullable<Node<
   return root
 }
 
-export function removeDocument<K, V>(root: Node<K, V[]>, id: V, key: K): void {
+export function removeDocument<K, V> (root: Node<K, V[]>, id: V, key: K): void {
   const node = getNodeByKey(root, key)!
 
   if (!node) {

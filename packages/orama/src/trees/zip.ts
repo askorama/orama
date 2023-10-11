@@ -15,7 +15,7 @@ interface Node<V = unknown> {
   n: number
 }
 
-function randomRank(): number {
+function randomRank (): number {
   const r = Math.random()
   return Math.floor(Math.log(1 - r) / Math.log(1 - 0.5))
 }
