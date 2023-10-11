@@ -9,7 +9,7 @@ t.test('search method', t => {
     //https://github.com/oramasearch/orama/issues/480
     //following testcase pass only if issue 480 is fixed.
     t.test('should correctly match with tolerance . even if prefix doesnt match.', async t => { 
-      t.plan(2)
+      t.plan(5)
 
       const db = await create({
         schema: {
@@ -23,18 +23,26 @@ t.test('search method', t => {
         },
       })
 
+      await insert(db, { name: "Dhris" })
+      const result1 = await search(db, { term: 'Chris', tolerance: 1 })
+      const result2 = await search(db, { term: 'Cgris', tolerance: 1 })
+      const result3 = await search(db, { term: 'Cgris', tolerance: 2 })
+      t.equal(result1.count, 1)
+      t.equal(result2.count, 0)
+      t.equal(result3.count, 1)
+
       await insert(db, { name:"Chris "})
       await insert(db, { name:"Craig"})
       await insert(db, { name:"Chxy"}) //create h node in radix tree.
       await insert(db, { name:"Crxy"}) //create r node in radix tree.
 
       //issue 480 says following will not match because the prefix "Cr" exists so prefix Ch is not searched.
-      const result1 = await search(db, { term: 'Cris', tolerance: 1 })
+      const result4 = await search(db, { term: 'Cris', tolerance: 1 })
       //should match "Craig" even if prefix "Ca" exists.
-      const result2 = await search(db, { term: 'Caig', tolerance: 1 })
+      const result5 = await search(db, { term: 'Caig', tolerance: 1 })
 
-      t.equal(result1.count, 1)
-      t.equal(result2.count, 1)
+      t.equal(result4.count, 1)
+      t.equal(result5.count, 1)
      
     })
 
