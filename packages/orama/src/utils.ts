@@ -15,7 +15,7 @@ export const isServer = typeof window === 'undefined'
  * But i don't know if this value change from nodejs to nodejs
  * So I will keep a safer value here.
  */
-export const MAX_ARGUMENT_FOR_STACK = 65535;
+export const MAX_ARGUMENT_FOR_STACK = 65535
 
 /**
  * This method is needed to used because of issues like: https://github.com/oramasearch/orama/issues/301
@@ -26,7 +26,7 @@ export const MAX_ARGUMENT_FOR_STACK = 65535;
  * safeArrayPush(myArray, [1, 2])
  * ```
  */
-export function safeArrayPush<T>(arr: T[], newArr: T[]): void {
+export function safeArrayPush<T> (arr: T[], newArr: T[]): void {
   if (newArr.length < MAX_ARGUMENT_FOR_STACK) {
     Array.prototype.push.apply(arr, newArr)
   } else {
@@ -36,7 +36,7 @@ export function safeArrayPush<T>(arr: T[], newArr: T[]): void {
   }
 }
 
-export function sprintf(template: string, ...args: (string | number)[]): string {
+export function sprintf (template: string, ...args: Array<string | number>): string {
   return template.replace(
     /%(?:(?<position>\d+)\$)?(?<width>-?\d*\.?\d*)(?<type>[dfs])/g,
     function (...replaceArgs: Array<string | number | Record<string, string>>): string {
@@ -67,11 +67,11 @@ export function sprintf(template: string, ...args: (string | number)[]): string 
         default:
           return replacement as string
       }
-    },
+    }
   )
 }
 
-export async function formatBytes(bytes: number, decimals = 2): Promise<string> {
+export async function formatBytes (bytes: number, decimals = 2): Promise<string> {
   if (bytes === 0) {
     return '0 Bytes'
   }
@@ -81,7 +81,7 @@ export async function formatBytes(bytes: number, decimals = 2): Promise<string> 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
-export async function formatNanoseconds(value: number | bigint): Promise<string> {
+export async function formatNanoseconds (value: number | bigint): Promise<string> {
   if (typeof value === 'number') {
     value = BigInt(value)
   }
@@ -97,7 +97,7 @@ export async function formatNanoseconds(value: number | bigint): Promise<string>
   return `${value / second}s`
 }
 
-export async function getNanosecondsTime(): Promise<bigint> {
+export async function getNanosecondsTime (): Promise<bigint> {
   if (typeof process !== 'undefined' && process.hrtime !== undefined) {
     return process.hrtime.bigint()
   }
@@ -110,11 +110,11 @@ export async function getNanosecondsTime(): Promise<bigint> {
   return BigInt(0)
 }
 
-export async function uniqueId(): Promise<string> {
+export async function uniqueId (): Promise<string> {
   return `${baseId}-${lastId++}`
 }
 
-export function getOwnProperty<T = unknown>(object: Record<string, T>, property: string): T | undefined {
+export function getOwnProperty<T = unknown> (object: Record<string, T>, property: string): T | undefined {
   // Checks if `hasOwn` method is defined avoiding errors with older Node.js versions
   if (Object.hasOwn === undefined) {
     return Object.prototype.hasOwnProperty.call(object, property) ? object[property] : undefined
@@ -123,7 +123,7 @@ export function getOwnProperty<T = unknown>(object: Record<string, T>, property:
   return Object.hasOwn(object, property) ? object[property] : undefined
 }
 
-export function getTokenFrequency(token: string, tokens: string[]): number {
+export function getTokenFrequency (token: string, tokens: string[]): number {
   let count = 0
 
   for (const t of tokens) {
@@ -135,10 +135,10 @@ export function getTokenFrequency(token: string, tokens: string[]): number {
   return count
 }
 
-export function insertSortedValue(
+export function insertSortedValue (
   arr: TokenScore[],
   el: TokenScore,
-  compareFn = sortTokenScorePredicate,
+  compareFn = sortTokenScorePredicate
 ): TokenScore[] {
   let low = 0
   let high = arr.length
@@ -158,7 +158,7 @@ export function insertSortedValue(
   return arr
 }
 
-export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
+export function sortTokenScorePredicate (a: TokenScore, b: TokenScore): number {
   if (b[1] === a[1]) {
     return a[0] - b[0]
   }
@@ -168,7 +168,7 @@ export function sortTokenScorePredicate(a: TokenScore, b: TokenScore): number {
 
 // Intersection function taken from https://github.com/lovasoa/fast_array_intersect.
 // MIT Licensed at the time of writing.
-export function intersect<T>(arrays: ReadonlyArray<T>[]): T[] {
+export function intersect<T> (arrays: Array<readonly T[]>): T[] {
   if (arrays.length === 0) {
     return []
   } else if (arrays.length === 1) {
@@ -206,7 +206,7 @@ export function intersect<T>(arrays: ReadonlyArray<T>[]): T[] {
   })
 }
 
-export async function getDocumentProperties(doc: AnyDocument, paths: string[]): Promise<Record<string, SearchableValue>> {
+export async function getDocumentProperties (doc: AnyDocument, paths: string[]): Promise<Record<string, SearchableValue>> {
   const properties: Record<string, SearchableValue> = {}
 
   const pathsLength = paths.length
@@ -217,7 +217,7 @@ export async function getDocumentProperties(doc: AnyDocument, paths: string[]): 
     let current: SearchableValue | AnyDocument | undefined = doc
     const pathTokensLength = pathTokens.length
     for (let j = 0; j < pathTokensLength; j++) {
-      current = (current as AnyDocument)[pathTokens[j]!] as AnyDocument | SearchableValue
+      current = (current)[pathTokens[j]!]
 
       // We found an object but we were supposed to be done
       if (typeof current === 'object' && !Array.isArray(current) && current !== null && j === pathTokensLength - 1) {
@@ -238,13 +238,13 @@ export async function getDocumentProperties(doc: AnyDocument, paths: string[]): 
   return properties
 }
 
-export async function getNested<T = SearchableValue>(obj: object, path: string): Promise<T | undefined> {
+export async function getNested<T = SearchableValue> (obj: object, path: string): Promise<T | undefined> {
   const props = await getDocumentProperties(obj as AnyDocument, [path])
 
   return props[path] as T | undefined
 }
 
-export function flattenObject(obj: object, prefix = ''): AnyDocument {
+export function flattenObject (obj: object, prefix = ''): AnyDocument {
   const result: AnyDocument = {}
 
   for (const key in obj) {
