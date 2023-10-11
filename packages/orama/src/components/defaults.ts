@@ -106,6 +106,7 @@ const IS_ARRAY_TYPE: Record<SearchableType, boolean> = {
   number: false,
   boolean: false,
   enum: false,
+  geopoint: false,
   'string[]': true,
   'number[]': true,
   'boolean[]': true,

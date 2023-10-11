@@ -74,7 +74,7 @@ t.test('insert', t => {
 
     insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [ 1 ])
     insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [ 2 ])
-    insert(tree, { lat: 12.1234243234235, lon: -129.18923712312378 }, [ 3 ])
+    insert(tree, { lat: 12.1234243234235, lon: -122.1293 }, [ 3 ])
 
     t.same(getDocIDsByCoordinates(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }), [ 1, 2 ])
   })
@@ -163,7 +163,7 @@ t.test('contains', t => {
     }
 
     t.same(contains(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }), true)
-    t.same(contains(tree, { lat: 10.1927374719287, lon: -132.97841923929291 }), false)
+    t.same(contains(tree, { lat: 10.1927374719287, lon: -132.123 }), false)
   })
 })
 
