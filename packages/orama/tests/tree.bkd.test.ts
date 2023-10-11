@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert, searchByRadius, searchByPolygon, contains } from '../src/trees/bkd.js'
+import { create, insert, searchByRadius, searchByPolygon, removeDocByID, getDocIDsByCoordinates, contains } from '../src/trees/bkd.js'
 
 const coordinates = [
   {
@@ -30,7 +30,7 @@ t.only('create', t => {
 })
 
 t.only('insert', t => {
-  t.plan(1)
+  t.plan(2)
 
   t.only('should insert a new node into an empty tree', t => {
     t.plan(1)
@@ -65,6 +65,18 @@ t.only('insert', t => {
         },
       }
     })
+  })
+
+  t.only('should merge docIDs if the point already exists', t => {
+    t.plan(1)
+
+    const tree = create()
+
+    insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [ 1 ])
+    insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [ 2 ])
+    insert(tree, { lat: 12.1234243234235, lon: -129.18923712312378 }, [ 3 ])
+
+    t.same(getDocIDsByCoordinates(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }), [ 1, 2 ])
   })
 })
 
@@ -152,5 +164,41 @@ t.only('contains', t => {
 
     t.same(contains(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }), true)
     t.same(contains(tree, { lat: 10.1927374719287, lon: -132.97841923929291 }), false)
+  })
+})
+
+t.only('removeDocByID', t => {
+  t.plan(2)
+
+  t.only('should remove a document from the tree by its ID', t => {
+    t.plan(1)
+
+    const tree = create()
+    
+    insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [1])
+    insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [2])
+    insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [3])
+    insert(tree, { lat: 10.1923018231231, lon: -102.01823819273723 }, [4])
+
+    removeDocByID(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, 2)
+
+    t.same(getDocIDsByCoordinates(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }), [1, 3])
+  })
+
+  t.only('If the node doesn\'t have any more docIDs, it should remove the node', t => {
+    t.plan(1)
+
+    const tree = create()
+    
+    insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [1])
+    insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [2])
+    insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [3])
+    insert(tree, { lat: 10.1923018231231, lon: -102.01823819273723 }, [4])
+
+    removeDocByID(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, 1)
+    removeDocByID(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, 2)
+    removeDocByID(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, 3)
+
+    t.same(contains(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }), false)
   })
 })

@@ -44,8 +44,17 @@ export function insert (tree: RootNode, point: Point, docIDs: InternalDocumentID
   let depth = 0
 
   while (node !== null) {
+    // Check if the current node's point matches the new point
+    if (node.point.lon === point.lon && node.point.lat === point.lat) {
+      // Merge the new docIDs with the existing ones and remove duplicates
+      node.docIDs = Array.from(new Set([...(node.docIDs || []), ...docIDs || []]))
+      // Exit since the docIDs have been merged
+      return
+    }
+
     const axis = depth % K
 
+    // Compare by longitude
     if (axis === 0) {
       if (point.lon < node.point.lon) {
         if (node.left == null) {
@@ -60,6 +69,7 @@ export function insert (tree: RootNode, point: Point, docIDs: InternalDocumentID
         }
         node = node.right
       }
+    // Compare by latitude
     } else {
       if (point.lat < node.point.lat) {
         if (node.left == null) {
@@ -84,7 +94,7 @@ export function contains (tree: RootNode, point: Point): boolean {
   let node: Nullable<Node> | undefined = tree.root
   let depth = 0
 
-  while (node) {
+  while (node != null) {
     if (node?.point.lon === point.lon && node.point.lat === point.lat) {
       return true
     }
@@ -93,14 +103,14 @@ export function contains (tree: RootNode, point: Point): boolean {
 
     // Compare by longitude
     if (axis === 0) {
-      if (point.lon < node!.point.lon) {
+      if (point.lon < node.point.lon) {
         node = node?.left
       } else {
         node = node?.right
       }
     // Compare by latitude
     } else {
-      if (point.lat < node!.point.lat) {
+      if (point.lat < node.point.lat) {
         node = node?.left
       } else {
         node = node?.right
@@ -111,6 +121,97 @@ export function contains (tree: RootNode, point: Point): boolean {
   }
 
   return false
+}
+
+// @todo: this is very inefficient. Fix this later.
+export function removeDocByID (tree: RootNode, point: Point, docID: InternalDocumentID): void {
+  let node: Nullable<Node> | undefined = tree.root
+  let depth = 0
+  let parentNode: Nullable<Node> = null
+  let direction: 'left' | 'right' | null = null
+
+  while (node !== null) {
+    if (node?.point.lon === point.lon && node.point.lat === point.lat) {
+      const index = node.docIDs?.indexOf(docID)
+      if (index !== undefined && index > -1) {
+        // Remove the docID from the array
+        node.docIDs?.splice(index, 1)
+
+        if ((node.docIDs == null) || node.docIDs.length === 0) {
+          // If the node doesn't have any more docIDs, remove the node
+          if (parentNode != null) {
+            if (direction === 'left') {
+              parentNode.left = (node.left !== null) ? node.left : node.right
+            } else if (direction === 'right') {
+              parentNode.right = (node.right !== null) ? node.right : node.left
+            }
+          } else {
+            // If the node to be removed is the root
+            tree.root = ((node.left !== null) ? node.left : node.right) as Node
+          }
+        }
+
+        return
+      }
+    }
+
+    const axis = depth % K
+
+    parentNode = node as Nullable<Node>
+    if (axis === 0) { // Compare by longitude
+      if (point.lon < node!.point.lon) {
+        node = node?.left
+        direction = 'left'
+      } else {
+        node = node?.right
+        direction = 'right'
+      }
+    } else { // Compare by latitude
+      if (point.lat < node!.point.lat) {
+        node = node?.left
+        direction = 'left'
+      } else {
+        node = node?.right
+        direction = 'right'
+      }
+    }
+
+    depth++
+  }
+}
+
+export function getDocIDsByCoordinates (tree: RootNode, point: Point): Nullable<InternalDocumentID[]> {
+  let node: Nullable<Node> = tree.root
+  let depth = 0
+
+  while (node !== null) {
+    // Check if the current node's point matches the provided point
+    if (node.point.lon === point.lon && node.point.lat === point.lat) {
+      return node.docIDs || null
+    }
+
+    const axis = depth % K
+
+    // Compare by longitude
+    if (axis === 0) {
+      if (point.lon < node.point.lon) {
+        node = node.left as Nullable<Node>
+      } else {
+        node = node.right as Nullable<Node>
+      }
+    // Compare by latitude
+    } else {
+      if (point.lat < node.point.lat) {
+        node = node.left as Nullable<Node>
+      } else {
+        node = node.right as Nullable<Node>
+      }
+    }
+
+    depth++
+  }
+
+  return null
 }
 
 export function searchByRadius (
