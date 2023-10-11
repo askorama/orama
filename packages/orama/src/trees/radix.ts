@@ -201,40 +201,112 @@ export function insert(root: Node, word: string, docId: InternalDocumentID) {
   }
 }
 
-export function find(root: Node, { term, exact, tolerance }: FindParams): FindResult {
-  // find the closest node to the term
-  for (let i = 0; i < term.length; i++) {
-    const character = term[i]
-    if (character in root.c) {
-      const rootChildCurrentChar = root.c[character]
-      const edgeLabel = rootChildCurrentChar.s
-      const termSubstring = term.substring(i)
-
-      // find the common prefix between two words ex: prime and primate = prim
-      const commonPrefix = getCommonPrefix(edgeLabel, termSubstring)
-      const commonPrefixLength = commonPrefix.length
-      // if the common prefix length is equal to edgeLabel length (the node subword) it means they are a match
-      // if the common prefix is equal to the term means it is contained in the node
-      if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
-        // if tolerance is set we take the current node as the closest
-        if (tolerance) break
-        return {}
-      }
-
-      // skip the subword length and check the next divergent character
-      i += rootChildCurrentChar.s.length - 1
-      // navigate into the child node
-      root = rootChildCurrentChar
-    } else {
-      return {}
-    }
+function _findLevenshtein(
+  node: Node, 
+  term: string, 
+  index: number, 
+  tolerance: number,
+  originalTolerance: number,
+  output: FindResult
+) {
+  if (tolerance < 0) {
+      return;
   }
 
-  const output: FindResult = {}
-  // found the closest node we recursively search through children
-  findAllWords(root, output, term, exact, tolerance)
+  if (node.e) 
+  {
+      const { w, d: docIDs } = node
+      if (w) {
+          const difference = Math.abs(term.length - w.length);
+          if (difference <= originalTolerance && syncBoundedLevenshtein(term, w, originalTolerance).isBounded) {
+            output[w] = []
+          }
+          if (getOwnProperty(output, w) && docIDs.length) {
+            const docs = new Set(output[w])
+      
+            const docIDsLength = docIDs.length
+            for (let i = 0; i < docIDsLength; i++) {
+              docs.add(docIDs[i])
+            }
+            output[w] = Array.from(docs)
+          }
+      }
+  }
 
-  return output
+  if (index >= term.length) {
+      return;
+  }
+
+  // Match current character without consuming tolerance
+  if (term[index] in node.c) {
+    _findLevenshtein(node.c[term[index]], term, index + 1, tolerance, originalTolerance, output);
+  }
+
+  // If tolerance is still available, consider other branches:
+  // 1. Deletion (skip the current term character)
+  _findLevenshtein(node, term, index + 1, tolerance - 1, originalTolerance, output);
+
+  // 2. Insertion (skip the current tree node character)
+  for (const character in node.c) {
+    _findLevenshtein(node.c[character], term, index, tolerance - 1,originalTolerance, output);
+  }
+
+  // 3. Substitution (skip both current term character and tree node character)
+  for (const character in node.c) {
+      if (character !== term[index]) {
+        _findLevenshtein(node.c[character], term, index + 1, tolerance - 1,originalTolerance, output);
+      }
+  }
+
+  return;
+}
+
+export function find(root: Node, { term, exact, tolerance }: FindParams): FindResult {
+  // find the closest node to the term
+
+  //had to use if condition because tolerance 0 is supposed to match only prefix.
+  //(allows infinite insertions at end, which is against normal levenshtein logic).
+  //(new _findLevenshtein only handles not exact and tolerance>0 condition)
+  if(tolerance && !exact){
+    const output: FindResult = {}
+    tolerance=tolerance||0
+    _findLevenshtein(root, term, 0, tolerance || 0,tolerance, output);
+    return output
+
+  }else{
+    for (let i = 0; i < term.length; i++) {
+      const character = term[i]
+      if (character in root.c) {
+        const rootChildCurrentChar = root.c[character]
+        const edgeLabel = rootChildCurrentChar.s
+        const termSubstring = term.substring(i)
+  
+        // find the common prefix between two words ex: prime and primate = prim
+        const commonPrefix = getCommonPrefix(edgeLabel, termSubstring)
+        const commonPrefixLength = commonPrefix.length
+        // if the common prefix length is equal to edgeLabel length (the node subword) it means they are a match
+        // if the common prefix is equal to the term means it is contained in the node
+        if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
+          // if tolerance is set we take the current node as the closest
+          if (tolerance) break
+          return {}
+        }
+  
+        // skip the subword length and check the next divergent character
+        i += rootChildCurrentChar.s.length - 1
+        // navigate into the child node
+        root = rootChildCurrentChar
+      } else {
+        return {}
+      }
+    }
+  
+    const output: FindResult = {}
+    // found the closest node we recursively search through children
+    findAllWords(root, output, term, exact, tolerance)
+
+    return output
+  }
 }
 
 export function contains(root: Node, term: string): boolean {

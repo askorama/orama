@@ -87,7 +87,7 @@ function validateComponents<OramaSchema, TIndex, TDocumentStore, TSorter, TOrama
 }
 
 export async function create<
-  const OramaSchema,
+  OramaSchema,
   TIndex = IIndex<Index>, 
   TDocumentStore = IDocumentsStore<DocumentsStore>, 
   TSorter = ISorter<Sorter>> ({
