@@ -226,7 +226,6 @@ export type SorterParams<T extends AnyOrama> = {
 
 export type FlattenSchema<T extends AnyOrama> = Flatten<T['schema']>
 export type FlattenSchemaProperty<T extends AnyOrama> = T['schema'] extends object ? keyof FlattenSchema<T> : string
-export type FlattenSchemaProperties<T extends AnyOrama> = FlattenSchemaProperty<T>[]
 export type OnlyStrings<T extends any[]> = T[number] extends infer V ? V extends string ? V : never : never
 
 export type SortByParams<T extends AnyOrama, ResultDocument> = SorterParams<T> | CustomSorterFunction<ResultDocument>
@@ -239,7 +238,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
   /**
    * The properties of the document to search in.
    */
-  properties?: '*' | FlattenSchemaProperties<T>
+  properties?: '*' | FlattenSchemaProperty<T>[]
   /**
    * The number of matched documents to return.
    */
@@ -298,7 +297,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    *
    * // In that case, the score of the 'title' property will be multiplied by 2.
    */
-  boost?: Partial<Record<OnlyStrings<FlattenSchemaProperties<T>>, number>>
+  boost?: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>
   /**
    * Facets configuration
    * Full documentation: https://docs.oramasearch.com/usage/search/facets
