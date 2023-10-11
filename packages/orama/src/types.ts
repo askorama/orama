@@ -99,7 +99,7 @@ export type Magnitude = number
 export type Vector = `vector[${number}]`
 export type VectorType = Float32Array
 
-export type ScalarSearchableType = 'string' | 'number' | 'boolean' | 'enum'
+export type ScalarSearchableType = 'string' | 'number' | 'boolean' | 'enum' | 'geopoint'
 export type ArraySearchableType = 'string[]' | 'number[]' | 'boolean[]' | 'enum[]' | Vector
 
 export type SearchableType = ScalarSearchableType | ArraySearchableType

@@ -1,4 +1,5 @@
 import type { Nullable, GenericSorting } from '../types.js'
+import type { InternalDocumentID } from '../components/internal-document-id-store.js'
 
 export interface Point {
   lon: number
@@ -7,9 +8,14 @@ export interface Point {
 
 export interface Node {
   point: Point
+  docIDs?: InternalDocumentID[]
   left?: Node
   right?: Node
   parent?: Node
+}
+
+export interface RootNode {
+  root: Nullable<Node>
 }
 
 export type SortGeoPoints = Nullable<GenericSorting>
@@ -22,12 +28,12 @@ interface SearchTask {
 const K = 2 // 2D points
 const EARTH_RADIUS = 6371e3 // Earth radius in meters
 
-export function create (): { root: Nullable<Node> } {
+export function create (): RootNode {
   return { root: null }
 }
 
-export function insert (tree: { root: Nullable<Node> }, point: Point): void {
-  const newNode: Node = { point }
+export function insert (tree: RootNode, point: Point, docIDs: InternalDocumentID[]): void {
+  const newNode: Node = { point, docIDs }
 
   if (tree.root == null) {
     tree.root = newNode
@@ -72,6 +78,39 @@ export function insert (tree: { root: Nullable<Node> }, point: Point): void {
 
     depth++
   }
+}
+
+export function contains (tree: RootNode, point: Point): boolean {
+  let node: Nullable<Node> | undefined = tree.root
+  let depth = 0
+
+  while (node) {
+    if (node?.point.lon === point.lon && node.point.lat === point.lat) {
+      return true
+    }
+
+    const axis = depth % K
+
+    // Compare by longitude
+    if (axis === 0) {
+      if (point.lon < node!.point.lon) {
+        node = node?.left
+      } else {
+        node = node?.right
+      }
+    // Compare by latitude
+    } else {
+      if (point.lat < node!.point.lat) {
+        node = node?.left
+      } else {
+        node = node?.right
+      }
+    }
+
+    depth++
+  }
+
+  return false
 }
 
 export function searchByRadius (

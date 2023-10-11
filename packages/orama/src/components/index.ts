@@ -44,6 +44,12 @@ import {
   Node as RadixNode,
   removeDocumentByWord as radixRemoveDocument,
 } from '../trees/radix.js'
+import {
+  create as bkdCreate,
+  insert as bkdInsert,
+  RootNode as BKDNode,
+  Point as BKDGeoPoint,
+} from '../trees/bkd.js'
 
 import { intersect, safeArrayPush } from '../utils.js'
 import { BM25 } from './algorithms.js'
@@ -76,6 +82,7 @@ export type TreeType =
   | 'Radix'
   | 'Bool'
   | 'Flat'
+  | 'BKD'
 
 export type TTree<T = TreeType, N = unknown> = {
   type: T,
@@ -88,6 +95,7 @@ export type Tree =
   | TTree<'AVL',   AVLNode<number, InternalDocumentID[]>>
   | TTree<'Bool',  BooleanIndex>
   | TTree<'Flat',  FlatTree>
+  | TTree<'BKD',   BKDNode>
 
 export interface Index extends AnyIndexStore {
   sharedInternalDocumentStore: InternalDocumentIDStore
@@ -261,6 +269,9 @@ export async function create<T extends AnyOrama, TSchema extends T['schema']>(
         case 'enum[]':
           index.indexes[path] = { type: 'Flat', node: flatCreate(), isArray }
           break
+        case 'geopoint':
+          index.indexes[path] = { type: 'BKD', node: bkdCreate(), isArray }
+          break
         default:
           throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type, path)
       }
@@ -292,9 +303,10 @@ async function insertScalar(
       node[value ? 'true' : 'false'].push(internalId)
       break
     }
-    case 'AVL':
+    case 'AVL': {
       avlInsert(node, value as number, [internalId])
       break
+    }
     case 'Radix': {
       const tokens = await tokenizer.tokenize(value as string, language, prop)
       await implementation.insertDocumentScoreParameters(index, prop, internalId, tokens, docsCount)
@@ -310,6 +322,9 @@ async function insertScalar(
     case 'Flat': {
       flatInsert(node, value as ScalarSearchableType, internalId)
       break
+    }
+    case 'BKD': {
+      bkdInsert(node, value as unknown as BKDGeoPoint, [internalId])
     }
   }
 }
@@ -409,6 +424,10 @@ async function removeScalar(
     case 'Flat': {
       flatRemoveDocument(node, internalId, value as ScalarSearchableType)
       return true
+    }
+    case 'BKD': {
+      throw new Error(`BKD not implemented`)
+      return false
     }
   }
 }
