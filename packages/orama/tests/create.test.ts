@@ -80,5 +80,17 @@ t.test('create method', t => {
     )
   })
 
+  t.test('should allow creation of an index with a geopoint property', async t => {
+    t.plan(1)
+
+    t.ok(await create({
+      schema: {
+        name: 'string',
+        location: 'geopoint',
+      }
+    }))
+
+  })
+
   t.end()
 })

@@ -83,8 +83,9 @@ function innerCreate<T extends AnyOrama>(
             type: type,
           }
           break
+        case 'geopoint':
         case 'enum':
-          // We don't allow to sort by enums
+          // We don't allow to sort by enums or geopoints
           continue
         case 'enum[]':
         case 'boolean[]':
