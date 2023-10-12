@@ -181,6 +181,34 @@ export type EnumArrComparisonOperator = {
   containsAll ?: (string | number | boolean)[]
 }
 
+export type GeosearchDistanceUnit =
+  | 'cm'
+  | 'm'
+  | 'km'
+  | 'ft'
+  | 'yd'
+  | 'mi'
+
+export type GeosearchRadiusOperator = {
+  radius: {
+    coordinates: Point,
+    value: number,
+    unit?: GeosearchDistanceUnit,
+    inside?: boolean
+  }
+}
+
+export type GeosearchPolygonOperator = {
+  polygon: {
+    coordinates: Point[],
+    inside?: boolean
+  }
+}
+
+export type GeosearchOperation =
+  | GeosearchRadiusOperator
+  | GeosearchPolygonOperator
+
 export type Operator<Value> = Value extends 'string'
   ? (string | string[])
   : Value extends 'string[]'
@@ -197,6 +225,8 @@ export type Operator<Value> = Value extends 'string'
   ? EnumComparisonOperator
   : Value extends 'enum[]'
   ? EnumArrComparisonOperator
+  : Value extends 'geopoint'
+  ? GeosearchOperation
   : never
 export type WhereCondition<TSchema> = {
   [key in keyof TSchema]?: Operator<TSchema[key]>

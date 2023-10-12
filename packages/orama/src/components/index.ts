@@ -6,6 +6,9 @@ import type {
   ComparisonOperator,
   EnumArrComparisonOperator,
   EnumComparisonOperator,
+  GeosearchOperation,
+  GeosearchPolygonOperator,
+  GeosearchRadiusOperator,
   IIndex,
   ScalarSearchableType,
   SearchableType,
@@ -50,9 +53,11 @@ import {
   removeDocByID as bkdRemoveDocByID,
   RootNode as BKDNode,
   Point as BKDGeoPoint,
+  searchByRadius,
+  searchByPolygon,
 } from '../trees/bkd.js'
 
-import { intersect, safeArrayPush } from '../utils.js'
+import { convertDistanceToMeters, intersect, safeArrayPush } from '../utils.js'
 import { BM25 } from './algorithms.js'
 import { getMagnitude } from './cosine-similarity.js'
 import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
@@ -527,6 +532,33 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
       const idx = node
       const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
       safeArrayPush(filtersMap[param], filteredIDs);
+      continue
+    }
+
+    if (type === 'BKD') {
+      let reqOperation: 'radius' | 'polygon'
+
+      if ('radius' in (operation as GeosearchOperation)) {
+        reqOperation = 'radius'
+      } else if ('polygon' in (operation as GeosearchOperation)) {
+        reqOperation = 'polygon'
+      } else {
+        throw new Error(`Invalid operation ${operation}`)
+      }
+
+      if (reqOperation === 'radius') {
+        const { value, coordinates, unit = 'm', inside = true } = operation[reqOperation] as GeosearchRadiusOperator['radius']
+        const distanceInMeters = convertDistanceToMeters(value, unit)
+        const ids = searchByRadius(node.root, coordinates as BKDGeoPoint, distanceInMeters, inside)
+        // @todo: convert this into a for loop
+        safeArrayPush(filtersMap[param], ids.map(({ docIDs }) => docIDs).flat())
+      } else {
+        const { coordinates, inside = true } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
+        const ids = searchByPolygon(node.root, coordinates as BKDGeoPoint[], inside)
+        // @todo: convert this into a for loop
+        safeArrayPush(filtersMap[param], ids.map(({ docIDs }) => docIDs).flat())
+      }
+
       continue
     }
 

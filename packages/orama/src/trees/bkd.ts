@@ -18,6 +18,11 @@ export interface RootNode {
   root: Nullable<Node>
 }
 
+export interface GeoSearchResult {
+  point: Point
+  docIDs: InternalDocumentID[]
+}
+
 export type SortGeoPoints = Nullable<GenericSorting>
 
 interface SearchTask {
@@ -47,9 +52,8 @@ export function insert (tree: RootNode, point: Point, docIDs: InternalDocumentID
     // Check if the current node's point matches the new point
     if (node.point.lon === point.lon && node.point.lat === point.lat) {
       // Merge the new docIDs with the existing ones and remove duplicates
-      const newDocIDs = node.docIDs || []
+      const newDocIDs = node.docIDs ?? []
       node.docIDs = Array.from(new Set([...newDocIDs, ...docIDs || []]))
-      // Exit since the docIDs have been merged
       return
     }
 
@@ -186,10 +190,9 @@ export function getDocIDsByCoordinates (tree: RootNode, point: Point): Nullable<
   let depth = 0
 
   while (node !== null) {
-    // Check if the current node's point matches the provided point
     if (node.point.lon === point.lon && node.point.lat === point.lat) {
       // prettier-ignore
-      return node.docIDs || null
+      return node.docIDs ?? null
     }
 
     const axis = depth % K
@@ -221,10 +224,10 @@ export function searchByRadius (
   center: Point,
   radius: number,
   inclusive = true,
-  sort: SortGeoPoints = null
-): Point[] {
+  sort: SortGeoPoints = 'asc'
+): GeoSearchResult[] {
   const stack: Array<{ node: Nullable<Node>, depth: number }> = [{ node, depth: 0 }]
-  const result: Point[] = []
+  const result: GeoSearchResult[] = []
 
   while (stack.length > 0) {
     const { node, depth } = stack.pop() as { node: Node, depth: number }
@@ -233,21 +236,21 @@ export function searchByRadius (
     const dist = haversineDistance(center, node.point)
 
     if (inclusive ? dist <= radius : dist > radius) {
-      result.push(node.point)
+      result.push({ point: node.point, docIDs: node.docIDs ?? [] })
     }
 
-    if (node.left != null && blockIntersectsCircle(node.left, center, radius)) {
+    if (node.left != null) {
       stack.push({ node: node.left, depth: depth + 1 })
     }
-    if (node.right != null && blockIntersectsCircle(node.right, center, radius)) {
+    if (node.right != null) {
       stack.push({ node: node.right, depth: depth + 1 })
     }
   }
 
-  if (sort !== null) {
+  if (sort) {
     result.sort((a, b) => {
-      const distA = haversineDistance(center, a)
-      const distB = haversineDistance(center, b)
+      const distA = haversineDistance(center, a.point)
+      const distB = haversineDistance(center, b.point)
       return sort.toLowerCase() === 'asc' ? distA - distB : distB - distA
     })
   }
@@ -279,9 +282,9 @@ function blockIntersectsCircle (node: Node, center: Point, radius: number): bool
   return distance <= radius
 }
 
-export function searchByPolygon (root: Nullable<Node>, polygon: Point[], inclusive = true): Point[] {
+export function searchByPolygon (root: Nullable<Node>, polygon: Point[], inclusive = true, sort: SortGeoPoints = null): GeoSearchResult[] {
   const stack: SearchTask[] = [{ node: root, depth: 0 }]
-  const result: Point[] = []
+  const result: GeoSearchResult[] = []
 
   while (stack.length > 0) {
     const task = stack.pop()
@@ -301,13 +304,49 @@ export function searchByPolygon (root: Nullable<Node>, polygon: Point[], inclusi
     const isInsidePolygon = isPointInPolygon(polygon, node.point)
 
     if (isInsidePolygon && inclusive) {
-      result.push(node.point)
+      result.push({ point: node.point, docIDs: node.docIDs ?? [] })
     } else if (!isInsidePolygon && !inclusive) {
-      result.push(node.point)
+      result.push({ point: node.point, docIDs: node.docIDs ?? [] })
     }
   }
 
+  const centroid = calculatePolygonCentroid(polygon)
+
+  if (sort !== null) {
+    result.sort((a, b) => {
+      const distA = haversineDistance(centroid, a.point)
+      const distB = haversineDistance(centroid, b.point)
+      return sort.toLowerCase() === 'asc' ? distA - distB : distB - distA
+    })
+  }
+
   return result
+}
+
+function calculatePolygonCentroid (polygon: Point[]): Point {
+  let totalArea = 0
+  let centroidX = 0
+  let centroidY = 0
+
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].lon
+    const yi = polygon[i].lat
+    const xj = polygon[j].lon
+    const yj = polygon[j].lat
+
+    const areaSegment = xi * yj - xj * yi
+    totalArea += areaSegment
+
+    centroidX += (xi + xj) * areaSegment
+    centroidY += (yi + yj) * areaSegment
+  }
+
+  totalArea /= 2
+
+  centroidX /= (6 * totalArea)
+  centroidY /= (6 * totalArea)
+
+  return { lon: centroidX, lat: centroidY }
 }
 
 function isPointInPolygon (polygon: Point[], point: Point): boolean {

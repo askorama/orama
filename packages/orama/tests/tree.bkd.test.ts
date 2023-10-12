@@ -29,10 +29,10 @@ t.test('create', t => {
   })
 })
 
-t.test('insert', t => {
+t.only('insert', t => {
   t.plan(2)
 
-  t.test('should insert a new node into an empty tree', t => {
+  t.only('should insert a new node into an empty tree', t => {
     t.plan(1)
 
     const tree = create()
@@ -67,7 +67,7 @@ t.test('insert', t => {
     })
   })
 
-  t.test('should merge docIDs if the point already exists', t => {
+  t.only('should merge docIDs if the point already exists', t => {
     t.plan(1)
 
     const tree = create()
@@ -80,10 +80,10 @@ t.test('insert', t => {
   })
 })
 
-t.test('searchByRadius', t => {
+t.only('searchByRadius', t => {
   t.plan(1)
 
-  t.test('should return all points within a given radius', t => {
+  t.only('should return all points within a given radius', t => {
     t.plan(3)
 
     const tree = create()
@@ -94,21 +94,36 @@ t.test('searchByRadius', t => {
     }
 
     // Should return the coordinates of the Golden Gate Bridge. Additional properties not implemented yet.
-    t.same(searchByRadius(tree.root, { lat: 37.7909625, lon: -122.4700284 }, 5_000, true, null), [ { lat: 37.8207190397588, lon: -122.47838916631231 } ])
+    t.same(searchByRadius(tree.root, { lat: 37.7909625, lon: -122.4700284 }, 5_000, true, null), [ 
+      {
+        point: {
+          lat: 37.8207190397588,
+          lon: -122.47838916631231
+        }, 
+        docIDs: []
+      }
+    ])
     
     // Should return nothing as the center is on the east side.
     t.same(searchByRadius(tree.root, { lat: 42.9195535, lon: -70.9817219 }, 10_000, true, null), [])
 
     // Should return the coordinates of all the California locations as they're outside the radius.
-    t.same(searchByRadius(tree.root, { lat: 42.9195535, lon: -70.9817219 }, 10_000, false, null), coordinatePoints)
+    t.same(searchByRadius(tree.root, { lat: 42.9195535, lon: -70.9817219 }, 10_000, false, null), coordinatePoints.map(({ lat, lon }) => ({
+      point: {
+        lat,
+        lon,
+      },
+      docIDs: []
+    }))
+    )
 
   })
 })
 
-t.test('searchInsidePolygon', t => {
+t.only('searchInsidePolygon', t => {
   t.plan(1)
 
-  t.test('should return all points inside a given polygon', t => {
+  t.only('should return all points inside a given polygon', t => {
     t.plan(2)
 
     const tree = create()
@@ -142,17 +157,23 @@ t.test('searchInsidePolygon', t => {
     ]
 
     // Should return the coordinates of all the California locations as they're outside the polygon
-    t.same(searchByPolygon(tree.root, polygon, true), coordinatePoints)
+    t.same(searchByPolygon(tree.root, polygon, true), coordinatePoints.map(({ lat, lon }) => ({
+      point: {
+        lat,
+        lon,
+      },
+      docIDs: []
+    })))
 
     // Should return nothing as all the coordinates are outside the polygon, and the search is not inclusive
     t.same(searchByPolygon(tree.root, polygon, false), [])
   })
 })
 
-t.test('contains', t => {
+t.only('contains', t => {
   t.plan(1)
 
-  t.test('should return true if the tree contains the given point', t => {
+  t.only('should return true if the tree contains the given point', t => {
     t.plan(2)
 
     const tree = create()
@@ -167,10 +188,10 @@ t.test('contains', t => {
   })
 })
 
-t.test('removeDocByID', t => {
+t.only('removeDocByID', t => {
   t.plan(2)
 
-  t.test('should remove a document from the tree by its ID', t => {
+  t.only('should remove a document from the tree by its ID', t => {
     t.plan(1)
 
     const tree = create()
@@ -185,7 +206,7 @@ t.test('removeDocByID', t => {
     t.same(getDocIDsByCoordinates(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }), [1, 3])
   })
 
-  t.test('If the node doesn\'t have any more docIDs, it should remove the node', t => {
+  t.only('If the node doesn\'t have any more docIDs, it should remove the node', t => {
     t.plan(1)
 
     const tree = create()
