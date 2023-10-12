@@ -1,6 +1,7 @@
-import { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { EnumArrComparisonOperator, EnumComparisonOperator, Nullable, ScalarSearchableValue } from '../types.js'
-import { intersect, safeArrayPush } from '../utils.js'
+import type { Point } from "./bkd.js"
+import { InternalDocumentID } from "../components/internal-document-id-store.js"
+import { EnumArrComparisonOperator, EnumComparisonOperator, Nullable, ScalarSearchableValue } from "../types.js"
+import { intersect, safeArrayPush } from "../utils.js"
 
 export interface FlatTree {
   numberToDocumentId: Map<ScalarSearchableValue, InternalDocumentID[]>
@@ -79,7 +80,7 @@ export function filter (root: FlatTree, operation: EnumComparisonOperator): Inte
 
       const keys = root.numberToDocumentId.keys()
       for (const key of keys) {
-        if (value.includes(key)) {
+        if (value.includes(key as Exclude<ScalarSearchableValue, Point>)) {
           continue
         }
         const ids = root.numberToDocumentId.get(key)

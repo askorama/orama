@@ -14,7 +14,7 @@ t.test('search method', t => {
       const db = await create({
         schema: {
           name: 'string',
-        },
+        } as const,
         components: {
           tokenizer: {
             stemming: true,
@@ -111,7 +111,7 @@ t.test('search method', t => {
         schema: {
           quote: 'string',
           author: 'string',
-        },
+        } as const,
         components: {
           tokenizer: {
             stemming: true,
@@ -161,7 +161,7 @@ t.test('search method', t => {
         schema: {
           quote: 'string',
           author: 'string',
-        },
+        } as const,
       })
 
       await insert(db, {
@@ -231,7 +231,7 @@ t.test('search method', t => {
         schema: {
           author: 'string',
           quote: 'string',
-        },
+        } as const,
       })
 
       const id = await insert(db, {
@@ -270,7 +270,7 @@ t.test('search method', t => {
         schema: {
           quote: 'string',
           author: 'string',
-        },
+        } as const,
       })
 
       await insert(db, {
@@ -294,7 +294,7 @@ t.test('search method', t => {
         schema: {
           quote: 'string',
           author: 'string',
-        },
+        } as const,
       })
 
       const id1 = await insert(db, {
@@ -333,7 +333,7 @@ t.test('search method', t => {
       const db = await create({
         schema: {
           animal: 'string',
-        },
+        } as const,
       })
 
       const id1 = await insert(db, { id: '0', animal: 'Quick brown fox' })
@@ -376,7 +376,7 @@ t.test('search method', t => {
       schema: {
         quote: 'string',
         author: 'string',
-      },
+      } as const,
       components: {
         tokenizer: {
           stopWords: englishStopwords,
@@ -418,7 +418,7 @@ t.test('search method', t => {
       schema: {
         quote: 'string',
         author: 'string',
-      },
+      } as const,
       components: {
         tokenizer: { language: 'english', stemming: false, stopWords: englishStopwords },
       },
@@ -474,7 +474,7 @@ t.test('search method', t => {
           name: 'string',
           surname: 'string',
         },
-      },
+      } as const,
     })
 
     await insert(db, {
@@ -533,7 +533,7 @@ t.test('search method', t => {
           name: 'string',
           description: 'string',
         },
-      },
+      } as const,
     })
 
     await insert(db, {
@@ -595,7 +595,7 @@ t.test('search method', t => {
       const db = await create({
         schema: {
           animal: 'string',
-        },
+        } as const,
         components: {
           afterSearch: () => {
             called++
@@ -625,7 +625,7 @@ t.test('search method', t => {
     const db = await create({
       schema: {
         animal: 'string',
-      }
+      } as const
     })
 
     await insertMultiple(db, [
@@ -647,6 +647,60 @@ t.test('search method', t => {
     t.end()
   })
 
+  t.test('with geosearch', async t => {
+    t.plan(4)
+
+    const db = await create({
+      schema: {
+        id: 'string',
+        name: 'string',
+        location: 'geopoint'
+      } as const
+    })
+
+    await insert(db, { id: '1', name: 'Duomo di Milano', location: { lat: 9.1916185, lon: 45.4641833 }  })
+    await insert(db, { id: '2', name: 'Piazza Duomo (Milano)', location: { lat: 9.1897839, lon: 45.4642360 }  })
+    await insert(db, { id: '3', name: 'Piazzetta Reale', location: { lat: 9.1908889, lon: 45.4633179 }  })
+    await insert(db, { id: '4', name: 'Duomo M1/M3', location: { lat: 9.1868877, lon: 45.4641707}  })
+
+    const r1 = await search(db, {
+      term: 'Duomo',
+      where: {
+        location: {
+          radius: {
+            coordinates: { lat: 9.1852139, lon: 45.4642677 },
+            value: 1,
+            unit: 'km'
+          }
+        }
+      }
+    })
+
+    t.equal(r1.count, 3)
+    t.strictSame(r1.hits.map(h => h.id).sort(), ['1', '2', '4'])
+
+    const r2 = await search(db, {
+      term: 'Duomo',
+      where: {
+        location: {
+          polygon: {
+            coordinates: [
+              { lat: 9.1885737, lon: 45.4648233 },
+              { lat: 9.1885528, lon: 45.4636546 },
+              { lat: 9.1928014, lon: 45.4636546 },
+              { lat: 9.1927755, lon: 45.4648084 },
+              { lat: 9.1885737, lon: 45.4648233 }
+            ],
+          }
+        }
+      }
+    })
+
+    t.equal(r2.count, 2)
+    t.strictSame(r2.hits.map(h => h.id).sort(), ['1', '2'])
+
+  })
+
   t.end()
 })
 
@@ -660,7 +714,7 @@ async function createSimpleDB() {
       meta: {
         sales: 'number',
       },
-    },
+    } as const,
     components: {
       tokenizer: {
         stopWords: englishStopwords,

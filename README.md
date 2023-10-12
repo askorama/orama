@@ -35,6 +35,7 @@ the
 
 - [Vector Search](https://docs.oramasearch.com/usage/search/vector-search)
 - [Search filters](https://docs.oramasearch.com/usage/search/filters)
+- [Geosearch](https://docs.oramasearch.com/usage/search/geosearch)
 - [Facets](https://docs.oramasearch.com/usage/search/facets)
 - [Fields Boosting](https://docs.oramasearch.com/usage/search/fields-boosting)
 - [Typo tolerance](https://docs.oramasearch.com/usage/search/introduction#typo-tolerance)

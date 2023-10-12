@@ -331,6 +331,28 @@ t.test('insert method', t => {
     t.end()
   })
 
+  t.test('should insert Geopoints', async t => {
+    t.plan(3)
+
+    const db = await create({
+      schema: {
+        name: 'string',
+        location: 'geopoint'
+      }
+    })
+
+    t.ok(await insert(db, {
+      name: 't1',
+      location: {
+        lat: 45.5771622,
+        lon: 9.261266
+      }
+    }))
+
+    t.equal((db.data.index.indexes.location.node as any).root.point.lat, 45.5771622)
+    t.equal((db.data.index.indexes.location.node as any).root.point.lon, 9.261266)
+  })
+
   t.end()
 })
 

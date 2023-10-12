@@ -3,6 +3,7 @@ import { Index } from './components/index.js'
 import { DocumentID, InternalDocumentID, InternalDocumentIDStore } from './components/internal-document-id-store.js'
 import { Sorter } from './components/sorter.js'
 import { Language } from './components/tokenizer/languages.js'
+import { Point } from './trees/bkd.js'
 
 export type Nullable<T> = T | null
 
@@ -54,6 +55,8 @@ export type SchemaTypes<Value> = Value extends 'string'
   ? string | number
   : Value extends 'enum[]'
   ? (string | number)[]
+  : Value extends 'geopoint'
+  ? Point
   : // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Value extends `vector[${number}]`
   ? number[]
@@ -100,12 +103,12 @@ export type Magnitude = number
 export type Vector = `vector[${number}]`
 export type VectorType = Float32Array
 
-export type ScalarSearchableType = 'string' | 'number' | 'boolean' | 'enum'
+export type ScalarSearchableType = 'string' | 'number' | 'boolean' | 'enum' | 'geopoint'
 export type ArraySearchableType = 'string[]' | 'number[]' | 'boolean[]' | 'enum[]' | Vector
 
 export type SearchableType = ScalarSearchableType | ArraySearchableType
 
-export type ScalarSearchableValue = string | number | boolean
+export type ScalarSearchableValue = string | number | boolean | Point
 export type ArraySearchableValue = string[] | number[] | boolean[] | VectorType
 export type SearchableValue = ScalarSearchableValue | ArraySearchableValue
 
@@ -125,7 +128,9 @@ export type BM25Params = {
   d?: number
 }
 
-export type FacetSorting = 'asc' | 'desc' | 'ASC' | 'DESC'
+export type GenericSorting = 'asc' | 'desc' | 'ASC' | 'DESC'
+
+export type FacetSorting = GenericSorting
 
 export interface StringFacetDefinition {
   limit?: number
@@ -177,6 +182,34 @@ export type EnumArrComparisonOperator = {
   containsAll ?: (string | number | boolean)[]
 }
 
+export type GeosearchDistanceUnit =
+  | 'cm'
+  | 'm'
+  | 'km'
+  | 'ft'
+  | 'yd'
+  | 'mi'
+
+export type GeosearchRadiusOperator = {
+  radius: {
+    coordinates: Point,
+    value: number,
+    unit?: GeosearchDistanceUnit,
+    inside?: boolean
+  }
+}
+
+export type GeosearchPolygonOperator = {
+  polygon: {
+    coordinates: Point[],
+    inside?: boolean
+  }
+}
+
+export type GeosearchOperation =
+  | GeosearchRadiusOperator
+  | GeosearchPolygonOperator
+
 export type Operator<Value> = Value extends 'string'
   ? (string | string[])
   : Value extends 'string[]'
@@ -193,6 +226,8 @@ export type Operator<Value> = Value extends 'string'
   ? EnumComparisonOperator
   : Value extends 'enum[]'
   ? EnumArrComparisonOperator
+  : Value extends 'geopoint'
+  ? GeosearchOperation
   : never
 export type WhereCondition<TSchema> = {
   [key in keyof TSchema]?: Operator<TSchema[key]>

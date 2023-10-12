@@ -1,4 +1,5 @@
 import { createError } from '../errors.js'
+import { Point } from '../trees/bkd.js'
 import {
   AnyDocument,
   AnyOrama,
@@ -40,6 +41,10 @@ export async function validateSchema<T extends AnyOrama, ResultDocument extends 
     const value = doc[prop]
 
     if (typeof value === 'undefined') {
+      continue
+    }
+
+    if (type === 'geopoint' && (typeof value === 'object' && typeof value.lon === 'number' && typeof value.lat === 'number')) {
       continue
     }
 
@@ -106,6 +111,7 @@ const IS_ARRAY_TYPE: Record<SearchableType, boolean> = {
   number: false,
   boolean: false,
   enum: false,
+  geopoint: false,
   'string[]': true,
   'number[]': true,
   'boolean[]': true,
@@ -117,6 +123,10 @@ const INNER_TYPE: Record<ArraySearchableType, ScalarSearchableType> = {
   'number[]': 'number',
   'boolean[]': 'boolean',
   'enum[]': 'enum',
+}
+
+export function isGeoPointType(type: unknown): type is Point {
+  return type === 'geopoint'
 }
 
 export function isVectorType(type: unknown): type is Vector {

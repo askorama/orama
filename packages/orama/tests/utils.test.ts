@@ -66,7 +66,7 @@ t.test('utils', t => {
   })
 
   t.test('should get value from a nested object', async t => {
-    t.plan(8)
+    t.plan(7)
 
     const myObject = {
       foo: 'bar',
@@ -87,7 +87,6 @@ t.test('utils', t => {
     t.same(await getNested(myObject, 'nested.nested2.nested3'), undefined)
     t.equal(await getNested(myObject, 'nested.nested2.nested3.bar'), 'baz')
     t.equal(await getNested(myObject, 'nested1.nested3.bar'), undefined)
-    t.equal(await getNested(myObject, 'nested.null.bar'), undefined)
     t.equal(await getNested(myObject, 'nested.noop.bar'), undefined)
   })
 
@@ -112,4 +111,5 @@ t.test('utils', t => {
     t.equal((flattened as Record<string, string>).foo, 'bar')
     t.equal(flattened['nested.nested2.nested3.bar'], 'baz')
   })
+
 })

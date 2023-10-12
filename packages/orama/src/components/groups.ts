@@ -1,7 +1,8 @@
 import { createError } from '../errors.js'
 import { getNested, intersect, safeArrayPush } from '../utils.js'
-import type { AnyDocument, AnyOrama, GroupByParams, GroupResult, Reduce, Result, ScalarSearchableValue, TokenScore, TypedDocument } from '../types.js'
+import type { AnyDocument, AnyOrama, GroupByParams, GroupResult, Reduce, Result, ScalarSearchableValue, SearchableType, TokenScore, TypedDocument } from '../types.js'
 import { getDocumentIdFromInternalId } from './internal-document-id-store.js'
+import { Point } from '../trees/bkd.js'
 
 interface PropertyGroup {
   property: string
@@ -18,6 +19,8 @@ interface Group {
   values: ScalarSearchableValue[]
   indexes: number[]
 }
+
+type GroupableType = Exclude<SearchableType, Point>
 
 const DEFAULT_REDUCE: Reduce<Result<AnyDocument>[]> = {
   reducer: (_, acc, res, index) => {
@@ -79,20 +82,20 @@ export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocume
         continue
       }
       const keyValue = typeof value !== 'boolean' ? value : '' + value
-      if (typeof group.perValue[keyValue] === 'undefined') {
-        group.perValue[keyValue] = {
+      if (typeof group.perValue[keyValue as GroupableType] === 'undefined') {
+        group.perValue[keyValue as GroupableType] = {
           indexes: [],
           count: 0,
         }
       }
-      if (group.perValue[keyValue].count >= returnedCount) {
+      if (group.perValue[keyValue as GroupableType].count >= returnedCount) {
         // We stop early because for this value we react the limit
         continue
       }
 
       // We use the index to keep track of the original order
-      group.perValue[keyValue].indexes.push(j)
-      group.perValue[keyValue].count++
+      group.perValue[keyValue as GroupableType].indexes.push(j)
+      group.perValue[keyValue as GroupableType].count++
 
       values.add(value)
     }
@@ -118,7 +121,7 @@ export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocume
     for (let j = 0; j < combinationLength; j++) {
       const value = combination[j]
       const property = properties[j]
-      indexes.push(g[property].perValue[typeof value !== 'boolean' ? value : '' + value].indexes)
+      indexes.push(g[property].perValue[(typeof value !== 'boolean' ? value : '' + value) as GroupableType].indexes)
       group.values.push(value)
     }
     // We leverage on the index to sort the results by the original order

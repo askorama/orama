@@ -6,6 +6,9 @@ import type {
   ComparisonOperator,
   EnumArrComparisonOperator,
   EnumComparisonOperator,
+  GeosearchOperation,
+  GeosearchPolygonOperator,
+  GeosearchRadiusOperator,
   IIndex,
   ScalarSearchableType,
   SearchableType,
@@ -44,8 +47,17 @@ import {
   Node as RadixNode,
   removeDocumentByWord as radixRemoveDocument,
 } from '../trees/radix.js'
+import {
+  create as bkdCreate,
+  insert as bkdInsert,
+  removeDocByID as bkdRemoveDocByID,
+  RootNode as BKDNode,
+  Point as BKDGeoPoint,
+  searchByRadius,
+  searchByPolygon,
+} from '../trees/bkd.js'
 
-import { intersect, safeArrayPush } from '../utils.js'
+import { convertDistanceToMeters, intersect, safeArrayPush } from '../utils.js'
 import { BM25 } from './algorithms.js'
 import { getMagnitude } from './cosine-similarity.js'
 import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
@@ -76,6 +88,7 @@ export type TreeType =
   | 'Radix'
   | 'Bool'
   | 'Flat'
+  | 'BKD'
 
 export type TTree<T = TreeType, N = unknown> = {
   type: T,
@@ -88,6 +101,7 @@ export type Tree =
   | TTree<'AVL',   AVLNode<number, InternalDocumentID[]>>
   | TTree<'Bool',  BooleanIndex>
   | TTree<'Flat',  FlatTree>
+  | TTree<'BKD',   BKDNode>
 
 export interface Index extends AnyIndexStore {
   sharedInternalDocumentStore: InternalDocumentIDStore
@@ -261,6 +275,9 @@ export async function create<T extends AnyOrama, TSchema extends T['schema']>(
         case 'enum[]':
           index.indexes[path] = { type: 'Flat', node: flatCreate(), isArray }
           break
+        case 'geopoint':
+          index.indexes[path] = { type: 'BKD', node: bkdCreate(), isArray }
+          break
         default:
           throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type, path)
       }
@@ -292,9 +309,10 @@ async function insertScalar(
       node[value ? 'true' : 'false'].push(internalId)
       break
     }
-    case 'AVL':
+    case 'AVL': {
       avlInsert(node, value as number, [internalId])
       break
+    }
     case 'Radix': {
       const tokens = await tokenizer.tokenize(value as string, language, prop)
       await implementation.insertDocumentScoreParameters(index, prop, internalId, tokens, docsCount)
@@ -311,6 +329,10 @@ async function insertScalar(
       flatInsert(node, value as ScalarSearchableType, internalId)
       break
     }
+    case 'BKD': {
+      bkdInsert(node, value as unknown as BKDGeoPoint, [internalId])
+      break
+    }
   }
 }
 
@@ -325,6 +347,7 @@ export async function insert(
   tokenizer: Tokenizer,
   docsCount: number,
 ): Promise<void> {
+
   if (isVectorType(schemaType)) {
     return insertVector(index, prop, value as number[] | Float32Array, id)
   }
@@ -409,6 +432,10 @@ async function removeScalar(
     case 'Flat': {
       flatRemoveDocument(node, internalId, value as ScalarSearchableType)
       return true
+    }
+    case 'BKD': {
+      bkdRemoveDocByID(node, value as unknown as BKDGeoPoint, internalId)
+      return false
     }
   }
 }
@@ -505,6 +532,33 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
       const idx = node
       const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
       safeArrayPush(filtersMap[param], filteredIDs);
+      continue
+    }
+
+    if (type === 'BKD') {
+      let reqOperation: 'radius' | 'polygon'
+
+      if ('radius' in (operation as GeosearchOperation)) {
+        reqOperation = 'radius'
+      } else if ('polygon' in (operation as GeosearchOperation)) {
+        reqOperation = 'polygon'
+      } else {
+        throw new Error(`Invalid operation ${operation}`)
+      }
+
+      if (reqOperation === 'radius') {
+        const { value, coordinates, unit = 'm', inside = true } = operation[reqOperation] as GeosearchRadiusOperator['radius']
+        const distanceInMeters = convertDistanceToMeters(value, unit)
+        const ids = searchByRadius(node.root, coordinates as BKDGeoPoint, distanceInMeters, inside)
+        // @todo: convert this into a for loop
+        safeArrayPush(filtersMap[param], ids.map(({ docIDs }) => docIDs).flat())
+      } else {
+        const { coordinates, inside = true } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
+        const ids = searchByPolygon(node.root, coordinates as BKDGeoPoint[], inside)
+        // @todo: convert this into a for loop
+        safeArrayPush(filtersMap[param], ids.map(({ docIDs }) => docIDs).flat())
+      }
+
       continue
     }
 

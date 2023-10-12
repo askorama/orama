@@ -1,4 +1,5 @@
-import type { AnyDocument, SearchableValue, TokenScore } from './types.js'
+import type { AnyDocument, GeosearchDistanceUnit, SearchableValue, TokenScore } from './types.js'
+import { createError } from './errors.js'
 
 const baseId = Date.now().toString().slice(5)
 let lastId = 0
@@ -220,9 +221,14 @@ export async function getDocumentProperties (doc: AnyDocument, paths: string[]):
       current = (current)[pathTokens[j]!]
 
       // We found an object but we were supposed to be done
-      if (typeof current === 'object' && !Array.isArray(current) && current !== null && j === pathTokensLength - 1) {
-        current = undefined
-        break
+      if (typeof current === 'object') {
+        if (current !== null && 'lat' in current && 'lon' in current && typeof current.lat === 'number' && typeof current.lon === 'number') {
+          current = properties[path] = current as SearchableValue
+          break
+        } else if (!Array.isArray(current) && current !== null && j === pathTokensLength - 1) {
+          current = undefined
+          break
+        }
       } else if ((current === null || typeof current !== 'object') && j < pathTokensLength - 1) {
         // We can't recurse anymore but we were supposed to
         current = undefined
@@ -258,4 +264,23 @@ export function flattenObject (obj: object, prefix = ''): AnyDocument {
     }
   }
   return result
+}
+
+const mapDistanceToMeters = {
+  cm: 0.01,
+  m: 1,
+  km: 1000,
+  ft: 0.3048,
+  yd: 0.9144,
+  mi: 1609.344,
+};
+
+export function convertDistanceToMeters(distance: number, unit: GeosearchDistanceUnit): number {
+  const ratio = mapDistanceToMeters[unit]
+  
+  if (ratio === undefined) {
+    throw new Error(createError('INVALID_DISTANCE_SUFFIX', distance).message)
+  }
+  
+  return distance * ratio
 }

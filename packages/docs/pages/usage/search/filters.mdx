@@ -2,7 +2,7 @@
 
 You can use the `filters` interface to filter the search results.
 
-Filters are available for numeric, boolean, string and enum properties.
+Filters are available for numeric, boolean, string, enum, and geopoint properties.
 Depends on the type of the property, you can use different operators.
 
 ## String operators
@@ -129,3 +129,11 @@ The enum properties support the following operators:
 | Operator           | Description                             | Example                                            |
 | ---------          | ------------------------------          | ---------------------------------                  |
 | `containsAll`      | Contains all the given values           | `genre: { containsAll: ['comedy', 'action'] }`     |
+
+## Geosearch
+
+Starting from Orama `v2.0.0`, you can perform geosearch queries.
+
+Even though the APIs are very simple, we decided to dedicate a separate section for them. This lets us explain the concepts behind the geosearch and how it works with more details.
+
+[Read more about geosearch](/usage/search/geosearch)
