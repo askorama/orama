@@ -1,14 +1,17 @@
 import {
-  AnyDocument, AnyOrama,
+  AnyDocument,
+  AnyOrama,
   Language,
   RawData,
-  Result, Results,
-  SearchParams, TypedDocument,
+  Result,
+  Results,
+  SearchParams,
+  TypedDocument,
   load,
   save,
   search
 } from '@orama/orama'
-import { boundedLevenshtein } from '@orama/orama/internals';
+import { boundedLevenshtein } from '@orama/orama/internals'
 
 export interface Position {
   start: number
@@ -19,8 +22,12 @@ export type OramaWithHighlight<T extends AnyOrama> = T & {
   data: { positions: Record<string, Record<string, Record<string, Position[]>>> }
 }
 
-export type SearchResultWithHighlight<ResultDocument> = Results<ResultDocument> & {
-  hits: (Result<ResultDocument> & { positions: Record<string, Record<string, Position[]>> })[]
+export type ResultWithPositions<ResultDocument> = Result<ResultDocument> & {
+  positions: Record<string, Record<string, Position[]>>
+}
+
+export type SearchResultWithHighlight<ResultDocument> = Omit<Results<ResultDocument>, 'hits'> & {
+  hits: ResultWithPositions<ResultDocument>[]
 }
 
 export type RawDataWithPositions = RawData & {
@@ -138,6 +145,6 @@ export async function saveWithHighlight<T extends AnyOrama>(orama: T): Promise<R
 }
 
 export async function loadWithHighlight<T extends AnyOrama>(orama: T, raw: RawDataWithPositions): Promise<void> {
-  await load(orama, raw);
-  (orama as OramaWithHighlight<T>).data.positions = raw.positions
+  await load(orama, raw)
+  ;(orama as OramaWithHighlight<T>).data.positions = raw.positions
 }

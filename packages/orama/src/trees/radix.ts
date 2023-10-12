@@ -3,7 +3,7 @@ import { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getOwnProperty } from '../utils.js'
 
 export class Node {
-  constructor(key: string, subWord: string, end: boolean) {
+  constructor (key: string, subWord: string, end: boolean) {
     this.k = key
     this.s = subWord
     this.e = end
@@ -22,18 +22,18 @@ export class Node {
   // Node word
   public w = ''
 
-  public toJSON(): object {
+  public toJSON (): object {
     return {
       w: this.w,
       s: this.s,
       c: this.c,
       d: this.d,
-      e: this.e,
+      e: this.e
     }
   }
 }
 
-type FindParams = {
+interface FindParams {
   term: string
   exact?: boolean
   tolerance?: number
@@ -41,15 +41,15 @@ type FindParams = {
 
 type FindResult = Record<string, InternalDocumentID[]>
 
-function updateParent(node: Node, parent: Node): void {
+function updateParent (node: Node, parent: Node): void {
   node.w = parent.w + node.s
 }
 
-function addDocument(node: Node, docID: InternalDocumentID): void {
+function addDocument (node: Node, docID: InternalDocumentID): void {
   node.d.push(docID)
 }
 
-function removeDocument(node: Node, docID: InternalDocumentID): boolean {
+function removeDocument (node: Node, docID: InternalDocumentID): boolean {
   const index = node.d.indexOf(docID)
 
   /* c8 ignore next 3 */
@@ -62,7 +62,7 @@ function removeDocument(node: Node, docID: InternalDocumentID): boolean {
   return true
 }
 
-function findAllWords(node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
+function findAllWords (node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
   if (node.e) {
     const { w, d: docIDs } = node
 
@@ -72,7 +72,7 @@ function findAllWords(node: Node, output: FindResult, term: string, exact?: bool
 
     // always check in own property to prevent access to inherited properties
     // fix https://github.com/OramaSearch/orama/issues/137
-    if (!getOwnProperty(output, w)) {
+    if (getOwnProperty(output, w) == null) {
       if (tolerance) {
         // computing the absolute difference of letters between the term and the word
         const difference = Math.abs(term.length - w.length)
@@ -91,7 +91,7 @@ function findAllWords(node: Node, output: FindResult, term: string, exact?: bool
     // check if _output[w] exists and then add the doc to it
     // always check in own property to prevent access to inherited properties
     // fix https://github.com/OramaSearch/orama/issues/137
-    if (getOwnProperty(output, w) && docIDs.length) {
+    if ((getOwnProperty(output, w) != null) && (docIDs.length > 0)) {
       const docs = new Set(output[w])
 
       const docIDsLength = docIDs.length
@@ -109,7 +109,7 @@ function findAllWords(node: Node, output: FindResult, term: string, exact?: bool
   return output
 }
 
-function getCommonPrefix(a: string, b: string) {
+function getCommonPrefix (a: string, b: string) {
   let commonPrefix = ''
   const len = Math.min(a.length, b.length)
   for (let i = 0; i < len; i++) {
@@ -121,11 +121,11 @@ function getCommonPrefix(a: string, b: string) {
   return commonPrefix
 }
 
-export function create(end = false, subWord = '', key = ''): Node {
+export function create (end = false, subWord = '', key = ''): Node {
   return new Node(key, subWord, end)
 }
 
-export function insert(root: Node, word: string, docId: InternalDocumentID) {
+export function insert (root: Node, word: string, docId: InternalDocumentID) {
   for (let i = 0; i < word.length; i++) {
     const currentCharacter = word[i]
     const wordAtIndex = word.substring(i)
@@ -201,43 +201,111 @@ export function insert(root: Node, word: string, docId: InternalDocumentID) {
   }
 }
 
-export function find(root: Node, { term, exact, tolerance }: FindParams): FindResult {
-  // find the closest node to the term
-  for (let i = 0; i < term.length; i++) {
-    const character = term[i]
-    if (character in root.c) {
-      const rootChildCurrentChar = root.c[character]
-      const edgeLabel = rootChildCurrentChar.s
-      const termSubstring = term.substring(i)
+function _findLevenshtein (
+  node: Node,
+  term: string,
+  index: number,
+  tolerance: number,
+  originalTolerance: number,
+  output: FindResult
+) {
+  if (tolerance < 0) {
+    return
+  }
 
-      // find the common prefix between two words ex: prime and primate = prim
-      const commonPrefix = getCommonPrefix(edgeLabel, termSubstring)
-      const commonPrefixLength = commonPrefix.length
-      // if the common prefix length is equal to edgeLabel length (the node subword) it means they are a match
-      // if the common prefix is equal to the term means it is contained in the node
-      if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
-        // if tolerance is set we take the current node as the closest
-        if (tolerance) break
-        return {}
+  if (node.e) {
+    const { w, d: docIDs } = node
+    if (w) {
+      const difference = Math.abs(term.length - w.length)
+      if (difference <= originalTolerance && syncBoundedLevenshtein(term, w, originalTolerance).isBounded) {
+        output[w] = []
       }
+      if ((getOwnProperty(output, w) != null) && (docIDs.length > 0)) {
+        const docs = new Set(output[w])
 
-      // skip the subword length and check the next divergent character
-      i += rootChildCurrentChar.s.length - 1
-      // navigate into the child node
-      root = rootChildCurrentChar
-    } else {
-      return {}
+        const docIDsLength = docIDs.length
+        for (let i = 0; i < docIDsLength; i++) {
+          docs.add(docIDs[i])
+        }
+        output[w] = Array.from(docs)
+      }
     }
   }
 
-  const output: FindResult = {}
-  // found the closest node we recursively search through children
-  findAllWords(root, output, term, exact, tolerance)
+  if (index >= term.length) {
+    return
+  }
 
-  return output
+  // Match current character without consuming tolerance
+  if (term[index] in node.c) {
+    _findLevenshtein(node.c[term[index]], term, index + 1, tolerance, originalTolerance, output)
+  }
+
+  // If tolerance is still available, consider other branches:
+  // 1. Deletion (skip the current term character)
+  _findLevenshtein(node, term, index + 1, tolerance - 1, originalTolerance, output)
+
+  // 2. Insertion (skip the current tree node character)
+  for (const character in node.c) {
+    _findLevenshtein(node.c[character], term, index, tolerance - 1, originalTolerance, output)
+  }
+
+  // 3. Substitution (skip both current term character and tree node character)
+  for (const character in node.c) {
+    if (character !== term[index]) {
+      _findLevenshtein(node.c[character], term, index + 1, tolerance - 1, originalTolerance, output)
+    }
+  }
 }
 
-export function contains(root: Node, term: string): boolean {
+export function find (root: Node, { term, exact, tolerance }: FindParams): FindResult {
+  // Find the closest node to the term
+
+  // Use `if` condition because tolerance `0` is supposed to match only prefix.
+  // (allows infinite insertions at end, which is against normal levenshtein logic).
+  // (new _findLevenshtein only handles not exact and tolerance>0 condition)
+  if (tolerance && !exact) {
+    const output: FindResult = {}
+    tolerance = tolerance || 0
+    _findLevenshtein(root, term, 0, tolerance || 0, tolerance, output)
+    return output
+  } else {
+    for (let i = 0; i < term.length; i++) {
+      const character = term[i]
+      if (character in root.c) {
+        const rootChildCurrentChar = root.c[character]
+        const edgeLabel = rootChildCurrentChar.s
+        const termSubstring = term.substring(i)
+
+        // find the common prefix between two words ex: prime and primate = prim
+        const commonPrefix = getCommonPrefix(edgeLabel, termSubstring)
+        const commonPrefixLength = commonPrefix.length
+        // if the common prefix length is equal to edgeLabel length (the node subword) it means they are a match
+        // if the common prefix is equal to the term means it is contained in the node
+        if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
+          // if tolerance is set we take the current node as the closest
+          if (tolerance) break
+          return {}
+        }
+
+        // skip the subword length and check the next divergent character
+        i += rootChildCurrentChar.s.length - 1
+        // navigate into the child node
+        root = rootChildCurrentChar
+      } else {
+        return {}
+      }
+    }
+
+    const output: FindResult = {}
+    // found the closest node we recursively search through children
+    findAllWords(root, output, term, exact, tolerance)
+
+    return output
+  }
+}
+
+export function contains (root: Node, term: string): boolean {
   for (let i = 0; i < term.length; i++) {
     const character = term[i]
 
@@ -260,7 +328,7 @@ export function contains(root: Node, term: string): boolean {
   return true
 }
 
-export function removeWord(root: Node, term: string): boolean {
+export function removeWord (root: Node, term: string): boolean {
   if (!term) {
     return false
   }
@@ -284,7 +352,7 @@ export function removeWord(root: Node, term: string): boolean {
   return false
 }
 
-export function removeDocumentByWord(root: Node, term: string, docID: InternalDocumentID, exact = true): boolean {
+export function removeDocumentByWord (root: Node, term: string, docID: InternalDocumentID, exact = true): boolean {
   if (!term) {
     return true
   }

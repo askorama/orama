@@ -1,6 +1,6 @@
 {
   "name": "@orama/plugin-parsedoc",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "description": "Orama plugin to populate an index with HTML/Markdown documents",
   "keywords": [],
   "author": "",
