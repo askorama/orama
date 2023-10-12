@@ -1,17 +1,17 @@
 import t from 'tap'
 import { create, insert, search } from '../src/index.js'
 
-t.only('geosearch', t => {
+t.test('geosearch', t => {
   t.plan(4)
 
-  t.only('should find geopoints inside a radius', async t => {
+  t.test('should find geopoints inside a radius', async t => {
     t.plan(2)
 
     const db = await create({
       schema: {
         id: 'string',
         location: 'geopoint',
-      }
+      } as const
     })
 
     await insert(db, {
@@ -50,14 +50,14 @@ t.only('geosearch', t => {
     t.same(results.hits.map(({ id }) => id), ['1', '2'])
   })
 
-  t.only('should find geopoints outside a radius', async t => {
+  t.test('should find geopoints outside a radius', async t => {
     t.plan(2)
 
     const db = await create({
       schema: {
         id: 'string',
         location: 'geopoint',
-      }
+      } as const
     })
 
     await insert(db, { id: '1', location: { lat: -72.1928787, lon: 42.9309292 } })
@@ -87,14 +87,14 @@ t.only('geosearch', t => {
     t.same(results.hits.map(({ id }) => id), ['1', '2', '3', '4', '5'])
   })
 
-  t.only('should find geopoints inside a polygon', async t => {
+  t.test('should find geopoints inside a polygon', async t => {
     t.plan(2)
 
     const db = await create({
       schema: {
         id: 'string',
         location: 'geopoint',
-      }
+      } as const
     })
 
     await insert(db, { id: '1', location: { lat: -50.6964111, lon: 70.2120854 } })
@@ -124,14 +124,14 @@ t.only('geosearch', t => {
 
   })
 
-  t.only('should find geopoints outside a polygon', async t => {
+  t.test('should find geopoints outside a polygon', async t => {
     t.plan(2)
 
     const db = await create({
       schema: {
         id: 'string',
         location: 'geopoint',
-      }
+      } as const
     })
 
     await insert(db, { id: '1', location: { lat: -50.6964111, lon: 70.2120854 } })

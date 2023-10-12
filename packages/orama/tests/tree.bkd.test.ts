@@ -29,10 +29,10 @@ t.test('create', t => {
   })
 })
 
-t.only('insert', t => {
+t.test('insert', t => {
   t.plan(2)
 
-  t.only('should insert a new node into an empty tree', t => {
+  t.test('should insert a new node into an empty tree', t => {
     t.plan(1)
 
     const tree = create()
@@ -67,7 +67,7 @@ t.only('insert', t => {
     })
   })
 
-  t.only('should merge docIDs if the point already exists', t => {
+  t.test('should merge docIDs if the point already exists', t => {
     t.plan(1)
 
     const tree = create()
@@ -80,10 +80,10 @@ t.only('insert', t => {
   })
 })
 
-t.only('searchByRadius', t => {
+t.test('searchByRadius', t => {
   t.plan(1)
 
-  t.only('should return all points within a given radius', t => {
+  t.test('should return all points within a given radius', t => {
     t.plan(3)
 
     const tree = create()
@@ -120,10 +120,10 @@ t.only('searchByRadius', t => {
   })
 })
 
-t.only('searchInsidePolygon', t => {
+t.test('searchInsidePolygon', t => {
   t.plan(1)
 
-  t.only('should return all points inside a given polygon', t => {
+  t.test('should return all points inside a given polygon', t => {
     t.plan(2)
 
     const tree = create()
@@ -170,10 +170,10 @@ t.only('searchInsidePolygon', t => {
   })
 })
 
-t.only('contains', t => {
+t.test('contains', t => {
   t.plan(1)
 
-  t.only('should return true if the tree contains the given point', t => {
+  t.test('should return true if the tree contains the given point', t => {
     t.plan(2)
 
     const tree = create()
@@ -188,10 +188,10 @@ t.only('contains', t => {
   })
 })
 
-t.only('removeDocByID', t => {
+t.test('removeDocByID', t => {
   t.plan(2)
 
-  t.only('should remove a document from the tree by its ID', t => {
+  t.test('should remove a document from the tree by its ID', t => {
     t.plan(1)
 
     const tree = create()
@@ -206,7 +206,7 @@ t.only('removeDocByID', t => {
     t.same(getDocIDsByCoordinates(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }), [1, 3])
   })
 
-  t.only('If the node doesn\'t have any more docIDs, it should remove the node', t => {
+  t.test('If the node doesn\'t have any more docIDs, it should remove the node', t => {
     t.plan(1)
 
     const tree = create()
