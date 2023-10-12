@@ -342,10 +342,11 @@ function isPointInPolygon (polygon: Point[], point: Point): boolean {
 }
 
 function haversineDistance (coord1, coord2): number {
-  const lat1 = coord1.lat * (Math.PI / 180)
-  const lat2 = coord2.lat * (Math.PI / 180)
-  const deltaLat = (coord2.lat - coord1.lat) * (Math.PI / 180)
-  const deltaLon = (coord2.lon - coord1.lon) * (Math.PI / 180)
+  const P = Math.PI / 180
+  const lat1 = coord1.lat * (P)
+  const lat2 = coord2.lat * (P)
+  const deltaLat = (coord2.lat - coord1.lat) * (P)
+  const deltaLon = (coord2.lon - coord1.lon) * (P)
 
   const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
             Math.cos(lat1) * Math.cos(lat2) *
