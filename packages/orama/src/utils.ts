@@ -278,11 +278,9 @@ const mapDistanceToMeters = {
 export function convertDistanceToMeters(distance: number, unit: GeosearchDistanceUnit): number {
   const ratio = mapDistanceToMeters[unit]
   
-  if (ratio === undefined)
+  if (ratio === undefined) {
     throw new Error(createError('INVALID_DISTANCE_SUFFIX', distance).message)
+  }
   
   return distance * ratio
-    default:
-      throw new Error(createError('INVALID_DISTANCE_SUFFIX', distance).message)
-  }
 }
