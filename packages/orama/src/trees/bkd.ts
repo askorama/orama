@@ -163,7 +163,8 @@ export function removeDocByID (tree: RootNode, point: Point, docID: InternalDocu
     const axis = depth % K
 
     parentNode = node as Nullable<Node>
-    if (axis === 0) { // Compare by longitude
+    // Compare by longitude
+    if (axis === 0) {
       if (point.lon < node!.point.lon) {
         node = node?.left
         direction = 'left'
@@ -171,7 +172,8 @@ export function removeDocByID (tree: RootNode, point: Point, docID: InternalDocu
         node = node?.right
         direction = 'right'
       }
-    } else { // Compare by latitude
+    // Compare by latitude
+    } else {
       if (point.lat < node!.point.lat) {
         node = node?.left
         direction = 'left'
@@ -256,30 +258,6 @@ export function searchByRadius (
   }
 
   return result
-}
-
-function closestPointInBlock (node: Node, center: Point): Point {
-  let closestLat, closestLon
-
-  if (center.lat < node.point.lat) {
-    closestLat = node.point.lat
-  } else {
-    closestLat = center.lat
-  }
-
-  if (center.lon < node.point.lon) {
-    closestLon = node.point.lon
-  } else {
-    closestLon = center.lon
-  }
-
-  return { lat: closestLat, lon: closestLon }
-}
-
-function blockIntersectsCircle (node: Node, center: Point, radius: number): boolean {
-  const closest = closestPointInBlock(node, center)
-  const distance = haversineDistance(center, closest)
-  return distance <= radius
 }
 
 export function searchByPolygon (root: Nullable<Node>, polygon: Point[], inclusive = true, sort: SortGeoPoints = null): GeoSearchResult[] {
