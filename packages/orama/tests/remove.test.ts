@@ -261,7 +261,7 @@ t.test('should correctly remove documents with vector properties', async t => {
     schema: {
       name: 'string',
       vector: 'vector[10]',
-    }
+    } as const
   })
 
   const id1 = await insert(db, {
@@ -290,7 +290,7 @@ async function createSimpleDB() {
       meta: {
         sales: 'number',
       },
-    },
+    } as const,
     components: {
       getDocumentIndexId(): string {
         return `__${++i}`
