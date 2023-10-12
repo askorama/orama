@@ -4,6 +4,7 @@
   "fields-boosting": "Fields boosting",
   "facets": "Facets",
   "filters": "Filters",
+  "geosearch": "Geosearch",
   "sorting": "Sorting",
   "grouping": "Grouping",
   "threshold": "Threshold",
