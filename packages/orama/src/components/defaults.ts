@@ -1,4 +1,5 @@
 import { createError } from '../errors.js'
+import { Point } from '../trees/bkd.js'
 import {
   AnyDocument,
   AnyOrama,
@@ -124,8 +125,8 @@ const INNER_TYPE: Record<ArraySearchableType, ScalarSearchableType> = {
   'enum[]': 'enum',
 }
 
-export function isGeoPointType(type: unknown) {
-  return typeof type === 'string' && type === 'geopoint'
+export function isGeoPointType(type: unknown): type is Point {
+  return type === 'geopoint'
 }
 
 export function isVectorType(type: unknown): type is Vector {
