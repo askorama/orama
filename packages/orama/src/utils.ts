@@ -266,20 +266,22 @@ export function flattenObject (obj: object, prefix = ''): AnyDocument {
   return result
 }
 
+const mapDistanceToMeters = {
+  cm: 0.01,
+  m: 1,
+  km: 1000,
+  ft: 0.3048,
+  yd: 0.9144,
+  mi: 1609.344,
+};
+
 export function convertDistanceToMeters(distance: number, unit: GeosearchDistanceUnit): number {
-  switch (unit) {
-    case 'cm':
-      return distance / 100
-    case 'm':
-      return distance
-    case 'km':
-      return distance * 1000
-    case 'ft':
-      return distance * 0.3048
-    case 'yd':
-      return distance * 0.9144
-    case 'mi':
-      return distance * 1609.344
+  const ratio = mapDistanceToMeters[unit]
+  
+  if (ratio === undefined)
+    throw new Error(createError('INVALID_DISTANCE_SUFFIX', distance).message)
+  
+  return distance * ratio
     default:
       throw new Error(createError('INVALID_DISTANCE_SUFFIX', distance).message)
   }
