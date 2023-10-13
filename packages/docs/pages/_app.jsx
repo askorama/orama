@@ -1,4 +1,5 @@
 import Script from 'next/script'
+import '../styles.css'
 
 export default function App({ Component, pageProps }) {
   const googleAnalyticsID = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID

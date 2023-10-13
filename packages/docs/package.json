@@ -18,6 +18,7 @@
     "@orama/orama": "workspace:*",
     "@orama/plugin-match-highlight": "workspace:*",
     "@orama/plugin-nextra": "workspace:*",
+    "classnames": "^2.3.2",
     "next": "^13.3.0",
     "next-sitemap": "^4.2.3",
     "nextra": "^2.4.0",
@@ -28,5 +29,11 @@
     "react-icons": "^4.8.0",
     "react-medium-image-zoom": "^5.1.8",
     "rehype-raw": "^6.1.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "install": "^0.13.0",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.3"
   }
 }

@@ -1,3 +1,21 @@
-<div>
-  Hello
+import { DocCards } from '../components/DocCards'
+
+<div 
+  className='flex flex-col w-full justify-center items-center p-10'
+  style={{
+    backgroundImage: 'url(/bg.svg)',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 'cover',
+    height: 'calc(100vh - 200px)'
+  }}
+>
+  <h1 className='text-6xl font-bold text-center'>
+    Getting started with Orama
+  </h1>
+  <p className='text-l text-center mt-4 text-zinc-400'>
+    Run unlimited full-text and vector search queries on the world's first Global Search Network.
+  </p>
+  <div className='mt-14'>
+    <DocCards />
+  </div>
 </div>
