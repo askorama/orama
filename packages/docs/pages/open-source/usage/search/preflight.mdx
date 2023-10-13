@@ -47,7 +47,7 @@ By using a `preflight` request, you will be able to retrieve facets and a total 
 
 ## How is that useful?
 
-Preflight requests are particularly useful in certain situations, like when spawned right before a query with a certain [threshold](/usage/search/threshold).
+Preflight requests are particularly useful in certain situations, like when spawned right before a query with a certain [threshold](/open-source/usage/search/threshold).
 
 For example, let's say you have a large database of 50,000 products. If a user searches for a very rare product, you may end up with just a few results if the threshold is set to `0` (exact match).
 
@@ -59,4 +59,4 @@ By running a preflight search, you will be able to programmatically set a differ
 - **The preflight search returns 10 results**. You can set the threshold to `0.2`, returning the 10 results + 20% of the fuzzy-matched results.
 - **The preflight search returns 100 results**. You can set the threshold to `0`, returning only the 100 exact-matched results.
 
-Read the [threshold](/usage/search/threshold) documentation for more information on how the `threshold` parameter affects search results.
+Read the [threshold](/open-source/usage/search/threshold) documentation for more information on how the `threshold` parameter affects search results.

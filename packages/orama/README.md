@@ -13,14 +13,14 @@ If you need more info, help, or want to provide general feedback on Orama, join 
 
 # Highlighted features
 
-- [Vector Search](https://docs.oramasearch.com/usage/search/vector-search)
-- [Search filters](https://docs.oramasearch.com/usage/search/filters)
-- [Geosearch](https://docs.oramasearch.com/usage/search/geosearch)
-- [Facets](https://docs.oramasearch.com/usage/search/facets)
-- [Fields Boosting](https://docs.oramasearch.com/usage/search/fields-boosting)
-- [Typo tolerance](https://docs.oramasearch.com/usage/search/introduction#typo-tolerance)
-- [Exact match](https://docs.oramasearch.com/usage/search/introduction#exact-match)
-- [Stemming and tokenization in 28 languages](https://docs.oramasearch.com/text-analysis/stemming)
+- [Vector Search](https://docs.oramasearch.com/open-source/usage/search/vector-search)
+- [Search filters](https://docs.oramasearch.com/open-source/usage/search/filters)
+- [Geosearch](https://docs.oramasearch.com/open-source/usage/search/geosearch)
+- [Facets](https://docs.oramasearch.com/open-source/usage/search/facets)
+- [Fields Boosting](https://docs.oramasearch.com/open-source/usage/search/fields-boosting)
+- [Typo tolerance](https://docs.oramasearch.com/open-source/usage/search/introduction#typo-tolerance)
+- [Exact match](https://docs.oramasearch.com/open-source/usage/search/introduction#exact-match)
+- [Stemming and tokenization in 28 languages](https://docs.oramasearch.com/open-source/text-analysis/stemming)
 
 # Installation
 

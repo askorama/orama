@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
 
 settings:
   autoInstallPeers: true
@@ -136,6 +136,9 @@ importers:
       react-icons:
         specifier: ^4.8.0
         version: 4.8.0(react@18.2.0)
+      react-medium-image-zoom:
+        specifier: ^5.1.8
+        version: 5.1.8(react-dom@18.2.0)(react@18.2.0)
       rehype-raw:
         specifier: ^6.1.1
         version: 6.1.1
@@ -13705,6 +13708,16 @@ packages:
       '@babel/runtime': 7.22.5
       react-loadable: /@docusaurus/react-loadable@5.5.2(react@17.0.2)
       webpack: 5.75.0(@swc/core@1.3.27)
+    dev: false
+
+  /react-medium-image-zoom@5.1.8(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-2X4oLlEopIWg7qalR1Qpy4gPrU9CTF0DvJ7HNu5u/NwdyQWupEsje2vuMbjBz7+np8MmQ4DKJ6zGr1ofCuzB3g==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /react-router-config@5.1.1(react-router@5.3.4)(react@17.0.2):

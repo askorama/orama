@@ -1,0 +1,6 @@
+{
+  "rest-api": "REST API",
+  "webhook": "Webhook",
+  "csv-file": "CSV File",
+  "json-file": "JSON File"
+}

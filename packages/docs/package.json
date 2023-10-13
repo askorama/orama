@@ -26,6 +26,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
+    "react-medium-image-zoom": "^5.1.8",
     "rehype-raw": "^6.1.1"
   }
 }
