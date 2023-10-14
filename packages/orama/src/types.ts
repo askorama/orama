@@ -58,7 +58,7 @@ export type SchemaTypes<Value> = Value extends 'string'
   : Value extends 'geopoint'
   ? Point
   : // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Value extends `vector[${number}]`
+  Value extends Vector
   ? number[]
   : Value extends object
   ? { [Key in keyof Value]: SchemaTypes<Value[Key]> } & {
@@ -210,6 +210,16 @@ export type GeosearchOperation =
   | GeosearchRadiusOperator
   | GeosearchPolygonOperator
 
+export type VectorSearchMode =
+  | 'hybrid'
+  | 'vector'
+  | 'fulltext'
+
+export type VectorSimilarityOperation = {
+  target: number[],
+  similarity?: number,
+}
+
 export type Operator<Value> = Value extends 'string'
   ? (string | string[])
   : Value extends 'string[]'
@@ -228,6 +238,8 @@ export type Operator<Value> = Value extends 'string'
   ? EnumArrComparisonOperator
   : Value extends 'geopoint'
   ? GeosearchOperation
+  : Value extends Vector
+  ? VectorSimilarityOperation
   : never
 export type WhereCondition<TSchema> = {
   [key in keyof TSchema]?: Operator<TSchema[key]>
@@ -274,6 +286,12 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    * The properties of the document to search in.
    */
   properties?: '*' | FlattenSchemaProperty<T>[]
+  /**
+   * Search mode. By default, the search mode is `fulltext` (full-text search).
+   * If you have a vector property, you can use the `vector` mode to search for similar vectors,
+   * or `hybrid` to search for similar vectors and full-text in one single query.
+   */
+  mode?: VectorSearchMode,
   /**
    * The number of matched documents to return.
    */
