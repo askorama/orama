@@ -701,6 +701,44 @@ t.test('search method', t => {
 
   })
 
+  t.test('with custom tokenizer', async t => {
+    t.plan(4)
+
+    const normalizationCache = new Map([['english:foo:dogs', 'Dogs']])
+
+    const db = await create({
+      schema: {
+        quote: 'string',
+        author: 'string',
+      },
+      components: {
+        tokenizer: {
+          language: 'english',
+          normalizationCache,
+          tokenize: (raw: string) => {
+            return raw.split(' ').filter(word => word.toLowerCase().startsWith('b'))
+          },
+        },
+      },
+    })
+
+    t.equal(db.tokenizer.normalizationCache.get('english:foo:dogs'), 'Dogs')
+
+    await insert(db, { quote: 'the quick, brown fox jumps over the lazy dog. What a fox!', author: 'John Doe' })
+    await insert(db, { quote: 'foxes are nice animals. But I prefer having a dog.', author: 'John Doe' })
+    await insert(db, { quote: 'I like dogs. They are the best.', author: 'Jane Doe' })
+    await insert(db, { quote: 'I like cats. They are the best.', author: 'Jane Doe' })
+
+    const result1 = await search(db, { term: 'foxes', exact: true })
+    const result2 = await search(db, { term: 'cats', exact: true })
+    const result3 = await search(db, { term: 'brown', exact: true })
+
+    t.equal(result1.count, 0)
+    t.equal(result2.count, 0)
+    t.equal(result3.count, 1)
+    t.end()
+  })
+
   t.end()
 })
 
