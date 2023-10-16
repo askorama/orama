@@ -105,7 +105,7 @@ export async function create<
     id = await uniqueId()
   }
 
-  let tokenizer = components.tokenizer as Tokenizer
+  let tokenizer = components.tokenizer
   let index: TIndex | undefined = components.index
   let documentsStore: TDocumentStore | undefined = components.documentsStore
   let sorter: TSorter | undefined = components.sorter
@@ -113,9 +113,12 @@ export async function create<
   if (!tokenizer) {
     // Use the default tokenizer
     tokenizer = await createTokenizer({ language: language ?? 'english' })
-  } else if (!tokenizer.tokenize) {
+  } else if (!(tokenizer as Tokenizer).tokenize) {
     // If there is no tokenizer function, we assume this is a TokenizerConfig
     tokenizer = await createTokenizer(tokenizer)
+  } else {
+    const customTokenizer = tokenizer as Tokenizer
+    tokenizer = customTokenizer
   }
 
   if (components.tokenizer && language) {
