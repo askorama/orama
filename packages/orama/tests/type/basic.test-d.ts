@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { expectType } from 'tsd'
-import type { InternalTypedDocument, Orama, Results, Schema } from '../../src/types.d.ts'
+import type { Orama, Results, SearchParams, TypedDocument } from '../../src/types.d.ts'
 import { create, insert, search } from '../../src/index.js'
 
 const movieSchema = {
@@ -10,8 +10,7 @@ const movieSchema = {
   isFavorite: 'boolean',
   stars: 'enum'
 } as const
-type MovieSchema = Schema<typeof movieSchema>
-type MovieDocument = InternalTypedDocument<MovieSchema>
+type MovieDocument = TypedDocument<Orama<typeof movieSchema>>
 
 const movieDBP = create({
   schema: movieSchema,
@@ -27,11 +26,11 @@ const idP = insert(movieDB, {
 })
 expectType<Promise<string>>(idP)
 
-const resultP = search(movieDB, {
+const searchParams: SearchParams<Orama<typeof movieSchema>> = {
   term: 'godfather',
-})
+}
+
+const resultP = search(movieDB, searchParams)
 expectType<Promise<Results<MovieDocument>>>(resultP)
 const result = await resultP
 expectType<string>(result.hits[0].document.title)
-
-
