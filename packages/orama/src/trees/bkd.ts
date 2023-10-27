@@ -387,15 +387,15 @@ function vincentyDistance (coord1: Point, coord2: Point): number {
 
   // Initial approximation for the longitude difference between the two points
   let lambda = deltaLon
-  let prevLambda
+  let prevLambda: number
 
   // Limit the iterations to ensure we don't get stuck in an infinite loop
   let iterationLimit = 1000
-  let sinAlpha
-  let cos2Alpha
-  let sinSigma
-  let cosSigma
-  let sigma
+  let sinAlpha: number
+  let cos2Alpha: number
+  let sinSigma: number
+  let cosSigma: number
+  let sigma: number
 
   // Refine the value of lambda (longitude difference)
   do {
