@@ -226,7 +226,8 @@ export function searchByRadius (
   center: Point,
   radius: number,
   inclusive = true,
-  sort: SortGeoPoints = 'asc'
+  sort: SortGeoPoints = 'asc',
+  highPrecision = false
 ): GeoSearchResult[] {
   const stack: Array<{ node: Nullable<Node>, depth: number }> = [{ node, depth: 0 }]
   const result: GeoSearchResult[] = []
@@ -250,9 +251,11 @@ export function searchByRadius (
   }
 
   if (sort) {
+    const sortFn = highPrecision ? vincentyDistance : haversineDistance
+
     result.sort((a, b) => {
-      const distA = haversineDistance(center, a.point)
-      const distB = haversineDistance(center, b.point)
+      const distA = sortFn(center, a.point)
+      const distB = sortFn(center, b.point)
       return sort.toLowerCase() === 'asc' ? distA - distB : distB - distA
     })
   }
@@ -290,7 +293,7 @@ export function searchByPolygon (root: Nullable<Node>, polygon: Point[], inclusi
 
   const centroid = calculatePolygonCentroid(polygon)
 
-  if (sort !== null) {
+  if (sort) {
     const sortFn = highPrecision ? vincentyDistance : haversineDistance
 
     result.sort((a, b) => {
