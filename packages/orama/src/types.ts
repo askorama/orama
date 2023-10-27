@@ -192,17 +192,19 @@ export type GeosearchDistanceUnit =
 
 export type GeosearchRadiusOperator = {
   radius: {
-    coordinates: Point,
-    value: number,
-    unit?: GeosearchDistanceUnit,
+    coordinates: Point
+    value: number
+    unit?: GeosearchDistanceUnit
     inside?: boolean
+    highPrecision?: boolean
   }
 }
 
 export type GeosearchPolygonOperator = {
   polygon: {
-    coordinates: Point[],
+    coordinates: Point[]
     inside?: boolean
+    highPrecision?: boolean
   }
 }
 
