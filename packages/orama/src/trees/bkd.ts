@@ -260,7 +260,7 @@ export function searchByRadius (
   return result
 }
 
-export function searchByPolygon (root: Nullable<Node>, polygon: Point[], inclusive = true, sort: SortGeoPoints = null): GeoSearchResult[] {
+export function searchByPolygon (root: Nullable<Node>, polygon: Point[], inclusive = true, sort: SortGeoPoints = null, highPrecision = false): GeoSearchResult[] {
   const stack: SearchTask[] = [{ node: root, depth: 0 }]
   const result: GeoSearchResult[] = []
 
@@ -291,9 +291,11 @@ export function searchByPolygon (root: Nullable<Node>, polygon: Point[], inclusi
   const centroid = calculatePolygonCentroid(polygon)
 
   if (sort !== null) {
+    const sortFn = highPrecision ? vincentyDistance : haversineDistance
+
     result.sort((a, b) => {
-      const distA = haversineDistance(centroid, a.point)
-      const distB = haversineDistance(centroid, b.point)
+      const distA = sortFn(centroid, a.point)
+      const distB = sortFn(centroid, b.point)
       return sort.toLowerCase() === 'asc' ? distA - distB : distB - distA
     })
   }
@@ -341,7 +343,7 @@ function isPointInPolygon (polygon: Point[], point: Point): boolean {
   return isInside
 }
 
-function haversineDistance (coord1, coord2): number {
+function haversineDistance (coord1: Point, coord2: Point): number {
   const P = Math.PI / 180
   const lat1 = coord1.lat * (P)
   const lat2 = coord2.lat * (P)
@@ -354,4 +356,94 @@ function haversineDistance (coord1, coord2): number {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
   return EARTH_RADIUS * c
+}
+
+function vincentyDistance (coord1: Point, coord2: Point): number {
+  // Constants for WGS 84 ellipsoidal Earth model (https://epsg.org/ellipsoid_7030/WGS-84.html)
+  
+  // Semi-major axis of the Earth in meters
+  const a = 6378137
+
+  // Flattening of the ellipsoid
+  const f = 1 / 298.257223563
+
+  // Semi-minor axis
+  const b = (1 - f) * a
+
+  // Convert degrees to radians for calculations
+  const P = Math.PI / 180
+  const lat1 = coord1.lat * P
+  const lat2 = coord2.lat * P
+  const deltaLon = (coord2.lon - coord1.lon) * P
+
+  // Reduced latitudes - account for flattening by transforming from geodetic to auxiliary latitude
+  const U1 = Math.atan((1 - f) * Math.tan(lat1))
+  const U2 = Math.atan((1 - f) * Math.tan(lat2))
+
+  const sinU1 = Math.sin(U1)
+  const cosU1 = Math.cos(U1)
+  const sinU2 = Math.sin(U2)
+  const cosU2 = Math.cos(U2)
+
+  // Initial approximation for the longitude difference between the two points
+  let lambda = deltaLon
+  let prevLambda
+
+  // Limit the iterations to ensure we don't get stuck in an infinite loop
+  let iterationLimit = 1000
+  let sinAlpha
+  let cos2Alpha
+  let sinSigma
+  let cosSigma
+  let sigma
+
+  // Refine the value of lambda (longitude difference)
+  do {
+    const sinLambda = Math.sin(lambda)
+    const cosLambda = Math.cos(lambda)
+
+    // Compute the trigonometric values required for Vincenty formulae
+    sinSigma = Math.sqrt(
+      (cosU2 * sinLambda) * (cosU2 * sinLambda) +
+      (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda) *
+      (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda)
+    )
+
+    cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLambda
+    sigma = Math.atan2(sinSigma, cosSigma)
+
+    // Angular separation between the two points and the equator
+    sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma
+    cos2Alpha = 1 - sinAlpha * sinAlpha
+
+    const cos2SigmaM = cosSigma - 2 * sinU1 * sinU2 / cos2Alpha
+
+    // Compensation factor for the Earth's shape
+    const C = f / 16 * cos2Alpha * (4 + f * (4 - 3 * cos2Alpha))
+
+    // Store previous lambda to check for convergence
+    prevLambda = lambda
+
+    // Refine the estimate of lambda using the Vincenty formula
+    lambda = deltaLon + (1 - C) * f * sinAlpha *
+      (sigma + C * sinSigma *
+      (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)))
+  } while (Math.abs(lambda - prevLambda) > 1e-12 && --iterationLimit > 0)
+
+  // Compute factors that depend on the shape of the Earth and angular distances
+  const u2 = cos2Alpha * (a * a - b * b) / (b * b)
+  const A = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)))
+  const B = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)))
+
+  // Compute the correction factor for the ellipsoidal shape of the Earth
+  const deltaSigma = B * sinSigma *
+    (cosSigma - 2 * sinU1 * sinU2 / cos2Alpha + B / 4 *
+    (cosSigma * (-1 + 2 * sinSigma * sinSigma) -
+    B / 6 * sigma * (-3 + 4 * sinSigma * sinSigma) *
+    (-3 + 4 * sigma * sigma)))
+
+  // Final calculation of distance using Vincenty formula
+  const s = b * A * (sigma - deltaSigma)
+
+  return s
 }
