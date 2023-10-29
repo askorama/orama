@@ -6,7 +6,7 @@ This plugin aims to provide a match location for search results.
 
 # Usage
 
-For the complete usage guide, please refer to the [official plugin documentation](https://docs.oramasearch.com/plugins/plugin-match-highlight).
+For the complete usage guide, please refer to the [official plugin documentation](https://docs.oramasearch.com/open-source/plugins/plugin-match-highlight).
 
 # License
 

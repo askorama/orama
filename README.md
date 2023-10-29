@@ -40,7 +40,7 @@ the
 - [Fields Boosting](https://docs.oramasearch.com/open-source/usage/search/fields-boosting)
 - [Typo tolerance](https://docs.oramasearch.com/open-source/usage/search/introduction#typo-tolerance)
 - [Exact match](https://docs.oramasearch.com/open-source/usage/search/introduction#exact-match)
-- [Stemming and tokenization in 28 languages](https://docs.oramasearch.com/text-analysis/stemming)
+- [Stemming and tokenization in 28 languages](https://docs.oramasearch.com/open-source/text-analysis/stemming)
 
 # Installation
 
