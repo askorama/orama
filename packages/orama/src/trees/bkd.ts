@@ -229,6 +229,7 @@ export function searchByRadius (
   sort: SortGeoPoints = 'asc',
   highPrecision = false
 ): GeoSearchResult[] {
+  const distanceFn = highPrecision ? vincentyDistance : haversineDistance
   const stack: Array<{ node: Nullable<Node>, depth: number }> = [{ node, depth: 0 }]
   const result: GeoSearchResult[] = []
 
@@ -236,7 +237,7 @@ export function searchByRadius (
     const { node, depth } = stack.pop() as { node: Node, depth: number }
     if (node === null) continue
 
-    const dist = haversineDistance(center, node.point)
+    const dist = distanceFn(center, node.point)
 
     if (inclusive ? dist <= radius : dist > radius) {
       result.push({ point: node.point, docIDs: node.docIDs ?? [] })
@@ -251,11 +252,9 @@ export function searchByRadius (
   }
 
   if (sort) {
-    const sortFn = highPrecision ? vincentyDistance : haversineDistance
-
     result.sort((a, b) => {
-      const distA = sortFn(center, a.point)
-      const distB = sortFn(center, b.point)
+      const distA = distanceFn(center, a.point)
+      const distB = distanceFn(center, b.point)
       return sort.toLowerCase() === 'asc' ? distA - distB : distB - distA
     })
   }
