@@ -30,13 +30,13 @@ export function DocCards () {
   const isDark = useDark()
 
   return (
-    <div className='relative flex w-full'>
+    <div className='relative flex flex-col md:flex-row w-full'>
       {docs.map((doc, index) => (
         <Link href={doc.link} key={index}>
           <div
-            className={clx('flex flex-col w-72 h-48 p-6 border border-zinc-800 rounded-md transition-all ease-linear hover:shadow-xl hover:border-zinc-600', {
-              'mr-8': index === 0,
-              'ml-8': index === 1,
+            className={clx('flex flex-col w-72 md:h-48 h-38 p-6 border dark:border-zinc-800 border-zinc-200 rounded-md transition-all ease-linear hover:shadow-xl hover:border-zinc-600', {
+              'md:mr-8': index === 0,
+              'md:ml-8 mt-4 md:mt-0': index === 1,
             })}
             style={{
               background: index === 0 ? bgOSS[isDark ? 'dark' : 'light'] : bgCloud[isDark ? 'dark' : 'light']
@@ -50,7 +50,7 @@ export function DocCards () {
             </p>
 
             <div className='flex justify-center relative w-full'>
-              <div className='transform translate-y-12'>
+              <div className='transform md:translate-y-12 translate-y-4'>
                 <BsArrowRightShort className='dark:text-zinc-500 text-zinc-400 w-8 h-8' />
               </div>
             </div>
