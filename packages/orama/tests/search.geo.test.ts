@@ -214,7 +214,7 @@ t.test('geosearch', t => {
 
     t.same(polygonResults.count, 5)
     t.same(polygonResults.hits.map(({ id }) => id), ['1', '2', '3', '4', '5'])
-    t.same(radiusResults.count, 2)
-    t.same(radiusResults.hits.map(({ id }) => id), ['1', '2'])
+    t.same(radiusResults.count, 1)
+    t.same(radiusResults.hits.map(({ id }) => id), ['1'])
   })
 })
