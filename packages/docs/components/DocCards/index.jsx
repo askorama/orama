@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import clx from 'classnames'
-import { useDark } from '../../hooks/useDark'
+import { useDark } from '../../hooks/useDark.js'
 import { BsArrowRightShort } from 'react-icons/bs'
 
 const docs = [
