@@ -309,7 +309,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    *
    * d: Frequency normalization lower bound. Default value is 0.5.
    *
-   * Full documentation: https://docs.oramasearch.com/usage/search/BM25-algorithm
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/BM25-algorithm
    *
    * @see https://en.wikipedia.org/wiki/Okapi_BM25
    */
@@ -320,7 +320,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    * The boost is a number that is multiplied to the score of the property.
    * It can be used to give more importance to some properties.
    *
-   * Full documentation: https://docs.oramasearch.com/usage/search/fields-boosting
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/fields-boosting
    *
    * @example
    * // Give more importance to the 'title' property.
@@ -337,7 +337,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
   boost?: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>
   /**
    * Facets configuration
-   * Full documentation: https://docs.oramasearch.com/usage/search/facets
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/facets
    *
    * A facet is a feature that allows users to narrow down their search results by specific
    * attributes or characteristics, such as category, price, or location.
@@ -360,7 +360,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
 
   /**
    * Distinct configuration
-   * Full documentation: https://docs.oramasearch.com/usage/search/introduction#distinct
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/introduction#distinct
    *
    * @example
    * const results = await search(db, {
@@ -372,7 +372,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
 
   /**
    * Groups configuration
-   * Full documentation: https://docs.oramasearch.com/usage/search/grouping
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/grouping
    *
    * @example
    * const results = await search(db, {
@@ -387,7 +387,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
 
   /**
    * Filter the search results.
-   * Full documentation: https://docs.oramasearch.com/usage/search/filters
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/filters
    *
    * @example
    * // Search for documents that contain 'Headphones' in the 'description' and 'title' fields and
@@ -410,7 +410,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    * The threshold is a number between 0 and 1 that represents the minimum score of the documents to return.
    * By default, the threshold is 1.
    *
-   * Full documentation: https://docs.oramasearch.com/usage/search/threshold
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/threshold
    *
    * @example
    *
@@ -434,7 +434,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    * Preflight query.
    * Will return just the facets (if needed) and the number of matched documents for the given query.
    *
-   * Full documentation: https://docs.oramasearch.com/usage/search/preflight
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/preflight
    *
    * @example
    *

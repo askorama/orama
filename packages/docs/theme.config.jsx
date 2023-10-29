@@ -3,6 +3,7 @@ import { FaSlack } from 'react-icons/fa'
 import { OramaSearch } from '@orama/plugin-nextra'
 import { useTheme } from 'next-themes'
 import { OramaLogo } from './components/Logo'
+import { Navigation } from './components/Navigation'
 
 const css = `
 li > ul.nx-mt-6 {
@@ -33,12 +34,18 @@ export default {
 
     return <OramaLogo isDark={isDark} />
   },
+  search: {
+    component: OramaSearch,
+  },
+  navbar: {
+    component: Navigation,
+  },
   chat: {
     link: 'https://orama.to/slack',
     icon: <FaSlack style={{ width: 24, height: 24 }} />,
   },
   footer: {
-    text: <p>Apache 2.0 - 2023 © OramaSearch Inc.</p>,
+    text: <p>2023 © OramaSearch Inc.</p>,
   },
   docsRepositoryBase: 'https://github.com/oramasearch/orama/tree/main/packages/docs',
   darkMode: true,
@@ -46,9 +53,6 @@ export default {
     return {
       titleTemplate: '%s – Orama',
     }
-  },
-  search: {
-    component: OramaSearch,
   },
   head: (
     <>
