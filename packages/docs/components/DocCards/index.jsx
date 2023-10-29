@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import clx from 'classnames'
+import { useDark } from '../../hooks/useDark'
 import { BsArrowRightShort } from 'react-icons/bs'
 
 const docs = [
@@ -15,7 +16,19 @@ const docs = [
   }
 ]
 
+const bgOSS = {
+  dark: 'radial-gradient(77.55% 79.46% at 5.73% 0%, #6A6279 0%, rgba(16, 17, 17, 0.00) 100%)',
+  light: 'radial-gradient(77.55% 79.46% at 5.73% 0%, #EBE8F0 0%, #FFF 100%)'
+}
+
+const bgCloud = {
+  dark: 'radial-gradient(77.55% 79.46% at 5.73% 0%, #4C3088 0%, rgba(16, 17, 17, 0.00) 100%)',
+  light: 'radial-gradient(77.55% 79.46% at 5.73% 0%, #D0A6F1 0%, rgba(255, 255, 255, 0.00) 100%)'
+}
+
 export function DocCards () {
+  const isDark = useDark()
+
   return (
     <div className='relative flex w-full'>
       {docs.map((doc, index) => (
@@ -26,19 +39,19 @@ export function DocCards () {
               'ml-8': index === 1,
             })}
             style={{
-              background: index === 0 ? 'radial-gradient(77.55% 79.46% at 5.73% 0%, #6A6279 0%, rgba(16, 17, 17, 0.00) 100%)' : 'radial-gradient(77.55% 79.46% at 5.73% 0%, #4C3088 0%, rgba(16, 17, 17, 0.00) 100%)',
+              background: index === 0 ? bgOSS[isDark ? 'dark' : 'light'] : bgCloud[isDark ? 'dark' : 'light']
             }}
           >
-            <h2 className='font-bold text-m text-zinc-200'>
+            <h2 className='font-bold text-m dark:text-zinc-200 text-zinc-900'>
               {doc.name}
             </h2>
-            <p className='text-xs text-zinc-300 mt-1'>
+            <p className={clx('text-xs dark:text-zinc-300 text-zinc-900 mt-1')}>
               {doc.description}
             </p>
 
             <div className='flex justify-center relative w-full'>
               <div className='transform translate-y-12'>
-                <BsArrowRightShort className='text-zinc-500 w-8 h-8' />
+                <BsArrowRightShort className='dark:text-zinc-500 text-zinc-400 w-8 h-8' />
               </div>
             </div>
           </div>

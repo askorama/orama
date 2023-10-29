@@ -45,7 +45,7 @@ export default {
     icon: <FaSlack style={{ width: 24, height: 24 }} />,
   },
   footer: {
-    text: <p>Apache 2.0 - 2023 © OramaSearch Inc.</p>,
+    text: <p>2023 © OramaSearch Inc.</p>,
   },
   docsRepositoryBase: 'https://github.com/oramasearch/orama/tree/main/packages/docs',
   darkMode: true,
