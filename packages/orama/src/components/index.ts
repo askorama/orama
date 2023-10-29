@@ -547,14 +547,14 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
       }
 
       if (reqOperation === 'radius') {
-        const { value, coordinates, unit = 'm', inside = true } = operation[reqOperation] as GeosearchRadiusOperator['radius']
+        const { value, coordinates, unit = 'm', inside = true, highPrecision = false } = operation[reqOperation] as GeosearchRadiusOperator['radius']
         const distanceInMeters = convertDistanceToMeters(value, unit)
-        const ids = searchByRadius(node.root, coordinates as BKDGeoPoint, distanceInMeters, inside)
+        const ids = searchByRadius(node.root, coordinates as BKDGeoPoint, distanceInMeters, inside, undefined, highPrecision)
         // @todo: convert this into a for loop
         safeArrayPush(filtersMap[param], ids.map(({ docIDs }) => docIDs).flat())
       } else {
-        const { coordinates, inside = true } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
-        const ids = searchByPolygon(node.root, coordinates as BKDGeoPoint[], inside)
+        const { coordinates, inside = true, highPrecision = false } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
+        const ids = searchByPolygon(node.root, coordinates as BKDGeoPoint[], inside, undefined, highPrecision)
         // @todo: convert this into a for loop
         safeArrayPush(filtersMap[param], ids.map(({ docIDs }) => docIDs).flat())
       }

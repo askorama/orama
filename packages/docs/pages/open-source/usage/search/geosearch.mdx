@@ -161,3 +161,41 @@ If we try to draw the polygon above on our map, we will get the following result
 The query above will return only one result: **Piazza Duomo**. This is because it will filter all the documents inside the polygon whose `name` property contains the term `"Duomo"`.
 
 If you want to return all the points outside the polygon, you can set the `inside` property to `false`.
+
+## High Precision Geosearch
+
+By default, Orama will use the Haversine Formula to calculate the distance between two points.
+
+This formula is very fast, but since it considers the Earth as a perfect sphere, it might not be very precise for long distances.
+
+Even though the Haversine Formula is more than enough for most use cases, if you need to perform geosearch queries with higher precision, you can force Orama to use the **Vincenty Formula** by setting `highPrecision: true` when performing your search:
+
+```javascript
+import { create, insert, search } from '@orama/orama'
+
+const db = await create({ ... })
+
+await insert(db, { ... })
+await insert(db, { ... })
+await insert(db, { ... })
+
+const searchResult = await search(db, {
+  term: 'Duomo',
+  where: {
+    location: {
+      polygon: {
+        coordinates: [
+          { lat: 45.46472, lon: 9.1886  },
+          { lat: 45.46352, lon: 9.19177 },
+          { lat: 45.46278, lon: 9.19176 },
+          { lat: 45.4628,  lon: 9.18857 },
+          { lat: 45.46472, lon: 9.1886  },
+        ],
+        highPrecision: true
+      }
+    }
+  }
+})
+```
+
+This will make the search a bit slower, but more precise on long distances.
