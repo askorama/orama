@@ -1,0 +1,2371 @@
+[
+  {
+    "breed": "Labrador Retriever",
+    "country": "Canada",
+    "longevity": 10,
+    "character": [
+      "Loyal",
+      "Friendly",
+      "Intelligent",
+      "Energetic",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Yellow",
+        "Black",
+        "Chocolate"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "German Shepherd",
+    "country": "Germany",
+    "longevity": 7,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Protective",
+      "Confident",
+      "Trainable"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Tan"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Bulldog",
+    "country": "England",
+    "longevity": 8,
+    "character": [
+      "Loyal",
+      "Calm",
+      "Gentle",
+      "Brave"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Poodle",
+    "country": "France",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Active",
+      "Affectionate",
+      "Hypoallergenic"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Black",
+        "Brown",
+        "Apricot"
+      ],
+      "eyes": [
+        "Brown",
+        "Blue"
+      ]
+    }
+  },
+  {
+    "breed": "Beagle",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Curious",
+      "Friendly",
+      "Energetic",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Tan",
+        "Red",
+        "Lemon"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Chihuahua",
+    "country": "Mexico",
+    "longevity": 12,
+    "character": [
+      "Loyal",
+      "Energetic",
+      "Confident",
+      "Sensitive"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Brown",
+        "Tan",
+        "White"
+      ],
+      "eyes": [
+        "Brown",
+        "Blue"
+      ]
+    }
+  },
+  {
+    "breed": "Boxer",
+    "country": "Germany",
+    "longevity": 10,
+    "character": [
+      "Loyal",
+      "Energetic",
+      "Intelligent",
+      "Playful",
+      "Protective"
+    ],
+    "colors": {
+      "fur": [
+        "Fawn",
+        "Brindle"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Golden Retriever",
+    "country": "Scotland",
+    "longevity": 10,
+    "character": [
+      "Intelligent",
+      "Friendly",
+      "Kind",
+      "Loyal",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Golden"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Pug",
+    "country": "China",
+    "longevity": 12,
+    "character": [
+      "Loyal",
+      "Playful",
+      "Affectionate",
+      "Social",
+      "Charming"
+    ],
+    "colors": {
+      "fur": [
+        "Fawn",
+        "Black"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Rottweiler",
+    "country": "Germany",
+    "longevity": 8,
+    "character": [
+      "Loyal",
+      "Protective",
+      "Confident",
+      "Strong"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Tan"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Siberian Husky",
+    "country": "Russia",
+    "longevity": 12,
+    "character": [
+      "Independent",
+      "Energetic",
+      "Intelligent",
+      "Playful",
+      "Strong"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "White"
+      ],
+      "eyes": [
+        "Blue"
+      ]
+    }
+  },
+  {
+    "breed": "Dachshund",
+    "country": "Germany",
+    "longevity": 12,
+    "character": [
+      "Loyal",
+      "Energetic",
+      "Playful",
+      "Curious"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Tan"
+      ],
+      "eyes": [
+        "Brown",
+        "Blue"
+      ]
+    }
+  },
+  {
+    "breed": "Shih Tzu",
+    "country": "China",
+    "longevity": 10,
+    "character": [
+      "Affectionate",
+      "Playful",
+      "Confident",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "White",
+        "Brown"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Bichon Frise",
+    "country": "France",
+    "longevity": 12,
+    "character": [
+      "Playful",
+      "Affectionate",
+      "Intelligent",
+      "Social"
+    ],
+    "colors": {
+      "fur": [
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Australian Shepherd",
+    "country": "Australia",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Loyal",
+      "Trainable"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Red"
+      ],
+      "eyes": [
+        "Brown",
+        "Blue"
+      ]
+    }
+  },
+  {
+    "breed": "Basset Hound",
+    "country": "France",
+    "longevity": 10,
+    "character": [
+      "Affectionate",
+      "Patient",
+      "Gentle",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Tan"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Cocker Spaniel",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Affectionate",
+      "Intelligent",
+      "Energetic",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Brown"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "French Bulldog",
+    "country": "France",
+    "longevity": 10,
+    "character": [
+      "Affectionate",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Black",
+        "Brindle"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Pomeranian",
+    "country": "Germany",
+    "longevity": 12,
+    "character": [
+      "Playful",
+      "Energetic",
+      "Intelligent",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Orange",
+        "Sable",
+        "Black"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Great Dane",
+    "country": "Germany",
+    "longevity": 8,
+    "character": [
+      "Gentle",
+      "Loyal",
+      "Intelligent",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Blue",
+        "Fawn",
+        "Harlequin"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Mastiff",
+    "country": "England",
+    "longevity": 8,
+    "character": [
+      "Loyal",
+      "Gentle",
+      "Protective",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Apricot",
+        "Fawn"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Newfoundland",
+    "country": "Canada",
+    "longevity": 9,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Gentle",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Brown",
+        "Grey"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Saint Bernard",
+    "country": "Switzerland",
+    "longevity": 8,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Gentle",
+      "Protective"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Old English Sheepdog",
+    "country": "England",
+    "longevity": 10,
+    "character": [
+      "Gentle",
+      "Intelligent",
+      "Good-natured",
+      "Protective"
+    ],
+    "colors": {
+      "fur": [
+        "Blue",
+        "Grey"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Irish Wolfhound",
+    "country": "Ireland",
+    "longevity": 6,
+    "character": [
+      "Gentle",
+      "Loyal",
+      "Intelligent",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Grey",
+        "Red",
+        "Black"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Greyhound",
+    "country": "England",
+    "longevity": 10,
+    "character": [
+      "Intelligent",
+      "Athletic",
+      "Sensitive",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "White",
+        "Brindle"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Scottish Deerhound",
+    "country": "Scotland",
+    "longevity": 8,
+    "character": [
+      "Gentle",
+      "Intelligent",
+      "Good-natured",
+      "Independent"
+    ],
+    "colors": {
+      "fur": [
+        "Blue",
+        "Grey"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Great Pyrenees",
+    "country": "France",
+    "longevity": 10,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Gentle",
+      "Protective"
+    ],
+    "colors": {
+      "fur": [
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Shar Pei",
+    "country": "China",
+    "longevity": 8,
+    "character": [
+      "Independent",
+      "Loyal",
+      "Intelligent",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Cream",
+        "Fawn"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Doberman Pinscher",
+    "country": "Germany",
+    "longevity": 10,
+    "character": [
+      "Loyal",
+      "Energetic",
+      "Intelligent",
+      "Protective"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Weimaraner",
+    "country": "Germany",
+    "longevity": 10,
+    "character": [
+      "Energetic",
+      "Intelligent",
+      "Good-natured",
+      "Loyal"
+    ],
+    "colors": {
+      "fur": [
+        "Silver",
+        "Grey"
+      ],
+      "eyes": [
+        "Blue",
+        "Grey"
+      ]
+    }
+  },
+  {
+    "breed": "Belgian Malinois",
+    "country": "Belgium",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Loyal",
+      "Protective"
+    ],
+    "colors": {
+      "fur": [
+        "Fawn",
+        "Mahogany"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Rhodesian Ridgeback",
+    "country": "Rhodesia",
+    "longevity": 10,
+    "character": [
+      "Intelligent",
+      "Athletic",
+      "Loyal",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Light Wheaten"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "English Setter",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Affectionate",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "White",
+        "Liver"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Pointer",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Affectionate"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "White",
+        "Liver"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Gordon Setter",
+    "country": "Scotland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Affectionate"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Tan"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Irish Setter",
+    "country": "Ireland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Affectionate"
+    ],
+    "colors": {
+      "fur": [
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Papillon",
+    "country": "France",
+    "longevity": 14,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Affectionate",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Black",
+        "Sable",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Pekingese",
+    "country": "China",
+    "longevity": 12,
+    "character": [
+      "Independent",
+      "Intelligent",
+      "Affectionate",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "White",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Toy Poodle",
+    "country": "France",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Active",
+      "Affectionate",
+      "Hypoallergenic"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Black",
+        "Brown",
+        "Apricot"
+      ],
+      "eyes": [
+        "Brown",
+        "Blue"
+      ]
+    }
+  },
+  {
+    "breed": "Miniature Poodle",
+    "country": "France",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Active",
+      "Affectionate",
+      "Hypoallergenic"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Black",
+        "Brown",
+        "Apricot"
+      ],
+      "eyes": [
+        "Brown",
+        "Blue"
+      ]
+    }
+  },
+  {
+    "breed": "Standard Poodle",
+    "country": "France",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Active",
+      "Affectionate",
+      "Hypoallergenic"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Black",
+        "Brown",
+        "Apricot"
+      ],
+      "eyes": [
+        "Brown",
+        "Blue"
+      ]
+    }
+  },
+  {
+    "breed": "Affenpinscher",
+    "country": "Germany",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Brown",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Boston Terrier",
+    "country": "United States",
+    "longevity": 11,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Affectionate",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Brussels Griffon",
+    "country": "Belgium",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Affectionate",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Cairn Terrier",
+    "country": "Scotland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Wheaten",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Chinese Crested",
+    "country": "China",
+    "longevity": 13,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Affectionate",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Pink",
+        "White",
+        "Black"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Miniature Schnauzer",
+    "country": "Germany",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Salt & Pepper",
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Standard Schnauzer",
+    "country": "Germany",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Salt & Pepper"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "West Highland White Terrier",
+    "country": "Scotland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Australian Terrier",
+    "country": "Australia",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Black & Tan"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Border Terrier",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Wheaten",
+        "Black"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Coton de Tulear",
+    "country": "Madagascar",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "English Toy Spaniel",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Blenheim"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Australian Stumpy Tail Cattle Dog",
+    "country": "Australia",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Loyal"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Black"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Pug",
+    "country": "China",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Fawn"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "American Eskimo Dog",
+    "country": "United States",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Australian Cattle Dog",
+    "country": "Australia",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Blue",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Basset Hound",
+    "country": "France",
+    "longevity": 10,
+    "character": [
+      "Gentle",
+      "Good-natured",
+      "Loyal",
+      "Intelligent"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "White",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Australian Kelpie",
+    "country": "Australia",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Loyal"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Black"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Bloodhound",
+    "country": "England",
+    "longevity": 10,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Good-natured",
+      "Energetic"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Black"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Border Collie",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "White",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Australian Shepherd",
+    "country": "Australia",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Loyal"
+    ],
+    "colors": {
+      "fur": [
+        "Blue Merle"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "American Bulldog",
+    "country": "United States",
+    "longevity": 10,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Good-natured",
+      "Energetic"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Australian Shepherd",
+    "country": "Australia",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Borzoi",
+    "country": "Russia",
+    "longevity": 10,
+    "character": [
+      "Gentle",
+      "Good-natured",
+      "Loyal",
+      "Intelligent"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Cream",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Bull Terrier",
+    "country": "England",
+    "longevity": 10,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Good-natured",
+      "Energetic"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Cane Corso",
+    "country": "Italy",
+    "longevity": 10,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Good-natured",
+      "Energetic"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Cardigan Welsh Corgi",
+    "country": "Wales",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Sable",
+        "Black"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Chesapeake Bay Retriever",
+    "country": "United States",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Brown",
+        "Tan"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Saluki",
+    "country": "Middle East",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Loyal"
+    ],
+    "colors": {
+      "fur": [
+        "Cream",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "English Setter",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Liver",
+        "Blue"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "English Springer Spaniel",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "White",
+        "Liver"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Field Spaniel",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Liver"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Finnish Spitz",
+    "country": "Finland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Golden"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Flat-Coated Retriever",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Liver"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Australian Terrier",
+    "country": "Australia",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Giant Schnauzer",
+    "country": "Germany",
+    "longevity": 10,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Good-natured",
+      "Energetic"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Salt & Pepper"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Golden Retriever",
+    "country": "Scotland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Gold"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Gordon Setter",
+    "country": "Scotland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Tan"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Australian Cattle Dog",
+    "country": "Australia",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Loyal"
+    ],
+    "colors": {
+      "fur": [
+        "Blue",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Greyhound",
+    "country": "England",
+    "longevity": 10,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Loyal"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Black",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Harrier",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Black & Tan"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Irish Setter",
+    "country": "Ireland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Irish Terrier",
+    "country": "Ireland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Irish Water Spaniel",
+    "country": "Ireland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Brown"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Irish Wolfhound",
+    "country": "Ireland",
+    "longevity": 6,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Good-natured",
+      "Energetic"
+    ],
+    "colors": {
+      "fur": [
+        "Grey",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Italian Greyhound",
+    "country": "Italy",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Black"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Jack Russell Terrier",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Black & Tan"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Japanese Chin",
+    "country": "Japan",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Keeshond",
+    "country": "Netherlands",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Cream"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Kerry Blue Terrier",
+    "country": "Ireland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Blue"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Kuvasz",
+    "country": "Hungary",
+    "longevity": 10,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Good-natured",
+      "Energetic"
+    ],
+    "colors": {
+      "fur": [
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Lhasa Apso",
+    "country": "Tibet",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Maltese",
+    "country": "Malta",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Miniature Pinscher",
+    "country": "Germany",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Stag Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Samoyed",
+    "country": "Russia",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Shetland Sheepdog",
+    "country": "Scotland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Sable",
+        "Black"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Staffordshire Bull Terrier",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Black",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Vizsla",
+    "country": "Hungary",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Anatolian Shepherd",
+    "country": "Turkey",
+    "longevity": 12,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Good-natured",
+      "Energetic"
+    ],
+    "colors": {
+      "fur": [
+        "Fawn"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Welsh Corgi",
+    "country": "Wales",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Sable"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Welsh Springer Spaniel",
+    "country": "Wales",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Liver",
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Welsh Terrier",
+    "country": "Wales",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Tan"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "West Highland White Terrier",
+    "country": "Scotland",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Whippet",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Loyal"
+    ],
+    "colors": {
+      "fur": [
+        "White",
+        "Black",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Wirehaired Pointing Griffon",
+    "country": "Belgium",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Brown",
+        "White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Xoloitzcuintli",
+    "country": "Mexico",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Yorkshire Terrier",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Blue & Tan"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Akita",
+    "country": "Japan",
+    "longevity": 10,
+    "character": [
+      "Loyal",
+      "Intelligent",
+      "Good-natured",
+      "Energetic"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Fawn",
+        "Sesame"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Africanis",
+    "country": "Africa",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Loyal"
+    ],
+    "colors": {
+      "fur": [
+        "Brown",
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Basenji",
+    "country": "Congo",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Black & White"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Catahoula Leopard Dog",
+    "country": "United States",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Loyal"
+    ],
+    "colors": {
+      "fur": [
+        "Merle",
+        "Black"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Cocker Spaniel",
+    "country": "England",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Black",
+        "Brown"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Miniature Shiba Inu",
+    "country": "Japan",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Playful",
+      "Good-natured"
+    ],
+    "colors": {
+      "fur": [
+        "Red",
+        "Sesame"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Belgian Tervuren",
+    "country": "Belgium",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Loyal"
+    ],
+    "colors": {
+      "fur": [
+        "Fawn"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  },
+  {
+    "breed": "Pharaoh Hound",
+    "country": "Malta",
+    "longevity": 12,
+    "character": [
+      "Intelligent",
+      "Energetic",
+      "Good-natured",
+      "Loyal"
+    ],
+    "colors": {
+      "fur": [
+        "Red"
+      ],
+      "eyes": [
+        "Brown"
+      ]
+    }
+  }
+]
