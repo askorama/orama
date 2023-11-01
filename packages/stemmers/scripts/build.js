@@ -38,10 +38,10 @@ const stemmers = {
   sanskrit: 'sk',
 }
 
-async function compile(lang, jsExtension, tsExtension, moduleType) {
+async function compile(lang, fullLang, jsExtension, tsExtension, moduleType) {
   const content = await readFile(resolve(sourceDir, `${lang}.js`), 'utf-8')
-
-  const compiled = await transform(content, {
+  const language = `\nexport const language = '${fullLang}'`
+  const compiled = await transform(content + language, {
     module: { type: moduleType },
     env: { targets: 'node >= 16' },
     jsc: { target: 'es2022' },
@@ -69,8 +69,8 @@ async function main() {
 
   // Copy all relevant files
   for (const [long, short] of Object.entries(stemmers)) {
-    await compile(short, 'js', 'ts', 'nodenext')
-    await compile(short, 'cjs', 'cts', 'commonjs')
+    await compile(short, long, 'js', 'ts', 'nodenext')
+    await compile(short, long, 'cjs', 'cts', 'commonjs')
 
     exports[`./${long}`] = {
       types: `./dist/${short}.d.ts`,
