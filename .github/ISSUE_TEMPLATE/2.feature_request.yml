@@ -1,0 +1,33 @@
+name: Feature Request
+description: Propose a new feature for Orama
+labels: ['template: feature']
+body:
+  - type: textarea
+    attributes:
+      label: Problem Description
+      description: What's the problem or limitation you're facing?
+      placeholder: "It's challenging to..."
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Proposed Solution
+      description: How do you envision the solution?
+      placeholder: 'Orama could implement...'
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Alternatives
+      description: Any other solutions or features you've considered?
+      placeholder: 'Another approach could be...'
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional Context
+      description: Any extra information or screenshots to help understand the feature request.
+      placeholder: 'For example, in a scenario where...'

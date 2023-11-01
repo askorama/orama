@@ -1,0 +1,67 @@
+name: Bug Report
+description: Create a bug report for Orama
+labels: ['template: bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This template is for Orama bugs.
+
+        Before opening a new issue, check existing [issues](https://github.com/oramasearch/orama/issues) and upvote if applicable.
+
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of the bug.
+      placeholder: 'When I do X, Y happens instead of Z.'
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Initialize Orama
+        2. Insert X data
+        3. Search for Y
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: What you expected to happen.
+      placeholder: 'I expected A but got B.'
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Environment Info
+      description: Details about your runtime environment.
+      render: bash
+      placeholder: |
+        OS: MacOS 12.1
+        Node: 18.17.1
+        Orama: 2.1.3
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: Affected areas
+      multiple: true
+      options:
+        - 'Initialization'
+        - 'Data Insertion'
+        - 'Search'
+        - 'Environment/OS'
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Extra information to help investigate.
+      placeholder: 'Happens only on Linux.'
