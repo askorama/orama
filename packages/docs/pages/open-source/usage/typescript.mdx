@@ -54,6 +54,7 @@ interface Movie {
   year: number,
 }
 
+//             this is important ---v
 const r = await search<typeof db, Movie>(db, { term: '' })
 const title = r.hits[0].document.title // well typed!
 const year = r.hits[0].document.year // well typed!
