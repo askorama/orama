@@ -146,6 +146,7 @@ export async function insertMultiple<T extends AnyOrama>(
   batchSize?: number,
   language?: string,
   skipHooks?: boolean,
+  timeout?: number,
 ): Promise<string[]> {
   if (!skipHooks) {
     await runMultipleHook(orama.beforeMultipleInsert, orama, docs as TypedDocument<T>[])
@@ -160,7 +161,7 @@ export async function insertMultiple<T extends AnyOrama>(
     }
   }
 
-  return innerInsertMultiple(orama, docs, batchSize, language, skipHooks)
+  return innerInsertMultiple(orama, docs, batchSize, language, skipHooks, timeout)
 }
 
 export async function innerInsertMultiple<T extends AnyOrama>(
@@ -169,10 +170,13 @@ export async function innerInsertMultiple<T extends AnyOrama>(
   batchSize?: number,
   language?: string,
   skipHooks?: boolean,
+  timeout?: number,
 ): Promise<string[]> {
   if (!batchSize) {
     batchSize = 1000
   }
+
+  timeout = timeout || 0
 
   const ids: string[] = []
   await new Promise<void>((resolve, reject) => {
@@ -194,10 +198,10 @@ export async function innerInsertMultiple<T extends AnyOrama>(
         }
       }
 
-      setTimeout(_insertMultiple, 0)
+      setTimeout(_insertMultiple, timeout)
     }
 
-    setTimeout(_insertMultiple, 0)
+    setTimeout(_insertMultiple, timeout)
   })
 
   if (!skipHooks) {

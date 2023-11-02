@@ -2,7 +2,7 @@ import t from 'tap'
 import { DocumentsStore } from '../src/components/documents-store.js'
 import { Index } from '../src/components/index.js'
 import { getInternalDocumentId } from '../src/components/internal-document-id-store.js'
-import { AnyDocument, create, insert, insertMultiple, search } from '../src/index.js'
+import { AnyDocument, count, create, insert, insertMultiple, search } from '../src/index.js'
 import dataset from './datasets/events.json' assert { type: 'json' }
 
 t.test('insert method', t => {
@@ -12,7 +12,7 @@ t.test('insert method', t => {
     const db = await create({
       schema: {
         example: 'string',
-      },
+      } as const,
     })
 
     const ex1Insert = await insert(db, { example: 'The quick, brown, fox' })
@@ -35,7 +35,7 @@ t.test('insert method', t => {
         author: 'string',
         isFavorite: 'boolean',
         rating: 'number',
-      },
+      } as const,
     })
 
     await insert(db, {
@@ -67,7 +67,7 @@ t.test('insert method', t => {
       schema: {
         id: 'string',
         name: 'string',
-      },
+      } as const,
     })
 
     const i1 = await insert(db, {
@@ -91,7 +91,7 @@ t.test('insert method', t => {
       schema: {
         id: 'string',
         name: 'string',
-      },
+      } as const,
       components: {
         getDocumentIndexId(doc: { name: string }): string {
           return `${doc.name.toLowerCase()}-foo-bar-baz`
@@ -119,7 +119,7 @@ t.test('insert method', t => {
     const db = await create({
       schema: {
         name: 'string',
-      },
+      } as const,
     })
 
     await t.rejects(
@@ -141,7 +141,7 @@ t.test('insert method', t => {
       schema: {
         id: 'string',
         name: 'string',
-      },
+      } as const,
     })
 
     await insert(db, {
@@ -165,7 +165,7 @@ t.test('insert method', t => {
     const db = await create({
       schema: {
         name: 'string',
-      },
+      } as const,
     })
 
     const i1 = await insert(db, {
@@ -183,7 +183,7 @@ t.test('insert method', t => {
       schema: {
         quote: 'string',
         author: 'string',
-      },
+      } as const,
     })
     await insert(db, {
       quote: 'hello, world!',
@@ -226,7 +226,7 @@ t.test('insert method', t => {
           },
           isFavorite: 'boolean',
           rating: 'number',
-        },
+        } as const,
       })
       const nestedExtraKeyDoc = {
         quote: 'So many books, so little time.',
@@ -276,7 +276,7 @@ t.test('insert method', t => {
           inner: {
             name: 'string',
           },
-        },
+        } as const,
       })
 
       await t.resolves(insert(db, {}))
@@ -298,7 +298,7 @@ t.test('insert method', t => {
             number: 'number',
             boolean: 'boolean',
           },
-        },
+        } as const,
       })
 
       const invalidDocuments: Array<object> = [
@@ -338,7 +338,7 @@ t.test('insert method', t => {
       schema: {
         name: 'string',
         location: 'geopoint'
-      }
+      } as const
     })
 
     t.ok(await insert(db, {
@@ -367,7 +367,7 @@ t.test('insert short prefixes, as in #327 and #328', t => {
         id: 'string',
         abbrv: 'string',
         type: 'string',
-      },
+      } as const,
     })
 
     await insertMultiple(db, [
@@ -411,7 +411,7 @@ t.test('insert short prefixes, as in #327 and #328', t => {
       schema: {
         id: 'string',
         quote: 'string',
-      },
+      } as const,
     })
 
     await insertMultiple(db, [
@@ -440,7 +440,7 @@ t.test('insertMultiple method', t => {
       schema: {
         id: 'string',
         name: 'string',
-      },
+      } as const,
       components: {
         getDocumentIndexId(doc: { id: string; name: string }): string {
           return `${doc.name.toLowerCase()}-${doc.id}`
@@ -462,7 +462,7 @@ t.test('insertMultiple method', t => {
     const db = await create({
       schema: {
         name: 'string',
-      },
+      } as const,
     })
 
     const ids = await insertMultiple(db, [{ name: 'John' }, { id: '02', name: 'Doe' }])
@@ -483,7 +483,7 @@ t.test('insertMultiple method', t => {
         category1: 'string',
         category2: 'string',
         granularity: 'string',
-      },
+      } as const,
     })
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -498,6 +498,32 @@ t.test('insertMultiple method', t => {
     } catch (_e) {}
 
     await t.rejects(() => insertMultiple(db, wrongSchemaDocs as unknown as DataEvent[]))
+  })
+
+  t.test('should support `timeout` parameter', async t => {
+    t.plan(2)
+
+    const db = await create({
+      schema: {
+        description: 'string',
+      } as const,
+    })
+
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const docs = (dataset as DataSet).result.events.slice(0, 4000)
+
+    const batchSize = 10
+
+    const before = Date.now()
+    await insertMultiple(db, docs, batchSize, undefined, false, 200)
+    const after = Date.now()
+
+    t.equal(await count(db), 4000)
+    const batchNumber = Math.ceil(docs.length / batchSize)
+    // the "sleep" is yeilded between batches,
+    // so it is not fired for the last batch
+    const expectedTime = (batchNumber - 1) * 200
+    t.equal(after - before > expectedTime, true)
   })
 
   t.end()
