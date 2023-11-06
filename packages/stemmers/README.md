@@ -35,14 +35,15 @@ Right now, Orama supports 28 languages and stemmers out of the box:
 
 ```js
 import { create } from '@orama/orama'
-import { stemmer } from '@orama/stemmers/italian'
+import { stemmer, language } from '@orama/stemmers/italian'
 
 const db = create({
   schema: {
   components: {
     tokenizer: {
       stemming: true,
-      stemmer
+      stemmer,
+      language
     }
   }
 })

@@ -19,7 +19,7 @@ When stemming is enabled, Orama uses **the English language analyzer**, but we c
 
 ```javascript copy
 import { create } from '@orama/orama'
-import { stemmer } from '@orama/stemmers/italian'
+import { stemmer, language } from '@orama/stemmers/italian'
 
 const db = create({
   schema: {
@@ -29,6 +29,7 @@ const db = create({
   components: {
     tokenizer: {
       stemming: true,
+      language,
       stemmer
     },
   },
