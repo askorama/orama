@@ -18,22 +18,7 @@ export const FUNCTION_COMPONENTS = [
   'formatElapsedTime',
 ]
 
-export const SINGLE_OR_ARRAY_COMPONENTS = [
-  'beforeInsert',
-  'afterInsert',
-  'beforeRemove',
-  'afterRemove',
-  'beforeUpdate',
-  'afterUpdate',
-  'beforeSearch',
-  'afterSearch',
-  'beforeInsertMultiple',
-  'afterInsertMultiple',
-  'beforeRemoveMultiple',
-  'afterRemoveMultiple',
-  'afterUpdateMultiple',
-  'afterUpdateMultiple',
-]
+export const SINGLE_OR_ARRAY_COMPONENTS = [/* deprecated with v2.0.0-beta.5 */]
 
 export async function runSingleHook<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
   hooks: SingleCallbackComponent<T>[],

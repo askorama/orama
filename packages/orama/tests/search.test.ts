@@ -596,11 +596,14 @@ t.test('search method', t => {
         schema: {
           animal: 'string',
         } as const,
-        components: {
-          afterSearch: () => {
-            called++
+        plugins: [
+          {
+            name: 'after-search-hook',
+            afterSearch: () => {
+              called++
+            },
           },
-        },
+        ]
       })
 
       await insertMultiple(db, [
@@ -710,7 +713,7 @@ t.test('search method', t => {
       schema: {
         quote: 'string',
         author: 'string',
-      },
+      } as const,
       components: {
         tokenizer: {
           language: 'english',
