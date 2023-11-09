@@ -90,7 +90,7 @@ t.only('plugin', async t => {
       beforeUpdate(orama, id) {
         data.push(`[Logger] beforeUpdate: ${id}`)
       },
-      afterUpdate(orama) {
+      afterUpdate() {
         data.push(`[Logger] afterUpdate`)
       },
       beforeRemoveMultiple(orama, ids) {
@@ -102,7 +102,7 @@ t.only('plugin', async t => {
       beforeUpdateMultiple(orama, ids) {
         data.push(`[Logger] beforeUpdateMultiple: ${ids}`)
       },
-      afterUpdateMultiple(orama) {
+      afterUpdateMultiple() {
         data.push(`[Logger] afterUpdateMultiple`)
       }
     }
