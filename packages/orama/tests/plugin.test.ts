@@ -56,7 +56,7 @@ t.test('getAllPluginsByHook', async t => {
 
 })
 
-t.only('plugin', async t => {
+t.test('plugin', async t => {
 
   const data: string[] = []
 
@@ -64,25 +64,21 @@ t.only('plugin', async t => {
     return {
       name: 'Logger',
       beforeInsert: async (orama, id, doc) => {
-        console.log('beforeInsert')
         data.push(`[Logger] beforeInsert: ${id} - ${JSON.stringify(doc)}`)
       },
       afterInsert: async (orama, id, doc) => {
-        console.log('afterInsert')
         data.push(`[Logger] afterInsert: ${id} - ${JSON.stringify(doc)}`)
       },
       beforeSearch: async (orama, query) => {
-        console.log('beforeSearch')
         data.push(`[Logger] beforeSearch: ${JSON.stringify(query)}`)
       },
       afterSearch: async (orama, query, result) => {
-        console.log('afterSearch')
         data.push(`[Logger] afterSearch: ${JSON.stringify(query)} - ${JSON.stringify(result)}`)
       }
     }
   }
 
-  t.only('should run all the hooks of a plugin', async t => {
+  t.test('should run all the hooks of a plugin', async t => {
 
     const db = await create({
       id: 'orama-1',
