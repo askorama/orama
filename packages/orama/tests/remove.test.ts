@@ -214,7 +214,7 @@ t.test('removeMultiple method', t => {
         name: 'string',
       },
       components: {
-        beforeMultipleRemove: function () {
+        beforeRemoveMultiple: function () {
           throw new Error('Kaboom')
         },
       },

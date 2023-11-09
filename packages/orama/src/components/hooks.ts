@@ -29,10 +29,10 @@ export const SINGLE_OR_ARRAY_COMPONENTS = [
   'afterSearch',
   'beforeInsertMultiple',
   'afterInsertMultiple',
-  'beforeMultipleRemove',
-  'afterMultipleRemove',
-  'beforeMultipleUpdate',
-  'afterMultipleUpdate',
+  'beforeRemoveMultiple',
+  'afterRemoveMultiple',
+  'afterUpdateMultiple',
+  'afterUpdateMultiple',
 ]
 
 export async function runSingleHook<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(

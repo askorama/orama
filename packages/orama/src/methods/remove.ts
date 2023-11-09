@@ -120,7 +120,7 @@ export async function removeMultiple<T extends AnyOrama>(
       )
 
   if (!skipHooks) {
-    await runMultipleHook(orama.beforeMultipleRemove, orama, docIdsForHooks)
+    await runMultipleHook(orama.beforeRemoveMultiple, orama, docIdsForHooks)
   }
 
   await new Promise<void>((resolve, reject) => {
@@ -150,7 +150,7 @@ export async function removeMultiple<T extends AnyOrama>(
   })
 
   if (!skipHooks) {
-    await runMultipleHook(orama.afterMultipleRemove, orama, docIdsForHooks)
+    await runMultipleHook(orama.afterRemoveMultiple, orama, docIdsForHooks)
   }
 
   return result

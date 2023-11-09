@@ -799,19 +799,19 @@ export interface SingleOrArrayCallbackComponents<T extends AnyOrama> {
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  beforeMultipleRemove: SingleOrArray<MultipleCallbackComponent<T>>
+  beforeRemoveMultiple: SingleOrArray<MultipleCallbackComponent<T>>
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  afterMultipleRemove: SingleOrArray<MultipleCallbackComponent<T>>
+  afterRemoveMultiple: SingleOrArray<MultipleCallbackComponent<T>>
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  beforeMultipleUpdate: SingleOrArray<MultipleCallbackComponent<T>>
+  beforeUpdateMultiple: SingleOrArray<MultipleCallbackComponent<T>>
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  afterMultipleUpdate: SingleOrArray<MultipleCallbackComponent<T>>
+  afterUpdateMultiple: SingleOrArray<MultipleCallbackComponent<T>>
 }
 
 export interface ArrayCallbackComponents<T extends AnyOrama> {
@@ -858,19 +858,19 @@ export interface ArrayCallbackComponents<T extends AnyOrama> {
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  beforeMultipleRemove: MultipleCallbackComponent<T>[]
+  beforeRemoveMultiple: MultipleCallbackComponent<T>[]
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  afterMultipleRemove: MultipleCallbackComponent<T>[]
+  afterRemoveMultiple: MultipleCallbackComponent<T>[]
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  beforeMultipleUpdate: MultipleCallbackComponent<T>[]
+  beforeUpdateMultiple: MultipleCallbackComponent<T>[]
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  afterMultipleUpdate: MultipleCallbackComponent<T>[]
+  afterUpdateMultiple: MultipleCallbackComponent<T>[]
 }
 
 export type Components<T extends AnyOrama, TSchema, TIndex, TDocumentStore, TSorter> = Partial<
@@ -964,8 +964,4 @@ export type OramaPlugin = {
   afterRemoveMultiple?: <T extends AnyOrama>(orama: T, ids: string[]) => SyncOrAsyncValue
   beforeUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
   afterUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
-  beforeLoad?: <T extends AnyOrama, R = unknown>(orama: T, raw: R) => SyncOrAsyncValue
-  afterLoad?: <T extends AnyOrama, R = unknown>(orama: T, raw: R) => SyncOrAsyncValue
-  beforeSave?: <T extends AnyOrama>(orama: T) => SyncOrAsyncValue
-  afterSave?: <T extends AnyOrama, R = unknown>(orama: T, raw: R) => SyncOrAsyncValue
 }

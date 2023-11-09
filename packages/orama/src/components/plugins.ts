@@ -18,9 +18,7 @@ export const AVAILABLE_PLUGIN_HOOKS = [
   'beforeUpdateMultiple',
   'afterUpdateMultiple',
   'beforeLoad',
-  'afterLoad',
-  'beforeSave',
-  'afterSave'
+  'afterLoad'
 ] as const
 
 export function getAllPluginsByHook<T extends AnyOrama> (orama: T, hook: AvailablePluginHooks): OramaPlugin[] {
