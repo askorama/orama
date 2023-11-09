@@ -572,6 +572,12 @@ export type AfterSearch<T extends AnyOrama, ResultDocument extends TypedDocument
   results: Results<ResultDocument>,
 ) => SyncOrAsyncValue
 
+export type BeforeSearch<T extends AnyOrama> = (
+  db: T,
+  params: SearchParams<T>,
+  language: string | undefined,
+) => SyncOrAsyncValue
+
 export type IIndexInsertOrRemoveHookFunction = <R = void>(
   index: AnyIndexStore,
   prop: string,
@@ -775,6 +781,10 @@ export interface SingleOrArrayCallbackComponents<T extends AnyOrama> {
    */
   afterUpdate: SingleOrArray<SingleCallbackComponent<T>>
   /**
+   * More details {@link BeforeSearch}
+   */
+  beforeSearch: SingleOrArray<BeforeSearch<T>>
+  /**
    * More details {@link AfterSearch}
    */
   afterSearch: SingleOrArray<AfterSearch<T>>
@@ -829,6 +839,10 @@ export interface ArrayCallbackComponents<T extends AnyOrama> {
    * More details {@link SingleCallbackComponent}
    */
   afterUpdate: SingleCallbackComponent<T>[]
+  /**
+   * More details {@link BeforeSearch}
+   */
+  beforeSearch: BeforeSearch<T>[]
   /**
    * More details {@link AfterSearch}
    */

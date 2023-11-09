@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create } from '../src/index.js'
+import { OramaPlugin, create, search, insert } from '../src/index.js'
 import { getAllPluginsByHook } from '../src/components/plugins.js'
 
 t.test('getAllPluginsByHook', async t => {
@@ -54,4 +54,62 @@ t.test('getAllPluginsByHook', async t => {
     t.equal(afterSearchPlugins.length, 2)
   })
 
+})
+
+t.only('plugin', async t => {
+
+  const data: string[] = []
+
+  function loggerPlugin(): OramaPlugin {
+    return {
+      name: 'Logger',
+      beforeInsert: async (orama, id, doc) => {
+        console.log('beforeInsert')
+        data.push(`[Logger] beforeInsert: ${id} - ${JSON.stringify(doc)}`)
+      },
+      afterInsert: async (orama, id, doc) => {
+        console.log('afterInsert')
+        data.push(`[Logger] afterInsert: ${id} - ${JSON.stringify(doc)}`)
+      },
+      beforeSearch: async (orama, query) => {
+        console.log('beforeSearch')
+        data.push(`[Logger] beforeSearch: ${JSON.stringify(query)}`)
+      },
+      afterSearch: async (orama, query, result) => {
+        console.log('afterSearch')
+        data.push(`[Logger] afterSearch: ${JSON.stringify(query)} - ${JSON.stringify(result)}`)
+      }
+    }
+  }
+
+  t.only('should run all the hooks of a plugin', async t => {
+
+    const db = await create({
+      id: 'orama-1',
+      schema: {
+        id: 'string',
+        name: 'string',
+      } as const,
+      plugins: [
+        loggerPlugin()
+      ]
+    })
+
+    await insert(db, {
+      id: '1',
+      name: 'John Doe'
+    })
+
+    await search(db, { term: 'john' })
+
+    t.equal(data[0], '[Logger] beforeInsert: 1 - {"id":"1","name":"John Doe"}')
+    t.equal(data[1], '[Logger] afterInsert: 1 - {"id":"1","name":"John Doe"}')
+    t.equal(data[2], '[Logger] beforeSearch: {"term":"john","relevance":{"k":1.2,"b":0.75,"d":0.5}}')
+    t.equal(data[3], '[Logger] afterSearch: {"term":"john","relevance":{"k":1.2,"b":0.75,"d":0.5}} - undefined')
+
+    console.log(data)
+    t.end()
+  })
+
+  t.end()
 })

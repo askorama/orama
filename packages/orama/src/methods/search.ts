@@ -2,7 +2,7 @@ import { prioritizeTokenScores } from '../components/algorithms.js'
 import { getFacets } from '../components/facets.js'
 import { intersectFilteredIDs } from '../components/filters.js'
 import { getGroups } from '../components/groups.js'
-import { runAfterSearch } from '../components/hooks.js'
+import { runAfterSearch, runBeforeSearch } from '../components/hooks.js'
 import {
   InternalDocumentID,
   getDocumentIdFromInternalId,
@@ -271,6 +271,10 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
 
   if (params.groupBy) {
     searchResult.groups = await getGroups<T, ResultDocument>(orama, uniqueDocsArray, params.groupBy)
+  }
+
+  if (orama.beforeSearch) {
+    await runBeforeSearch(orama.beforeSearch, orama, params, language)
   }
 
   if (orama.afterSearch) {

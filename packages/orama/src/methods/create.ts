@@ -9,6 +9,7 @@ import { createTokenizer } from '../components/tokenizer/index.js'
 import { createError } from '../errors.js'
 import {
   AfterSearch,
+  BeforeSearch,
   ArrayCallbackComponents,
   Components,
   FunctionComponents,
@@ -61,6 +62,7 @@ function validateComponents<OramaSchema, TIndex, TDocumentStore, TSorter, TOrama
 
     const component:
       | SingleOrArray<AfterSearch<TOrama>>
+      | SingleOrArray<BeforeSearch<TOrama>>
       | SingleOrArray<SingleCallbackComponent<TOrama>>
       | SingleOrArray<MultipleCallbackComponent<TOrama>>
       | undefined = components[key]
@@ -150,6 +152,7 @@ export async function create<
     afterRemove,
     beforeUpdate,
     afterUpdate,
+    beforeSearch,
     afterSearch,
     beforeMultipleInsert,
     afterMultipleInsert,
@@ -178,6 +181,7 @@ export async function create<
     afterRemove,
     beforeUpdate,
     afterUpdate,
+    beforeSearch,
     afterSearch,
     beforeMultipleInsert,
     afterMultipleInsert,
