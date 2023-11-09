@@ -920,12 +920,38 @@ export type PickInferGeneric<T, Default> = T extends AnyGeneric<infer Generic>
     : never
   : never
 
-export type Orama<TSchema, TIndex = IIndex<Index>, TDocumentStore = IDocumentsStore<DocumentsStore>, TSorter = ISorter<Sorter>> = FunctionComponents<TSchema> &
-  Internals<TSchema, AnyGenericIndex<TIndex>, AnyGenericDocumentStore<TDocumentStore>, AnyGenericSorter<TSorter>> &
-  ArrayCallbackComponents<any> &
-  OramaID
+export type Orama<TSchema, TIndex = IIndex<Index>, TDocumentStore = IDocumentsStore<DocumentsStore>, TSorter = ISorter<Sorter>> =
+  FunctionComponents<TSchema>
+  & Internals<TSchema, AnyGenericIndex<TIndex>, AnyGenericDocumentStore<TDocumentStore>, AnyGenericSorter<TSorter>>
+  & ArrayCallbackComponents<any>
+  & OramaID
+  & { plugins: OramaPlugin[] }
 
-export type AnyOrama<TSchema = any> = FunctionComponents<TSchema> &
-  Internals<TSchema, AnyIndexStore, AnyDocumentStore, AnySorterStore> &
-  ArrayCallbackComponents<any> &
-  OramaID
+export type AnyOrama<TSchema = any> =
+  FunctionComponents<TSchema>
+  & Internals<TSchema, AnyIndexStore, AnyDocumentStore, AnySorterStore>
+  & ArrayCallbackComponents<any>
+  & OramaID
+  & { plugins: OramaPlugin[] }
+
+export type OramaPlugin = {
+  name: string
+  beforeInsert?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
+  afterInsert?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
+  beforeRemove?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
+  afterRemove?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
+  beforeUpdate?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
+  afterUpdate?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
+  beforeSearch?: <T extends AnyOrama>(orama: T, params: SearchParams<T>, language: string | undefined) => SyncOrAsyncValue
+  afterSearch?: <T extends AnyOrama>(orama: T, params: SearchParams<T>, language: string | undefined, results: Results<TypedDocument<T>>) => SyncOrAsyncValue
+  beforeInsertMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
+  afterInsertMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
+  beforeRemoveMultiple?: <T extends AnyOrama>(orama: T, ids: string[]) => SyncOrAsyncValue
+  afterRemoveMultiple?: <T extends AnyOrama>(orama: T, ids: string[]) => SyncOrAsyncValue
+  beforeUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
+  afterUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
+  beforeLoad?: <T extends AnyOrama, R = unknown>(orama: T, raw: R) => SyncOrAsyncValue
+  afterLoad?: <T extends AnyOrama, R = unknown>(orama: T, raw: R) => SyncOrAsyncValue
+  beforeSave?: <T extends AnyOrama>(orama: T) => SyncOrAsyncValue
+  afterSave?: <T extends AnyOrama, R = unknown>(orama: T, raw: R) => SyncOrAsyncValue
+}

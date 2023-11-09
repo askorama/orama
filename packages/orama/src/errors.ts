@@ -35,6 +35,8 @@ const errors = {
   WRONG_SEARCH_PROPERTY_TYPE: `Property "%s" is not searchable. Only "string" properties are searchable.`,
   FACET_NOT_SUPPORTED: `Facet doens't support the type "%s".`,
   INVALID_DISTANCE_SUFFIX: `Invalid distance suffix "%s". Valid suffixes are: cm, m, km, mi, yd, ft.`,
+  PLUGIN_NOT_FOUND: `Plugin "%s" not found.`,
+  PLUGIN_HOOK_NOT_FOUND: `Plugin "%s" does not expose a "%s" hook.`,
 }
 
 export type ErrorCode = keyof typeof errors

@@ -1,5 +1,6 @@
 import { formatElapsedTime, getDocumentIndexId, getDocumentProperties, validateSchema } from '../components/defaults.js'
 import { DocumentsStore, createDocumentsStore } from '../components/documents-store.js'
+import { AVAILABLE_PLUGIN_HOOKS, getAllPluginsByHook } from '../components/plugins.js'
 import { FUNCTION_COMPONENTS, OBJECT_COMPONENTS, SINGLE_OR_ARRAY_COMPONENTS } from '../components/hooks.js'
 import { Index, createIndex } from '../components/index.js'
 import { createInternalDocumentIDStore } from '../components/internal-document-id-store.js'
@@ -16,6 +17,7 @@ import {
   ISorter,
   MultipleCallbackComponent,
   Orama,
+  OramaPlugin,
   SingleCallbackComponent,
   SingleOrArray,
   SingleOrArrayCallbackComponents,
@@ -29,6 +31,7 @@ interface CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter> {
   sort?: SorterConfig
   language?: string
   components?: Components<Orama<OramaSchema, TIndex, TDocumentStore, TSorter>, OramaSchema, TIndex, TDocumentStore, TSorter>
+  plugins?: OramaPlugin[]
   id?: string
 }
 
@@ -96,6 +99,7 @@ export async function create<
   language,
   components,
   id,
+  plugins,
 }: CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter>): Promise<Orama<OramaSchema, TIndex, TDocumentStore, TSorter>> {
   if (!components) {
     components = {}
@@ -183,12 +187,17 @@ export async function create<
     afterMultipleUpdate,
     formatElapsedTime,
     id,
+    plugins,
   } as unknown as Orama<OramaSchema, TIndex, TDocumentStore, TSorter>
 
   orama.data = {
     index: await orama.index.create(orama, internalDocumentStore, schema),
     docs: await orama.documentsStore.create(orama, internalDocumentStore),
     sorting: await orama.sorter.create(orama, internalDocumentStore, schema, sort),
+  }
+
+  for (const hook of AVAILABLE_PLUGIN_HOOKS) {
+    orama[hook] = (orama[hook] ?? []).concat(getAllPluginsByHook(orama, hook))
   }
 
   return orama
