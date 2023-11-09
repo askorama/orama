@@ -8,30 +8,42 @@ t.test('getAllPluginsByHook', async t => {
   t.test('should return all the plugins that includes a given hook name', async t => {
     t.plan(2)
 
+    function plugin1 () {
+      return {
+        name: 'plugin1',
+        beforeInsert: async () => {},
+        afterInsert: async () => {},
+        beforeSearch: async () => {},
+        afterSearch: async () => {},
+      }
+    }
+
+    function plugin2 () {
+      return {
+        name: 'plugin2',
+        beforeInsert: async () => {},
+        afterInsert: async () => {},
+        beforeSearch: async () => {},
+        afterSearch: async () => {},
+      }
+    }
+
+    function plugin3 () {
+      return {
+        name: 'plugin3',
+        beforeInsert: async () => {},
+        beforeSearch: async () => {},
+      }
+    }
+
     const db = await create({
       schema: {
         name: 'string',
       } as const,
       plugins: [
-        {
-          name: 'plugin1',
-          beforeInsert: async () => {},
-          afterInsert: async () => {},
-          beforeSearch: async () => {},
-          afterSearch: async () => {},
-        },
-        {
-          name: 'plugin2',
-          beforeInsert: async () => {},
-          afterInsert: async () => {},
-          beforeSearch: async () => {},
-          afterSearch: async () => {},
-        },
-        {
-          name: 'plugin3',
-          beforeInsert: async () => {},
-          beforeSearch: async () => {},
-        }
+        plugin1(),
+        plugin2(),
+        plugin3()
       ]
     })
 
