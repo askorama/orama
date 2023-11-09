@@ -71,7 +71,7 @@ export async function runAfterSearch<T extends AnyOrama, ResultDocument extends 
   }
 }
 
-export async function runBeforeSearch<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+export async function runBeforeSearch<T extends AnyOrama>(
   hooks: BeforeSearch<T>[],
   db: T,
   params: SearchParams<T, TypedDocument<any>>,

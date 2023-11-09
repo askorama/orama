@@ -1,5 +1,4 @@
 import type { AnyOrama, OramaPlugin } from '../types.js'
-import { createError } from '../errors.js'
 
 export type AvailablePluginHooks = typeof AVAILABLE_PLUGIN_HOOKS[number]
 
