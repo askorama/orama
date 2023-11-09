@@ -791,11 +791,11 @@ export interface SingleOrArrayCallbackComponents<T extends AnyOrama> {
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  beforeMultipleInsert: SingleOrArray<MultipleCallbackComponent<T>>
+  beforeInsertMultiple: SingleOrArray<MultipleCallbackComponent<T>>
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  afterMultipleInsert: SingleOrArray<MultipleCallbackComponent<T>>
+  afterInsertMultiple: SingleOrArray<MultipleCallbackComponent<T>>
   /**
    * More details {@link MultipleCallbackComponent}
    */
@@ -850,11 +850,11 @@ export interface ArrayCallbackComponents<T extends AnyOrama> {
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  beforeMultipleInsert: MultipleCallbackComponent<T>[]
+  beforeInsertMultiple: MultipleCallbackComponent<T>[]
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  afterMultipleInsert: MultipleCallbackComponent<T>[]
+  afterInsertMultiple: MultipleCallbackComponent<T>[]
   /**
    * More details {@link MultipleCallbackComponent}
    */

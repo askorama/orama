@@ -1,5 +1,5 @@
 import t from 'tap'
-import { OramaPlugin, create, search, insert } from '../src/index.js'
+import { OramaPlugin, create, search, insert, insertMultiple } from '../src/index.js'
 import { getAllPluginsByHook } from '../src/components/plugins.js'
 
 t.test('getAllPluginsByHook', async t => {
@@ -56,7 +56,7 @@ t.test('getAllPluginsByHook', async t => {
 
 })
 
-t.test('plugin', async t => {
+t.only('plugin', async t => {
 
   const data: string[] = []
 
@@ -74,11 +74,17 @@ t.test('plugin', async t => {
       },
       afterSearch: async (orama, query, result) => {
         data.push(`[Logger] afterSearch: ${JSON.stringify(query)} - ${JSON.stringify(result)}`)
+      },
+      beforeInsertMultiple: async (orama, docs) => {
+        data.push(`[Logger] beforeInsertMultiple: ${JSON.stringify(docs)}`)
+      },
+      afterInsertMultiple: async (orama, docs) => {
+        data.push(`[Logger] afterInsertMultiple: ${JSON.stringify(docs)}`)
       }
     }
   }
 
-  t.test('should run all the hooks of a plugin', async t => {
+  t.only('should run all the hooks of a plugin', async t => {
 
     const db = await create({
       id: 'orama-1',
@@ -98,10 +104,23 @@ t.test('plugin', async t => {
 
     await search(db, { term: 'john' })
 
+    await insertMultiple(db, [
+      {
+        id: '2',
+        name: 'Jane Doe'
+      },
+      {
+        id: '3',
+        name: 'Jim Doe'
+      }
+    ])
+
     t.equal(data[0], '[Logger] beforeInsert: 1 - {"id":"1","name":"John Doe"}')
     t.equal(data[1], '[Logger] afterInsert: 1 - {"id":"1","name":"John Doe"}')
     t.equal(data[2], '[Logger] beforeSearch: {"term":"john","relevance":{"k":1.2,"b":0.75,"d":0.5}}')
     t.equal(data[3], '[Logger] afterSearch: {"term":"john","relevance":{"k":1.2,"b":0.75,"d":0.5}} - undefined')
+    t.equal(data[4], '[Logger] beforeInsertMultiple: [{"id":"2","name":"Jane Doe"},{"id":"3","name":"Jim Doe"}]')
+    t.equal(data[9], '[Logger] afterInsertMultiple: [{"id":"2","name":"Jane Doe"},{"id":"3","name":"Jim Doe"}]')
 
     console.log(data)
     t.end()
