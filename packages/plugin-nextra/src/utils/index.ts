@@ -34,11 +34,16 @@ export async function createOramaIndex(basePath, locale): Promise<NextraOrama> {
   const index = await create({
     schema: defaultSchema,
     components: {
-      afterInsert: [highlightAfterInsertHook],
       tokenizer: {
         stemming: false,
       },
     },
+    plugins: [
+      {
+        name: 'match-highlight',
+        afterInsert: highlightAfterInsertHook,
+      }
+    ]
   })
 
   const paths = Object.keys(data)

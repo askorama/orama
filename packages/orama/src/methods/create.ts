@@ -1,24 +1,20 @@
 import { formatElapsedTime, getDocumentIndexId, getDocumentProperties, validateSchema } from '../components/defaults.js'
 import { DocumentsStore, createDocumentsStore } from '../components/documents-store.js'
-import { FUNCTION_COMPONENTS, OBJECT_COMPONENTS, SINGLE_OR_ARRAY_COMPONENTS } from '../components/hooks.js'
+import { AVAILABLE_PLUGIN_HOOKS, getAllPluginsByHook } from '../components/plugins.js'
+import { FUNCTION_COMPONENTS, OBJECT_COMPONENTS } from '../components/hooks.js'
 import { Index, createIndex } from '../components/index.js'
 import { createInternalDocumentIDStore } from '../components/internal-document-id-store.js'
 import { Sorter, createSorter } from '../components/sorter.js'
 import { createTokenizer } from '../components/tokenizer/index.js'
 import { createError } from '../errors.js'
 import {
-  AfterSearch,
-  ArrayCallbackComponents,
   Components,
   FunctionComponents,
   IDocumentsStore,
   IIndex,
   ISorter,
-  MultipleCallbackComponent,
   Orama,
-  SingleCallbackComponent,
-  SingleOrArray,
-  SingleOrArrayCallbackComponents,
+  OramaPlugin,
   SorterConfig,
   Tokenizer
 } from '../types.js'
@@ -29,6 +25,7 @@ interface CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter> {
   sort?: SorterConfig
   language?: string
   components?: Components<Orama<OramaSchema, TIndex, TDocumentStore, TSorter>, OramaSchema, TIndex, TDocumentStore, TSorter>
+  plugins?: OramaPlugin[]
   id?: string
 }
 
@@ -53,33 +50,10 @@ function validateComponents<OramaSchema, TIndex, TDocumentStore, TSorter, TOrama
     }
   }
 
-  for (const rawKey of SINGLE_OR_ARRAY_COMPONENTS) {
-    const key = rawKey as keyof ArrayCallbackComponents<TOrama>
-
-    const component:
-      | SingleOrArray<AfterSearch<TOrama>>
-      | SingleOrArray<SingleCallbackComponent<TOrama>>
-      | SingleOrArray<MultipleCallbackComponent<TOrama>>
-      | undefined = components[key]
-    if (!component) {
-      components[key] = []
-    } else if (!Array.isArray(components[key])) {
-      // @ts-expect-error TSC is unable to resolve this
-      components[key] = [components[key]]
-    }
-
-    for (const fn of components[key] as unknown as SingleOrArrayCallbackComponents<TOrama>[]) {
-      if (typeof fn !== 'function') {
-        throw createError('COMPONENT_MUST_BE_FUNCTION_OR_ARRAY_FUNCTIONS', key)
-      }
-    }
-  }
-
   for (const rawKey of Object.keys(components)) {
     if (
       !OBJECT_COMPONENTS.includes(rawKey) &&
-      !FUNCTION_COMPONENTS.includes(rawKey) &&
-      !SINGLE_OR_ARRAY_COMPONENTS.includes(rawKey)
+      !FUNCTION_COMPONENTS.includes(rawKey)
     ) {
       throw createError('UNSUPPORTED_COMPONENT', rawKey)
     }
@@ -96,6 +70,7 @@ export async function create<
   language,
   components,
   id,
+  plugins,
 }: CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter>): Promise<Orama<OramaSchema, TIndex, TDocumentStore, TSorter>> {
   if (!components) {
     components = {}
@@ -140,19 +115,6 @@ export async function create<
     getDocumentProperties,
     getDocumentIndexId,
     validateSchema,
-    beforeInsert,
-    afterInsert,
-    beforeRemove,
-    afterRemove,
-    beforeUpdate,
-    afterUpdate,
-    afterSearch,
-    beforeMultipleInsert,
-    afterMultipleInsert,
-    beforeMultipleRemove,
-    afterMultipleRemove,
-    beforeMultipleUpdate,
-    afterMultipleUpdate,
     formatElapsedTime,
   } = components
 
@@ -168,27 +130,33 @@ export async function create<
     getDocumentProperties,
     getDocumentIndexId,
     validateSchema,
-    beforeInsert,
-    afterInsert,
-    beforeRemove,
-    afterRemove,
-    beforeUpdate,
-    afterUpdate,
-    afterSearch,
-    beforeMultipleInsert,
-    afterMultipleInsert,
-    beforeMultipleRemove,
-    afterMultipleRemove,
-    beforeMultipleUpdate,
-    afterMultipleUpdate,
+    beforeInsert: [],
+    afterInsert: [],
+    beforeRemove: [],
+    afterRemove: [],
+    beforeUpdate: [],
+    afterUpdate: [],
+    beforeSearch: [],
+    afterSearch: [],
+    beforeInsertMultiple: [],
+    afterInsertMultiple: [],
+    beforeRemoveMultiple: [],
+    afterRemoveMultiple: [],
+    afterUpdateMultiple: [],
+    beforeUpdateMultiple: [],
     formatElapsedTime,
     id,
+    plugins,
   } as unknown as Orama<OramaSchema, TIndex, TDocumentStore, TSorter>
 
   orama.data = {
     index: await orama.index.create(orama, internalDocumentStore, schema),
     docs: await orama.documentsStore.create(orama, internalDocumentStore),
     sorting: await orama.sorter.create(orama, internalDocumentStore, schema, sort),
+  }
+
+  for (const hook of AVAILABLE_PLUGIN_HOOKS) {
+    orama[hook] = (orama[hook] ?? []).concat(getAllPluginsByHook(orama, hook))
   }
 
   return orama

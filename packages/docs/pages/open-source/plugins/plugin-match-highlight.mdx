@@ -41,10 +41,13 @@ const db = await create({
   schema: {
     text: 'string'
   },
-  components: {
+  plugins: [
     // Register the hook
-    afterInsert: [highlightAfterInsert]
-  }
+    {
+      name: 'highlight',
+      afterInsert: highlightAfterInsert
+    }
+  ]
 })
 
 // Insert a document
@@ -93,9 +96,13 @@ const db = await create({
   schema: {
     text: 'string'
   },
-  components: {
-    afterInsert: [highlightAfterInsert]
-  }
+  plugins: [
+    // Register the hook
+    {
+      name: 'highlight',
+      afterInsert: highlightAfterInsert
+    }
+  ]
 })
 
 await insert(db, { text: 'hello world' })

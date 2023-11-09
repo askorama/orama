@@ -147,9 +147,12 @@ async function buildDevSearchData(siteDir: string, outDir: string, allContent: a
   // Create the Orama database and then serialize it
   const _db = await create({
     schema,
-    components: {
-      afterInsert: [highlightAfterInsert]
-    }
+    plugins: [
+      {
+        name: 'highlight',
+        afterInsert: highlightAfterInsert
+      }
+    ]
   })
   const db = _db as OramaWithHighlight<typeof _db>
 

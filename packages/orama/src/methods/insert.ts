@@ -149,7 +149,7 @@ export async function insertMultiple<T extends AnyOrama>(
   timeout?: number,
 ): Promise<string[]> {
   if (!skipHooks) {
-    await runMultipleHook(orama.beforeMultipleInsert, orama, docs as TypedDocument<T>[])
+    await runMultipleHook(orama.beforeInsertMultiple, orama, docs as TypedDocument<T>[])
   }
 
   // Validate all documents before the insertion
@@ -205,7 +205,7 @@ export async function innerInsertMultiple<T extends AnyOrama>(
   })
 
   if (!skipHooks) {
-    await runMultipleHook(orama.afterMultipleInsert, orama, docs as TypedDocument<T>[])
+    await runMultipleHook(orama.afterInsertMultiple, orama, docs as TypedDocument<T>[])
   }
 
   return ids
