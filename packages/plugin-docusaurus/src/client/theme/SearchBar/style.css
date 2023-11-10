@@ -71,3 +71,15 @@
   font-size: 0.9em;
   color: var(--ifm-color-emphasis-600);
 }
+
+.aa-ItemLink {
+  margin-bottom: .6rem;
+  text-decoration: none !important;
+  color: rgba(var(--aa-primary-color-rgb), 1) !important;
+  padding: calc(var(--aa-spacing-half)/1.2);
+}
+
+.aa-ItemContentHighlight {
+  color: rgba(var(--aa-primary-color-rgb), 1);
+  font-weight: bold;
+}

@@ -1,26 +1,30 @@
-import { autocomplete } from '@algolia/autocomplete-js'
-import '@algolia/autocomplete-theme-classic/dist/theme.min.css'
+import { autocomplete } from "@algolia/autocomplete-js"
+import "@algolia/autocomplete-theme-classic/dist/theme.min.css"
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
 // @ts-ignore Will fail in CJS compilation
-import { GlobalVersion, useActiveVersion, useVersions } from '@docusaurus/plugin-content-docs/client'
-import { useColorMode, useDocsPreferredVersion } from '@docusaurus/theme-common'
-import useBaseUrl from '@docusaurus/useBaseUrl'
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-import { usePluginData } from '@docusaurus/useGlobalData'
-import useIsBrowser from '@docusaurus/useIsBrowser'
-import { create, load, AnyDocument } from '@orama/orama'
-import type { OramaWithHighlight, Position } from '@orama/plugin-match-highlight'
-import { searchWithHighlight } from '@orama/plugin-match-highlight'
-import { ungzip } from 'pako'
-import { Fragment, createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { render } from 'react-dom'
+import { GlobalVersion, useActiveVersion, useVersions } from "@docusaurus/plugin-content-docs/client"
+import { useColorMode, useDocsPreferredVersion } from "@docusaurus/theme-common"
+import useBaseUrl from "@docusaurus/useBaseUrl"
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext"
+import { usePluginData } from "@docusaurus/useGlobalData"
+import useIsBrowser from "@docusaurus/useIsBrowser"
+import { AnyDocument, create, load, Orama, RawData, search as oramaSearch } from "@orama/orama"
+import { Highlight } from "@orama/highlight"
+import { ungzip } from "pako"
+import { createElement, Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { render } from "react-dom"
 // @ts-expect-error Resolve at runtime
-import { SearchNoResults } from '@theme/SearchNoResults'
+import { SearchNoResults } from "@theme/SearchNoResults"
 // @ts-expect-error Resolve at runtime
-import { SearchResults } from '@theme/SearchResults'
+import { SearchResults } from "@theme/SearchResults"
 // @ts-expect-error Resolve at runtime
-import { SearchResult } from '@theme/SearchResult'
-import { Hit, INDEX_FILE, PLUGIN_NAME, PluginData, RawDataWithPositions, schema } from '../../../server/types.js'
+import { SearchResult } from "@theme/SearchResult"
+import { Hit, INDEX_FILE, PLUGIN_NAME, PluginData, schema } from "../../../server/types.js"
+
+const highlighter = new Highlight({
+  CSSClass: 'aa-ItemContentHighlight',
+  HTMLTag: 'span',
+})
 
 export default function SearchBar(): JSX.Element {
   const isBrowser = useIsBrowser()
@@ -28,7 +32,7 @@ export default function SearchBar(): JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null)
   const { colorMode } = useColorMode()
   const { searchData } = usePluginData(PLUGIN_NAME) as PluginData
-  const [database, setDatabase] = useState<OramaWithHighlight<AnyDocument>>()
+  const [database, setDatabase] = useState<Orama<AnyDocument>>()
   const searchBaseUrl = useBaseUrl(INDEX_FILE)
   const versions = useVersions(undefined)
   const activeVersion = useActiveVersion(undefined)
@@ -79,21 +83,24 @@ export default function SearchBar(): JSX.Element {
           {
             sourceId: 'orama',
             async getItems() {
-              const results = await searchWithHighlight(database, {
+              if(!term) {
+                return []
+              }
+
+              const results = await oramaSearch(database, {
                 term,
                 properties: ['sectionTitle', 'sectionContent', 'type']
               })
 
-              const processed = results.hits.flatMap(hit =>
-                Object.values((hit as any).positions.sectionContent).flatMap(positions =>
-                  (positions as any).map((position: Position) => ({
-                    ...hit,
-                    position
-                  }))
-                )
-              )
-
-              return processed
+              return results.hits.flatMap((hit) => {
+                return {
+                  ...hit,
+                  document: {
+                    ...hit.document,
+                    sectionContent: highlighter.highlight(hit.document.sectionContent, term).trim(20),
+                  }
+                }
+              })
             },
             getItemUrl({ item }: { item: Hit }) {
               return item.document.pageRoute
@@ -151,13 +158,13 @@ export default function SearchBar(): JSX.Element {
       }
 
       const deflated = ungzip(buffer, { to: 'string' })
-      const data: RawDataWithPositions = JSON.parse(deflated)
+      const data: RawData = JSON.parse(deflated)
 
       const _db = await create({ schema })
-      const db = _db as OramaWithHighlight<typeof _db>;
-      await load(db, data)
-      db.data.positions = data.positions
-      setDatabase(db)
+
+      await load(_db, data)
+
+      setDatabase(_db)
     }
 
     if (!isBrowser || !version) {

@@ -1,5 +1,5 @@
 import { Result } from '@orama/orama'
-import type { Position } from '@orama/plugin-match-highlight'
+import type { Position } from '@orama/highlight'
 
 import type { AnyDocument, AnySchema, RawData } from '@orama/orama'
 

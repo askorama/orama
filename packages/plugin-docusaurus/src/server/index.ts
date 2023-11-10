@@ -1,7 +1,6 @@
 import type { LoadedContent, LoadedVersion } from '@docusaurus/plugin-content-docs'
 import type { LoadContext, Plugin } from '@docusaurus/types'
 import { create, insertMultiple, save } from '@orama/orama'
-import { OramaWithHighlight, afterInsert as highlightAfterInsert } from '@orama/plugin-match-highlight'
 import type { DefaultSchemaElement, NodeContent, PopulateFnContext } from '@orama/plugin-parsedoc'
 import { defaultHtmlSchema, populate } from '@orama/plugin-parsedoc'
 import * as githubSlugger from 'github-slugger'
@@ -13,9 +12,9 @@ import { gzip as gzipCB } from 'node:zlib'
 import type { Configuration as WebpackConfiguration } from 'webpack'
 
 import { retrieveTranslationMessages } from './translationMessages.js'
-import { INDEX_FILE, PLUGIN_NAME, PluginOptions, RawDataWithPositions, SectionSchema, schema } from './types.js'
+import { INDEX_FILE, PLUGIN_NAME, PluginOptions, SectionSchema, schema } from './types.js'
 
-export type { PluginData, PluginOptions, RawDataWithPositions, SectionSchema } from './types.js'
+export type { PluginData, PluginOptions, SectionSchema } from './types.js'
 
 const gzip = promisify(gzipCB)
 
@@ -146,20 +145,12 @@ async function buildDevSearchData(siteDir: string, outDir: string, allContent: a
 
   // Create the Orama database and then serialize it
   const _db = await create({
-    schema,
-    plugins: [
-      {
-        name: 'highlight',
-        afterInsert: highlightAfterInsert
-      }
-    ]
+    schema
   })
-  const db = _db as OramaWithHighlight<typeof _db>
 
-  await insertMultiple(db, documents)
+  await insertMultiple(_db, documents)
 
-  const serialized = (await save(db)) as RawDataWithPositions
-  serialized.positions = db.data.positions
+  const serialized = (await save(_db))
 
   await writeFile(indexPath(outDir, version), await gzip(JSON.stringify(serialized)))
 }
