@@ -1,4 +1,4 @@
-import { AnyDocument, AnyOrama, create, insertMultiple } from '@orama/orama'
+import { AnyDocument, AnyOrama, insertMultiple } from '@orama/orama'
 import glob from 'glob'
 import { Content, Element, Parent, Properties, Root } from 'hast'
 import { fromHtml } from 'hast-util-from-html'
@@ -27,6 +27,7 @@ export interface NodeContent {
 export type TransformFn = (node: NodeContent, context: PopulateFnContext) => NodeContent
 
 export interface DefaultSchemaElement extends AnyDocument {
+  page: string
   type: string
   content: string
   path: string
@@ -46,8 +47,7 @@ type PopulateOptions = PopulateFromGlobOptions & { basePath?: string }
 type FileType = 'html' | 'md'
 
 export const defaultHtmlSchema = {
-  // "Page" is part of the doc, but we won't index it as it's not a target for search
-  // page: 'string',
+  page: 'enum',
   type: 'string',
   content: 'string'
   // "Path" is part of the doc, but we won't index it as it's not a target for search
@@ -103,8 +103,8 @@ export const parseFile = async (
 
   return records.map(record => {
     return {
-      page: basePathToFileName(options?.basePath!),
-      ...record
+      ...record,
+      page: basePathToFileName(options?.basePath!)
     }
   })
 }
@@ -210,20 +210,20 @@ function addRecords (
   switch (mergeStrategy) {
     case 'merge':
       if (!isRecordMergeable(parentPath, type, records)) {
-        records.push(newRecord)
+        records.push({ ...newRecord, page: slugToTitle(parentPath) })
         return
       }
       addContentToLastRecord(records, content, properties)
       return
     case 'split':
-      records.push(newRecord)
+      records.push({ ...newRecord, page: slugToTitle(parentPath) })
       return
     case 'both':
       if (!isRecordMergeable(parentPath, type, records)) {
-        records.push(newRecord, { ...newRecord })
+        records.push({...newRecord, page: slugToTitle(parentPath)}, { ...newRecord, page: slugToTitle(parentPath) })
         return
       }
-      records.splice(records.length - 1, 0, newRecord)
+      records.splice(records.length - 1, 0, {...newRecord, page: slugToTitle(parentPath)})
       addContentToLastRecord(records, content, properties)
   }
 }

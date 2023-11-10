@@ -2,8 +2,7 @@ import type { populate as esmPopulate, populateFromGlob as esmPopulateFromGlob }
 
 // Keep in sync with the one in index.ts
 export const defaultHtmlSchema = {
-  // "Page" is part of the doc, but we won't index it as it's not a target for search 
-  // page: 'string',
+  page: 'enum',
   type: 'string',
   content: 'string',
   // "Path" is part of the doc, but we won't index it as it's not a target for search
