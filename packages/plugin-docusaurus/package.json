@@ -39,7 +39,7 @@
     "build": "swc --delete-dir-on-start --extensions .ts,.tsx,.cts -d dist src",
     "postbuild": "sh scripts/postbuild.sh",
     "pretest": "node ../../scripts/test-pack.mjs plugin-docusaurus",
-    "test": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
+    "test": "node --loader=tsx --test ./test/integration.ts | tap-mocha-reporter spec",
     "format": "prettier -w src",
     "lint": "eslint src --ext .js,.ts,.tsx,.cts",
     "changelog": "auto-changelog -p"

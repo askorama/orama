@@ -72,7 +72,7 @@ async function populateFromFile<T extends AnyOrama> (
 ): Promise<string[]> {
   const data = await readFile(filename)
   const fileType = filename.slice(filename.lastIndexOf('.') + 1) as FileType
-  return await populate(db, data, fileType, { ...options, basePath: `${filename}/` })
+  return populate(db, data, fileType, { ...options, basePath: `${filename}/` })
 }
 
 export const parseFile = async (
