@@ -1,4 +1,4 @@
-import { AnyDocument, AnyOrama, insertMultiple } from '@orama/orama'
+import { AnyDocument, AnyOrama, create, insertMultiple } from '@orama/orama'
 import glob from 'glob'
 import { Content, Element, Parent, Properties, Root } from 'hast'
 import { fromHtml } from 'hast-util-from-html'
@@ -16,11 +16,15 @@ import { unified } from 'unified'
 
 export type MergeStrategy = 'merge' | 'split' | 'both'
 
-export const defaultHtmlSchema = {
-  type: 'string',
-  content: 'string',
-  path: 'string'
-} as const
+export interface NodeContent {
+  tag: string
+  raw: string
+  content: string
+  properties?: Properties
+  additionalProperties?: Properties
+}
+
+export type TransformFn = (node: NodeContent, context: PopulateFnContext) => NodeContent
 
 export interface DefaultSchemaElement extends AnyDocument {
   type: string
@@ -40,25 +44,35 @@ interface PopulateFromGlobOptions {
 type PopulateOptions = PopulateFromGlobOptions & { basePath?: string }
 
 type FileType = 'html' | 'md'
+
+export const defaultHtmlSchema = {
+  // "Page" is part of the doc, but we won't index it as it's not a target for search
+  // page: 'string',
+  type: 'string',
+  content: 'string'
+  // "Path" is part of the doc, but we won't index it as it's not a target for search
+  // path: 'string'
+} as const
+
 const asyncGlob = promisify(glob)
 
-export async function populateFromGlob<T extends AnyOrama>(
+export async function populateFromGlob<T extends AnyOrama> (
   db: T,
   pattern: string,
   options?: PopulateFromGlobOptions
 ): Promise<void> {
   const files = await asyncGlob(pattern)
-  await Promise.all(files.map(async filename => populateFromFile(db, filename, options)))
+  await Promise.all(files.map(async filename => await populateFromFile(db, filename, options)))
 }
 
-async function populateFromFile<T extends AnyOrama>(
+async function populateFromFile<T extends AnyOrama> (
   db: T,
   filename: string,
   options?: PopulateFromGlobOptions
 ): Promise<string[]> {
   const data = await readFile(filename)
   const fileType = filename.slice(filename.lastIndexOf('.') + 1) as FileType
-  return populate(db, data, fileType, { ...options, basePath: `${filename}/` })
+  return await populate(db, data, fileType, { ...options, basePath: `${filename}/` })
 }
 
 export const parseFile = async (
@@ -87,20 +101,25 @@ export const parseFile = async (
     /* c8 ignore stop */
   }
 
-  return records
+  return records.map(record => {
+    return {
+      page: basePathToFileName(options?.basePath!),
+      ...record
+    }
+  })
 }
 
-export async function populate<T extends AnyOrama>(
+export async function populate<T extends AnyOrama> (
   db: T,
   data: Buffer | string,
   fileType: FileType,
   options?: PopulateOptions
 ): Promise<string[]> {
-  return insertMultiple(db, await parseFile(data, fileType, options) as AnyDocument)
+  return await insertMultiple(db, await parseFile(data, fileType, options) as AnyDocument)
 }
 
-function rehypeOrama(records: DefaultSchemaElement[], options?: PopulateOptions): (tree: Root) => void {
-  if (!options) {
+function rehypeOrama (records: DefaultSchemaElement[], options?: PopulateOptions): (tree: Root) => void {
+  if (options == null) {
     options = {}
   }
 
@@ -118,7 +137,7 @@ function rehypeOrama(records: DefaultSchemaElement[], options?: PopulateOptions)
   }
 }
 
-function visitChildren(
+function visitChildren (
   node: Content,
   parent: Parent,
   path: string,
@@ -148,13 +167,13 @@ function visitChildren(
   })
 }
 
-function applyTransform(node: Element, transformFn: TransformFn, context: PopulateFnContext): Element {
+function applyTransform (node: Element, transformFn: TransformFn, context: PopulateFnContext): Element {
   const preparedNode = prepareNode(node)
   const transformedNode = transformFn(preparedNode, context)
   return applyChanges(node, transformedNode)
 }
 
-function prepareNode(node: Element): NodeContent {
+function prepareNode (node: Element): NodeContent {
   const tag = node.tagName
   const content = toString(node)
   const raw = toHtml(node)
@@ -162,7 +181,7 @@ function prepareNode(node: Element): NodeContent {
   return { tag, content, raw, properties }
 }
 
-function applyChanges(node: Element, transformedNode: NodeContent): Element {
+function applyChanges (node: Element, transformedNode: NodeContent): Element {
   let changed = node
 
   if (toHtml(node) !== transformedNode.raw) {
@@ -178,7 +197,7 @@ function applyChanges(node: Element, transformedNode: NodeContent): Element {
   return changed
 }
 
-function addRecords(
+function addRecords (
   content: string,
   type: string,
   path: string,
@@ -209,20 +228,20 @@ function addRecords(
   }
 }
 
-function isRecordMergeable(path: string, tag: string, records: DefaultSchemaElement[]): boolean {
-  if (!records.length) return false
+function isRecordMergeable (path: string, tag: string, records: DefaultSchemaElement[]): boolean {
+  if (records.length === 0) return false
   const lastRecord = records[records.length - 1]
   const parentPath = pathWithoutLastIndex(path)
   const lastPath = pathWithoutLastIndex(lastRecord.path)
   return parentPath === lastPath && tag === lastRecord.type
 }
 
-function pathWithoutLastIndex(path: string): string {
+function pathWithoutLastIndex (path: string): string {
   const lastBracket = path.lastIndexOf('[')
   return path.slice(0, lastBracket)
 }
 
-function addContentToLastRecord(
+function addContentToLastRecord (
   records: Array<DefaultSchemaElement & { properties?: Properties }>,
   content: string,
   properties?: Properties
@@ -232,12 +251,30 @@ function addContentToLastRecord(
   lastRecord.properties = { ...properties, ...lastRecord.properties }
 }
 
-export interface NodeContent {
-  tag: string
-  raw: string
-  content: string
-  properties?: Properties
-  additionalProperties?: Properties
+function slugToTitle (slug: string): string {
+  return slug
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }
 
-export type TransformFn = (node: NodeContent, context: PopulateFnContext) => NodeContent
+function basePathToFileName (basePath: string): string {
+  const parts = basePath.replace(/(\.md|\.html)/i, '').split('/').filter(Boolean)
+  let lastPart = parts.at(-1)!
+
+  if (lastPart === 'index') {
+    lastPart = parts.at(-2)!
+  }
+
+  lastPart = lastPart.replace(/\d{2,4}-\d{2,4}-\d{2,4}-/i, '')
+  lastPart = slugToTitle(lastPart)
+
+  return lastPart
+}
+
+const db = await create({
+  schema: defaultHtmlSchema
+})
+
+const baseURL = new URL('../test-docusaurus/**/*.md', import.meta.url).pathname
+populateFromGlob(db, baseURL)
