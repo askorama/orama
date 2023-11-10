@@ -271,10 +271,3 @@ function basePathToFileName (basePath: string): string {
 
   return lastPart
 }
-
-const db = await create({
-  schema: defaultHtmlSchema
-})
-
-const baseURL = new URL('../test-docusaurus/**/*.md', import.meta.url).pathname
-populateFromGlob(db, baseURL)
