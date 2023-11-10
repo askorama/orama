@@ -34,7 +34,7 @@ export async function updateMultiple<T extends AnyOrama>(
   skipHooks?: boolean,
 ): Promise<string[]> {
   if (!skipHooks) {
-    await runMultipleHook(orama.beforeMultipleUpdate, orama, ids)
+    await runMultipleHook(orama.beforeUpdateMultiple, orama, ids)
   }
 
   // Validate all documents before the insertion
@@ -50,7 +50,7 @@ export async function updateMultiple<T extends AnyOrama>(
   const newIds = await innerInsertMultiple(orama, docs, batchSize, language, skipHooks)
 
   if (!skipHooks) {
-    await runMultipleHook(orama.afterMultipleUpdate, orama, newIds)
+    await runMultipleHook(orama.afterUpdateMultiple, orama, newIds)
   }
 
   return newIds

@@ -11,7 +11,7 @@ t.test('language', t => {
     await t.rejects(
       () =>
         create({
-          schema: {},
+          schema: {} as const,
           language: 'latin',
         }),
       { code: 'LANGUAGE_NOT_SUPPORTED' },
@@ -29,9 +29,8 @@ t.test('language', t => {
       () =>
         insert(
           db,
-          {
-            foo: 'bar',
-          },
+          // @ts-expect-error - error case
+          { foo: 'bar' },
           'latin',
         ),
       { code: 'LANGUAGE_NOT_SUPPORTED' },
@@ -84,36 +83,6 @@ t.test('language', t => {
   })
 })
 
-t.test('orama - hooks', t => {
-  t.test('afterInsert hook', async t => {
-    let callOrder = 0
-    const db = await create({
-      schema: {
-        quote: 'string',
-        author: {
-          name: 'string',
-          surname: 'string',
-        },
-      },
-      components: {
-        afterInsert(): void {
-          t.same(++callOrder, 1)
-        },
-      },
-    })
-    await insert(db, {
-      quote: 'Harry Potter, the boy who lived, come to die. Avada kedavra.',
-      author: {
-        name: 'Tom',
-        surname: 'Riddle',
-      },
-    })
-    t.same(++callOrder, 2)
-  })
-
-  t.end()
-})
-
 t.test('custom tokenizer configuration', t => {
   t.plan(1)
 
@@ -122,7 +91,7 @@ t.test('custom tokenizer configuration', t => {
     const db = await create({
       schema: {
         txt: 'string',
-      },
+      } as const,
       components: {
         tokenizer: {
           tokenize(text: string) {
@@ -159,7 +128,7 @@ t.test('should access own properties exclusively', async t => {
   const db = await create({
     schema: {
       txt: 'string',
-    },
+    } as const,
   })
 
   await insert(db, {
@@ -179,7 +148,7 @@ t.test('should search numbers in supported languages', async t => {
     const db = await create({
       schema: {
         number: 'string',
-      },
+      } as const,
       components: {
         tokenizer: { language: language, stemming: false },
       },
@@ -204,7 +173,7 @@ t.test('should correctly search accented words in Italian', async t => {
   const db = await create({
     schema: {
       description: 'string',
-    },
+    } as const,
     components: {
       tokenizer: { language: 'italian', stemming: false },
     },
@@ -225,7 +194,7 @@ t.test('should correctly search accented words in English', async t => {
   const db = await create({
     schema: {
       description: 'string',
-    },
+    } as const,
     components: {
       tokenizer: { language: 'english', stemming: false },
     },
@@ -246,7 +215,7 @@ t.test('should correctly search accented words in Dutch', async t => {
   const db = await create({
     schema: {
       description: 'string',
-    },
+    } as const,
     components: {
       tokenizer: { language: 'dutch', stemming: false },
     },
@@ -266,7 +235,7 @@ t.test('should correctly search accented words in Slovenian', async t => {
   const db = await create({
     schema: {
       description: 'string',
-    },
+    } as const,
     components: {
       tokenizer: { language: 'slovenian', stemming: false },
     },
@@ -294,7 +263,7 @@ t.test('should correctly search words in Bulgarian', async t => {
   const db = await create({
     schema: {
       description: 'string',
-    },
+    } as const,
     components: {
       tokenizer: { language: 'bulgarian', stemming: false },
     },

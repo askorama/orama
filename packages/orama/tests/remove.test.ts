@@ -60,6 +60,7 @@ t.test('remove method', t => {
 
     const r1_gt = await search(db, {
       where: {
+        // @ts-expect-error - err
         'meta.sales': {
           eq: 100,
         },
@@ -74,6 +75,7 @@ t.test('remove method', t => {
 
     const r2_gt = await search(db, {
       where: {
+        // @ts-expect-error - err
         'meta.sales': {
           eq: 100,
         },
@@ -91,7 +93,7 @@ t.test('remove method', t => {
     const orama = await create({
       schema: {
         word: 'string',
-      },
+      } as const,
     })
 
     const halo = await insert(orama, { word: 'Halo' })
@@ -124,6 +126,7 @@ t.test('remove method', t => {
 
       const searchResult2 = await search(db, {
         where: {
+          // @ts-expect-error - err
           'meta.sales': { eq: (doc.meta as Record<string, number>).sales },
         },
       })
@@ -148,6 +151,7 @@ t.test('remove method', t => {
 
       const searchResult2 = await search(db, {
         where: {
+          // @ts-expect-error - err
           'meta.sales': { eq: (doc.meta as Record<string, number>).sales },
         },
       })
@@ -212,12 +216,15 @@ t.test('removeMultiple method', t => {
     const db = await create({
       schema: {
         name: 'string',
-      },
-      components: {
-        beforeMultipleRemove: function () {
-          throw new Error('Kaboom')
+      } as const,
+      plugins: [
+        {
+          name: 'throw-error',
+          afterRemoveMultiple: () => {
+            throw new Error('Kaboom')
+          },
         },
-      },
+      ]
     })
     const id1 = await insert(db, { name: 'coffee' })
 

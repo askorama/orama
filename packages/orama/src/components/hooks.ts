@@ -1,4 +1,5 @@
 import {
+  BeforeSearch,
   AfterSearch,
   AnyOrama,
   MultipleCallbackComponent,
@@ -17,21 +18,7 @@ export const FUNCTION_COMPONENTS = [
   'formatElapsedTime',
 ]
 
-export const SINGLE_OR_ARRAY_COMPONENTS = [
-  'beforeInsert',
-  'afterInsert',
-  'beforeRemove',
-  'afterRemove',
-  'beforeUpdate',
-  'afterUpdate',
-  'afterSearch',
-  'beforeMultipleInsert',
-  'afterMultipleInsert',
-  'beforeMultipleRemove',
-  'afterMultipleRemove',
-  'beforeMultipleUpdate',
-  'afterMultipleUpdate',
-]
+export const SINGLE_OR_ARRAY_COMPONENTS = [/* deprecated with v2.0.0-beta.5 */]
 
 export async function runSingleHook<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
   hooks: SingleCallbackComponent<T>[],
@@ -66,5 +53,17 @@ export async function runAfterSearch<T extends AnyOrama, ResultDocument extends 
   const hooksLength = hooks.length
   for (let i = 0; i < hooksLength; i++) {
     await hooks[i](db, params, language, results)
+  }
+}
+
+export async function runBeforeSearch<T extends AnyOrama>(
+  hooks: BeforeSearch<T>[],
+  db: T,
+  params: SearchParams<T, TypedDocument<any>>,
+  language: string | undefined,
+): Promise<void> {
+  const hooksLength = hooks.length
+  for (let i = 0; i < hooksLength; i++) {
+    await hooks[i](db, params, language)
   }
 }

@@ -572,6 +572,12 @@ export type AfterSearch<T extends AnyOrama, ResultDocument extends TypedDocument
   results: Results<ResultDocument>,
 ) => SyncOrAsyncValue
 
+export type BeforeSearch<T extends AnyOrama> = (
+  db: T,
+  params: SearchParams<T>,
+  language: string | undefined,
+) => SyncOrAsyncValue
+
 export type IIndexInsertOrRemoveHookFunction = <R = void>(
   index: AnyIndexStore,
   prop: string,
@@ -775,33 +781,37 @@ export interface SingleOrArrayCallbackComponents<T extends AnyOrama> {
    */
   afterUpdate: SingleOrArray<SingleCallbackComponent<T>>
   /**
+   * More details {@link BeforeSearch}
+   */
+  beforeSearch: SingleOrArray<BeforeSearch<T>>
+  /**
    * More details {@link AfterSearch}
    */
   afterSearch: SingleOrArray<AfterSearch<T>>
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  beforeMultipleInsert: SingleOrArray<MultipleCallbackComponent<T>>
+  beforeInsertMultiple: SingleOrArray<MultipleCallbackComponent<T>>
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  afterMultipleInsert: SingleOrArray<MultipleCallbackComponent<T>>
+  afterInsertMultiple: SingleOrArray<MultipleCallbackComponent<T>>
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  beforeMultipleRemove: SingleOrArray<MultipleCallbackComponent<T>>
+  beforeRemoveMultiple: SingleOrArray<MultipleCallbackComponent<T>>
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  afterMultipleRemove: SingleOrArray<MultipleCallbackComponent<T>>
+  afterRemoveMultiple: SingleOrArray<MultipleCallbackComponent<T>>
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  beforeMultipleUpdate: SingleOrArray<MultipleCallbackComponent<T>>
+  beforeUpdateMultiple: SingleOrArray<MultipleCallbackComponent<T>>
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  afterMultipleUpdate: SingleOrArray<MultipleCallbackComponent<T>>
+  afterUpdateMultiple: SingleOrArray<MultipleCallbackComponent<T>>
 }
 
 export interface ArrayCallbackComponents<T extends AnyOrama> {
@@ -830,33 +840,37 @@ export interface ArrayCallbackComponents<T extends AnyOrama> {
    */
   afterUpdate: SingleCallbackComponent<T>[]
   /**
+   * More details {@link BeforeSearch}
+   */
+  beforeSearch: BeforeSearch<T>[]
+  /**
    * More details {@link AfterSearch}
    */
   afterSearch: AfterSearch<T>[]
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  beforeMultipleInsert: MultipleCallbackComponent<T>[]
+  beforeInsertMultiple: MultipleCallbackComponent<T>[]
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  afterMultipleInsert: MultipleCallbackComponent<T>[]
+  afterInsertMultiple: MultipleCallbackComponent<T>[]
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  beforeMultipleRemove: MultipleCallbackComponent<T>[]
+  beforeRemoveMultiple: MultipleCallbackComponent<T>[]
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  afterMultipleRemove: MultipleCallbackComponent<T>[]
+  afterRemoveMultiple: MultipleCallbackComponent<T>[]
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  beforeMultipleUpdate: MultipleCallbackComponent<T>[]
+  beforeUpdateMultiple: MultipleCallbackComponent<T>[]
   /**
    * More details {@link MultipleCallbackComponent}
    */
-  afterMultipleUpdate: MultipleCallbackComponent<T>[]
+  afterUpdateMultiple: MultipleCallbackComponent<T>[]
 }
 
 export type Components<T extends AnyOrama, TSchema, TIndex, TDocumentStore, TSorter> = Partial<
@@ -920,12 +934,34 @@ export type PickInferGeneric<T, Default> = T extends AnyGeneric<infer Generic>
     : never
   : never
 
-export type Orama<TSchema, TIndex = IIndex<Index>, TDocumentStore = IDocumentsStore<DocumentsStore>, TSorter = ISorter<Sorter>> = FunctionComponents<TSchema> &
-  Internals<TSchema, AnyGenericIndex<TIndex>, AnyGenericDocumentStore<TDocumentStore>, AnyGenericSorter<TSorter>> &
-  ArrayCallbackComponents<any> &
-  OramaID
+export type Orama<TSchema, TIndex = IIndex<Index>, TDocumentStore = IDocumentsStore<DocumentsStore>, TSorter = ISorter<Sorter>> =
+  FunctionComponents<TSchema>
+  & Internals<TSchema, AnyGenericIndex<TIndex>, AnyGenericDocumentStore<TDocumentStore>, AnyGenericSorter<TSorter>>
+  & ArrayCallbackComponents<any>
+  & OramaID
+  & { plugins: OramaPlugin[] }
 
-export type AnyOrama<TSchema = any> = FunctionComponents<TSchema> &
-  Internals<TSchema, AnyIndexStore, AnyDocumentStore, AnySorterStore> &
-  ArrayCallbackComponents<any> &
-  OramaID
+export type AnyOrama<TSchema = any> =
+  FunctionComponents<TSchema>
+  & Internals<TSchema, AnyIndexStore, AnyDocumentStore, AnySorterStore>
+  & ArrayCallbackComponents<any>
+  & OramaID
+  & { plugins: OramaPlugin[] }
+
+export type OramaPlugin = {
+  name: string
+  beforeInsert?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
+  afterInsert?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
+  beforeRemove?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
+  afterRemove?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
+  beforeUpdate?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
+  afterUpdate?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
+  beforeSearch?: <T extends AnyOrama>(orama: T, params: SearchParams<T>, language: string | undefined) => SyncOrAsyncValue
+  afterSearch?: <T extends AnyOrama>(orama: T, params: SearchParams<T>, language: string | undefined, results: Results<TypedDocument<T>>) => SyncOrAsyncValue
+  beforeInsertMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
+  afterInsertMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
+  beforeRemoveMultiple?: <T extends AnyOrama>(orama: T, ids: string[]) => SyncOrAsyncValue
+  afterRemoveMultiple?: <T extends AnyOrama>(orama: T, ids: string[]) => SyncOrAsyncValue
+  beforeUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
+  afterUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
+}

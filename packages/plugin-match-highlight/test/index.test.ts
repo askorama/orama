@@ -12,7 +12,13 @@ t.test('it should store the position of tokens', async t => {
     const db = await create({
         schema: {
             text: 'string',
-        }, components: { afterInsert: (orama, key, doc) => afterInsert(orama, key) },
+        } as const,
+        plugins: [
+            {
+                name: 'highlight',
+                afterInsert,
+            }
+        ]
     });
 
     const id = await insert(db, { text: 'hello world' });
@@ -29,7 +35,7 @@ t.test('it should manage nested schemas', async t => {
         },
     } as const;
 
-    const db = (await create({ schema, components: { afterInsert: (orama, key, doc) => afterInsert(orama, key) } }));
+    const db = (await create({ schema, plugins: [{ name: 'highlight', afterInsert }] }));
 
     const id = await insert(db, { other: { text: 'hello world' } });
 
@@ -45,7 +51,13 @@ t.test('it shouldn\'t stem tokens', async t => {
 
     const db = (await create({
         schema,
-        components: { afterInsert: (orama, key, doc) => afterInsert(orama, key), tokenizer: { stemming: false } },
+        plugins: [
+            {
+                name: 'highlight',
+                afterInsert,
+            }
+        ],
+        components: { tokenizer: { stemming: false } },
     }));
 
     const id = await insert(db, { text: 'hello personalization' });
@@ -60,7 +72,7 @@ t.test('should retrieve positions', async t => {
         text: 'string',
     } as const;
 
-    const db = (await create({ schema, components: { afterInsert } }));
+    const db = (await create({ schema, plugins: [{ name: 'highlight', afterInsert }] }));
 
     await insert(db, { text: 'hello world' });
 
@@ -76,7 +88,7 @@ t.test('should retrieve positions also with typo, if tolerance is used', async t
         slug: 'string'
     } as const
   
-    const db = await create({ schema, components: { afterInsert } })
+    const db = await create({ schema, plugins: [{ name: 'highlight', afterInsert }] })
   
     await insert(db, {
         title: 'Introduction to React',
@@ -100,7 +112,7 @@ t.test('should work with texts containing constructor and __proto__ properties',
         text: 'string',
     } as const;
 
-    const db = (await create({ schema, components: { afterInsert } }));
+    const db = (await create({ schema, plugins: [{ name: 'highlight', afterInsert }] }));
 
     await insert(db, { text: 'constructor __proto__' });
 
@@ -116,13 +128,13 @@ t.test('should correctly save and load data with positions', async t => {
         text: 'string',
     } as const;
 
-    const originalDB = (await create({ schema, components: { afterInsert } }));
+    const originalDB = (await create({ schema, plugins: [{ name: 'highlight', afterInsert }] }));
 
     const id = await insert(originalDB, { text: 'hello world' });
 
     const DBData = await saveWithHighlight(originalDB);
 
-    const newDB = (await create({ schema, components: { afterInsert } }));
+    const newDB = (await create({ schema, plugins: [{ name: 'highlight', afterInsert }] }));
 
     await loadWithHighlight(newDB, DBData);
 
