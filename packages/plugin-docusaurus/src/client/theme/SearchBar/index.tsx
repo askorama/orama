@@ -21,6 +21,11 @@ import { SearchResults } from "@theme/SearchResults"
 import { SearchResult } from "@theme/SearchResult"
 import { Hit, INDEX_FILE, PLUGIN_NAME, PluginData, schema } from "../../../server/types.js"
 
+const highlighter = new Highlight({
+  CSSClass: 'aa-ItemContentHighlight',
+  HTMLTag: 'span',
+})
+
 export default function SearchBar(): JSX.Element {
   const isBrowser = useIsBrowser()
   const { siteConfig } = useDocusaurusContext()
@@ -32,7 +37,6 @@ export default function SearchBar(): JSX.Element {
   const versions = useVersions(undefined)
   const activeVersion = useActiveVersion(undefined)
   const { preferredVersion } = useDocsPreferredVersion()
-  const highlighter = useMemo(() => new Highlight(), [])
 
   const version = useMemo(() => {
     if (!isBrowser) {
@@ -133,7 +137,7 @@ export default function SearchBar(): JSX.Element {
       window.removeEventListener('keydown', handler)
       search.destroy()
     }
-  }, [isBrowser, siteConfig, database, colorMode, onKeyDown, highlighter])
+  }, [isBrowser, siteConfig, database, colorMode, onKeyDown])
 
   useEffect(() => {
     async function loadDatabase(version: GlobalVersion): Promise<void> {

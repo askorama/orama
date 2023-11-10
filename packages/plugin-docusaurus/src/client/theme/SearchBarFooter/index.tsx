@@ -42,7 +42,7 @@ export function SearchBarFooter({ translations = {} }: SearchBarFooterProps): JS
     navigateDownKeyAriaLabel = 'Arrow down',
     closeText = 'to close',
     closeKeyAriaLabel = 'Escape key',
-    searchByText = 'Search by'
+    searchByText = 'Powered by'
   } = translations
 
   const { colorMode } = useColorMode()
