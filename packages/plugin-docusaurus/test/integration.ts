@@ -1,5 +1,4 @@
-import { AnyOrama, TypedDocument, create, load } from '@orama/orama'
-import { OramaWithHighlight, SearchResultWithHighlight, searchWithHighlight } from '@orama/plugin-match-highlight'
+import { create, load, search } from "@orama/orama"
 import assert from 'node:assert'
 import { exec, ExecException } from 'node:child_process'
 import { existsSync } from 'node:fs'
@@ -26,10 +25,6 @@ const sandbox = process.env.KEEP_SANDBOX_DOCUSAURUS
 
 async function cleanup(): Promise<void> {
   await rm(sandbox, { force: true, recursive: true })
-}
-
-function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(database: OramaWithHighlight<T>, term: string): Promise<SearchResultWithHighlight<ResultDocument>> {
-  return searchWithHighlight(database, { term, properties: ['sectionTitle', 'sectionContent', 'type'] })
 }
 
 async function execute(command: string, cwd?: string): Promise<Execution> {
@@ -94,31 +89,29 @@ await test('generated DBs have indexed pages content', async () => {
   const rawData = gunzipSync(rawCompressedData).toString('utf-8')
   const data = JSON.parse(rawData)
 
-  const _database = await create({ schema })
-  const database = _database as OramaWithHighlight<typeof _database>;
+  const database = await create({ schema })
   await load(database, data)
-  database.data.positions = data.positions
 
   // Search results seem reasonable
-  const indexSearchResult = await search(database, 'index')
+  const indexSearchResult = await search(database, { term: 'index', properties: ['sectionTitle', 'sectionContent', 'type'] })
   assert.ok(indexSearchResult.count === 1)
   assert.ok(indexSearchResult.hits[0].document.pageRoute === '/#main')
 
-  const catSearchResult = await search(database, 'cat')
+  const catSearchResult = await search(database, { term: 'cat', properties: ['sectionTitle', 'sectionContent', 'type'] })
   assert.ok(catSearchResult.count === 1)
   assert.ok(catSearchResult.hits[0].document.pageRoute === '/animals_cat')
 
-  const dogSearchResult = await search(database, 'dog')
+  const dogSearchResult = await search(database, { term: 'dog', properties: ['sectionTitle', 'sectionContent', 'type'] })
   assert.ok(dogSearchResult.count === 2)
   assert.ok(dogSearchResult.hits[0].document.pageRoute === '/animals_dog#dog')
 
-  const domesticSearchResult = await search(database, 'domestic')
+  const domesticSearchResult = await search(database, { term: 'domestic', properties: ['sectionTitle', 'sectionContent', 'type'] })
   assert.ok(domesticSearchResult.count === 2)
   assert.ok(domesticSearchResult.hits[0].document.pageRoute === '/animals_cat')
   assert.ok(domesticSearchResult.hits[1].document.pageRoute === '/animals_dog#dog')
 
   // We do not have content about turtles
-  const turtleSearchResult = await search(database, 'turtle')
+  const turtleSearchResult = await search(database, { term: 'turtle', properties: ['sectionTitle', 'sectionContent', 'type'] })
   assert.ok(turtleSearchResult.count === 0)
 })
 

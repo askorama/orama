@@ -71,3 +71,7 @@
   font-size: 0.9em;
   color: var(--ifm-color-emphasis-600);
 }
+
+.aa-ItemLink {
+  margin-bottom: .6rem;
+}
