@@ -1,6 +1,7 @@
 {
   "index": "Introduction",
   "writing-your-own-plugins": "Writing your own plugins",
+  "plugin-telemetry": "Plugin Telemetry",
   "plugin-astro": "Plugin Astro",
   "plugin-data-persistence": "Plugin Data Persistence",
   "plugin-docusaurus": "Plugins Docusaurus",
