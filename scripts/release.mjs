@@ -11,6 +11,7 @@ const packages = [
   'plugin-match-highlight',
   'plugin-nextra',
   'plugin-parsedoc',
+  'plugin-telemetry',
   'stemmers',
   'stopwords'
 ]
