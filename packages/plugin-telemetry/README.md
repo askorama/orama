@@ -1,4 +1,4 @@
-# Nextra Plugin
+# Orama Telemetry Plugin
 
 [![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
 
@@ -20,7 +20,7 @@ const db = await create({
     description: 'string'
   },
   plugins: [
-    pluginTelemetry({ apiKey: '<API-KEY>' })
+    pluginTelemetry({ apiKey: '<API-KEY>', endpoint: '<ENDPOINT>' })
   ]
 })
 ```
