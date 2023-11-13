@@ -1,0 +1,41 @@
+{
+  "name": "@orama/plugin-telemetry",
+  "version": "2.0.0-beta.5",
+  "description": "Orama plugin for providing telemetry data on your searches",
+  "keywords": [
+    "orama",
+    "telemetry",
+    "analytics"
+  ],
+  "license": "Apache-2.0",
+  "main": "./dist/index.js",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/oramasearch/orama/issues"
+  },
+  "homepage": "https://github.com/oramasearch/orama#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oramasearch/orama.git"
+  },
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "swc --delete-dir-on-start --extensions .ts,.tsx,.cts -d dist src",
+    "postbuild": "tsc -p . --emitDeclarationOnly",
+    "lint": "ts-standard --fix ."
+  },
+  "dependencies": {
+    "@orama/orama": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "ts-standard": "^12.0.2",
+    "typescript": "^5.0.0"
+  }
+}
