@@ -19,6 +19,7 @@ export function pluginTelemetry (params: PluginTelemetryParams) {
 
   const collector = Collector.create({
     id: params.endpoint,
+    endpoint: params.endpoint,
     api_key: params.apiKey,
     flushSize,
     flushInterval

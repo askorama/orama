@@ -5,6 +5,7 @@ type Data = object[]
 
 export interface CollectorConstructor extends TelemetryConfig {
   id: string
+  endpoint: string
   api_key: string
 }
 
