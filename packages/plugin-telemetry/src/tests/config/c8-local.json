@@ -1,0 +1,4 @@
+{
+  "reporter": ["text", "html"],
+  "exclude": ["dist", "tests", "src/cjs", "src/tokenizer/stop-words"]
+}
