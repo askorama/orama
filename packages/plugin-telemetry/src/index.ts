@@ -5,6 +5,7 @@ import { DEFAULT_TELEMETRY_FLUSH_INTERVAL, DEFAULT_TELEMETRY_FLUSH_SIZE } from '
 
 export interface PluginTelemetryParams {
   apiKey: string
+  endpoint: string
   flushInterval?: number
   flushSize?: number
 }
@@ -13,8 +14,11 @@ export function pluginTelemetry (params: PluginTelemetryParams) {
   const flushInterval = params.flushInterval || DEFAULT_TELEMETRY_FLUSH_INTERVAL
   const flushSize = params.flushSize || DEFAULT_TELEMETRY_FLUSH_SIZE
 
+  if (!params.apiKey) throw new Error('Missing apiKey for plugin-telemetry')
+  if (!params.endpoint) throw new Error('Missing endpoint for plugin-telemetry')
+
   const collector = Collector.create({
-    id: '',
+    id: params.endpoint,
     api_key: params.apiKey,
     flushSize,
     flushInterval
