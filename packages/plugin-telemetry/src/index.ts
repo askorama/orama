@@ -1,21 +1,35 @@
 import type { AnyOrama, Results, SearchParams, Language } from '@orama/orama'
-import * as CONST from './const.js'
+import type { Optional } from './types.js'
+import { Collector } from './collector.js'
+import { DEFAULT_TELEMETRY_FLUSH_INTERVAL, DEFAULT_TELEMETRY_FLUSH_SIZE } from './const.js'
 
-type Maybe<T = unknown> = T | undefined
-
-export type PluginTelemetryParams = {
+export interface PluginTelemetryParams {
   apiKey: string
-  endpoint: string
   flushInterval?: number
   flushSize?: number
 }
 
-export function pluginTelemetry(params: PluginTelemetryParams) {
-  const flushInterval = params.flushInterval || CONST.DEFAULT_TELEMETRY_FLUSH_INTERVAL
-  const flushSize = params.flushSize || CONST.DEFAULT_TELEMETRY_FLUSH_SIZE
+export function pluginTelemetry (params: PluginTelemetryParams) {
+  const flushInterval = params.flushInterval || DEFAULT_TELEMETRY_FLUSH_INTERVAL
+  const flushSize = params.flushSize || DEFAULT_TELEMETRY_FLUSH_SIZE
+
+  const collector = Collector.create({
+    id: '',
+    api_key: params.apiKey,
+    flushSize,
+    flushInterval
+  })
 
   return {
     name: 'plugin-telemetry',
-    afterSearch: (orama: AnyOrama, query: SearchParams<AnyOrama>, language: Maybe<Language>, results: Results<unknown>) => {}
+    afterSearch: (orama: AnyOrama, query: SearchParams<AnyOrama, unknown>, language: Optional<Language>, results: Results<unknown>) => {
+      collector.add({
+        query,
+        resultsCount: results.count,
+        roundTripTime: results.elapsed.raw,
+        searchedAt: new Date(),
+        rawSearchString: query.term
+      })
+    }
   }
 }

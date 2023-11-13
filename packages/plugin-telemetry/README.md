@@ -20,7 +20,10 @@ const db = await create({
     description: 'string'
   },
   plugins: [
-    pluginTelemetry({ apiKey: '<API-KEY>', endpoint: '<ENDPOINT>' })
+    pluginTelemetry({
+      apiKey: '<API-KEY>',
+      endpoint: '<ENDPOINT>'
+    })
   ]
 })
 ```
