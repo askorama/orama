@@ -11,4 +11,8 @@ export function sendBeacon (endpoint: string, body?: string): Promise<Response> 
       'Content-Type': 'application/json'
     }
   })
+  // @todo: handle errors with retries
+  .catch((error) => {
+    console.error(error)
+  })
 }

@@ -34,7 +34,7 @@
   "scripts": {
     "test": "echo 0;",
     "build": "tsup --config tsup.lib.js",
-    "lint": "ts-standard --fix ."
+    "lint": "ts-standard --fix src"
   },
   "dependencies": {
     "@orama/orama": "workspace:*"
