@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "ESNext",
+    "module": "NodeNext",
+    "outDir": "../../../../../Desktop/plugin-docusaurus-v3/dist",
+    "lib": ["ESNext", "DOM"],
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "declaration": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "moduleResolution": "nodenext"
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}

@@ -1,0 +1,7 @@
+{
+  "plugin-docusaurus.searchBar.placeholder": "搜索...",
+  "plugin-docusaurus.searchBar.noResults": "无搜索结果",
+  "plugin-docusaurus.searchBar.clearButtonTitle": "清除",
+  "plugin-docusaurus.searchBar.detachedCancelButtonText": "取消",
+  "plugin-docusaurus.searchBar.submitButtonTitle": "搜索"
+}

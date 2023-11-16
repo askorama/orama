@@ -11,6 +11,7 @@
     "build:plugin-astro": "cd packages/plugin-astro && npm run build",
     "build:plugin-data-persistence": "cd packages/plugin-data-persistence && npm run build",
     "build:plugin-docusaurus": "cd packages/plugin-docusaurus && npm run build",
+    "build:plugin-docusaurus-v3": "cd packages/plugin-docusaurus-v3 && npm run build",
     "build:plugin-match-highlight": "cd packages/plugin-match-highlight && npm run build",
     "build:plugin-parsedoc": "cd packages/plugin-parsedoc && npm run build",
     "format": "prettier -w packages",

@@ -1,0 +1,7 @@
+{
+  "plugin-docusaurus.searchBar.placeholder": "検索...",
+  "plugin-docusaurus.searchBar.noResults": "該当する結果はありません。",
+  "plugin-docusaurus.searchBar.clearButtonTitle": "Clear",
+  "plugin-docusaurus.searchBar.detachedCancelButtonText": "Cancel",
+  "plugin-docusaurus.searchBar.submitButtonTitle": "Submit"
+}
