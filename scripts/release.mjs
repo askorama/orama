@@ -8,6 +8,7 @@ const packages = [
   'plugin-astro',
   'plugin-data-persistence',
   'plugin-docusaurus',
+  'plugin-docusaurus-v3',
   'plugin-match-highlight',
   'plugin-nextra',
   'plugin-parsedoc',
