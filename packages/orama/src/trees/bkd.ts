@@ -310,7 +310,8 @@ function calculatePolygonCentroid (polygon: Point[]): Point {
   let centroidX = 0
   let centroidY = 0
 
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+  const polygonLength = polygon.length;
+  for (let i = 0, j = polygonLength - 1; i < polygonLength; j = i++) {
     const xi = polygon[i].lon
     const yi = polygon[i].lat
     const xj = polygon[j].lon
@@ -324,9 +325,10 @@ function calculatePolygonCentroid (polygon: Point[]): Point {
   }
 
   totalArea /= 2
+  const centroidCoordinate = (6 * totalArea)
 
-  centroidX /= (6 * totalArea)
-  centroidY /= (6 * totalArea)
+  centroidX /= centroidCoordinate
+  centroidY /= centroidCoordinate
 
   return { lon: centroidX, lat: centroidY }
 }
@@ -334,7 +336,8 @@ function calculatePolygonCentroid (polygon: Point[]): Point {
 function isPointInPolygon (polygon: Point[], point: Point): boolean {
   let isInside = false
   const x = point.lon; const y = point.lat
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+  const polygonLength = polygon.length;
+  for (let i = 0, j = polygonLength - 1; i < polygonLength; j = i++) {
     const xi = polygon[i].lon; const yi = polygon[i].lat
     const xj = polygon[j].lon; const yj = polygon[j].lat
 
