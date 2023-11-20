@@ -126,7 +126,8 @@ export function create (end = false, subWord = '', key = ''): Node {
 }
 
 export function insert (root: Node, word: string, docId: InternalDocumentID) {
-  for (let i = 0; i < word.length; i++) {
+  const wordLength = word.length
+  for (let i = 0; i < wordLength; i++) {
     const currentCharacter = word[i]
     const wordAtIndex = word.substring(i)
     const rootChildCurrentChar = root.c[currentCharacter]
@@ -270,7 +271,8 @@ export function find (root: Node, { term, exact, tolerance }: FindParams): FindR
     _findLevenshtein(root, term, 0, tolerance || 0, tolerance, output)
     return output
   } else {
-    for (let i = 0; i < term.length; i++) {
+    const termLength = term.length
+    for (let i = 0; i < termLength; i++) {
       const character = term[i]
       if (character in root.c) {
         const rootChildCurrentChar = root.c[character]
@@ -306,7 +308,8 @@ export function find (root: Node, { term, exact, tolerance }: FindParams): FindR
 }
 
 export function contains (root: Node, term: string): boolean {
-  for (let i = 0; i < term.length; i++) {
+  const termLength = term.length
+  for (let i = 0; i < termLength; i++) {
     const character = term[i]
 
     if (character in root.c) {
@@ -333,7 +336,8 @@ export function removeWord (root: Node, term: string): boolean {
     return false
   }
 
-  for (let i = 0; i < term.length; i++) {
+  const termLength = term.length
+  for (let i = 0; i < termLength; i++) {
     const character = term[i]
     const parent = root
     if (character in root.c) {
@@ -357,7 +361,8 @@ export function removeDocumentByWord (root: Node, term: string, docID: InternalD
     return true
   }
 
-  for (let i = 0; i < term.length; i++) {
+  const termLength = term.length
+  for (let i = 0; i < termLength; i++) {
     const character = term[i]
     if (character in root.c) {
       const rootChildCurrentChar = root.c[character]
