@@ -14,16 +14,8 @@ export interface Node<K, V> {
   h: number
 }
 
-const BALANCE_STATE = {
-  UNBALANCED_RIGHT: -2,
-  SLIGHTLY_UNBALANCED_RIGHT: -1,
-  BALANCED: 0,
-  SLIGHTLY_UNBALANCED_LEFT: 1,
-  UNBALANCED_LEFT: 2
-}
-
-function getHeight<K, V> (node: Nullable<Node<K, V>>): number {
-  return (node != null) ? node.h : -1
+export interface RootNode<K, V> {
+  root: Node<K, V>
 }
 
 function rotateLeft<K, V> (node: Node<K, V>): Node<K, V> {
@@ -44,16 +36,16 @@ function rotateRight<K, V> (node: Node<K, V>): Node<K, V> {
   return left
 }
 
-export function contains<K, V> (node: Node<K, V>, key: K): boolean {
+export function contains<K, V> (node: RootNode<K, V>, key: K): boolean {
   return !!find(node, key)
 }
 
-export function getSize<K, V> (root: Nullable<Node<K, V>>): number {
+export function getSize<K, V> (root: Nullable<RootNode<K, V>>): number {
   let size = 0
   const queue: Array<Node<K, V>> = []
 
   if (root !== null) {
-    queue.push(root)
+    queue.push(root.root)
   }
 
   while (queue.length > 0) {
@@ -72,43 +64,45 @@ export function getSize<K, V> (root: Nullable<Node<K, V>>): number {
   return size
 }
 
-export function isBalanced<K, V> (root: Nullable<Node<K, V>>): boolean {
-  if (root === null) return true
+export function isBalanced<K, V>(root: Nullable<RootNode<K, V>>): boolean {
+  if (root === null) return true;
 
-  const stack: Array<Node<K, V>> = [root]
+  const stack: Array<Node<K, V>> = [root.root];
 
   while (stack.length > 0) {
-    const node = stack.pop()
+    const node = stack.pop();
 
-    if (node === undefined) return true
+    if (node) {
+      const leftHeight = getHeight(node.l);
+      const rightHeight = getHeight(node.r);
+      const heightDiff = leftHeight - rightHeight;
 
-    const heightDiff = getHeight(node.l) - getHeight(node.r)
+      if (Math.abs(heightDiff) > 1) {
+        // Node is unbalanced
+        return false;
+      }
 
-    if (heightDiff > 1 || heightDiff < -1) {
-      return false
-    }
-
-    if (node.r !== null) {
-      stack.push(node.r)
-    }
-
-    if (node.l !== null) {
-      stack.push(node.l)
+      if (node.l !== null) {
+        stack.push(node.l);
+      }
+      if (node.r !== null) {
+        stack.push(node.r);
+      }
     }
   }
 
-  return true
+  return true;
 }
 
-export function rangeSearch<K, V> (node: Node<K, V>, min: K, max: K): V {
-  if (!node) {
+export function rangeSearch<K, V> (node: RootNode<K, V>, min: K, max: K): V {
+  if (node === null) {
     return [] as unknown as V
   }
 
   const result: V[] = []
 
   function traverse (node: Node<K, V>) {
-    if (!node) {
+    if (node === null) {
       return
     }
 
@@ -125,12 +119,12 @@ export function rangeSearch<K, V> (node: Node<K, V>, min: K, max: K): V {
     }
   }
 
-  traverse(node)
+  traverse(node.root)
 
   return result as V
 }
 
-export function greaterThan<K, V> (node: Node<K, V>, key: K, inclusive = false): V {
+export function greaterThan<K, V> (node: RootNode<K, V>, key: K, inclusive = false): V {
   if (!node) {
     return [] as unknown as V
   }
@@ -154,12 +148,12 @@ export function greaterThan<K, V> (node: Node<K, V>, key: K, inclusive = false):
     traverse(node.r as Node<K, V>)
   }
 
-  traverse(node)
+  traverse(node.root)
 
   return result as V
 }
 
-export function lessThan<K, V> (node: Node<K, V>, key: K, inclusive = false): V {
+export function lessThan<K, V> (node: RootNode<K, V>, key: K, inclusive = false): V {
   if (!node) {
     return [] as unknown as V
   }
@@ -183,7 +177,7 @@ export function lessThan<K, V> (node: Node<K, V>, key: K, inclusive = false): V 
     traverse(node.r as Node<K, V>)
   }
 
-  traverse(node)
+  traverse(node.root)
 
   return result as V
 }
@@ -201,71 +195,77 @@ function getNodeByKey<K, V> (node: Nullable<Node<K, V>>, key: K): Nullable<Node<
   return null
 }
 
-export function create<K, V> (key: K, value: V): Node<K, V> {
+export function create<K, V> (key: K, value: V): RootNode<K, V> {
   return {
-    k: key,
-    v: value,
-    l: null,
-    r: null,
-    h: 0
+    root: {
+      k: key,
+      v: value,
+      l: null,
+      r: null,
+      h: 0
+    }
   }
 }
 
-export function insert<K, V> (root: Node<K, V>, key: K, value: V): Node<K, V> {
-  let parent: Nullable<Node<K, V>> = null
-  let current: Nullable<Node<K, V>> = root
+export function insert<K, V>(rootNode: RootNode<K, V>, key: K, value: V): void {
+  function insertNode(node: Nullable<Node<K, V>>, key: K, value: V): Node<K, V> {
+    if (node == null) {
+      return {
+        k: key,
+        v: value,
+        l: null,
+        r: null,
+        h: 0
+      };
+    }
 
-  while (current !== null) {
-    parent = current
-    if (key < current.k) {
-      current = current.l
-    } else if (key > current.k) {
-      current = current.r
+    if (key < node.k) {
+      node.l = insertNode(node.l, key, value);
+    } else if (key > node.k) {
+      node.r = insertNode(node.r, key, value);
     } else {
-      // assuming value is an array here
-      (current.v as string[]) = (current.v as string[]).concat(value as string)
-      return root
+      // Duplicate key; assuming value is an array here
+      (node.v as V[]).push(value);
+      return node;
     }
+
+    // Update the height of this ancestor node
+    node.h = 1 + Math.max(getHeight(node.l), getHeight(node.r));
+
+    // Get the balance factor
+    let balanceFactor = getHeight(node.l) - getHeight(node.r);
+
+    // Perform rotations if necessary
+    // Left Left Case
+    if (balanceFactor > 1 && key < node.l!.k) {
+      return rotateRight(node);
+    }
+
+    // Right Right Case
+    if (balanceFactor < -1 && key > node.r!.k) {
+      return rotateLeft(node);
+    }
+
+    // Left Right Case
+    if (balanceFactor > 1 && key > node.l!.k) {
+      node.l = rotateLeft(node.l!);
+      return rotateRight(node);
+    }
+
+    // Right Left Case
+    if (balanceFactor < -1 && key < node.r!.k) {
+      node.r = rotateRight(node.r!);
+      return rotateLeft(node);
+    }
+
+    return node;
   }
 
-  const newNode = create(key, value)
+  rootNode.root = insertNode(rootNode.root, key, value);
+}
 
-  if (parent == null) {
-    root = newNode // tree was empty
-  } else if (key < parent.k) {
-    parent.l = newNode
-  } else {
-    parent.r = newNode
-  }
-
-  current = newNode
-
-  while (parent != null) {
-    const balanceFactor = getHeight(parent.l) - getHeight(parent.r)
-
-    if (balanceFactor === BALANCE_STATE.UNBALANCED_LEFT) {
-      if (key > (parent.l as Node<K, V>).k) {
-        parent.l = rotateLeft(parent.l as Node<K, V>)
-      }
-      parent = rotateRight(parent)
-    }
-
-    if (balanceFactor === BALANCE_STATE.UNBALANCED_RIGHT) {
-      if (key < (parent.r as Node<K, V>).k) {
-        parent.r = rotateRight(parent.r as Node<K, V>)
-      }
-      parent = rotateLeft(parent)
-    }
-
-    if (parent === root) {
-      break
-    }
-
-    current = parent
-    parent = getNodeParent(root, current.k)
-  }
-
-  return root
+function getHeight<K, V> (node: Nullable<Node<K, V>>): number {
+  return (node != null) ? node.h : -1
 }
 
 function getNodeParent<K, V> (root: Node<K, V>, key: K): Nullable<Node<K, V>> {
@@ -287,77 +287,92 @@ function getNodeParent<K, V> (root: Node<K, V>, key: K): Nullable<Node<K, V>> {
   return parent
 }
 
-export function find<K, V> (root: Node<K, V>, key: K): V | null {
-  const node = getNodeByKey(root, key)
+export function find<K, V> (root: RootNode<K, V>, key: K): V | null {
+  const node = getNodeByKey(root.root, key)
   if (node == null) {
     return null
   }
   return node.v
 }
 
-export function remove<K, V> (root: Nullable<Node<K, V>>, key: K): Nullable<Node<K, V>> {
-  let node = root
-  let parentNode: Nullable<Node<K, V>> = null
+export function remove<K, V>(rootNode: Nullable<RootNode<K, V>>, key: K): void {
+  if (rootNode == null || rootNode.root == null) {
+    return;
+  }
 
-  while ((node != null) && node.k !== key) {
-    parentNode = node
+  let node = rootNode.root;
+  let parentNode: Nullable<Node<K, V>> = null;
+
+  // Find the node to be deleted and its parent
+  while (node != null && node.k !== key) {
+    parentNode = node;
     if (key < node.k) {
-      node = node.l as Node<K, V>
+      node = node.l!;
     } else {
-      node = node.r as Node<K, V>
+      node = node.r!;
     }
   }
 
-  if (node == null) {
-    return null
+  // If the node to be deleted is not found
+  if (node === null) {
+    return;
   }
 
-  if ((node.l == null) && (node.r == null)) {
-    if (parentNode == null) {
-      // Node to be deleted is root
-      root = null
-    } else {
-      if (parentNode.l === node) {
-        parentNode.l = null
+  // Function to handle node deletion logic
+  const deleteNode = () => {
+    // Node with no children
+    if (node.l == null && node.r == null) {
+      if (parentNode == null) {
+        rootNode.root = null!; // The tree becomes empty
       } else {
-        parentNode.r = null
+        if (parentNode.l === node) {
+          parentNode.l = null;
+        } else {
+          parentNode.r = null;
+        }
       }
     }
-  } else if ((node.l != null) && (node.r != null)) {
-    let minValueNode = node.r
-    let minValueParent = node
+    // Node with two children
+    else if (node.l != null && node.r != null) {
+      let minValueNode = node.r;
+      let minValueParent = node;
 
-    while (minValueNode.l != null) {
-      minValueParent = minValueNode
-      minValueNode = minValueNode.l
-    }
+      // Find the minimum value in the right subtree
+      while (minValueNode.l != null) {
+        minValueParent = minValueNode;
+        minValueNode = minValueNode.l;
+      }
 
-    node.k = minValueNode.k
+      node.k = minValueNode.k; // Replace node with minValueNode
 
-    if (minValueParent === node) {
-      minValueParent.r = minValueNode.r
-    } else {
-      minValueParent.l = minValueNode.r
-    }
-  } else {
-    const childNode = (node.l != null) ? node.l : node.r
-
-    if (parentNode == null) {
-      root = childNode as Node<K, V>
-    } else {
-      if (parentNode.l === node) {
-        parentNode.l = childNode
+      // Remove the minValueNode
+      if (minValueParent === node) {
+        minValueParent.r = minValueNode.r;
       } else {
-        parentNode.r = childNode
+        minValueParent.l = minValueNode.r;
       }
     }
-  }
+    // Node with one child
+    else {
+      const childNode = node.l != null ? node.l : node.r;
+      
+      if (parentNode == null) {
+        rootNode.root = childNode!; // Replace root with childNode
+      } else {
+        if (parentNode.l === node) {
+          parentNode.l = childNode;
+        } else {
+          parentNode.r = childNode;
+        }
+      }
+    }
+  };
 
-  return root
+  deleteNode();
 }
 
-export function removeDocument<K, V> (root: Node<K, V[]>, id: V, key: K): void {
-  const node = getNodeByKey(root, key)!
+export function removeDocument<K, V> (root: RootNode<K, V[]>, id: V, key: K): void {
+  const node = getNodeByKey(root.root, key)!
 
   if (!node) {
     return
@@ -370,3 +385,17 @@ export function removeDocument<K, V> (root: Node<K, V[]>, id: V, key: K): void {
 
   node.v.splice(node.v.indexOf(id), 1)
 }
+
+// const numbers = [
+//   [ 7288, 0.4166666666666667 ],
+//   [ 19172, 0.4791666666666667 ],
+//   [ 5025, 0.5526315789473685 ],
+//   [ 9148, 0.5625 ],
+//   [ 10806, 0.6097560975609756 ]
+// ]
+// let tree = create(0, [])
+// for (const [id, number] of numbers) {
+//   insert(tree, number, [id])
+// }
+// console.log(JSON.stringify(tree, null, 2))
+// console.log('isBalanced', isBalanced(tree.root))
