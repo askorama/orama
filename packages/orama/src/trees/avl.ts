@@ -94,10 +94,6 @@ export function isBalanced<K, V> (root: Nullable<RootNode<K, V>>): boolean {
 }
 
 export function rangeSearch<K, V> (node: RootNode<K, V>, min: K, max: K): V {
-  if (node === null) {
-    return [] as unknown as V
-  }
-
   const result: V[] = []
 
   function traverse (node: Node<K, V>) {
@@ -124,10 +120,6 @@ export function rangeSearch<K, V> (node: RootNode<K, V>, min: K, max: K): V {
 }
 
 export function greaterThan<K, V> (node: RootNode<K, V>, key: K, inclusive = false): V {
-  if (!node) {
-    return [] as unknown as V
-  }
-
   const result: V[] = []
 
   function traverse (node: Node<K, V>) {
@@ -153,10 +145,6 @@ export function greaterThan<K, V> (node: RootNode<K, V>, key: K, inclusive = fal
 }
 
 export function lessThan<K, V> (node: RootNode<K, V>, key: K, inclusive = false): V {
-  if (!node) {
-    return [] as unknown as V
-  }
-
   const result: V[] = []
 
   function traverse (node: Node<K, V>) {
@@ -208,7 +196,7 @@ export function create<K, V> (key: K, value: V): RootNode<K, V> {
 
 export function insert<K, V> (rootNode: RootNode<K, V>, key: K, value: V): void {
   function insertNode (node: Nullable<Node<K, V>>, key: K, value: V): Node<K, V> {
-    if (node == null) {
+    if (node === null) {
       return {
         k: key,
         v: value,
@@ -261,14 +249,14 @@ function getHeight<K, V> (node: Nullable<Node<K, V>>): number {
 
 export function find<K, V> (root: RootNode<K, V>, key: K): V | null {
   const node = getNodeByKey(root.root, key)
-  if (node == null) {
+  if (node === null) {
     return null
   }
   return node.v
 }
 
 export function remove<K, V> (rootNode: Nullable<RootNode<K, V>>, key: K): void {
-  if (rootNode == null || rootNode.root == null) {
+  if (rootNode === null || rootNode.root === null) {
     return
   }
 
@@ -289,8 +277,8 @@ export function remove<K, V> (rootNode: Nullable<RootNode<K, V>>, key: K): void 
   }
 
   const deleteNode = () => {
-    if (node.l == null && node.r == null) {
-      if (parentNode == null) {
+    if (node.l === null && node.r === null) {
+      if (parentNode === null) {
         rootNode.root = null!
       } else {
         if (parentNode.l === node) {
@@ -318,7 +306,7 @@ export function remove<K, V> (rootNode: Nullable<RootNode<K, V>>, key: K): void 
     } else {
       const childNode = node.l != null ? node.l : node.r
 
-      if (parentNode == null) {
+      if (parentNode === null) {
         rootNode.root = childNode!
       } else {
         if (parentNode.l === node) {
