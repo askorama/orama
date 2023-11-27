@@ -244,7 +244,7 @@ t.test('filters', t => {
         price: {
           lte: 40,
         },
-        // @ts-ignore
+        // @ts-expect-error - unknown field
         'meta.sales': {
           eq: 25,
         },

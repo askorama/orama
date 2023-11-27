@@ -244,7 +244,7 @@ export function insert<K, V> (rootNode: RootNode<K, V>, key: K, value: V): void 
 }
 
 function getHeight<K, V> (node: Nullable<Node<K, V>>): number {
-  return (node != null) ? node.h : -1
+  return (node !== null) ? node.h : -1
 }
 
 export function find<K, V> (root: RootNode<K, V>, key: K): V | null {
