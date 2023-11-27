@@ -123,7 +123,7 @@ export function greaterThan<K, V> (node: RootNode<K, V>, key: K, inclusive = fal
   const result: V[] = []
 
   function traverse (node: Node<K, V>) {
-    if (!node) {
+    if (node === null) {
       return
     }
 
@@ -148,7 +148,7 @@ export function lessThan<K, V> (node: RootNode<K, V>, key: K, inclusive = false)
   const result: V[] = []
 
   function traverse (node: Node<K, V>) {
-    if (!node) {
+    if (node === null) {
       return
     }
 
