@@ -221,7 +221,7 @@ function _findLevenshtein (
       if (difference <= originalTolerance && syncBoundedLevenshtein(term, w, originalTolerance).isBounded) {
         output[w] = []
       }
-      if (originalTolerance > 0 && difference && w.includes(term)) {
+      if (originalTolerance > 0 && difference && w.startsWith(term)) {
         output[w] = []
       }
       if ((getOwnProperty(output, w) != null) && (docIDs.length > 0)) {
