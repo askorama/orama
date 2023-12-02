@@ -22,7 +22,7 @@ const phrases = [
 ]
 
 t.test('radix tree', t => {
-  t.plan(7)
+  t.plan(9)
 
   t.test('should correctly find an element by prefix', t => {
     t.plan(1)
@@ -34,6 +34,28 @@ t.test('radix tree', t => {
     t.strictSame(result, {
       [phrases[5].doc]: [phrases[5].id],
     })
+  })
+
+  t.test('should correctly find an element by prefix if tolerance is greater than 0', t => {
+    t.plan(1)
+    const root = createNode()
+    for (const { doc, id } of phrases) {
+      radixInsert(root, doc, id)
+    }
+    const result = radixFind(root, { term: phrases[5].doc.slice(0, 5), tolerance: 1 })
+    t.strictSame(result, {
+      [phrases[5].doc]: [phrases[5].id],
+    })
+  })
+
+  t.test('should not find an element by prefix if tolerance is greater than 0 but prefixSearch is turned off', t => {
+    t.plan(1)
+    const root = createNode()
+    for (const { doc, id } of phrases) {
+      radixInsert(root, doc, id)
+    }
+    const result = radixFind(root, { term: phrases[5].doc.slice(0, 5), tolerance: 1, prefixSearch: false })
+    t.strictSame(result, {})
   })
 
   t.test('should correctly find a complete sentence', t => {
