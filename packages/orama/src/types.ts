@@ -298,6 +298,11 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    */
   tolerance?: number
   /**
+   * A flag to enable prefix search for tolerance(s) greater than 0.
+   * The default value is true
+   */
+  prefixSearch?: boolean
+  /**
    * The BM25 parameters to use.
    *
    * k: Term frequency saturation parameter.
