@@ -491,8 +491,8 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
     throw createError('WRONG_SEARCH_PROPERTY_TYPE', prop)
   }
 
-  const { exact, tolerance } = context.params
-  const searchResult = radixFind(node, { term, exact, tolerance })
+  const { exact, tolerance, prefixSearch = true } = context.params
+  const searchResult = radixFind(node, { term, exact, tolerance, prefixSearch })
   const ids = new Set<InternalDocumentID>()
 
   for (const key in searchResult) {
@@ -564,9 +564,10 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
 
     if (type === 'Radix' && (typeof operation === 'string' || Array.isArray(operation))) {
       for (const raw of [operation].flat()) {
+        const { prefixSearch = true } = context.params
         const term = await context.tokenizer.tokenize(raw, context.language, param)
         for (const t of term) {
-          const filteredIDsResults = radixFind(node, { term: t, exact: true })
+          const filteredIDsResults = radixFind(node, { term: t, exact: true, prefixSearch })
           safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())}
       }
 
