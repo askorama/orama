@@ -37,6 +37,7 @@ interface FindParams {
   term: string
   exact?: boolean
   tolerance?: number
+  prefixSearch?: boolean
 }
 
 type FindResult = Record<string, InternalDocumentID[]>
@@ -208,6 +209,7 @@ function _findLevenshtein (
   index: number,
   tolerance: number,
   originalTolerance: number,
+  prefixSearch: boolean,
   output: FindResult
 ) {
   if (tolerance < 0) {
@@ -221,7 +223,7 @@ function _findLevenshtein (
       if (difference <= originalTolerance && syncBoundedLevenshtein(term, w, originalTolerance).isBounded) {
         output[w] = []
       }
-      if (originalTolerance > 0 && difference && w.startsWith(term)) {
+      if (prefixSearch && originalTolerance > 0 && difference && w.startsWith(term)) {
         output[w] = []
       }
       if ((getOwnProperty(output, w) != null) && (docIDs.length > 0)) {
@@ -242,27 +244,27 @@ function _findLevenshtein (
 
   // Match current character without consuming tolerance
   if (term[index] in node.c) {
-    _findLevenshtein(node.c[term[index]], term, index + 1, tolerance, originalTolerance, output)
+    _findLevenshtein(node.c[term[index]], term, index + 1, tolerance, originalTolerance, prefixSearch, output)
   }
 
   // If tolerance is still available, consider other branches:
   // 1. Deletion (skip the current term character)
-  _findLevenshtein(node, term, index + 1, tolerance - 1, originalTolerance, output)
+  _findLevenshtein(node, term, index + 1, tolerance - 1, originalTolerance, prefixSearch, output)
 
   // 2. Insertion (skip the current tree node character)
   for (const character in node.c) {
-    _findLevenshtein(node.c[character], term, index, tolerance - 1, originalTolerance, output)
+    _findLevenshtein(node.c[character], term, index, tolerance - 1, originalTolerance, prefixSearch, output)
   }
 
   // 3. Substitution (skip both current term character and tree node character)
   for (const character in node.c) {
     if (character !== term[index]) {
-      _findLevenshtein(node.c[character], term, index + 1, tolerance - 1, originalTolerance, output)
+      _findLevenshtein(node.c[character], term, index + 1, tolerance - 1, originalTolerance, prefixSearch, output)
     }
   }
 }
 
-export function find (root: Node, { term, exact, tolerance }: FindParams): FindResult {
+export function find (root: Node, { term, exact, tolerance, prefixSearch = true }: FindParams): FindResult {
   // Find the closest node to the term
 
   // Use `if` condition because tolerance `0` is supposed to match only prefix.
@@ -271,7 +273,7 @@ export function find (root: Node, { term, exact, tolerance }: FindParams): FindR
   if (tolerance && !exact) {
     const output: FindResult = {}
     tolerance = tolerance || 0
-    _findLevenshtein(root, term, 0, tolerance || 0, tolerance, output)
+    _findLevenshtein(root, term, 0, tolerance || 0, tolerance, prefixSearch, output)
     return output
   } else {
     const termLength = term.length
