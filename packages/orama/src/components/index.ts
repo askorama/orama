@@ -28,7 +28,7 @@ import {
   greaterThan as avlGreaterThan,
   insert as avlInsert,
   lessThan as avlLessThan,
-  Node as AVLNode,
+  RootNode as AVLRootNode,
   rangeSearch as avlRangeSearch,
   removeDocument as avlRemoveDocument,
 } from '../trees/avl.js'
@@ -98,7 +98,7 @@ export type TTree<T = TreeType, N = unknown> = {
 
 export type Tree =
   | TTree<'Radix', RadixNode>
-  | TTree<'AVL',   AVLNode<number, InternalDocumentID[]>>
+  | TTree<'AVL',   AVLRootNode<number, InternalDocumentID[]>>
   | TTree<'Bool',  BooleanIndex>
   | TTree<'Flat',  FlatTree>
   | TTree<'BKD',   BKDNode>

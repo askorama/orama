@@ -5,7 +5,7 @@ t.test('create should support array of string', async t => {
   const db = await create({
     schema: {
       name: 'string[]',
-    },
+    } as const,
   })
 
   const albusId = await insert(db, {
@@ -67,7 +67,7 @@ t.test('create should support array of number', async t => {
   const db = await create({
     schema: {
       num: 'number[]',
-    },
+    } as const,
   })
 
   const first = await insert(db, {
@@ -115,7 +115,7 @@ t.test('create should support array of boolean', async t => {
   const db = await create({
     schema: {
       b: 'boolean[]',
-    },
+    } as const,
   })
 
   const first = await insert(db, {
@@ -159,7 +159,7 @@ t.test('remove should support array as well', async t => {
       strings: 'string[]',
       num: 'number[]',
       b: 'boolean[]',
-    },
+    } as const,
   })
 
   const docId = await insert(db, {
@@ -181,7 +181,7 @@ t.test('serialization should support array as well', async t => {
       strings: 'string[]',
       num: 'number[]',
       b: 'boolean[]',
-    },
+    } as const,
   })
   const docId = await insert(db, {
     strings: ['Albus', 'Percival', 'Wulfric', 'Brian'],
@@ -216,7 +216,7 @@ t.test('update supports array as well', async t => {
       strings: 'string[]',
       num: 'number[]',
       b: 'boolean[]',
-    },
+    } as const,
   })
   const docId = await insert(db, {
     strings: ['Albus', 'Percival', 'Wulfric', 'Brian'],
@@ -250,7 +250,7 @@ async function checkSearchWhere(t, db, key, where, expectedIds) {
   })
   t.equal(result.hits.length, expectedIds.length)
   t.equal(result.count, expectedIds.length)
-  t.strictSame(new Set(result.hits.map(h => h.id)), new Set(expectedIds))
+  t.strictSame(new Set(result.hits.map(h => h.id).sort()), new Set(expectedIds))
 }
 
 async function checkSearchFacets(t: Tap.Test, db, key, facet, expectedFacet) {

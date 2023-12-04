@@ -11,7 +11,7 @@ async function createSimpleDB() {
       meta: {
         sales: 'number',
       },
-    },
+    } as const,
     components: {
       getDocumentIndexId(): string {
         return `__${++i}`
@@ -59,6 +59,7 @@ t.test('filters', t => {
       search(db, {
         term: 'coffee',
         where: {
+          // @ts-expect-error - unknown field
           unknownField: '5',
         },
       }),
@@ -72,6 +73,7 @@ t.test('filters', t => {
       search(db, {
         term: 'coffee',
         where: {
+          // @ts-expect-error - unknown field
           unknownField: { gt: '5' } as unknown as string,
         },
       }),
@@ -85,6 +87,7 @@ t.test('filters', t => {
       search(db, {
         term: 'coffee',
         where: {
+          // @ts-expect-error - unknown field
           unknownField: true as unknown as string,
         },
       }),
@@ -241,6 +244,7 @@ t.test('filters', t => {
         price: {
           lte: 40,
         },
+        // @ts-expect-error - unknown field
         'meta.sales': {
           eq: 25,
         },
@@ -280,7 +284,7 @@ t.test('boolean filters', async t => {
       id: 'string',
       isAvailable: 'boolean',
       name: 'string',
-    },
+    } as const,
   })
 
   await insert(db, {
@@ -343,7 +347,7 @@ t.test('string filters', async t => {
       id: 'string',
       name: 'string',
       tags: 'string',
-    },
+    } as const,
   })
 
   await insert(db, {
@@ -421,7 +425,7 @@ t.test('string filters with stemming', async t => {
       id: 'string',
       name: 'string',
       tags: 'string',
-    },
+    } as const,
     components: {
       tokenizer: {
         stemming: true,
