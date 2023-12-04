@@ -19,7 +19,7 @@
     "@orama/plugin-match-highlight": "workspace:*",
     "@orama/plugin-nextra": "workspace:*",
     "classnames": "^2.3.2",
-    "next": "^13.3.0",
+    "next": "^13.5.1",
     "next-sitemap": "^4.2.3",
     "nextra": "^2.4.0",
     "nextra-theme-blog": "^2.2.19",
