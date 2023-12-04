@@ -27,7 +27,7 @@ async function generateTestDBInstance() {
       author: 'string',
       genre: 'enum',
       colors: 'enum[]',
-    }
+    } as const
   })
 
   await insert(db, {
@@ -64,7 +64,6 @@ t.test('binary persistence', t => {
 
   t.test('should generate a persistence file on the disk with random name', async t => {
     t.plan(2)
-
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
       term: 'way'
@@ -94,11 +93,11 @@ t.test('binary persistence', t => {
 
     // Clean up
     await rm(path)
+    t.end()
   })
 
   t.test('should generate a persistence file on the disk with a given name', async t => {
     t.plan(2)
-
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
       term: 'way'
@@ -128,11 +127,11 @@ t.test('binary persistence', t => {
 
     // Clean up
     await rm(path)
+    t.end()
   })
 
   t.test('should generate a persistence file on the disk using ORAMA_DB_NAME env', async t => {
     t.plan(3)
-
     let currentOramaDBNameValue: string | undefined
 
     // @ts-expect-error Deno is only available in Deno
@@ -187,11 +186,11 @@ t.test('binary persistence', t => {
         process.env.ORAMA_DB_NAME = currentOramaDBNameValue
       }
     }
+    t.end()
   })
 
   t.test('should continue to work with `enum`', async t => {
     t.plan(1)
-
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
       where: {
@@ -211,11 +210,11 @@ t.test('binary persistence', t => {
     t.same(q1.hits, qp1.hits)
 
     await rm(path)
+    t.end()
   })
 
   t.test('should continue to work with `enum[]`', async t => {
     t.plan(1)
-
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
       where: {
@@ -235,7 +234,9 @@ t.test('binary persistence', t => {
     t.same(q1.hits, qp1.hits)
 
     await rm(path)
+    t.end()
   })
+
 })
 
 t.test('json persistence', t => {
@@ -243,7 +244,6 @@ t.test('json persistence', t => {
 
   t.test('should generate a persistence file on the disk with random name and json format', async t => {
     t.plan(2)
-
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
       term: 'way'
@@ -273,16 +273,16 @@ t.test('json persistence', t => {
 
     // Clean up
     await rm(path)
+    t.end()
   })
 
   t.test('should generate a persistence file on the disk with support for vectors', async t => {
     t.plan(1)
-
     const db1 = await create({
       schema: {
         text: 'string',
         vector: 'vector[5]'
-      }
+      } as const
     })
 
     await insert(db1, { text: 'vector 1', vector: [1, 0, 0, 0, 0] })
@@ -310,11 +310,11 @@ t.test('json persistence', t => {
 
     // Clean up
     await rm(path)
+    t.end()
   })
 
   t.test('should generate a persistence file on the disk with a given name and json format', async t => {
     t.plan(2)
-
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
       term: 'way'
@@ -344,11 +344,11 @@ t.test('json persistence', t => {
 
     // Clean up
     await rm(path)
+    t.end()
   })
 
   t.test('should continue to work with `enum`', async t => {
     t.plan(1)
-
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
       where: {
@@ -368,6 +368,7 @@ t.test('json persistence', t => {
     t.same(q1.hits, qp1.hits)
 
     await rm(path)
+    t.end()
   })
 
   t.test('should continue to work with `enum[]`', async t => {
@@ -392,6 +393,7 @@ t.test('json persistence', t => {
     t.same(q1.hits, qp1.hits)
 
     await rm(path)
+    t.end()
   })
 })
 
@@ -430,6 +432,7 @@ t.test('dpack persistence', t => {
 
     // Clean up
     await rm(path)
+    t.end()
   })
 
   t.test('should generate a persistence file on the disk with a given name and dpack format', async t => {
@@ -464,6 +467,7 @@ t.test('dpack persistence', t => {
 
     // Clean up
     await rm(path)
+    t.end()
   })
 
   t.test('should continue to work with `enum`', async t => {
@@ -488,6 +492,7 @@ t.test('dpack persistence', t => {
     t.same(q1.hits, qp1.hits)
 
     await rm(path)
+    t.end()
   })
 
   t.test('should continue to work with `enum[]`', async t => {
@@ -512,11 +517,11 @@ t.test('dpack persistence', t => {
     t.same(q1.hits, qp1.hits)
 
     await rm(path)
+    t.end()
   })
 })
 
 t.test('should persist data in-memory', async t => {
-  t.plan(4)
   const db = await generateTestDBInstance()
 
   const q1 = await search(db, {
@@ -558,13 +563,12 @@ t.test('should persist data in-memory', async t => {
   t.same(q2.hits, qp2.hits)
   t.same(q1.hits, qp3.hits)
   t.same(q2.hits, qp4.hits)
+  t.end()
 })
 
 t.test('errors', t => {
-  t.plan(2)
 
   t.test('should throw an error when trying to persist a database in an unsupported format', async t => {
-    t.plan(1)
 
     const db = await generateTestDBInstance()
     try {
@@ -576,7 +580,6 @@ t.test('errors', t => {
   })
 
   t.test('should throw an error when trying to restoreFromFile a database from an unsupported format', async t => {
-    t.plan(1)
 
     const format = 'unsupported'
     const db = await generateTestDBInstance()
@@ -589,10 +592,11 @@ t.test('errors', t => {
       await rm(path)
     }
   })
+  t.end()
 })
 
 t.test('should throw an error when trying to use a deprecated method', async t => {
-  t.plan(2)
+
   const db = await generateTestDBInstance()
 
   try {
@@ -606,4 +610,6 @@ t.test('should throw an error when trying to use a deprecated method', async t =
   } catch ({ message }) {
     t.match(message, METHOD_MOVED('restoreFromFile'))
   }
+
+  t.end()
 })
