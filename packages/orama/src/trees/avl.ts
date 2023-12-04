@@ -100,16 +100,16 @@ export function rangeSearch<K, V> (node: RootNode<K, V>, min: K, max: K): V {
     if (node === null) {
       return
     }
-
-    if (node.k > min) {
+  
+    if (min < node.k) {
       traverse(node.l as Node<K, V>)
     }
-
+  
     if (node.k >= min && node.k <= max) {
       safeArrayPush(result, node.v as V[])
     }
-
-    if (node.k < max) {
+  
+    if (max > node.k) {
       traverse(node.r as Node<K, V>)
     }
   }
@@ -194,12 +194,12 @@ export function create<K, V> (key: K, value: V): RootNode<K, V> {
   }
 }
 
-export function insert<K, V> (rootNode: RootNode<K, V>, key: K, value: V): void {
-  function insertNode (node: Nullable<Node<K, V>>, key: K, value: V): Node<K, V> {
+export function insert<K, V> (rootNode: RootNode<K, V[]>, key: K, newValue: V[]): void {
+  function insertNode (node: Nullable<Node<K, V[]>>, key: K, newValue: V[]): Node<K, V[]> {
     if (node === null) {
       return {
         k: key,
-        v: value,
+        v: newValue,
         l: null,
         r: null,
         h: 0
@@ -207,11 +207,11 @@ export function insert<K, V> (rootNode: RootNode<K, V>, key: K, value: V): void 
     }
 
     if (key < node.k) {
-      node.l = insertNode(node.l, key, value)
+      node.l = insertNode(node.l, key, newValue)
     } else if (key > node.k) {
-      node.r = insertNode(node.r, key, value)
+      node.r = insertNode(node.r, key, newValue)
     } else {
-      (node.v as V[]).push(value)
+      node.v = Array.from(new Set([...node.v, ...newValue]))
       return node
     }
 
@@ -240,14 +240,14 @@ export function insert<K, V> (rootNode: RootNode<K, V>, key: K, value: V): void 
     return node
   }
 
-  rootNode.root = insertNode(rootNode.root, key, value)
+  rootNode.root = insertNode(rootNode.root, key, newValue)
 }
 
 function getHeight<K, V> (node: Nullable<Node<K, V>>): number {
   return (node !== null) ? node.h : -1
 }
 
-export function find<K, V> (root: RootNode<K, V>, key: K): V | null {
+export function find<K, V> (root: RootNode<K, V>, key: K): Nullable<V> {
   const node = getNodeByKey(root.root, key)
   if (node === null) {
     return null

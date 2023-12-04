@@ -250,7 +250,7 @@ async function checkSearchWhere(t, db, key, where, expectedIds) {
   })
   t.equal(result.hits.length, expectedIds.length)
   t.equal(result.count, expectedIds.length)
-  t.strictSame(new Set(result.hits.map(h => h.id)), new Set(expectedIds))
+  t.strictSame(new Set(result.hits.map(h => h.id).sort()), new Set(expectedIds))
 }
 
 async function checkSearchFacets(t: Tap.Test, db, key, facet, expectedFacet) {
