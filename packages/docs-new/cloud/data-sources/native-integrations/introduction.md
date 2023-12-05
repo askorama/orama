@@ -2,13 +2,12 @@
 
 With Orama, you can integrate with every external system, library, and API.
 
-While we let you build your own integrations via our [custom integrations](/cloud/data-sources/custom/introduction) feature, we also provide a set of native integrations that you can use out of the box.
+While we let you build your own integrations via our [custom integrations](/cloud/data-sources/custom-integrations/introduction) feature, we also provide a set of native integrations that you can use out of the box.
 
 At the time of writing this, we have the following native integrations:
 
 - [**Shopify**](/cloud/data-sources/native-integrations/shopify)
 - [**Docusaurus**](/cloud/data-sources/native-integrations/docusaurus) (Coming soon)
-- [**Nextra**](/cloud/data-sources/native-integrations/nextra) (Coming soon)
 
 When available, we suggest using native integrations over custom integrations, as they are highly optimized and provide a better developer experience, performance, and maintainability.
 

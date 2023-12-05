@@ -32,8 +32,8 @@ where the main purpose is to provide a fast and reliable search experience, with
 
 Orama Cloud integrates natively with many different data sources, including:
 
-- [Shopify](/cloud/guide/data-sources/shopify)
-- [Docusaurus](/cloud/guide/data-sources/docusaurus)
+- [Shopify](/cloud/data-sources/native-integrations/shopify)
+- [Docusaurus](/cloud/data-sources/native-integrations/docusaurus)
 - _Strapi (coming soon)_
 - _Contentful (coming soon)_
 - _Storyblok (coming soon)_
@@ -44,11 +44,11 @@ And many more to come.
 
 You can always create a custom integration with your own data source. Orama Cloud currently supports the following data sources:
 
-- [REST API](/cloud/guide/data-sources/rest-api) \
+- [REST API](/cloud/data-sources/custom-integrations/rest-api) \
 You can index data from a REST API. Orama Cloud will periodically fetch the data from the API and index it.
-- [WebHooks](/cloud/guide/data-sources/webhooks) \
+- [WebHooks](/cloud/data-sources/custom-integrations/webhooks) \
 You can index data from a WebHook. Orama Cloud will index the data every time the WebHook is triggered.
-- [JSON File](/cloud/guide/data-sources/json-file) \
+- [JSON File](/cloud/data-sources/custom-integrations/json-file) \
 You can upload a JSON file to Orama Cloud, and it will be indexed automatically.
-- [CSV File](/cloud/guide/data-sources/csv-file) \
+- [CSV File](/cloud/data-sources/custom-integrations/csv-file) \
 You can upload a CSV file to Orama Cloud, and it will be indexed automatically.
