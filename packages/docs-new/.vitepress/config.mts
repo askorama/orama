@@ -12,6 +12,11 @@ export default defineConfig({
     plugins: [OramaSearch()]
   },
 
+  rewrites: {
+    '/open-source': '/open-source/index.html',
+    '/cloud': '/cloud/index.html',
+  },
+
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     logo: {
@@ -22,8 +27,8 @@ export default defineConfig({
     siteTitle: false,
 
     nav: [
-      { text: 'Open Source', link: '/open-source' },
-      { text: 'Orama Cloud', link: '/cloud' }
+      { text: 'Open Source', link: '/open-source/index.html' },
+      { text: 'Orama Cloud', link: '/cloud/index.html' }
     ],
 
     sidebar: {
@@ -32,7 +37,7 @@ export default defineConfig({
           text: 'Usage',
           collapsed: false,
           items: [
-            { text: 'Getting Started', link: '/open-source.html' },
+            { text: 'Getting Started', link: '/open-source/index.html' },
             { text: 'Create',          link: '/open-source/usage/create.html' },
             { text: 'Insert',          link: '/open-source/usage/insert.html' },
             { text: 'Remove',          link: '/open-source/usage/remove.html' },
@@ -86,12 +91,60 @@ export default defineConfig({
           collapsed: true,
           items: [
             { text: 'Stemming',      link: '/open-source/text-analysis/stemming.html' },
-            { text: 'Stopwords',    link: '/open-source/text-analysis/stopwords.html' },
+            { text: 'Stopwords',     link: '/open-source/text-analysis/stopwords.html' },
           ]
         }
       ],
       '/cloud/': [
-
+        {
+          text: 'Understanding Orama',
+          collapsed: false,
+          items: [
+            { text: 'Introduction', link: '/cloud/understanding-orama/introduction.html' },
+            { text: 'Indexes',      link: '/cloud/understanding-orama/indexes.html' },
+          ]
+        },
+        {
+          text: 'Working with indexes',
+          collapsed: true,
+          items: [
+            { text: 'Create a new index', link: '/cloud/working-with-indexes/create-a-new-index.html' },
+            { text: 'Edit an index',      link: '/cloud/working-with-indexes/edit-an-index.html' },
+            { text: 'Delete an index',    link: '/cloud/working-with-indexes/delete-an-index.html' },
+          ]
+        },
+        {
+          text: 'Data Sources',
+          collapsed: false,
+          items: [
+            {
+              text: 'Native Integrations',
+              collapsed: true,
+              items: [
+                { text: 'Introduction', link: '/cloud/data-sources/native-integrations/introduction.html' },
+                { text: 'Shopify',      link: '/cloud/data-sources/native-integrations/shopify.html' },
+                { text: 'Docusaurus',   link: '/cloud/data-sources/native-integrations/docusaurus.html' },
+              ]
+            },
+            {
+              text: 'Custom Integrations',
+              collapsed: true,
+              items: [
+                { text: 'Introduction', link: '/cloud/data-sources/custom-integrations/introduction.html' },
+                { text: 'REST API',     link: '/cloud/data-sources/custom-integrations/rest-api.html' },
+                { text: 'Webhook',      link: '/cloud/data-sources/custom-integrations/webhooks.html' },
+                { text: 'JSON File',    link: '/cloud/data-sources/custom-integrations/json-file.html' },
+                { text: 'CSV File',     link: '/cloud/data-sources/custom-integrations/csv-file.html' },
+              ]
+            }
+          ]
+        },
+        {
+          text: 'Integrating Orama Cloud',
+          items: [
+            { text: 'JavaScript SDK', link: '/cloud/integrating-orama-cloud/javascript-sdk.html' },
+          ]
+        }
       ]
     },
 
