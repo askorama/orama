@@ -188,7 +188,7 @@ To customize the index used by Orama, provide an object which has at least the f
 * `searchByWhereClause`: A function that searches in boolean and numeric indexes and returns a list of matching IDs. It receives the following arguments:
   * `context`: A search context with various useful information about the search.
   * `index`: The index.
-  * `filters`: An object where keys are the properties to match and the values are search operators as described in the [filters](usage/search/filters) page.
+  * `filters`: An object where keys are the properties to match and the values are search operators as described in the [filters](/open-source/usage/search/filters) page.
 * `getSearchableProperties`: A function that returns a list of all searchable properties in the index. It receives the index as the only argument.
 * `getSearchablePropertiesWithTypes`: A function that returns an object where keys are the searchable properties in the index and the values are the type of the index for a property. It receives the index as the only argument.
 * `load`: A function that deserializes an index from a JavaScript object. It receives The documents IDs mapper and a JavaScript object as its only argument and must return an index.

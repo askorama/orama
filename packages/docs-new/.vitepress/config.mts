@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import { OramaSearch } from '../plugins/searchbox/index.ts'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -6,6 +7,10 @@ export default defineConfig({
   title: "Orama Docs",
   description: "Search, everywhere",
   lastUpdated: true,
+
+  vite: {
+    plugins: [OramaSearch()]
+  },
 
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
@@ -75,6 +80,6 @@ export default defineConfig({
 
     footer: {
       copyright: 'Copyright © 2023-present OramaSearch Inc.',
-    }
-  }
+    },
+  },
 })

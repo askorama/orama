@@ -151,7 +151,7 @@ the document will be indexed with the following `id`: `73cbcc79-2203-49b8-bb52-6
 ::: tip
 If the `id` field is not found, Orama will generate a random `id` for the document. 
 
-To provide a custom ID for a document, see the [components](/open-source/internals/components.html) page.
+To provide a custom ID for a document, see the [components](/open-source/advanced/components.html) page.
 :::
 
 ::: danger
