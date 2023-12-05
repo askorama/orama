@@ -17,6 +17,15 @@ onMounted(async () => {
     show: false
   })
 
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      $.show.value = false
+    }
+    
+    if (e.key === 'k' && (e.ctrlKey || e.metaKey)) {
+      $.show.value = true
+    }
+  })
 })
 </script>
 
