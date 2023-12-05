@@ -59,11 +59,34 @@ export default defineConfig({
           ]
         },
         {
-          text: 'Advanced',
+          text: 'Internals',
           collapsed: true,
           items: [
-            { text: 'Components', link: '/open-source/advanced/components.html' },
-            { text: 'Utilities',  link: '/open-source/advanced/utilities.html' },
+            { text: 'Components', link: '/open-source/internals/components.html' },
+            { text: 'Utilities',  link: '/open-source/internals/utilities.html' },
+          ]
+        },
+        {
+          text: 'Plugins',
+          collapsed: true,
+          items: [
+            { text: 'Introduction',             link: '/open-source/plugins/introduction.html' },
+            { text: 'Writing your own plugins', link: '/open-source/plugins/writing-your-own-plugins.html' },
+            { text: 'Plugin Telemetry',         link: '/open-source/plugins/plugin-telemetry.html' },
+            { text: 'Plugin Astro',             link: '/open-source/plugins/plugin-astro.html' },
+            { text: 'Plugin Data Persistence',  link: '/open-source/plugins/plugin-data-persistence.html' },
+            { text: 'Plugin Docusaurus',        link: '/open-source/plugins/plugin-docusaurus.html' },
+            { text: 'Plugin Match Highlight',   link: '/open-source/plugins/plugin-match-highlight.html' },
+            { text: 'Plugin Parsedoc',          link: '/open-source/plugins/plugin-parsedoc.html' },
+            { text: 'Plugin Nextra',            link: '/open-source/plugins/plugin-nextra.html' },
+          ]
+        },
+        {
+          text: 'Text Analysis',
+          collapsed: true,
+          items: [
+            { text: 'Stemming',      link: '/open-source/text-analysis/stemming.html' },
+            { text: 'Stopwords',    link: '/open-source/text-analysis/stopwords.html' },
           ]
         }
       ],

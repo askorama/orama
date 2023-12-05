@@ -1,6 +1,5 @@
 import type { Plugin } from 'vite'
 import type { SiteConfig } from 'vitepress'
-import glob from 'fast-glob'
 import MarkdownIt from 'markdown-it'
 import { JSDOM } from 'jsdom'
 import { presets } from '@orama/searchbox'
