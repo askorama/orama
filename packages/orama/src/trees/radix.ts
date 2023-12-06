@@ -260,20 +260,20 @@ function _findLevenshtein (
   }
 }
 
-function mergeFindResult(r1: FindResult, r2: FindResult) {
-  const output: FindResult = {}
+function mergeFindResult (...results: FindResult[]): FindResult {
+  const mergedResult: FindResult = {};
 
-  for (const key in r1) {
-    output[key] = r1[key];
+  for (const result of results) {
+    Object.keys(result).forEach(key => {
+      if (!mergedResult[key]) {
+        mergedResult[key] = [];
+      }
+
+      mergedResult[key] = Array.from(new Set(Array.from(mergedResult[key]).concat(result[key])));
+    })
   }
 
-  for (const key in r2) {
-    output[key] = output[key]
-      ? Array.from(new Set(output[key].concat(r2[key])))
-      : r2[key];
-  }
-  
-  return output;
+  return mergedResult;
 }
 
 export function find (root: Node, { term, exact, tolerance, usePrefixWithTolerance }: FindParams): FindResult {
@@ -299,7 +299,7 @@ export function find (root: Node, { term, exact, tolerance, usePrefixWithToleran
   return findByDefault(root, { term, exact, tolerance });
 }
 
-export function findByDefault(root: Node, { term, exact, tolerance }: FindParams): FindResult {
+export function findByDefault (root: Node, { term, exact, tolerance }: FindParams): FindResult {
   const termLength = term.length
   for (let i = 0; i < termLength; i++) {
     const character = term[i]
