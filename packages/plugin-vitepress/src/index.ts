@@ -27,7 +27,7 @@ const md = new MarkdownIt({
   html: true
 })
 
-export async function createOramaContentLoader (paths: string[], root: string) {
+async function createOramaContentLoader (paths: string[], root: string) {
   const contents = paths
     .map(file => ({
       path: file.replace(root, '').replace('.md', ''),
@@ -41,7 +41,6 @@ export async function createOramaContentLoader (paths: string[], root: string) {
     schema: presets.docusaurus.schema
   })
 
-  console.log('Inserting into Orama')
   // @ts-ignore
   await insertMultiple(db, contents)
 
@@ -80,14 +79,13 @@ function parseHTMLContent({ html, path }: { html: string, path: string }): Array
 function formatForOrama(data: Array<ParserResult>): Array<OramaSchema> {
   try {
     const firstH1Header = data.find(section => section.header === 'h1')
-    const isOSS = data?.[0]?.path?.startsWith('/open-source')
 
     return data.map((res) => ({
       title: res.title,
       content: res.content,
       section: firstH1Header!.title.replace(/\s$/, ''),
       path: res?.path + '#' + slugify.default(res.title, { lower: true }),
-      category: isOSS ? 'open-source' : 'cloud',
+      category: ''
     }))
   } catch (error) {
     console.error(error)
@@ -95,8 +93,7 @@ function formatForOrama(data: Array<ParserResult>): Array<OramaSchema> {
   }
 }
 
-export function OramaSearch(): Plugin {
-
+export function OramaPlugin(): Plugin {
   let resolveConfig: any
   const virtualModuleId = "virtual:search-data";
   const resolvedVirtualModuleId = `\0${virtualModuleId}`
@@ -160,7 +157,7 @@ export function OramaSearch(): Plugin {
   }
 }
 
-export const pluginSiteConfig: Partial<SiteConfig> = {
+const pluginSiteConfig: Partial<SiteConfig> = {
   buildEnd(ctx) {},
   transformHead(ctx) {
     return []

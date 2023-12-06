@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import { OramaSearch } from '../plugins/searchbox/index.ts'
+import { OramaPlugin } from '@orama/plugin-vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -24,7 +24,7 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [OramaSearch()]
+    plugins: [OramaPlugin()]
   },
 
   rewrites: {
@@ -97,10 +97,11 @@ export default defineConfig({
           items: [
             { text: 'Introduction',             link: '/open-source/plugins/introduction.html' },
             { text: 'Writing your own plugins', link: '/open-source/plugins/writing-your-own-plugins.html' },
+            { text: 'Plugin Vitepress',         link: '/open-source/plugins/plugin-vitepress.html' },
+            { text: 'Plugin Docusaurus',        link: '/open-source/plugins/plugin-docusaurus.html' },
             { text: 'Plugin Telemetry',         link: '/open-source/plugins/plugin-telemetry.html' },
             { text: 'Plugin Astro',             link: '/open-source/plugins/plugin-astro.html' },
             { text: 'Plugin Data Persistence',  link: '/open-source/plugins/plugin-data-persistence.html' },
-            { text: 'Plugin Docusaurus',        link: '/open-source/plugins/plugin-docusaurus.html' },
             { text: 'Plugin Match Highlight',   link: '/open-source/plugins/plugin-match-highlight.html' },
             { text: 'Plugin Parsedoc',          link: '/open-source/plugins/plugin-parsedoc.html' },
             { text: 'Plugin Nextra',            link: '/open-source/plugins/plugin-nextra.html' },

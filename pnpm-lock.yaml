@@ -68,7 +68,7 @@ importers:
         version: 3.17.0
       tap:
         specifier: ^16.3.2
-        version: 16.3.4(typescript@5.0.3)
+        version: 16.3.4(ts-node@10.9.1)(typescript@5.0.3)
       tap-mocha-reporter:
         specifier: ^5.0.3
         version: 5.0.3
@@ -106,6 +106,9 @@ importers:
       '@orama/plugin-data-persistence':
         specifier: workspace:*
         version: link:../plugin-data-persistence
+      '@orama/plugin-vitepress':
+        specifier: workspace:*
+        version: link:../plugin-vitepress
       '@orama/searchbox':
         specifier: 1.0.0-beta.9
         version: 1.0.0-beta.9(@orama/highlight@0.1.2)(@orama/orama@packages+orama)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.0)(@preact/signals@1.2.2)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.2)
@@ -124,6 +127,9 @@ importers:
       vite:
         specifier: ^4.1.4
         version: 4.1.4(@types/node@18.11.18)
+      vue:
+        specifier: ^3.0.0
+        version: 3.3.10(typescript@5.0.3)
     devDependencies:
       '@preact/signals-core':
         specifier: ^1.5.0
@@ -184,7 +190,7 @@ importers:
         version: 2.8.1
       tap:
         specifier: ^16.3.2
-        version: 16.3.4(typescript@5.0.3)
+        version: 16.3.4(ts-node@10.9.1)(typescript@5.0.3)
       tap-mocha-reporter:
         specifier: ^5.0.3
         version: 5.0.3
@@ -282,7 +288,7 @@ importers:
         version: 4.3.0
       tap:
         specifier: ^16.3.0
-        version: 16.3.4(typescript@5.0.3)
+        version: 16.3.4(ts-node@10.9.1)(typescript@5.0.3)
       tap-mocha-reporter:
         specifier: ^5.0.3
         version: 5.0.3
@@ -558,7 +564,7 @@ importers:
         version: 7.12.0
       tap:
         specifier: ^16.3.4
-        version: 16.3.4(typescript@5.0.3)
+        version: 16.3.4(ts-node@10.9.1)(typescript@5.0.3)
       tsx:
         specifier: ^3.12.2
         version: 3.12.2
@@ -662,7 +668,7 @@ importers:
         version: 7.12.0
       tap:
         specifier: ^16.3.4
-        version: 16.3.4(typescript@5.0.3)
+        version: 16.3.4(ts-node@10.9.1)(typescript@5.0.3)
       tsx:
         specifier: ^3.12.2
         version: 3.12.2
@@ -687,7 +693,7 @@ importers:
         version: 17.0.1
       tap:
         specifier: ^16.3.2
-        version: 16.3.4(typescript@5.2.2)
+        version: 16.3.4(ts-node@10.9.1)(typescript@5.2.2)
       tap-mocha-reporter:
         specifier: ^5.0.3
         version: 5.0.3
@@ -699,10 +705,62 @@ importers:
         version: 12.0.2(typescript@5.2.2)
       tsup:
         specifier: ^7.2.0
-        version: 7.2.0(@swc/core@1.3.27)(typescript@5.2.2)
+        version: 7.2.0(@swc/core@1.3.27)(ts-node@10.9.1)(typescript@5.2.2)
       typescript:
         specifier: ^5.0.0
         version: 5.2.2
+
+  packages/plugin-vitepress:
+    dependencies:
+      '@orama/orama':
+        specifier: workspace:*
+        version: link:../orama
+      '@orama/plugin-data-persistence':
+        specifier: workspace:*
+        version: link:../plugin-data-persistence
+      '@orama/searchbox':
+        specifier: 1.0.0-beta.9
+        version: 1.0.0-beta.9(@orama/highlight@0.1.2)(@orama/orama@packages+orama)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.0)(@preact/signals@1.2.2)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.2)
+      '@vitejs/plugin-vue':
+        specifier: ^4.5.1
+        version: 4.5.1(vite@4.1.4)(vue@3.3.10)
+      jsdom:
+        specifier: ^23.0.1
+        version: 23.0.1
+      markdown-it:
+        specifier: ^13.0.2
+        version: 13.0.2
+      slugify:
+        specifier: ^1.6.6
+        version: 1.6.6
+      vite:
+        specifier: ^4.1.4
+        version: 4.1.4(@types/node@18.11.18)
+      vue:
+        specifier: ^3.0.0
+        version: 3.3.10(typescript@5.2.2)
+    devDependencies:
+      '@preact/signals-core':
+        specifier: ^1.5.0
+        version: 1.5.0
+      '@swc/cli':
+        specifier: ^0.1.59
+        version: 0.1.59(@swc/core@1.3.27)
+      '@swc/core':
+        specifier: ^1.3.27
+        version: 1.3.27
+      '@types/jsdom':
+        specifier: ^21.1.6
+        version: 21.1.6
+      '@types/markdown-it':
+        specifier: ^13.0.7
+        version: 13.0.7
+      typescript:
+        specifier: ^5.0.0
+        version: 5.2.2
+      vitepress:
+        specifier: 1.0.0-rc.31
+        version: 1.0.0-rc.31(@types/node@18.11.18)(postcss@8.4.32)(search-insights@2.11.0)(typescript@5.2.2)
 
   packages/stemmers:
     devDependencies:
@@ -1106,7 +1164,7 @@ packages:
       '@babel/helper-compilation-targets': 7.22.15
       '@babel/helper-module-transforms': 7.23.3(@babel/core@7.23.3)
       '@babel/helpers': 7.23.2
-      '@babel/parser': 7.23.3
+      '@babel/parser': 7.23.5
       '@babel/template': 7.22.15
       '@babel/traverse': 7.23.3
       '@babel/types': 7.23.3
@@ -3709,7 +3767,7 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       '@babel/code-frame': 7.22.13
-      '@babel/parser': 7.23.3
+      '@babel/parser': 7.23.5
       '@babel/types': 7.23.3
     dev: false
 
@@ -17837,7 +17895,7 @@ packages:
       postcss-value-parser: 4.2.0
     dev: false
 
-  /postcss-load-config@4.0.1:
+  /postcss-load-config@4.0.1(ts-node@10.9.1):
     resolution: {integrity: sha512-vEJIc8RdiBRu3oRAI0ymerOn+7rPuMvRXslTvZUKZonDHFIczxztIyJ1urxM1x9JXEikvpWWTUUqal5j/8QgvA==}
     engines: {node: '>= 14'}
     peerDependencies:
@@ -17850,6 +17908,7 @@ packages:
         optional: true
     dependencies:
       lilconfig: 2.1.0
+      ts-node: 10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@5.0.3)
       yaml: 2.3.1
     dev: true
 
@@ -20905,7 +20964,7 @@ packages:
       yaml: 1.10.2
     dev: true
 
-  /tap@16.3.4(typescript@5.0.3):
+  /tap@16.3.4(ts-node@10.9.1)(typescript@5.0.3):
     resolution: {integrity: sha512-SAexdt2ZF4XBgye6TPucFI2y7VE0qeFXlXucJIV1XDPCs+iJodk0MYacr1zR6Ycltzz7PYg8zrblDXKbAZM2LQ==}
     engines: {node: '>=12'}
     hasBin: true
@@ -20944,6 +21003,7 @@ packages:
       tap-parser: 11.0.2
       tap-yaml: 1.0.2
       tcompare: 5.0.7
+      ts-node: 10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@5.0.3)
       typescript: 5.0.3
       which: 2.0.2
     transitivePeerDependencies:
@@ -20956,7 +21016,7 @@ packages:
       - '@isaacs/import-jsx'
       - react
 
-  /tap@16.3.4(typescript@5.2.2):
+  /tap@16.3.4(ts-node@10.9.1)(typescript@5.2.2):
     resolution: {integrity: sha512-SAexdt2ZF4XBgye6TPucFI2y7VE0qeFXlXucJIV1XDPCs+iJodk0MYacr1zR6Ycltzz7PYg8zrblDXKbAZM2LQ==}
     engines: {node: '>=12'}
     hasBin: true
@@ -20995,6 +21055,7 @@ packages:
       tap-parser: 11.0.2
       tap-yaml: 1.0.2
       tcompare: 5.0.7
+      ts-node: 10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@5.0.3)
       typescript: 5.2.2
       which: 2.0.2
     transitivePeerDependencies:
@@ -21434,7 +21495,7 @@ packages:
     resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
     dev: false
 
-  /tsup@7.2.0(@swc/core@1.3.27)(typescript@5.2.2):
+  /tsup@7.2.0(@swc/core@1.3.27)(ts-node@10.9.1)(typescript@5.2.2):
     resolution: {integrity: sha512-vDHlczXbgUvY3rWvqFEbSqmC1L7woozbzngMqTtL2PGBODTtWlRwGDDawhvWzr5c1QjKe4OAKqJGfE1xeXUvtQ==}
     engines: {node: '>=16.14'}
     hasBin: true
@@ -21459,7 +21520,7 @@ packages:
       execa: 5.1.1
       globby: 11.1.0
       joycon: 3.1.1
-      postcss-load-config: 4.0.1
+      postcss-load-config: 4.0.1(ts-node@10.9.1)
       resolve-from: 5.0.0
       rollup: 3.24.0
       source-map: 0.8.0-beta.0
@@ -22394,6 +22455,62 @@ packages:
       - universal-cookie
     dev: true
 
+  /vitepress@1.0.0-rc.31(@types/node@18.11.18)(postcss@8.4.32)(search-insights@2.11.0)(typescript@5.2.2):
+    resolution: {integrity: sha512-ikH9pIjOOAbyoYAGBVfTz8TzuXp+UoWaIRMU4bw/oiTg8R65SbAaGKY84xx6TuL+f4VqUJ8lhzW82YyxSLvstA==}
+    hasBin: true
+    peerDependencies:
+      markdown-it-mathjax3: ^4.3.2
+      postcss: ^8.4.31
+    peerDependenciesMeta:
+      markdown-it-mathjax3:
+        optional: true
+      postcss:
+        optional: true
+    dependencies:
+      '@docsearch/css': 3.5.2
+      '@docsearch/js': 3.5.2(search-insights@2.11.0)
+      '@types/markdown-it': 13.0.7
+      '@vitejs/plugin-vue': 4.5.1(vite@5.0.5)(vue@3.3.10)
+      '@vue/devtools-api': 6.5.1
+      '@vueuse/core': 10.7.0(vue@3.3.10)
+      '@vueuse/integrations': 10.7.0(focus-trap@7.5.4)(vue@3.3.10)
+      focus-trap: 7.5.4
+      mark.js: 8.11.1
+      minisearch: 6.3.0
+      mrmime: 1.0.1
+      postcss: 8.4.32
+      shikiji: 0.7.6
+      shikiji-transformers: 0.7.6
+      vite: 5.0.5(@types/node@18.11.18)
+      vue: 3.3.10(typescript@5.2.2)
+    transitivePeerDependencies:
+      - '@algolia/client-search'
+      - '@types/node'
+      - '@types/react'
+      - '@vue/composition-api'
+      - async-validator
+      - axios
+      - change-case
+      - drauu
+      - fuse.js
+      - idb-keyval
+      - jwt-decode
+      - less
+      - lightningcss
+      - nprogress
+      - qrcode
+      - react
+      - react-dom
+      - sass
+      - search-insights
+      - sortablejs
+      - stylus
+      - sugarss
+      - terser
+      - typescript
+      - universal-cookie
+    dev: true
+
   /vscode-css-languageservice@6.2.6:
     resolution: {integrity: sha512-SA2WkeOecIpUiEbZnjOsP/fI5CRITZEiQGSHXKiDQDwLApfKcnLhZwMtOBbIifSzESVcQa7b/shX/nbnF4NoCg==}
     dependencies:
@@ -22488,6 +22605,21 @@ packages:
       '@vue/server-renderer': 3.3.10(vue@3.3.10)
       '@vue/shared': 3.3.10
       typescript: 5.0.3
+
+  /vue@3.3.10(typescript@5.2.2):
+    resolution: {integrity: sha512-zg6SIXZdTBwiqCw/1p+m04VyHjLfwtjwz8N57sPaBhEex31ND0RYECVOC1YrRwMRmxFf5T1dabl6SGUbMKKuVw==}
+    peerDependencies:
+      typescript: '*'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      '@vue/compiler-dom': 3.3.10
+      '@vue/compiler-sfc': 3.3.10
+      '@vue/runtime-dom': 3.3.10
+      '@vue/server-renderer': 3.3.10(vue@3.3.10)
+      '@vue/shared': 3.3.10
+      typescript: 5.2.2
 
   /w3c-xmlserializer@5.0.0:
     resolution: {integrity: sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA==}
