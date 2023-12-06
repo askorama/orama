@@ -19,6 +19,36 @@ Orama is a fast, batteries-included, full-text and vector search engine entirely
 
 Get started with just a few lines of code:
 
+```js
+import { create, insert, search } from '@orama/orama'
+
+const db = await create({
+  schema: {
+    title: 'string',
+    director: 'string',
+    isFavorite: 'boolean',
+    year: 'number'
+  }
+})
+
+await insert(db, {
+  title: 'The Prestige',
+  director: 'Christopher Nolan',
+  isFavorite: true,
+  year: 2006
+})
+
+const searchResults = await search(db, {
+  term: 'prestige',
+  where: {
+    isFavorite: true,
+    year: {
+      between: [2000, 2008]
+    }
+  }
+})
+```
+
 ## Requirements
 
 A JavaScript runtime is the **only** requirement. Orama has been designed to work on any runtime and has no dependencies.

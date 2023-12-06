@@ -68,7 +68,7 @@ importers:
         version: 3.17.0
       tap:
         specifier: ^16.3.2
-        version: 16.3.4(typescript@5.0.3)
+        version: 16.3.4(ts-node@10.9.1)(typescript@5.0.3)
       tap-mocha-reporter:
         specifier: ^5.0.3
         version: 5.0.3
@@ -157,7 +157,7 @@ importers:
         version: 8.4.31
       tailwindcss:
         specifier: ^3.3.3
-        version: 3.3.3
+        version: 3.3.3(ts-node@10.9.1)
 
   packages/docs-new:
     dependencies:
@@ -168,17 +168,11 @@ importers:
         specifier: workspace:*
         version: link:../plugin-data-persistence
       '@orama/searchbox':
-        specifier: 1.0.0-beta.5
-        version: 1.0.0-beta.5(@orama/highlight@0.1.2)(@orama/orama@packages+orama)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.0)(@preact/signals@1.2.2)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.2)
+        specifier: 1.0.0-beta.9
+        version: 1.0.0-beta.9(@orama/highlight@0.1.2)(@orama/orama@packages+orama)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.0)(@preact/signals@1.2.2)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.2)
       '@vitejs/plugin-vue':
         specifier: ^4.5.1
         version: 4.5.1(vite@4.1.4)(vue@3.3.10)
-      fast-glob:
-        specifier: ^3.3.2
-        version: 3.3.2
-      html-to-text:
-        specifier: ^9.0.3
-        version: 9.0.3
       jsdom:
         specifier: ^23.0.1
         version: 23.0.1
@@ -195,9 +189,6 @@ importers:
       '@preact/signals-core':
         specifier: ^1.5.0
         version: 1.5.0
-      '@types/html-to-text':
-        specifier: ^9.0.0
-        version: 9.0.0
       '@types/jsdom':
         specifier: ^21.1.6
         version: 21.1.6
@@ -254,7 +245,7 @@ importers:
         version: 2.8.1
       tap:
         specifier: ^16.3.2
-        version: 16.3.4(typescript@5.0.3)
+        version: 16.3.4(ts-node@10.9.1)(typescript@5.0.3)
       tap-mocha-reporter:
         specifier: ^5.0.3
         version: 5.0.3
@@ -352,7 +343,7 @@ importers:
         version: 4.3.0
       tap:
         specifier: ^16.3.0
-        version: 16.3.4(typescript@5.0.3)
+        version: 16.3.4(ts-node@10.9.1)(typescript@5.0.3)
       tap-mocha-reporter:
         specifier: ^5.0.3
         version: 5.0.3
@@ -628,7 +619,7 @@ importers:
         version: 7.12.0
       tap:
         specifier: ^16.3.4
-        version: 16.3.4(typescript@5.0.3)
+        version: 16.3.4(ts-node@10.9.1)(typescript@5.0.3)
       tsx:
         specifier: ^3.12.2
         version: 3.12.2
@@ -732,7 +723,7 @@ importers:
         version: 7.12.0
       tap:
         specifier: ^16.3.4
-        version: 16.3.4(typescript@5.0.3)
+        version: 16.3.4(ts-node@10.9.1)(typescript@5.0.3)
       tsx:
         specifier: ^3.12.2
         version: 3.12.2
@@ -757,7 +748,7 @@ importers:
         version: 17.0.1
       tap:
         specifier: ^16.3.2
-        version: 16.3.4(typescript@5.2.2)
+        version: 16.3.4(ts-node@10.9.1)(typescript@5.2.2)
       tap-mocha-reporter:
         specifier: ^5.0.3
         version: 5.0.3
@@ -769,7 +760,7 @@ importers:
         version: 12.0.2(typescript@5.2.2)
       tsup:
         specifier: ^7.2.0
-        version: 7.2.0(@swc/core@1.3.27)(typescript@5.2.2)
+        version: 7.2.0(@swc/core@1.3.27)(ts-node@10.9.1)(typescript@5.2.2)
       typescript:
         specifier: ^5.0.0
         version: 5.2.2
@@ -6507,8 +6498,8 @@ packages:
     engines: {node: '>= 16.0.0'}
     dev: false
 
-  /@orama/searchbox@1.0.0-beta.5(@orama/highlight@0.1.2)(@orama/orama@packages+orama)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.0)(@preact/signals@1.2.2)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.2):
-    resolution: {integrity: sha512-xW4Ty/Hrm1WNZvSIvbcwuNSQ476yUjW78n9XqD4ExUYHwlOWbh0ogV18e1Aa580/IS2IS48vbeKbb159sYN+cg==}
+  /@orama/searchbox@1.0.0-beta.9(@orama/highlight@0.1.2)(@orama/orama@packages+orama)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.0)(@preact/signals@1.2.2)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.2):
+    resolution: {integrity: sha512-amuQLNtTu5sd+jmQUe6feLAAZqpJelMHHULfYCZBs2AoQDT8shpeQMudtwoIFySH90G6zlqFbrEw4ukklW3jbw==}
     peerDependencies:
       '@orama/highlight': ^0.1.2
       '@orama/orama': 2.0.0-beta.7
@@ -9766,7 +9757,7 @@ packages:
     resolution: {integrity: sha512-gxGWBrTT1JuMx6R+o5PTXMmUnhnVzLQ9SNutD4YqKtI6ap897t3tKECYla6gCWEkplXnlNybEkZg9GEGxKFCgw==}
     dependencies:
       pascal-case: 3.1.2
-      tslib: 2.5.3
+      tslib: 2.6.2
     dev: false
 
   /camelcase-css@2.0.1:
@@ -11288,7 +11279,7 @@ packages:
     resolution: {integrity: sha512-Kv5nKlh6yRrdrGvxeJ2e5y2eRUpkUosIW4A2AS38zwSz27zu7ufDwQPi5Jhs3XAlGNetl3bmnGhQsMtkKJnj3w==}
     dependencies:
       no-case: 3.0.4
-      tslib: 2.5.3
+      tslib: 2.6.2
     dev: false
 
   /dot-prop@5.3.0:
@@ -12807,17 +12798,6 @@ packages:
       glob-parent: 5.1.2
       merge2: 1.4.1
       micromatch: 4.0.5
-
-  /fast-glob@3.3.2:
-    resolution: {integrity: sha512-oX2ruAFQwf/Orj8m737Y5adxDQO0LAB7/S5MnxCdTNDd4p6BsyIVsv9JQsATbTSq8KHRpLwIHbVlUNatxd+1Ow==}
-    engines: {node: '>=8.6.0'}
-    dependencies:
-      '@nodelib/fs.stat': 2.0.5
-      '@nodelib/fs.walk': 1.2.8
-      glob-parent: 5.1.2
-      merge2: 1.4.1
-      micromatch: 4.0.5
-    dev: false
 
   /fast-json-stable-stringify@2.1.0:
     resolution: {integrity: sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==}
@@ -18492,7 +18472,7 @@ packages:
       postcss: 8.4.31
     dev: true
 
-  /postcss-load-config@4.0.1(postcss@8.4.31):
+  /postcss-load-config@4.0.1(postcss@8.4.31)(ts-node@10.9.1):
     resolution: {integrity: sha512-vEJIc8RdiBRu3oRAI0ymerOn+7rPuMvRXslTvZUKZonDHFIczxztIyJ1urxM1x9JXEikvpWWTUUqal5j/8QgvA==}
     engines: {node: '>= 14'}
     peerDependencies:
@@ -18506,6 +18486,7 @@ packages:
     dependencies:
       lilconfig: 2.1.0
       postcss: 8.4.31
+      ts-node: 10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@5.0.3)
       yaml: 2.3.1
     dev: true
 
@@ -21412,7 +21393,7 @@ packages:
       strip-ansi: 6.0.1
     dev: true
 
-  /tailwindcss@3.3.3:
+  /tailwindcss@3.3.3(ts-node@10.9.1):
     resolution: {integrity: sha512-A0KgSkef7eE4Mf+nKJ83i75TMyq8HqY3qmFIJSWy8bNt0v1lG7jUcpGpoTFxAwYcWOphcTBLPPJg+bDfhDf52w==}
     engines: {node: '>=14.0.0'}
     hasBin: true
@@ -21434,7 +21415,7 @@ packages:
       postcss: 8.4.31
       postcss-import: 15.1.0(postcss@8.4.31)
       postcss-js: 4.0.1(postcss@8.4.31)
-      postcss-load-config: 4.0.1(postcss@8.4.31)
+      postcss-load-config: 4.0.1(postcss@8.4.31)(ts-node@10.9.1)
       postcss-nested: 6.0.1(postcss@8.4.31)
       postcss-selector-parser: 6.0.13
       resolve: 1.22.2
@@ -21476,7 +21457,7 @@ packages:
       yaml: 1.10.2
     dev: true
 
-  /tap@16.3.4(typescript@5.0.3):
+  /tap@16.3.4(ts-node@10.9.1)(typescript@5.0.3):
     resolution: {integrity: sha512-SAexdt2ZF4XBgye6TPucFI2y7VE0qeFXlXucJIV1XDPCs+iJodk0MYacr1zR6Ycltzz7PYg8zrblDXKbAZM2LQ==}
     engines: {node: '>=12'}
     hasBin: true
@@ -21515,6 +21496,7 @@ packages:
       tap-parser: 11.0.2
       tap-yaml: 1.0.2
       tcompare: 5.0.7
+      ts-node: 10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@5.0.3)
       typescript: 5.0.3
       which: 2.0.2
     transitivePeerDependencies:
@@ -21527,7 +21509,7 @@ packages:
       - '@isaacs/import-jsx'
       - react
 
-  /tap@16.3.4(typescript@5.2.2):
+  /tap@16.3.4(ts-node@10.9.1)(typescript@5.2.2):
     resolution: {integrity: sha512-SAexdt2ZF4XBgye6TPucFI2y7VE0qeFXlXucJIV1XDPCs+iJodk0MYacr1zR6Ycltzz7PYg8zrblDXKbAZM2LQ==}
     engines: {node: '>=12'}
     hasBin: true
@@ -21566,6 +21548,7 @@ packages:
       tap-parser: 11.0.2
       tap-yaml: 1.0.2
       tcompare: 5.0.7
+      ts-node: 10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@5.0.3)
       typescript: 5.2.2
       which: 2.0.2
     transitivePeerDependencies:
@@ -22020,7 +22003,7 @@ packages:
     resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
     dev: false
 
-  /tsup@7.2.0(@swc/core@1.3.27)(typescript@5.2.2):
+  /tsup@7.2.0(@swc/core@1.3.27)(ts-node@10.9.1)(typescript@5.2.2):
     resolution: {integrity: sha512-vDHlczXbgUvY3rWvqFEbSqmC1L7woozbzngMqTtL2PGBODTtWlRwGDDawhvWzr5c1QjKe4OAKqJGfE1xeXUvtQ==}
     engines: {node: '>=16.14'}
     hasBin: true
@@ -22045,7 +22028,7 @@ packages:
       execa: 5.1.1
       globby: 11.1.0
       joycon: 3.1.1
-      postcss-load-config: 4.0.1(postcss@8.4.31)
+      postcss-load-config: 4.0.1(postcss@8.4.31)(ts-node@10.9.1)
       resolve-from: 5.0.0
       rollup: 3.24.0
       source-map: 0.8.0-beta.0
