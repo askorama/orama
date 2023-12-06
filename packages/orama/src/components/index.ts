@@ -491,8 +491,8 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
     throw createError('WRONG_SEARCH_PROPERTY_TYPE', prop)
   }
 
-  const { exact, tolerance } = context.params
-  const searchResult = radixFind(node, { term, exact, tolerance })
+  const { exact, tolerance, usePrefixWithTolerance } = context.params
+  const searchResult = radixFind(node, { term, exact, tolerance, usePrefixWithTolerance })
   const ids = new Set<InternalDocumentID>()
 
   for (const key in searchResult) {

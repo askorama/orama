@@ -297,6 +297,11 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    * between the term and the searchable property.
    */
   tolerance?: number
+   /**
+   * Allowing to execute the default prefix search even when tolerance is not 0
+   * The default value is false
+   */
+  usePrefixWithTolerance?: boolean
   /**
    * The BM25 parameters to use.
    *
