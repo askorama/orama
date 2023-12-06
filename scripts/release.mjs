@@ -9,6 +9,7 @@ const packages = [
   'plugin-data-persistence',
   'plugin-docusaurus',
   'plugin-docusaurus-v3',
+  'plugin-vitepress',
   'plugin-match-highlight',
   'plugin-nextra',
   'plugin-parsedoc',

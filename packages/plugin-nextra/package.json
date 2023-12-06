@@ -1,6 +1,6 @@
 {
   "name": "@orama/plugin-nextra",
-  "version": "2.0.0-beta.8",
+  "version": "2.0.0-beta.9",
   "description": "Nextra plugin for local search powered by orama",
   "keywords": [
     "orama",
