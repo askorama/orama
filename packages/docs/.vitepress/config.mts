@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import { OramaSearch } from '../plugins/searchbox/index.ts'
+import { OramaPlugin } from '@orama/plugin-vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -24,7 +24,7 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [OramaSearch()]
+    plugins: [OramaPlugin()]
   },
 
   rewrites: {

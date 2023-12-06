@@ -53,5 +53,8 @@
     "@types/markdown-it": "^13.0.7",
     "typescript": "^5.0.0",
     "vitepress": "1.0.0-rc.31"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
   }
 }
