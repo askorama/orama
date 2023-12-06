@@ -3,37 +3,26 @@
   "version": "2.0.0-beta.8",
   "description": "Documentation for Orama",
   "private": true,
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "serve": "next start",
-    "postbuild": "next-sitemap"
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "@mdx-js/mdx": "^2.3.0",
     "@orama/orama": "workspace:*",
-    "@orama/plugin-match-highlight": "workspace:*",
-    "@orama/plugin-nextra": "workspace:*",
-    "classnames": "^2.3.2",
-    "next": "^13.3.0",
-    "next-sitemap": "^4.2.3",
-    "nextra": "^2.4.0",
-    "nextra-theme-blog": "^2.2.19",
-    "nextra-theme-docs": "^2.2.19",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-icons": "^4.8.0",
-    "react-medium-image-zoom": "^5.1.8",
-    "rehype-raw": "^6.1.1"
+    "@orama/plugin-data-persistence": "workspace:*",
+    "@orama/searchbox": "1.0.0-beta.9",
+    "@vitejs/plugin-vue": "^4.5.1",
+    "jsdom": "^23.0.1",
+    "markdown-it": "^13.0.2",
+    "slugify": "^1.6.6",
+    "vite": "^4.1.4"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.16",
-    "install": "^0.13.0",
-    "postcss": "^8.4.31",
-    "tailwindcss": "^3.3.3"
+    "@preact/signals-core": "^1.5.0",
+    "@types/jsdom": "^21.1.6",
+    "@types/markdown-it": "^13.0.7",
+    "vitepress": "1.0.0-rc.31"
   }
 }
