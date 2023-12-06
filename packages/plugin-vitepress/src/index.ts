@@ -41,7 +41,6 @@ async function createOramaContentLoader (paths: string[], root: string) {
     schema: presets.docusaurus.schema
   })
 
-  console.log('Inserting into Orama')
   // @ts-ignore
   await insertMultiple(db, contents)
 
