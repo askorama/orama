@@ -1,9 +1,0 @@
-# *
-User-agent: *
-Allow: /
-
-# Host
-Host: https://docs.oramasearch.com
-
-# Sitemaps
-Sitemap: https://docs.oramasearch.com/sitemap.xml

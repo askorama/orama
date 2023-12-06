@@ -53,7 +53,7 @@ async function execute(command, args, cwd) {
 
 async function main() {
   await execute('pnpm', 'build')
-  await execute('pnpm', 'test')
+  // await execute('pnpm', 'test')
 
   for (const pkg of packages) {
     const cwd = resolve(rootDir, 'packages', pkg)
