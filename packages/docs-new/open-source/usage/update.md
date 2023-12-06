@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Update data
 
 Orama is optimized to be immutable. Rather than trying to update a document in the database, we suggest you to create the database from scratch.

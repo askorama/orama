@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Data Persistence
 
 The `plugin-data-persistence` plugin allows you to persist your Orama database to disk or in-memory

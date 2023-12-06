@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Connect Orama Cloud to Shopify
 
 Orama Cloud integrates natively with Shopify via the **official Orama data source**. \

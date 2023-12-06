@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # BM25 Algorithm
 
 Orama uses the [BM25](https://en.wikipedia.org/wiki/Okapi_BM25) algorithm to calculate the relevance of a document when searching.

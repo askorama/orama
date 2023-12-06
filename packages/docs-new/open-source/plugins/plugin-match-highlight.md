@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Match highlight plugin
 
 The plugin-match-highlight plugin allows Orama to keep track of all token positions on each property of each document.

@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Orama Cloud
 
 Orama is a next-generation full-text and vector search engine, highly optimized for speed and low latency.

@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Remove data
 
 Removal is one of the easiest things to do in Orama. Let's say we have the

@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Use with Typescript
 
 Orama is written in TypeScript and supports strong typing as a first-class feature.

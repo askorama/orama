@@ -7,6 +7,7 @@ export default defineConfig({
   title: 'Orama Docs',
   description: 'Search, everywhere',
   lastUpdated: true,
+  cleanUrls: true,
 
   head: [
     ['link', { rel: 'apple-touch-icon',        sizes: '180x180', href: '/apple-touch-icon.png' }],
@@ -25,8 +26,8 @@ export default defineConfig({
   },
 
   rewrites: {
-    '/open-source': '/open-source/index.html',
-    '/cloud': '/cloud/index.html',
+    '/open-source': '/open-source/index',
+    '/cloud': '/cloud/index',
   },
 
   themeConfig: {
@@ -37,6 +38,11 @@ export default defineConfig({
     },
 
     siteTitle: false,
+
+    editLink: {
+      pattern: 'https://github.com/oramasearch/orama/edit/main/packages/docs/:path',
+      text: 'Edit this page on GitHub'
+    },
 
     nav: [
       { text: 'Open Source', link: '/open-source/index.html' },

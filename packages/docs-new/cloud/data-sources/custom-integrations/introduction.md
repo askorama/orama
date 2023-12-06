@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Custom Integrations
 
 Orama Cloud provides a growing number of custom integrations with popular CMSs, eCommerce platforms, and other web applications.

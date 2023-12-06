@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Parsedoc plugin
 
 The plugin-parsedoc plugin allows Orama to parse and create indexes from HTML and Markdown documents automatically.

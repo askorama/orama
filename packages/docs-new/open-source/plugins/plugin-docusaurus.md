@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Docusaurus Plugin
 
 The plugin-docusaurus plugin allows you to index the content of your Docusaurus websites and offer text search to your visitors.

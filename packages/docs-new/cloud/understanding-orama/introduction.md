@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Understanding Orama Cloud
 
 Orama Cloud brings **Orama** to the next level.

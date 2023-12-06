@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Grouping
 
 Orama supports `groupBy` operations.

@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Utility functions for Orama
 
 Orama exposes a few utility functions that can be useful when working with the search results.

@@ -1,4 +1,6 @@
-import { Callout } from 'nextra-theme-docs'
+---
+outline: deep
+---
 
 # Stemming
 

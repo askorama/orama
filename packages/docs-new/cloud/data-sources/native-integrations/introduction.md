@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Native Integrations
 
 With Orama, you can integrate with every external system, library, and API.

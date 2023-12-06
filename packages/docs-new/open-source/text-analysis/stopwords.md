@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Stop-words
 
 ::: info What are stopwords?

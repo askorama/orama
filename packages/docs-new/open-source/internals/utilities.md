@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Utilities
 
 Orama exposes some of its internal utility functions:

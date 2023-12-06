@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Insert Data
 
 Whenever we create a database with Orama, we must specify a `schema`, which

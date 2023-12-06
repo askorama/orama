@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # JavaScript SDK
 
 Orama Cloud provides an official JavaScript SDK to help you integrate your Orama indexes into your JavaScript application.

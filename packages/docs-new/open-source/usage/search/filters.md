@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Filters
 
 You can use the `filters` interface to filter the search results.

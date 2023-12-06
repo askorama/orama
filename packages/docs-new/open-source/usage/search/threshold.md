@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Threshold
 
 The threshold property is used to set the minimum/maximum number of results to return.

@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Introduction to search
 
 Orama provides a simple search interface that allows you to search through your documents.

@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Astro plugin
 
 The plugin-astro plugin allows you to index the content of your Astro websites and offer text search to your visitors.

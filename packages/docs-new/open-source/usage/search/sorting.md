@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Sorting
 
 To sort, Orama uses the properties defined in the `schema` to know on which properties you want to sort.

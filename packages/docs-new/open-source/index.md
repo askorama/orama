@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Getting Started with Orama
 
 Orama is a fast, batteries-included, full-text and vector search engine entirely written in TypeScript, with zero dependencies. <br /><br />

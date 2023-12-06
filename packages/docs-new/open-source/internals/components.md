@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Components
 
 Orama can be completely customized and extended by using its components architecture.

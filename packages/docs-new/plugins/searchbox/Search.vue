@@ -1,6 +1,6 @@
 <script lang='ts' setup>
 import { onMounted } from "vue"
-import { useData, withBase } from "vitepress"
+import { useData } from "vitepress"
 import { RegisterSearchBox, presets, signals as $ } from "@orama/searchbox"
 
 const VPData = useData()

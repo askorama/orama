@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Preflight Search
 
 **Preflight search** is an Orama feature that allows you to run a preliminary search query that will return just the number of results that match your query. This is useful for determining if a search query will return a large number of results, which can be useful for determining if you should run a full search query and facets (if needed).

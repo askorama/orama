@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Facets
 
 Facets are a powerful tool for filtering and narrowing down search results on the Orama search engine.

@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Import a JSON file to Orama Cloud
 
 With Orama Cloud, you can upload a JSON file as a data source.

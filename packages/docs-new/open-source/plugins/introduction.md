@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Plugin system
 
 Since the beginning of the project, Orama has been developed thinking of a simple way to add new features via a plugin system, leaving the core as small as possible.

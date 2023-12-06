@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Writing your own plugins
 
 With Orama `v2.0.0-beta.5`, we introduced the new plugin system. This allows you to write your own plugins and use them in your Orama project.

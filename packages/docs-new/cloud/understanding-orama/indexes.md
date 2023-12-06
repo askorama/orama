@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Orama Cloud Indexes
 
 An Orama index is essentially a collection of Orama documents that share the following properties:

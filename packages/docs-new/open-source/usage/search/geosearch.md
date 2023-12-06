@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Geosearch
 
 Geosearch is a feature that allows you to filter your search results by distance from a given location, or by bounding box.

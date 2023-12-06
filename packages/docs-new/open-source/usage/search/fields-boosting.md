@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Fields Boosting
 
 You can use the `boost` interface to boost the importance of a field in the search results.

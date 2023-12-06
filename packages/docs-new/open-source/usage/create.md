@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Create a new Orama instance
 
 We can create a new instance (from now on database) with an **indexing `schema`**.<br/>

@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Plugin Nextra
 
 [Nextra](https://nextra.site) is a static site generator for Next.js, which provides an easy and effective way to create a blog or a documentation website.

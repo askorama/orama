@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Vector Search
 
 Since `v1.2.0`, Orama supports **vector search** natively 🎉.
