@@ -1,5 +1,5 @@
 {
-  "name": "@orama/plugin-docusaurus",
+  "name": "@orama/plugin-docusaurus-dev",
   "version": "2.0.0-beta.8",
   "description": "Docusaurus plugin for local search powered by orama",
   "keywords": [
@@ -15,42 +15,18 @@
     "type": "git",
     "url": "git+https://github.com/orama/plugin-docusaurus.git"
   },
-  "type": "module",
   "sideEffects": false,
-  "exports": {
-    ".": {
-      "types": "./dist/server/index.d.ts",
-      "import": "./dist/server/index.js",
-      "require": "./dist/server/commonjs.cjs"
-    },
-    "./types": {
-      "types": "./dist/server/types.d.ts",
-      "import": "./dist/server/types.js",
-      "require": "./dist/server/types.cjs"
-    }
-  },
-  "types": "./dist/server/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "dev": "swc --delete-dir-on-start -s -w --extensions .ts,.tsx,.cts -d dist src",
-    "prebuild": "npm run lint",
-    "build": "swc --delete-dir-on-start --extensions .ts,.tsx,.cts -d dist src",
-    "postbuild": "sh scripts/postbuild.sh",
-    "pretest": "node ../../scripts/test-pack.mjs plugin-docusaurus",
-    "test": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
-    "format": "prettier -w src",
-    "lint": "eslint src --ext .js,.ts,.tsx,.cts",
-    "changelog": "auto-changelog -p"
-  },
+  "main": "src/server/index.js",
+  "scripts": {},
   "dependencies": {
     "@algolia/autocomplete-js": "^1.12.2",
     "@algolia/autocomplete-theme-classic": "^1.12.2",
-    "@docusaurus/theme-common": "^2.4.3",
+    "@docusaurus/plugin-content-docs": "^3.0.1",
+    "@docusaurus/theme-common": "^3.0.1",
     "@orama/highlight": "^0.1.2",
     "@orama/orama": "workspace:*",
     "@orama/plugin-parsedoc": "workspace:*",
+    "@orama/searchbox": "1.0.0-beta.9",
     "github-slugger": "^2.0.0",
     "pako": "^2.1.0",
     "vfile-message": "^3.1.4"
@@ -80,16 +56,16 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.3.0",
     "prettier": "^2.8.8",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "tap-mocha-reporter": "^5.0.4",
     "tsx": "^3.14.0",
     "typescript": "^5.3.2",
     "webpack": "^5.89.0"
   },
   "peerDependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "publishConfig": {
     "access": "public"

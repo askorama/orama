@@ -41,24 +41,24 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "@msgpack/msgpack": "^2.8.0",
     "@orama/orama": "workspace:*",
-    "@msgpack/msgpack": "^2.7.2",
     "dpack": "^0.6.22"
   },
   "devDependencies": {
-    "@swc/cli": "^0.1.59",
-    "@swc/core": "^1.3.27",
-    "@types/node": "^18.11.18",
-    "@types/tap": "^15.0.7",
-    "@typescript-eslint/eslint-plugin": "^6.4.1",
-    "@typescript-eslint/parser": "^6.4.1",
-    "c8": "^7.12.0",
+    "@swc/cli": "^0.1.63",
+    "@swc/core": "^1.3.100",
+    "@types/node": "^18.19.2",
+    "@types/tap": "^15.0.11",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "c8": "^7.14.0",
     "msgpack": "link:@types/msgpack/msgpack",
-    "readable-stream": "^4.3.0",
-    "tap": "^16.3.0",
-    "tap-mocha-reporter": "^5.0.3",
-    "tsx": "^3.12.2",
-    "typescript": "^5.0.0"
+    "readable-stream": "^4.4.2",
+    "tap": "^16.3.9",
+    "tap-mocha-reporter": "^5.0.4",
+    "tsx": "^3.14.0",
+    "typescript": "^5.3.2"
   },
   "publishConfig": {
     "access": "public"
