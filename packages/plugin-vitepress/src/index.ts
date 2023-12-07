@@ -9,157 +9,157 @@ import slugify from 'slugify'
 import { readFileSync } from 'fs'
 
 type OramaSchema = {
-	title: string
-	content: string
-	path: string
-	category: string
-	section: string
+  title: string
+  content: string
+  path: string
+  category: string
+  section: string
 }
 
 type ParserResult = {
-	title: string
-	header: string
-	content: string
-	path: string
+  title: string
+  header: string
+  content: string
+  path: string
 }
 
 const md = new MarkdownIt({
-	html: true,
+  html: true
 })
 
 async function createOramaContentLoader(paths: string[], root: string) {
-	const contents = paths
-		.map(file => ({
-			path: file.replace(root, '').replace('.md', ''),
-			html: md.render(readFileSync(file, 'utf-8'), ''),
-		}))
-		.map(parseHTMLContent)
-		.map(formatForOrama)
-		.flat()
+  const contents = paths
+    .map((file) => ({
+      path: file.replace(root, '').replace('.md', ''),
+      html: md.render(readFileSync(file, 'utf-8'), '')
+    }))
+    .map(parseHTMLContent)
+    .map(formatForOrama)
+    .flat()
 
-	const db = await create({
-		schema: presets.docusaurus.schema,
-	})
+  const db = await create({
+    schema: presets.docusaurus.schema
+  })
 
-	// @ts-ignore
-	await insertMultiple(db, contents)
+  // @ts-ignore
+  await insertMultiple(db, contents)
 
-	return persist(db, 'json', 'browser')
+  return persist(db, 'json', 'browser')
 }
 
 function parseHTMLContent({ html, path }: { html: string; path: string }): Array<ParserResult> {
-	const dom = new JSDOM(html)
-	const document = dom.window.document
+  const dom = new JSDOM(html)
+  const document = dom.window.document
 
-	const sections: Array<ParserResult> = []
+  const sections: Array<ParserResult> = []
 
-	const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6')
-	headers.forEach(header => {
-		const sectionTitle = header.textContent!.trim()
-		const headerTag = header.tagName.toLowerCase()
-		let sectionContent = ''
+  const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6')
+  headers.forEach((header) => {
+    const sectionTitle = header.textContent!.trim()
+    const headerTag = header.tagName.toLowerCase()
+    let sectionContent = ''
 
-		let sibling = header.nextElementSibling
-		while (sibling && !['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(sibling.tagName)) {
-			sectionContent += sibling.textContent!.trim() + '\n'
-			sibling = sibling.nextElementSibling
-		}
+    let sibling = header.nextElementSibling
+    while (sibling && !['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(sibling.tagName)) {
+      sectionContent += sibling.textContent!.trim() + '\n'
+      sibling = sibling.nextElementSibling
+    }
 
-		sections.push({
-			title: sectionTitle,
-			header: headerTag,
-			content: sectionContent,
-			path,
-		})
-	})
+    sections.push({
+      title: sectionTitle,
+      header: headerTag,
+      content: sectionContent,
+      path
+    })
+  })
 
-	return sections
+  return sections
 }
 
 function formatForOrama(data: Array<ParserResult>): Array<OramaSchema> {
-	try {
-		const firstH1Header = data.find(section => section.header === 'h1')
+  try {
+    const firstH1Header = data.find((section) => section.header === 'h1')
 
-		return data.map(res => ({
-			title: res.title,
-			content: res.content,
-			section: firstH1Header!.title.replace(/\s$/, ''),
-			path: res?.path + '#' + slugify.default(res.title, { lower: true }),
-			category: '',
-		}))
-	} catch (error) {
-		console.error(error)
-		return []
-	}
+    return data.map((res) => ({
+      title: res.title,
+      content: res.content,
+      section: firstH1Header!.title.replace(/\s$/, ''),
+      path: res?.path + '#' + slugify.default(res.title, { lower: true }),
+      category: ''
+    }))
+  } catch (error) {
+    console.error(error)
+    return []
+  }
 }
 
 export function OramaPlugin(): Plugin {
-	let resolveConfig: any
-	const virtualModuleId = 'virtual:search-data'
-	const resolvedVirtualModuleId = `\0${virtualModuleId}`
+  let resolveConfig: any
+  const virtualModuleId = 'virtual:search-data'
+  const resolvedVirtualModuleId = `\0${virtualModuleId}`
 
-	return {
-		name: 'oramasearch',
-		enforce: 'pre',
+  return {
+    name: 'oramasearch',
+    enforce: 'pre',
 
-		configResolved(config: any) {
-			if (resolveConfig) {
-				return
-			}
-			resolveConfig = config
+    configResolved(config: any) {
+      if (resolveConfig) {
+        return
+      }
+      resolveConfig = config
 
-			const vitepressConfig: SiteConfig = config.vitepress
-			if (!vitepressConfig) {
-				return
-			}
+      const vitepressConfig: SiteConfig = config.vitepress
+      if (!vitepressConfig) {
+        return
+      }
 
-			const selfBuildEnd = vitepressConfig.buildEnd
+      const selfBuildEnd = vitepressConfig.buildEnd
 
-			vitepressConfig.buildEnd = (siteConfig: any) => {
-				selfBuildEnd?.(siteConfig)
-				siteConfig = Object.assign(siteConfig || {})
-				pluginSiteConfig?.buildEnd?.(siteConfig)
-			}
+      vitepressConfig.buildEnd = (siteConfig: any) => {
+        selfBuildEnd?.(siteConfig)
+        siteConfig = Object.assign(siteConfig || {})
+        pluginSiteConfig?.buildEnd?.(siteConfig)
+      }
 
-			const selfTransformHead = vitepressConfig.transformHead
+      const selfTransformHead = vitepressConfig.transformHead
 
-			vitepressConfig.transformHead = async ctx => {
-				const selfHead = (await Promise.resolve(selfTransformHead?.(ctx))) || []
-				const pluginHead = (await Promise.resolve(pluginSiteConfig?.transformHead?.(ctx))) || []
-				return selfHead.concat(pluginHead)
-			}
-		},
-		config: () => ({
-			resolve: {
-				alias: {
-					'./VPNavBarSearch.vue': new URL('./Search.vue', import.meta.url).pathname,
-				},
-			},
-		}),
+      vitepressConfig.transformHead = async (ctx) => {
+        const selfHead = (await Promise.resolve(selfTransformHead?.(ctx))) || []
+        const pluginHead = (await Promise.resolve(pluginSiteConfig?.transformHead?.(ctx))) || []
+        return selfHead.concat(pluginHead)
+      }
+    },
+    config: () => ({
+      resolve: {
+        alias: {
+          './VPNavBarSearch.vue': new URL('./Search.vue', import.meta.url).pathname
+        }
+      }
+    }),
 
-		async resolveId(id) {
-			if (id === virtualModuleId) {
-				return resolvedVirtualModuleId
-			}
-		},
+    async resolveId(id) {
+      if (id === virtualModuleId) {
+        return resolvedVirtualModuleId
+      }
+    },
 
-		async load(this, id) {
-			if (id !== resolvedVirtualModuleId) return
+    async load(this, id) {
+      if (id !== resolvedVirtualModuleId) return
 
-			const root = resolveConfig.vitepress.root
-			const pages = resolveConfig.vitepress.pages.map((page: string) => `${root}/${page}`)
+      const root = resolveConfig.vitepress.root
+      const pages = resolveConfig.vitepress.pages.map((page: string) => `${root}/${page}`)
 
-			return `
+      return `
         const data = ${JSON.stringify(await createOramaContentLoader(pages, root))};
         export default data;
       `
-		},
-	}
+    }
+  }
 }
 
 const pluginSiteConfig: Partial<SiteConfig> = {
-	buildEnd(ctx) {},
-	transformHead(ctx) {
-		return []
-	},
+  buildEnd(ctx) {},
+  transformHead(ctx) {
+    return []
+  }
 }
