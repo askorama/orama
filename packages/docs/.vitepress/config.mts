@@ -161,6 +161,20 @@ export default defineConfig({
           ]
         },
         {
+          text: 'Orama AI',
+          items: [
+            { text: 'Automatic embeddings generation', link: '/cloud/orama-ai/automatic-embeddings-generation.html' },
+          ]
+        },
+        {
+          text: 'Performing search',
+          collapsed: false,
+          items: [
+            { text: 'Full-text search', link: '/cloud/performing-search/full-text-search.html' },
+            { text: 'Vector search',    link: '/cloud/performing-search/vector-search.html' },
+          ]
+        },
+        {
           text: 'Integrating Orama Cloud',
           items: [
             { text: 'JavaScript SDK', link: '/cloud/integrating-orama-cloud/javascript-sdk.html' },
