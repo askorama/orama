@@ -7,7 +7,6 @@ export default defineConfig({
   title: 'Orama Docs',
   description: 'Search, everywhere',
   lastUpdated: true,
-  cleanUrls: true,
 
   head: [
     ['link', { rel: 'apple-touch-icon',        sizes: '180x180', href: '/apple-touch-icon.png' }],
