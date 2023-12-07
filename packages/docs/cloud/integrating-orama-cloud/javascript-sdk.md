@@ -71,3 +71,11 @@ const results = await client.search({
   }
 })
 ```
+
+## Performing full-text search
+
+You can perform full-text search on Orama Cloud by using the Orama Client SDK. Read the full documentation [here](/cloud/performing-search/full-text-search).
+
+## Performing vector search
+
+You can perform vector search on Orama Cloud by using the Orama Client SDK. Read the full documentation [here](/cloud/performing-search/vector-search).
