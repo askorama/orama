@@ -36,21 +36,21 @@ You can follow the [official Shopify documentation](https://shopify.dev/docs/app
 
 As an alternative, you can install the official [headless](https://apps.shopify.com/headless) app, which will simplify the process of generating a private app and getting your access token:
 
-<img
+<ZoomImg
   src='/cloud/guides/shopify/headless-app.webp'
   alt='Shopify Headless App'
 />
 
 Clicking on "Install" will take you to the installation process. Click on "Add to sales channel" to finally install the app:
 
-<img
+<ZoomImg
   src='/cloud/guides/shopify/headless-app-installation.webp'
   alt='Shopify Headless App installation process'
 />
 
 Now you need to create a new storefront. Click on "Create storefront":
 
-<img
+<ZoomImg
   src='/cloud/guides/shopify/headless-app-create-storefront.webp'
   alt='Shopify Headless App create storefront'
 />
@@ -59,14 +59,14 @@ Now that you created a new storefront, you will be presented with the following 
 
 In the "Storefront API" section, click on "Manage" to access your storefront API settings.
 
-<img
+<ZoomImg
   src='/cloud/guides/shopify/headless-app-storefront-created.webp'
   alt='Shopify Headless App storefront API'
 />
 
 You can finally copy the access token from the "Public access token" field:
 
-<img
+<ZoomImg
   src='/cloud/guides/shopify/headless-app-access-token.webp'
   alt='Shopify Headless App copy access token'
 />
@@ -80,28 +80,28 @@ Now that you have your Shopify access token, you can create an index on Orama Cl
 
 To do that, go to your [dashboard](https://cloud.oramasearch.com/indexes) and click on "Create new":
 
-<img
+<ZoomImg
   src='/cloud/guides/shopify/orama-new-index.webp'
   alt='Create new Orama index'
 />
 
 Select "Shopify" as the data source, add a new name for your index, and click on "Create index":
 
-<img
+<ZoomImg
   src='/cloud/guides/shopify/orama-new-index-shopify.webp'
   alt='Create new Orama index with Shopify'
 />
 
 Now you need to add your Shopify access token and shop domain to your index:
 
-<img
+<ZoomImg
   src='/cloud/guides/shopify/orama-new-index-shopify-feed.webp'
   alt='Feed your Orama index'
 />
 
 Once you click on "Save and deploy", Orama will start indexing your Shopify store data.
 
-<img
+<ZoomImg
   src='/cloud/guides/shopify/orama-deployed.webp'
   alt='Index deployed'
 />

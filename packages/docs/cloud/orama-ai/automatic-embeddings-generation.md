@@ -35,11 +35,17 @@ We will encrypt this API Key and store it securely. For safety reasons, we recom
 
 As soon as you have your OpenAI API Key ready, you can add it to Orama Cloud by going to [https://cloud.oramasearch.com/developer-tools](https://cloud.oramasearch.com/developer-tools), and selecting "OpenAI API key" from the left menu.
 
-![Adding OpenAI API Key to Orama Cloud](/cloud/guides/automatic-embeddings-generation/automatic-embeddings-generation.png)
+<ZoomImg
+  src='/cloud/guides/automatic-embeddings-generation/automatic-embeddings-generation.png'
+  alt='Adding OpenAI API Key to Orama Cloud'
+/>
 
 After adding your API key, you won't be able to view it again due to security measures. You can always delete it, though this is discouraged because all operations dependent on vector search will cease to function. Alternatively, you can replace it with a new key.
 
-![Your OpenAI API Key](/cloud/guides/automatic-embeddings-generation/open-ai-api-key.png)
+<ZoomImg
+  src='/cloud/guides/automatic-embeddings-generation/open-ai-api-key.png'
+  alt='Your OpenAI API Key'
+/>
 
 ### Creating the embeddings 
 
@@ -49,11 +55,17 @@ You can download the same JSON file here: [download dataset](/cloud/guides/examp
 
 Once you have your dataset ready, you can create a new Index:
 
-![Creating a new index on Orama Cloud](/cloud/guides/automatic-embeddings-generation/new-index.png)
+<ZoomImg
+  src='/cloud/guides/automatic-embeddings-generation/new-index.png'
+  alt='Creating a new index on Orama Cloud'
+/>
 
 After uploading the file, you can enable the "AI Search". This feature will scan the `"string"` properties in your schema and automatically select them to generate embeddings. You can always select or deselect different properties as needed.
 
-![Enablin Orama AI on Orama Cloud](/cloud/guides/automatic-embeddings-generation/enable-orama-ai.png)
+<ZoomImg
+  src='/cloud/guides/automatic-embeddings-generation/enable-orama-ai.png'
+  alt='Enablin Orama AI on Orama Cloud'
+/>
 
 Once you have deployed your index containing embeddings, you can locate it in the indexes list where the "AI Search" column is marked with the icon of the chosen model, such as OpenAI.
 

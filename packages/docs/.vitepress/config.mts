@@ -15,7 +15,7 @@ export default defineConfig({
     ['link', { rel: 'mask-icon',                                 href: '/safari-pinned-tab.svg', color: '#3a0839'}],
     ['meta', { name: 'theme-color', content: '#000'}],
     ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-V30F6HTKBF' }],
-    ['script', {}, `window.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag('js', new Date());\ngtag('config', 'G-V30F6HTKBF');`]
+    ['script', {}, `window.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag('js', new Date());\ngtag('config', 'G-V30F6HTKBF');`],
   ],
 
   sitemap: {
