@@ -24,7 +24,7 @@ const defaultSchema = {
   id: 'string',
   title: 'string',
   url: 'string',
-  content: 'string',
+  content: 'string'
 } as const
 
 export async function createOramaIndex(basePath, locale): Promise<NextraOrama> {
@@ -35,13 +35,13 @@ export async function createOramaIndex(basePath, locale): Promise<NextraOrama> {
     schema: defaultSchema,
     components: {
       tokenizer: {
-        stemming: false,
-      },
+        stemming: false
+      }
     },
     plugins: [
       {
         name: 'match-highlight',
-        afterInsert: highlightAfterInsertHook,
+        afterInsert: highlightAfterInsertHook
       }
     ]
   })
@@ -58,7 +58,7 @@ export async function createOramaIndex(basePath, locale): Promise<NextraOrama> {
       id: url,
       title,
       url,
-      content,
+      content
     })
 
     const sectionData = data[path].data
@@ -72,7 +72,7 @@ export async function createOramaIndex(basePath, locale): Promise<NextraOrama> {
         id: `${url}#${hash}`,
         title,
         url: `${url}#${hash}`,
-        content,
+        content
       })
     }
   }

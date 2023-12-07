@@ -23,8 +23,8 @@ const defaultProps: OramaSearchProps = {
   boost: {
     title: 2,
     description: 1,
-    content: 1,
-  },
+    content: 1
+  }
 }
 
 export function OramaSearch(props = defaultProps) {
@@ -49,7 +49,7 @@ function OramaSearchPlugin({ router, ...props }) {
   useEffect(() => {
     setIndexing(true)
 
-    createOramaIndex(basePath, locale).then(index => {
+    createOramaIndex(basePath, locale).then((index) => {
       indexes[locale] = index
       setIndexing(false)
     })
@@ -59,7 +59,7 @@ function OramaSearchPlugin({ router, ...props }) {
   useEffect(() => {
     if (!(locale in indexes)) {
       setIndexing(true)
-      createOramaIndex(basePath, locale).then(index => {
+      createOramaIndex(basePath, locale).then((index) => {
         indexes[locale] = index
         setIndexing(false)
       })
@@ -72,8 +72,8 @@ function OramaSearchPlugin({ router, ...props }) {
       searchWithHighlight(indexes[locale], {
         term: searchTerm,
         limit: props.limitResults,
-        boost: props.boost,
-      }).then(results => {
+        boost: props.boost
+      }).then((results) => {
         setResults(results)
         setGroupedResults(groupDocumentsBy(results.hits, 'title'))
       })
@@ -119,7 +119,7 @@ function OramaSearchPlugin({ router, ...props }) {
           type="search"
           placeholder="Search documentation..."
           className="nx-block nx-w-full nx-appearance-none nx-rounded-lg nx-px-3 nx-py-2 nx-transition-colors nx-text-base nx-leading-tight md:nx-text-sm nx-bg-black/[.05] dark:nx-bg-gray-50/10 focus:nx-bg-white dark:focus:nx-bg-dark placeholder:nx-text-gray-500 dark:placeholder:nx-text-gray-400 contrast-more:nx-border contrast-more:nx-border-current"
-          onChange={e => setSearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm(e.target.value)}
           value={searchTerm}
           onFocus={() => setHasFocus(true)}
           onBlur={() => {
@@ -151,7 +151,7 @@ function OramaSearchPlugin({ router, ...props }) {
             <>
               <div ref={wrapperRef}>
                 <ul>
-                  {Object.keys(groupedResults).map(title => (
+                  {Object.keys(groupedResults).map((title) => (
                     <li key={title} className="nx-bg-primary-600">
                       <div className="nx-mx-2.5 nx-mb-2 nx-mt-6 nx-select-none nx-border-b nx-border-black/10 nx-px-2.5 nx-pb-1.5 nx-text-xs nx-font-semibold nx-uppercase nx-text-gray-500 first:nx-mt-0 dark:nx-border-white/20 dark:nx-text-gray-300 contrast-more:nx-border-gray-600 contrast-more:nx-text-gray-900 contrast-more:dark:nx-border-gray-50 contrast-more:dark:nx-text-gray-50">
                         {title}

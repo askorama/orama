@@ -13,7 +13,7 @@ export function HighlightedDocument({ hit, trim = 200 }: HighlightedDocumentProp
     let highlightedText = ''
     let currentIndex = 0
 
-    positions.forEach(position => {
+    positions.forEach((position) => {
       const start = position.start
       const length = position.length
       highlightedText +=
