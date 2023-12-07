@@ -15,7 +15,7 @@ As always, you can create a new Orama Cloud index by going to [https://cloud.ora
 
 Once you're there, you will be presented with the following screen:
 
-<img
+<ZoomImg
   src='/cloud/guides/json-file/orama-cloud-index-creation.webp'
   alt='Create a new JSON File index with Orama Cloud'
 />
@@ -24,7 +24,7 @@ Of course, you can choose any name and description you want for your index. In t
 
 After selecting "JSON File" as a data source, we can click on the "Create Index" button, and we'll see the following screen:
 
-<img
+<ZoomImg
   src='/cloud/guides/json-file/orama-cloud-index-feed.webp'
   alt='Feeding a JSON File index with Orama Cloud'
 />
@@ -33,21 +33,21 @@ At this point, we can upload our JSON file by dragging and dropping it into the 
 
 As soon as we do that, we will see the preview of the JSON file, which will help us write the Orama Schema for our index.
 
-<img
+<ZoomImg
   src='/cloud/guides/json-file/orama-cloud-index-json-preview.webp'
   alt='JSON preview of a JSON File index with Orama Cloud'
 />
 
 We can also use the "autodetect" feature, which will automatically generate a schema for us. This is an experimental feature, so please always double check the generated schema.
 
-<img
+<ZoomImg
   src='/cloud/guides/json-file/orama-cloud-index-json-autodetect.webp'
   alt='Auto detecting the schema of a JSON File index with Orama Cloud'
 />
 
 Once we are happy with the schema, we can click on the "Save and deploy" button, and our index will be deployed.
 
-<img
+<ZoomImg
   src='/cloud/guides/json-file/orama-cloud-index-json-deploy.webp'
   alt='Deploying a JSON File index with Orama Cloud'
 />

@@ -39,7 +39,7 @@ const client = new OramaClient({
 
 You can always find your public API key and endpoint in the Orama Dashboard. Here is an example of what it looks like:
 
-<img
+<ZoomImg
   src='/cloud/guides/javascript-sdk/orama-api-key.webp'
   alt='Orama Shopify Dashboard'
 />
