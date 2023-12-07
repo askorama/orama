@@ -1,4 +1,4 @@
-export function sendBeacon (endpoint: string, body?: string): Promise<Response> | undefined {
+export function sendBeacon(endpoint: string, body?: string): Promise<Response> | undefined {
   if (typeof navigator !== 'undefined') {
     navigator.sendBeacon(endpoint, body)
     return
@@ -11,7 +11,7 @@ export function sendBeacon (endpoint: string, body?: string): Promise<Response> 
       'Content-Type': 'application/json'
     }
   })
-  // @todo: handle errors with retries
+    // @todo: handle errors with retries
     .catch((error) => {
       console.error(error)
     })

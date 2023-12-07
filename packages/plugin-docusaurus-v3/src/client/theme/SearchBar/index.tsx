@@ -1,30 +1,30 @@
-import { autocomplete } from "@algolia/autocomplete-js"
-import "@algolia/autocomplete-theme-classic/dist/theme.min.css"
+import { autocomplete } from '@algolia/autocomplete-js'
+import '@algolia/autocomplete-theme-classic/dist/theme.min.css'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
 // @ts-ignore Will fail in CJS compilation
-import { GlobalVersion, useActiveVersion, useVersions } from "@docusaurus/plugin-content-docs/client"
-import { useColorMode, useDocsPreferredVersion } from "@docusaurus/theme-common"
-import useBaseUrl from "@docusaurus/useBaseUrl"
-import useDocusaurusContext from "@docusaurus/useDocusaurusContext"
-import { usePluginData } from "@docusaurus/useGlobalData"
-import useIsBrowser from "@docusaurus/useIsBrowser"
-import { AnyDocument, create, load, Orama, RawData, search as oramaSearch } from "@orama/orama"
-import { Highlight } from "@orama/highlight"
-import { ungzip } from "pako"
-import { createElement, Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { createRoot } from "react-dom/client"
+import { GlobalVersion, useActiveVersion, useVersions } from '@docusaurus/plugin-content-docs/client'
+import { useColorMode, useDocsPreferredVersion } from '@docusaurus/theme-common'
+import useBaseUrl from '@docusaurus/useBaseUrl'
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
+import { usePluginData } from '@docusaurus/useGlobalData'
+import useIsBrowser from '@docusaurus/useIsBrowser'
+import { AnyDocument, create, load, Orama, RawData, search as oramaSearch } from '@orama/orama'
+import { Highlight } from '@orama/highlight'
+import { ungzip } from 'pako'
+import { createElement, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createRoot } from 'react-dom/client'
 // @ts-expect-error Resolve at runtime
-import { SearchNoResults } from "@theme/SearchNoResults"
+import { SearchNoResults } from '@theme/SearchNoResults'
 // @ts-expect-error Resolve at runtime
-import { SearchResults } from "@theme/SearchResults"
+import { SearchResults } from '@theme/SearchResults'
 // @ts-expect-error Resolve at runtime
-import { SearchResult } from "@theme/SearchResult"
-import { Hit, INDEX_FILE, PLUGIN_NAME, PluginData, schema } from "../../../server/types.js"
+import { SearchResult } from '@theme/SearchResult'
+import { Hit, INDEX_FILE, PLUGIN_NAME, PluginData, schema } from '../../../server/types.js'
 import styles from './SearchBar.module.css'
 
 const highlighter = new Highlight({
   CSSClass: 'aa-ItemContentHighlight',
-  HTMLTag: 'span',
+  HTMLTag: 'span'
 })
 
 export default function SearchBar(): JSX.Element {
@@ -83,7 +83,7 @@ export default function SearchBar(): JSX.Element {
           {
             sourceId: 'orama',
             async getItems() {
-              if(!term) {
+              if (!term) {
                 return []
               }
 
@@ -97,7 +97,7 @@ export default function SearchBar(): JSX.Element {
                   ...hit,
                   document: {
                     ...hit.document,
-                    sectionContent: highlighter.highlight(hit.document.sectionContent, term).trim(20),
+                    sectionContent: highlighter.highlight(hit.document.sectionContent, term).trim(20)
                   }
                 }
               })
@@ -173,7 +173,7 @@ export default function SearchBar(): JSX.Element {
       return
     }
 
-    loadDatabase(version).catch(error => {
+    loadDatabase(version).catch((error) => {
       console.error('Cannot load search index.', error)
     })
   }, [isBrowser, searchData, searchBaseUrl, version])

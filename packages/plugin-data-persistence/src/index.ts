@@ -46,7 +46,7 @@ function slowHexToBuffer(hex: string): Uint8Array {
 /* c8 ignore next 5 */
 function slowHexToString(bytes: Uint8Array): string {
   return Array.from(bytes || [])
-    .map(b => hexToMap[b >> 4] + hexToMap[b & 15])
+    .map((b) => hexToMap[b >> 4] + hexToMap[b & 15])
     .join('')
 }
 
@@ -69,18 +69,17 @@ export async function persist<T extends AnyOrama>(
     case 'dpack':
       serialized = dpack.serialize(dbExport)
       break
-    case 'binary':
-      {
-        const msgpack = encode(dbExport)
-        if (runtime === 'node') {
-          serialized = Buffer.from(msgpack.buffer, msgpack.byteOffset, msgpack.byteLength)
-          serialized = serialized.toString('hex')
-          /* c8 ignore next 3 */
-        } else {
-          serialized = slowHexToString(msgpack)
-        }
+    case 'binary': {
+      const msgpack = encode(dbExport)
+      if (runtime === 'node') {
+        serialized = Buffer.from(msgpack.buffer, msgpack.byteOffset, msgpack.byteLength)
+        serialized = serialized.toString('hex')
+        /* c8 ignore next 3 */
+      } else {
+        serialized = slowHexToString(msgpack)
       }
-      break
+    }
+    break
     default:
       throw new Error(UNSUPPORTED_FORMAT(format))
   }

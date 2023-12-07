@@ -14,22 +14,22 @@ export class Collector {
   private params?: ICollector
   private readonly config: CollectorConstructor
 
-  private constructor (config: CollectorConstructor) {
+  private constructor(config: CollectorConstructor) {
     this.data = []
     this.config = config
   }
 
-  public setParams (params: ICollector): void {
+  public setParams(params: ICollector): void {
     this.params = params
   }
 
-  public static create (config: CollectorConstructor): Collector {
+  public static create(config: CollectorConstructor): Collector {
     const collector = new Collector(config)
     collector.start()
     return collector
   }
 
-  public add (data: SearchEvent): void {
+  public add(data: SearchEvent): void {
     this.data.push({
       rawSearchString: data.rawSearchString,
       query: data.query,
@@ -42,13 +42,13 @@ export class Collector {
       referer: typeof location !== 'undefined' ? location.toString() : undefined
     })
 
-    if ((this.params != null) && this.data.length >= this.config.flushSize) {
+    if (this.params != null && this.data.length >= this.config.flushSize) {
       this.flush()
     }
   }
 
-  public flush (): void {
-    if ((this.params == null) || this.data.length === 0) {
+  public flush(): void {
+    if (this.params == null || this.data.length === 0) {
       return
     }
 
@@ -70,13 +70,10 @@ export class Collector {
       events: data
     }
 
-    sendBeacon(
-      this.params.endpoint + `?api-key=${this.config.api_key}`,
-      JSON.stringify(body)
-    )
+    sendBeacon(this.params.endpoint + `?api-key=${this.config.api_key}`, JSON.stringify(body))
   }
 
-  private start (): void {
+  private start(): void {
     const interval = setInterval(this.flush.bind(this), this.config.flushInterval)
     if (interval.unref != null) {
       interval.unref()

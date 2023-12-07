@@ -49,7 +49,7 @@ export function SearchBarFooter({ translations = {} }: SearchBarFooterProps): JS
 
   return (
     <footer className={styles['aa-Footer']}>
-      <ul className={styles["aa-FooterCommands"]}>
+      <ul className={styles['aa-FooterCommands']}>
         <li>
           <kbd>
             <CommandIcon ariaLabel={selectKeyAriaLabel}>
@@ -80,7 +80,12 @@ export function SearchBarFooter({ translations = {} }: SearchBarFooterProps): JS
           <span>{closeText}</span>
         </li>
       </ul>
-      <a className={styles['aa-FooterSearchCredit']} href={'https://oramasearch.com'} target="_blank" rel="noopener noreferrer">
+      <a
+        className={styles['aa-FooterSearchCredit']}
+        href={'https://oramasearch.com'}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <span>{searchByText}</span>
         {colorMode === 'dark' ? <OramaLogoDark /> : <OramaLogoLight />}
       </a>

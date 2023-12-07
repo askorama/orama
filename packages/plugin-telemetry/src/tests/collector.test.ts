@@ -2,8 +2,8 @@ import t from 'tap'
 import sinon from 'sinon'
 import { Collector } from '../collector.js'
 
-t.test('Collector', async t => {
-  t.test('should create a collector', async t => {
+t.test('Collector', async (t) => {
+  t.test('should create a collector', async (t) => {
     const config = { id: 'myid', api_key: '123', flushSize: 10, flushInterval: 1000 }
     const collector = Collector.create(config)
 
@@ -35,7 +35,11 @@ t.test('add and flush methods', async (t) => {
     // @ts-expect-error - data is private
     t.equal(collector.data.length, 1, 'data array length should increase')
     // @ts-expect-error - data is private
-    t.match(collector.data[0], { ...testData, referer: 'http://mock-location' }, 'data should match added data with referer')
+    t.match(
+      collector.data[0],
+      { ...testData, referer: 'http://mock-location' },
+      'data should match added data with referer'
+    )
     t.end()
   })
 
@@ -54,7 +58,7 @@ t.test('add and flush methods', async (t) => {
     t.ok(flushSpy.called, 'flush should be called')
     t.end()
   })
-  
+
   t.test('should flush data when flush interval is reached', async (t) => {
     const clock = sinon.useFakeTimers()
 
