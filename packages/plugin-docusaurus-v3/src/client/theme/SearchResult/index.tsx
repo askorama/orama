@@ -1,5 +1,5 @@
-import { Result } from "@orama/orama"
-import { SectionSchema } from "../../../server/types.js"
+import { Result } from '@orama/orama'
+import { SectionSchema } from '../../../server/types.js'
 
 interface SearchResultProps {
   hit: Result<SectionSchema>
@@ -13,8 +13,10 @@ export function SearchResult({ hit }: SearchResultProps): JSX.Element {
           <div className="aa-ItemContentTitle">
             <h5 style={{ marginBottom: 0 }}>{hit.document.sectionTitle as string}</h5>
           </div>
-          <div className="aa-ItemContentDescription"
-               dangerouslySetInnerHTML={{ __html: hit.document.sectionContent }}></div>
+          <div
+            className="aa-ItemContentDescription"
+            dangerouslySetInnerHTML={{ __html: hit.document.sectionContent }}
+          ></div>
         </div>
       </div>
     </a>

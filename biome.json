@@ -1,21 +1,29 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.4.1/schema.json",
-  "formatter": {
-    "lineWidth": 120,
-    "indentStyle": "space"
-  },
-  "files": {
-    "include": ["plugin-vitepress", "plugin-nextra", "plugin-docusaurus"],
-    "maxSize": 1000000000
-  },
-  "javascript": {
-    "formatter": {
-      "semicolons": "asNeeded",
-      "trailingComma": "none",
-      "quoteStyle":"single"
-    }
-  },
-  "linter": {
-    "enabled": false
-  }
+	"$schema": "https://biomejs.dev/schemas/1.4.1/schema.json",
+	"formatter": {
+		"lineWidth": 120,
+		"indentStyle": "space"
+	},
+	"files": {
+		"include": [
+			"plugin-vitepress",
+			"plugin-nextra",
+			"plugin-docusaurus",
+			"plugin-docusaurus-v3",
+			"plugin-parsedoc",
+			"plugin-telemetry",
+			"plugin-data-persistence"
+		],
+		"maxSize": 1000000000
+	},
+	"javascript": {
+		"formatter": {
+			"semicolons": "asNeeded",
+			"trailingComma": "none",
+			"quoteStyle": "single"
+		}
+	},
+	"linter": {
+		"enabled": false
+	}
 }

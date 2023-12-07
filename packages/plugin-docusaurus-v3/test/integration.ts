@@ -1,4 +1,4 @@
-import { create, load, search } from "@orama/orama"
+import { create, load, search } from '@orama/orama'
 import assert from 'node:assert'
 import { exec, ExecException } from 'node:child_process'
 import { existsSync } from 'node:fs'
@@ -96,25 +96,40 @@ await test('generated DBs have indexed pages content', async () => {
   await load(database, data)
 
   // Search results seem reasonable
-  const indexSearchResult = await search(database, { term: 'index', properties: ['sectionTitle', 'sectionContent', 'type'] })
+  const indexSearchResult = await search(database, {
+    term: 'index',
+    properties: ['sectionTitle', 'sectionContent', 'type']
+  })
   assert.ok(indexSearchResult.count === 1)
   assert.ok(indexSearchResult.hits[0].document.pageRoute === '/#main')
 
-  const catSearchResult = await search(database, { term: 'cat', properties: ['sectionTitle', 'sectionContent', 'type'] })
+  const catSearchResult = await search(database, {
+    term: 'cat',
+    properties: ['sectionTitle', 'sectionContent', 'type']
+  })
   assert.ok(catSearchResult.count === 1)
   assert.ok(catSearchResult.hits[0].document.pageRoute === '/animals_cat')
 
-  const dogSearchResult = await search(database, { term: 'dog', properties: ['sectionTitle', 'sectionContent', 'type'] })
+  const dogSearchResult = await search(database, {
+    term: 'dog',
+    properties: ['sectionTitle', 'sectionContent', 'type']
+  })
   assert.ok(dogSearchResult.count === 2)
   assert.ok(dogSearchResult.hits[0].document.pageRoute === '/animals_dog#dog')
 
-  const domesticSearchResult = await search(database, { term: 'domestic', properties: ['sectionTitle', 'sectionContent', 'type'] })
+  const domesticSearchResult = await search(database, {
+    term: 'domestic',
+    properties: ['sectionTitle', 'sectionContent', 'type']
+  })
   assert.ok(domesticSearchResult.count === 2)
   assert.ok(domesticSearchResult.hits[0].document.pageRoute === '/animals_cat')
   assert.ok(domesticSearchResult.hits[1].document.pageRoute === '/animals_dog#dog')
 
   // We do not have content about turtles
-  const turtleSearchResult = await search(database, { term: 'turtle', properties: ['sectionTitle', 'sectionContent', 'type'] })
+  const turtleSearchResult = await search(database, {
+    term: 'turtle',
+    properties: ['sectionTitle', 'sectionContent', 'type']
+  })
   assert.ok(turtleSearchResult.count === 0)
 })
 
