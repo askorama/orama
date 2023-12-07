@@ -16,9 +16,6 @@
 			"quoteStyle": "single"
 		}
 	},
-	"organizeImports": {
-		"enabled": false
-	},
 	"linter": {
 		"enabled": false
 	}
