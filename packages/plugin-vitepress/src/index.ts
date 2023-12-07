@@ -27,9 +27,9 @@ const md = new MarkdownIt({
   html: true
 })
 
-async function createOramaContentLoader (paths: string[], root: string) {
+async function createOramaContentLoader(paths: string[], root: string) {
   const contents = paths
-    .map(file => ({
+    .map((file) => ({
       path: file.replace(root, '').replace('.md', ''),
       html: md.render(readFileSync(file, 'utf-8'), '')
     }))
@@ -47,22 +47,22 @@ async function createOramaContentLoader (paths: string[], root: string) {
   return persist(db, 'json', 'browser')
 }
 
-function parseHTMLContent({ html, path }: { html: string, path: string }): Array<ParserResult> {
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
+function parseHTMLContent({ html, path }: { html: string; path: string }): Array<ParserResult> {
+  const dom = new JSDOM(html)
+  const document = dom.window.document
 
-  const sections: Array<ParserResult> = [];
+  const sections: Array<ParserResult> = []
 
-  const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-  headers.forEach(header => {
-    const sectionTitle = header.textContent!.trim();
-    const headerTag = header.tagName.toLowerCase();
-    let sectionContent = '';
+  const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6')
+  headers.forEach((header) => {
+    const sectionTitle = header.textContent!.trim()
+    const headerTag = header.tagName.toLowerCase()
+    let sectionContent = ''
 
-    let sibling = header.nextElementSibling;
+    let sibling = header.nextElementSibling
     while (sibling && !['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(sibling.tagName)) {
-      sectionContent += sibling.textContent!.trim() + '\n';
-      sibling = sibling.nextElementSibling;
+      sectionContent += sibling.textContent!.trim() + '\n'
+      sibling = sibling.nextElementSibling
     }
 
     sections.push({
@@ -70,15 +70,15 @@ function parseHTMLContent({ html, path }: { html: string, path: string }): Array
       header: headerTag,
       content: sectionContent,
       path
-    });
-  });
+    })
+  })
 
-  return sections;
+  return sections
 }
 
 function formatForOrama(data: Array<ParserResult>): Array<OramaSchema> {
   try {
-    const firstH1Header = data.find(section => section.header === 'h1')
+    const firstH1Header = data.find((section) => section.header === 'h1')
 
     return data.map((res) => ({
       title: res.title,
@@ -95,7 +95,7 @@ function formatForOrama(data: Array<ParserResult>): Array<OramaSchema> {
 
 export function OramaPlugin(): Plugin {
   let resolveConfig: any
-  const virtualModuleId = "virtual:search-data";
+  const virtualModuleId = 'virtual:search-data'
   const resolvedVirtualModuleId = `\0${virtualModuleId}`
 
   return {
@@ -132,19 +132,19 @@ export function OramaPlugin(): Plugin {
     config: () => ({
       resolve: {
         alias: {
-          './VPNavBarSearch.vue': new URL('./Search.vue', import.meta.url).pathname,
-        },
+          './VPNavBarSearch.vue': new URL('./Search.vue', import.meta.url).pathname
+        }
       }
     }),
 
     async resolveId(id) {
       if (id === virtualModuleId) {
-        return resolvedVirtualModuleId;
+        return resolvedVirtualModuleId
       }
     },
 
     async load(this, id) {
-      if (id !== resolvedVirtualModuleId) return;
+      if (id !== resolvedVirtualModuleId) return
 
       const root = resolveConfig.vitepress.root
       const pages = resolveConfig.vitepress.pages.map((page: string) => `${root}/${page}`)

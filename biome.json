@@ -1,0 +1,21 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.4.1/schema.json",
+  "formatter": {
+    "lineWidth": 120,
+    "indentStyle": "space"
+  },
+  "files": {
+    "include": ["plugin-vitepress"],
+    "maxSize": 1000000000
+  },
+  "javascript": {
+    "formatter": {
+      "semicolons": "asNeeded",
+      "trailingComma": "none",
+      "quoteStyle":"single"
+    }
+  },
+  "linter": {
+    "enabled": false
+  }
+}

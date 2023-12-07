@@ -15,6 +15,7 @@
     "build:plugin-match-highlight": "cd packages/plugin-match-highlight && npm run build",
     "build:plugin-parsedoc": "cd packages/plugin-parsedoc && npm run build",
     "format": "prettier -w packages",
+    "format:biome": "biome format --write ./packages",
     "lint": "turbo lint",
     "test": "turbo test",
     "test:orama": "cd packages/orama && npm test",
@@ -29,6 +30,7 @@
     "publish-packages": "node scripts/release.mjs"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.4.1",
     "@swc/cli": "^0.1.59",
     "@swc/core": "^1.3.27",
     "@types/node": "^18.11.18",
