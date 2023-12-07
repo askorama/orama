@@ -5,7 +5,7 @@
     "indentStyle": "space"
   },
   "files": {
-    "include": ["plugin-vitepress"],
+    "include": ["plugin-vitepress", "plugin-nextra", "plugin-docusaurus"],
     "maxSize": 1000000000
   },
   "javascript": {
