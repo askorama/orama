@@ -12,7 +12,11 @@
 			"plugin-docusaurus-v3",
 			"plugin-parsedoc",
 			"plugin-telemetry",
-			"plugin-data-persistence"
+			"plugin-data-persistence",
+			"plugin-astro",
+			"plugin-match-highlight",
+			"stemmers",
+			"stopwords"
 		],
 		"maxSize": 1000000000
 	},

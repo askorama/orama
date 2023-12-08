@@ -201,5 +201,5 @@ export const stopwords = [
   'terão',
   'teria',
   'teríamos',
-  'teriam',
+  'teriam'
 ]

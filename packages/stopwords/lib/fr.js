@@ -163,5 +163,5 @@ export const stopwords = [
   'quelle',
   'quelles',
   'sans',
-  'soi',
+  'soi'
 ]

@@ -779,5 +779,5 @@ export const stopwords = [
   'ő',
   'ők',
   'őket',
-  'őt',
+  'őt'
 ]

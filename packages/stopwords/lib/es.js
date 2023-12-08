@@ -575,5 +575,5 @@ export const stopwords = [
   'última',
   'últimas',
   'último',
-  'últimos',
+  'últimos'
 ]
