@@ -200,5 +200,5 @@ export const stopwords = [
   'so',
   'than',
   'too',
-  'very',
+  'very'
 ]

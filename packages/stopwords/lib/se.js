@@ -112,5 +112,5 @@ export const stopwords = [
   'våra',
   'ert',
   'era',
-  'vilkas',
+  'vilkas'
 ]

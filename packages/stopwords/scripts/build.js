@@ -35,7 +35,7 @@ const stemmers = {
   tamil: 'ta',
   turkish: 'tr',
   ukrainian: 'uk',
-  sanskrit: 'sk',
+  sanskrit: 'sk'
 }
 
 async function compile(lang, jsExtension, tsExtension, moduleType) {
@@ -44,7 +44,7 @@ async function compile(lang, jsExtension, tsExtension, moduleType) {
   const compiled = await transform(content, {
     module: { type: moduleType },
     env: { targets: 'node >= 16' },
-    jsc: { target: 'es2022' },
+    jsc: { target: 'es2022' }
   })
 
   const minified = await minify(compiled.code, { sourceMap: true })
@@ -71,7 +71,7 @@ async function main() {
     exports[`./${long}`] = {
       types: `./dist/${short}.d.ts`,
       import: `./dist/${short}.js`,
-      require: `./dist/${short}.cjs`,
+      require: `./dist/${short}.cjs`
     }
   }
 

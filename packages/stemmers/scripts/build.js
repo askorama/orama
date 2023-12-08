@@ -35,7 +35,7 @@ const stemmers = {
   tamil: 'ta',
   turkish: 'tr',
   ukrainian: 'uk',
-  sanskrit: 'sk',
+  sanskrit: 'sk'
 }
 
 async function compile(lang, fullLang, jsExtension, tsExtension, moduleType) {
@@ -44,7 +44,7 @@ async function compile(lang, fullLang, jsExtension, tsExtension, moduleType) {
   const compiled = await transform(content + language, {
     module: { type: moduleType },
     env: { targets: 'node >= 16' },
-    jsc: { target: 'es2022' },
+    jsc: { target: 'es2022' }
   })
 
   const minified = await minify(compiled.code, { sourceMap: true })
@@ -56,7 +56,7 @@ async function compile(lang, fullLang, jsExtension, tsExtension, moduleType) {
   await writeFile(
     resolve(destinationDir, `${lang}.d.${tsExtension}`),
     'export declare function stemmer(word: string): string',
-    'utf-8',
+    'utf-8'
   )
 }
 
@@ -75,7 +75,7 @@ async function main() {
     exports[`./${long}`] = {
       types: `./dist/${short}.d.ts`,
       import: `./dist/${short}.js`,
-      require: `./dist/${short}.cjs`,
+      require: `./dist/${short}.cjs`
     }
   }
 
@@ -89,7 +89,7 @@ async function main() {
   await writeFile(
     resolve(rootDir, '../orama/src/components/tokenizer/english-stemmer.ts'),
     `// eslint-disable-next-line @typescript-eslint/ban-ts-comment\n// @ts-nocheck\n\n${englishStemmer}`,
-    'utf-8',
+    'utf-8'
   )
 }
 

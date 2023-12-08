@@ -233,5 +233,5 @@ export const stopwords = [
   'kun',
   'niin',
   'nyt',
-  'itse',
+  'itse'
 ]

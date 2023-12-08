@@ -279,12 +279,12 @@ function stem() {
     d = [
       ['kah', -1, 1],
       ['lah', -1, 1],
-      ['pun', -1, 1],
+      ['pun', -1, 1]
     ],
     n = [
       ['nya', -1, 1],
       ['ku', -1, 1],
-      ['mu', -1, 1],
+      ['mu', -1, 1]
     ],
     v = [
       [
@@ -297,7 +297,7 @@ function stem() {
           if (a.g('s')) return p
           a.cursor = a.a - b
           return g
-        },
+        }
       ],
       [
         'an',
@@ -305,7 +305,7 @@ function stem() {
         1,
         function () {
           return 1 == t ? p : g
-        },
+        }
       ],
       [
         'kan',
@@ -313,8 +313,8 @@ function stem() {
         1,
         function () {
           return 3 == t || 2 == t ? p : g
-        },
-      ],
+        }
+      ]
     ],
     b = [
       ['di', -1, 1],
@@ -328,7 +328,7 @@ function stem() {
       ['pen', -1, 2],
       ['peng', 8, 2],
       ['peny', 8, 4, l],
-      ['ter', -1, 1],
+      ['ter', -1, 1]
     ],
     f = [
       [
@@ -337,13 +337,13 @@ function stem() {
         3,
         function () {
           return !a.k(q, 97, 117) || !a.m('er') ? p : g
-        },
+        }
       ],
       ['belajar', 0, 4],
       ['ber', 0, 3],
       ['pe', -1, 1],
       ['pelajar', 3, 2],
-      ['per', 3, 1],
+      ['per', 3, 1]
     ],
     q = [17, 65, 16],
     t = 0,

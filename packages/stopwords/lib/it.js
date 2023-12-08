@@ -277,5 +277,5 @@ export const stopwords = [
   'stesse',
   'stessimo',
   'stessero',
-  'stando',
+  'stando'
 ]
