@@ -211,7 +211,9 @@ export function insert<K, V> (rootNode: RootNode<K, V[]>, key: K, newValue: V[])
     } else if (key > node.k) {
       node.r = insertNode(node.r, key, newValue)
     } else {
-      node.v = Array.from(new Set([...node.v, ...newValue]))
+      for (const value of newValue) {
+        node.v.push(value);
+      }
       return node
     }
 
