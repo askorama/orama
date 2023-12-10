@@ -10,9 +10,9 @@ const db = await create({
     description: 'string',
     categories: {
       first: 'string',
-      second: 'string',
-    },
-  },
+      second: 'string'
+    }
+  }
 })
 
 const dbNoStemming = await create({
@@ -21,12 +21,12 @@ const dbNoStemming = await create({
     description: 'string',
     categories: {
       first: 'string',
-      second: 'string',
-    },
+      second: 'string'
+    }
   },
   components: {
-    tokenizer: await createTokenizer('english', { stemming: false }),
-  },
+    tokenizer: await createTokenizer('english', { stemming: false })
+  }
 })
 
 const first30000Events = formattedEvents.slice(0, 30_000)
@@ -39,79 +39,79 @@ if (!isMainThread) {
 await cronometro({
   'search "beauty", default settings': () => {
     return search(db, {
-      term: 'beauty',
+      term: 'beauty'
     })
   },
   'search "beauty", tolerance of 1': () => {
     return search(db, {
       term: 'beauty',
-      tolerance: 1,
+      tolerance: 1
     })
   },
   'search "beauty", tolerance of 2': () => {
     return search(db, {
       term: 'beauty',
-      tolerance: 2,
+      tolerance: 2
     })
-  },
+  }
 })
 
 await cronometro({
   'search "decides to leave", default settings': () => {
     return search(db, {
-      term: 'decides to leave',
+      term: 'decides to leave'
     })
   },
   'search "decides to leave", tolerance of 1': () => {
     return search(db, {
       term: 'decides to leave',
-      tolerance: 1,
+      tolerance: 1
     })
   },
   'search "decides to leave", tolerance of 2': () => {
     return search(db, {
       term: 'decides to leave',
-      tolerance: 2,
+      tolerance: 2
     })
-  },
+  }
 })
 
 await cronometro({
   'search "beauty", default settings, no stemming': () => {
     return search(dbNoStemming, {
-      term: 'beauty',
+      term: 'beauty'
     })
   },
   'search "beauty", tolerance of 1, no stemming': () => {
     return search(dbNoStemming, {
       term: 'beauty',
-      tolerance: 1,
+      tolerance: 1
     })
   },
   'search "beauty", tolerance of 2, no stemming': () => {
     return search(dbNoStemming, {
       term: 'beauty',
-      tolerance: 2,
+      tolerance: 2
     })
-  },
+  }
 })
 
 await cronometro({
   'search "decides to leave", default settings, no stemming': () => {
     return search(dbNoStemming, {
-      term: 'decides to leave',
+      term: 'decides to leave'
     })
   },
   'search "decides to leave", tolerance of 1, no stemming': () => {
     return search(dbNoStemming, {
       term: 'decides to leave',
-      tolerance: 1,
+      tolerance: 1
     })
   },
   'search "decides to leave", tolerance of 2, no stemming': () => {
     return search(dbNoStemming, {
       term: 'decides to leave',
-      tolerance: 2,
+      tolerance: 2
     })
-  },
+  }
 })
