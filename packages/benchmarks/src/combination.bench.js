@@ -29,7 +29,7 @@ function calculateCombination_Current(arrs) {
 
 function calculateCombination_Recursive_Head(arrs) {
   if (!arrs.length) return []
-  if (arrs.length === 1) return arrs[0].map(item => [item])
+  if (arrs.length === 1) return arrs[0].map((item) => [item])
 
   const [head, ...tail] = arrs
   const c = calculateCombination_Recursive_Head(tail)
@@ -45,7 +45,7 @@ function calculateCombination_Recursive_Head(arrs) {
 }
 
 function calculateCombination_Recursive_Head_Indexed(arrs, index = 0) {
-  if (index + 1 === arrs.length) return arrs[index].map(item => [item])
+  if (index + 1 === arrs.length) return arrs[index].map((item) => [item])
 
   const head = arrs[index]
   const c = calculateCombination_Recursive_Head_Indexed(arrs, index + 1)
@@ -61,7 +61,7 @@ function calculateCombination_Recursive_Head_Indexed(arrs, index = 0) {
 }
 
 function calculateCombination_Recursive_Head_Indexed2(arrs, count, index = 0) {
-  if (index === count) return arrs[index].map(item => [item])
+  if (index === count) return arrs[index].map((item) => [item])
 
   const head = arrs[index]
   const c = calculateCombination_Recursive_Head_Indexed2(arrs, count, index + 1)
@@ -78,7 +78,7 @@ function calculateCombination_Recursive_Head_Indexed2(arrs, count, index = 0) {
 
 function calculateCombination_Recursive_Tail(arrs) {
   if (!arrs.length) return []
-  if (arrs.length === 1) return arrs[0].map(item => [item])
+  if (arrs.length === 1) return arrs[0].map((item) => [item])
 
   const tail = arrs.pop()
   const c = calculateCombination_Recursive_Tail(arrs)
@@ -94,7 +94,7 @@ function calculateCombination_Recursive_Tail(arrs) {
 }
 
 function calculateCombination_Recursive_Tail_Indexed(arrs, index) {
-  if (index === 0) return arrs[0].map(item => [item])
+  if (index === 0) return arrs[0].map((item) => [item])
 
   const tail = arrs[index]
   const c = calculateCombination_Recursive_Tail_Indexed(arrs, index - 1)
@@ -158,7 +158,7 @@ const combination = (desc, arrs) => {
     b.cycle(),
     b.complete(),
     b.save({ file: 'reduce', version: '1.0.0' }),
-    b.save({ file: 'reduce', format: 'chart' + desc + '.html' }),
+    b.save({ file: 'reduce', format: 'chart' + desc + '.html' })
   )
 }
 
@@ -166,7 +166,7 @@ const main = async () => {
   const deep = [
     ['a', 'b', 'c', 'd', 'e'],
     ['f', 'g', 'h', 'i', 'j'],
-    ['k', 'l', 'm', 'n', 'o'],
+    ['k', 'l', 'm', 'n', 'o']
   ]
   await combination('deep property', deep)
 

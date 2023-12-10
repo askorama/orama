@@ -6,7 +6,7 @@ import DefaultTheme from 'vitepress/theme'
 import ZoomImg from './components/ZoomImg.vue'
 import './style.css'
 
-export default {
+export default ({
   extends: DefaultTheme,
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
@@ -15,6 +15,5 @@ export default {
   },
   enhanceApp({ app, router, siteData }) {
     app.component('ZoomImg', ZoomImg)
-  },
-
-} satisfies Theme
+  }
+} satisfies Theme)

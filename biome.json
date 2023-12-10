@@ -16,7 +16,9 @@
 			"plugin-astro",
 			"plugin-match-highlight",
 			"stemmers",
-			"stopwords"
+			"stopwords",
+			"docs",
+			"benchmarks"
 		],
 		"maxSize": 1000000000
 	},

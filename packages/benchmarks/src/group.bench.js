@@ -10,9 +10,9 @@ async function createDb() {
       description: 'string',
       categories: {
         first: 'string',
-        second: 'string',
-      },
-    },
+        second: 'string'
+      }
+    }
   })
   const first3000Events = formattedEvents.slice(0, 3000)
 
@@ -29,7 +29,7 @@ b.suite(
 
     return async () => {
       await search(db, {
-        limit: 1,
+        limit: 1
       })
     }
   }),
@@ -39,7 +39,7 @@ b.suite(
     return async () => {
       await search(db, {
         distinctOn: 'date',
-        limit: 1,
+        limit: 1
       })
     }
   }),
@@ -50,8 +50,8 @@ b.suite(
       await search(db, {
         groupBy: {
           properties: ['date'],
-          maxResult: 1,
-        },
+          maxResult: 1
+        }
       })
     }
   }),
@@ -59,5 +59,5 @@ b.suite(
   b.cycle(),
   b.complete(),
   b.save({ file: 'reduce', version: '1.0.0' }),
-  b.save({ file: 'reduce', format: 'chart.html' }),
+  b.save({ file: 'reduce', format: 'chart.html' })
 )
