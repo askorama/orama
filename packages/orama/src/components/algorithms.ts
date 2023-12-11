@@ -6,7 +6,7 @@ export function prioritizeTokenScores(
   arrays: TokenScore[][],
   boost: number,
   threshold = 1,
-  keywordsCount: number,
+  keywordsCount: number
 ): TokenScore[] {
   if (boost === 0) {
     throw createError('INVALID_BOOST_VALUE')
@@ -100,7 +100,7 @@ export function BM25(
   docsCount: number,
   fieldLength: number,
   averageFieldLength: number,
-  BM25Params: Required<BM25Params>,
+  BM25Params: Required<BM25Params>
 ) {
   const { k, b, d } = BM25Params
   const idf = Math.log(1 + (docsCount - matchingCount + 0.5) / (matchingCount + 0.5))

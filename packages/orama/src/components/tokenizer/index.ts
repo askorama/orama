@@ -142,7 +142,7 @@ export async function createTokenizer(config: DefaultTokenizerConfig = {}): Prom
     stopWords,
     allowDuplicates: Boolean(config.allowDuplicates),
     normalizeToken,
-    normalizationCache: new Map(),
+    normalizationCache: new Map()
   }
 
   tokenizer.tokenize = tokenize.bind(tokenizer)

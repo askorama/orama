@@ -9,7 +9,7 @@ export async function insert<T extends AnyOrama>(
   orama: T,
   doc: PartialSchemaDeep<TypedDocument<T>>,
   language?: string,
-  skipHooks?: boolean,
+  skipHooks?: boolean
 ): Promise<string> {
   const errorProperty = await orama.validateSchema(doc, orama.schema)
   if (errorProperty) {
@@ -23,7 +23,7 @@ async function innerInsert<T extends AnyOrama>(
   orama: T,
   doc: PartialSchemaDeep<TypedDocument<T>>,
   language?: string,
-  skipHooks?: boolean,
+  skipHooks?: boolean
 ): Promise<string> {
   const { index, docs } = orama.data
 
@@ -55,7 +55,12 @@ async function innerInsert<T extends AnyOrama>(
     const actualType = typeof value
     const expectedType = indexablePropertiesWithTypes[key]
 
-    if (isGeoPointType(expectedType) && typeof value === 'object' && typeof (value as Point).lon === 'number' && typeof (value as Point).lat === 'number') {
+    if (
+      isGeoPointType(expectedType) &&
+      typeof value === 'object' &&
+      typeof (value as Point).lon === 'number' &&
+      typeof (value as Point).lat === 'number'
+    ) {
       continue
     }
 
@@ -68,7 +73,10 @@ async function innerInsert<T extends AnyOrama>(
       continue
     }
 
-    if ((expectedType === 'enum' || expectedType === 'enum[]') && (actualType === 'string' || actualType === 'number')) {
+    if (
+      (expectedType === 'enum' || expectedType === 'enum[]') &&
+      (actualType === 'string' || actualType === 'number')
+    ) {
       continue
     }
 
@@ -92,7 +100,7 @@ async function innerInsert<T extends AnyOrama>(
       expectedType,
       language,
       orama.tokenizer,
-      docsCount,
+      docsCount
     )
     await orama.index.insert(
       orama.index,
@@ -103,7 +111,7 @@ async function innerInsert<T extends AnyOrama>(
       expectedType,
       language,
       orama.tokenizer,
-      docsCount,
+      docsCount
     )
     await orama.index.afterInsert?.(
       orama.data.index,
@@ -113,7 +121,7 @@ async function innerInsert<T extends AnyOrama>(
       expectedType,
       language,
       orama.tokenizer,
-      docsCount,
+      docsCount
     )
   }
 
@@ -146,7 +154,7 @@ export async function insertMultiple<T extends AnyOrama>(
   batchSize?: number,
   language?: string,
   skipHooks?: boolean,
-  timeout?: number,
+  timeout?: number
 ): Promise<string[]> {
   if (!skipHooks) {
     await runMultipleHook(orama.beforeInsertMultiple, orama, docs as TypedDocument<T>[])
@@ -170,7 +178,7 @@ export async function innerInsertMultiple<T extends AnyOrama>(
   batchSize?: number,
   language?: string,
   skipHooks?: boolean,
-  timeout?: number,
+  timeout?: number
 ): Promise<string[]> {
   if (!batchSize) {
     batchSize = 1000

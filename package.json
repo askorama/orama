@@ -14,8 +14,8 @@
     "build:plugin-docusaurus-v3": "cd packages/plugin-docusaurus-v3 && npm run build",
     "build:plugin-match-highlight": "cd packages/plugin-match-highlight && npm run build",
     "build:plugin-parsedoc": "cd packages/plugin-parsedoc && npm run build",
-    "format": "prettier -w packages",
-    "format:biome": "biome format --write ./packages",
+    "format": "biome format --write ./packages",
+    "format:hook": "biome format --write --no-errors-on-unmatched ./packages",
     "lint": "turbo lint",
     "test": "turbo test",
     "test:orama": "cd packages/orama && npm test",
@@ -46,7 +46,6 @@
     "execa": "^6.1.0",
     "husky": "^8.0.2",
     "lint-staged": "^13.1.0",
-    "prettier": "^2.8.1",
     "semver": "^7.3.8",
     "simple-git": "^3.17.0",
     "tap": "^16.3.2",
@@ -74,7 +73,7 @@
   "license": "Apache-2.0",
   "lint-staged": {
     "*": [
-      "prettier packages/**/*.{js,ts,mjs,cjs,cts,json} --write"
+      "pnpm format:hook"
     ]
   },
   "config": {

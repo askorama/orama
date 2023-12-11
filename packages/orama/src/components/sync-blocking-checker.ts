@@ -19,7 +19,7 @@ export function trackInsertion<T extends AnyOrama>(orama: T): void {
   if (orama[kInsertions]! > 1000) {
     warn(
       "Orama's insert operation is synchronous. Please avoid inserting a large number of document in a single operation in order not to block the main thread or, in alternative, please use insertMultiple.",
-      { code: 'ORAMA0001' },
+      { code: 'ORAMA0001' }
     )
 
     orama[kInsertions] = -1
@@ -40,7 +40,7 @@ export function trackRemoval<T extends AnyOrama>(orama: T): void {
   if (orama[kRemovals]! > 1000) {
     warn(
       "Orama's remove operation is synchronous. Please avoid removing a large number of document in a single operation in order not to block the main thread, in alternative, please use updateMultiple.",
-      { code: 'ORAMA0002' },
+      { code: 'ORAMA0002' }
     )
 
     orama[kRemovals] = -1

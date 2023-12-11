@@ -7,7 +7,7 @@ import type {
   NumberFacetDefinition,
   SearchableValue,
   StringFacetDefinition,
-  TokenScore,
+  TokenScore
 } from '../types.js'
 import { getNested } from '../utils.js'
 
@@ -24,7 +24,7 @@ function sortingPredicate(order: FacetSorting = 'desc', a: [string, number], b: 
 export async function getFacets<T extends AnyOrama>(
   orama: T,
   results: TokenScore[],
-  facetsConfig: FacetsParams<T>,
+  facetsConfig: FacetsParams<T>
 ): Promise<FacetResult> {
   const facets: FacetResult = {}
   const allIDs = results.map(([id]) => id)
@@ -49,7 +49,7 @@ export async function getFacets<T extends AnyOrama>(
 
     facets[facet] = {
       count: 0,
-      values,
+      values
     }
   }
 
@@ -110,7 +110,7 @@ export async function getFacets<T extends AnyOrama>(
       facets[facet].values = Object.fromEntries(
         Object.entries(facets[facet].values)
           .sort((a, b) => sortingPredicate(stringFacetDefinition.sort, a, b))
-          .slice(stringFacetDefinition.offset ?? 0, stringFacetDefinition.limit ?? 10),
+          .slice(stringFacetDefinition.offset ?? 0, stringFacetDefinition.limit ?? 10)
       )
     }
   }
@@ -122,7 +122,7 @@ function calculateNumberFacet(
   ranges: NumberFacetDefinition['ranges'],
   values: Record<string, number>,
   facetValue: number,
-  alreadyInsertedValues?: Set<string>,
+  alreadyInsertedValues?: Set<string>
 ) {
   for (const range of ranges) {
     const value = `${range.from}-${range.to}`
@@ -148,7 +148,7 @@ function calculateBooleanStringOrEnumFacet(
   values: Record<string, number>,
   facetValue: FacetValue,
   propertyType: 'string' | 'boolean' | 'enum',
-  alreadyInsertedValues?: Set<string>,
+  alreadyInsertedValues?: Set<string>
 ) {
   // String or boolean based facets
   const value = facetValue?.toString() ?? (propertyType === 'boolean' ? 'false' : '')
