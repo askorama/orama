@@ -13,7 +13,7 @@ const movieSchema = {
 type MovieDocument = TypedDocument<Orama<typeof movieSchema>>
 
 const movieDBP = create({
-  schema: movieSchema,
+  schema: movieSchema
 })
 expectType<Promise<Orama<typeof movieSchema>>>(movieDBP)
 const movieDB = await movieDBP
@@ -22,12 +22,12 @@ const idP = insert(movieDB, {
   title: 'The Godfather',
   year: 1972,
   actors: ['Marlon Brando', 'Al Pacino'],
-  isFavorite: true,
+  isFavorite: true
 })
 expectType<Promise<string>>(idP)
 
 const searchParams: SearchParams<Orama<typeof movieSchema>> = {
-  term: 'godfather',
+  term: 'godfather'
 }
 
 const resultP = search(movieDB, searchParams)

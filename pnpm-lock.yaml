@@ -60,9 +60,6 @@ importers:
       lint-staged:
         specifier: ^13.1.0
         version: 13.1.0
-      prettier:
-        specifier: ^2.8.1
-        version: 2.8.1
       semver:
         specifier: ^7.3.8
         version: 7.3.8
@@ -8256,7 +8253,7 @@ packages:
     dependencies:
       '@vue/compiler-ssr': 3.3.10
       '@vue/shared': 3.3.10
-      vue: 3.3.10(typescript@5.2.2)
+      vue: 3.3.10(typescript@5.0.3)
 
   /@vue/shared@3.3.10:
     resolution: {integrity: sha512-2y3Y2J1a3RhFa0WisHvACJR2ncvWiVHcP8t0Inxo+NKz+8RKO4ZV8eZgCxRgQoA6ITfV12L4E6POOL9HOU5nqw==}

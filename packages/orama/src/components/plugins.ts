@@ -1,6 +1,6 @@
 import type { AnyOrama, OramaPlugin } from '../types.js'
 
-export type AvailablePluginHooks = typeof AVAILABLE_PLUGIN_HOOKS[number]
+export type AvailablePluginHooks = (typeof AVAILABLE_PLUGIN_HOOKS)[number]
 
 export const AVAILABLE_PLUGIN_HOOKS = [
   'beforeInsert',
@@ -21,7 +21,7 @@ export const AVAILABLE_PLUGIN_HOOKS = [
   'afterLoad'
 ] as const
 
-export function getAllPluginsByHook<T extends AnyOrama> (orama: T, hook: AvailablePluginHooks): OramaPlugin[] {
+export function getAllPluginsByHook<T extends AnyOrama>(orama: T, hook: AvailablePluginHooks): OramaPlugin[] {
   const pluginsToRun: OramaPlugin[] = []
 
   const pluginsLength = orama.plugins?.length

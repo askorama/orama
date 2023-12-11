@@ -9,7 +9,7 @@ export async function update<T extends AnyOrama>(
   id: string,
   doc: PartialSchemaDeep<TypedDocument<T>>,
   language?: string,
-  skipHooks?: boolean,
+  skipHooks?: boolean
 ): Promise<string> {
   if (!skipHooks && orama.beforeUpdate) {
     await runSingleHook(orama.beforeUpdate, orama, id)
@@ -31,7 +31,7 @@ export async function updateMultiple<T extends AnyOrama>(
   docs: PartialSchemaDeep<TypedDocument<T>>[],
   batchSize?: number,
   language?: string,
-  skipHooks?: boolean,
+  skipHooks?: boolean
 ): Promise<string[]> {
   if (!skipHooks) {
     await runMultipleHook(orama.beforeUpdateMultiple, orama, ids)

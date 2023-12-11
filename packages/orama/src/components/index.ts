@@ -19,7 +19,7 @@ import type {
   TypedDocument,
   VectorIndex,
   VectorType,
-  WhereCondition,
+  WhereCondition
 } from '../types.js'
 import { createError } from '../errors.js'
 import {
@@ -30,7 +30,7 @@ import {
   lessThan as avlLessThan,
   RootNode as AVLRootNode,
   rangeSearch as avlRangeSearch,
-  removeDocument as avlRemoveDocument,
+  removeDocument as avlRemoveDocument
 } from '../trees/avl.js'
 import {
   create as flatCreate,
@@ -38,14 +38,14 @@ import {
   filterArr as flatFilterArr,
   insert as flatInsert,
   removeDocument as flatRemoveDocument,
-  FlatTree,
+  FlatTree
 } from '../trees/flat.js'
 import {
   create as radixCreate,
   find as radixFind,
   insert as radixInsert,
   Node as RadixNode,
-  removeDocumentByWord as radixRemoveDocument,
+  removeDocumentByWord as radixRemoveDocument
 } from '../trees/radix.js'
 import {
   create as bkdCreate,
@@ -54,7 +54,7 @@ import {
   RootNode as BKDNode,
   Point as BKDGeoPoint,
   searchByRadius,
-  searchByPolygon,
+  searchByPolygon
 } from '../trees/bkd.js'
 
 import { convertDistanceToMeters, intersect, safeArrayPush } from '../utils.js'
@@ -65,7 +65,7 @@ import {
   DocumentID,
   getInternalDocumentId,
   InternalDocumentID,
-  InternalDocumentIDStore,
+  InternalDocumentIDStore
 } from './internal-document-id-store.js'
 
 export type FrequencyMap = {
@@ -83,25 +83,20 @@ export type BooleanIndex = {
   false: InternalDocumentID[]
 }
 
-export type TreeType =
-  | 'AVL'
-  | 'Radix'
-  | 'Bool'
-  | 'Flat'
-  | 'BKD'
+export type TreeType = 'AVL' | 'Radix' | 'Bool' | 'Flat' | 'BKD'
 
 export type TTree<T = TreeType, N = unknown> = {
-  type: T,
+  type: T
   node: N
   isArray: boolean
 }
 
 export type Tree =
   | TTree<'Radix', RadixNode>
-  | TTree<'AVL',   AVLRootNode<number, InternalDocumentID[]>>
-  | TTree<'Bool',  BooleanIndex>
-  | TTree<'Flat',  FlatTree>
-  | TTree<'BKD',   BKDNode>
+  | TTree<'AVL', AVLRootNode<number, InternalDocumentID[]>>
+  | TTree<'Bool', BooleanIndex>
+  | TTree<'Flat', FlatTree>
+  | TTree<'BKD', BKDNode>
 
 export interface Index extends AnyIndexStore {
   sharedInternalDocumentStore: InternalDocumentIDStore
@@ -120,7 +115,7 @@ export async function insertDocumentScoreParameters(
   prop: string,
   id: DocumentID,
   tokens: string[],
-  docsCount: number,
+  docsCount: number
 ): Promise<void> {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
@@ -134,7 +129,7 @@ export async function insertTokenScoreParameters(
   prop: string,
   id: DocumentID,
   tokens: string[],
-  token: string,
+  token: string
 ): Promise<void> {
   let tokenFrequency = 0
 
@@ -161,7 +156,7 @@ export async function removeDocumentScoreParameters(
   index: Index,
   prop: string,
   id: DocumentID,
-  docsCount: number,
+  docsCount: number
 ): Promise<void> {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
@@ -180,7 +175,7 @@ export async function calculateResultScores<T extends AnyOrama, ResultDocument =
   index: Index,
   prop: string,
   term: string,
-  ids: DocumentID[],
+  ids: DocumentID[]
 ): Promise<TokenScore[]> {
   const documentIDs = Array.from(ids)
 
@@ -207,7 +202,7 @@ export async function calculateResultScores<T extends AnyOrama, ResultDocument =
       context.docsCount,
       fieldLengths[internalId]!,
       avgFieldLength,
-      context.params.relevance! as Required<BM25Params>,
+      context.params.relevance! as Required<BM25Params>
     )
 
     scoreList.push([internalId, bm25])
@@ -220,7 +215,7 @@ export async function create<T extends AnyOrama, TSchema extends T['schema']>(
   sharedInternalDocumentStore: T['internalDocumentIDStore'],
   schema: TSchema,
   index?: Index,
-  prefix = '',
+  prefix = ''
 ): Promise<Index> {
   if (!index) {
     index = {
@@ -232,7 +227,7 @@ export async function create<T extends AnyOrama, TSchema extends T['schema']>(
       frequencies: {},
       tokenOccurrences: {},
       avgFieldLength: {},
-      fieldLengths: {},
+      fieldLengths: {}
     }
   }
 
@@ -250,7 +245,7 @@ export async function create<T extends AnyOrama, TSchema extends T['schema']>(
       index.searchablePropertiesWithTypes[path] = type
       index.vectorIndexes[path] = {
         size: getVectorSize(type),
-        vectors: {},
+        vectors: {}
       }
     } else {
       const isArray = /\[/.test(type as string)
@@ -299,7 +294,7 @@ async function insertScalar(
   schemaType: ScalarSearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
-  docsCount: number,
+  docsCount: number
 ): Promise<void> {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
@@ -345,9 +340,8 @@ export async function insert(
   schemaType: SearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
-  docsCount: number,
+  docsCount: number
 ): Promise<void> {
-
   if (isVectorType(schemaType)) {
     return insertVector(index, prop, value as number[] | Float32Array, id)
   }
@@ -362,7 +356,7 @@ export async function insert(
       schemaType as ScalarSearchableType,
       language,
       tokenizer,
-      docsCount,
+      docsCount
     )
   }
 
@@ -395,7 +389,7 @@ async function removeScalar(
   schemaType: ScalarSearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
-  docsCount: number,
+  docsCount: number
 ): Promise<boolean> {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
@@ -449,7 +443,7 @@ export async function remove(
   schemaType: SearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
-  docsCount: number,
+  docsCount: number
 ): Promise<boolean> {
   if (!isArrayType(schemaType)) {
     return removeScalar(
@@ -461,7 +455,7 @@ export async function remove(
       schemaType as ScalarSearchableType,
       language,
       tokenizer,
-      docsCount,
+      docsCount
     )
   }
 
@@ -480,7 +474,7 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
   context: SearchContext<T, ResultDocument>,
   index: Index,
   prop: string,
-  term: string,
+  term: string
 ): Promise<TokenScore[]> {
   if (!(prop in index.tokenOccurrences)) {
     return []
@@ -507,16 +501,16 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
 export async function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   context: SearchContext<T, ResultDocument>,
   index: Index,
-  filters: Partial<WhereCondition<T['schema']>>,
+  filters: Partial<WhereCondition<T['schema']>>
 ): Promise<number[]> {
   const filterKeys = Object.keys(filters)
 
   const filtersMap: Record<string, InternalDocumentID[]> = filterKeys.reduce(
     (acc, key) => ({
       [key]: [],
-      ...acc,
+      ...acc
     }),
-    {},
+    {}
   )
 
   for (const param of filterKeys) {
@@ -531,7 +525,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
     if (type === 'Bool') {
       const idx = node
       const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
-      safeArrayPush(filtersMap[param], filteredIDs);
+      safeArrayPush(filtersMap[param], filteredIDs)
       continue
     }
 
@@ -547,13 +541,30 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
       }
 
       if (reqOperation === 'radius') {
-        const { value, coordinates, unit = 'm', inside = true, highPrecision = false } = operation[reqOperation] as GeosearchRadiusOperator['radius']
+        const {
+          value,
+          coordinates,
+          unit = 'm',
+          inside = true,
+          highPrecision = false
+        } = operation[reqOperation] as GeosearchRadiusOperator['radius']
         const distanceInMeters = convertDistanceToMeters(value, unit)
-        const ids = searchByRadius(node.root, coordinates as BKDGeoPoint, distanceInMeters, inside, undefined, highPrecision)
+        const ids = searchByRadius(
+          node.root,
+          coordinates as BKDGeoPoint,
+          distanceInMeters,
+          inside,
+          undefined,
+          highPrecision
+        )
         // @todo: convert this into a for loop
         safeArrayPush(filtersMap[param], ids.map(({ docIDs }) => docIDs).flat())
       } else {
-        const { coordinates, inside = true, highPrecision = false } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
+        const {
+          coordinates,
+          inside = true,
+          highPrecision = false
+        } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
         const ids = searchByPolygon(node.root, coordinates as BKDGeoPoint[], inside, undefined, highPrecision)
         // @todo: convert this into a for loop
         safeArrayPush(filtersMap[param], ids.map(({ docIDs }) => docIDs).flat())
@@ -567,7 +578,8 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
         const term = await context.tokenizer.tokenize(raw, context.language, param)
         for (const t of term) {
           const filteredIDsResults = radixFind(node, { term: t, exact: true })
-          safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())}
+          safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())
+        }
       }
 
       continue
@@ -591,7 +603,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
     if (type === 'AVL') {
       const operationOpt = operationKeys[0] as keyof ComparisonOperator
       const operationValue = (operation as ComparisonOperator)[operationOpt]
-      let filteredIDs: InternalDocumentID[] = [];
+      let filteredIDs: InternalDocumentID[] = []
 
       switch (operationOpt) {
         case 'gt': {
@@ -654,7 +666,7 @@ function loadRadixNode(node: RadixNode): RadixNode {
 
 function loadFlatNode(node: unknown): FlatTree {
   return {
-    numberToDocumentId: new Map(node as [ScalarSearchableType, InternalDocumentID[]][]),
+    numberToDocumentId: new Map(node as [ScalarSearchableType, InternalDocumentID[]][])
   }
 }
 
@@ -671,7 +683,7 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
     frequencies,
     tokenOccurrences,
     avgFieldLength,
-    fieldLengths,
+    fieldLengths
   } = raw as Index
 
   const indexes: Index['indexes'] = {}
@@ -709,7 +721,7 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
 
     vectorIndexes[idx] = {
       size: rawVectorIndexes[idx].size,
-      vectors,
+      vectors
     }
   }
 
@@ -722,7 +734,7 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
     frequencies,
     tokenOccurrences,
     avgFieldLength,
-    fieldLengths,
+    fieldLengths
   }
 }
 
@@ -735,7 +747,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
     frequencies,
     tokenOccurrences,
     avgFieldLength,
-    fieldLengths,
+    fieldLengths
   } = index
 
   const vectorIndexesAsArrays: Index['vectorIndexes'] = {}
@@ -749,14 +761,14 @@ export async function save<R = unknown>(index: Index): Promise<R> {
 
     vectorIndexesAsArrays[idx] = {
       size: vectorIndexes[idx].size,
-      vectors,
+      vectors
     }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const savedIndexes: any = {}
   for (const name of Object.keys(indexes)) {
-    const {type, node, isArray} = indexes[name]
+    const { type, node, isArray } = indexes[name]
     if (type !== 'Flat') {
       savedIndexes[name] = indexes[name]
       continue
@@ -764,7 +776,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
     savedIndexes[name] = {
       type: 'Flat',
       node: saveFlatNode(node),
-      isArray,
+      isArray
     }
   }
 
@@ -776,7 +788,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
     frequencies,
     tokenOccurrences,
     avgFieldLength,
-    fieldLengths,
+    fieldLengths
   } as R
 }
 
@@ -795,6 +807,6 @@ export async function createIndex(): Promise<IIndex<Index>> {
     getSearchableProperties,
     getSearchablePropertiesWithTypes,
     load,
-    save,
+    save
   }
 }

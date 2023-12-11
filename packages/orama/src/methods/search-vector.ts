@@ -15,7 +15,7 @@ export type SearchVectorParams = {
 
 export async function searchVector<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
   orama: T,
-  params: SearchVectorParams,
+  params: SearchVectorParams
 ): Promise<Results<ResultDocument>> {
   const timeStart = await getNanosecondsTime()
   let { vector } = params
@@ -53,7 +53,7 @@ export async function searchVector<T extends AnyOrama, ResultDocument extends Ty
       const newDoc: Result<ResultDocument> = {
         id: result.id,
         score: result.score,
-        document: doc,
+        document: doc
       }
       docs[i] = newDoc
     }
@@ -67,7 +67,7 @@ export async function searchVector<T extends AnyOrama, ResultDocument extends Ty
     hits: docs.filter(Boolean),
     elapsed: {
       raw: Number(elapsedTime),
-      formatted: await formatNanoseconds(elapsedTime),
-    },
+      formatted: await formatNanoseconds(elapsedTime)
+    }
   }
 }

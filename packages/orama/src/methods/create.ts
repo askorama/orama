@@ -21,20 +21,32 @@ import {
 import { uniqueId } from '../utils.js'
 
 interface CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter> {
-  schema: OramaSchema,
+  schema: OramaSchema
   sort?: SorterConfig
   language?: string
-  components?: Components<Orama<OramaSchema, TIndex, TDocumentStore, TSorter>, OramaSchema, TIndex, TDocumentStore, TSorter>
+  components?: Components<
+    Orama<OramaSchema, TIndex, TDocumentStore, TSorter>,
+    OramaSchema,
+    TIndex,
+    TDocumentStore,
+    TSorter
+  >
   plugins?: OramaPlugin[]
   id?: string
 }
 
-function validateComponents<OramaSchema, TIndex, TDocumentStore, TSorter, TOrama extends Orama<OramaSchema, TIndex, TDocumentStore, TSorter>>(components: Components<TOrama, OramaSchema, TIndex, TDocumentStore, TSorter>) {
+function validateComponents<
+  OramaSchema,
+  TIndex,
+  TDocumentStore,
+  TSorter,
+  TOrama extends Orama<OramaSchema, TIndex, TDocumentStore, TSorter>
+>(components: Components<TOrama, OramaSchema, TIndex, TDocumentStore, TSorter>) {
   const defaultComponents = {
     formatElapsedTime,
     getDocumentIndexId,
     getDocumentProperties,
-    validateSchema,
+    validateSchema
   }
 
   for (const rawKey of FUNCTION_COMPONENTS) {
@@ -51,10 +63,7 @@ function validateComponents<OramaSchema, TIndex, TDocumentStore, TSorter, TOrama
   }
 
   for (const rawKey of Object.keys(components)) {
-    if (
-      !OBJECT_COMPONENTS.includes(rawKey) &&
-      !FUNCTION_COMPONENTS.includes(rawKey)
-    ) {
+    if (!OBJECT_COMPONENTS.includes(rawKey) && !FUNCTION_COMPONENTS.includes(rawKey)) {
       throw createError('UNSUPPORTED_COMPONENT', rawKey)
     }
   }
@@ -62,16 +71,19 @@ function validateComponents<OramaSchema, TIndex, TDocumentStore, TSorter, TOrama
 
 export async function create<
   OramaSchema,
-  TIndex = IIndex<Index>, 
-  TDocumentStore = IDocumentsStore<DocumentsStore>, 
-  TSorter = ISorter<Sorter>> ({
+  TIndex = IIndex<Index>,
+  TDocumentStore = IDocumentsStore<DocumentsStore>,
+  TSorter = ISorter<Sorter>
+>({
   schema,
   sort,
   language,
   components,
   id,
-  plugins,
-}: CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter>): Promise<Orama<OramaSchema, TIndex, TDocumentStore, TSorter>> {
+  plugins
+}: CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter>): Promise<
+  Orama<OramaSchema, TIndex, TDocumentStore, TSorter>
+> {
   if (!components) {
     components = {}
   }
@@ -103,20 +115,15 @@ export async function create<
 
   const internalDocumentStore = createInternalDocumentIDStore()
 
-  index ||= await createIndex() as TIndex
-  sorter ||= await createSorter() as TSorter
-  documentsStore ||= await createDocumentsStore() as TDocumentStore
+  index ||= (await createIndex()) as TIndex
+  sorter ||= (await createSorter()) as TSorter
+  documentsStore ||= (await createDocumentsStore()) as TDocumentStore
 
   // Validate all other components
   validateComponents(components)
 
   // Assign only recognized components and hooks
-  const {
-    getDocumentProperties,
-    getDocumentIndexId,
-    validateSchema,
-    formatElapsedTime,
-  } = components
+  const { getDocumentProperties, getDocumentIndexId, validateSchema, formatElapsedTime } = components
 
   const orama = {
     data: {},
@@ -146,13 +153,13 @@ export async function create<
     beforeUpdateMultiple: [],
     formatElapsedTime,
     id,
-    plugins,
+    plugins
   } as unknown as Orama<OramaSchema, TIndex, TDocumentStore, TSorter>
 
   orama.data = {
     index: await orama.index.create(orama, internalDocumentStore, schema),
     docs: await orama.documentsStore.create(orama, internalDocumentStore),
-    sorting: await orama.sorter.create(orama, internalDocumentStore, schema, sort),
+    sorting: await orama.sorter.create(orama, internalDocumentStore, schema, sort)
   }
 
   for (const hook of AVAILABLE_PLUGIN_HOOKS) {

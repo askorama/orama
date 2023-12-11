@@ -1,9 +1,4 @@
-import {
-  avl as esmAVL,
-  radix as esmRadix,
-  zip as esmZip,
-  bkd as esmBkd
-} from '../trees.js'
+import { avl as esmAVL, radix as esmRadix, zip as esmZip, bkd as esmBkd } from '../trees.js'
 
 export const avl = esmAVL
 export const radix = esmRadix

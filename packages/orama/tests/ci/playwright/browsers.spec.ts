@@ -15,10 +15,10 @@ test('works correctly', async ({ page }) => {
           director: 'Christopher Nolan',
           plot: 'Two friends and fellow magicians become bitter enemies after a sudden tragedy. As they devote themselves to this rivalry, they make sacrifices that bring them fame but with terrible consequences.',
           year: 2006,
-          isFavorite: true,
-        },
-      },
+          isFavorite: true
+        }
+      }
     ],
-    count: 1,
+    count: 1
   })
 })

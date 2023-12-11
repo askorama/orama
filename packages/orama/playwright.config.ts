@@ -14,7 +14,7 @@ const config: PlaywrightTestConfig = {
   testDir: './tests/ci/playwright',
   webServer: {
     command: 'npx vite --config ./tests/ci/playwright/vite.config.js',
-    port: 3000,
+    port: 3000
   },
   /* Maximum time one test can run for. */
   timeout: 30 * 1000,
@@ -23,7 +23,7 @@ const config: PlaywrightTestConfig = {
      * Maximum time expect() should wait for the condition to be met.
      * For example in `await expect(locator).toHaveText();`
      */
-    timeout: 5000,
+    timeout: 5000
   },
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -42,7 +42,7 @@ const config: PlaywrightTestConfig = {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: 'http://localhost:3000/',
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: 'on-first-retry'
   },
 
   /* Configure projects for major browsers */
@@ -50,22 +50,22 @@ const config: PlaywrightTestConfig = {
     {
       name: 'chromium',
       use: {
-        ...devices['Desktop Chrome'],
-      },
+        ...devices['Desktop Chrome']
+      }
     },
 
     {
       name: 'firefox',
       use: {
-        ...devices['Desktop Firefox'],
-      },
+        ...devices['Desktop Firefox']
+      }
     },
 
     {
       name: 'webkit',
       use: {
-        ...devices['Desktop Safari'],
-      },
+        ...devices['Desktop Safari']
+      }
     },
 
     /* Test against mobile viewports. */
@@ -86,16 +86,16 @@ const config: PlaywrightTestConfig = {
     {
       name: 'Microsoft Edge',
       use: {
-        channel: 'msedge',
-      },
+        channel: 'msedge'
+      }
     },
     {
       name: 'Google Chrome',
       use: {
-        channel: 'chrome',
-      },
-    },
-  ],
+        channel: 'chrome'
+      }
+    }
+  ]
 
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
   // outputDir: 'test-results/',

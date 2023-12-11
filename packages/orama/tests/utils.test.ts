@@ -1,10 +1,10 @@
 import t from 'tap'
 import { formatBytes, formatNanoseconds, getOwnProperty, getNested, flattenObject } from '../src/utils.js'
 
-t.test('utils', t => {
+t.test('utils', (t) => {
   t.plan(5)
 
-  t.test('should correctly format bytes', async t => {
+  t.test('should correctly format bytes', async (t) => {
     t.plan(9)
 
     t.equal(await formatBytes(0), '0 Bytes')
@@ -18,7 +18,7 @@ t.test('utils', t => {
     t.equal(await formatBytes(1024 ** 7), '1 ZB')
   })
 
-  t.test('should correctly format nanoseconds', async t => {
+  t.test('should correctly format nanoseconds', async (t) => {
     t.plan(13)
 
     t.equal(await formatNanoseconds(1n), '1ns')
@@ -36,28 +36,28 @@ t.test('utils', t => {
     t.equal(await formatNanoseconds(1000_000_000_000n), '1000s')
   })
 
-  t.test('should check object properties', t => {
+  t.test('should check object properties', (t) => {
     t.plan(2)
 
-    t.test('should return the value of the property or undefined', t => {
+    t.test('should return the value of the property or undefined', (t) => {
       t.plan(2)
 
       const myObject = {
-        foo: 'bar',
+        foo: 'bar'
       }
 
       t.equal(getOwnProperty(myObject, 'foo'), 'bar')
       t.equal(getOwnProperty(myObject, 'bar'), undefined)
     })
 
-    t.test('should return even if the hasOwn method is not available', t => {
+    t.test('should return even if the hasOwn method is not available', (t) => {
       t.plan(2)
 
       // @ts-expect-error - we are testing the fallback
       globalThis.Object.hasOwn = undefined
 
       const myObject = {
-        foo: 'bar',
+        foo: 'bar'
       }
 
       t.equal(getOwnProperty(myObject, 'foo'), 'bar')
@@ -65,7 +65,7 @@ t.test('utils', t => {
     })
   })
 
-  t.test('should get value from a nested object', async t => {
+  t.test('should get value from a nested object', async (t) => {
     t.plan(7)
 
     const myObject = {
@@ -73,12 +73,12 @@ t.test('utils', t => {
       nested: {
         nested2: {
           nested3: {
-            bar: 'baz',
-          },
+            bar: 'baz'
+          }
         },
         null: null,
-        noop: () => null,
-      },
+        noop: () => null
+      }
     }
 
     t.equal(await getNested(myObject, 'foo'), 'bar')
@@ -90,7 +90,7 @@ t.test('utils', t => {
     t.equal(await getNested(myObject, 'nested.noop.bar'), undefined)
   })
 
-  t.test('should flatten an object', t => {
+  t.test('should flatten an object', (t) => {
     t.plan(2)
 
     const myObject = {
@@ -98,12 +98,12 @@ t.test('utils', t => {
       nested: {
         nested2: {
           nested3: {
-            bar: 'baz',
-          },
+            bar: 'baz'
+          }
         },
         null: null,
-        noop: () => null,
-      },
+        noop: () => null
+      }
     }
 
     const flattened = flattenObject(myObject)
@@ -111,5 +111,4 @@ t.test('utils', t => {
     t.equal((flattened as Record<string, string>).foo, 'bar')
     t.equal(flattened['nested.nested2.nested3.bar'], 'baz')
   })
-
 })

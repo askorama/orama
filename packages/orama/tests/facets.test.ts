@@ -1,8 +1,8 @@
 import t from 'tap'
 import { create, insert, insertMultiple, search } from '../src/index.js'
 
-t.test('facets', t => {
-  t.test('should generate correct facets', async t => {
+t.test('facets', (t) => {
+  t.test('should generate correct facets', async (t) => {
     t.plan(6)
 
     const db = await create({
@@ -11,9 +11,9 @@ t.test('facets', t => {
         quote: 'string',
         meta: {
           tag: 'string',
-          isFavorite: 'boolean',
-        },
-      },
+          isFavorite: 'boolean'
+        }
+      }
     })
 
     await insert(db, {
@@ -21,8 +21,8 @@ t.test('facets', t => {
       quote: 'Be the change you wish to see in the world',
       meta: {
         tag: 'inspirational',
-        isFavorite: true,
-      },
+        isFavorite: true
+      }
     })
 
     await insert(db, {
@@ -30,8 +30,8 @@ t.test('facets', t => {
       quote: "I have not failed. I've just found 10,000 ways that won't work.",
       meta: {
         tag: 'inspirational',
-        isFavorite: true,
-      },
+        isFavorite: true
+      }
     })
 
     await insert(db, {
@@ -39,8 +39,8 @@ t.test('facets', t => {
       quote: 'It does not matter how slowly you go as long as you do not stop.',
       meta: {
         tag: 'inspirational',
-        isFavorite: false,
-      },
+        isFavorite: false
+      }
     })
 
     await insert(db, {
@@ -49,8 +49,8 @@ t.test('facets', t => {
         'The best and most beautiful things in the world cannot be seen or even touched - they must be felt with the heart.',
       meta: {
         tag: 'love',
-        isFavorite: true,
-      },
+        isFavorite: true
+      }
     })
 
     await insert(db, {
@@ -58,8 +58,8 @@ t.test('facets', t => {
       quote: "Your time is limited, so don't waste it living someone else's life.",
       meta: {
         tag: 'inspirational',
-        isFavorite: false,
-      },
+        isFavorite: false
+      }
     })
 
     await insert(db, {
@@ -67,8 +67,8 @@ t.test('facets', t => {
       quote: 'The only way to do great work is to love what you do.',
       meta: {
         tag: 'inspirational',
-        isFavorite: false,
-      },
+        isFavorite: false
+      }
     })
 
     const results = await search(db, {
@@ -76,11 +76,11 @@ t.test('facets', t => {
       facets: {
         'meta.isFavorite': {
           true: true,
-          false: false,
+          false: false
         },
         'meta.tag': {},
-        author: {},
-      },
+        author: {}
+      }
     })
 
     t.same(results.facets?.['meta.isFavorite'].count, 2)
@@ -91,51 +91,51 @@ t.test('facets', t => {
     t.same(results.facets?.author.values, { 'Steve Jobs': 2, 'Thomas A. Edison': 1 })
   })
 
-  t.test('should correctly handle range facets', async t => {
+  t.test('should correctly handle range facets', async (t) => {
     t.plan(5)
 
     const db = await create({
       schema: {
         name: 'string',
         price: 'number',
-        category: 'string',
-      },
+        category: 'string'
+      }
     })
 
     await insert(db, {
       name: 'Chocolate',
       price: 1.99,
-      category: 'groceries',
+      category: 'groceries'
     })
 
     await insert(db, {
       name: 'Milk',
       price: 2.99,
-      category: 'groceries',
+      category: 'groceries'
     })
 
     await insert(db, {
       name: 'Bread',
       price: 3.99,
-      category: 'groceries',
+      category: 'groceries'
     })
 
     await insert(db, {
       name: 'Eggs',
       price: 4.99,
-      category: 'groceries',
+      category: 'groceries'
     })
 
     await insert(db, {
       name: 'Cheese',
       price: 5.99,
-      category: 'groceries',
+      category: 'groceries'
     })
 
     await insert(db, {
       name: 'Butter',
       price: 6.99,
-      category: 'groceries',
+      category: 'groceries'
     })
 
     const results = await search(db, {
@@ -147,10 +147,10 @@ t.test('facets', t => {
             { from: 0, to: 2 },
             { from: 2, to: 4 },
             { from: 4, to: 6 },
-            { from: 6, to: 8 },
-          ],
-        },
-      },
+            { from: 6, to: 8 }
+          ]
+        }
+      }
     })
 
     t.same(results.facets?.price.count, 4)
@@ -160,13 +160,12 @@ t.test('facets', t => {
     t.same(results.facets?.price.values['6-8'], 1)
   })
 
-  t.test('should work with `enum` and `enum[]`', async t => {
-
+  t.test('should work with `enum` and `enum[]`', async (t) => {
     const db = await create({
       schema: {
         category: 'enum',
-        colors: 'enum[]',
-      },
+        colors: 'enum[]'
+      }
     })
 
     await insertMultiple(db, [
@@ -181,15 +180,15 @@ t.test('facets', t => {
       {
         category: 'jeans',
         colors: ['white', 'black', 'blue']
-      },
+      }
     ])
 
     const results = await search(db, {
       term: '',
       facets: {
         category: {},
-        colors: {},
-      },
+        colors: {}
+      }
     })
 
     t.strictSame(results.facets, {
@@ -197,19 +196,19 @@ t.test('facets', t => {
         count: 3,
         values: {
           't-shirt': 1,
-          'sweatshirt': 1,
-          'jeans': 1,
+          sweatshirt: 1,
+          jeans: 1
         }
       },
       colors: {
         count: 6,
         values: {
-          'red': 2,
-          'green': 2,
-          'blue': 2,
-          'orange': 1,
-          'white': 1,
-          'black': 1,
+          red: 2,
+          green: 2,
+          blue: 2,
+          orange: 1,
+          white: 1,
+          black: 1
         }
       }
     })

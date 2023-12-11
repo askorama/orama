@@ -7,7 +7,7 @@ import {
   SearchParams,
   SingleCallbackComponent,
   TypedDocument
-} from '../types.js';
+} from '../types.js'
 
 export const OBJECT_COMPONENTS = ['tokenizer', 'index', 'documentsStore', 'sorter']
 
@@ -15,16 +15,18 @@ export const FUNCTION_COMPONENTS = [
   'validateSchema',
   'getDocumentIndexId',
   'getDocumentProperties',
-  'formatElapsedTime',
+  'formatElapsedTime'
 ]
 
-export const SINGLE_OR_ARRAY_COMPONENTS = [/* deprecated with v2.0.0-beta.5 */]
+export const SINGLE_OR_ARRAY_COMPONENTS = [
+  /* deprecated with v2.0.0-beta.5 */
+]
 
 export async function runSingleHook<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
   hooks: SingleCallbackComponent<T>[],
   orama: T,
   id: string,
-  doc?: ResultDocument,
+  doc?: ResultDocument
 ): Promise<void> {
   const hooksLength = hooks.length
   for (let i = 0; i < hooksLength; i++) {
@@ -35,7 +37,7 @@ export async function runSingleHook<T extends AnyOrama, ResultDocument extends T
 export async function runMultipleHook<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
   hooks: MultipleCallbackComponent<T>[],
   orama: T,
-  docsOrIds: ResultDocument[] | string[],
+  docsOrIds: ResultDocument[] | string[]
 ): Promise<void> {
   const hooksLength = hooks.length
   for (let i = 0; i < hooksLength; i++) {
@@ -48,7 +50,7 @@ export async function runAfterSearch<T extends AnyOrama, ResultDocument extends 
   db: T,
   params: SearchParams<T, ResultDocument>,
   language: string | undefined,
-  results: Results<ResultDocument>,
+  results: Results<ResultDocument>
 ): Promise<void> {
   const hooksLength = hooks.length
   for (let i = 0; i < hooksLength; i++) {
@@ -60,7 +62,7 @@ export async function runBeforeSearch<T extends AnyOrama>(
   hooks: BeforeSearch<T>[],
   db: T,
   params: SearchParams<T, TypedDocument<any>>,
-  language: string | undefined,
+  language: string | undefined
 ): Promise<void> {
   const hooksLength = hooks.length
   for (let i = 0; i < hooksLength; i++) {
