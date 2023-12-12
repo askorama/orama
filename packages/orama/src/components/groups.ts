@@ -1,6 +1,17 @@
 import { createError } from '../errors.js'
 import { getNested, intersect, safeArrayPush } from '../utils.js'
-import type { AnyDocument, AnyOrama, GroupByParams, GroupResult, Reduce, Result, ScalarSearchableValue, SearchableType, TokenScore, TypedDocument } from '../types.js'
+import type {
+  AnyDocument,
+  AnyOrama,
+  GroupByParams,
+  GroupResult,
+  Reduce,
+  Result,
+  ScalarSearchableValue,
+  SearchableType,
+  TokenScore,
+  TypedDocument
+} from '../types.js'
 import { getDocumentIdFromInternalId } from './internal-document-id-store.js'
 import { Point } from '../trees/bkd.js'
 
@@ -27,7 +38,7 @@ const DEFAULT_REDUCE: Reduce<Result<AnyDocument>[]> = {
     acc[index] = res
     return acc
   },
-  getInitialValue: length => Array.from({ length }),
+  getInitialValue: (length) => Array.from({ length })
 }
 
 const ALLOWED_TYPES = ['string', 'number', 'boolean']
@@ -35,7 +46,7 @@ const ALLOWED_TYPES = ['string', 'number', 'boolean']
 export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
   results: TokenScore[],
-  groupBy: GroupByParams<T, ResultDocument>,
+  groupBy: GroupByParams<T, ResultDocument>
 ): Promise<GroupResult<ResultDocument>> {
   const properties = groupBy.properties
   const propertiesLength = properties.length
@@ -69,7 +80,7 @@ export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocume
     const groupByKey = properties[i]
     const group: PropertyGroup = {
       property: groupByKey,
-      perValue: {},
+      perValue: {}
     }
 
     const values: Set<ScalarSearchableValue> = new Set()
@@ -85,7 +96,7 @@ export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocume
       if (typeof group.perValue[keyValue as GroupableType] === 'undefined') {
         group.perValue[keyValue as GroupableType] = {
           indexes: [],
-          count: 0,
+          count: 0
         }
       }
       if (group.perValue[keyValue as GroupableType].count >= returnedCount) {
@@ -115,7 +126,7 @@ export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocume
 
     const group: Group = {
       values: [],
-      indexes: [],
+      indexes: []
     }
     const indexes: number[][] = []
     for (let j = 0; j < combinationLength; j++) {
@@ -142,11 +153,11 @@ export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocume
 
     const reduce = (groupBy.reduce || DEFAULT_REDUCE) as Reduce<Result<ResultDocument>[]>
 
-    const docs = group.indexes.map(index => {
+    const docs = group.indexes.map((index) => {
       return {
         id: allIDs[index],
         score: results[index][1],
-        document: allDocs[index]!,
+        document: allDocs[index]!
       }
     })
 
@@ -156,7 +167,7 @@ export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocume
 
     res[i] = {
       values: group.values,
-      result: aggregationValue,
+      result: aggregationValue
     }
   }
 
@@ -164,7 +175,7 @@ export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocume
 }
 
 function calculateCombination(arrs: ScalarSearchableValue[][], index = 0): ScalarSearchableValue[][] {
-  if (index + 1 === arrs.length) return arrs[index].map(item => [item])
+  if (index + 1 === arrs.length) return arrs[index].map((item) => [item])
 
   const head = arrs[index]
   const c = calculateCombination(arrs, index + 1)
@@ -172,7 +183,7 @@ function calculateCombination(arrs: ScalarSearchableValue[][], index = 0): Scala
   const combinations: ScalarSearchableValue[][] = []
   for (const value of head) {
     for (const combination of c) {
-      const result = [value];
+      const result = [value]
 
       safeArrayPush(result, combination)
 

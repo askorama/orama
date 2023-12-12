@@ -15,13 +15,13 @@ export function createInternalDocumentIDStore(): InternalDocumentIDStore {
     idToInternalId: new Map(),
     internalIdToId: [],
     save,
-    load,
+    load
   }
 }
 
 export function save(store: InternalDocumentIDStore): unknown {
   return {
-    internalIdToId: store.internalIdToId,
+    internalIdToId: store.internalIdToId
   }
 }
 

@@ -99,5 +99,5 @@ export const stopwords = [
   'uw',
   'iemand',
   'geweest',
-  'andere',
+  'andere'
 ]

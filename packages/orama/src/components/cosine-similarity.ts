@@ -20,7 +20,7 @@ export function findSimilarVectors(
   length: number,
   threshold = 0.8
 ) {
-  const targetMagnitude = getMagnitude(targetVector, length);
+  const targetMagnitude = getMagnitude(targetVector, length)
 
   const similarVectors: SimilarVector[] = []
 
@@ -40,4 +40,3 @@ export function findSimilarVectors(
 
   return similarVectors.sort((a, b) => b.score - a.score)
 }
-

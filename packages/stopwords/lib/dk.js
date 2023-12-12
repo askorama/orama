@@ -92,5 +92,5 @@ export const stopwords = [
   'været',
   'thi',
   'jer',
-  'sådan',
+  'sådan'
 ]

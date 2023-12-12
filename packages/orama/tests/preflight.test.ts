@@ -3,13 +3,13 @@ import { create } from '../src/methods/create.js'
 import { insert } from '../src/methods/insert.js'
 import { search } from '../src/methods/search.js'
 
-t.test('preflight request', async t => {
+t.test('preflight request', async (t) => {
   t.plan(4)
 
   const db = await create({
     schema: {
-      title: 'string',
-    },
+      title: 'string'
+    }
   })
 
   await insert(db, { title: 'Red headphones' })
@@ -20,11 +20,11 @@ t.test('preflight request', async t => {
 
   const results = await search(db, {
     term: 'headphones',
-    preflight: true,
+    preflight: true
   })
 
   const fullResults = await search(db, {
-    term: 'headphones',
+    term: 'headphones'
   })
 
   t.same(results.count, 5)

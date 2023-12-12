@@ -2,7 +2,7 @@ import type {
   formatElapsedTime as esmFormatElapsedTime,
   getDocumentIndexId as esmGetDocumentIndexId,
   getDocumentProperties as esmGetDocumentProperties,
-  validateSchema as esmValidateSchema,
+  validateSchema as esmValidateSchema
 } from '../../components/defaults.js'
 
 let _esmFormatElapsedTime: typeof esmFormatElapsedTime

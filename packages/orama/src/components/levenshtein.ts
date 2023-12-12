@@ -132,7 +132,7 @@ export async function boundedLevenshtein(a: string, b: string, tolerance: number
   const distance = _boundedLevenshtein(a, b, tolerance)
   return {
     distance,
-    isBounded: distance >= 0,
+    isBounded: distance >= 0
   }
 }
 
@@ -141,7 +141,7 @@ export function syncBoundedLevenshtein(a: string, b: string, tolerance: number):
   const distance = _boundedLevenshtein(a, b, tolerance)
   return {
     distance,
-    isBounded: distance >= 0,
+    isBounded: distance >= 0
   }
 }
 

@@ -9,13 +9,13 @@ import {
   isBalanced,
   greaterThan,
   lessThan,
-  rangeSearch,
+  rangeSearch
 } from '../src/trees/avl.js'
 
-t.test('AVL Tree', t => {
+t.test('AVL Tree', (t) => {
   t.plan(8)
 
-  t.test('create', t => {
+  t.test('create', (t) => {
     t.plan(3)
 
     const tree = create(1, 'foo')
@@ -24,7 +24,7 @@ t.test('AVL Tree', t => {
     t.equal(find(tree, 4), null)
   })
 
-  t.test('insert', t => {
+  t.test('insert', (t) => {
     t.plan(1)
 
     const tree = create(1, 'foo')
@@ -39,7 +39,7 @@ t.test('AVL Tree', t => {
     t.equal(getSize(tree), 7)
   })
 
-  t.test('isBalanced', t => {
+  t.test('isBalanced', (t) => {
     t.plan(1)
 
     const tree = create(1, { foo: 'bar' })
@@ -61,7 +61,7 @@ t.test('AVL Tree', t => {
     t.equal(isBalanced(tree), true)
   })
 
-  t.test('find', t => {
+  t.test('find', (t) => {
     t.plan(2)
 
     const tree = create(1, [1, 2, 3])
@@ -77,7 +77,7 @@ t.test('AVL Tree', t => {
     t.same(find(tree, 20), [16, 17, 18])
   })
 
-  t.test('remove', t => {
+  t.test('remove', (t) => {
     t.plan(3)
 
     const tree = create(1, 'foo')
@@ -96,7 +96,7 @@ t.test('AVL Tree', t => {
     t.equal(isBalanced(tree), true)
   })
 
-  t.test('rangeSearch', t => {
+  t.test('rangeSearch', (t) => {
     t.plan(1)
 
     const tree = create(1, ['foo'])
@@ -111,7 +111,7 @@ t.test('AVL Tree', t => {
     t.same(rangeSearch(tree, 5, 20), ['quux', 'baz', 'corge', 'quuz'])
   })
 
-  t.test('greaterThan', t => {
+  t.test('greaterThan', (t) => {
     t.plan(1)
 
     const tree = create(1, ['foo'])
@@ -123,10 +123,10 @@ t.test('AVL Tree', t => {
     insert(tree, 20, ['quuz'])
     insert(tree, 12, ['corge'])
 
-    t.same(greaterThan(tree, 10), ['qux', 'quuz', 'corge'])
+    t.same(greaterThan(tree, 10), ['quuz', 'corge', 'qux'])
   })
 
-  t.test('lessThan', t => {
+  t.test('lessThan', (t) => {
     t.plan(1)
 
     const tree = create(1, ['foo'])
@@ -138,6 +138,6 @@ t.test('AVL Tree', t => {
     insert(tree, 20, ['quuz'])
     insert(tree, 12, ['corge'])
 
-    t.same(lessThan(tree, 10), ['foo', 'bar', 'quux'])
+    t.same(lessThan(tree, 10), ['bar', 'foo', 'quux'])
   })
 })

@@ -26,7 +26,7 @@ export async function retrieveTranslationMessages(docusaurusContext: LoadContext
   const localesToTry = codeTranslationLocalesToTry(docusaurusContext.i18n.currentLocale)
 
   const existingLocalePath = localesToTry
-    .map(locale => path.join(translationsDir, `${locale}.json`))
+    .map((locale) => path.join(translationsDir, `${locale}.json`))
     .find(fs.existsSync)
 
   return existingLocalePath ? retrieveObjectContent(existingLocalePath) : Promise.resolve({})

@@ -353,5 +353,5 @@ export const stopwords = [
   'wong',
   'yaitu',
   'yakni',
-  'yang',
+  'yang'
 ]

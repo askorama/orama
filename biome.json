@@ -1,0 +1,38 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.4.1/schema.json",
+	"formatter": {
+		"lineWidth": 120,
+		"indentStyle": "space"
+	},
+	"files": {
+		"ignore": [
+			".vscode/",
+			"**/.docusaurus/",
+			"**/coverage",
+			"**/dist/",
+			"**/node_modules/",
+			"**/Dockerfile",
+			"packages/plugin-docusaurus-sandbox/build/**",
+			"playwright-report/**",
+			"packages/docs/.next/**/*",
+			"pnpm-lock.yaml",
+			"**/*.mdx",
+			"*.webmanifest",
+			"*.png",
+			"*.svg",
+			"*.xml",
+			"*.ico"
+		],
+		"maxSize": 10000000000
+	},
+	"javascript": {
+		"formatter": {
+			"semicolons": "asNeeded",
+			"trailingComma": "none",
+			"quoteStyle": "single"
+		}
+	},
+	"linter": {
+		"enabled": false
+	}
+}

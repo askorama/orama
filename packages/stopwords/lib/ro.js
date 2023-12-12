@@ -280,5 +280,5 @@ export const stopwords = [
   'şi',
   'ştiu',
   'ţi',
-  'ţie',
+  'ţie'
 ]

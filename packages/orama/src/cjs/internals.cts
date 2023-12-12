@@ -3,7 +3,7 @@ import type {
   formatBytes as esmFormatBytes,
   formatNanoseconds as esmFormatNanoseconds,
   getNanosecondsTime as esmGetNanosecondsTime,
-  uniqueId as esmUniqueId,
+  uniqueId as esmUniqueId
 } from '../internals.js'
 
 let _esmBoundedLevenshtein: typeof esmBoundedLevenshtein

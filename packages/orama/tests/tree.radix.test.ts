@@ -5,7 +5,7 @@ import {
   find as radixFind,
   insert as radixInsert,
   removeDocumentByWord as radixRemoveDocumentByWord,
-  removeWord as radixRemoveWord,
+  removeWord as radixRemoveWord
 } from '../src/trees/radix.js'
 
 const phrases = [
@@ -18,13 +18,13 @@ const phrases = [
   { id: 7, doc: "let's try this trie" },
   { id: 8, doc: 'primo' },
   { id: 9, doc: 'primate' },
-  { id: 10, doc: 'prova' },
+  { id: 10, doc: 'prova' }
 ]
 
 t.test('radix tree', t => {
   t.plan(9)
 
-  t.test('should correctly find an element by prefix', t => {
+  t.test('should correctly find an element by prefix', (t) => {
     t.plan(1)
     const root = createNode()
     for (const { doc, id } of phrases) {
@@ -32,7 +32,7 @@ t.test('radix tree', t => {
     }
     const result = radixFind(root, { term: phrases[5].doc.slice(0, 5) })
     t.strictSame(result, {
-      [phrases[5].doc]: [phrases[5].id],
+      [phrases[5].doc]: [phrases[5].id]
     })
   })
 
@@ -68,12 +68,12 @@ t.test('radix tree', t => {
     for (const phrase of phrases) {
       const result = radixFind(root, { term: phrase.doc })
       t.strictSame(result, {
-        [phrase.doc]: [phrase.id],
+        [phrase.doc]: [phrase.id]
       })
     }
   })
 
-  t.test('exact works correctly', t => {
+  t.test('exact works correctly', (t) => {
     t.plan(2)
     const root = createNode()
     for (const { doc, id } of phrases) {
@@ -86,7 +86,7 @@ t.test('radix tree', t => {
     t.strictSame(result, { [phrases[5].doc]: [phrases[5].id] })
   })
 
-  t.test('should correctly index phrases into a prefix tree', t => {
+  t.test('should correctly index phrases into a prefix tree', (t) => {
     t.plan(phrases.length + 1)
 
     const root = createNode()
@@ -102,7 +102,7 @@ t.test('radix tree', t => {
     t.notOk(radixContains(root, 'thought it was saturday'))
   })
 
-  t.test('should correctly delete a word from the tree', t => {
+  t.test('should correctly delete a word from the tree', (t) => {
     t.plan(phrases.length + 2)
 
     const root = createNode()
@@ -124,13 +124,13 @@ t.test('radix tree', t => {
       } else {
         const result = radixFind(root, { term: phrases[i].doc })
         t.strictSame(result, {
-          [phrases[i].doc]: [phrases[i].id],
+          [phrases[i].doc]: [phrases[i].id]
         })
       }
     }
   })
 
-  t.test('should correctly delete a id from the tree with exact=true', t => {
+  t.test('should correctly delete a id from the tree with exact=true', (t) => {
     t.plan(2)
 
     const root = createNode()
@@ -144,16 +144,16 @@ t.test('radix tree', t => {
     const resultFullSearch = radixFind(root, { term: phrases[0].doc })
 
     t.strictSame(resultFullSearch, {
-      [phrases[0].doc]: [],
+      [phrases[0].doc]: []
     })
 
     const resultHalfSearch = radixFind(root, { term: 'the' })
     t.has(resultHalfSearch, {
-      [phrases[0].doc]: [],
+      [phrases[0].doc]: []
     })
   })
 
-  t.test('should correctly delete a id from the tree', t => {
+  t.test('should correctly delete a id from the tree', (t) => {
     t.plan(2)
 
     const root = createNode()
@@ -166,20 +166,20 @@ t.test('radix tree', t => {
 
     const resultFullSearch = radixFind(root, { term: phrases[0].doc })
     t.strictSame(resultFullSearch, {
-      [phrases[0].doc]: [],
+      [phrases[0].doc]: []
     })
 
     const resultHalfSearch = radixFind(root, { term: phrases[0].doc.slice(0, 5) })
     t.strictSame(resultHalfSearch, {
-      [phrases[0].doc]: [],
+      [phrases[0].doc]: []
     })
   })
 })
 
-t.test('test from trie for compatibility', t => {
+t.test('test from trie for compatibility', (t) => {
   t.plan(3)
 
-  t.test('should correctly index phrases into a prefix tree', t => {
+  t.test('should correctly index phrases into a prefix tree', (t) => {
     t.plan(phrases.length)
 
     const trie = createNode()
@@ -193,7 +193,7 @@ t.test('test from trie for compatibility', t => {
     }
   })
 
-  t.test('should correctly find an element by prefix', t => {
+  t.test('should correctly find an element by prefix', (t) => {
     t.plan(2)
 
     const trie = createNode()
@@ -207,11 +207,11 @@ t.test('test from trie for compatibility', t => {
       [phrases[0].doc]: [phrases[0].id],
       [phrases[3].doc]: [phrases[3].id],
       [phrases[4].doc]: [phrases[4].id],
-      [phrases[5].doc]: [phrases[5].id],
+      [phrases[5].doc]: [phrases[5].id]
     })
   })
 
-  t.test('should correctly delete a word from the trie', t => {
+  t.test('should correctly delete a word from the trie', (t) => {
     t.plan(2)
 
     const trie = createNode()

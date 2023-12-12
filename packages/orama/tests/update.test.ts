@@ -1,10 +1,10 @@
 import t from 'tap'
 import { create, insert, getByID, update, updateMultiple, count } from '../src/index.js'
 
-t.test('update method', t => {
+t.test('update method', (t) => {
   t.plan(1)
 
-  t.test('should remove a document the old document and insert the new one', async t => {
+  t.test('should remove a document the old document and insert the new one', async (t) => {
     t.plan(3)
 
     const db = await create({
@@ -12,25 +12,25 @@ t.test('update method', t => {
         quote: 'string',
         author: 'string',
         meta: {
-          tags: 'string',
-        },
-      },
+          tags: 'string'
+        }
+      }
     })
 
     const oldDocId = await insert(db, {
       quote: "Life is what happens when you're busy making other plans",
       author: 'John Lennon',
       meta: {
-        tags: 'music, life, music',
-      },
+        tags: 'music, life, music'
+      }
     })
 
     const newDocId = await update(db, oldDocId, {
       quote: 'What I cannot create, I do not understand',
       author: 'Richard Feynman',
       meta: {
-        tags: 'physics, science, philosophy',
-      },
+        tags: 'physics, science, philosophy'
+      }
     })
 
     const oldDoc = await getByID(db, oldDocId)
@@ -43,21 +43,21 @@ t.test('update method', t => {
   })
 })
 
-t.test('updateMultiple', async t => {
-  t.test('should update the documents', async t => {
+t.test('updateMultiple', async (t) => {
+  t.test('should update the documents', async (t) => {
     const db = await create({
       schema: {
         quote: 'string',
-        author: 'string',
-      },
+        author: 'string'
+      }
     })
 
     const oldDocId1 = await insert(db, {
       quote: "Life is what happens when you're busy making other plans",
-      author: 'John Lennon',
+      author: 'John Lennon'
     })
     const oldDocId2 = await insert(db, {
-      quote: 'What I cannot create, I do not understand',
+      quote: 'What I cannot create, I do not understand'
     })
 
     const [id1, id2] = await updateMultiple(
@@ -66,13 +66,13 @@ t.test('updateMultiple', async t => {
       [
         {
           quote: 'He who is brave is free',
-          author: 'Seneca',
+          author: 'Seneca'
         },
         {
           quote: 'You must be the change you wish to see in the world',
-          author: 'Mahatma Gandhi',
-        },
-      ],
+          author: 'Mahatma Gandhi'
+        }
+      ]
     )
 
     t.notOk(await getByID(db, oldDocId1))
@@ -84,16 +84,16 @@ t.test('updateMultiple', async t => {
     t.end()
   })
 
-  t.test('should skip the update if a document is not valid', async t => {
+  t.test('should skip the update if a document is not valid', async (t) => {
     const db = await create({
       schema: {
-        quote: 'string',
-      },
+        quote: 'string'
+      }
     })
 
     const oldDocId = await insert(db, {
       quote: "Life is what happens when you're busy making other plans",
-      author: 'John Lennon',
+      author: 'John Lennon'
     })
 
     await t.rejects(updateMultiple(db, [oldDocId], [{ quote: 55 }] as any))

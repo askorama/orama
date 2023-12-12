@@ -72,7 +72,7 @@ export function defaultToSectionSchema(
     sectionTitle = (pageRoute.split('/').pop() ?? '')
       .replace(/(-)+/g, ' ')
       .split(' ')
-      .map(word => word && `${word[0].toUpperCase()}${word.substring(1)}`)
+      .map((word) => word && `${word[0].toUpperCase()}${word.substring(1)}`)
       .join(' ')
   }
 
@@ -104,7 +104,7 @@ async function generateDocument(
 
   // Convert all the documents to a
   const sections = Object.values(db.data.docs.docs)
-    .map(node => {
+    .map((node) => {
       return defaultToSectionSchema(node, permalink.slice(1), title, version)
     })
     .filter(isIndexable)
@@ -149,7 +149,7 @@ async function buildDevSearchData(siteDir: string, outDir: string, allContent: a
 
   await insertMultiple(_db, documents)
 
-  const serialized = (await save(_db))
+  const serialized = await save(_db)
 
   await writeFile(indexPath(outDir, version), await gzip(JSON.stringify(serialized)))
 }
@@ -171,16 +171,19 @@ function docusaurusOramaPlugin(context: LoadContext, options: PluginOptions): Pl
       return retrieveTranslationMessages(context)
     },
     getClientModules() {
-      return [resolve(getThemePath(), 'SearchBar/SearchBar.module.css'), resolve(getThemePath(), 'SearchBarFooter/SearchBarFooter.module.css')]
+      return [
+        resolve(getThemePath(), 'SearchBar/SearchBar.module.css'),
+        resolve(getThemePath(), 'SearchBarFooter/SearchBarFooter.module.css')
+      ]
     },
     async contentLoaded({ actions, allContent }) {
       const isDevelopment = process.env.NODE_ENV === 'development'
       const loadedVersions = (allContent['docusaurus-plugin-content-docs']?.default as LoadedContent)?.loadedVersions
-      versions = loadedVersions.map(v => v.versionName)
+      versions = loadedVersions.map((v) => v.versionName)
 
       // Build all versions
       await Promise.all(
-        versions.map(version => buildDevSearchData(context.siteDir, context.generatedFilesDir, allContent, version))
+        versions.map((version) => buildDevSearchData(context.siteDir, context.generatedFilesDir, allContent, version))
       )
 
       for (const name of versions) {
@@ -191,7 +194,7 @@ function docusaurusOramaPlugin(context: LoadContext, options: PluginOptions): Pl
         actions.setGlobalData({
           searchData: Object.fromEntries(
             await Promise.all(
-              versions.map(async version => {
+              versions.map(async (version) => {
                 return [version, await readFile(indexPath(context.generatedFilesDir, version))]
               })
             )
@@ -203,7 +206,7 @@ function docusaurusOramaPlugin(context: LoadContext, options: PluginOptions): Pl
     },
     async postBuild({ outDir }: { outDir: string }) {
       await Promise.all(
-        versions.map(async version => {
+        versions.map(async (version) => {
           return cp(indexPath(context.generatedFilesDir, version), indexPath(outDir, version))
         })
       )

@@ -6,10 +6,10 @@ import { runAfterSearch, runBeforeSearch } from '../components/hooks.js'
 import {
   InternalDocumentID,
   getDocumentIdFromInternalId,
-  getInternalDocumentId,
+  getInternalDocumentId
 } from '../components/internal-document-id-store.js'
 import { createError } from '../errors.js'
-import { getNanosecondsTime, getNested, sortTokenScorePredicate, safeArrayPush } from '../utils.js';
+import { getNanosecondsTime, getNested, sortTokenScorePredicate, safeArrayPush } from '../utils.js'
 import type {
   AnyOrama,
   BM25Params,
@@ -25,13 +25,13 @@ import type {
   TokenMap,
   TokenScore,
   Tokenizer,
-  TypedDocument,
+  TypedDocument
 } from '../types.js'
 
 const defaultBM25Params: BM25Params = {
   k: 1.2,
   b: 0.75,
-  d: 0.5,
+  d: 0.5
 }
 
 async function createSearchContext<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
@@ -43,7 +43,7 @@ async function createSearchContext<T extends AnyOrama, ResultDocument = TypedDoc
   properties: string[],
   tokens: string[],
   docsCount: number,
-  timeStart: bigint,
+  timeStart: bigint
 ): Promise<SearchContext<T, ResultDocument>> {
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
   // const hasFilters = Object.keys(params.where ?? {}).length > 0;
@@ -98,14 +98,14 @@ async function createSearchContext<T extends AnyOrama, ResultDocument = TypedDoc
     docsCount,
     uniqueDocsIDs: {},
     indexMap,
-    docsIntersection,
+    docsIntersection
   }
 }
 
 export async function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
   params: SearchParams<T, ResultDocument>,
-  language?: string,
+  language?: string
 ): Promise<Results<ResultDocument>> {
   const timeStart = await getNanosecondsTime()
 
@@ -125,7 +125,7 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
 
     propertiesToSearch = await orama.index.getSearchableProperties(index)
     propertiesToSearch = propertiesToSearch.filter((prop: string) =>
-      propertiesToSearchWithTypes[prop].startsWith('string'),
+      propertiesToSearchWithTypes[prop].startsWith('string')
     )
 
     orama.caches['propertiesToSearch'] = propertiesToSearch
@@ -151,7 +151,7 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
     propertiesToSearch,
     tokens,
     await orama.documentsStore.count(docs),
-    timeStart,
+    timeStart
   )
 
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
@@ -177,12 +177,12 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
           // Lookup
           const scoreList = await orama.index.search(context, index, prop, term)
 
-          safeArrayPush(context.indexMap[prop][term], scoreList);
+          safeArrayPush(context.indexMap[prop][term], scoreList)
         }
       } else {
         context.indexMap[prop][''] = []
         const scoreList = await orama.index.search(context, index, prop, '')
-        safeArrayPush(context.indexMap[prop][''], scoreList);
+        safeArrayPush(context.indexMap[prop][''], scoreList)
       }
 
       const docIds = context.indexMap[prop]
@@ -208,7 +208,7 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
     context.uniqueDocsIDs = {}
   } else {
     context.uniqueDocsIDs = Object.fromEntries(
-      Object.keys(await orama.documentsStore.getAll(orama.data.docs)).map(k => [k, 0]),
+      Object.keys(await orama.documentsStore.getAll(orama.data.docs)).map((k) => [k, 0])
     )
   }
 
@@ -227,15 +227,15 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
       const docsWithIdAndScore: CustomSorterFunctionItem<ResultDocument>[] = docs.map((d, i) => [
         uniqueDocsArray[i][0],
         uniqueDocsArray[i][1],
-        d!,
+        d!
       ])
       docsWithIdAndScore.sort(params.sortBy)
       uniqueDocsArray = docsWithIdAndScore.map(([id, score]) => [id, score])
     } else {
       uniqueDocsArray = await orama.sorter
         .sortBy(orama.data.sorting, uniqueDocsArray, params.sortBy)
-        .then(results =>
-          results.map(([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score]),
+        .then((results) =>
+          results.map(([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score])
         )
     }
   } else {
@@ -252,11 +252,11 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
   const searchResult: Results<ResultDocument> = {
     elapsed: {
       formatted: '',
-      raw: 0,
+      raw: 0
     },
     // We keep the hits array empty if it's a preflight request.
     hits: [],
-    count: uniqueDocsArray.length,
+    count: uniqueDocsArray.length
   }
 
   if (typeof results !== 'undefined') {
@@ -283,7 +283,7 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
 
   // Calculate elapsed time only at the end of the function
   searchResult.elapsed = (await orama.formatElapsedTime(
-    (await getNanosecondsTime()) - context.timeStart,
+    (await getNanosecondsTime()) - context.timeStart
   )) as ElapsedTime
 
   return searchResult
@@ -294,7 +294,7 @@ async function fetchDocumentsWithDistinct<T extends AnyOrama, ResultDocument ext
   uniqueDocsArray: [InternalDocumentID, number][],
   offset: number,
   limit: number,
-  distinctOn: LiteralUnion<T['schema']>,
+  distinctOn: LiteralUnion<T['schema']>
 ): Promise<Result<ResultDocument>[]> {
   const docs = orama.data.docs
 
@@ -351,12 +351,12 @@ async function fetchDocuments<T extends AnyOrama, ResultDocument extends TypedDo
   orama: T,
   uniqueDocsArray: [InternalDocumentID, number][],
   offset: number,
-  limit: number,
+  limit: number
 ): Promise<Result<ResultDocument>[]> {
   const docs = orama.data.docs
 
   const results: Result<ResultDocument>[] = Array.from({
-    length: limit,
+    length: limit
   })
 
   const resultIDs: Set<InternalDocumentID> = new Set()

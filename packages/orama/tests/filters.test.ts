@@ -9,14 +9,14 @@ async function createSimpleDB() {
       rating: 'number',
       price: 'number',
       meta: {
-        sales: 'number',
-      },
-    },
+        sales: 'number'
+      }
+    } as const,
     components: {
       getDocumentIndexId(): string {
         return `__${++i}`
-      },
-    },
+      }
+    }
   })
 
   await insert(db, {
@@ -24,8 +24,8 @@ async function createSimpleDB() {
     rating: 5,
     price: 900,
     meta: {
-      sales: 100,
-    },
+      sales: 100
+    }
   })
 
   await insert(db, {
@@ -33,8 +33,8 @@ async function createSimpleDB() {
     rating: 3,
     price: 30,
     meta: {
-      sales: 25,
-    },
+      sales: 25
+    }
   })
 
   await insert(db, {
@@ -42,62 +42,65 @@ async function createSimpleDB() {
     rating: 5,
     price: 45,
     meta: {
-      sales: 25,
-    },
+      sales: 25
+    }
   })
 
   return db
 }
 
-t.test('filters', t => {
+t.test('filters', (t) => {
   t.plan(9)
 
-  t.test('should throw on unknown field', async t => {
+  t.test('should throw on unknown field', async (t) => {
     const db = await createSimpleDB()
 
     await t.rejects(
       search(db, {
         term: 'coffee',
         where: {
-          unknownField: '5',
-        },
+          // @ts-expect-error - unknown field
+          unknownField: '5'
+        }
       }),
       {
         message: 'Unknown filter property "unknownField"',
-        code: 'UNKNOWN_FILTER_PROPERTY',
-      },
+        code: 'UNKNOWN_FILTER_PROPERTY'
+      }
     )
 
     await t.rejects(
       search(db, {
         term: 'coffee',
         where: {
-          unknownField: { gt: '5' } as unknown as string,
-        },
+          // @ts-expect-error - unknown field
+          unknownField: { gt: '5' } as unknown as string
+        }
       }),
       {
         message: 'Unknown filter property "unknownField"',
-        code: 'UNKNOWN_FILTER_PROPERTY',
-      },
+        code: 'UNKNOWN_FILTER_PROPERTY'
+      }
     )
 
     await t.rejects(
       search(db, {
         term: 'coffee',
         where: {
-          unknownField: true as unknown as string,
-        },
+          // @ts-expect-error - unknown field
+          unknownField: true as unknown as string
+        }
       }),
       {
         message: 'Unknown filter property "unknownField"',
-        code: 'UNKNOWN_FILTER_PROPERTY',
-      },
+        code: 'UNKNOWN_FILTER_PROPERTY'
+      }
     )
 
     t.end()
   })
 
-  t.test('greater than', async t => {
+  t.test('greater than', async (t) => {
     t.plan(2)
 
     const db = await createSimpleDB()
@@ -106,16 +109,16 @@ t.test('filters', t => {
       term: 'coffee',
       where: {
         rating: {
-          gt: 4,
-        },
-      },
+          gt: 4
+        }
+      }
     })
 
     t.equal(r1_gt.count, 1)
     t.equal(r1_gt.hits[0].id, '__3')
   })
 
-  t.test('greater than or equal to', async t => {
+  t.test('greater than or equal to', async (t) => {
     t.plan(3)
 
     const db = await createSimpleDB()
@@ -124,9 +127,9 @@ t.test('filters', t => {
       term: 'coffee',
       where: {
         rating: {
-          gte: 3,
-        },
-      },
+          gte: 3
+        }
+      }
     })
 
     t.equal(r1_gte.count, 2)
@@ -134,7 +137,7 @@ t.test('filters', t => {
     t.equal(r1_gte.hits[1].id, '__3')
   })
 
-  t.test('less than', async t => {
+  t.test('less than', async (t) => {
     t.plan(2)
 
     const db = await createSimpleDB()
@@ -143,16 +146,16 @@ t.test('filters', t => {
       term: 'coffee',
       where: {
         rating: {
-          lt: 5,
-        },
-      },
+          lt: 5
+        }
+      }
     })
 
     t.equal(r1_lt.count, 1)
     t.equal(r1_lt.hits[0].id, '__2')
   })
 
-  t.test('less than or equal to', async t => {
+  t.test('less than or equal to', async (t) => {
     t.plan(2)
 
     const db = await createSimpleDB()
@@ -161,16 +164,16 @@ t.test('filters', t => {
       term: 'coffee',
       where: {
         rating: {
-          lte: 3,
-        },
-      },
+          lte: 3
+        }
+      }
     })
 
     t.equal(r1_lte.count, 1)
     t.equal(r1_lte.hits[0].id, '__2')
   })
 
-  t.test('equal', async t => {
+  t.test('equal', async (t) => {
     t.plan(2)
 
     const db = await createSimpleDB()
@@ -179,16 +182,16 @@ t.test('filters', t => {
       term: 'coffee',
       where: {
         rating: {
-          eq: 3,
-        },
-      },
+          eq: 3
+        }
+      }
     })
 
     t.equal(r1_lte.count, 1)
     t.equal(r1_lte.hits[0].id, '__2')
   })
 
-  t.test('between', async t => {
+  t.test('between', async (t) => {
     t.plan(2)
 
     const db = await createSimpleDB()
@@ -197,16 +200,16 @@ t.test('filters', t => {
       term: 'coffee',
       where: {
         rating: {
-          between: [1, 4],
-        },
-      },
+          between: [1, 4]
+        }
+      }
     })
 
     t.equal(r1_lte.count, 1)
     t.equal(r1_lte.hits[0].id, '__2')
   })
 
-  t.test('multiple filters', async t => {
+  t.test('multiple filters', async (t) => {
     t.plan(2)
 
     const db = await createSimpleDB()
@@ -215,19 +218,19 @@ t.test('filters', t => {
       term: 'coffee',
       where: {
         rating: {
-          between: [1, 4],
+          between: [1, 4]
         },
         price: {
-          lte: 40,
-        },
-      },
+          lte: 40
+        }
+      }
     })
 
     t.equal(r1_lte.count, 1)
     t.equal(r1_lte.hits[0].id, '__2')
   })
 
-  t.test('multiple filters, and operation', async t => {
+  t.test('multiple filters, and operation', async (t) => {
     t.plan(2)
 
     const db = await createSimpleDB()
@@ -236,15 +239,16 @@ t.test('filters', t => {
       term: 'coffee',
       where: {
         rating: {
-          between: [1, 4],
+          between: [1, 4]
         },
         price: {
-          lte: 40,
+          lte: 40
         },
+        // @ts-expect-error - unknown field
         'meta.sales': {
-          eq: 25,
-        },
-      },
+          eq: 25
+        }
+      }
     })
 
     t.equal(r1_lte.count, 1)
@@ -252,7 +256,7 @@ t.test('filters', t => {
   })
 })
 
-t.test('should throw when using multiple operators', async t => {
+t.test('should throw when using multiple operators', async (t) => {
   t.plan(1)
 
   const db = await createSimpleDB()
@@ -264,48 +268,48 @@ t.test('should throw when using multiple operators', async t => {
         where: {
           rating: {
             gt: 4,
-            lte: 10,
-          },
-        },
+            lte: 10
+          }
+        }
       }),
-    { code: 'INVALID_FILTER_OPERATION' },
+    { code: 'INVALID_FILTER_OPERATION' }
   )
 })
 
-t.test('boolean filters', async t => {
+t.test('boolean filters', async (t) => {
   t.plan(7)
 
   const db = await create({
     schema: {
       id: 'string',
       isAvailable: 'boolean',
-      name: 'string',
-    },
+      name: 'string'
+    } as const
   })
 
   await insert(db, {
     id: '1',
     isAvailable: true,
-    name: 'coffee',
+    name: 'coffee'
   })
 
   await insert(db, {
     id: '2',
     isAvailable: true,
-    name: 'coffee machine',
+    name: 'coffee machine'
   })
 
   await insert(db, {
     id: '3',
     isAvailable: false,
-    name: 'coffee maker',
+    name: 'coffee maker'
   })
 
   const r1 = await search(db, {
     term: 'coffee',
     where: {
-      isAvailable: true,
-    },
+      isAvailable: true
+    }
   })
 
   t.equal(r1.count, 2)
@@ -315,8 +319,8 @@ t.test('boolean filters', async t => {
   const r2 = await search(db, {
     term: 'coffee',
     where: {
-      isAvailable: false,
-    },
+      isAvailable: false
+    }
   })
 
   t.equal(r2.count, 1)
@@ -327,61 +331,61 @@ t.test('boolean filters', async t => {
   const r3 = await search(db, {
     term: 'coffee',
     where: {
-      isAvailable: true,
-    },
+      isAvailable: true
+    }
   })
 
   t.equal(r3.count, 1)
   t.equal(r3.hits[0].id, '1')
 })
 
-t.test('string filters', async t => {
+t.test('string filters', async (t) => {
   t.plan(9)
 
   const db = await create({
     schema: {
       id: 'string',
       name: 'string',
-      tags: 'string',
-    },
+      tags: 'string'
+    } as const
   })
 
   await insert(db, {
     id: '1',
     name: 'coffee type',
-    tags: 'coffee type',
+    tags: 'coffee type'
   })
 
   await insert(db, {
     id: '2',
     name: 'coffee machine',
-    tags: 'coffee machine',
+    tags: 'coffee machine'
   })
 
   await insert(db, {
     id: '3',
     name: 'coffee maker',
-    tags: 'coffee maker',
+    tags: 'coffee maker'
   })
 
   await insert(db, {
     id: '4',
     name: 'coffee drinker',
-    tags: 'coffee drinker',
+    tags: 'coffee drinker'
   })
 
   await insert(db, {
     id: '5',
     name: 'another',
-    tags: 'coffee drinker',
+    tags: 'coffee drinker'
   })
 
   const r1 = await search(db, {
     term: 'coffee',
     properties: ['name'],
     where: {
-      tags: 'coffee',
-    },
+      tags: 'coffee'
+    }
   })
 
   t.equal(r1.count, 4)
@@ -394,8 +398,8 @@ t.test('string filters', async t => {
     term: 'coffee',
     properties: ['name'],
     where: {
-      name: ['machine', 'maker'],
-    },
+      name: ['machine', 'maker']
+    }
   })
 
   t.equal(r2.count, 2)
@@ -406,47 +410,47 @@ t.test('string filters', async t => {
     term: 'another',
     properties: ['name'],
     where: {
-      name: ['coffee'],
-    },
+      name: ['coffee']
+    }
   })
 
   t.equal(r3.count, 0)
 })
 
-t.test('string filters with stemming', async t => {
+t.test('string filters with stemming', async (t) => {
   t.plan(6)
 
   const db = await create({
     schema: {
       id: 'string',
       name: 'string',
-      tags: 'string',
-    },
+      tags: 'string'
+    } as const,
     components: {
       tokenizer: {
-        stemming: true,
-      },
-    },
+        stemming: true
+      }
+    }
   })
 
   await insert(db, {
     id: '1',
     name: 'coffee',
-    tags: 'machine',
+    tags: 'machine'
   })
 
   await insert(db, {
     id: '2',
     name: 'coffee',
-    tags: 'machines',
+    tags: 'machines'
   })
 
   const r1 = await search(db, {
     term: 'coffee',
     properties: ['name'],
     where: {
-      tags: 'machine',
-    },
+      tags: 'machine'
+    }
   })
 
   t.equal(r1.count, 2)
@@ -457,8 +461,8 @@ t.test('string filters with stemming', async t => {
     term: 'coffee',
     properties: ['name'],
     where: {
-      tags: 'machines',
-    },
+      tags: 'machines'
+    }
   })
 
   t.equal(r2.count, 2)

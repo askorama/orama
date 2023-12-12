@@ -48,7 +48,7 @@ export async function populateFromGlob<T extends AnyOrama>(
   options?: PopulateFromGlobOptions
 ): Promise<void> {
   const files = await asyncGlob(pattern)
-  await Promise.all(files.map(async filename => populateFromFile(db, filename, options)))
+  await Promise.all(files.map(async (filename) => populateFromFile(db, filename, options)))
 }
 
 async function populateFromFile<T extends AnyOrama>(
@@ -96,7 +96,7 @@ export async function populate<T extends AnyOrama>(
   fileType: FileType,
   options?: PopulateOptions
 ): Promise<string[]> {
-  return insertMultiple(db, await parseFile(data, fileType, options) as AnyDocument)
+  return insertMultiple(db, (await parseFile(data, fileType, options)) as AnyDocument)
 }
 
 function rehypeOrama(records: DefaultSchemaElement[], options?: PopulateOptions): (tree: Root) => void {

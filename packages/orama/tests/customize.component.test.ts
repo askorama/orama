@@ -2,7 +2,7 @@ import t from 'tap'
 import {
   documentsStore as defaultDocumentsStore,
   index as defaultIndex,
-  sorter as defaultSorter,
+  sorter as defaultSorter
 } from '../src/components.js'
 import { DocumentsStore } from '../src/components/documents-store.js'
 import { DocumentID, InternalDocumentIDStore } from '../src/components/internal-document-id-store.js'
@@ -20,24 +20,24 @@ import {
   load,
   remove,
   save,
-  search,
+  search
 } from '../src/index.js'
 
-t.test('index', t => {
-  t.test('should allow custom component', async t => {
+t.test('index', (t) => {
+  t.test('should allow custom component', async (t) => {
     const index = await defaultIndex.createIndex()
     const db = await create({
       schema: {
-        number: 'number',
+        number: 'number'
       },
       components: {
         index: {
           ...index,
           remove(impl, i, prop, id, value, schemaType, language, tokenizer, docsCount) {
             return index.remove(impl, i, prop, id, value, schemaType, language, tokenizer, docsCount)
-          },
-        },
-      },
+          }
+        }
+      }
     })
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })
@@ -51,8 +51,8 @@ t.test('index', t => {
   t.end()
 })
 
-t.test('documentStore', t => {
-  t.test('should allow custom component', async t => {
+t.test('documentStore', (t) => {
+  t.test('should allow custom component', async (t) => {
     const store = await defaultDocumentsStore.createDocumentsStore()
     const customDocumentStore: IDocumentsStore<DocumentsStore> = {
       count(s) {
@@ -81,15 +81,15 @@ t.test('documentStore', t => {
       },
       store(s, id, doc) {
         return store.store(s, id, doc)
-      },
+      }
     }
     const db = await create({
       schema: {
-        number: 'number',
+        number: 'number'
       },
       components: {
-        documentsStore: customDocumentStore,
-      },
+        documentsStore: customDocumentStore
+      }
     })
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })
@@ -100,21 +100,21 @@ t.test('documentStore', t => {
     t.end()
   })
 
-  t.test('should allow custom component - partially', async t => {
+  t.test('should allow custom component - partially', async (t) => {
     const store = await defaultDocumentsStore.createDocumentsStore()
     const customDocumentStore: IDocumentsStore<DocumentsStore> = {
       ...store,
       remove(s, id) {
         return store.remove(s, id)
-      },
+      }
     }
     const db = await create({
       schema: {
-        number: 'number',
+        number: 'number'
       },
       components: {
-        documentsStore: customDocumentStore,
-      },
+        documentsStore: customDocumentStore
+      }
     })
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })
@@ -128,8 +128,8 @@ t.test('documentStore', t => {
   t.end()
 })
 
-t.test('sorter', t => {
-  t.test('should allow custom component', async t => {
+t.test('sorter', (t) => {
+  t.test('should allow custom component', async (t) => {
     const s = await defaultSorter.createSorter()
     const customSorter: ISorter<Sorter> = {
       async sortBy(sort, docIds, by) {
@@ -161,16 +161,16 @@ t.test('sorter', t => {
       },
       getSortablePropertiesWithTypes(sort) {
         return s.getSortablePropertiesWithTypes(sort)
-      },
+      }
     }
     const order: string[] = []
     const db = await create({
       schema: {
-        number: 'number',
+        number: 'number'
       },
       components: {
-        sorter: customSorter,
-      },
+        sorter: customSorter
+      }
     })
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })
@@ -183,23 +183,23 @@ t.test('sorter', t => {
     t.end()
   })
 
-  t.test('should allow custom component - partially', async t => {
+  t.test('should allow custom component - partially', async (t) => {
     const s = await defaultSorter.createSorter()
     const customSorter: ISorter<Sorter> = {
       ...s,
       async remove(sort, prop, id) {
         order.push('remove')
         return s.remove(sort, prop, id)
-      },
+      }
     }
     const order: string[] = []
     const db = await create({
       schema: {
-        number: 'number',
+        number: 'number'
       },
       components: {
-        sorter: customSorter,
-      },
+        sorter: customSorter
+      }
     })
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })
@@ -212,7 +212,7 @@ t.test('sorter', t => {
     t.end()
   })
 
-  t.test('should allow custom sorter - partial type definition', async t => {
+  t.test('should allow custom sorter - partial type definition', async (t) => {
     interface SorterStorage extends AnySorterStore {
       storage: Sorter
     }
@@ -225,7 +225,7 @@ t.test('sorter', t => {
       }
       async create(orama, internalDocumentIdStore, schema, config) {
         return {
-          storage: await this.sorter.create(orama, internalDocumentIdStore, schema, config),
+          storage: await this.sorter.create(orama, internalDocumentIdStore, schema, config)
         }
       }
       async insert(sort, prop, id, value, schemaType, language) {
@@ -236,7 +236,7 @@ t.test('sorter', t => {
       }
       async load(internalDocumentIdStore, raw) {
         return {
-          storage: await this.sorter.load(internalDocumentIdStore, raw),
+          storage: await this.sorter.load(internalDocumentIdStore, raw)
         }
       }
       async save<R = unknown>(sort) {
@@ -254,11 +254,11 @@ t.test('sorter', t => {
 
     const db = await create({
       schema: {
-        number: 'number',
+        number: 'number'
       },
       components: {
-        sorter: sorter,
-      },
+        sorter: sorter
+      }
     })
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })
@@ -269,7 +269,7 @@ t.test('sorter', t => {
     t.end()
   })
 
-  t.test('should allow custom document store - partial type definition', async t => {
+  t.test('should allow custom document store - partial type definition', async (t) => {
     interface DocStorage extends AnyDocumentStore {
       storage: DocumentsStore
     }
@@ -279,12 +279,12 @@ t.test('sorter', t => {
       }
       async create<T extends AnyOrama<any>>(
         orama: T,
-        sharedInternalDocumentStore: InternalDocumentIDStore,
+        sharedInternalDocumentStore: InternalDocumentIDStore
       ): Promise<DocStorage> {
         const originalDoc = await this.doc.create(orama, sharedInternalDocumentStore)
         return {
           storage: originalDoc,
-          docs: originalDoc.docs,
+          docs: originalDoc.docs
         }
       }
       get(store: DocStorage, id: DocumentID) {
@@ -310,7 +310,7 @@ t.test('sorter', t => {
 
         return {
           storage: originalDoc,
-          docs: originalDoc.docs,
+          docs: originalDoc.docs
         }
       }
       save<R = unknown>(store: DocStorage): SyncOrAsyncValue<R> {
@@ -322,11 +322,11 @@ t.test('sorter', t => {
 
     const db = await create({
       schema: {
-        number: 'number',
+        number: 'number'
       },
       components: {
-        documentsStore: documentsStore,
-      },
+        documentsStore: documentsStore
+      }
     })
     const id = await insert(db, { number: 1 })
     await search(db, { sortBy: { property: 'number' } })

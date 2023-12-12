@@ -2,12 +2,17 @@ import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import {
   DocumentID,
   getDocumentIdFromInternalId,
-  getInternalDocumentId,
+  getInternalDocumentId
 } from '../components/internal-document-id-store.js'
 import { trackRemoval } from '../components/sync-blocking-checker.js'
 import { AnyOrama } from '../types.js'
 
-export async function remove<T extends AnyOrama>(orama: T, id: DocumentID, language?: string, skipHooks?: boolean): Promise<boolean> {
+export async function remove<T extends AnyOrama>(
+  orama: T,
+  id: DocumentID,
+  language?: string,
+  skipHooks?: boolean
+): Promise<boolean> {
   let result = true
   const { index, docs } = orama.data
 
@@ -18,7 +23,7 @@ export async function remove<T extends AnyOrama>(orama: T, id: DocumentID, langu
 
   const docId = getDocumentIdFromInternalId(
     orama.internalDocumentIDStore,
-    getInternalDocumentId(orama.internalDocumentIDStore, id),
+    getInternalDocumentId(orama.internalDocumentIDStore, id)
   )
   const docsCount = await orama.documentsStore.count(docs)
 
@@ -47,7 +52,7 @@ export async function remove<T extends AnyOrama>(orama: T, id: DocumentID, langu
       schemaType,
       language,
       orama.tokenizer,
-      docsCount,
+      docsCount
     )
     if (
       !(await orama.index.remove(
@@ -59,7 +64,7 @@ export async function remove<T extends AnyOrama>(orama: T, id: DocumentID, langu
         schemaType,
         language,
         orama.tokenizer,
-        docsCount,
+        docsCount
       ))
     ) {
       result = false
@@ -72,7 +77,7 @@ export async function remove<T extends AnyOrama>(orama: T, id: DocumentID, langu
       schemaType,
       language,
       orama.tokenizer,
-      docsCount,
+      docsCount
     )
   }
 
@@ -102,7 +107,7 @@ export async function removeMultiple<T extends AnyOrama>(
   ids: DocumentID[],
   batchSize?: number,
   language?: string,
-  skipHooks?: boolean,
+  skipHooks?: boolean
 ): Promise<number> {
   let result = 0
 
@@ -112,11 +117,11 @@ export async function removeMultiple<T extends AnyOrama>(
 
   const docIdsForHooks = skipHooks
     ? []
-    : ids.map(id =>
+    : ids.map((id) =>
         getDocumentIdFromInternalId(
           orama.internalDocumentIDStore,
-          getInternalDocumentId(orama.internalDocumentIDStore, id),
-        ),
+          getInternalDocumentId(orama.internalDocumentIDStore, id)
+        )
       )
 
   if (!skipHooks) {

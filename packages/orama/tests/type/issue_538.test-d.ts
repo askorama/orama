@@ -4,13 +4,13 @@ import { expectAssignable } from 'tsd'
 import { create, search } from '../../src/index.ts'
 
 const movieSchema = {
-  title: 'string',
+  title: 'string'
 } as const
 const db = await create({ schema: movieSchema })
 
 interface Movie {
-  title: string,
-  year: number,
+  title: string
+  year: number
 }
 
 const r = await search<typeof db, Movie>(db, { term: '' })

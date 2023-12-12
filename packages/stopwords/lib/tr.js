@@ -277,5 +277,5 @@ export const stopwords = [
   'ţayet',
   'ţimdi',
   'ţu',
-  'ţöyle',
+  'ţöyle'
 ]

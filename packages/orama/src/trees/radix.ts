@@ -3,7 +3,7 @@ import { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getOwnProperty } from '../utils.js'
 
 export class Node {
-  constructor (key: string, subWord: string, end: boolean) {
+  constructor(key: string, subWord: string, end: boolean) {
     this.k = key
     this.s = subWord
     this.e = end
@@ -22,7 +22,7 @@ export class Node {
   // Node word
   public w = ''
 
-  public toJSON (): object {
+  public toJSON(): object {
     return {
       w: this.w,
       s: this.s,
@@ -42,15 +42,15 @@ interface FindParams {
 
 type FindResult = Record<string, InternalDocumentID[]>
 
-function updateParent (node: Node, parent: Node): void {
+function updateParent(node: Node, parent: Node): void {
   node.w = parent.w + node.s
 }
 
-function addDocument (node: Node, docID: InternalDocumentID): void {
+function addDocument(node: Node, docID: InternalDocumentID): void {
   node.d.push(docID)
 }
 
-function removeDocument (node: Node, docID: InternalDocumentID): boolean {
+function removeDocument(node: Node, docID: InternalDocumentID): boolean {
   const index = node.d.indexOf(docID)
 
   /* c8 ignore next 3 */
@@ -63,7 +63,7 @@ function removeDocument (node: Node, docID: InternalDocumentID): boolean {
   return true
 }
 
-function findAllWords (node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
+function findAllWords(node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
   if (node.e) {
     const { w, d: docIDs } = node
 
@@ -92,7 +92,7 @@ function findAllWords (node: Node, output: FindResult, term: string, exact?: boo
     // check if _output[w] exists and then add the doc to it
     // always check in own property to prevent access to inherited properties
     // fix https://github.com/OramaSearch/orama/issues/137
-    if ((getOwnProperty(output, w) != null) && (docIDs.length > 0)) {
+    if (getOwnProperty(output, w) != null && docIDs.length > 0) {
       const docs = new Set(output[w])
 
       const docIDsLength = docIDs.length
@@ -110,7 +110,7 @@ function findAllWords (node: Node, output: FindResult, term: string, exact?: boo
   return output
 }
 
-function getCommonPrefix (a: string, b: string) {
+function getCommonPrefix(a: string, b: string) {
   let commonPrefix = ''
   const len = Math.min(a.length, b.length)
   for (let i = 0; i < len; i++) {
@@ -122,11 +122,11 @@ function getCommonPrefix (a: string, b: string) {
   return commonPrefix
 }
 
-export function create (end = false, subWord = '', key = ''): Node {
+export function create(end = false, subWord = '', key = ''): Node {
   return new Node(key, subWord, end)
 }
 
-export function insert (root: Node, word: string, docId: InternalDocumentID) {
+export function insert(root: Node, word: string, docId: InternalDocumentID) {
   const wordLength = word.length
   for (let i = 0; i < wordLength; i++) {
     const currentCharacter = word[i]
@@ -203,7 +203,7 @@ export function insert (root: Node, word: string, docId: InternalDocumentID) {
   }
 }
 
-function _findLevenshtein (
+function _findLevenshtein(
   node: Node,
   term: string,
   index: number,
@@ -312,7 +312,7 @@ export function find (root: Node, { term, exact, tolerance, prefixSearch = true 
   }
 }
 
-export function contains (root: Node, term: string): boolean {
+export function contains(root: Node, term: string): boolean {
   const termLength = term.length
   for (let i = 0; i < termLength; i++) {
     const character = term[i]
@@ -336,7 +336,7 @@ export function contains (root: Node, term: string): boolean {
   return true
 }
 
-export function removeWord (root: Node, term: string): boolean {
+export function removeWord(root: Node, term: string): boolean {
   if (!term) {
     return false
   }
@@ -361,7 +361,7 @@ export function removeWord (root: Node, term: string): boolean {
   return false
 }
 
-export function removeDocumentByWord (root: Node, term: string, docID: InternalDocumentID, exact = true): boolean {
+export function removeDocumentByWord(root: Node, term: string, docID: InternalDocumentID, exact = true): boolean {
   if (!term) {
     return true
   }

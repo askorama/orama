@@ -2,17 +2,17 @@ import t from 'tap'
 import { create, insert, search } from '../../src/index.js'
 // 👆 This test assumes the module has been built
 
-t.test('orama', t => {
+t.test('orama', (t) => {
   t.plan(1)
 
-  t.test('should correctly search for data', async t => {
+  t.test('should correctly search for data', async (t) => {
     t.plan(6)
 
     const db = await create({
       schema: {
         quote: 'string',
-        author: 'string',
-      },
+        author: 'string'
+      }
     })
 
     await insert(db, { quote: 'the quick, brown fox jumps over the lazy dog. What a fox!', author: 'John Doe' })

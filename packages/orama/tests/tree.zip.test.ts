@@ -8,13 +8,13 @@ import {
   contains,
   greaterThan,
   lessThan,
-  rangeSearch,
+  rangeSearch
 } from '../src/trees/zip.js'
 
-t.test('ZIP Tree', t => {
+t.test('ZIP Tree', (t) => {
   t.plan(7)
 
-  t.test('create', t => {
+  t.test('create', (t) => {
     t.plan(3)
 
     const tree = create(1, 'foo')
@@ -23,7 +23,7 @@ t.test('ZIP Tree', t => {
     t.equal(find(tree, 4), null)
   })
 
-  t.test('insert', t => {
+  t.test('insert', (t) => {
     t.plan(1)
 
     const tree = create(1, 'foo')
@@ -38,7 +38,7 @@ t.test('ZIP Tree', t => {
     t.equal(getSize(tree), 7)
   })
 
-  t.test('find', t => {
+  t.test('find', (t) => {
     t.plan(2)
 
     const tree = create(1, [1, 2, 3])
@@ -54,7 +54,7 @@ t.test('ZIP Tree', t => {
     t.same(find(tree, 20), [16, 17, 18])
   })
 
-  t.test('remove', t => {
+  t.test('remove', (t) => {
     t.plan(2)
 
     const tree = create(1, 'foo')
@@ -72,7 +72,7 @@ t.test('ZIP Tree', t => {
     t.equal(contains(tree, 20), false)
   })
 
-  t.test('rangeSearch', t => {
+  t.test('rangeSearch', (t) => {
     t.plan(1)
 
     const tree = create(1, 'foo')
@@ -87,7 +87,7 @@ t.test('ZIP Tree', t => {
     t.same(rangeSearch(tree, 5, 20), ['quux', 'baz', 'corge', 'quuz'])
   })
 
-  t.test('greaterThan', t => {
+  t.test('greaterThan', (t) => {
     t.plan(1)
 
     const tree = create(1, 'foo')
@@ -102,7 +102,7 @@ t.test('ZIP Tree', t => {
     t.same(greaterThan(tree, 10), ['corge', 'quuz', 'qux'])
   })
 
-  t.test('lessThan', t => {
+  t.test('lessThan', (t) => {
     t.plan(1)
 
     const tree = create(1, 'foo')
