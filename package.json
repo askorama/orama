@@ -98,6 +98,6 @@
     "node": ">= 16.0.0"
   },
   "dependencies": {
-    "@changesets/cli": "^2.27.1"
+    "@changesets/cli": "^2.26.0"
   }
 }

@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@changesets/cli':
-        specifier: ^2.27.1
+        specifier: ^2.26.0
         version: 2.27.1
     devDependencies:
       '@biomejs/biome':
