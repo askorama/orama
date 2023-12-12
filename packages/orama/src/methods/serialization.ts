@@ -23,6 +23,6 @@ export async function save<T extends AnyOrama>(orama: T): Promise<RawData> {
     index: await orama.index.save(orama.data.index),
     docs: await orama.documentsStore.save(orama.data.docs),
     sorting: await orama.sorter.save(orama.data.sorting),
-    language: orama.tokenizer.language,
+    language: orama.tokenizer.language
   }
 }

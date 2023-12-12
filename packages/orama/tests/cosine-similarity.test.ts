@@ -5,19 +5,19 @@ function toF32(vector: number[]): Float32Array {
   return new Float32Array(vector)
 }
 
-t.test('cosine similarity', t => {
+t.test('cosine similarity', (t) => {
   t.plan(2)
 
-  t.test('getMagnitude', t => {
+  t.test('getMagnitude', (t) => {
     t.plan(1)
 
-    t.test('should return the magnitude of a vector', t => {
+    t.test('should return the magnitude of a vector', (t) => {
       t.plan(3)
 
       {
         const vector = toF32([1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         const magnitude = getMagnitude(vector, vector.length)
-  
+
         t.equal(magnitude, 1)
       }
 
@@ -34,14 +34,13 @@ t.test('cosine similarity', t => {
 
         t.equal(magnitude, Math.sqrt(385))
       }
-
     })
   })
 
-  t.test('findSimilarVectors', t => {
+  t.test('findSimilarVectors', (t) => {
     t.plan(1)
 
-    t.test('should return the most similar vectors', t => {
+    t.test('should return the most similar vectors', (t) => {
       t.plan(3)
 
       const targetVector = toF32([1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
@@ -58,6 +57,5 @@ t.test('cosine similarity', t => {
       t.same(similarVectors[0].id, '2')
       t.same(similarVectors[1].id, '3')
     })
-
   })
 })

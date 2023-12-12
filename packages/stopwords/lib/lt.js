@@ -505,5 +505,5 @@ export const stopwords = [
   'visoks',
   'vos',
   'vos',
-  'ypaè',
+  'ypaè'
 ]

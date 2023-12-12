@@ -17,7 +17,7 @@ export { getDocumentProperties } from '../utils.js'
 export async function formatElapsedTime(n: bigint): Promise<ElapsedTime> {
   return {
     raw: Number(n),
-    formatted: await formatNanoseconds(n),
+    formatted: await formatNanoseconds(n)
   }
 }
 
@@ -35,7 +35,7 @@ export async function getDocumentIndexId(doc: AnyDocument): Promise<string> {
 
 export async function validateSchema<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
   doc: ResultDocument,
-  schema: T['schema'],
+  schema: T['schema']
 ): Promise<string | undefined> {
   for (const [prop, type] of Object.entries(schema)) {
     const value = doc[prop]
@@ -44,7 +44,12 @@ export async function validateSchema<T extends AnyOrama, ResultDocument extends 
       continue
     }
 
-    if (type === 'geopoint' && (typeof value === 'object' && typeof value.lon === 'number' && typeof value.lat === 'number')) {
+    if (
+      type === 'geopoint' &&
+      typeof value === 'object' &&
+      typeof value.lon === 'number' &&
+      typeof value.lat === 'number'
+    ) {
       continue
     }
 
@@ -115,14 +120,14 @@ const IS_ARRAY_TYPE: Record<SearchableType, boolean> = {
   'string[]': true,
   'number[]': true,
   'boolean[]': true,
-  'enum[]': true,
+  'enum[]': true
 }
 
 const INNER_TYPE: Record<ArraySearchableType, ScalarSearchableType> = {
   'string[]': 'string',
   'number[]': 'number',
   'boolean[]': 'boolean',
-  'enum[]': 'enum',
+  'enum[]': 'enum'
 }
 
 export function isGeoPointType(type: unknown): type is Point {

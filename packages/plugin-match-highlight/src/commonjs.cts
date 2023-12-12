@@ -7,7 +7,7 @@ import type {
   searchWithHighlight as esmSearchWithHighlight,
   saveWithHighlight as esmSaveWithHighlight,
   loadWithHighlight as esmLoadWithHighlight
-// @ts-expect-error Ignore broken resolution - This errors when using tsconfig.cjs.json
+  // @ts-expect-error Ignore broken resolution - This errors when using tsconfig.cjs.json
 } from './index.js'
 
 export interface OramaPluginMatchHighlight {

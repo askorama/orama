@@ -229,5 +229,5 @@ export const stopwords = [
   'zum',
   'zur',
   'zwar',
-  'zwischen',
+  'zwischen'
 ]

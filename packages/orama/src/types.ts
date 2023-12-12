@@ -17,54 +17,53 @@ export type SyncOrAsyncValue<T = void> = T | PromiseLike<T>
 type Flatten<T extends object> = object extends T
   ? object
   : {
-    [K in keyof T]-?: (
-      // Create a function as argument:
-      // - Pick<T, K> if the value is not an object (not run recursion)
-      // - { [key concatenation]: function calculated by recursion }
-      // - never is the value is an array
-      x: NonNullable<T[K]> extends infer V
-          ? V extends object
-            ? V extends readonly any[]
-              ? never // Orama schema doens't allow array as value
-              : Flatten<V> extends infer FV
-              ? {
-                  [P in keyof FV as `${Extract<K, string>}.${Extract<P, string>}`]: FV[P]
-                }
-              : never // Never happen: it is needed due to `extends` typescript syntax
-            : Pick<T, K>
-          : never, // Never happen: it is needed due to typescript syntax
-      ) => void
-  } extends Record<keyof T, (y: infer O) => void>
-  ? O // Return the type of the function argument
-  : never // Never happen: it is needed due to typescript syntax
-
+        [K in keyof T]-?: (
+          // Create a function as argument:
+          // - Pick<T, K> if the value is not an object (not run recursion)
+          // - { [key concatenation]: function calculated by recursion }
+          // - never is the value is an array
+          x: NonNullable<T[K]> extends infer V
+            ? V extends object
+              ? V extends readonly any[]
+                ? never // Orama schema doens't allow array as value
+                : Flatten<V> extends infer FV
+                  ? {
+                      [P in keyof FV as `${Extract<K, string>}.${Extract<P, string>}`]: FV[P]
+                    }
+                  : never // Never happen: it is needed due to `extends` typescript syntax
+              : Pick<T, K>
+            : never // Never happen: it is needed due to typescript syntax
+        ) => void
+      } extends Record<keyof T, (y: infer O) => void>
+    ? O // Return the type of the function argument
+    : never // Never happen: it is needed due to typescript syntax
 
 export type SchemaTypes<Value> = Value extends 'string'
   ? string
   : Value extends 'string[]'
-  ? string[]
-  : Value extends 'boolean'
-  ? boolean
-  : Value extends 'boolean[]'
-  ? boolean[]
-  : Value extends 'number'
-  ? number
-  : Value extends 'number[]'
-  ? number[]
-  : Value extends 'enum'
-  ? string | number
-  : Value extends 'enum[]'
-  ? (string | number)[]
-  : Value extends 'geopoint'
-  ? Point
-  : // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Value extends `vector[${number}]`
-  ? number[]
-  : Value extends object
-  ? { [Key in keyof Value]: SchemaTypes<Value[Key]> } & {
-      [otherKeys: PropertyKey]: any
-    }
-  : never
+    ? string[]
+    : Value extends 'boolean'
+      ? boolean
+      : Value extends 'boolean[]'
+        ? boolean[]
+        : Value extends 'number'
+          ? number
+          : Value extends 'number[]'
+            ? number[]
+            : Value extends 'enum'
+              ? string | number
+              : Value extends 'enum[]'
+                ? (string | number)[]
+                : Value extends 'geopoint'
+                  ? Point
+                  : // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    Value extends `vector[${number}]`
+                    ? number[]
+                    : Value extends object
+                      ? { [Key in keyof Value]: SchemaTypes<Value[Key]> } & {
+                          [otherKeys: PropertyKey]: any
+                        }
+                      : never
 
 export type Schema<TSchema> = TSchema extends AnySchema
   ? InternalTypedDocument<{
@@ -179,16 +178,10 @@ export type EnumComparisonOperator = {
 }
 
 export type EnumArrComparisonOperator = {
-  containsAll ?: (string | number | boolean)[]
+  containsAll?: (string | number | boolean)[]
 }
 
-export type GeosearchDistanceUnit =
-  | 'cm'
-  | 'm'
-  | 'km'
-  | 'ft'
-  | 'yd'
-  | 'mi'
+export type GeosearchDistanceUnit = 'cm' | 'm' | 'km' | 'ft' | 'yd' | 'mi'
 
 export type GeosearchRadiusOperator = {
   radius: {
@@ -208,29 +201,27 @@ export type GeosearchPolygonOperator = {
   }
 }
 
-export type GeosearchOperation =
-  | GeosearchRadiusOperator
-  | GeosearchPolygonOperator
+export type GeosearchOperation = GeosearchRadiusOperator | GeosearchPolygonOperator
 
 export type Operator<Value> = Value extends 'string'
-  ? (string | string[])
+  ? string | string[]
   : Value extends 'string[]'
-  ? (string | string[])
-  : Value extends 'boolean'
-  ? boolean
-  : Value extends 'boolean[]'
-  ? boolean
-  : Value extends 'number'
-  ? ComparisonOperator
-  : Value extends 'number[]'
-  ? ComparisonOperator
-  : Value extends 'enum'
-  ? EnumComparisonOperator
-  : Value extends 'enum[]'
-  ? EnumArrComparisonOperator
-  : Value extends 'geopoint'
-  ? GeosearchOperation
-  : never
+    ? string | string[]
+    : Value extends 'boolean'
+      ? boolean
+      : Value extends 'boolean[]'
+        ? boolean
+        : Value extends 'number'
+          ? ComparisonOperator
+          : Value extends 'number[]'
+            ? ComparisonOperator
+            : Value extends 'enum'
+              ? EnumComparisonOperator
+              : Value extends 'enum[]'
+                ? EnumArrComparisonOperator
+                : Value extends 'geopoint'
+                  ? GeosearchOperation
+                  : never
 export type WhereCondition<TSchema> = {
   [key in keyof TSchema]?: Operator<TSchema[key]>
 }
@@ -242,7 +233,7 @@ export type CustomSorterFunctionItem<ResultDocument> = [InternalDocumentID, numb
 
 export type CustomSorterFunction<ResultDocument> = (
   a: CustomSorterFunctionItem<ResultDocument>,
-  b: CustomSorterFunctionItem<ResultDocument>,
+  b: CustomSorterFunctionItem<ResultDocument>
 ) => number
 // thanks to https://github.com/sindresorhus/type-fest/blob/main/source/literal-union.d.ts
 export type LiteralUnion<T> = (keyof T extends string ? keyof T : never) | (string & Record<never, never>)
@@ -253,17 +244,16 @@ export type SorterParams<T extends AnyOrama> = {
   /**
    * The key of the document used to sort the result.
    */
-  property: LiteralUnion<T['schema']>;
+  property: LiteralUnion<T['schema']>
   /**
    * Whether to sort the result in ascending or descending order.
    */
   order?: 'ASC' | 'DESC'
 }
 
-
 export type FlattenSchema<T extends AnyOrama> = Flatten<T['schema']>
 export type FlattenSchemaProperty<T extends AnyOrama> = T['schema'] extends object ? keyof FlattenSchema<T> : string
-export type OnlyStrings<T extends any[]> = T[number] extends infer V ? V extends string ? V : never : never
+export type OnlyStrings<T extends any[]> = T[number] extends infer V ? (V extends string ? V : never) : never
 
 export type SortByParams<T extends AnyOrama, ResultDocument> = SorterParams<T> | CustomSorterFunction<ResultDocument>
 
@@ -479,11 +469,10 @@ export type FacetResult = Record<
   }
 >
 
-export type GroupResult<Document> =
-  | {
-      values: ScalarSearchableValue[]
-      result: Result<Document>[]
-    }[]
+export type GroupResult<Document> = {
+  values: ScalarSearchableValue[]
+  result: Result<Document>[]
+}[]
 
 export type TokenScore = [InternalDocumentID, number]
 
@@ -541,7 +530,7 @@ export type Results<Document> = {
 export type SingleCallbackComponent<T extends AnyOrama> = (
   orama: T,
   id: string,
-  doc?: TypedDocument<T>,
+  doc?: TypedDocument<T>
 ) => SyncOrAsyncValue
 
 /**
@@ -554,7 +543,7 @@ export type SingleCallbackComponent<T extends AnyOrama> = (
  */
 export type MultipleCallbackComponent<T extends AnyOrama> = (
   orama: T,
-  doc: TypedDocument<T>[] | string[],
+  doc: TypedDocument<T>[] | string[]
 ) => SyncOrAsyncValue
 
 /**
@@ -569,13 +558,13 @@ export type AfterSearch<T extends AnyOrama, ResultDocument extends TypedDocument
   db: T,
   params: SearchParams<T, ResultDocument>,
   language: string | undefined,
-  results: Results<ResultDocument>,
+  results: Results<ResultDocument>
 ) => SyncOrAsyncValue
 
 export type BeforeSearch<T extends AnyOrama> = (
   db: T,
   params: SearchParams<T>,
-  language: string | undefined,
+  language: string | undefined
 ) => SyncOrAsyncValue
 
 export type IIndexInsertOrRemoveHookFunction = <R = void>(
@@ -586,7 +575,7 @@ export type IIndexInsertOrRemoveHookFunction = <R = void>(
   type: SearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
-  docsCount: number,
+  docsCount: number
 ) => SyncOrAsyncValue<R>
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -599,7 +588,7 @@ export interface IIndex<I extends AnyIndexStore> {
   create<T extends AnyOrama>(
     orama: T,
     sharedInternalDocumentStore: T['internalDocumentIDStore'],
-    schema: T['schema'],
+    schema: T['schema']
   ): SyncOrAsyncValue<I>
 
   beforeInsert?: IIndexInsertOrRemoveHookFunction
@@ -612,7 +601,7 @@ export interface IIndex<I extends AnyIndexStore> {
     schemaType: SearchableType,
     language: string | undefined,
     tokenizer: Tokenizer,
-    docsCount: number,
+    docsCount: number
   ) => SyncOrAsyncValue
   afterInsert?: IIndexInsertOrRemoveHookFunction
 
@@ -626,7 +615,7 @@ export interface IIndex<I extends AnyIndexStore> {
     schemaType: SearchableType,
     language: string | undefined,
     tokenizer: Tokenizer,
-    docsCount: number,
+    docsCount: number
   ) => SyncOrAsyncValue<boolean>
   afterRemove?: IIndexInsertOrRemoveHookFunction
 
@@ -635,7 +624,7 @@ export interface IIndex<I extends AnyIndexStore> {
     prop: string,
     id: DocumentID,
     tokens: string[],
-    docsCount: number,
+    docsCount: number
   ): SyncOrAsyncValue
   insertTokenScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], token: string): SyncOrAsyncValue
   removeDocumentScoreParameters(index: I, prop: string, id: DocumentID, docsCount: number): SyncOrAsyncValue
@@ -645,19 +634,19 @@ export interface IIndex<I extends AnyIndexStore> {
     index: I,
     prop: string,
     term: string,
-    ids: DocumentID[],
+    ids: DocumentID[]
   ): SyncOrAsyncValue<TokenScore[]>
 
   search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
     context: SearchContext<T, ResultDocument>,
     index: I,
     prop: string,
-    term: string,
+    term: string
   ): SyncOrAsyncValue<TokenScore[]>
   searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
     context: SearchContext<T, ResultDocument>,
     index: I,
-    filters: Partial<WhereCondition<T['schema']>>,
+    filters: Partial<WhereCondition<T['schema']>>
   ): SyncOrAsyncValue<InternalDocumentID[]>
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
@@ -698,7 +687,7 @@ export interface ISorter<So extends AnySorterStore> {
     orama: T,
     sharedInternalDocumentStore: InternalDocumentIDStore,
     schema: T['schema'],
-    sorterConfig?: SorterConfig,
+    sorterConfig?: SorterConfig
   ): SyncOrAsyncValue<So>
   insert: <T extends So>(
     sorter: T,
@@ -706,7 +695,7 @@ export interface ISorter<So extends AnySorterStore> {
     id: DocumentID,
     value: SortValue,
     schemaType: SortType,
-    language: string | undefined,
+    language: string | undefined
   ) => SyncOrAsyncValue
   remove: <T extends So>(sorter: T, prop: string, id: DocumentID) => SyncOrAsyncValue
 
@@ -716,7 +705,7 @@ export interface ISorter<So extends AnySorterStore> {
   sortBy<T extends AnyOrama>(
     sorter: So,
     docIds: [DocumentID, number][],
-    by: SorterParams<T>,
+    by: SorterParams<T>
   ): Promise<[DocumentID, number][]>
 
   getSortableProperties(sorter: So): SyncOrAsyncValue<string[]>
@@ -886,7 +875,7 @@ type Internals<
   TSchema,
   TIndex extends AnyIndexStore,
   TDocumentStore extends AnyDocumentStore,
-  TSorter extends AnySorterStore,
+  TSorter extends AnySorterStore
 > = {
   schema: TSchema
   typeSchema: Schema<TSchema>
@@ -934,19 +923,20 @@ export type PickInferGeneric<T, Default> = T extends AnyGeneric<infer Generic>
     : never
   : never
 
-export type Orama<TSchema, TIndex = IIndex<Index>, TDocumentStore = IDocumentsStore<DocumentsStore>, TSorter = ISorter<Sorter>> =
-  FunctionComponents<TSchema>
-  & Internals<TSchema, AnyGenericIndex<TIndex>, AnyGenericDocumentStore<TDocumentStore>, AnyGenericSorter<TSorter>>
-  & ArrayCallbackComponents<any>
-  & OramaID
-  & { plugins: OramaPlugin[] }
+export type Orama<
+  TSchema,
+  TIndex = IIndex<Index>,
+  TDocumentStore = IDocumentsStore<DocumentsStore>,
+  TSorter = ISorter<Sorter>
+> = FunctionComponents<TSchema> &
+  Internals<TSchema, AnyGenericIndex<TIndex>, AnyGenericDocumentStore<TDocumentStore>, AnyGenericSorter<TSorter>> &
+  ArrayCallbackComponents<any> &
+  OramaID & { plugins: OramaPlugin[] }
 
-export type AnyOrama<TSchema = any> =
-  FunctionComponents<TSchema>
-  & Internals<TSchema, AnyIndexStore, AnyDocumentStore, AnySorterStore>
-  & ArrayCallbackComponents<any>
-  & OramaID
-  & { plugins: OramaPlugin[] }
+export type AnyOrama<TSchema = any> = FunctionComponents<TSchema> &
+  Internals<TSchema, AnyIndexStore, AnyDocumentStore, AnySorterStore> &
+  ArrayCallbackComponents<any> &
+  OramaID & { plugins: OramaPlugin[] }
 
 export type OramaPlugin = {
   name: string
@@ -956,8 +946,17 @@ export type OramaPlugin = {
   afterRemove?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
   beforeUpdate?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
   afterUpdate?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
-  beforeSearch?: <T extends AnyOrama>(orama: T, params: SearchParams<T>, language: string | undefined) => SyncOrAsyncValue
-  afterSearch?: <T extends AnyOrama>(orama: T, params: SearchParams<T>, language: string | undefined, results: Results<TypedDocument<T>>) => SyncOrAsyncValue
+  beforeSearch?: <T extends AnyOrama>(
+    orama: T,
+    params: SearchParams<T>,
+    language: string | undefined
+  ) => SyncOrAsyncValue
+  afterSearch?: <T extends AnyOrama>(
+    orama: T,
+    params: SearchParams<T>,
+    language: string | undefined,
+    results: Results<TypedDocument<T>>
+  ) => SyncOrAsyncValue
   beforeInsertMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
   afterInsertMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
   beforeRemoveMultiple?: <T extends AnyOrama>(orama: T, ids: string[]) => SyncOrAsyncValue

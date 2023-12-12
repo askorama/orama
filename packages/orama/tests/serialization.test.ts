@@ -10,27 +10,27 @@ function extractOriginalDoc(result: Result<AnyDocument>[]): AnyDocument[] {
   return result.map(({ document }: AnyDocument) => document)
 }
 
-t.test('Edge getters', t => {
+t.test('Edge getters', (t) => {
   t.plan(4)
 
-  t.test('should correctly enable edge index getter', async t => {
+  t.test('should correctly enable edge index getter', async (t) => {
     t.plan(2)
 
     const db = await create({
       schema: {
         name: 'string',
-        age: 'number',
-      },
+        age: 'number'
+      }
     })
 
     await insert(db, {
       name: 'John',
-      age: 30,
+      age: 30
     })
 
     await insert(db, {
       name: 'Jane',
-      age: 25,
+      age: 25
     })
 
     const { index } = await save(db)
@@ -41,66 +41,66 @@ t.test('Edge getters', t => {
     t.ok(trieContains(nameIndex.node as RadixNode, 'jane'))
   })
 
-  t.test('should correctly enable edge docs getter', async t => {
+  t.test('should correctly enable edge docs getter', async (t) => {
     t.plan(2)
 
     const db = await create({
       schema: {
         name: 'string',
-        age: 'number',
-      },
+        age: 'number'
+      }
     })
 
     const doc1 = await insert(db, {
       name: 'John',
-      age: 30,
+      age: 30
     })
 
     const doc2 = await insert(db, {
       name: 'Jane',
-      age: 25,
+      age: 25
     })
 
     const { docs } = await save(db)
 
     t.strictSame((docs as DocumentsStore).docs[getInternalDocumentId(db.internalDocumentIDStore, doc1)], {
       name: 'John',
-      age: 30,
+      age: 30
     })
     t.strictSame((docs as DocumentsStore).docs[getInternalDocumentId(db.internalDocumentIDStore, doc2)], {
       name: 'Jane',
-      age: 25,
+      age: 25
     })
   })
 
-  t.test('should correctly enable index setter', async t => {
+  t.test('should correctly enable index setter', async (t) => {
     t.plan(6)
 
     const db = await create({
       schema: {
         name: 'string',
-        age: 'number',
-      },
+        age: 'number'
+      }
     })
 
     const jonh = {
       name: 'John',
-      age: 30,
+      age: 30
     }
 
     const jane = {
       name: 'Jane',
-      age: 25,
+      age: 25
     }
 
     const michele = {
       name: 'Michele',
-      age: 27,
+      age: 27
     }
 
     const paolo = {
       name: 'Paolo',
-      age: 37,
+      age: 37
     }
 
     await insert(db, jonh)
@@ -109,8 +109,8 @@ t.test('Edge getters', t => {
     const db2 = await create({
       schema: {
         name: 'string',
-        age: 'number',
-      },
+        age: 'number'
+      }
     })
 
     await insert(db2, michele)
@@ -133,24 +133,24 @@ t.test('Edge getters', t => {
     t.strictSame(extractOriginalDoc(search4.hits), [michele])
   })
 
-  t.test('should correctly save and load data', async t => {
+  t.test('should correctly save and load data', async (t) => {
     t.plan(2)
 
     const originalDB = await create({
       schema: {
         name: 'string',
-        age: 'number',
-      },
+        age: 'number'
+      }
     })
 
     await insert(originalDB, {
       name: 'Michele',
-      age: 27,
+      age: 27
     })
 
     await insert(originalDB, {
       name: 'Paolo',
-      age: 37,
+      age: 37
     })
 
     const DBData = await save(originalDB)
@@ -158,8 +158,8 @@ t.test('Edge getters', t => {
     const newDB = await create({
       schema: {
         name: 'string',
-        age: 'number',
-      },
+        age: 'number'
+      }
     })
 
     await load(newDB, DBData)

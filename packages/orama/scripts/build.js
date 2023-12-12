@@ -26,7 +26,7 @@ async function execute(section, command, args, cwd) {
   step(section, `Executing: ${command} ${args.join(' ')} ...`)
   const childProcess = spawn(fullCommand, args, { cwd, stdio: 'inherit' })
 
-  childProcess.on('close', code => {
+  childProcess.on('close', (code) => {
     if (code !== 0) {
       fail(new Error(`Process failed with status code ${code}.`))
     }
@@ -66,7 +66,7 @@ async function cjs() {
   step('CJS', 'Fixing file extensions ...')
   const filesGlob = await glob('**/*.{js,js.map,d.ts}', { cwd: resolve(destinationDir, 'cjs'), withFileTypes: true })
   await Promise.all(
-    filesGlob.map(file => {
+    filesGlob.map((file) => {
       const source = file.fullpath()
       const destination = file
         .fullpath()
@@ -75,14 +75,14 @@ async function cjs() {
         .replace(/.d.ts$/, '.d.cts')
 
       return rename(source, destination)
-    }),
+    })
   )
 
   step('CJS', 'Fixing file inclusions ...')
   await replaceInFile(resolve(destinationDir, 'cjs/index.cjs'), [/require\("\.\/(.+)\.cts"\)/g, 'require("./$1.cjs")'])
   await replaceInFile(resolve(destinationDir, 'cjs/components.cjs'), [
     /require\("\.\/(.+)\.cts"\)/g,
-    'require("./$1.cjs")',
+    'require("./$1.cjs")'
   ])
 }
 

@@ -174,5 +174,5 @@ export const stopwords = [
   'verte',
   'vort',
   'varte',
-  'vart',
+  'vart'
 ]

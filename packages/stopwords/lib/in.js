@@ -161,5 +161,5 @@ export const stopwords = [
   'जब',
   'अत',
   'व',
-  'न',
+  'न'
 ]

@@ -135,9 +135,7 @@ export async function updateMultiple(
   return _esmUpdateMultiple(...args)
 }
 
-export async function searchVector(
-  ...args: Parameters<typeof esmSearchVector>
-): ReturnType<typeof esmSearchVector> {
+export async function searchVector(...args: Parameters<typeof esmSearchVector>): ReturnType<typeof esmSearchVector> {
   if (!_esmSearchVector) {
     const imported = await import('../methods/search-vector.js')
     _esmSearchVector = imported.searchVector

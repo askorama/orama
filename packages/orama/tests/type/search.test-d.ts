@@ -39,7 +39,7 @@ const movieSchema = {
   expectAssignable<MovieSearchParamsBoost>({})
   expectAssignable<MovieSearchParamsBoost>({ title: 1 })
   expectAssignable<MovieSearchParamsBoost>({ 'meta.foo': 1 })
-  expectNotAssignable<MovieSearchParamsBoost>({ 'unknown': 1 })
+  expectNotAssignable<MovieSearchParamsBoost>({ unknown: 1 })
   expectNotAssignable<MovieSearchParamsBoost>({ 'meta.unknown': 1 })
 
   // Test search boost type with unknown schema

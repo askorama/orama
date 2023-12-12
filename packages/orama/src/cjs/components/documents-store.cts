@@ -7,7 +7,7 @@ import {
   count as esmCount,
   load as esmLoad,
   save as esmSave,
-  createDocumentsStore as esmCreateDocumentsStore,
+  createDocumentsStore as esmCreateDocumentsStore
 } from '../../components/documents-store.js'
 
 let _esmCreate: typeof esmCreate

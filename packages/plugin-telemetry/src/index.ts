@@ -10,7 +10,7 @@ export interface PluginTelemetryParams {
   flushSize?: number
 }
 
-export function pluginTelemetry (params: PluginTelemetryParams) {
+export function pluginTelemetry(params: PluginTelemetryParams) {
   const flushInterval = params.flushInterval || DEFAULT_TELEMETRY_FLUSH_INTERVAL
   const flushSize = params.flushSize || DEFAULT_TELEMETRY_FLUSH_SIZE
 
@@ -27,7 +27,12 @@ export function pluginTelemetry (params: PluginTelemetryParams) {
 
   return {
     name: 'plugin-telemetry',
-    afterSearch: (orama: AnyOrama, query: SearchParams<AnyOrama, unknown>, language: Optional<Language>, results: Results<unknown>) => {
+    afterSearch: (
+      orama: AnyOrama,
+      query: SearchParams<AnyOrama, unknown>,
+      language: Optional<Language>,
+      results: Results<unknown>
+    ) => {
       collector.add({
         query,
         resultsCount: results.count,

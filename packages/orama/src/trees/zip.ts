@@ -15,12 +15,12 @@ interface Node<V = unknown> {
   n: number
 }
 
-function randomRank (): number {
+function randomRank(): number {
   const r = Math.random()
   return Math.floor(Math.log(1 - r) / Math.log(1 - 0.5))
 }
 
-export function create<V> (key: number, value: V): Node<V> {
+export function create<V>(key: number, value: V): Node<V> {
   return {
     v: value,
     k: key,
@@ -31,7 +31,7 @@ export function create<V> (key: number, value: V): Node<V> {
   }
 }
 
-export function insert<V> (root: Node<V>, key: number, value: V): void {
+export function insert<V>(root: Node<V>, key: number, value: V): void {
   const newNode = create(key, value)
   if (!root) {
     return
@@ -52,7 +52,7 @@ export function insert<V> (root: Node<V>, key: number, value: V): void {
     }
   }
 
-  if ((parent != null) && key < parent.k) {
+  if (parent != null && key < parent.k) {
     parent.l = newNode
   } else {
     if (parent != null) {
@@ -62,7 +62,7 @@ export function insert<V> (root: Node<V>, key: number, value: V): void {
   newNode.p = parent
 }
 
-export function remove<V> (root: Nullable<Node<V>>, key: number): Nullable<Node<V>> {
+export function remove<V>(root: Nullable<Node<V>>, key: number): Nullable<Node<V>> {
   if (root === null) {
     return null
   }
@@ -74,24 +74,24 @@ export function remove<V> (root: Nullable<Node<V>>, key: number): Nullable<Node<
   return newRoot
 }
 
-export function find<V> (root: Nullable<Node<V>>, key: number): Nullable<V> {
+export function find<V>(root: Nullable<Node<V>>, key: number): Nullable<V> {
   let currentNode: Nullable<Node<V>> = root
 
   while (currentNode !== null) {
     if (currentNode.k === key) {
       return currentNode.v
     }
-    currentNode = (currentNode.k < key) ? currentNode.r : currentNode.l
+    currentNode = currentNode.k < key ? currentNode.r : currentNode.l
   }
 
   return null
 }
 
-export function contains<V> (root: Nullable<Node<V>>, key: number): boolean {
+export function contains<V>(root: Nullable<Node<V>>, key: number): boolean {
   return !!find(root, key)
 }
 
-export function rangeSearch<V> (root: Nullable<Node<V>>, min: number, max: number): V[] {
+export function rangeSearch<V>(root: Nullable<Node<V>>, min: number, max: number): V[] {
   const results: V[] = []
   const stack: Array<Nullable<Node<V>>> = []
   let currentNode = root
@@ -113,7 +113,7 @@ export function rangeSearch<V> (root: Nullable<Node<V>>, min: number, max: numbe
   return results
 }
 
-export function greaterThan<V> (root: Nullable<Node<V>>, key: number): V[] {
+export function greaterThan<V>(root: Nullable<Node<V>>, key: number): V[] {
   const results: V[] = []
   const stack: Array<Nullable<Node<V>>> = []
   let currentNode = root
@@ -135,7 +135,7 @@ export function greaterThan<V> (root: Nullable<Node<V>>, key: number): V[] {
   return results
 }
 
-export function lessThan<V> (root: Nullable<Node<V>>, key: number): V[] {
+export function lessThan<V>(root: Nullable<Node<V>>, key: number): V[] {
   const results: V[] = []
   const stack: Array<Nullable<Node<V>>> = []
   let currentNode = root
@@ -157,7 +157,7 @@ export function lessThan<V> (root: Nullable<Node<V>>, key: number): V[] {
   return results
 }
 
-export function getSize<V> (root: Nullable<Node<V>>): number {
+export function getSize<V>(root: Nullable<Node<V>>): number {
   const stack: Array<Nullable<Node<V>>> = []
   let count = 0
   let currentNode = root
@@ -176,7 +176,7 @@ export function getSize<V> (root: Nullable<Node<V>>): number {
   return count
 }
 
-function split<V> (root: Nullable<Node<V>>, key: number): [Nullable<Node<V>>, Nullable<Node<V>>] {
+function split<V>(root: Nullable<Node<V>>, key: number): [Nullable<Node<V>>, Nullable<Node<V>>] {
   let left: Nullable<Node<V>> = null
   let leftTail: Nullable<Node<V>> = null
   let right: Nullable<Node<V>> = null
@@ -209,7 +209,7 @@ function split<V> (root: Nullable<Node<V>>, key: number): [Nullable<Node<V>>, Nu
   return [left, right]
 }
 
-function merge<V> (left: Nullable<Node<V>>, right: Nullable<Node<V>>): Nullable<Node<V>> {
+function merge<V>(left: Nullable<Node<V>>, right: Nullable<Node<V>>): Nullable<Node<V>> {
   if (left == null) return right
   if (right == null) return left
 
@@ -224,7 +224,7 @@ function merge<V> (left: Nullable<Node<V>>, right: Nullable<Node<V>>): Nullable<
   return left
 }
 
-export function removeDocument<V> (root: Node<V[]>, id: V, key: number): void {
+export function removeDocument<V>(root: Node<V[]>, id: V, key: number): void {
   const node = getNodeByKey(root, key)
 
   if (node == null) return
@@ -239,14 +239,14 @@ export function removeDocument<V> (root: Node<V[]>, id: V, key: number): void {
   }
 }
 
-function getNodeByKey<V> (root: Nullable<Node<V>>, key: number): Nullable<Node<V>> {
+function getNodeByKey<V>(root: Nullable<Node<V>>, key: number): Nullable<Node<V>> {
   let currentNode: Nullable<Node<V>> = root
 
   while (currentNode !== null) {
     if (currentNode.k === key) {
       return currentNode
     }
-    currentNode = (currentNode.k < key) ? currentNode.r : currentNode.l
+    currentNode = currentNode.k < key ? currentNode.r : currentNode.l
   }
 
   return null

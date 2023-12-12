@@ -33,11 +33,11 @@ interface SearchTask {
 const K = 2 // 2D points
 const EARTH_RADIUS = 6371e3 // Earth radius in meters
 
-export function create (): RootNode {
+export function create(): RootNode {
   return { root: null }
 }
 
-export function insert (tree: RootNode, point: Point, docIDs: InternalDocumentID[]): void {
+export function insert(tree: RootNode, point: Point, docIDs: InternalDocumentID[]): void {
   const newNode: Node = { point, docIDs }
 
   if (tree.root == null) {
@@ -53,7 +53,7 @@ export function insert (tree: RootNode, point: Point, docIDs: InternalDocumentID
     if (node.point.lon === point.lon && node.point.lat === point.lat) {
       // Merge the new docIDs with the existing ones and remove duplicates
       const newDocIDs = node.docIDs ?? []
-      node.docIDs = Array.from(new Set([...newDocIDs, ...docIDs || []]))
+      node.docIDs = Array.from(new Set([...newDocIDs, ...(docIDs || [])]))
       return
     }
 
@@ -74,7 +74,7 @@ export function insert (tree: RootNode, point: Point, docIDs: InternalDocumentID
         }
         node = node.right
       }
-    // Compare by latitude
+      // Compare by latitude
     } else {
       if (point.lat < node.point.lat) {
         if (node.left == null) {
@@ -95,7 +95,7 @@ export function insert (tree: RootNode, point: Point, docIDs: InternalDocumentID
   }
 }
 
-export function contains (tree: RootNode, point: Point): boolean {
+export function contains(tree: RootNode, point: Point): boolean {
   let node: Nullable<Node> | undefined = tree.root
   let depth = 0
 
@@ -113,7 +113,7 @@ export function contains (tree: RootNode, point: Point): boolean {
       } else {
         node = node?.right
       }
-    // Compare by latitude
+      // Compare by latitude
     } else {
       if (point.lat < node.point.lat) {
         node = node?.left
@@ -129,7 +129,7 @@ export function contains (tree: RootNode, point: Point): boolean {
 }
 
 // @todo: this is very inefficient. Fix this later.
-export function removeDocByID (tree: RootNode, point: Point, docID: InternalDocumentID): void {
+export function removeDocByID(tree: RootNode, point: Point, docID: InternalDocumentID): void {
   let node: Nullable<Node> | undefined = tree.root
   let depth = 0
   let parentNode: Nullable<Node> = null
@@ -142,17 +142,17 @@ export function removeDocByID (tree: RootNode, point: Point, docID: InternalDocu
         // Remove the docID from the array
         node.docIDs?.splice(index, 1)
 
-        if ((node.docIDs == null) || node.docIDs.length === 0) {
+        if (node.docIDs == null || node.docIDs.length === 0) {
           // If the node doesn't have any more docIDs, remove the node
           if (parentNode != null) {
             if (direction === 'left') {
-              parentNode.left = (node.left !== null) ? node.left : node.right
+              parentNode.left = node.left !== null ? node.left : node.right
             } else if (direction === 'right') {
-              parentNode.right = (node.right !== null) ? node.right : node.left
+              parentNode.right = node.right !== null ? node.right : node.left
             }
           } else {
             // If the node to be removed is the root
-            tree.root = ((node.left !== null) ? node.left : node.right) as Node
+            tree.root = (node.left !== null ? node.left : node.right) as Node
           }
         }
 
@@ -172,7 +172,7 @@ export function removeDocByID (tree: RootNode, point: Point, docID: InternalDocu
         node = node?.right
         direction = 'right'
       }
-    // Compare by latitude
+      // Compare by latitude
     } else {
       if (point.lat < node!.point.lat) {
         node = node?.left
@@ -187,7 +187,7 @@ export function removeDocByID (tree: RootNode, point: Point, docID: InternalDocu
   }
 }
 
-export function getDocIDsByCoordinates (tree: RootNode, point: Point): Nullable<InternalDocumentID[]> {
+export function getDocIDsByCoordinates(tree: RootNode, point: Point): Nullable<InternalDocumentID[]> {
   let node: Nullable<Node> = tree.root
   let depth = 0
 
@@ -206,7 +206,7 @@ export function getDocIDsByCoordinates (tree: RootNode, point: Point): Nullable<
       } else {
         node = node.right as Nullable<Node>
       }
-    // Compare by latitude
+      // Compare by latitude
     } else {
       if (point.lat < node.point.lat) {
         node = node.left as Nullable<Node>
@@ -221,7 +221,7 @@ export function getDocIDsByCoordinates (tree: RootNode, point: Point): Nullable<
   return null
 }
 
-export function searchByRadius (
+export function searchByRadius(
   node: Nullable<Node>,
   center: Point,
   radius: number,
@@ -230,11 +230,11 @@ export function searchByRadius (
   highPrecision = false
 ): GeoSearchResult[] {
   const distanceFn = highPrecision ? vincentyDistance : haversineDistance
-  const stack: Array<{ node: Nullable<Node>, depth: number }> = [{ node, depth: 0 }]
+  const stack: Array<{ node: Nullable<Node>; depth: number }> = [{ node, depth: 0 }]
   const result: GeoSearchResult[] = []
 
   while (stack.length > 0) {
-    const { node, depth } = stack.pop() as { node: Node, depth: number }
+    const { node, depth } = stack.pop() as { node: Node; depth: number }
     if (node === null) continue
 
     const dist = distanceFn(center, node.point)
@@ -262,13 +262,19 @@ export function searchByRadius (
   return result
 }
 
-export function searchByPolygon (root: Nullable<Node>, polygon: Point[], inclusive = true, sort: SortGeoPoints = null, highPrecision = false): GeoSearchResult[] {
+export function searchByPolygon(
+  root: Nullable<Node>,
+  polygon: Point[],
+  inclusive = true,
+  sort: SortGeoPoints = null,
+  highPrecision = false
+): GeoSearchResult[] {
   const stack: SearchTask[] = [{ node: root, depth: 0 }]
   const result: GeoSearchResult[] = []
 
   while (stack.length > 0) {
     const task = stack.pop()
-    if ((task == null) || (task.node == null)) continue
+    if (task == null || task.node == null) continue
 
     const { node, depth } = task
     const nextDepth = depth + 1
@@ -305,12 +311,12 @@ export function searchByPolygon (root: Nullable<Node>, polygon: Point[], inclusi
   return result
 }
 
-function calculatePolygonCentroid (polygon: Point[]): Point {
+function calculatePolygonCentroid(polygon: Point[]): Point {
   let totalArea = 0
   let centroidX = 0
   let centroidY = 0
 
-  const polygonLength = polygon.length;
+  const polygonLength = polygon.length
   for (let i = 0, j = polygonLength - 1; i < polygonLength; j = i++) {
     const xi = polygon[i].lon
     const yi = polygon[i].lat
@@ -325,7 +331,7 @@ function calculatePolygonCentroid (polygon: Point[]): Point {
   }
 
   totalArea /= 2
-  const centroidCoordinate = (6 * totalArea)
+  const centroidCoordinate = 6 * totalArea
 
   centroidX /= centroidCoordinate
   centroidY /= centroidCoordinate
@@ -333,39 +339,42 @@ function calculatePolygonCentroid (polygon: Point[]): Point {
   return { lon: centroidX, lat: centroidY }
 }
 
-function isPointInPolygon (polygon: Point[], point: Point): boolean {
+function isPointInPolygon(polygon: Point[], point: Point): boolean {
   let isInside = false
-  const x = point.lon; const y = point.lat
-  const polygonLength = polygon.length;
+  const x = point.lon
+  const y = point.lat
+  const polygonLength = polygon.length
   for (let i = 0, j = polygonLength - 1; i < polygonLength; j = i++) {
-    const xi = polygon[i].lon; const yi = polygon[i].lat
-    const xj = polygon[j].lon; const yj = polygon[j].lat
+    const xi = polygon[i].lon
+    const yi = polygon[i].lat
+    const xj = polygon[j].lon
+    const yj = polygon[j].lat
 
-    const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)
+    const intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi
     if (intersect) isInside = !isInside
   }
 
   return isInside
 }
 
-function haversineDistance (coord1: Point, coord2: Point): number {
+function haversineDistance(coord1: Point, coord2: Point): number {
   const P = Math.PI / 180
-  const lat1 = coord1.lat * (P)
-  const lat2 = coord2.lat * (P)
-  const deltaLat = (coord2.lat - coord1.lat) * (P)
-  const deltaLon = (coord2.lon - coord1.lon) * (P)
+  const lat1 = coord1.lat * P
+  const lat2 = coord2.lat * P
+  const deltaLat = (coord2.lat - coord1.lat) * P
+  const deltaLon = (coord2.lon - coord1.lon) * P
 
-  const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-            Math.cos(lat1) * Math.cos(lat2) *
-            Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2)
+  const a =
+    Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2)
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
   return EARTH_RADIUS * c
 }
 
-function vincentyDistance (coord1: Point, coord2: Point): number {
+function vincentyDistance(coord1: Point, coord2: Point): number {
   // Constants for WGS 84 ellipsoidal Earth model (https://epsg.org/ellipsoid_7030/WGS-84.html)
-  
+
   // Semi-major axis of the Earth in meters
   const a = 6378137
 
@@ -409,43 +418,45 @@ function vincentyDistance (coord1: Point, coord2: Point): number {
 
     // Compute the trigonometric values required for Vincenty formulae
     sinSigma = Math.sqrt(
-      (cosU2 * sinLambda) * (cosU2 * sinLambda) +
-      (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda) *
-      (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda)
+      cosU2 * sinLambda * (cosU2 * sinLambda) +
+        (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda) * (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda)
     )
 
     cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLambda
     sigma = Math.atan2(sinSigma, cosSigma)
 
     // Angular separation between the two points and the equator
-    sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma
+    sinAlpha = (cosU1 * cosU2 * sinLambda) / sinSigma
     cos2Alpha = 1 - sinAlpha * sinAlpha
 
-    const cos2SigmaM = cosSigma - 2 * sinU1 * sinU2 / cos2Alpha
+    const cos2SigmaM = cosSigma - (2 * sinU1 * sinU2) / cos2Alpha
 
     // Compensation factor for the Earth's shape
-    const C = f / 16 * cos2Alpha * (4 + f * (4 - 3 * cos2Alpha))
+    const C = (f / 16) * cos2Alpha * (4 + f * (4 - 3 * cos2Alpha))
 
     // Store previous lambda to check for convergence
     prevLambda = lambda
 
     // Refine the estimate of lambda using the Vincenty formula
-    lambda = deltaLon + (1 - C) * f * sinAlpha *
-      (sigma + C * sinSigma *
-      (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)))
+    lambda =
+      deltaLon +
+      (1 - C) * f * sinAlpha * (sigma + C * sinSigma * (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)))
   } while (Math.abs(lambda - prevLambda) > 1e-12 && --iterationLimit > 0)
 
   // Compute factors that depend on the shape of the Earth and angular distances
-  const u2 = cos2Alpha * (a * a - b * b) / (b * b)
-  const A = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)))
-  const B = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)))
+  const u2 = (cos2Alpha * (a * a - b * b)) / (b * b)
+  const A = 1 + (u2 / 16384) * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)))
+  const B = (u2 / 1024) * (256 + u2 * (-128 + u2 * (74 - 47 * u2)))
 
   // Compute the correction factor for the ellipsoidal shape of the Earth
-  const deltaSigma = B * sinSigma *
-    (cosSigma - 2 * sinU1 * sinU2 / cos2Alpha + B / 4 *
-    (cosSigma * (-1 + 2 * sinSigma * sinSigma) -
-    B / 6 * sigma * (-3 + 4 * sinSigma * sinSigma) *
-    (-3 + 4 * sigma * sigma)))
+  const deltaSigma =
+    B *
+    sinSigma *
+    (cosSigma -
+      (2 * sinU1 * sinU2) / cos2Alpha +
+      (B / 4) *
+        (cosSigma * (-1 + 2 * sinSigma * sinSigma) -
+          (B / 6) * sigma * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * sigma * sigma)))
 
   // Final calculation of distance using Vincenty formula
   const s = b * A * (sigma - deltaSigma)

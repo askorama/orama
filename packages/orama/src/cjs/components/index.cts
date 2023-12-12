@@ -8,7 +8,7 @@ import {
   getSearchablePropertiesWithTypes as esmGetSearchablePropertiesWithTypes,
   load as esmLoad,
   save as esmSave,
-  createIndex as esmCreateIndex,
+  createIndex as esmCreateIndex
 } from '../../components/index.js'
 
 let _esmCreate: typeof esmCreate

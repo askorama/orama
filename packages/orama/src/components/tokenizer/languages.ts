@@ -27,7 +27,7 @@ export const STEMMERS: Record<string, string> = {
   tamil: 'ta',
   turkish: 'tr',
   ukrainian: 'uk',
-  sanskrit: 'sk',
+  sanskrit: 'sk'
 }
 
 export const SPLITTERS: Record<Language, RegExp> = {
@@ -64,4 +64,4 @@ export const SPLITTERS: Record<Language, RegExp> = {
 
 export const SUPPORTED_LANGUAGES = Object.keys(STEMMERS)
 
-export type Language = typeof SUPPORTED_LANGUAGES[number]
+export type Language = (typeof SUPPORTED_LANGUAGES)[number]

@@ -27,9 +27,9 @@ const md = new MarkdownIt({
   html: true
 })
 
-export async function createOramaContentLoader (paths: string[], root: string) {
+async function createOramaContentLoader(paths: string[], root: string) {
   const contents = paths
-    .map(file => ({
+    .map((file) => ({
       path: file.replace(root, '').replace('.md', ''),
       html: md.render(readFileSync(file, 'utf-8'), '')
     }))
@@ -41,29 +41,28 @@ export async function createOramaContentLoader (paths: string[], root: string) {
     schema: presets.docusaurus.schema
   })
 
-  console.log('Inserting into Orama')
   // @ts-ignore
   await insertMultiple(db, contents)
 
   return persist(db, 'json', 'browser')
 }
 
-function parseHTMLContent({ html, path }: { html: string, path: string }): Array<ParserResult> {
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
+function parseHTMLContent({ html, path }: { html: string; path: string }): Array<ParserResult> {
+  const dom = new JSDOM(html)
+  const document = dom.window.document
 
-  const sections: Array<ParserResult> = [];
+  const sections: Array<ParserResult> = []
 
-  const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-  headers.forEach(header => {
-    const sectionTitle = header.textContent!.trim();
-    const headerTag = header.tagName.toLowerCase();
-    let sectionContent = '';
+  const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6')
+  headers.forEach((header) => {
+    const sectionTitle = header.textContent!.trim()
+    const headerTag = header.tagName.toLowerCase()
+    let sectionContent = ''
 
-    let sibling = header.nextElementSibling;
+    let sibling = header.nextElementSibling
     while (sibling && !['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(sibling.tagName)) {
-      sectionContent += sibling.textContent!.trim() + '\n';
-      sibling = sibling.nextElementSibling;
+      sectionContent += sibling.textContent!.trim() + '\n'
+      sibling = sibling.nextElementSibling
     }
 
     sections.push({
@@ -71,23 +70,22 @@ function parseHTMLContent({ html, path }: { html: string, path: string }): Array
       header: headerTag,
       content: sectionContent,
       path
-    });
-  });
+    })
+  })
 
-  return sections;
+  return sections
 }
 
 function formatForOrama(data: Array<ParserResult>): Array<OramaSchema> {
   try {
-    const firstH1Header = data.find(section => section.header === 'h1')
-    const isOSS = data?.[0]?.path?.startsWith('/open-source')
+    const firstH1Header = data.find((section) => section.header === 'h1')
 
     return data.map((res) => ({
       title: res.title,
       content: res.content,
       section: firstH1Header!.title.replace(/\s$/, ''),
       path: res?.path + '#' + slugify.default(res.title, { lower: true }),
-      category: isOSS ? 'open-source' : 'cloud',
+      category: ''
     }))
   } catch (error) {
     console.error(error)
@@ -95,10 +93,9 @@ function formatForOrama(data: Array<ParserResult>): Array<OramaSchema> {
   }
 }
 
-export function OramaSearch(): Plugin {
-
+export function OramaPlugin(): Plugin {
   let resolveConfig: any
-  const virtualModuleId = "virtual:search-data";
+  const virtualModuleId = 'virtual:search-data'
   const resolvedVirtualModuleId = `\0${virtualModuleId}`
 
   return {
@@ -135,19 +132,19 @@ export function OramaSearch(): Plugin {
     config: () => ({
       resolve: {
         alias: {
-          './VPNavBarSearch.vue': new URL('./Search.vue', import.meta.url).pathname,
-        },
+          './VPNavBarSearch.vue': new URL('./Search.vue', import.meta.url).pathname
+        }
       }
     }),
 
     async resolveId(id) {
       if (id === virtualModuleId) {
-        return resolvedVirtualModuleId;
+        return resolvedVirtualModuleId
       }
     },
 
     async load(this, id) {
-      if (id !== resolvedVirtualModuleId) return;
+      if (id !== resolvedVirtualModuleId) return
 
       const root = resolveConfig.vitepress.root
       const pages = resolveConfig.vitepress.pages.map((page: string) => `${root}/${page}`)
@@ -160,7 +157,7 @@ export function OramaSearch(): Plugin {
   }
 }
 
-export const pluginSiteConfig: Partial<SiteConfig> = {
+const pluginSiteConfig: Partial<SiteConfig> = {
   buildEnd(ctx) {},
   transformHead(ctx) {
     return []

@@ -204,7 +204,7 @@ function stem() {
       ['sh', -1, 3],
       ['t-', -1, 1],
       ['th', -1, 9],
-      ['ts', -1, 3],
+      ['ts', -1, 3]
     ],
     h = [
       ['\u00edochta', -1, 1],
@@ -222,7 +222,7 @@ function stem() {
       ['\u00edocht', -1, 1],
       ['a\u00edocht', 12, 1],
       ['ir\u00ed', -1, 2],
-      ['air\u00ed', 14, 2],
+      ['air\u00ed', 14, 2]
     ],
     c = [
       ['\u00f3ideacha', -1, 6],
@@ -249,7 +249,7 @@ function stem() {
       ['eacht', 19, 1],
       ['grafa\u00edocht', -1, 4],
       ['arcachta\u00ed', -1, 2],
-      ['grafa\u00edochta\u00ed', -1, 4],
+      ['grafa\u00edochta\u00ed', -1, 4]
     ],
     a = [
       ['imid', -1, 1],
@@ -263,7 +263,7 @@ function stem() {
       ['\u00e1il', -1, 2],
       ['ain', -1, 2],
       ['tear', -1, 2],
-      ['tar', -1, 2],
+      ['tar', -1, 2]
     ],
     d = [17, 65, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 17, 4, 2],
     n = 0,

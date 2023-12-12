@@ -1,50 +1,56 @@
 import t from 'tap'
-import { OramaPlugin, create, search, insert, insertMultiple, remove, update, removeMultiple, updateMultiple } from '../src/index.js'
+import {
+  OramaPlugin,
+  create,
+  search,
+  insert,
+  insertMultiple,
+  remove,
+  update,
+  removeMultiple,
+  updateMultiple
+} from '../src/index.js'
 import { getAllPluginsByHook } from '../src/components/plugins.js'
 
-t.test('getAllPluginsByHook', async t => {
+t.test('getAllPluginsByHook', async (t) => {
   t.plan(1)
 
-  t.test('should return all the plugins that includes a given hook name', async t => {
+  t.test('should return all the plugins that includes a given hook name', async (t) => {
     t.plan(2)
 
-    function plugin1 () {
+    function plugin1() {
       return {
         name: 'plugin1',
         beforeInsert: async () => {},
         afterInsert: async () => {},
         beforeSearch: async () => {},
-        afterSearch: async () => {},
+        afterSearch: async () => {}
       }
     }
 
-    function plugin2 () {
+    function plugin2() {
       return {
         name: 'plugin2',
         beforeInsert: async () => {},
         afterInsert: async () => {},
         beforeSearch: async () => {},
-        afterSearch: async () => {},
+        afterSearch: async () => {}
       }
     }
 
-    function plugin3 () {
+    function plugin3() {
       return {
         name: 'plugin3',
         beforeInsert: async () => {},
-        beforeSearch: async () => {},
+        beforeSearch: async () => {}
       }
     }
 
     const db = await create({
       schema: {
-        name: 'string',
+        name: 'string'
       } as const,
-      plugins: [
-        plugin1(),
-        plugin2(),
-        plugin3()
-      ]
+      plugins: [plugin1(), plugin2(), plugin3()]
     })
 
     const beforeInsertPlugins = getAllPluginsByHook(db, 'beforeInsert')
@@ -53,11 +59,9 @@ t.test('getAllPluginsByHook', async t => {
     t.equal(beforeInsertPlugins.length, 3)
     t.equal(afterSearchPlugins.length, 2)
   })
-
 })
 
-t.only('plugin', async t => {
-
+t.only('plugin', async (t) => {
   const data: string[] = []
 
   function loggerPlugin(): OramaPlugin {
@@ -108,17 +112,14 @@ t.only('plugin', async t => {
     }
   }
 
-  t.only('should run all the hooks of a plugin', async t => {
-
+  t.only('should run all the hooks of a plugin', async (t) => {
     const db = await create({
       id: 'orama-1',
       schema: {
         id: 'string',
-        name: 'string',
+        name: 'string'
       } as const,
-      plugins: [
-        loggerPlugin()
-      ]
+      plugins: [loggerPlugin()]
     })
 
     await insert(db, {
@@ -146,7 +147,7 @@ t.only('plugin', async t => {
 
     await insertMultiple(db, [
       { id: '4', name: 'Foo Bar' },
-      { id: '5', name: 'Bar Baz' },
+      { id: '5', name: 'Bar Baz' }
     ])
 
     await updateMultiple(db, ['4', '5'], [{ name: 'Foo Bar Baz' }, { name: 'Bar Baz Foo' }])

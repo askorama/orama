@@ -39,7 +39,7 @@ const client = new OramaClient({
 
 You can always find your public API key and endpoint in the Orama Dashboard. Here is an example of what it looks like:
 
-<img
+<ZoomImg
   src='/cloud/guides/javascript-sdk/orama-api-key.webp'
   alt='Orama Shopify Dashboard'
 />
@@ -71,3 +71,11 @@ const results = await client.search({
   }
 })
 ```
+
+## Performing full-text search
+
+You can perform full-text search on Orama Cloud by using the Orama Client SDK. Read the full documentation [here](/cloud/performing-search/full-text-search).
+
+## Performing vector search
+
+You can perform vector search on Orama Cloud by using the Orama Client SDK. Read the full documentation [here](/cloud/performing-search/vector-search).

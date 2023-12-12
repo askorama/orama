@@ -22,7 +22,7 @@ const step2List = {
   aliti: 'al',
   iviti: 'ive',
   biliti: 'ble',
-  logi: 'log',
+  logi: 'log'
 }
 
 const step3List = {
@@ -32,7 +32,7 @@ const step3List = {
   iciti: 'ic',
   ical: 'ic',
   ful: '',
-  ness: '',
+  ness: ''
 }
 
 // Consonant
