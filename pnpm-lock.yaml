@@ -20580,7 +20580,7 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
   file:packages/plugin-docusaurus-v3/orama-plugin-docusaurus-v3-2.0.0-beta.8.tgz(@docusaurus/types@3.0.1)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.1)(@preact/signals@1.2.2)(@swc/core@1.3.100)(eslint@8.55.0)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.3)(react-dom@18.2.0)(react@18.2.0)(search-insights@2.13.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-cTW0tHFgec1t/jNlUkKV2QC94VdHUyRV8TDVH/CJ3RlIYdhtfIoPwLGHJD4g41Qn+nX1NDI+UjuKaO1yDjIKQw==, tarball: file:packages/plugin-docusaurus-v3/orama-plugin-docusaurus-v3-2.0.0-beta.8.tgz}
+    resolution: {integrity: sha512-pzlCwIvRn16lgNgQ7XWCMcMyMBNJxQ0x7Nc9gLNGEBx5Y+qjM5/zyMJQQdA5WDEviUK1NaJWtl4djTUXd0nyoA==, tarball: file:packages/plugin-docusaurus-v3/orama-plugin-docusaurus-v3-2.0.0-beta.8.tgz}
     id: file:packages/plugin-docusaurus-v3/orama-plugin-docusaurus-v3-2.0.0-beta.8.tgz
     name: '@orama/plugin-docusaurus-v3'
     version: 2.0.0-beta.8
