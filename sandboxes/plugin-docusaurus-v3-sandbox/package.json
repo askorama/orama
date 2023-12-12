@@ -18,7 +18,7 @@
     "@docusaurus/preset-classic": "3.0.1",
     "@docusaurus/utils": "^3.0.1",
     "@mdx-js/react": "^3.0.0",
-    "@orama/plugin-docusaurus-dev": "file:/Users/micheleriva/projects/orama/release/packages/plugin-docusaurus-dev/orama-plugin-docusaurus-dev-2.0.0-beta.8.tgz",
+    "@orama/plugin-docusaurus-v3": "file:/Users/micheleriva/projects/orama/release/packages/plugin-docusaurus-v3/orama-plugin-docusaurus-v3-2.0.0-beta.8.tgz",
     "clsx": "^2.0.0",
     "jsdom": "^23.0.1",
     "markdown-it": "^13.0.2",

@@ -5,7 +5,7 @@ import { useActiveVersion, useVersions } from '@docusaurus/plugin-content-docs/c
 import { useColorMode, useDocsPreferredVersion } from '@docusaurus/theme-common'
 import { usePluginData } from '@docusaurus/useGlobalData'
 import { ungzip } from 'pako'
-import { RegisterSearchBox, presets, signals as $ } from '@orama/searchbox'
+import { RegisterSearchBox, presets, signals as $, events } from '@orama/searchbox'
 import '@orama/searchbox/dist/index.css'
 
 export function OramaSearch () {
@@ -16,7 +16,7 @@ export function OramaSearch () {
   const activeVersion = useActiveVersion(undefined)
   const versions = useVersions(undefined)
   const { preferredVersion } = useDocsPreferredVersion()
-  const { searchData } = usePluginData('@orama/plugin-docusaurus-dev')
+  const { searchData } = usePluginData('@orama/plugin-docusaurus-v3')
   const { colorMode } = useColorMode()
 
   const version = useMemo(() => {
@@ -34,6 +34,21 @@ export function OramaSearch () {
   useEffect(() => {
     $.colorScheme.value = colorMode
   }, [colorMode])
+
+  useEffect(() => {
+    window.addEventListener(events.seeItem, (event) => {
+      try {
+        const path = event.detail.item.document.path
+        window.location.pathname = path
+      } catch (e) {
+        console.error(e)
+      }
+    })
+
+    return () => {
+      window.removeEventListener(events.seeItem, () => {})
+    }
+  }, [])
 
   useEffect(() => {
 
@@ -75,7 +90,7 @@ export function OramaSearch () {
       if(customElements.get('orama-searchbox') === undefined) {
         RegisterSearchBox({
           oramaInstance,
-          preset: presets.docusaurus.name,
+          preset: presets.docs.name,
           show: false,
           colorScheme: colorMode,
         })

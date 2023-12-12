@@ -35,7 +35,7 @@ const config = {
   },
 
   plugins: [
-    '@orama/plugin-docusaurus-dev'
+    '@orama/plugin-docusaurus-v3'
   ],
 
   presets: [

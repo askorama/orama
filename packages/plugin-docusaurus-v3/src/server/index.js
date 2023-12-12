@@ -3,16 +3,16 @@ import { gzip as gzipCB } from 'node:zlib'
 import { promisify } from 'node:util'
 import { resolve } from 'node:path'
 import { presets } from '@orama/searchbox'
-import { create, insertMultiple, insert, save } from '@orama/orama'
+import { create, insertMultiple, save } from '@orama/orama'
 import { JSDOM } from 'jsdom'
 import MarkdownIt from 'markdown-it'
-import slugify from 'slugify'
+import matter from 'gray-matter'
 
 export default function OramaPluginDocusaurus(ctx, options) {
   let versions = []
 
   return {
-    name: '@orama/plugin-docusaurus-dev',
+    name: '@orama/plugin-docusaurus-v3',
 
     getPathsToWatch() {
       return [getThemePath()]
@@ -82,7 +82,7 @@ async function buildDevSearchData(siteDir, generatedFilesDir, allContent, versio
   }))
 
   const db = await create({
-    schema: presets.docusaurus.schema
+    schema: presets.docs.schema
   })
 
   await insertMultiple(db, oramaDocs)
@@ -97,10 +97,11 @@ async function generateDocs(siteDir, content, version) {
   const { title, permalink, source } = content
 
   const fileContent = readFileSync(source.replace('@site', siteDir), 'utf-8')
+  const contentWithoutFrontMatter = matter(fileContent).content
 
   return parseHTMLContent({
     originalTitle: title,
-    html: new MarkdownIt().render(fileContent),
+    html: new MarkdownIt().render(contentWithoutFrontMatter),
     path: permalink
   })
 }
