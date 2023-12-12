@@ -8,7 +8,7 @@ import { ungzip } from 'pako'
 import { RegisterSearchBox, presets, signals as $, events } from '@orama/searchbox'
 import '@orama/searchbox/dist/index.css'
 
-export function OramaSearch () {
+export function OramaSearch() {
   const [oramaInstance, setOramaInstance] = useState(null)
 
   const baseURL = useBaseUrl('orama-search-index-@VERSION@.json.gz')
@@ -51,8 +51,7 @@ export function OramaSearch () {
   }, [])
 
   useEffect(() => {
-
-    async function loadOrama () {
+    async function loadOrama() {
       let buffer
 
       if (searchData[version.name]) {
@@ -78,21 +77,19 @@ export function OramaSearch () {
       return
     }
 
-    loadOrama(version)
-      .catch(error => {
-        console.error('Cannot load search index.', error)
-      })
-
+    loadOrama(version).catch((error) => {
+      console.error('Cannot load search index.', error)
+    })
   }, [isBrowser, searchData, baseURL, version])
 
   useEffect(() => {
     if (oramaInstance) {
-      if(customElements.get('orama-searchbox') === undefined) {
+      if (customElements.get('orama-searchbox') === undefined) {
         RegisterSearchBox({
           oramaInstance,
           preset: presets.docs.name,
           show: false,
-          colorScheme: colorMode,
+          colorScheme: colorMode
         })
       }
     }
@@ -100,31 +97,31 @@ export function OramaSearch () {
 
   return (
     <div>
-      <button
-        className='DocSearch DocSearch-Button'
-        onClick={() => $.setShow(true)}
-      >
+      <button className="DocSearch DocSearch-Button" onClick={() => $.setShow(true)}>
         <span className="DocSearch-Button-Container">
           <svg width="20" height="20" class="DocSearch-Search-Icon" viewBox="0 0 20 20">
-            <path d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z" stroke="currentColor" fill="none" fillRule="evenodd" strokeLinecap="round" strokeLinejoin="round">
-            </path>
-            </svg>
-          <span className="DocSearch-Button-Placeholder">
-            Search
-          </span>
+            <path
+              d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z"
+              stroke="currentColor"
+              fill="none"
+              fillRule="evenodd"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            ></path>
+          </svg>
+          <span className="DocSearch-Button-Placeholder">Search</span>
         </span>
-        <span className="DocSearch-Button-Keys"><kbd className="DocSearch-Button-Key">⌘</kbd><kbd className="DocSearch-Button-Key">K</kbd></span>
+        <span className="DocSearch-Button-Keys">
+          <kbd className="DocSearch-Button-Key">⌘</kbd>
+          <kbd className="DocSearch-Button-Key">K</kbd>
+        </span>
       </button>
 
-      {oramaInstance && (
-        <orama-searchbox />
-      )}
+      {oramaInstance && <orama-searchbox />}
     </div>
   )
 }
 
-export default function OramaSearchWrapper () {
-  return (
-    <OramaSearch />
-  )
+export default function OramaSearchWrapper() {
+  return <OramaSearch />
 }

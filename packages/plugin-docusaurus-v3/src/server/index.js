@@ -40,46 +40,49 @@ export default function OramaPluginDocusaurus(ctx, options) {
     async contentLoaded({ actions, allContent }) {
       const isDevelopment = process.env.NODE_ENV === 'development'
 
-      const loadedVersions = (allContent['docusaurus-plugin-content-docs']?.default)?.loadedVersions
-      versions = loadedVersions.map(v => v.versionName)
+      const loadedVersions = allContent['docusaurus-plugin-content-docs']?.default?.loadedVersions
+      versions = loadedVersions.map((v) => v.versionName)
 
-      await Promise.all(versions.map(version => buildDevSearchData(ctx.siteDir, ctx.generatedFilesDir, allContent, version)))
+      await Promise.all(
+        versions.map((version) => buildDevSearchData(ctx.siteDir, ctx.generatedFilesDir, allContent, version))
+      )
 
       if (isDevelopment) {
         actions.setGlobalData({
           searchData: Object.fromEntries(
             await Promise.all(
-              versions.map(async version => {
+              versions.map(async (version) => {
                 return [version, readFileSync(indexPath(ctx.generatedFilesDir, version))]
               })
             )
           )
         })
       }
-
     }
   }
 }
 
 async function buildDevSearchData(siteDir, generatedFilesDir, allContent, version) {
-  const loadedVersion = allContent['docusaurus-plugin-content-docs']?.default?.loadedVersions?.find((v) => v.versionName === version)
+  const loadedVersion = allContent['docusaurus-plugin-content-docs']?.default?.loadedVersions?.find(
+    (v) => v.versionName === version
+  )
   const blogs = allContent['docusaurus-plugin-content-blog']?.default?.blogPosts?.map(({ metadata }) => metadata) ?? []
   const pages = allContent['docusaurus-plugin-content-pages']?.default ?? []
   const docs = loadedVersion?.docs ?? []
 
   const oramaDocs = [
-    ...await Promise.all(blogs.map(data => generateDocs(siteDir, data, version))),
-    ...await Promise.all(pages.map(data => generateDocs(siteDir, data, version))),
-    ...await Promise.all(docs.map(data => generateDocs(siteDir, data, version)))
+    ...(await Promise.all(blogs.map((data) => generateDocs(siteDir, data, version)))),
+    ...(await Promise.all(pages.map((data) => generateDocs(siteDir, data, version)))),
+    ...(await Promise.all(docs.map((data) => generateDocs(siteDir, data, version))))
   ]
-  .flat()
-  .map((data) => ({
-    title: data.title,
-    content: data.content,
-    section: data.originalTitle,
-    path: data.path,
-    category: ''
-  }))
+    .flat()
+    .map((data) => ({
+      title: data.title,
+      content: data.content,
+      section: data.originalTitle,
+      path: data.path,
+      category: ''
+    }))
 
   const db = await create({
     schema: presets.docs.schema
@@ -107,21 +110,21 @@ async function generateDocs(siteDir, content, version) {
 }
 
 function parseHTMLContent({ html, path, originalTitle }) {
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
+  const dom = new JSDOM(html)
+  const document = dom.window.document
 
-  const sections = [];
+  const sections = []
 
-  const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-  headers.forEach(header => {
-    const sectionTitle = header.textContent.trim();
-    const headerTag = header.tagName.toLowerCase();
-    let sectionContent = '';
+  const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6')
+  headers.forEach((header) => {
+    const sectionTitle = header.textContent.trim()
+    const headerTag = header.tagName.toLowerCase()
+    let sectionContent = ''
 
-    let sibling = header.nextElementSibling;
+    let sibling = header.nextElementSibling
     while (sibling && !['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(sibling.tagName)) {
-      sectionContent += sibling.textContent.trim() + '\n';
-      sibling = sibling.nextElementSibling;
+      sectionContent += sibling.textContent.trim() + '\n'
+      sibling = sibling.nextElementSibling
     }
 
     sections.push({
@@ -130,10 +133,10 @@ function parseHTMLContent({ html, path, originalTitle }) {
       header: headerTag,
       content: sectionContent,
       path
-    });
-  });
+    })
+  })
 
-  return sections;
+  return sections
 }
 
 function indexPath(outDir, version) {
