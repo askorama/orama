@@ -71,10 +71,10 @@ import {
 export type FrequencyMap = {
   [property: string]: {
     [documentID: InternalDocumentID]:
-      | {
-          [token: string]: number
-        }
-      | undefined
+    | {
+      [token: string]: number
+    }
+    | undefined
   }
 }
 
@@ -580,6 +580,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
         for (const t of term) {
           const filteredIDsResults = radixFind(node, { term: t, exact: true, prefixSearch })
           safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())
+        }
       }
 
       continue
