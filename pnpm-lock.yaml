@@ -801,8 +801,8 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0(@types/react@18.2.43)(react@18.2.0)
       '@orama/plugin-docusaurus-v3':
-        specifier: file:/Users/micheleriva/projects/orama/release/packages/plugin-docusaurus-v3/orama-plugin-docusaurus-v3-2.0.0-beta.8.tgz
-        version: file:packages/plugin-docusaurus-v3/orama-plugin-docusaurus-v3-2.0.0-beta.8.tgz(@docusaurus/types@3.0.1)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.1)(@preact/signals@1.2.2)(@swc/core@1.3.100)(eslint@8.55.0)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.3)(react-dom@18.2.0)(react@18.2.0)(search-insights@2.13.0)(typescript@5.3.3)
+        specifier: workspace:*
+        version: link:../../packages/plugin-docusaurus-v3
       clsx:
         specifier: ^2.0.0
         version: 2.0.0
@@ -5505,59 +5505,9 @@ packages:
     engines: {node: '>= 16.0.0'}
     dev: false
 
-  /@orama/orama@2.0.0-beta.8:
-    resolution: {integrity: sha512-rpm2nL8I1+Rb5NSQsvHp/4BEUynOS8oSjopmjctpr8f+tfFQTZUEuzYh+ri8ffkBd+wnF/LM17mb/MK3ZTgzog==}
-    engines: {node: '>= 16.0.0'}
-    dev: false
-
   /@orama/orama@2.0.0-beta.9:
     resolution: {integrity: sha512-jT9UfHEw1BVlkopY8+SPbriftEQdw/ika9u5qtRBxgGTYMDl/wNy9Oht/8FSpw7LnsiHG3NRwwJ6LrutWKw8Yw==}
     engines: {node: '>= 16.0.0'}
-    dev: false
-
-  /@orama/plugin-parsedoc@2.0.0-beta.8:
-    resolution: {integrity: sha512-2/NqWWCXghrJozOsfew4J0OSN5FMdK1LNU/AaYPYyFxkMgTXH6rZA2qUEg+gYqCmM7FzK1P7v9fH7kCWh9JdaA==}
-    dependencies:
-      '@orama/orama': 2.0.0-beta.8
-      glob: 8.1.0
-      hast-util-from-html: 1.0.2
-      hast-util-from-string: 2.0.0
-      hast-util-to-html: 8.0.4
-      hast-util-to-string: 2.0.0
-      rehype: 12.0.1
-      rehype-document: 6.1.0
-      rehype-parse: 8.0.5
-      rehype-preset-minify: 6.0.0
-      remark-parse: 10.0.2
-      remark-rehype: 10.1.0
-      unified: 10.1.2
-    transitivePeerDependencies:
-      - supports-color
-    dev: false
-
-  /@orama/searchbox@1.0.0-beta.11(@orama/highlight@0.1.2)(@orama/orama@2.0.0-beta.8)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.1)(@preact/signals@1.2.2)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.3):
-    resolution: {integrity: sha512-+zai6c0N31A+m0W3rU+JiiY9Lp7VYURmc+GMmzQhwv0ny9SbZLDZ5lliPenqoR/B0Si9RI/4IPHVJ4AsY9D+vg==}
-    peerDependencies:
-      '@orama/highlight': ^0.1.2
-      '@orama/orama': 2.0.0-beta.7
-      '@oramacloud/client': 1.0.0-beta.21
-      '@preact/signals': ^1.2.2
-      '@preact/signals-core': ^1.5.0
-      preact: ^10.19.1
-      preact-custom-element: ^4.3.0
-    dependencies:
-      '@orama/highlight': 0.1.2
-      '@orama/orama': 2.0.0-beta.8
-      '@oramacloud/client': 1.0.0-beta.21(typescript@5.3.3)
-      '@preact/signals': 1.2.2(preact@10.19.3)
-      '@preact/signals-core': 1.5.1
-      object-to-css-variables: 0.2.1
-      postcss-functions: 4.0.2(postcss@8.4.32)
-      preact: 10.19.3
-      preact-custom-element: 4.3.0(preact@10.19.3)
-      preact-feather: 4.2.1(preact@10.19.3)
-    transitivePeerDependencies:
-      - postcss
     dev: false
 
   /@orama/searchbox@1.0.0-beta.11(@orama/highlight@0.1.2)(@orama/orama@packages+orama)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.1)(@preact/signals@1.2.2)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.3):
@@ -20712,54 +20662,3 @@ packages:
 
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
-
-  file:packages/plugin-docusaurus-v3/orama-plugin-docusaurus-v3-2.0.0-beta.8.tgz(@docusaurus/types@3.0.1)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.1)(@preact/signals@1.2.2)(@swc/core@1.3.100)(eslint@8.55.0)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.3)(react-dom@18.2.0)(react@18.2.0)(search-insights@2.13.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-pzlCwIvRn16lgNgQ7XWCMcMyMBNJxQ0x7Nc9gLNGEBx5Y+qjM5/zyMJQQdA5WDEviUK1NaJWtl4djTUXd0nyoA==, tarball: file:packages/plugin-docusaurus-v3/orama-plugin-docusaurus-v3-2.0.0-beta.8.tgz}
-    id: file:packages/plugin-docusaurus-v3/orama-plugin-docusaurus-v3-2.0.0-beta.8.tgz
-    name: '@orama/plugin-docusaurus-v3'
-    version: 2.0.0-beta.8
-    peerDependencies:
-      react: ^18.0.0
-      react-dom: ^18.0.0
-    dependencies:
-      '@algolia/autocomplete-js': 1.12.2(search-insights@2.13.0)
-      '@algolia/autocomplete-theme-classic': 1.12.2
-      '@docusaurus/plugin-content-docs': 3.0.1(@swc/core@1.3.100)(eslint@8.55.0)(react-dom@18.2.0)(react@18.2.0)(typescript@5.3.3)
-      '@docusaurus/theme-common': 3.0.1(@docusaurus/types@3.0.1)(@swc/core@1.3.100)(eslint@8.55.0)(react-dom@18.2.0)(react@18.2.0)(typescript@5.3.3)
-      '@orama/highlight': 0.1.2
-      '@orama/orama': 2.0.0-beta.8
-      '@orama/plugin-parsedoc': 2.0.0-beta.8
-      '@orama/searchbox': 1.0.0-beta.11(@orama/highlight@0.1.2)(@orama/orama@2.0.0-beta.8)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.1)(@preact/signals@1.2.2)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.3)
-      github-slugger: 2.0.0
-      gray-matter: 4.0.3
-      pako: 2.1.0
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      vfile-message: 3.1.4
-    transitivePeerDependencies:
-      - '@algolia/client-search'
-      - '@docusaurus/types'
-      - '@oramacloud/client'
-      - '@parcel/css'
-      - '@preact/signals'
-      - '@preact/signals-core'
-      - '@swc/core'
-      - '@swc/css'
-      - algoliasearch
-      - bufferutil
-      - csso
-      - debug
-      - esbuild
-      - eslint
-      - lightningcss
-      - postcss
-      - preact
-      - preact-custom-element
-      - search-insights
-      - supports-color
-      - typescript
-      - uglify-js
-      - utf-8-validate
-      - vue-template-compiler
-      - webpack-cli
-    dev: false
