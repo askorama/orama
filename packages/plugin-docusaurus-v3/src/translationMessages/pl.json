@@ -1,7 +1,0 @@
-{
-  "plugin-docusaurus.searchBar.placeholder": "Szukaj...",
-  "plugin-docusaurus.searchBar.noResults": "Nie znaleziono wyników.",
-  "plugin-docusaurus.searchBar.clearButtonTitle": "Wyczyść",
-  "plugin-docusaurus.searchBar.detachedCancelButtonText": "Anuluj",
-  "plugin-docusaurus.searchBar.submitButtonTitle": "Zatwierdź"
-}

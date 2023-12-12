@@ -1,7 +1,7 @@
 {
   "name": "@orama/plugin-docusaurus-v3",
   "version": "2.0.0-beta.8",
-  "description": "Docusaurus v3 plugin for local search powered by orama",
+  "description": "Docusaurus plugin for local search powered by orama",
   "keywords": [
     "orama",
     "docusaurus"
@@ -15,42 +15,18 @@
     "type": "git",
     "url": "git+https://github.com/orama/plugin-docusaurus.git"
   },
-  "type": "module",
   "sideEffects": false,
-  "exports": {
-    ".": {
-      "types": "./dist/server/index.d.ts",
-      "import": "./dist/server/index.js",
-      "require": "./dist/server/commonjs.cjs"
-    },
-    "./types": {
-      "types": "./dist/server/types.d.ts",
-      "import": "./dist/server/types.js",
-      "require": "./dist/server/types.cjs"
-    }
-  },
-  "types": "./dist/server/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "dev": "swc --delete-dir-on-start -s -w --extensions .ts,.tsx,.cts -d dist src",
-    "prebuild": "npm run lint",
-    "build": "swc --delete-dir-on-start --extensions .ts,.tsx,.cts -d dist src",
-    "postbuild": "sh scripts/postbuild.sh",
-    "pretest": "node ../../scripts/test-pack.mjs plugin-docusaurus",
-    "test": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
-    "format": "prettier -w src",
-    "lint": "eslint src --ext .js,.ts,.tsx,.cts",
-    "changelog": "auto-changelog -p"
-  },
+  "main": "src/server/index.js",
+  "scripts": {},
   "dependencies": {
     "@algolia/autocomplete-js": "^1.12.2",
     "@algolia/autocomplete-theme-classic": "^1.12.2",
+    "@docusaurus/plugin-content-docs": "^3.0.1",
     "@docusaurus/theme-common": "^3.0.1",
     "@orama/highlight": "^0.1.2",
-    "@orama/orama": "workspace:2.0.0-beta.8",
-    "@orama/plugin-parsedoc": "workspace:2.0.0-beta.8",
+    "@orama/orama": "workspace:*",
+    "@orama/plugin-parsedoc": "workspace:*",
+    "@orama/searchbox": "1.0.0-beta.9",
     "github-slugger": "^2.0.0",
     "pako": "^2.1.0",
     "vfile-message": "^3.1.4"
@@ -58,8 +34,8 @@
   "devDependencies": {
     "@commitlint/cli": "^17.8.1",
     "@commitlint/config-conventional": "^17.8.1",
-    "@docusaurus/module-type-aliases": "^3.0.1",
-    "@docusaurus/types": "^3.0.1",
+    "@docusaurus/module-type-aliases": "^2.4.3",
+    "@docusaurus/types": "^2.4.3",
     "@swc/cli": "^0.1.63",
     "@swc/core": "^1.3.100",
     "@types/node": "^18.19.2",

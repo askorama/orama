@@ -1,6 +1,9 @@
 [
   {
     "test": ".*\\.ts$",
+    "env": {
+      "targets": "node >= 16"
+    },
     "jsc": {
       "target": "es2022",
       "parser": {
@@ -17,6 +20,9 @@
   },
   {
     "test": ".*\\.tsx$",
+    "env": {
+      "targets": "node >= 16"
+    },
     "jsc": {
       "target": "es2022",
       "parser": {
@@ -41,6 +47,9 @@
     "module": {
       "type": "commonjs",
       "ignoreDynamic": true
+    },
+    "env": {
+      "targets": "node >= 16"
     },
     "jsc": {
       "target": "es2022",
