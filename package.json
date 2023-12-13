@@ -8,23 +8,10 @@
   ],
   "scripts": {
     "build": "turbo build",
-    "build:orama": "cd packages/orama && npm run build",
-    "build:plugin-astro": "cd packages/plugin-astro && npm run build",
-    "build:plugin-data-persistence": "cd packages/plugin-data-persistence && npm run build",
-    "build:plugin-docusaurus": "cd packages/plugin-docusaurus && npm run build",
-    "build:plugin-docusaurus-v3": "cd packages/plugin-docusaurus-v3 && npm run build",
-    "build:plugin-match-highlight": "cd packages/plugin-match-highlight && npm run build",
-    "build:plugin-parsedoc": "cd packages/plugin-parsedoc && npm run build",
     "format": "biome format --write ./packages",
     "format:hook": "biome format --write --no-errors-on-unmatched ./packages",
     "lint": "turbo lint",
     "test": "turbo test",
-    "test:orama": "cd packages/orama && npm test",
-    "test:plugin-astro": "cd packages/plugin-astro && npm test",
-    "test:plugin-data-persistence": "cd packages/plugin-data-persistence && npm test",
-    "test:plugin-docusaurus": "cd packages/plugin-docusaurus && npm test",
-    "test:plugin-match-highlight": "cd packages/plugin-match-highlight && npm test",
-    "test:plugin-parsedoc": "cd packages/plugin-parsedoc && npm test",
     "commit": "turbo lint && pnpm lint-staged && cz",
     "prepare": "husky install .husky",
     "version": "node scripts/version.mjs",
@@ -65,9 +52,18 @@
   },
   "contributors": [
     {
-      "name": "Paolo Insogna",
-      "email": "paolo.insogna@oramasearch.com",
-      "url": "https://cowtech.it",
+      "name": "Tommaso Allevi",
+      "email": "tommaso.allevi@oramasearch.com",
+      "author": true
+    },
+    {
+      "name": "Francesca Giannino",
+      "email": "francesca.giannino@oramasearch.com",
+      "author": true
+    },
+    {
+      "name": "Lucas de Morais",
+      "email": "lucas.demorais@oramasearch.com",
       "author": true
     }
   ],
