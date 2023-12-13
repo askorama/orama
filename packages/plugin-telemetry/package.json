@@ -33,7 +33,6 @@
   ],
   "scripts": {
     "build": "tsup --config tsup.lib.js",
-    "lint": "ts-standard --fix src",
     "test": "c8 -c src/tests/config/c8-local.json tap --rcfile=src/tests/config/tap.yml src/tests/*.test.ts"
   },
   "dependencies": {

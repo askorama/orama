@@ -70,12 +70,16 @@
     {
       "name": "Tommaso Allevi",
       "email": "tommaso.allevi@oramasearch.com",
-      "url": "https://github.com/allevo"
+      "author": true
     },
     {
-      "name": "Paolo Insogna",
-      "email": "paolo.insogna@oramasearch.com",
-      "url": "http://cowtech.it",
+      "name": "Francesca Giannino",
+      "email": "francesca.giannino@oramasearch.com",
+      "author": true
+    },
+    {
+      "name": "Lucas de Morais",
+      "email": "lucas.demorais@oramasearch.com",
       "author": true
     }
   ],

@@ -24,8 +24,7 @@
   ],
   "scripts": {
     "build": "swc --delete-dir-on-start --extensions .ts,.tsx,.cts -d dist src",
-    "postbuild": "tsc -p . --emitDeclarationOnly",
-    "lint": "eslint src --ext .js,.ts,.cts"
+    "postbuild": "tsc -p . --emitDeclarationOnly"
   },
   "dependencies": {
     "@orama/orama": "workspace:*",
@@ -37,9 +36,6 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "lint-staged": {
-    "*.{ts, tsx}": "eslint ./src --cache --fix"
   },
   "devDependencies": {
     "@swc/cli": "^0.1.59",

@@ -26,8 +26,7 @@
   ],
   "scripts": {
     "build": "swc --delete-dir-on-start --extensions .ts -d dist src",
-    "postbuild": "tsc -p . --emitDeclarationOnly && cp ./src/Search.vue ./dist/Search.vue",
-    "lint": "eslint src --ext .js,.ts,.cts"
+    "postbuild": "tsc -p . --emitDeclarationOnly && cp ./src/Search.vue ./dist/Search.vue"
   },
   "dependencies": {
     "@orama/orama": "workspace:*",
