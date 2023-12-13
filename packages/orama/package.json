@@ -41,9 +41,7 @@
   "scripts": {
     "predev": "rm -rf dist && mkdir dist",
     "dev": "swc -s -w --extensions .ts,.cts -d dist src",
-    "prebuild": "npm run lint",
     "build": "node scripts/build.js",
-    "lint": "eslint src tests --ext .js,.ts,.cts",
     "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
     "test:smoke": "tap --rcfile=tests/config/tap.yml tests/smoke/*.test.ts",
