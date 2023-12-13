@@ -174,6 +174,7 @@ function docusaurusOramaPlugin(context: LoadContext, options: PluginOptions): Pl
     getClientModules() {
       return [resolve(getThemePath(), 'SearchBar/style.css'), resolve(getThemePath(), 'SearchBarFooter/style.css')]
     },
+    // @ts-ignore
     configureWebpack(): WebpackConfiguration {
       return {
         resolve: {

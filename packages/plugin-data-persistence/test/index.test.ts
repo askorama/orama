@@ -521,6 +521,7 @@ t.test('dpack persistence', (t) => {
 })
 
 t.test('should persist data in-memory', async (t) => {
+  t.plan(4)
   const db = await generateTestDBInstance()
 
   const q1 = await search(db, {
