@@ -1,5 +1,5 @@
 import t from 'tap'
-import { boundedLevenshtein, levenshtein } from '../src/components/levenshtein.js'
+import { boundedLevenshtein, levenshtein, syncBoundedLevenshtein } from '../src/components/levenshtein.js'
 
 t.test('levenshtein', (t) => {
   t.plan(3)
@@ -29,7 +29,7 @@ t.test('levenshtein', (t) => {
 })
 
 t.test('boundedLevenshtein', (t) => {
-  t.plan(4)
+  t.plan(5)
 
   t.test('should be 0 when both inputs are empty', async (t) => {
     t.plan(2)
@@ -71,5 +71,21 @@ t.test('boundedLevenshtein', (t) => {
 
     t.match(await boundedLevenshtein('somebody once', 'told me', 9), { isBounded: true })
     t.match(await boundedLevenshtein('somebody once', 'told me', 8), { isBounded: false })
+  })
+
+  t.test('foo', async (t) => {
+    t.plan(3)
+
+    const a = syncBoundedLevenshtein('Chris', 'Christopher', 0)
+    t.match(a, { distance: 0, isBounded: true })
+    console.log(a)
+
+    const b = syncBoundedLevenshtein('Chris', 'Christopher', 1)
+    t.match(b, { distance: 0, isBounded: true })
+    console.log(b)
+
+    const c = syncBoundedLevenshtein('Chris', 'Chriastopher', 1)
+    t.match(b, { distance: 0, isBounded: true })
+    console.log(c)
   })
 })

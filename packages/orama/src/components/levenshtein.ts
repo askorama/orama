@@ -44,17 +44,22 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
   lenB -= startIdx
 
   // early return when the smallest string is empty
+  /*
   if (lenA === 0) {
+    if ()
+    console.log('AAAAAAA ---- ')
     return lenB > tolerance ? -1 : lenB
   }
+  */
 
   const delta = lenB - lenA
 
   if (tolerance > lenB) {
     tolerance = lenB
-  } else if (delta > tolerance) {
+  }/* else if (delta > tolerance) {
+    console.log('AAAAAAA ---- ')
     return -1
-  }
+  }*/
 
   let i = 0
   const row: number[] = []
