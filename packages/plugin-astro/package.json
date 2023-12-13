@@ -37,7 +37,7 @@
     "build": "swc --delete-dir-on-start --extensions .ts -d dist src",
     "postbuild": "tsc -p . --emitDeclarationOnly",
     "pretest": "node ../../scripts/test-pack.mjs plugin-astro",
-    "test": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
+    "test": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec"
   },
   "dependencies": {
     "@orama/orama": "workspace:*",
