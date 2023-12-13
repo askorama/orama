@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from 'node:fs'
+import { cp } from 'node:fs/promises'
 import { gzip as gzipCB } from 'node:zlib'
 import { promisify } from 'node:util'
 import { resolve } from 'node:path'
@@ -26,17 +27,6 @@ export default function OramaPluginDocusaurus(ctx, options) {
       return [resolve(getThemePath(), 'SearchBar/index.css')]
     },
 
-    configureWebpack() {
-      return {
-        resolve: {
-          alias: {
-            // 'react/jsx-dev-runtime': 'react/jsx-dev-runtime.js',
-            // 'react/jsx-runtime': 'react/jsx-runtime.js'
-          }
-        }
-      }
-    },
-
     async contentLoaded({ actions, allContent }) {
       const isDevelopment = process.env.NODE_ENV === 'development'
 
@@ -57,7 +47,17 @@ export default function OramaPluginDocusaurus(ctx, options) {
             )
           )
         })
+      } else {
+        actions.setGlobalData({ searchData: {} })
       }
+    },
+
+    async postBuild({ outDir }) {
+      await Promise.all(
+        versions.map(async (version) => {
+          return cp(indexPath(ctx.generatedFilesDir, version), indexPath(outDir, version))
+        })
+      )
     }
   }
 }
