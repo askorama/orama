@@ -60,7 +60,7 @@ async function generateTestDBInstance() {
 }
 
 t.test('binary persistence', (t) => {
-  t.plan(6)
+  t.plan(5)
 
   t.test('should generate a persistence file on the disk with random name', async (t) => {
     t.plan(2)
@@ -75,6 +75,7 @@ t.test('binary persistence', (t) => {
 
     // Persist database on disk in binary format
     const path = await persistToFile(db, 'binary')
+    t.teardown(rmTeardown(path))
 
     // Load database from disk in binary format
     const db2 = await restoreFromFile('binary')
@@ -90,10 +91,6 @@ t.test('binary persistence', (t) => {
     // Queries on the loaded database should match the original database
     t.same(q1.hits, qp1.hits)
     t.same(q2.hits, qp2.hits)
-
-    // Clean up
-    await rm(path)
-    t.end()
   })
 
   t.test('should generate a persistence file on the disk with a given name', async (t) => {
@@ -109,6 +106,7 @@ t.test('binary persistence', (t) => {
 
     // Persist database on disk in binary format
     const path = await persistToFile(db, 'binary', 'test.dpack')
+    t.teardown(rmTeardown(path))
 
     // Load database from disk in binary format
     const db2 = await restoreFromFile('binary', 'test.dpack')
@@ -124,10 +122,6 @@ t.test('binary persistence', (t) => {
     // Queries on the loaded database should match the original database
     t.same(q1.hits, qp1.hits)
     t.same(q2.hits, qp2.hits)
-
-    // Clean up
-    await rm(path)
-    t.end()
   })
 
   t.test('should generate a persistence file on the disk using ORAMA_DB_NAME env', async (t) => {
@@ -157,6 +151,7 @@ t.test('binary persistence', (t) => {
 
     // Persist database on disk in binary format
     const path = await persistToFile(db, 'binary')
+    t.teardown(rmTeardown(path))
     t.match(path, 'example_db_dump')
 
     // Load database from disk in binary format
@@ -174,9 +169,6 @@ t.test('binary persistence', (t) => {
     t.same(q1.hits, qp1.hits)
     t.same(q2.hits, qp2.hits)
 
-    // Clean up
-    await rm(path)
-
     if (currentOramaDBNameValue) {
       // @ts-expect-error Deno is only available in Deno
       if (typeof Deno !== 'undefined') {
@@ -186,7 +178,6 @@ t.test('binary persistence', (t) => {
         process.env.ORAMA_DB_NAME = currentOramaDBNameValue
       }
     }
-    t.end()
   })
 
   t.test('should continue to work with `enum`', async (t) => {
@@ -199,6 +190,8 @@ t.test('binary persistence', (t) => {
     })
 
     const path = await persistToFile(db, 'binary', 'test.dpack')
+    t.teardown(rmTeardown(path))
+
     const db2 = await restoreFromFile('binary', 'test.dpack')
 
     const qp1 = await search(db2, {
@@ -208,9 +201,6 @@ t.test('binary persistence', (t) => {
     })
 
     t.same(q1.hits, qp1.hits)
-
-    await rm(path)
-    t.end()
   })
 
   t.test('should continue to work with `enum[]`', async (t) => {
@@ -223,6 +213,8 @@ t.test('binary persistence', (t) => {
     })
 
     const path = await persistToFile(db, 'binary', 'test.dpack')
+    t.teardown(rmTeardown(path))
+
     const db2 = await restoreFromFile('binary', 'test.dpack')
 
     const qp1 = await search(db2, {
@@ -232,9 +224,6 @@ t.test('binary persistence', (t) => {
     })
 
     t.same(q1.hits, qp1.hits)
-
-    await rm(path)
-    t.end()
   })
 })
 
@@ -254,6 +243,7 @@ t.test('json persistence', (t) => {
 
     // Persist database on disk in json format
     const path = await persistToFile(db, 'json')
+    t.teardown(rmTeardown(path))
 
     // Load database from disk in json format
     const db2 = await restoreFromFile('json')
@@ -269,10 +259,6 @@ t.test('json persistence', (t) => {
     // Queries on the loaded database should match the original database
     t.same(q1.hits, qp1.hits)
     t.same(q2.hits, qp2.hits)
-
-    // Clean up
-    await rm(path)
-    t.end()
   })
 
   t.test('should generate a persistence file on the disk with support for vectors', async (t) => {
@@ -290,6 +276,7 @@ t.test('json persistence', (t) => {
 
     // Persist database on disk in json format
     const path = await persistToFile(db1, 'json', 'test.json')
+    t.teardown(rmTeardown(path))
 
     // Load database from disk in json format
     const db2 = await restoreFromFile('json', 'test.json')
@@ -306,10 +293,6 @@ t.test('json persistence', (t) => {
 
     // Queries on the loaded database should match the original database
     t.same(qp1.hits, qp2.hits)
-
-    // Clean up
-    await rm(path)
-    t.end()
   })
 
   t.test('should generate a persistence file on the disk with a given name and json format', async (t) => {
@@ -325,6 +308,7 @@ t.test('json persistence', (t) => {
 
     // Persist database on disk in json format
     const path = await persistToFile(db, 'json', 'test.json')
+    t.teardown(rmTeardown(path))
 
     // Load database from disk in json format
     const db2 = await restoreFromFile('json', 'test.json')
@@ -340,10 +324,6 @@ t.test('json persistence', (t) => {
     // Queries on the loaded database should match the original database
     t.same(q1.hits, qp1.hits)
     t.same(q2.hits, qp2.hits)
-
-    // Clean up
-    await rm(path)
-    t.end()
   })
 
   t.test('should continue to work with `enum`', async (t) => {
@@ -356,6 +336,8 @@ t.test('json persistence', (t) => {
     })
 
     const path = await persistToFile(db, 'json', 'test.json')
+    t.teardown(rmTeardown(path))
+
     const db2 = await restoreFromFile('json', 'test.json')
 
     const qp1 = await search(db2, {
@@ -365,9 +347,6 @@ t.test('json persistence', (t) => {
     })
 
     t.same(q1.hits, qp1.hits)
-
-    await rm(path)
-    t.end()
   })
 
   t.test('should continue to work with `enum[]`', async (t) => {
@@ -381,6 +360,8 @@ t.test('json persistence', (t) => {
     })
 
     const path = await persistToFile(db, 'json', 'test.json')
+    t.teardown(rmTeardown(path))
+
     const db2 = await restoreFromFile('json', 'test.json')
 
     const qp1 = await search(db2, {
@@ -390,9 +371,6 @@ t.test('json persistence', (t) => {
     })
 
     t.same(q1.hits, qp1.hits)
-
-    await rm(path)
-    t.end()
   })
 })
 
@@ -413,6 +391,7 @@ t.test('dpack persistence', (t) => {
 
     // Persist database on disk in dpack format
     const path = await persistToFile(db, 'dpack')
+    t.teardown(rmTeardown(path))
 
     // Load database from disk in dpack format
     const db2 = await restoreFromFile('dpack')
@@ -428,10 +407,6 @@ t.test('dpack persistence', (t) => {
     // Queries on the loaded database should match the original database
     t.same(q1.hits, qp1.hits)
     t.same(q2.hits, qp2.hits)
-
-    // Clean up
-    await rm(path)
-    t.end()
   })
 
   t.test('should generate a persistence file on the disk with a given name and dpack format', async (t) => {
@@ -448,6 +423,7 @@ t.test('dpack persistence', (t) => {
 
     // Persist database on disk in json format
     const path = await persistToFile(db, 'dpack', 'test.dpack')
+    t.teardown(rmTeardown(path))
 
     // Load database from disk in json format
     const db2 = await restoreFromFile('dpack', 'test.dpack')
@@ -463,10 +439,6 @@ t.test('dpack persistence', (t) => {
     // Queries on the loaded database should match the original database
     t.same(q1.hits, qp1.hits)
     t.same(q2.hits, qp2.hits)
-
-    // Clean up
-    await rm(path)
-    t.end()
   })
 
   t.test('should continue to work with `enum`', async (t) => {
@@ -480,6 +452,8 @@ t.test('dpack persistence', (t) => {
     })
 
     const path = await persistToFile(db, 'dpack', 'test.dpack')
+    t.teardown(rmTeardown(path))
+
     const db2 = await restoreFromFile('dpack', 'test.dpack')
 
     const qp1 = await search(db2, {
@@ -489,9 +463,6 @@ t.test('dpack persistence', (t) => {
     })
 
     t.same(q1.hits, qp1.hits)
-
-    await rm(path)
-    t.end()
   })
 
   t.test('should continue to work with `enum[]`', async (t) => {
@@ -505,6 +476,8 @@ t.test('dpack persistence', (t) => {
     })
 
     const path = await persistToFile(db, 'dpack', 'test.dpack')
+    t.teardown(rmTeardown(path))
+
     const db2 = await restoreFromFile('dpack', 'test.dpack')
 
     const qp1 = await search(db2, {
@@ -514,9 +487,6 @@ t.test('dpack persistence', (t) => {
     })
 
     t.same(q1.hits, qp1.hits)
-
-    await rm(path)
-    t.end()
   })
 })
 
@@ -563,11 +533,14 @@ t.test('should persist data in-memory', async (t) => {
   t.same(q2.hits, qp2.hits)
   t.same(q1.hits, qp3.hits)
   t.same(q2.hits, qp4.hits)
-  t.end()
 })
 
 t.test('errors', (t) => {
+  t.plan(2)
+
   t.test('should throw an error when trying to persist a database in an unsupported format', async (t) => {
+    t.plan(1)
+
     const db = await generateTestDBInstance()
     try {
       // @ts-expect-error - 'unsupported' is not a supported format
@@ -578,21 +551,24 @@ t.test('errors', (t) => {
   })
 
   t.test('should throw an error when trying to restoreFromFile a database from an unsupported format', async (t) => {
+    t.plan(1)
+
     const format = 'unsupported'
     const db = await generateTestDBInstance()
     const path = await persistToFile(db, 'binary', 'supported')
+    t.teardown(rmTeardown(path))
+
     try {
       // @ts-expect-error - 'unsupported' is not a supported format
       await restoreFromFile(format, path)
     } catch ({ message }) {
       t.match(message, UNSUPPORTED_FORMAT(format))
-      await rm(path)
     }
   })
-  t.end()
 })
 
 t.test('should throw an error when trying to use a deprecated method', async (t) => {
+  t.plan(2)
   const db = await generateTestDBInstance()
 
   try {
@@ -606,6 +582,12 @@ t.test('should throw an error when trying to use a deprecated method', async (t)
   } catch ({ message }) {
     t.match(message, METHOD_MOVED('restoreFromFile'))
   }
-
-  t.end()
 })
+
+function rmTeardown(p: string) {
+  return async () => {
+    try {
+      await rm(p)
+    } catch (e) {}
+  }
+}
