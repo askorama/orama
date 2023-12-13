@@ -38,7 +38,6 @@
     "postbuild": "tsc -p . --emitDeclarationOnly",
     "pretest": "node ../../scripts/test-pack.mjs plugin-astro",
     "test": "node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
-    "lint": "eslint src --ext .js,.ts,.tsx,.cts"
   },
   "dependencies": {
     "@orama/orama": "workspace:*",

@@ -41,9 +41,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "lint-staged": {
-    "*.{ts, tsx}": "eslint ./src --cache --fix"
-  },
   "devDependencies": {
     "@swc/cli": "^0.1.59",
     "@swc/core": "^1.3.27",

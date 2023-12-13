@@ -82,8 +82,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "lint-staged": {
-    "*.{ts, tsx}": "eslint ./src --cache --fix"
   }
 }
