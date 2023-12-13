@@ -32,7 +32,16 @@
 			"quoteStyle": "single"
 		}
 	},
+	"organizeImports": {
+		"enabled": true
+	},
 	"linter": {
-		"enabled": false
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"performance": {
+				"recommended": true
+			}
+		}
 	}
 }
