@@ -331,7 +331,6 @@ t.test('Tokenizer', async (t) => {
 
     const O1 = tokenizer.tokenize(I1)
     const O2 = tokenizer.tokenize(I2)
-    console.log(tokenizer)
 
     t.strictSame(O1, ['sovn', 'svar', 'ting', 'prov', 'mislyk'])
     t.strictSame(O2, ['bagt', 'smakag'])
