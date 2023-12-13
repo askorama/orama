@@ -73,7 +73,7 @@ t.test('boundedLevenshtein', (t) => {
     t.match(await boundedLevenshtein('somebody once', 'told me', 8), { isBounded: false })
   })
 
-  t.test('foo', async (t) => {
+  t.test('substrings are ok even if with tolerance', async (t) => {
     t.plan(3)
 
     const a = syncBoundedLevenshtein('Chris', 'Christopher', 0)
