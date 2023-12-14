@@ -216,6 +216,7 @@ function _findLevenshtein(
 
   if(node.w.startsWith(term)){
     findAllWords(node,output,term,false,0)
+    return
   }
 
   if (node.e) {
