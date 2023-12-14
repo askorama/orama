@@ -18,5 +18,9 @@
       "codespaces": {
         "openFiles": ["CONTRIBUTING.md", "README.md"]
       }
-    }
+    },
+    "mounts": [
+      "source=orama-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume", // deps volume
+      "source=orama-pnpm_store,target=${containerWorkspaceFolder}/.pnpm-store,type=volume" // pnpm-store volume
+    ]
   }
