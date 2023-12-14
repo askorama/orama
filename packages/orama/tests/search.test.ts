@@ -8,7 +8,7 @@ t.test('search method', (t) => {
 
     //https://github.com/oramasearch/orama/issues/480
     //following testcase pass only if issue 480 is fixed.
-    t.test('should correctly match with tolerance . even if prefix doesnt match.', async (t) => {
+    t.test('should correctly match with tolerance. even if prefix doesnt match.', async (t) => {
       t.plan(5)
 
       const db = await create({
@@ -38,10 +38,10 @@ t.test('search method', (t) => {
 
       //issue 480 says following will not match because the prefix "Cr" exists so prefix Ch is not searched.
       const result4 = await search(db, { term: 'Cris', tolerance: 1 })
+      t.equal(result4.count, 1)
+
       //should match "Craig" even if prefix "Ca" exists.
       const result5 = await search(db, { term: 'Caig', tolerance: 1 })
-
-      t.equal(result4.count, 1)
       t.equal(result5.count, 1)
     })
 
@@ -732,6 +732,34 @@ t.test('search method', (t) => {
     t.equal(result3.count, 1)
     t.end()
   })
+
+  t.end()
+})
+
+t.test('fix-544', async t => {
+  const db = await create({
+    schema: {
+      name: 'string',
+    } as const,
+    components: {
+      tokenizer: {
+        stemming: true,
+        stopWords: englishStopwords,
+      },
+    },
+  })
+
+  await insert(db, { name: "Christopher" })
+  let result
+
+  result = await search(db, { term: 'Chris', tolerance: 0 })
+  t.equal(result.count, 1)
+
+  result = await search(db, { term: 'Chris', tolerance: 1 })
+  t.equal(result.count, 1)
+  
+  result = await search(db, { term: 'Chris', tolerance: 2 })
+  t.equal(result.count, 1)
 
   t.end()
 })

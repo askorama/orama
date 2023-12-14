@@ -217,8 +217,7 @@ function _findLevenshtein(
   if (node.e) {
     const { w, d: docIDs } = node
     if (w) {
-      const difference = Math.abs(term.length - w.length)
-      if (difference <= originalTolerance && syncBoundedLevenshtein(term, w, originalTolerance).isBounded) {
+      if (syncBoundedLevenshtein(term, w, originalTolerance).isBounded) {
         output[w] = []
       }
       if (getOwnProperty(output, w) != null && docIDs.length > 0) {
@@ -268,6 +267,7 @@ export function find(root: Node, { term, exact, tolerance }: FindParams): FindRe
   if (tolerance && !exact) {
     const output: FindResult = {}
     tolerance = tolerance || 0
+
     _findLevenshtein(root, term, 0, tolerance || 0, tolerance, output)
     return output
   } else {
