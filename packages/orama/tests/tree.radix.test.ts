@@ -174,7 +174,6 @@ t.test('radix tree', (t) => {
     const expected1={"apple":[0],"app":[1],"apply":[2]}
     t.strictSame(result1, expected1)
 
-    console.log(result1=== expected1)
     const result2 = radixFind(root, { term: 'app' ,exact:false, tolerance:1})
     const expected2={"apple":[0],"app":[1],"apply":[2], "apt":[3]}
     t.strictSame(result2, expected2)
