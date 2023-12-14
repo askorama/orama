@@ -6,45 +6,7 @@ t.test('search method', (t) => {
   t.test('with term', async (t) => {
     const [db, id1, id2, id3, id4] = await createSimpleDB()
 
-    //https://github.com/oramasearch/orama/issues/480
-    //following testcase pass only if issue 480 is fixed.
-    t.test('should correctly match with tolerance. even if prefix doesnt match.', async (t) => {
-      t.plan(5)
-
-      const db = await create({
-        schema: {
-          name: 'string'
-        } as const,
-        components: {
-          tokenizer: {
-            stemming: true,
-            stopWords: englishStopwords
-          }
-        }
-      })
-
-      await insert(db, { name: 'Dhris' })
-      const result1 = await search(db, { term: 'Chris', tolerance: 1 })
-      const result2 = await search(db, { term: 'Cgris', tolerance: 1 })
-      const result3 = await search(db, { term: 'Cgris', tolerance: 2 })
-      t.equal(result1.count, 1)
-      t.equal(result2.count, 0)
-      t.equal(result3.count, 1)
-
-      await insert(db, { name: 'Chris ' })
-      await insert(db, { name: 'Craig' })
-      await insert(db, { name: 'Chxy' }) //create h node in radix tree.
-      await insert(db, { name: 'Crxy' }) //create r node in radix tree.
-
-      //issue 480 says following will not match because the prefix "Cr" exists so prefix Ch is not searched.
-      const result4 = await search(db, { term: 'Cris', tolerance: 1 })
-      t.equal(result4.count, 1)
-
-      //should match "Craig" even if prefix "Ca" exists.
-      const result5 = await search(db, { term: 'Caig', tolerance: 1 })
-      t.equal(result5.count, 1)
-    })
-
+    
     t.test('should return all the document on empty string', async (t) => {
       const result = await search(db, {
         term: ''
@@ -324,6 +286,74 @@ t.test('search method', (t) => {
       t.strictSame(new Set(tolerantSearch.hits.map((d) => d.id)), new Set([id1, id2]))
     })
 
+
+    t.test('should correctly match with tolerance. even if prefix doesnt match.', async (t) => {
+      const db = await create({
+        schema: {
+          name: 'string'
+        } as const,
+        components: {
+          tokenizer: {
+            stemming: true,
+            stopWords: englishStopwords
+          }
+        }
+      })
+
+      await insert(db, { name: 'Dhris' })
+      const result1 = await search(db, { term: 'Chris', tolerance: 1 })
+      const result2 = await search(db, { term: 'Cgris', tolerance: 1 })
+      const result3 = await search(db, { term: 'Cgris', tolerance: 2 })
+      t.equal(result1.count, 1)
+      t.equal(result2.count, 0)
+      t.equal(result3.count, 1)
+
+      await insert(db, { name: 'Chris ' })
+      await insert(db, { name: 'Craig' })
+      await insert(db, { name: 'Chxy' }) //create h node in radix tree.
+      await insert(db, { name: 'Crxy' }) //create r node in radix tree.
+
+      //issue 480 says following will not match because the prefix "Cr" exists so prefix Ch is not searched.
+      const result4 = await search(db, { term: 'Cris', tolerance: 1 })
+      t.equal(result4.count, 1)
+
+      //should match "Craig" even if prefix "Ca" exists.
+      const result5 = await search(db, { term: 'Caig', tolerance: 1 })
+      t.equal(result5.count, 1)
+      t.end()
+      
+    })
+
+    //issue#544 
+    //bug both words apple and apply arent matching even after PR#580
+    t.test('match exact prefix , along with tolerance', async (t) => {
+      // Creating the database
+      const db = await create({
+        schema: {
+          word: 'string'
+        } as const,
+        components: {
+          tokenizer: {
+            stemming: true,
+            stopWords: englishStopwords
+          }
+        }
+      })
+
+      await insert(db, { word: 'apt' });
+      await insert(db, { word: 'apple' });
+      await insert(db, { word: 'app' });
+      await insert(db, { word: 'apply' });
+      await insert(db, { word: 'about' });
+      await insert(db, { word: 'again' });
+
+      // Searching for 'app' with a tolerance of 1
+      const result = await search(db, { term: 'app', tolerance: 1 });
+
+      //apt,app,apple,apply should match.
+      t.equal(result.count, 4, 'Should match 4 words for "app" with tolerance 1');
+      t.end()
+    })
     t.end()
   })
 
