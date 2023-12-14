@@ -28,7 +28,7 @@ t.test('levenshtein', (t) => {
   })
 })
 
-t.only('boundedLevenshtein', (t) => {
+t.test('boundedLevenshtein', (t) => {
   t.plan(3)
 
   t.test('should be 0 when both inputs are empty', async (t) => {
@@ -46,29 +46,6 @@ t.only('boundedLevenshtein', (t) => {
     t.match(await boundedLevenshtein('', 'some', 4), { distance: 0, isBounded: true })
     t.match(await boundedLevenshtein('body', '', 4), { distance: 0, isBounded: true })
   })
-
-  /*
-  t.only('distance should be the same as levenshtein, when tolerance is high enough', async (t) => {
-    t.plan(5)
-
-    const tol = 15
-
-    t.equal(levenshtein('aa', 'b'), (await boundedLevenshtein('aa', 'b', tol)).distance)
-    t.equal(levenshtein('b', 'aa'), (await boundedLevenshtein('bb', 'a', tol)).distance)
-    t.equal(
-      levenshtein('somebody once', 'told me'),
-      (await boundedLevenshtein('somebody once', 'told me', tol)).distance
-    )
-    t.equal(
-      levenshtein('the world is gonna', 'roll me'),
-      (await boundedLevenshtein('the world is gonna', 'roll me', tol)).distance
-    )
-    t.equal(
-      levenshtein('kaushuk chadhui', 'caushik chakrabar'),
-      (await boundedLevenshtein('kaushuk chadhui', 'caushik chakrabar', tol)).distance
-    )
-  })
-  */
 
   t.test('should tell whether the Levenshtein distance is upperbounded by a given tolerance', async (t) => {
     t.plan(2)

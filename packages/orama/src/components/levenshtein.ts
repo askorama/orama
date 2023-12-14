@@ -29,12 +29,12 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
     startIdx++
   }
 
-  // string A is subfix of B
+  // if string A is subfix of B, we consider the distance 0
+  // because we search for prefix!
+  // fix https://github.com/oramasearch/orama/issues/544
   if (startIdx === lenA) {
     return 0
   }
-
-  // console.log({ startIdx, lenA, lenB, tolerance })
 
   // ignore common suffix
   // note: `~-` decreases by a unit in a bitwise fashion
@@ -51,9 +51,11 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
   lenA -= startIdx
   lenB -= startIdx
 
-  // early return when the smallest string is empty
+  // If both strings are smaller than the tolerance, we accept any distance
+  // Probably the result distance is wrong, but we don't care:
+  // It is always less then the tolerance!
   if (lenA <= tolerance && lenB <= tolerance) {
-    return Math.max(lenA, lenB)
+    return lenA > lenB ? lenA : lenB
   }
 
   const delta = lenB - lenA

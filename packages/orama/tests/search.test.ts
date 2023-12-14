@@ -37,10 +37,8 @@ t.test('search method', (t) => {
       await insert(db, { name: 'Crxy' }) //create r node in radix tree.
 
       //issue 480 says following will not match because the prefix "Cr" exists so prefix Ch is not searched.
-      console.log('AAAAA')
       const result4 = await search(db, { term: 'Cris', tolerance: 1 })
       t.equal(result4.count, 1)
-      console.log(result4.hits)
 
       //should match "Craig" even if prefix "Ca" exists.
       const result5 = await search(db, { term: 'Caig', tolerance: 1 })
@@ -738,7 +736,7 @@ t.test('search method', (t) => {
   t.end()
 })
 
-t.only('fix-544', async t => {
+t.test('fix-544', async t => {
   const db = await create({
     schema: {
       name: 'string',
