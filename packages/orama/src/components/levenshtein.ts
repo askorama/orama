@@ -23,6 +23,19 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
   let lenA = a.length
   let lenB = b.length
 
+  // ignore common prefix
+  let startIdx = 0
+  while (startIdx < lenA && a.charCodeAt(startIdx) === b.charCodeAt(startIdx)) {
+    startIdx++
+  }
+
+  // string A is subfix of B
+  if (startIdx === lenA) {
+    return 0
+  }
+
+  // console.log({ startIdx, lenA, lenB, tolerance })
+
   // ignore common suffix
   // note: `~-` decreases by a unit in a bitwise fashion
   while (lenA > 0 && a.charCodeAt(~-lenA) === b.charCodeAt(~-lenB)) {
@@ -35,18 +48,20 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
     return lenB > tolerance ? -1 : lenB
   }
 
-  // ignore common prefix
-  let startIdx = 0
-  while (startIdx < lenA && a.charCodeAt(startIdx) === b.charCodeAt(startIdx)) {
-    startIdx++
-  }
   lenA -= startIdx
   lenB -= startIdx
+
+  // early return when the smallest string is empty
+  if (lenA <= tolerance && lenB <= tolerance) {
+    return Math.max(lenA, lenB)
+  }
 
   const delta = lenB - lenA
 
   if (tolerance > lenB) {
     tolerance = lenB
+  } else if (delta > tolerance) {
+    return -1
   }
 
   let i = 0
