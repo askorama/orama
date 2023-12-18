@@ -6,6 +6,7 @@ import { getFacets } from '../components/facets.js'
 import { createError } from '../errors.js'
 import { findSimilarVectors } from '../components/cosine-similarity.js'
 import { intersectFilteredIDs } from '../components/filters.js'
+import { getGroups } from '../components/groups.js'
 import { getInternalDocumentId, getDocumentIdFromInternalId } from '../components/internal-document-id-store.js'
 import { Language } from '../index.js'
 
@@ -109,6 +110,12 @@ export async function searchVectorFn<T extends AnyOrama, ResultDocument = TypedD
     }
   }
 
+  let groups: any = []
+
+  if (params.groupBy) {
+    groups = await getGroups<T, ResultDocument>(orama, results, params.groupBy)
+  }
+
   const timeEnd = await getNanosecondsTime()
   const elapsedTime = timeEnd - timeStart
 
@@ -119,6 +126,7 @@ export async function searchVectorFn<T extends AnyOrama, ResultDocument = TypedD
       raw: Number(elapsedTime),
       formatted: await formatNanoseconds(elapsedTime)
     },
-    ...(facetsResults ? { facets: facetsResults } : {})
+    ...(facetsResults ? { facets: facetsResults } : {}),
+    ...(groups ? { groups } : {})
   }
 }

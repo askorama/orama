@@ -601,6 +601,12 @@ export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDo
   facets?: FacetsParams<T>
 
   /**
+   * Groups configuration
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/grouping
+   */
+  groupBy?: GroupByParams<T, ResultDocument>
+
+  /**
    * The number of matched documents to return.
    * By default, Orama will return 10.
    */
