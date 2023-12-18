@@ -1,3 +1,4 @@
+import { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from './constants.js'
 import { DocumentsStore } from './components/documents-store.js'
 import { Index } from './components/index.js'
 import { DocumentID, InternalDocumentID, InternalDocumentIDStore } from './components/internal-document-id-store.js'
@@ -257,36 +258,56 @@ export type OnlyStrings<T extends any[]> = T[number] extends infer V ? (V extend
 
 export type SortByParams<T extends AnyOrama, ResultDocument> = SorterParams<T> | CustomSorterFunction<ResultDocument>
 
-export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> = {
+export type SearchMode =
+  | typeof MODE_FULLTEXT_SEARCH
+  | typeof MODE_HYBRID_SEARCH
+  | typeof MODE_VECTOR_SEARCH
+
+export interface SearchParamsBase<T extends AnyOrama, ResultDocument = TypedDocument<T>> {}
+
+interface SearchParamsFullText<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
   /**
-   * The word to search.
+   * The term, sentence, or word to search.
    */
   term?: string
+
+  /**
+   * Search mode. Tell Orama to perform either a fulltext search, a vector search or a hybrid search.
+   * By default, Orama will perform a full-text search.
+   */
+  mode: typeof MODE_FULLTEXT_SEARCH
+
   /**
    * The properties of the document to search in.
    */
   properties?: '*' | FlattenSchemaProperty<T>[]
+
   /**
    * The number of matched documents to return.
    */
   limit?: number
+
   /**
    * The number of matched documents to skip.
    */
   offset?: number
+
   /**
    * The key of the document used to sort the result.
    */
   sortBy?: SortByParams<T, ResultDocument>
+
   /**
    * Whether to match the term exactly.
    */
   exact?: boolean
+
   /**
    * The maximum [levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
    * between the term and the searchable property.
    */
   tolerance?: number
+
   /**
    * The BM25 parameters to use.
    *
@@ -304,6 +325,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    * @see https://en.wikipedia.org/wiki/Okapi_BM25
    */
   relevance?: BM25Params
+
   /**
    * The boost to apply to the properties.
    *
@@ -325,6 +347,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    * // In that case, the score of the 'title' property will be multiplied by 2.
    */
   boost?: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>
+
   /**
    * Facets configuration
    * Full documentation: https://docs.oramasearch.com/open-source/usage/search/facets
@@ -445,6 +468,73 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    */
   preflight?: boolean
 }
+
+interface SearchParamsHybridBase<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
+  /**
+   * Search mode. Tell Orama to perform either a fulltext search, a vector search or a hybrid search.
+   * By default, Orama will perform a full-text search.
+   */
+  mode: typeof MODE_HYBRID_SEARCH
+
+  /**
+   * Combine the results of the full-text search and the vector search into the same "hits" property.
+   * By default, Orama will return the results of the full-text search in the "hits" property and the results of the vector search in the "hitsVector" property.
+   */
+  combine: true
+
+  /**
+   * The properties of the document to search in (for the full-text search part).
+   */
+  properties?: '*' | FlattenSchemaProperty<T>[]
+
+  /**
+   * The number of matched documents to return.
+   * It's the sum of the limit of the full-text search and the limit of the vector search.
+   * By default, Orama will return 10 of each.
+   */
+  limit?: number
+
+  /**
+   * The number of matched documents to skip.
+   * It's the sum of the offset of the full-text search and the offset of the vector search.
+   * By default, Orama will skip 0 of each.
+   */
+  offset?: number
+
+  /**
+   * Similarity threshold for the vector search.
+   * By default, Orama will use 0.8.
+   */
+  similarity?: number
+}
+
+interface SearchParamsHybridViaTerm<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsHybridBase<T, ResultDocument> {
+  /**
+   * The term, sentence, or word to search.
+   */
+  term: string
+}
+
+interface SearchParamsHybridViaVector<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsHybridBase<T, ResultDocument> {
+  /**
+   * The vector to search.
+   */
+  vector: VectorType
+}
+
+interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
+  /**
+   * Search mode. Tell Orama to perform either a fulltext search, a vector search or a hybrid search.
+   * By default, Orama will perform a full-text search.
+   */
+    mode: typeof MODE_VECTOR_SEARCH
+}
+
+export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> =
+  | SearchParamsFullText<T, ResultDocument>
+  | SearchParamsHybridViaTerm<T, ResultDocument>
+  | SearchParamsHybridViaVector<T, ResultDocument>
+  | SearchParamsVector<T, ResultDocument>
 
 export type Result<Document> = {
   /**
