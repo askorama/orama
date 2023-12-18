@@ -57,6 +57,7 @@ export async function searchVectorFn<T extends AnyOrama, ResultDocument = TypedD
 
     orama.caches['propertiesToSearch'] = propertiesToSearch
   }
+
   const tokens = []
 
   const context = await createSearchContext(

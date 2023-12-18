@@ -3,12 +3,10 @@ import {
   getDocumentIdFromInternalId,
 } from '../components/internal-document-id-store.js'
 import { createError } from '../errors.js'
-import { getNanosecondsTime, getNested, formatNanoseconds } from '../utils.js'
+import { getNested } from '../utils.js'
 import type {
   AnyOrama,
   BM25Params,
-  HybridResultsBase,
-  HybridResultsCombine,
   IndexMap,
   LiteralUnion,
   Result,
@@ -26,6 +24,7 @@ import type {
 import { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from '../constants.js'
 import { fullTextSearch } from './search-fulltext.js'
 import { searchVectorFn } from './search-vector.js'
+import { hybridSearch } from './search-hybrid.js'
 
 export const defaultBM25Params: BM25Params = {
   k: 1.2,
@@ -113,81 +112,10 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
   }
 
   if (mode === MODE_HYBRID_SEARCH) {
-    return searchHybrid(orama, params as SearchParamsHybrid<T, ResultDocument>)
+    return hybridSearch(orama, params as SearchParamsHybrid<T, ResultDocument>)
   }
 
   throw createError('INVALID_SEARCH_MODE', mode)
-}
-
-export async function searchHybrid<T extends AnyOrama, ResultDocument = TypedDocument<T>>(orama: T, params: SearchParamsHybrid<T, ResultDocument>): Promise<HybridResultsBase<ResultDocument> | HybridResultsCombine<ResultDocument>> {
-  const timeStart = await getNanosecondsTime()
-  const term = params.term
-  const combine = params.combine ?? true // User should explicitly set this to false if they don't want to combine results
-  const vector = params.vector
-  const secureProxyPlugin = orama.plugins?.filter((plugin) => plugin.name === 'plugin-secure-proxy')
-  const hasSecureProxyPlugin = secureProxyPlugin?.length > 0
-
-  if (!term) {
-    // "term" is not required when performing full-text search, but it is required when performing hybrid search.
-    throw createError('MISSING_TERM')
-  }
-
-  if (!vector && !hasSecureProxyPlugin) {
-    throw createError('MISSING_VECTOR_AND_SECURE_PROXY')
-  }
-
-  const vectorSearchParams: SearchParamsVector<T, ResultDocument> = {
-    mode: MODE_VECTOR_SEARCH,
-    property: params.vectorPropertiy,
-    vector: vector!,
-    includeVectors: params.includeVectors,
-    limit: params.limit,
-    offset: params.offset,
-    similarity: params.similarity
-  }
-
-  const fulltextSearchParams: SearchParamsFullText<T, ResultDocument> = {
-    ...params,
-    mode: MODE_FULLTEXT_SEARCH,
-  }
-
-  const [fullTextResults, vectorResults] = await Promise.all([
-    fullTextSearch(orama, fulltextSearchParams),
-    searchVectorFn(orama, vectorSearchParams)
-  ])
-
-  if (!combine) {
-    const count = fullTextResults.count + vectorResults.count
-    const fullTextResultsHits = minMaxScoreNormalization(fullTextResults.hits)
-    const vectorResultsHits = minMaxScoreNormalization(vectorResults.hits)
-    const elapsedTime = await getNanosecondsTime() - timeStart
-
-    return {
-      count,
-      hits: fullTextResultsHits,
-      hitsVector: vectorResultsHits,
-      elapsed: {
-        raw: Number(elapsedTime),
-        formatted: await formatNanoseconds(elapsedTime)
-      },
-    }
-  }
-
-  const elapsedTime = await getNanosecondsTime() - timeStart
-
-  return {
-    ...fullTextResults,
-    hits: [...fullTextResults.hits, ...vectorResults.hits],
-    elapsed: {
-      raw: Number(elapsedTime),
-      formatted: await formatNanoseconds(elapsedTime)
-    }
-  }
-}
-
-function minMaxScoreNormalization(results: Result<any>[]): Result<any>[] {
-  const maxScore = Math.max(...results.map((r) => r.score))
-  return results.map((r) => ({ ...r, score: r.score / maxScore }))
 }
 
 export async function fetchDocumentsWithDistinct<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(

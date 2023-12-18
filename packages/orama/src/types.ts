@@ -517,6 +517,24 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
   vectorPropertiy: string,
 
   /**
+   * The BM25 parameters to use.
+   *
+   * k: Term frequency saturation parameter.
+   * The higher the value, the more important the term frequency becomes.
+   * The default value is 1.2. It should be set to a value between 1.2 and 2.0.
+   *
+   * b: Document length saturation impact. The higher the value, the more
+   * important the document length becomes. The default value is 0.75.
+   *
+   * d: Frequency normalization lower bound. Default value is 0.5.
+   *
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/BM25-algorithm
+   *
+   * @see https://en.wikipedia.org/wiki/Okapi_BM25
+   */
+  relevance?: BM25Params
+
+  /**
    * The number of matched documents to return.
    * By default, Orama will return 10 of each (10 for full-text search, and 10 for vector search).
    */
@@ -538,6 +556,47 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
    * Wether to include the vectors in the result. By default, Orama will not include the vectors, as they can be quite large.
    */
   includeVectors?: boolean
+
+  /**
+   * Groups configuration
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/grouping
+   */
+  groupBy?: GroupByParams<T, ResultDocument>
+
+  /**
+   * Filter the search results.
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/filters
+   */
+  where?: Partial<WhereCondition<T['schema']>>
+  
+  /**
+   * Threshold to use for refining the search results.
+   * The threshold is a number between 0 and 1 that represents the minimum score of the documents to return.
+   * By default, the threshold is 1. Only applies to the full-text search.
+   *
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/threshold
+   */
+  threshold?: number
+
+  /**
+   * The boost to apply to the properties.
+   *
+   * The boost is a number that is multiplied to the score of the property.
+   * It can be used to give more importance to some properties. Only applies to the full-text search.
+   *
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/fields-boosting
+   */
+  boost?: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>
+
+  /**
+   * Facets configuration
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/facets
+   *
+   * A facet is a feature that allows users to narrow down their search results by specific
+   * attributes or characteristics, such as category, price, or location.
+   * This can help users find more relevant and specific results for their search query.
+   */
+  facets?: FacetsParams<T>
 }
 
 export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
