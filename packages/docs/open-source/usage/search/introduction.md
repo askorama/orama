@@ -6,6 +6,10 @@ outline: deep
 
 Orama provides a simple search interface that allows you to search through your documents.
 
+::: tip NOTE
+Search is NOT case sensitive.
+:::
+
 ## Searching with Orama
 
 By default, Orama uses all the string properties to perform the search.
