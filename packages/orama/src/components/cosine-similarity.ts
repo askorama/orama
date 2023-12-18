@@ -1,9 +1,6 @@
 import type { Magnitude, VectorType } from '../types.js'
 
-export type SimilarVector = {
-  id: string
-  score: number
-}
+export type SimilarVector = [string, number]
 
 export function getMagnitude(vector: Float32Array, vectorLength: number): number {
   let magnitude = 0
@@ -19,7 +16,7 @@ export function findSimilarVectors(
   vectors: Record<string, [Magnitude, VectorType]>,
   length: number,
   threshold = 0.8
-) {
+): SimilarVector[] {
   const targetMagnitude = getMagnitude(targetVector, length)
 
   const similarVectors: SimilarVector[] = []
@@ -34,9 +31,9 @@ export function findSimilarVectors(
     const similarity = dotProduct / (targetMagnitude * magnitude)
 
     if (similarity >= threshold) {
-      similarVectors.push({ id: vectorId, score: similarity })
+      similarVectors.push([vectorId, similarity])
     }
   }
 
-  return similarVectors.sort((a, b) => b.score - a.score)
+  return similarVectors.sort((a, b) => b[1] - a[1])
 }

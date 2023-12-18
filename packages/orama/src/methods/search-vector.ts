@@ -1,8 +1,12 @@
 import type { AnyOrama, Results, SearchParamsVector, TypedDocument, Result } from '../types.js'
+import type { InternalDocumentID } from '../components/internal-document-id-store.js'
+import { createSearchContext } from './search.js'
 import { getNanosecondsTime, formatNanoseconds } from '../utils.js'
 import { createError } from '../errors.js'
 import { findSimilarVectors } from '../components/cosine-similarity.js'
-import { getInternalDocumentId } from '../components/internal-document-id-store.js'
+import { intersectFilteredIDs } from '../components/filters.js'
+import { getInternalDocumentId, getDocumentIdFromInternalId } from '../components/internal-document-id-store.js'
+import { Language } from '../index.js'
 
 export type SearchVectorParams = {
   vector: number[] | Float32Array
@@ -14,18 +18,20 @@ export type SearchVectorParams = {
 }
 
 export async function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<T>>(orama: T, params: SearchVectorParams): Promise<Results<ResultDocument>> {
-  console.warn(`"searchVector" function is now part of "search" function, and will be deprecated soon. Please use "search" instead.`)
+  console.warn(`"searchVector" function is now part of "search" function, and will be deprecated in Orama v2.0. Please use "search" instead.`)
   console.warn('Read more at https://docs.oramasearch.com/open-source/usage/search/vector-search.html')
   return searchVectorFn(orama, params as SearchParamsVector<T, ResultDocument>)
 }
 
-export async function searchVectorFn<T extends AnyOrama, ResultDocument = TypedDocument<T>>(orama: T, params: SearchParamsVector<T, ResultDocument>): Promise<Results<ResultDocument>> {
+export async function searchVectorFn<T extends AnyOrama, ResultDocument = TypedDocument<T>>(orama: T, params: SearchParamsVector<T, ResultDocument>, language: Language = 'english'): Promise<Results<ResultDocument>> {
   const timeStart = await getNanosecondsTime()
   let { vector } = params
   const { property, limit = 10, offset = 0, includeVectors = false } = params
   const vectorIndex = orama.data.index.vectorIndexes[property]
   const vectorSize = vectorIndex.size
   const vectors = vectorIndex.vectors
+  const hasFilters = Object.keys(params.where ?? {}).length > 0
+  const { index, docs: oramaDocs } = orama.data
 
   if (vector.length !== vectorSize) {
     throw createError('INVALID_INPUT_VECTOR', property, vectorSize, vector.length)
@@ -35,7 +41,39 @@ export async function searchVectorFn<T extends AnyOrama, ResultDocument = TypedD
     vector = new Float32Array(vector)
   }
 
-  const results = findSimilarVectors(vector, vectors, vectorSize, params.similarity)
+  let results = findSimilarVectors(vector, vectors, vectorSize, params.similarity)
+    .map(([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score]) as [number, number][]
+
+  let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
+
+  if (!propertiesToSearch) {
+    const propertiesToSearchWithTypes = await orama.index.getSearchablePropertiesWithTypes(index)
+
+    propertiesToSearch = await orama.index.getSearchableProperties(index)
+    propertiesToSearch = propertiesToSearch.filter((prop: string) =>propertiesToSearchWithTypes[prop].startsWith('string'))
+
+    orama.caches['propertiesToSearch'] = propertiesToSearch
+  }
+  const tokens = []
+
+  const context = await createSearchContext(
+    orama.tokenizer,
+    orama.index,
+    orama.documentsStore,
+    language,
+    params,
+    propertiesToSearch,
+    tokens,
+    await orama.documentsStore.count(oramaDocs),
+    timeStart
+  )
+
+  let whereFiltersIDs: InternalDocumentID[] = []
+
+  if (hasFilters) {
+    whereFiltersIDs = await orama.index.searchByWhereClause(context, index, params.where!)
+    results = intersectFilteredIDs(whereFiltersIDs, results)
+  }
 
   const docs: Result<ResultDocument>[] = Array.from({ length: limit })
 
@@ -45,8 +83,7 @@ export async function searchVectorFn<T extends AnyOrama, ResultDocument = TypedD
       break
     }
 
-    const originalID = getInternalDocumentId(orama.internalDocumentIDStore, result.id)
-    const doc = orama.data.docs.docs[originalID]
+    const doc = orama.data.docs.docs[result[0]]
 
     if (doc) {
       if (!includeVectors) {
@@ -54,8 +91,8 @@ export async function searchVectorFn<T extends AnyOrama, ResultDocument = TypedD
       }
 
       const newDoc: Result<ResultDocument> = {
-        id: result.id,
-        score: result.score,
+        id: getDocumentIdFromInternalId(orama.internalDocumentIDStore, result[0]),
+        score: result[1],
         document: doc
       }
       docs[i] = newDoc

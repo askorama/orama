@@ -1,7 +1,6 @@
 import {
   InternalDocumentID,
   getDocumentIdFromInternalId,
-  getInternalDocumentId
 } from '../components/internal-document-id-store.js'
 import { createError } from '../errors.js'
 import { getNanosecondsTime, getNested, formatNanoseconds } from '../utils.js'

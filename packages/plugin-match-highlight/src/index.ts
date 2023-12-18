@@ -5,7 +5,7 @@ import {
   RawData,
   Result,
   Results,
-  SearchParams,
+  SearchParamsFullText,
   TypedDocument,
   load,
   save,
@@ -92,7 +92,7 @@ async function recursivePositionInsertion<T extends AnyOrama, ResultDocument = T
 
 export async function searchWithHighlight<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
-  params: SearchParams<T, ResultDocument>,
+  params: SearchParamsFullText<T, ResultDocument>,
   language?: Language
 ): Promise<SearchResultWithHighlight<ResultDocument>> {
   const result = await search(orama, params, language)
