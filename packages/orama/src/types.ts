@@ -536,7 +536,66 @@ interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDocument<
    * Search mode. Tell Orama to perform either a fulltext search, a vector search or a hybrid search.
    * By default, Orama will perform a full-text search.
    */
-    mode: typeof MODE_VECTOR_SEARCH
+  mode: typeof MODE_VECTOR_SEARCH
+
+  /**
+   * The vector used to perform vector similarity search.
+   * 
+   * @example
+   * const db = await create({
+   *   schema: {
+   *     embeddings: 'vector[3]'
+   *   }
+   * })
+   * 
+   * const result = await search(db, {
+   *   vector: [0.1, 0.2, 0.3],
+   *   mode: 'vector',
+   *   property: 'embedding',
+   * })
+   */
+  vector: number[] | Float32Array
+
+  /**
+   * The property of the document to search in. 
+   * @example
+   * const db = await create({
+   *   schema: {
+   *     embeddings: 'vector[3]'
+   *   }
+   * })
+   * 
+   * const result = await search(db, {
+   *   vector: [0.1, 0.2, 0.3],
+   *   mode: 'vector',
+   *   property: 'embedding',
+   * })
+   */
+  property: string
+
+  /**
+   * The minimum similarity score between the vector and the document.
+   * By default, Orama will use 0.8.
+   */
+  similarity?: number
+
+  /**
+   * The number of matched documents to return.
+   * By default, Orama will return 10.
+   */
+  limit?: number
+
+  /**
+   * The number of matched documents to skip.
+   * By default, Orama will skip 0.
+   */
+  offset?: number
+
+  /**
+   * Whether to include the vectors in the result.
+   * By default, Orama will not include the vectors, as they can be quite large.
+   */
+  includeVectors?: boolean
 }
 
 export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> =
