@@ -117,7 +117,7 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
     return searchVector(orama, params as SearchParamsVector<T, ResultDocument>)
   }
 
-  throw ('No other search modes are supported yet')
+  throw createError('INVALID_SEARCH_MODE', mode)
 }
 
 export async function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<T>>(orama: T, params: SearchParamsVector<T, ResultDocument>): Promise<Results<ResultDocument>> {
@@ -175,7 +175,6 @@ export async function searchVector<T extends AnyOrama, ResultDocument = TypedDoc
     }
   }
 }
-
 
 async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(orama: T, params: SearchParamsFullText<T, ResultDocument>, language?: string): Promise<Results<ResultDocument>> {
     const timeStart = await getNanosecondsTime()
