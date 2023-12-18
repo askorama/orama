@@ -470,7 +470,7 @@ export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = Typed
   preflight?: boolean
 }
 
-interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
+export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
   /**
    * The vector used to perform vector similarity search.
    * Since "mode" is set to "hybrid", Orama will perform a full-text search and a vector search,
@@ -532,7 +532,7 @@ interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDocument<
   similarity?: number
 }
 
-interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
+export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
   /**
    * Search mode. Tell Orama to perform either a fulltext search, a vector search or a hybrid search.
    * By default, Orama will perform a full-text search.

@@ -13,10 +13,7 @@ export type SearchVectorParams = {
   includeVectors?: boolean
 }
 
-export async function searchVector<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
-  orama: T,
-  params: SearchVectorParams
-): Promise<Results<ResultDocument>> {
+export async function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<T>>(orama: T, params: SearchVectorParams): Promise<Results<ResultDocument>> {
   const timeStart = await getNanosecondsTime()
   let { vector } = params
   const { property, limit = 10, offset = 0, includeVectors = false } = params

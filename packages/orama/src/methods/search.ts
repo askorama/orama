@@ -22,13 +22,15 @@ import type {
   SearchContext,
   SearchParams,
   SearchParamsFullText,
+  SearchParamsVector,
   SearchableValue,
   TokenMap,
   TokenScore,
   Tokenizer,
   TypedDocument
 } from '../types.js'
-import { MODE_FULLTEXT_SEARCH } from '../constants.js'
+import { MODE_FULLTEXT_SEARCH, MODE_VECTOR_SEARCH } from '../constants.js'
+import { searchVector } from './search-vector.js'
 
 const defaultBM25Params: BM25Params = {
   k: 1.2,
@@ -111,9 +113,9 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
     return fullTextSearch(orama, params as SearchParamsFullText<T, ResultDocument>, language)
   }
 
-  // if (mode === MODE_VECTOR_SEARCH) {
-  //   return searchVector(orama, params as SearchVectorParams)
-  // }
+  if (mode === MODE_VECTOR_SEARCH) {
+    return searchVector(orama, params as SearchParamsVector<T, ResultDocument>)
+  }
 
   throw ('No other search modes are supported yet')
 }
