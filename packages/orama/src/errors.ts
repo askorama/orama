@@ -36,6 +36,8 @@ const errors = {
   FACET_NOT_SUPPORTED: `Facet doens't support the type "%s".`,
   INVALID_DISTANCE_SUFFIX: `Invalid distance suffix "%s". Valid suffixes are: cm, m, km, mi, yd, ft.`,
   INVALID_SEARCH_MODE: `Invalid search mode "%s". Valid modes are: "fulltext", "vector", "hybrid".`,
+  MISSING_VECTOR_AND_SECURE_PROXY: `No vector was provided and no secure proxy was configured. Please provide a vector or configure an Orama Secure Proxy to perform hybrid search.`,
+  MISSING_TERM: `"term" is a required parameter when performing hybrid search. Please provide a search term.`,
 }
 
 export type ErrorCode = keyof typeof errors

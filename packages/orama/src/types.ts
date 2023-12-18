@@ -512,16 +512,19 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
   properties?: '*' | FlattenSchemaProperty<T>[]
 
   /**
+   * The vector property of the document to search in (for the vector search part).
+   */
+  vectorPropertiy: string,
+
+  /**
    * The number of matched documents to return.
-   * It's the sum of the limit of the full-text search and the limit of the vector search.
-   * By default, Orama will return 10 of each.
+   * By default, Orama will return 10 of each (10 for full-text search, and 10 for vector search).
    */
   limit?: number
 
   /**
    * The number of matched documents to skip.
-   * It's the sum of the offset of the full-text search and the offset of the vector search.
-   * By default, Orama will skip 0 of each.
+   * By default, Orama will skip 0 of each (0 for full-text search, and 0 for vector search).
    */
   offset?: number
 
@@ -529,7 +532,12 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
    * Similarity threshold for the vector search.
    * By default, Orama will use 0.8.
    */
-  similarity?: number
+  similarity?: number,
+
+  /**
+   * Wether to include the vectors in the result. By default, Orama will not include the vectors, as they can be quite large.
+   */
+  includeVectors?: boolean
 }
 
 export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
@@ -656,24 +664,64 @@ export type ElapsedTime = {
   formatted: string
 }
 
+export interface HybridResultsBase<Document> {
+  /**
+   * The number of all the matched documents, combining vector and full-text search. Will contain duplicated results between vector and full-text search.
+   */
+  count: number
+
+  /**
+   * All the matched elements from the full-text search.
+   */
+  hits: Result<Document>[]
+  
+  /**
+   * The time taken to search.
+   */
+  elapsed: ElapsedTime
+
+  /**
+   * The facets results. Includes full-text search facets only.
+   */
+  facets?: FacetResult
+
+  /**
+   * The groups results. Includes full-text search groups only.
+   */
+  groups?: GroupResult<Document>
+}
+
+export interface HybridResultsCombine<Document> extends HybridResultsBase<Document> {
+  /**
+   * All the matched elements from the vector search.
+   */
+  hitsVector: Result<Document>[]
+}
+
 export type Results<Document> = {
   /**
    * The number of all the matched documents.
    */
   count: number
+
   /**
    * An array of matched documents taking `limit` and `offset` into account.
    */
   hits: Result<Document>[]
+
   /**
    * The time taken to search.
    */
   elapsed: ElapsedTime
+
   /**
    * The facets results.
    */
   facets?: FacetResult
 
+  /**
+   * The groups results.
+   */
   groups?: GroupResult<Document>
 }
 

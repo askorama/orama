@@ -94,6 +94,7 @@
     "cronometro": "^1.1.5",
     "execa": "^6.1.0",
     "glob": "^9.2.3",
+    "openai": "^4.23.0",
     "prettier": "^2.8.1",
     "tap": "^16.3.2",
     "tap-mocha-reporter": "^5.0.3",
