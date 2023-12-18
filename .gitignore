@@ -11,3 +11,4 @@ playwright-report
 .DS_Store
 .turbo
 .idea/
+.pnpm-store/

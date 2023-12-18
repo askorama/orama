@@ -214,6 +214,11 @@ function _findLevenshtein(
     return
   }
 
+  if(node.w.startsWith(term)){
+    findAllWords(node,output,term,false,0)
+    return
+  }
+
   if (node.e) {
     const { w, d: docIDs } = node
     if (w) {
