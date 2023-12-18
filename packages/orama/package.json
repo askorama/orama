@@ -44,9 +44,9 @@
     "prebuild": "npm run lint",
     "build": "node scripts/build.js",
     "lint": "eslint src tests --ext .js,.ts,.cts",
-    "test": "c8 -c tests/config/c8-local.json tap --rcfile=tests/config/tap.yml tests/*.test.ts",
-    "test:ci": "c8 -c tests/config/c8-ci.json tap --rcfile=tests/config/tap.yml --no-color tests/*.test.ts",
-    "test:smoke": "tap --rcfile=tests/config/tap.yml tests/smoke/*.test.ts",
+    "test": "c8 -c tests/config/c8-local.json tap tests/*.test.ts",
+    "test:ci": "c8 -c tests/config/c8-ci.json tap --no-color tests/*.test.ts",
+    "test:smoke": "tap tests/smoke/*.test.ts",
     "test:types": "tsc --emitDeclarationOnly; tsd --files tests/type/",
     "ci": "npm run build && npm run test:ci && npm run test:types"
   },
@@ -86,7 +86,7 @@
     "@playwright/test": "^1.29.2",
     "@swc/cli": "^0.1.59",
     "@swc/core": "^1.3.27",
-    "@types/node": "^18.11.18",
+    "@types/node": "^20.9.0",
     "@types/tap": "^15.0.7",
     "auto-changelog": "^2.4.0",
     "c8": "^7.12.0",
@@ -96,7 +96,7 @@
     "glob": "^9.2.3",
     "openai": "^4.23.0",
     "prettier": "^2.8.1",
-    "tap": "^16.3.2",
+    "tap": "^18.6.1",
     "tap-mocha-reporter": "^5.0.3",
     "tape": "^5.6.1",
     "tcompare": "^6.0.0",
@@ -107,5 +107,8 @@
   },
   "engines": {
     "node": ">= 16.0.0"
+  },
+  "tap": {
+    "extends": "tests/config/tap.yml"
   }
 }

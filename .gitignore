@@ -12,3 +12,5 @@ playwright-report
 .turbo
 .idea/
 .pnpm-store/
+.tap
+.nyc_output

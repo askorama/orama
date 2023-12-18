@@ -1,4 +1,4 @@
-import * as t from 'tap'
+import t from 'tap'
 import { count, getByID, create, insert } from '../src/index.js'
 
 t.test('count', async (t) => {
