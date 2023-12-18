@@ -5,5 +5,4 @@ reporter: base
 disable-coverage: false
 allow-incomplete-coverage: true
 node-arg:
-  - --loader=tsx
   - --no-warnings=loader
