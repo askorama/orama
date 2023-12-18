@@ -2,6 +2,7 @@ import type { AnyOrama, Results, SearchParamsVector, TypedDocument, Result } fro
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { createSearchContext } from './search.js'
 import { getNanosecondsTime, formatNanoseconds } from '../utils.js'
+import { getFacets } from '../components/facets.js'
 import { createError } from '../errors.js'
 import { findSimilarVectors } from '../components/cosine-similarity.js'
 import { intersectFilteredIDs } from '../components/filters.js'
@@ -30,6 +31,7 @@ export async function searchVectorFn<T extends AnyOrama, ResultDocument = TypedD
   const vectorIndex = orama.data.index.vectorIndexes[property]
   const vectorSize = vectorIndex.size
   const vectors = vectorIndex.vectors
+  const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
   const hasFilters = Object.keys(params.where ?? {}).length > 0
   const { index, docs: oramaDocs } = orama.data
 
@@ -75,6 +77,14 @@ export async function searchVectorFn<T extends AnyOrama, ResultDocument = TypedD
     results = intersectFilteredIDs(whereFiltersIDs, results)
   }
 
+  let facetsResults: any = []
+
+  if (shouldCalculateFacets) {
+    // Populate facets if needed
+    const facets = await getFacets(orama, results, params.facets!)
+    facetsResults = facets
+  }
+
   const docs: Result<ResultDocument>[] = Array.from({ length: limit })
 
   for (let i = 0; i < limit; i++) {
@@ -108,6 +118,7 @@ export async function searchVectorFn<T extends AnyOrama, ResultDocument = TypedD
     elapsed: {
       raw: Number(elapsedTime),
       formatted: await formatNanoseconds(elapsedTime)
-    }
+    },
+    ...(facetsResults ? { facets: facetsResults } : {})
   }
 }

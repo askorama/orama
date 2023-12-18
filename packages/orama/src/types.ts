@@ -591,22 +591,14 @@ export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDo
   /**
    * Filter the search results.
    * Full documentation: https://docs.oramasearch.com/open-source/usage/search/filters
-   *
-   * @example
-   * // Search for documents that contain 'Headphones' in the 'description' and 'title' fields and
-   * // have a price less than 100.
-   *
-   * const result = await search(db, {
-   *  term: 'Headphones',
-   *  properties: ['description', 'title'],
-   *  where: {
-   *    price: {
-   *      lt: 100
-   *    }
-   *  }
-   * });
    */
   where?: Partial<WhereCondition<T['schema']>>
+
+  /**
+   * Facets configuration
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/facets
+   */
+  facets?: FacetsParams<T>
 
   /**
    * The number of matched documents to return.

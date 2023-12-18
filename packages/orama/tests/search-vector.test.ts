@@ -177,7 +177,7 @@ t.test('search', (t) => {
   })
 })
 
-t.test('search with where clause', async (t) => {
+t.test('vector search with where clause', async (t) => {
   const db = await create({
     schema: {
       embedding: 'vector[5]',
@@ -204,4 +204,40 @@ t.test('search with where clause', async (t) => {
 
   t.same(results.count, 1)
   t.same(results.hits[0].id, id2)
+})
+
+t.test('vector search with facets', async t => {
+  const db = await create({
+    schema: {
+      embedding: 'vector[5]',
+      rating: 'number'
+    } as const
+  })
+
+  await insertMultiple(db, [
+    { embedding: [1, 1, 1, 1, 1], rating: 1 },
+    { embedding: [0, 1, 1, 1, 1], rating: 2 },
+    { embedding: [0, 0, 1, 1, 1], rating: 4 }
+  ])
+
+  const results = await search(db, {
+    vector: [1, 1, 1, 1, 1],
+    mode: 'vector',
+    property: 'embedding',
+    similarity: 0,
+    facets: {
+      rating: {
+        ranges: [
+          { from: 0, to: 1 },
+          { from: 1, to: 3 },
+          { from: 3, to: 5 },
+        ]
+      }
+    }
+  })
+
+  t.same(results.count, 3)
+  t.same(results.facets?.rating.values['0-1'], 1)
+  t.same(results.facets?.rating.values['1-3'], 2)
+  t.same(results.facets?.rating.values['3-5'], 1)
 })
