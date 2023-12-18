@@ -469,7 +469,30 @@ interface SearchParamsFullText<T extends AnyOrama, ResultDocument = TypedDocumen
   preflight?: boolean
 }
 
-interface SearchParamsHybridBase<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
+interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
+  /**
+   * The vector used to perform vector similarity search.
+   * Since "mode" is set to "hybrid", Orama will perform a full-text search and a vector search,
+   * therefore, you have to provide a "term" property as well when setting the "vector" property.
+   * 
+   * @example
+   * const result = await search(db, {
+   *  term: 'Noise cancelling headphones',
+   *  vector: [0.1, 0.2, 0.3]
+   * })
+   */
+  vector?: Array<number> | VectorType
+
+  /**
+   * The term, sentence, or word to search.
+   * @example
+   * const result = await search(db, {
+   *   term: 'Noise cancelling headphones',
+   *   mode: 'hybrid', 
+   * })
+   */
+  term: string
+
   /**
    * Search mode. Tell Orama to perform either a fulltext search, a vector search or a hybrid search.
    * By default, Orama will perform a full-text search.
@@ -480,7 +503,7 @@ interface SearchParamsHybridBase<T extends AnyOrama, ResultDocument = TypedDocum
    * Combine the results of the full-text search and the vector search into the same "hits" property.
    * By default, Orama will return the results of the full-text search in the "hits" property and the results of the vector search in the "hitsVector" property.
    */
-  combine: true
+  combine?: boolean
 
   /**
    * The properties of the document to search in (for the full-text search part).
@@ -508,20 +531,6 @@ interface SearchParamsHybridBase<T extends AnyOrama, ResultDocument = TypedDocum
   similarity?: number
 }
 
-interface SearchParamsHybridViaTerm<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsHybridBase<T, ResultDocument> {
-  /**
-   * The term, sentence, or word to search.
-   */
-  term: string
-}
-
-interface SearchParamsHybridViaVector<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsHybridBase<T, ResultDocument> {
-  /**
-   * The vector to search.
-   */
-  vector: VectorType
-}
-
 interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
   /**
    * Search mode. Tell Orama to perform either a fulltext search, a vector search or a hybrid search.
@@ -532,8 +541,7 @@ interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDocument<
 
 export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> =
   | SearchParamsFullText<T, ResultDocument>
-  | SearchParamsHybridViaTerm<T, ResultDocument>
-  | SearchParamsHybridViaVector<T, ResultDocument>
+  | SearchParamsHybrid<T, ResultDocument>
   | SearchParamsVector<T, ResultDocument>
 
 export type Result<Document> = {
