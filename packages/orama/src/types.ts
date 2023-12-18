@@ -263,9 +263,10 @@ export type SearchMode =
   | typeof MODE_HYBRID_SEARCH
   | typeof MODE_VECTOR_SEARCH
 
+// eslint-disable-next-line
 export interface SearchParamsBase<T extends AnyOrama, ResultDocument = TypedDocument<T>> {}
 
-interface SearchParamsFullText<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
+export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
   /**
    * The term, sentence, or word to search.
    */
@@ -637,13 +638,13 @@ export type TokenMap = Record<string, TokenScore[]>
 
 export type IndexMap = Record<string, TokenMap>
 
-export type SearchContext<T extends AnyOrama, ResultDocument = TypedDocument<T>> = {
+export type SearchContext<T extends AnyOrama, ResultDocument = TypedDocument<T>, P = SearchParams<T, ResultDocument>> = {
   timeStart: bigint
   tokenizer: Tokenizer
   index: T['index']
   documentsStore: T['documentsStore']
   language: string | undefined
-  params: SearchParams<T, ResultDocument>
+  params: P
   docsCount: number
   uniqueDocsIDs: Record<number, number>
   indexMap: IndexMap
