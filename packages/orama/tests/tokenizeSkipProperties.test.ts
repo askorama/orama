@@ -1,4 +1,4 @@
-import * as t from 'tap'
+import t from 'tap'
 import { Orama, create, insert, search } from '../src/index.js'
 
 t.test('tokenizeSkipProperties', (t) => {

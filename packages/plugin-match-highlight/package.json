@@ -35,7 +35,7 @@
     "dev": "swc --delete-dir-on-start -s -w --extensions .ts,.cts -d dist src",
     "build": "swc --delete-dir-on-start --extensions .ts,.cts -d dist src",
     "postbuild": "tsc -p . --emitDeclarationOnly && tsc -p tsconfig.cjs.json --emitDeclarationOnly && mv dist/commonjs.js dist/commonjs.cjs && mv dist/commonjs.js.map dist/commonjs.cjs.map",
-    "test": "c8 -c test/config/c8.json tap --rcfile=test/config/tap.yml test/*.test.ts"
+    "test": "c8 -c test/config/c8.json tap test/*.test.ts"
   },
   "dependencies": {
     "@orama/orama": "workspace:*"
@@ -43,10 +43,10 @@
   "devDependencies": {
     "@swc/cli": "^0.1.59",
     "@swc/core": "^1.3.27",
-    "@types/node": "^18.11.18",
+    "@types/node": "^20.9.0",
     "@types/tap": "^15.0.7",
     "c8": "^7.12.0",
-    "tap": "^16.3.4",
+    "tap": "^18.6.1",
     "tsx": "^3.12.2",
     "typescript": "^5.0.0"
   },
@@ -54,5 +54,8 @@
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
+  },
+  "tap": {
+    "extends": "test/config/tap.yml"
   }
 }
