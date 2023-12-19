@@ -340,7 +340,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    *  properties: ['title', 'description', 'category.primary', 'category.secondary'],
    *  facets: {
    *    'category.primary': {
-   *      size: 10,
+   *      limit: 10,
    *      sort: 'ASC',
    *    }
    *  }
