@@ -10,6 +10,7 @@ import { getGroups } from '../components/groups.js'
 import { findSimilarVectors } from '../components/cosine-similarity.js'
 import { getInternalDocumentId } from '../components/internal-document-id-store.js'
 import { fetchDocuments } from './search.js'
+import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
 
 export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
@@ -17,6 +18,11 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
   language?: string
 ): Promise<Results<ResultDocument>> {
   const timeStart = await getNanosecondsTime()
+
+  if (orama.beforeSearch) {
+    await runBeforeSearch(orama.beforeSearch, orama, params, language)
+  }
+
   const { offset = 0, limit = 10, includeVectors = false } = params
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
 
@@ -99,6 +105,10 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
         }
       }
     })
+  }
+
+  if (orama.afterSearch) {
+    await runAfterSearch(orama.afterSearch, orama, params, language, results as any)
   }
 
   const timeEnd = await getNanosecondsTime()

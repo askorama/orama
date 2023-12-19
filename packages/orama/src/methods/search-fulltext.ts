@@ -24,6 +24,11 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
   language?: string
 ): Promise<Results<ResultDocument>> {
   const timeStart = await getNanosecondsTime()
+
+  if (orama.beforeSearch) {
+    await runBeforeSearch(orama.beforeSearch, orama, params, language)
+  }
+
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
@@ -186,10 +191,6 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
 
   if (params.groupBy) {
     searchResult.groups = await getGroups<T, ResultDocument>(orama, uniqueDocsArray, params.groupBy)
-  }
-
-  if (orama.beforeSearch) {
-    await runBeforeSearch(orama.beforeSearch, orama, params, language)
   }
 
   if (orama.afterSearch) {

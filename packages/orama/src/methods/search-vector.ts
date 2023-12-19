@@ -9,6 +9,7 @@ import { intersectFilteredIDs } from '../components/filters.js'
 import { getGroups } from '../components/groups.js'
 import { getInternalDocumentId, getDocumentIdFromInternalId } from '../components/internal-document-id-store.js'
 import { Language } from '../index.js'
+import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
 
 export type SearchVectorParams = {
   vector: number[] | Float32Array
@@ -25,6 +26,11 @@ export async function searchVector<T extends AnyOrama, ResultDocument = TypedDoc
   language: Language = 'english'
 ): Promise<Results<ResultDocument>> {
   const timeStart = await getNanosecondsTime()
+
+  if (orama.beforeSearch) {
+    await runBeforeSearch(orama.beforeSearch, orama, params, language)
+  }
+
   const { vector } = params
 
   if (vector && (!('value' in vector) || !('property' in vector))) {
@@ -122,6 +128,10 @@ export async function searchVector<T extends AnyOrama, ResultDocument = TypedDoc
 
   if (params.groupBy) {
     groups = await getGroups<T, ResultDocument>(orama, results, params.groupBy)
+  }
+
+  if (orama.afterSearch) {
+    await runAfterSearch(orama.afterSearch, orama, params, language, results as any)
   }
 
   const timeEnd = await getNanosecondsTime()
