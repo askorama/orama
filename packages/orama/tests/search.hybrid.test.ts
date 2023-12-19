@@ -19,12 +19,14 @@ t.test('hybrid search', async (t) => {
     const results = await search(db, {
       mode: 'hybrid',
       term: 'hello',
-      vectorPropertiy: 'embedding',
-      vector: [1, 2, 3, 4, 5],
+      vector: {
+        value: [1, 2, 3, 4, 5],
+        property: 'embedding'
+      },
       similarity: 1
     })
 
-    t.equal(results.count, 1)
+    t.equal(results.count, 2)
   })
 
   t.test('should return results with filters', async (t) => {
@@ -45,8 +47,10 @@ t.test('hybrid search', async (t) => {
     const results1 = await search(db, {
       mode: 'hybrid',
       term: 'hello',
-      vectorPropertiy: 'embedding',
-      vector: [1, 2, 3, 4, 4],
+      vector: {
+        property: 'embedding',
+        value: [1, 2, 3, 4, 4]
+      },
       similarity: 1,
       where: {
         number: {
@@ -58,9 +62,11 @@ t.test('hybrid search', async (t) => {
     const results2 = await search(db, {
       mode: 'hybrid',
       term: 'hello',
-      vectorPropertiy: 'embedding',
-      vector: [1, 2, 3, 4, 4],
-      similarity: 1,
+      vector: {
+        property: 'embedding',
+        value: [1, 2, 3, 4, 4]
+      },
+      similarity: 0.99,
       where: {
         number: {
           eq: 0

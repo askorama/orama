@@ -274,7 +274,7 @@ export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = Typed
    * Search mode. Tell Orama to perform either a fulltext search, a vector search or a hybrid search.
    * By default, Orama will perform a full-text search.
    */
-  mode: typeof MODE_FULLTEXT_SEARCH
+  mode?: typeof MODE_FULLTEXT_SEARCH
 
   /**
    * The properties of the document to search in.
@@ -700,7 +700,7 @@ export type GroupResult<Document> = {
   result: Result<Document>[]
 }[]
 
-export type TokenScore = [InternalDocumentID, number]
+export type TokenScore = [id: InternalDocumentID, score: number]
 
 export type TokenMap = Record<string, TokenScore[]>
 

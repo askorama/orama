@@ -31,7 +31,7 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
     vectorIDs.slice(offset, offset + limit)
   )
 
-  // @todo avoid tokenize twoce
+  // @todo avoid tokenize twice
   const tokens = await orama.tokenizer.tokenize(params.term ?? '', language)
   let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
   if (!propertiesToSearch) {
@@ -76,89 +76,41 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
     uniqueTokenScores = intersectFilteredIDs(whereFiltersIDs, uniqueTokenScores)
   }
 
-  let facetsResults: any = []
-
+  let facetsResults: any
   if (shouldCalculateFacets) {
-    // Populate facets if needed
     const facets = await getFacets(orama, uniqueTokenScores, params.facets!)
     facetsResults = facets
   }
 
-  let groups: any = []
-
+  let groups: any
   if (params.groupBy) {
     groups = await getGroups<T, ResultDocument>(orama, uniqueTokenScores, params.groupBy)
   }
 
-  if (params.combine) {
-    let docs = (await fetchDocuments(orama, uniqueTokenScores, offset, limit)).filter(Boolean)
-    if (!includeVectors) {
-      docs = docs.map((doc) => {
-        return {
-          id: doc.id,
-          score: doc.score,
-          document: {
-            ...doc.document,
-            [params.vectorPropertiy]: null
-          }
+  let results = (await fetchDocuments(orama, uniqueTokenScores, offset, limit)).filter(Boolean)
+  if (!includeVectors) {
+    results = results.map((doc) => {
+      return {
+        id: doc.id,
+        score: doc.score,
+        document: {
+          ...doc.document,
+          [params.vector?.property!]: null
         }
-      })
-    }
+      }
+    })
+  }
 
-    const timeEnd = await getNanosecondsTime()
-    return {
-      count: fullTextIDs.length + vectorIDs.length,
-      elapsed: {
-        raw: Number(timeEnd - timeStart),
-        formatted: await formatNanoseconds(timeEnd - timeStart)
-      },
-      hits: docs as Result<ResultDocument>[],
-      ...(facetsResults ? { facets: facetsResults } : {}),
-      ...(groups ? { groups } : {})
-    }
-  } else {
-    let hits = ((await fetchDocuments(orama, fullTextIDs, offset, limit)) as Result<ResultDocument>[]).filter(Boolean)
-    let vectorHits = ((await fetchDocuments(orama, vectorIDs, offset, limit)) as Result<ResultDocument>[]).filter(
-      Boolean
-    )
-    const timeEnd = await getNanosecondsTime()
-    const elapsedTime = timeEnd - timeStart
-
-    if (!includeVectors) {
-      hits = hits.map((doc) => {
-        return {
-          id: doc.id,
-          score: doc.score,
-          document: {
-            ...doc.document,
-            [params.vectorPropertiy]: null
-          }
-        }
-      })
-      vectorHits = vectorHits.map((doc) => {
-        return {
-          id: doc.id,
-          score: doc.score,
-          document: {
-            ...doc.document,
-            [params.vectorPropertiy]: null
-          }
-        }
-      })
-    }
-
-    return {
-      count: uniqueTokenScores.length,
-      hits,
-      // @ts-expect-error - vectorHits is not defined in the type interface
-      vectorHits,
-      elapsed: {
-        raw: Number(elapsedTime),
-        formatted: await formatNanoseconds(elapsedTime)
-      },
-      ...(facetsResults ? { facets: facetsResults } : {}),
-      ...(groups ? { groups } : {})
-    }
+  const timeEnd = await getNanosecondsTime()
+  return {
+    count: uniqueTokenScores.length,
+    elapsed: {
+      raw: Number(timeEnd - timeStart),
+      formatted: await formatNanoseconds(timeEnd - timeStart)
+    },
+    hits: results as Result<ResultDocument>[],
+    ...(facetsResults ? { facets: facetsResults } : {}),
+    ...(groups ? { groups } : {})
   }
 }
 
@@ -272,24 +224,26 @@ export async function getVectorSearchIDs<T extends AnyOrama, ResultDocument = Ty
   orama: T,
   params: SearchParamsHybrid<T, ResultDocument>
 ): Promise<TokenScore[]> {
-  let vector = params.vector
-  const { vectorPropertiy } = params
-  const vectorIndex = orama.data.index.vectorIndexes[vectorPropertiy]
+  const vector = params.vector
+  const vectorIndex = orama.data.index.vectorIndexes[vector?.property!]
   const vectorSize = vectorIndex.size
   const vectors = vectorIndex.vectors
 
-  if (vector?.length !== vectorSize) {
-    throw createError('INVALID_INPUT_VECTOR', vectorPropertiy, vectorSize, vector!.length)
+  if (vector && (!vector.value || !vector.property)) {
+    throw createError('INVALID_VECTOR_INPUT', Object.keys(vector).join(', '))
+  }
+
+  if (vector!.value.length !== vectorSize) {
+    throw createError('INVALID_INPUT_VECTOR', vector!.property, vectorSize, vector!.value.length)
   }
 
   if (!(vector instanceof Float32Array)) {
-    vector = new Float32Array(vector)
+    vector!.value = new Float32Array(vector!.value)
   }
 
-  const uniqueIDs = findSimilarVectors(vector, vectors, vectorSize, params.similarity).map(([id, score]) => [
-    getInternalDocumentId(orama.internalDocumentIDStore, id),
-    score
-  ]) as TokenScore[]
+  const uniqueIDs = findSimilarVectors(vector!.value as Float32Array, vectors, vectorSize, params.similarity).map(
+    ([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score]
+  ) as TokenScore[]
 
   return minMaxScoreNormalization(uniqueIDs)
 }
@@ -299,27 +253,43 @@ function minMaxScoreNormalization(results: TokenScore[]): TokenScore[] {
   return results.map(([id, score]) => [id, score / maxScore] as TokenScore)
 }
 
-function mergeSortedArrays(arr1: TokenScore[], arr2: TokenScore[]): TokenScore[] {
-  const merged: TokenScore[] = new Array(arr1.length + arr2.length)
+function mergeSortedArrays(fulltext: TokenScore[], vector: TokenScore[]): TokenScore[] {
+  const merged: TokenScore[] = []
+  const addedIds = new Map<number, boolean>()
   let i = 0,
-    j = 0,
-    k = 0
+    j = 0
 
-  while (i < arr1.length && j < arr2.length) {
-    if (arr1[i][1] > arr2[j][1]) {
-      merged[k++] = arr1[i++]
+  while (i < fulltext.length && j < vector.length) {
+    if (fulltext[i][1] > vector[j][1]) {
+      addUnique(merged, addedIds, fulltext[i])
+      i++
+    } else if (vector[j][1] > fulltext[i][1]) {
+      addUnique(merged, addedIds, vector[j])
+      j++
     } else {
-      merged[k++] = arr2[j++]
+      addUnique(merged, addedIds, fulltext[i])
+      addUnique(merged, addedIds, vector[j])
+      i++
+      j++
     }
   }
 
-  while (i < arr1.length) {
-    merged[k++] = arr1[i++]
+  // Add remaining elements from both arrays
+  while (i < fulltext.length) {
+    addUnique(merged, addedIds, fulltext[i])
+    i++
   }
-
-  while (j < arr2.length) {
-    merged[k++] = arr2[j++]
+  while (j < vector.length) {
+    addUnique(merged, addedIds, vector[j])
+    j++
   }
 
   return merged
+}
+
+function addUnique(array: TokenScore[], addedIds: Map<number, boolean>, element: TokenScore) {
+  if (!addedIds.has(element[0])) {
+    array.push(element)
+    addedIds.set(element[0], true)
+  }
 }
