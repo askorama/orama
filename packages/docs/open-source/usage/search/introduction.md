@@ -221,7 +221,7 @@ const searchResult = await search(movieDB, {
 })
 ```
 
-We are searching for all the documents that contains the term `Chris` in the
+We are searching for all the documents that contain the term `Chris` in the
 `director` property, but returning the document at offset `1`.
 
 ::: tip Remember!

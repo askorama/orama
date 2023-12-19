@@ -35,11 +35,11 @@ const results = await search(db, {
   term: 'Movie about cars and racing',
   properties: ['description'],
   facets: {
-    'categories.first': {
+    'categories.primary': {
       size: 3,
       order: 'DESC',
     },
-    'categories.second': {
+    'categories.secondary': {
       size: 2,
       order: 'DESC',
     },

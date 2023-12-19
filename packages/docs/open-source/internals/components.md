@@ -6,7 +6,7 @@ outline: deep
 
 Orama can be completely customized and extended by using its components architecture.
 
-Depending on the case, a component can be a simple as function or a slightly more complex interface. All components can be
+Depending on the case, a component can be a simple as a function or a slightly more complex interface. All components can be
 synchronous or return a promise and Orama will make sure everything is handled correctly.
 
 When no components are specified, an Orama database is created with some defaults components which satisfies most common use cases:
@@ -64,7 +64,7 @@ INSERTED
 
 The tokenizer is used to tokenize documents fields and search terms. To customize the tokenizer used by Orama, provide an object which has at least the following properties:
 
-* `tokenize`: A function that accepts a string and language and returns a list of tokens.
+* `tokenize`: A function that accepts the content to tokenize (string), the language (string) and the property name (string) and returns a list of tokens.
 * `language` (string): The language supported by the tokenizer.
 * `normalizationCache` (Map): It can used to cache tokens normalization.
 
@@ -143,7 +143,7 @@ To customize the index used by Orama, provide an object which has at least the f
 
 * `create`: A function that creates a new index. It receives the following arguments:
   * `orama`: The Orama instance.
-  * `mapper`: The documents IDs mapper (see <a href="#internal-components">Internal components</a> section below).
+  * `mapper`: The document IDs mapper (see <a href="#internal-components">Internal components</a> section below).
   * `schema`: The documents schema.
 * `insert`: A function that inserts a new document in the index. It receives the following arguments:
   * `implementation`: The current index implementation.
@@ -158,7 +158,7 @@ To customize the index used by Orama, provide an object which has at least the f
 * `remove`: A function that removes a document from the index. It receives the same arguments as `insert`.
 * `insertDocumentScoreParameters`: A function that inserts document information into the index for future results score calculation. It should be typically invoked within `insert`. It receives the following arguments:
   * `index`: The index.
-  * `prop`: The property that it is currently considered.
+  * `prop`: The property that is currently considered.
   * `id`: The ID of the document being inserted.
   * `tokens`: The list of the tokens found in the document.
   * `docsCount`: The number of documents in the documents store before the action is performed.
@@ -170,12 +170,12 @@ To customize the index used by Orama, provide an object which has at least the f
   * `tokens`: The list of the tokens found in the document.
 * `removeDocumentScoreParameters`: A function that removes document scores information from the index. It should be typically invoked within `remove`. It receives the following arguments:
   * `index`: The index.
-  * `prop`: The property that it is currently considered.
+  * `prop`: The property that is currently considered.
   * `id`: The ID of the document being inserted.
   * `docsCount`: The number of documents in the documents store before the action is performed.
 * `removeTokenScoreParameters`: A function that removes token score information from the index. It should be typically invoked within `remove`. It receives the following arguments:
   * `index`: The index.
-  * `prop`: The property that it is currently considered.
+  * `prop`: The property that is currently considered.
   * `id`: The ID of the document being inserted.
   * `token`: The token.
 * `calculateResultScores`: A function that calculates the score for the results of the current search. It should be typically invoked within `search`. It receives the following arguments:
@@ -183,25 +183,25 @@ To customize the index used by Orama, provide an object which has at least the f
   * `index`: The index.
   * `prop`: The property search. 
   * `term`: The term used to search.
-  * `ids`: The list of documents IDs matched by the search.
-* `search`: A function that search documents int index data and returns matching IDs with scores. It receives the following arguments:
+  * `ids`: The list of document IDs matched by the search.
+* `search`: A function that searches documents in index data and returns matching IDs with scores. It receives the following arguments:
   * `context`: A search context with various useful information about the search.
   * `index`: The index.
-  * `prop`: The property to search. 
-  * `term`: The term to search.
+  * `prop`: The property to search into. 
+  * `term`: The term to search for.
 * `searchByWhereClause`: A function that searches in boolean and numeric indexes and returns a list of matching IDs. It receives the following arguments:
   * `context`: A search context with various useful information about the search.
   * `index`: The index.
   * `filters`: An object where keys are the properties to match and the values are search operators as described in the [filters](/open-source/usage/search/filters) page.
 * `getSearchableProperties`: A function that returns a list of all searchable properties in the index. It receives the index as the only argument.
 * `getSearchablePropertiesWithTypes`: A function that returns an object where keys are the searchable properties in the index and the values are the type of the index for a property. It receives the index as the only argument.
-* `load`: A function that deserializes an index from a JavaScript object. It receives The documents IDs mapper and a JavaScript object as its only argument and must return an index.
+* `load`: A function that deserializes an index from a JavaScript object. It receives The document IDs mapper and a JavaScript object as its only argument and must return an index.
 * `save`: A function that serializes the index into a JavaScript object. It receives the index as the only argument and must return a JavaScript object.
 
 The following functions are optional:
 
-* `beforeInsert` or `afterInsert`: A function invoked before or after `insert`. They accept the same arguments as `insert` except the first one.
-* `beforeRemove` or `afterRemove`: A function invoked before or after `remove`. They accept the same arguments as `remove` except the first one.
+* `beforeInsert` or `afterInsert`: Functions invoked before or after `insert`. They accept the same arguments as `insert` except the first one.
+* `beforeRemove` or `afterRemove`: Functions invoked before or after `remove`. They accept the same arguments as `remove` except the first one.
 
 For the more formal interface information, look for the `IIndex` interface in `src/types.ts` in Orama's source code.
 
@@ -237,7 +237,7 @@ To customize the documents store used by Orama, provide an object which has at l
 
 * `create`: A function that creates a new document store. It receives the following arguments:
   * `orama`: The Orama instance.
-  * `mapper`: The documents IDs mapper (see <a href="#internal-components">Internal components</a> section below).
+  * `mapper`: The document IDs mapper (see <a href="#internal-components">Internal components</a> section below).
 * `get`: A function that returns a document from the store. It receives the following arguments:
   * The documents store.
   * The ID of the document to get.
@@ -256,7 +256,7 @@ To customize the documents store used by Orama, provide an object which has at l
   * The documents store.
   * The ID of the new document to remove.
 * `count`: A function that returns the count of the documents currently stored. It receives the current documents store as the only argument.
-* `load`: A function that deserializes a documents store from a JavaScript object. It receives The documents IDs mapper and a JavaScript object as its only argument and must return a documents store.
+* `load`: A function that deserializes a documents store from a JavaScript object. It receives The document IDs mapper and a JavaScript object as its only argument and must return a documents store.
 * `save`: A function that serializes the documents store into a JavaScript object. It receives the current documents store as the only argument and must return a JavaScript object.
 
 For the more formal interface information, look for the `IDocumentsStore` interface in `src/types.ts` in Orama's source code.
@@ -293,27 +293,27 @@ The sorter component is used to store the documents in Orama.
 To customize the documents sort used by Orama, provide an object which has at least the following properties:
 
 * `create`: A function that creates a new sorter. It receives the following arguments:
-  * `mapper`: The documents IDs mapper (see <a href="#internal-components">Internal components</a> section below).
+  * `mapper`: The document IDs mapper (see <a href="#internal-components">Internal components</a> section below).
   * `schema`: The documents schema.
   * `configuration`: The sorter configuration.
 * `insert`: A function that inserts a new document in the sorter. It receives the following arguments:
   * `sorter`: The sorter returned by the `create` function.
-  * `prop`: The property that it is currently considered.
+  * `prop`: The property that is currently considered.
   * `id`: The ID of the document being inserted.
   * `value`: The value of the property in the document.
   * `schemaType`: The type of the property in the document according with the sort schema.
   * `language`: The language of the document.
 * `remove`: A function that removes a document from the index. It receives the following arguments:
   * `sorter`: The sorter returned by the `create` function.
-  * `prop`: The property that it is currently considered.
+  * `prop`: The property that is currently considered.
   * `id`: The ID of the document being inserted.
 * `sortBy`: A function that inserts document information into the index for future results score calculation. It should be typically invoked within `insert`. It receives the following arguments:
   * `sorter`: The sorter returned by the `create` function.
   * `docIds`: A [string, number] array contains for each id the weight.
-  * `by`: The SortParamets specified during the search
+  * `by`: The SortParameters specified during the search
 * `getSortableProperties`: A function that returns a list of all sortable properties in the sorter. It receives the index as the only argument.
 * `getSortablePropertiesWithTypes`: A function that returns an object where keys are the sortable properties in the sorter and the values are the type of the sort for a property. It receives the index as the only argument.
-* `load`: A function that deserializes an sort from a JavaScript object. It receives The documents IDs mapper and a JavaScript object as its only argument and must return an sort.
+* `load`: A function that deserializes a sorter from a JavaScript object. It receives The document IDs mapper and a JavaScript object as its only argument and must return a sorter.
 * `save`: A function that serializes the sorter into a JavaScript object. It receives the sorter as the only argument and must return a JavaScript object.
 
 ```javascript
@@ -443,7 +443,7 @@ const movieDB = await create({
 
 The component is used to format the `elapsed` property in the search results. The return value can be a `number`, a `string` or an `object`.
 
-The function received a single argument: the search elapsed time as BigInt.
+The function receives a single argument: the search elapsed time as BigInt.
 
 ```javascript
 import { create, insert, search } from '@orama/orama'
@@ -473,7 +473,7 @@ await insert(movieDB, {
 
 const results = await search(movieDB, { term: 'Harry' })
 
-// This will something like: 100 - custom
+// This will print something like: 100 - custom
 console.log(results.elapsed)
 ```
 
@@ -483,7 +483,7 @@ console.log(results.elapsed)
 
 In order to improve performance, Orama uses an internal ID for each document. The documents IDs mapper component is used to maintain a between the user document ID and the Orama document ID.
 
-This component is internal and cannot be replaced by the developer. The component is passed to the customizable components (like `documentsStore`) and must be treated as a opaque object.
+This component is internal and cannot be replaced by the developer. The component is passed to the customizable components (like `documentsStore`) and must be treated as an opaque object.
 
 When writing or reading documents in the `data` section of The Orama instance, such as `orama.data.index`, make sure you always use a internal ID.
 
