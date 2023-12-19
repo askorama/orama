@@ -109,10 +109,10 @@ If a property is specified as `string` in the schema, the facet will accept the 
 configuration:
 
 | Property | Type     | Default | Description                                         |
-| -------- | -------- | ------- |-----------------------------------------------------|
-| `order`  | `string` | `DESC`  | Order of the values. Can be either `ASC` or `DESC`. |
-| `limit`  | `number` | `100`   | Maximum number of values to return.                 |
-| `offset` | `number` | `0`     | Number of values to skip.                           |
+| -------- | -------- | ------ |-----------------------------------------------------|
+| `order`  | `string` | `DESC` | Order of the values. Can be either `ASC` or `DESC`. |
+| `limit`  | `number` | `10`   | Maximum number of values to return.                 |
+| `offset` | `number` | `0`    | Number of values to skip.                           |
 
 In the search result, `string` facets will be returned as an `object` with the following properties:
 
