@@ -33,12 +33,12 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
   let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
   if (!propertiesToSearch) {
     const propertiesToSearchWithTypes = await orama.index.getSearchablePropertiesWithTypes(index)
-    
+
     propertiesToSearch = await orama.index.getSearchableProperties(index)
     propertiesToSearch = propertiesToSearch.filter((prop: string) =>
-    propertiesToSearchWithTypes[prop].startsWith('string')
+      propertiesToSearchWithTypes[prop].startsWith('string')
     )
-    
+
     orama.caches['propertiesToSearch'] = propertiesToSearch
   }
 
