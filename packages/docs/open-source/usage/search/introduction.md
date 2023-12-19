@@ -72,7 +72,7 @@ Let's say we have run the following query:
 
 ```javascript copy
 const searchResult = await search(movieDB, {
-  term: 'Cris',
+  term: 'Chris',
   properties: ['director'],
   tolerance: 1,
 })
