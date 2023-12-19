@@ -1,4 +1,4 @@
-import type { AnyOrama, TypedDocument, SearchParamsHybrid, Results, TokenScore, ElapsedTime, Result } from '../types.js'
+import type { AnyOrama, TypedDocument, SearchParamsHybrid, Results, TokenScore, Result } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getNanosecondsTime, safeArrayPush, formatNanoseconds } from '../utils.js'
 import { intersectFilteredIDs } from '../components/filters.js'
@@ -7,9 +7,8 @@ import { createError } from '../errors.js'
 import { createSearchContext, defaultBM25Params } from './search.js'
 import { getFacets } from '../components/facets.js'
 import { getGroups } from '../components/groups.js'
-import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
 import { findSimilarVectors } from '../components/cosine-similarity.js'
-import { getInternalDocumentId, getDocumentIdFromInternalId } from '../components/internal-document-id-store.js'
+import { getInternalDocumentId } from '../components/internal-document-id-store.js'
 import { fetchDocuments } from './search.js'
 
 export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(orama: T, params: SearchParamsHybrid<T, ResultDocument>, language?: string): Promise<Results<ResultDocument>> {
@@ -19,7 +18,7 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
 
   const [fullTextIDs, vectorIDs] = await Promise.all([
     getFullTextSearchIDs(orama, params, language),
-    getVectorSearchIDs(orama, params, language)
+    getVectorSearchIDs(orama, params)
   ])
 
   const { index, docs } = orama.data
@@ -145,6 +144,7 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
     return {
       count: uniqueTokenScores.length,
       hits,
+      // @ts-expect-error - vectorHits is not defined in the type interface
       vectorHits,
       elapsed: {
         raw: Number(elapsedTime),
@@ -160,7 +160,7 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
   const timeStart = await getNanosecondsTime()
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
 
-  const { limit = 10, offset = 0, term, properties, threshold = 1 } = params
+  const { term, properties, threshold = 1 } = params
 
   const { index, docs } = orama.data
   const tokens = await orama.tokenizer.tokenize(term ?? '', language)
@@ -257,9 +257,9 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
   return minMaxScoreNormalization(uniqueIDs)
 }
 
-export async function getVectorSearchIDs<T extends AnyOrama, ResultDocument = TypedDocument<T>>(orama: T, params: SearchParamsHybrid<T, ResultDocument>, language?: string): Promise<TokenScore[]> {
+export async function getVectorSearchIDs<T extends AnyOrama, ResultDocument = TypedDocument<T>>(orama: T, params: SearchParamsHybrid<T, ResultDocument>): Promise<TokenScore[]> {
   let vector = params.vector
-  const { vectorPropertiy, limit = 10, offset = 0 } = params
+  const { vectorPropertiy } = params
   const vectorIndex = orama.data.index.vectorIndexes[vectorPropertiy]
   const vectorSize = vectorIndex.size
   const vectors = vectorIndex.vectors
@@ -279,12 +279,12 @@ export async function getVectorSearchIDs<T extends AnyOrama, ResultDocument = Ty
 }
 
 function minMaxScoreNormalization(results: TokenScore[]): TokenScore[] {
-  const maxScore = Math.max(...results.map(([id, score]) => score))
+  const maxScore = Math.max(...results.map(([, score]) => score))
   return results.map(([id, score]) => [id, score / maxScore] as TokenScore)
 }
 
 function mergeSortedArrays(arr1: TokenScore[], arr2: TokenScore[]): TokenScore[] {
-  let merged: TokenScore[] = new Array(arr1.length + arr2.length)
+  const merged: TokenScore[] = new Array(arr1.length + arr2.length)
   let i = 0, j = 0, k = 0
 
   while (i < arr1.length && j < arr2.length) {
