@@ -27,6 +27,7 @@ export default defineConfig({
   },
 
   vite: {
+    // @ts-ignore
     plugins: [OramaPlugin()]
   },
 
@@ -72,6 +73,7 @@ export default defineConfig({
               items: [
                 { text: 'Searching with Orama', link: '/open-source/usage/search/introduction.html' },
                 { text: 'Vector Search', link: '/open-source/usage/search/vector-search.html' },
+                { text: 'Hybrid Search', link: '/open-source/usage/search/hybrid-search.html' },
                 { text: 'Fields Boosting', link: '/open-source/usage/search/fields-boosting.html' },
                 { text: 'Facets', link: '/open-source/usage/search/facets.html' },
                 { text: 'Filters', link: '/open-source/usage/search/filters.html' },
