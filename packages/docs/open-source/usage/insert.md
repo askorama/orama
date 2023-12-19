@@ -166,7 +166,7 @@ If you try to insert two documents with the same ID, Orama will throw an error.
 
 By default Orama keeps a copy of the inserted document in memory (and in the serialized data) to speed up search performance.
 
-If this is not acceptable, you can provide a custom `documentsStore` components which will be responsible to store
+If this is not acceptable, you can provide a custom `documentsStore` component which will be responsible to store
 and fetch documents from another location (local or remote).
 
 The code example below is an example that implements a proxy: when a document is requested, the code finds it on a location of the filesystem. 
