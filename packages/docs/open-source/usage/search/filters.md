@@ -7,11 +7,11 @@ outline: deep
 You can use the `filters` interface to filter the search results.
 
 Filters are available for numeric, boolean, string, enum, and geopoint properties.
-Depends on the type of the property, you can use different operators.
+Depending on the type of the property, you can use different operators.
 
 ## String operators
 
-On string properties it perform an exact matching on tokens so it is advised to disable stemming for the properties
+On string properties it performs an exact matching on tokens so it is advised to disable stemming for the properties
 you want to use filters on (when using the default tokenizer you can provide the `stemmerSkipProperties` configuration property).
 
 If we consider the following schema:
