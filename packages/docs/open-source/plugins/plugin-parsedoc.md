@@ -49,7 +49,7 @@ An asynchronous function that takes three arguments:
 
 #### `populate`
 
-A asynchronous function that takes three arguments. Should be used internally by `populateFromGlob`:
+An asynchronous function that takes three arguments. Should be used internally by `populateFromGlob`:
 
 - `db`: the database to populate. Should use Orama's native `insert` or `insertBatch` methods internally.
 - `data`: raw HTML/Markdown string or Buffer.
