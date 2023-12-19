@@ -211,11 +211,12 @@ function afterSearchPluginExample() {
 ### `beforeInsertMultiple`
 Runs before an `insertMultiple` operation. Receives the Orama instance and the documents to be inserted as arguments.
 
-::: "warning
+::: warning
   Since the `insertMultiple` operation is calling the `insert` operation underneath,
   the `beforeInsertMultiple` hook will be called for each document. \
   If there's an existing `beforeInsert` hook in the plugin, it will be called for each document as well.
 ::: 
+
 ```js
 function beforeInsertMultiplePluginExample() {
   return {
