@@ -1,7 +1,4 @@
-import {
-  InternalDocumentID,
-  getDocumentIdFromInternalId,
-} from '../components/internal-document-id-store.js'
+import { InternalDocumentID, getDocumentIdFromInternalId } from '../components/internal-document-id-store.js'
 import { createError } from '../errors.js'
 import { getNested } from '../utils.js'
 import type {
@@ -23,7 +20,7 @@ import type {
 } from '../types.js'
 import { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from '../constants.js'
 import { fullTextSearch } from './search-fulltext.js'
-import { searchVectorFn } from './search-vector.js'
+import { searchVector } from './search-vector.js'
 import { hybridSearch } from './search-hybrid.js'
 
 export const defaultBM25Params: BM25Params = {
@@ -100,7 +97,11 @@ export async function createSearchContext<T extends AnyOrama, ResultDocument = T
   }
 }
 
-export async function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>( orama: T, params: SearchParams<T, ResultDocument>, language?: string): Promise<Results<ResultDocument>> {
+export async function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+  orama: T,
+  params: SearchParams<T, ResultDocument>,
+  language?: string
+): Promise<Results<ResultDocument>> {
   const mode = params.mode ?? MODE_FULLTEXT_SEARCH
 
   if (mode === MODE_FULLTEXT_SEARCH) {
@@ -108,7 +109,7 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
   }
 
   if (mode === MODE_VECTOR_SEARCH) {
-    return searchVectorFn(orama, params as SearchParamsVector<T, ResultDocument>)
+    return searchVector(orama, params as SearchParamsVector<T, ResultDocument>)
   }
 
   if (mode === MODE_HYBRID_SEARCH) {

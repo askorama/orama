@@ -258,15 +258,13 @@ export type OnlyStrings<T extends any[]> = T[number] extends infer V ? (V extend
 
 export type SortByParams<T extends AnyOrama, ResultDocument> = SorterParams<T> | CustomSorterFunction<ResultDocument>
 
-export type SearchMode =
-  | typeof MODE_FULLTEXT_SEARCH
-  | typeof MODE_HYBRID_SEARCH
-  | typeof MODE_VECTOR_SEARCH
+export type SearchMode = typeof MODE_FULLTEXT_SEARCH | typeof MODE_HYBRID_SEARCH | typeof MODE_VECTOR_SEARCH
 
 // eslint-disable-next-line
 export interface SearchParamsBase<T extends AnyOrama, ResultDocument = TypedDocument<T>> {}
 
-export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
+export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = TypedDocument<T>>
+  extends SearchParamsBase<T, ResultDocument> {
   /**
    * The term, sentence, or word to search.
    */
@@ -470,26 +468,33 @@ export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = Typed
   preflight?: boolean
 }
 
-export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
+export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDocument<T>>
+  extends SearchParamsBase<T, ResultDocument> {
   /**
    * The vector used to perform vector similarity search.
    * Since "mode" is set to "hybrid", Orama will perform a full-text search and a vector search,
    * therefore, you have to provide a "term" property as well when setting the "vector" property.
-   * 
+   *
    * @example
    * const result = await search(db, {
    *  term: 'Noise cancelling headphones',
-   *  vector: [0.1, 0.2, 0.3]
+   *  vector: {
+   *    value: [0.1, 0.2, 0.3],
+   *    property: 'embedding'
+   *  }
    * })
    */
-  vector?: Array<number> | VectorType
+  vector?: {
+    value: Array<number> | VectorType
+    property: string
+  }
 
   /**
    * The term, sentence, or word to search.
    * @example
    * const result = await search(db, {
    *   term: 'Noise cancelling headphones',
-   *   mode: 'hybrid', 
+   *   mode: 'hybrid',
    * })
    */
   term: string
@@ -501,20 +506,9 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
   mode: typeof MODE_HYBRID_SEARCH
 
   /**
-   * Combine the results of the full-text search and the vector search into the same "hits" property.
-   * By default, Orama will return the results of the full-text search in the "hits" property and the results of the vector search in the "hitsVector" property.
-   */
-  combine?: boolean
-
-  /**
    * The properties of the document to search in (for the full-text search part).
    */
   properties?: '*' | FlattenSchemaProperty<T>[]
-
-  /**
-   * The vector property of the document to search in (for the vector search part).
-   */
-  vectorPropertiy: string,
 
   /**
    * The BM25 parameters to use.
@@ -550,7 +544,7 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
    * Similarity threshold for the vector search.
    * By default, Orama will use 0.8.
    */
-  similarity?: number,
+  similarity?: number
 
   /**
    * Wether to include the vectors in the result. By default, Orama will not include the vectors, as they can be quite large.
@@ -568,7 +562,7 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
    * Full documentation: https://docs.oramasearch.com/open-source/usage/search/filters
    */
   where?: Partial<WhereCondition<T['schema']>>
-  
+
   /**
    * Threshold to use for refining the search results.
    * The threshold is a number between 0 and 1 that represents the minimum score of the documents to return.
@@ -599,7 +593,8 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
   facets?: FacetsParams<T>
 }
 
-export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDocument<T>> extends SearchParamsBase<T, ResultDocument> {
+export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDocument<T>>
+  extends SearchParamsBase<T, ResultDocument> {
   /**
    * Search mode. Tell Orama to perform either a fulltext search, a vector search or a hybrid search.
    * By default, Orama will perform a full-text search.
@@ -608,38 +603,26 @@ export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDo
 
   /**
    * The vector used to perform vector similarity search.
-   * 
+   *
    * @example
    * const db = await create({
    *   schema: {
    *     embeddings: 'vector[3]'
    *   }
    * })
-   * 
+   *
    * const result = await search(db, {
-   *   vector: [0.1, 0.2, 0.3],
    *   mode: 'vector',
-   *   property: 'embedding',
-   * })
-   */
-  vector: number[] | Float32Array
-
-  /**
-   * The property of the document to search in. 
-   * @example
-   * const db = await create({
-   *   schema: {
-   *     embeddings: 'vector[3]'
+   *   vector {
+   *     value: [0.1, 0.2, 0.3],
+   *     property: 'embedding',
    *   }
    * })
-   * 
-   * const result = await search(db, {
-   *   vector: [0.1, 0.2, 0.3],
-   *   mode: 'vector',
-   *   property: 'embedding',
-   * })
    */
-  property: string
+  vector?: {
+    value: Array<number> | VectorType
+    property: string
+  }
 
   /**
    * The minimum similarity score between the vector and the document.
@@ -723,7 +706,11 @@ export type TokenMap = Record<string, TokenScore[]>
 
 export type IndexMap = Record<string, TokenMap>
 
-export type SearchContext<T extends AnyOrama, ResultDocument = TypedDocument<T>, P = SearchParams<T, ResultDocument>> = {
+export type SearchContext<
+  T extends AnyOrama,
+  ResultDocument = TypedDocument<T>,
+  P = SearchParams<T, ResultDocument>
+> = {
   timeStart: bigint
   tokenizer: Tokenizer
   index: T['index']
@@ -751,7 +738,7 @@ export interface HybridResultsBase<Document> {
    * All the matched elements from the full-text search.
    */
   hits: Result<Document>[]
-  
+
   /**
    * The time taken to search.
    */

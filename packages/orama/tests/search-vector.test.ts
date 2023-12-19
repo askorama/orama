@@ -60,9 +60,11 @@ t.test('search', (t) => {
     await insertMultiple(db, [{ vector: [1, 1, 1, 1, 1] }, { vector: [0, 1, 1, 1, 1] }, { vector: [0, 0, 1, 1, 1] }])
 
     const results = await search(db, {
-      vector: [1, 1, 1, 1, 1],
       mode: 'vector',
-      property: 'vector',
+      vector: {
+        value: [1, 1, 1, 1, 1],
+        property: 'vector'
+      },
       includeVectors: true
     })
 
@@ -91,8 +93,10 @@ t.test('search', (t) => {
 
     const results = await search(db, {
       mode: 'vector',
-      vector: [1, 1, 1, 1, 1],
-      property: 'vectors.embedding',
+      vector: {
+        value: [1, 1, 1, 1, 1],
+        property: 'vectors.embedding'
+      },
       includeVectors: true
     })
 
@@ -123,8 +127,10 @@ t.test('search', (t) => {
 
     const results = await search(db, {
       mode: 'vector',
-      vector: [1, 1, 1, 1, 1],
-      property: 'deeply.nested.vectors',
+      vector: {
+        value: [1, 1, 1, 1, 1],
+        property: 'deeply.nested.vectors'
+      },
       includeVectors: true
     })
 
@@ -154,15 +160,19 @@ t.test('search', (t) => {
 
     const results1 = await search(db, {
       mode: 'vector',
-      vector: [1, 1, 1, 1, 1],
-      property: 'vectors.embedding',
+      vector: {
+        value: [1, 1, 1, 1, 1],
+        property: 'vectors.embedding'
+      },
       includeVectors: true
     })
 
     const results2 = await search(db, {
       mode: 'vector',
-      vector: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
-      property: 'vectors.embedding_2',
+      vector: {
+        value: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
+        property: 'vectors.embedding_2'
+      },
       includeVectors: true
     })
 
@@ -185,16 +195,18 @@ t.test('vector search with where clause', async (t) => {
     } as const
   })
 
-  const [,id2,] = await insertMultiple(db, [
+  const [, id2] = await insertMultiple(db, [
     { embedding: [1, 1, 1, 1, 1], rating: 4.5 },
     { embedding: [0, 1, 1, 1, 1], rating: 4.3 },
     { embedding: [0, 0, 1, 1, 1], rating: 4.1 }
   ])
 
   const results = await search(db, {
-    vector: [1, 1, 1, 1, 1],
     mode: 'vector',
-    property: 'embedding',
+    vector: {
+      value: [1, 1, 1, 1, 1],
+      property: 'embedding'
+    },
     where: {
       rating: {
         eq: 4.3
@@ -206,7 +218,7 @@ t.test('vector search with where clause', async (t) => {
   t.same(results.hits[0].id, id2)
 })
 
-t.test('vector search with facets', async t => {
+t.test('vector search with facets', async (t) => {
   const db = await create({
     schema: {
       embedding: 'vector[5]',
@@ -221,16 +233,18 @@ t.test('vector search with facets', async t => {
   ])
 
   const results = await search(db, {
-    vector: [1, 1, 1, 1, 1],
     mode: 'vector',
-    property: 'embedding',
+    vector: {
+      value: [1, 1, 1, 1, 1],
+      property: 'embedding'
+    },
     similarity: 0,
     facets: {
       rating: {
         ranges: [
           { from: 0, to: 1 },
           { from: 1, to: 3 },
-          { from: 3, to: 5 },
+          { from: 3, to: 5 }
         ]
       }
     }

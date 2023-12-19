@@ -38,6 +38,7 @@ const errors = {
   INVALID_SEARCH_MODE: `Invalid search mode "%s". Valid modes are: "fulltext", "vector", "hybrid".`,
   MISSING_VECTOR_AND_SECURE_PROXY: `No vector was provided and no secure proxy was configured. Please provide a vector or configure an Orama Secure Proxy to perform hybrid search.`,
   MISSING_TERM: `"term" is a required parameter when performing hybrid search. Please provide a search term.`,
+  INVALID_VECTOR_INPUT: `Invalid "vector" property. Expected an object with "value" and "property" properties, but got "%s" instead.`
 }
 
 export type ErrorCode = keyof typeof errors

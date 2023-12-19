@@ -1,4 +1,4 @@
-import { create, insert, Orama, search, searchVector } from '@orama/orama'
+import { create, insert, Orama, search } from '@orama/orama'
 import t from 'tap'
 import { UNSUPPORTED_FORMAT, METHOD_MOVED } from '../src/errors.js'
 import {
@@ -66,10 +66,12 @@ t.test('binary persistence', (t) => {
     t.plan(2)
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const q2 = await search(db, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -81,10 +83,12 @@ t.test('binary persistence', (t) => {
     const db2 = await restoreFromFile('binary')
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const qp2 = await search(db2, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -97,10 +101,12 @@ t.test('binary persistence', (t) => {
     t.plan(2)
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const q2 = await search(db, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -112,10 +118,12 @@ t.test('binary persistence', (t) => {
     const db2 = await restoreFromFile('binary', 'test.dpack')
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const qp2 = await search(db2, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -142,10 +150,12 @@ t.test('binary persistence', (t) => {
 
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const q2 = await search(db, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -158,10 +168,12 @@ t.test('binary persistence', (t) => {
     const db2 = await restoreFromFile('binary', path)
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const qp2 = await search(db2, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -184,6 +196,7 @@ t.test('binary persistence', (t) => {
     t.plan(1)
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       where: {
         genre: { eq: 'way' }
       }
@@ -195,6 +208,7 @@ t.test('binary persistence', (t) => {
     const db2 = await restoreFromFile('binary', 'test.dpack')
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       where: {
         genre: { eq: 'way' }
       }
@@ -207,6 +221,7 @@ t.test('binary persistence', (t) => {
     t.plan(1)
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       where: {
         colors: { containsAll: ['green'] }
       }
@@ -218,6 +233,7 @@ t.test('binary persistence', (t) => {
     const db2 = await restoreFromFile('binary', 'test.dpack')
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       where: {
         colors: { containsAll: ['green'] }
       }
@@ -234,10 +250,12 @@ t.test('json persistence', (t) => {
     t.plan(2)
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const q2 = await search(db, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -249,10 +267,12 @@ t.test('json persistence', (t) => {
     const db2 = await restoreFromFile('json')
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const qp2 = await search(db2, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -281,14 +301,19 @@ t.test('json persistence', (t) => {
     // Load database from disk in json format
     const db2 = await restoreFromFile('json', 'test.json')
 
-    const qp1 = await searchVector(db1, {
-      vector: [1, 0, 0, 0, 0],
-      property: 'vector'
+    const qp1 = await search(db1, {
+      mode: 'vector',
+      vector: {
+        value: [1, 0, 0, 0, 0],
+        property: 'vector'
+      }
     })
 
-    const qp2 = await searchVector(db2, {
-      vector: [1, 0, 0, 0, 0],
-      property: 'vector'
+    const qp2 = await search(db2, {
+      vector: {
+        value: [1, 0, 0, 0, 0],
+        property: 'vector'
+      }
     })
 
     // Queries on the loaded database should match the original database
@@ -299,10 +324,12 @@ t.test('json persistence', (t) => {
     t.plan(2)
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const q2 = await search(db, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -314,10 +341,12 @@ t.test('json persistence', (t) => {
     const db2 = await restoreFromFile('json', 'test.json')
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const qp2 = await search(db2, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -330,6 +359,7 @@ t.test('json persistence', (t) => {
     t.plan(1)
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       where: {
         genre: { eq: 'way' }
       }
@@ -341,6 +371,7 @@ t.test('json persistence', (t) => {
     const db2 = await restoreFromFile('json', 'test.json')
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       where: {
         genre: { eq: 'way' }
       }
@@ -354,6 +385,7 @@ t.test('json persistence', (t) => {
 
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       where: {
         colors: { containsAll: ['green'] }
       }
@@ -365,6 +397,7 @@ t.test('json persistence', (t) => {
     const db2 = await restoreFromFile('json', 'test.json')
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       where: {
         colors: { containsAll: ['green'] }
       }
@@ -382,10 +415,12 @@ t.test('dpack persistence', (t) => {
 
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const q2 = await search(db, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -397,10 +432,12 @@ t.test('dpack persistence', (t) => {
     const db2 = await restoreFromFile('dpack')
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const qp2 = await search(db2, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -414,10 +451,12 @@ t.test('dpack persistence', (t) => {
 
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const q2 = await search(db, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -429,10 +468,12 @@ t.test('dpack persistence', (t) => {
     const db2 = await restoreFromFile('dpack', 'test.dpack')
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       term: 'way'
     })
 
     const qp2 = await search(db2, {
+      mode: 'fulltext',
       term: 'i'
     })
 
@@ -446,6 +487,7 @@ t.test('dpack persistence', (t) => {
 
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       where: {
         genre: { eq: 'way' }
       }
@@ -457,6 +499,7 @@ t.test('dpack persistence', (t) => {
     const db2 = await restoreFromFile('dpack', 'test.dpack')
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       where: {
         genre: { eq: 'way' }
       }
@@ -470,6 +513,7 @@ t.test('dpack persistence', (t) => {
 
     const db = await generateTestDBInstance()
     const q1 = await search(db, {
+      mode: 'fulltext',
       where: {
         colors: { containsAll: ['green'] }
       }
@@ -481,6 +525,7 @@ t.test('dpack persistence', (t) => {
     const db2 = await restoreFromFile('dpack', 'test.dpack')
 
     const qp1 = await search(db2, {
+      mode: 'fulltext',
       where: {
         colors: { containsAll: ['green'] }
       }
@@ -495,10 +540,12 @@ t.test('should persist data in-memory', async (t) => {
   const db = await generateTestDBInstance()
 
   const q1 = await search(db, {
+    mode: 'fulltext',
     term: 'way'
   })
 
   const q2 = await search(db, {
+    mode: 'fulltext',
     term: 'i'
   })
 
@@ -513,18 +560,22 @@ t.test('should persist data in-memory', async (t) => {
   const dpackDB2 = await restore('dpack', dpackDB)
 
   const qp1 = await search(binDB2, {
+    mode: 'fulltext',
     term: 'way'
   })
 
   const qp2 = await search(jsonDB2, {
+    mode: 'fulltext',
     term: 'i'
   })
 
   const qp3 = await search(dpackDB2, {
+    mode: 'fulltext',
     term: 'way'
   })
 
   const qp4 = await search(dpackDB2, {
+    mode: 'fulltext',
     term: 'i'
   })
 

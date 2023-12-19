@@ -1,4 +1,12 @@
-import type { AnyOrama, TypedDocument, SearchParamsFullText, Results, CustomSorterFunctionItem, TokenScore, ElapsedTime } from '../types.js'
+import type {
+  AnyOrama,
+  TypedDocument,
+  SearchParamsFullText,
+  Results,
+  CustomSorterFunctionItem,
+  TokenScore,
+  ElapsedTime
+} from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getInternalDocumentId } from '../components/internal-document-id-store.js'
 import { getNanosecondsTime, safeArrayPush, sortTokenScorePredicate } from '../utils.js'
@@ -10,7 +18,11 @@ import { getFacets } from '../components/facets.js'
 import { getGroups } from '../components/groups.js'
 import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
 
-export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(orama: T, params: SearchParamsFullText<T, ResultDocument>, language?: string): Promise<Results<ResultDocument>> {
+export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+  orama: T,
+  params: SearchParamsFullText<T, ResultDocument>,
+  language?: string
+): Promise<Results<ResultDocument>> {
   const timeStart = await getNanosecondsTime()
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
 
