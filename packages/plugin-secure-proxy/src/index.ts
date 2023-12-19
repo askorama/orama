@@ -25,15 +25,14 @@ async function getCSRFToken(apiKey: string): Promise<InitResponse> {
 }
 
 async function getEmbeddings(apiKey: string, query: string, csrfToken: string): Promise<EmbeddingsResponse> {
+  const body = new URLSearchParams({ query, csrf: csrfToken }).toString()
+
   const response = await fetch(`${SEARCH_URL}?apiKey=${apiKey}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     },
-    body: new URLSearchParams({
-      query,
-      csrf: csrfToken
-    })
+    body
   })
 
   return response.json()
