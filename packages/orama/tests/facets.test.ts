@@ -216,5 +216,48 @@ t.test('facets', (t) => {
     t.end()
   })
 
+  t.test('should generate correct facets with correct number of items', async (t) => {
+    const db = await create({
+      schema: {
+        author: 'string',
+        quote: 'string'
+      }
+    })
+
+    const quotes = [];
+    const authors = [
+      'First person',
+      'Second person',
+      'Third person',
+      'Fourth person',
+      'Fifth person',
+      'Sixth person',
+      'Seventh person',
+      'Eighth person',
+      'Ninth person',
+      'Tenth person',
+      'Eleventh person'
+    ];
+
+    for (let i = 0; i < authors.length; i++) {
+      quotes.push({author: authors[i], quote: 'Be the change you wish to see in the world'});
+    }
+
+    await insertMultiple(db, quotes);
+
+    const results = await search(db, {
+      term: 'person',
+      facets: {
+        'author': {
+          size: 15,
+          limit: 20
+        }
+      }
+    })
+
+    t.same(results.facets?.['author'].count, 11)
+    t.same(Object.keys(results.facets?.['author'].values).length, 11)
+  })
+
   t.end()
 })
