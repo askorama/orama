@@ -216,21 +216,21 @@ t.test('facets', (t) => {
     t.end()
   })
 
-  const orderedAuthors = [
-    'First person',
-    'Second person',
-    'Third person',
-    'Fourth person',
-    'Fifth person',
-    'Sixth person',
-    'Seventh person',
-    'Eighth person',
-    'Ninth person',
-    'Tenth person',
-    'Eleventh person'
-  ];
+  const insertQuotesForOrderedAuthors = async ()  => {
+    const orderedAuthors = [
+      'First person',
+      'Second person',
+      'Third person',
+      'Fourth person',
+      'Fifth person',
+      'Sixth person',
+      'Seventh person',
+      'Eighth person',
+      'Ninth person',
+      'Tenth person',
+      'Eleventh person'
+    ];
 
-  t.test('should generate correct facets with 10 items if limit is not set', async (t) => {
     const db = await create({
       schema: {
         author: 'string',
@@ -245,6 +245,12 @@ t.test('facets', (t) => {
     }
 
     await insertMultiple(db, quotes);
+
+    return {db, orderedAuthors};
+  }
+
+  t.test('should generate correct facets with 10 items if limit is not set', async (t) => {
+    const {db, orderedAuthors} = await insertQuotesForOrderedAuthors();
 
     const results = await search(db, {
       term: 'person',
@@ -258,32 +264,35 @@ t.test('facets', (t) => {
   })
 
   t.test('should generate correct facets with correct number of items', async (t) => {
-    const db = await create({
-      schema: {
-        author: 'string',
-        quote: 'string'
-      }
-    })
-
-    const quotes = [];
-
-    for (let i = 0; i < orderedAuthors.length; i++) {
-      quotes.push({author: orderedAuthors[i], quote: 'Be the change you wish to see in the world'});
-    }
-
-    await insertMultiple(db, quotes);
+    const {db, orderedAuthors} = await insertQuotesForOrderedAuthors();
 
     const results = await search(db, {
       term: 'person',
       facets: {
         'author': {
-          limit: 20
+          limit: orderedAuthors.length + 1
         }
       }
     })
 
     t.same(results.facets?.['author'].count, orderedAuthors.length)
     t.same(Object.keys(results.facets?.['author'].values).length, orderedAuthors.length)
+  })
+
+  t.test('should generate correct facets when limit is lower than total values', async (t) => {
+    const {db, orderedAuthors} = await insertQuotesForOrderedAuthors();
+
+    const results = await search(db, {
+      term: 'person',
+      facets: {
+        'author': {
+          limit: orderedAuthors.length - 1
+        }
+      }
+    })
+
+    t.same(results.facets?.['author'].count, orderedAuthors.length)
+    t.same(Object.keys(results.facets?.['author'].values).length, orderedAuthors.length - 1)
   })
 
   t.end()
