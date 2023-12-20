@@ -267,7 +267,7 @@ t.test('facets', (t) => {
 
     const quotes = [];
 
-    for (let i = 0; i <= orderedAuthors.length; i++) {
+    for (let i = 0; i < orderedAuthors.length; i++) {
       quotes.push({author: orderedAuthors[i], quote: 'Be the change you wish to see in the world'});
     }
 
