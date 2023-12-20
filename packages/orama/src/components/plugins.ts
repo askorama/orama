@@ -1,4 +1,5 @@
 import type { AnyOrama, OramaPlugin } from '../types.js'
+import { createError } from '../errors.js'
 
 export type AvailablePluginHooks = (typeof AVAILABLE_PLUGIN_HOOKS)[number]
 
@@ -21,9 +22,11 @@ export const AVAILABLE_PLUGIN_HOOKS = [
   'afterLoad'
 ] as const
 
-export function getAllPluginsByHook<T extends AnyOrama>(orama: T, hook: AvailablePluginHooks): OramaPlugin[] {
+export async function getAllPluginsByHook<T extends AnyOrama>(
+  orama: T,
+  hook: AvailablePluginHooks
+): Promise<OramaPlugin[]> {
   const pluginsToRun: OramaPlugin[] = []
-
   const pluginsLength = orama.plugins?.length
 
   if (!pluginsLength) {
@@ -31,10 +34,14 @@ export function getAllPluginsByHook<T extends AnyOrama>(orama: T, hook: Availabl
   }
 
   for (let i = 0; i < pluginsLength; i++) {
-    const plugin = orama.plugins[i]
-
-    if (typeof plugin[hook] === 'function') {
-      pluginsToRun.push(plugin[hook] as OramaPlugin)
+    try {
+      const plugin = await orama.plugins[i]
+      if (typeof plugin[hook] === 'function') {
+        pluginsToRun.push(plugin[hook] as OramaPlugin)
+      }
+    } catch (error) {
+      console.error('Caught error in getAllPluginsByHook:', error)
+      throw createError('PLUGIN_CRASHED')
     }
   }
 

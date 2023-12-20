@@ -101,6 +101,7 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
         score: doc.score,
         document: {
           ...doc.document,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
           [params.vector?.property!]: null
         }
       }
@@ -235,6 +236,7 @@ export async function getVectorSearchIDs<T extends AnyOrama, ResultDocument = Ty
   params: SearchParamsHybrid<T, ResultDocument>
 ): Promise<TokenScore[]> {
   const vector = params.vector
+  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
   const vectorIndex = orama.data.index.vectorIndexes[vector?.property!]
   const vectorSize = vectorIndex.size
   const vectors = vectorIndex.vectors

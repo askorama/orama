@@ -1,8 +1,13 @@
-import type { AnyOrama, SearchParamsHybrid, SearchParamsVector } from '@orama/orama'
-
-type SearchParams<T extends AnyOrama, ResultDocument> =
-  | SearchParamsHybrid<T, ResultDocument>
-  | SearchParamsVector<T, ResultDocument>
+import type {
+  AnyOrama,
+  SearchParamsHybrid,
+  SearchParamsVector,
+  SearchParams,
+  TypedDocument,
+  OramaPluginAsync,
+  OramaPluginSync,
+  OramaPlugin
+} from '@orama/orama'
 
 type InitResponse = {
   clientID: string
@@ -21,8 +26,21 @@ const SECURE_PROXY_ENDPOINT = 'https://secure-proxy.orama.run'
 const INIT_URL = `${SECURE_PROXY_ENDPOINT}/init`
 const SEARCH_URL = `${SECURE_PROXY_ENDPOINT}/query`
 
+function isServer() {
+  return typeof window === 'undefined'
+}
+
+function getReferer() {
+  return isServer() ? 'http://localhost' : window.location.href
+}
+
 async function getCSRFToken(apiKey: string): Promise<InitResponse> {
-  const response = await fetch(`${INIT_URL}?apiKey=${apiKey}`)
+  const response = await fetch(`${INIT_URL}?apiKey=${apiKey}`, {
+    headers: {
+      Referer: getReferer()
+    }
+  })
+
   return response.json()
 }
 
@@ -32,7 +50,8 @@ async function getEmbeddings(apiKey: string, query: string, csrfToken: string): 
   const response = await fetch(`${SEARCH_URL}?apiKey=${apiKey}`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      Referer: getReferer()
     },
     body
   })
@@ -40,7 +59,7 @@ async function getEmbeddings(apiKey: string, query: string, csrfToken: string): 
   return response.json()
 }
 
-export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions) {
+export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): OramaPluginAsync {
   if (!pluginParams.apiKey) throw new Error('Missing "apiKey" parameter for plugin-telemetry')
   if (!pluginParams.defaultProperty) throw new Error('Missing "defaultProperty" parameter for plugin-telemetry')
 
@@ -48,16 +67,26 @@ export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions) 
 
   return {
     name: 'secure-proxy',
-    async beforeSearch(_db: AnyOrama, params: SearchParams<AnyOrama, any>) {
-      const term = params.term
-      const embeddings = await getEmbeddings(pluginParams.apiKey, term, csrfToken)
+
+    async beforeSearch<T extends AnyOrama>(_db: AnyOrama, params: SearchParams<T, TypedDocument<any>>) {
+      if (params.mode !== 'vector' && params.mode !== 'hybrid') {
+        return
+      }
 
       if (params?.vector?.value) {
         return
       }
 
+      if (!params.term) {
+        throw new Error('Neither "term" nor "vector" parameters were provided')
+      }
+
+      const term = params.term
+      const embeddings = await getEmbeddings(pluginParams.apiKey, term, csrfToken)
+
       if (!params.vector) {
         params.vector = {
+          // @ts-expect-error - vector param is not present in full-text search
           property: params?.vector?.property ?? pluginParams.defaultProperty,
           value: embeddings
         }

@@ -31,6 +31,7 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
 
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
 
+  const vectorProperties = Object.keys(orama.data.index.vectorIndexes)
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
   const { limit = 10, offset = 0, term, properties, threshold = 1, distinctOn } = params
   const isPreflight = params.preflight === true
@@ -180,7 +181,24 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
   }
 
   if (typeof results !== 'undefined') {
-    searchResult.hits = results.filter(Boolean)
+    searchResult.hits = results.filter(Boolean).map((result) => ({
+      ...result,
+      document: {
+        ...result.document,
+        // Remove embeddings from the result
+        ...vectorProperties.reduce((acc, prop) => {
+          const path = prop.split('.')
+          const lastKey = path.pop()!
+          let obj = acc
+          for (const key of path) {
+            obj[key] = obj[key] ?? {}
+            obj = obj[key] as any
+          }
+          obj[lastKey] = null
+          return acc
+        }, result.document)
+      }
+    }))
   }
 
   if (shouldCalculateFacets) {
