@@ -602,6 +602,30 @@ export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDo
   mode: typeof MODE_VECTOR_SEARCH
 
   /**
+   * The search term. If used with the Orama Secure Proxy, this will be converted into a vector automatically for you.
+   *
+   * @example
+   * import { pluginSecureProxy } from '@orama/plugin-secure-proxy'
+   *
+   * const db = await create({
+   *   schema: {
+   *     title: 'string',
+   *     description: 'string',
+   *     embedding: 'vector[3]',
+   *   },
+   *   plugins: [
+   *     await pluginSecureProxy({ apiKey: '', defaultProperty: 'embedding' })
+   *   ]
+   * });
+   *
+   * const result = await search(db, {
+   *   mode: 'vector',
+   *   term: 'Noise cancelling headphones',
+   * });
+   */
+  term?: string
+
+  /**
    * The vector used to perform vector similarity search.
    *
    * @example

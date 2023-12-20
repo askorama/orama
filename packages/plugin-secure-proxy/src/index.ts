@@ -1,7 +1,8 @@
-import type { AnyOrama, SearchParamsHybrid, SearchParamsVector, Language } from '@orama/orama'
+import type { AnyOrama, SearchParamsHybrid, SearchParamsVector } from '@orama/orama'
 
-type SearchParams<T extends AnyOrama, ResultDocument> = SearchParamsHybrid<T, ResultDocument>
-// | SearchParamsVector<T, ResultDocument>
+type SearchParams<T extends AnyOrama, ResultDocument> =
+  | SearchParamsHybrid<T, ResultDocument>
+  | SearchParamsVector<T, ResultDocument>
 
 type InitResponse = {
   clientID: string
@@ -13,6 +14,7 @@ type EmbeddingsResponse = number[]
 
 export type SecureProxyPluginOptions = {
   apiKey: string
+  defaultProperty: string
 }
 
 const SECURE_PROXY_ENDPOINT = 'https://secure-proxy.orama.run'
@@ -39,19 +41,24 @@ async function getEmbeddings(apiKey: string, query: string, csrfToken: string): 
 }
 
 export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions) {
-  if (!pluginParams.apiKey) throw new Error('Missing apiKey for plugin-telemetry')
+  if (!pluginParams.apiKey) throw new Error('Missing "apiKey" parameter for plugin-telemetry')
+  if (!pluginParams.defaultProperty) throw new Error('Missing "defaultProperty" parameter for plugin-telemetry')
 
-  let { csrfToken } = await getCSRFToken(pluginParams.apiKey)
+  const { csrfToken } = await getCSRFToken(pluginParams.apiKey)
 
   return {
     name: 'secure-proxy',
-    async beforeSearch(_db: AnyOrama, params: SearchParams<any, any>) {
+    async beforeSearch(_db: AnyOrama, params: SearchParams<AnyOrama, any>) {
       const term = params.term
       const embeddings = await getEmbeddings(pluginParams.apiKey, term, csrfToken)
 
+      if (params?.vector?.value) {
+        return
+      }
+
       if (!params.vector) {
         params.vector = {
-          property: 'vector', // @todo: remove this
+          property: params?.vector?.property ?? pluginParams.defaultProperty,
           value: embeddings
         }
       }
