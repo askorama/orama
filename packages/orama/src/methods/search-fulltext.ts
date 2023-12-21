@@ -9,7 +9,7 @@ import type {
 } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getInternalDocumentId } from '../components/internal-document-id-store.js'
-import { getNanosecondsTime, safeArrayPush, sortTokenScorePredicate } from '../utils.js'
+import { getNanosecondsTime, removeVectorsFromHits, safeArrayPush, sortTokenScorePredicate } from '../utils.js'
 import { intersectFilteredIDs } from '../components/filters.js'
 import { prioritizeTokenScores } from '../components/algorithms.js'
 import { createError } from '../errors.js'
@@ -32,6 +32,8 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
 
   const vectorProperties = Object.keys(orama.data.index.vectorIndexes)
+  const shouldRemoveVectors = !Boolean(params.includeVectors)
+
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
   const { limit = 10, offset = 0, term, properties, threshold = 1, distinctOn } = params
   const isPreflight = params.preflight === true
@@ -181,24 +183,12 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
   }
 
   if (typeof results !== 'undefined') {
-    searchResult.hits = results.filter(Boolean).map((result) => ({
-      ...result,
-      document: {
-        ...result.document,
-        // Remove embeddings from the result
-        ...vectorProperties.reduce((acc, prop) => {
-          const path = prop.split('.')
-          const lastKey = path.pop()!
-          let obj = acc
-          for (const key of path) {
-            obj[key] = obj[key] ?? {}
-            obj = obj[key] as any
-          }
-          obj[lastKey] = null
-          return acc
-        }, result.document)
-      }
-    }))
+    searchResult.hits = results.filter(Boolean)
+
+    // Vectors can be very large, so we remove them from the result if not needed
+    if (shouldRemoveVectors) {
+      removeVectorsFromHits(searchResult, vectorProperties)
+    }
   }
 
   if (shouldCalculateFacets) {

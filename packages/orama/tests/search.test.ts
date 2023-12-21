@@ -791,6 +791,45 @@ t.test('fix-544', async (t) => {
   t.end()
 })
 
+t.test('full-text search with vector properties', async (t) => {
+  t.test("shouldn't return vectors unless explicitly specified", async (t) => {
+    const db = await create({
+      schema: {
+        text: 'string',
+        embeddings: {
+          first: 'vector[2]',
+          second: 'vector[2]'
+        }
+      } as const
+    })
+
+    await insert(db, {
+      text: 'foo',
+      embeddings: {
+        first: [1, 2],
+        second: [3, 4]
+      }
+    })
+
+    await insert(db, {
+      text: 'bar',
+      embeddings: {
+        first: [5, 6],
+        second: [7, 8]
+      }
+    })
+
+    const result2 = await search(db, {
+      term: 'foo'
+    })
+
+    t.strictSame(
+      result2.hits.map((hit) => hit.document.embeddings),
+      [{ first: null, second: null }]
+    )
+  })
+})
+
 async function createSimpleDB() {
   let i = 0
   const db = await create({

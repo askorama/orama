@@ -466,6 +466,13 @@ export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = Typed
    * // }
    */
   preflight?: boolean
+
+  /**
+   * Whether to include the vectors in the result.
+   * By default, Orama will not include the vectors, as they can be quite large.
+   * If set to "false" (default), vectors will be presented as "null".
+   */
+  includeVectors?: boolean
 }
 
 export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDocument<T>>
@@ -547,7 +554,9 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
   similarity?: number
 
   /**
-   * Wether to include the vectors in the result. By default, Orama will not include the vectors, as they can be quite large.
+   * Whether to include the vectors in the result.
+   * By default, Orama will not include the vectors, as they can be quite large.
+   * If set to "false" (default), vectors will be presented as "null".
    */
   includeVectors?: boolean
 
@@ -687,6 +696,7 @@ export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDo
   /**
    * Whether to include the vectors in the result.
    * By default, Orama will not include the vectors, as they can be quite large.
+   * If set to "false" (default), vectors will be presented as "null".
    */
   includeVectors?: boolean
 }
