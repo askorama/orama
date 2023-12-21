@@ -65,7 +65,7 @@ const results = await searchVector(db, {
 When running hybrid search using the secure proxy, you won't need to explicitly pass the `vector` configuration. Just run a simple search query!
 
 ```js
-const resultsHybrid = await search(db, {
+const results = await search(db, {
   mode: 'hybrid',
   term: 'The Prestige'
 })
