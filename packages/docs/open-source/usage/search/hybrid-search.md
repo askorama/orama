@@ -11,7 +11,7 @@ Running hybrid search on the front-end requires a translation from text to vecto
 
 If you're using systems such as OpenAI to generate text embeddings, this would put you at risk of exposing your API Keys.
 
-We highly recommend using the [Orama Secure Proxy](#) to mask your API Keys securely and prevent abuse of any kind.
+We highly recommend using the [Orama Secure Proxy Plugin](/open-source/plugins/plugin-secure-proxy.html) to mask your API Keys securely and prevent abuse of any kind.
 :::
 
 ## Performing Hybrid Search
@@ -60,6 +60,21 @@ const results = await searchVector(db, {
   offset: 0,             // Defaults to `0`
 })
 ```
+
+::: info Tip!
+When running hybrid search using the secure proxy, you won't need to explicitly pass the `vector` configuration. Just run a simple search query!
+
+```js
+const resultsHybrid = await search(db, {
+  mode: 'hybrid',
+  term: 'The Prestige'
+})
+```
+
+The plugin will automatically convert this text to vector for you, and will also prevent you from exposing your OpenAI API key when using it on the front-end.
+
+[Learn more](/open-source/plugins/plugin-secure-proxy.html).
+:::
 
 The returning object will be exactly the same as the one we would expect when performing full-text search:
 

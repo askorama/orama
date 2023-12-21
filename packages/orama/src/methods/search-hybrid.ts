@@ -269,7 +269,7 @@ function mergeAndRankResults(textResults: TokenScore[], vectorResults: TokenScor
   const maxTextScore = Math.max(...textResults.map(([, score]) => score))
   const maxVectorScore = Math.max(...vectorResults.map(([, score]) => score))
 
-  const { textWeight, vectorWeight } = adjustWeightsBasedOnQuery(query)
+  const { textWeight, vectorWeight } = getQueryWeights(query)
   const mergedResults = new Map()
 
   const textResultsLength = textResults.length
@@ -300,7 +300,7 @@ function mergeAndRankResults(textResults: TokenScore[], vectorResults: TokenScor
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function adjustWeightsBasedOnQuery(query: string) {
+function getQueryWeights(query: string) {
   // In the next versions of Orama, we will ship a plugin containing a ML model to adjust the weights
   // based on whether the query is keyword-focused, conceptual, etc.
   // For now, we just return a fixed value.

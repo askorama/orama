@@ -104,6 +104,7 @@ export default defineConfig({
             { text: 'Writing your own plugins', link: '/open-source/plugins/writing-your-own-plugins.html' },
             { text: 'Plugin Vitepress', link: '/open-source/plugins/plugin-vitepress.html' },
             { text: 'Plugin Docusaurus', link: '/open-source/plugins/plugin-docusaurus.html' },
+            { text: 'Plugin Secure Proxy', link: '/open-source/plugins/plugin-secure-proxy.html' },
             { text: 'Plugin Telemetry', link: '/open-source/plugins/plugin-telemetry.html' },
             { text: 'Plugin Astro', link: '/open-source/plugins/plugin-astro.html' },
             { text: 'Plugin Data Persistence', link: '/open-source/plugins/plugin-data-persistence.html' },
@@ -168,7 +169,8 @@ export default defineConfig({
         {
           text: 'Orama AI',
           items: [
-            { text: 'Automatic embeddings generation', link: '/cloud/orama-ai/automatic-embeddings-generation.html' }
+            { text: 'Automatic embeddings generation', link: '/cloud/orama-ai/automatic-embeddings-generation.html' },
+            { text: 'Orama Secure Proxy', link: '/cloud/orama-ai/orama-secure-proxy.html' }
           ]
         },
         {
