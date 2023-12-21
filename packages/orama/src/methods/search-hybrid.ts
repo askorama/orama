@@ -1,4 +1,4 @@
-import type { AnyOrama, TypedDocument, SearchParamsHybrid, Results, TokenScore, Result } from '../types.js'
+import type { AnyOrama, TypedDocument, SearchParamsHybrid, Results, TokenScore, Result, AnyDocument } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getNanosecondsTime, safeArrayPush, formatNanoseconds, removeVectorsFromHits } from '../utils.js'
 import { intersectFilteredIDs } from '../components/filters.js'
@@ -32,10 +32,7 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
   ])
 
   const { index, docs } = orama.data
-  let uniqueTokenScores = mergeSortedArrays(
-    fullTextIDs.slice(offset, offset + limit),
-    vectorIDs.slice(offset, offset + limit)
-  )
+  let uniqueTokenScores = mergeAndRankResults(fullTextIDs, vectorIDs, params.term ?? '')
 
   // @todo avoid tokenize twice
   const tokens = await orama.tokenizer.tokenize(params.term ?? '', language)
@@ -79,7 +76,7 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
 
   if (hasFilters) {
     whereFiltersIDs = await orama.index.searchByWhereClause(context, index, params.where!)
-    uniqueTokenScores = intersectFilteredIDs(whereFiltersIDs, uniqueTokenScores)
+    uniqueTokenScores = intersectFilteredIDs(whereFiltersIDs, uniqueTokenScores).slice(offset, offset + limit)
   }
 
   let facetsResults: any
@@ -260,43 +257,54 @@ function minMaxScoreNormalization(results: TokenScore[]): TokenScore[] {
   return results.map(([id, score]) => [id, score / maxScore] as TokenScore)
 }
 
-function mergeSortedArrays(fulltext: TokenScore[], vector: TokenScore[]): TokenScore[] {
-  const merged: TokenScore[] = []
-  const addedIds = new Map<number, boolean>()
-  let i = 0,
-    j = 0
+function normalizeScore(score: number, maxScore: number) {
+  return score / maxScore
+}
 
-  while (i < fulltext.length && j < vector.length) {
-    if (fulltext[i][1] > vector[j][1]) {
-      addUnique(merged, addedIds, fulltext[i])
-      i++
-    } else if (vector[j][1] > fulltext[i][1]) {
-      addUnique(merged, addedIds, vector[j])
-      j++
+function hybridScore(textScore: number, vectorScore: number, textWeight: number, vectorWeight: number) {
+  return textScore * textWeight + vectorScore * vectorWeight
+}
+
+function mergeAndRankResults(textResults: TokenScore[], vectorResults: TokenScore[], query: string) {
+  const maxTextScore = Math.max(...textResults.map(([, score]) => score))
+  const maxVectorScore = Math.max(...vectorResults.map(([, score]) => score))
+
+  const { textWeight, vectorWeight } = adjustWeightsBasedOnQuery(query)
+  let mergedResults = new Map()
+
+  const textResultsLength = textResults.length
+  for (let i = 0; i < textResultsLength; i++) {
+    const normalizedScore = normalizeScore(textResults[i][1], maxTextScore)
+    //                                                    ^ 1 here refers to "score"
+    const hybridScoreValue = hybridScore(normalizedScore, 0, textWeight, vectorWeight)
+    mergedResults.set(textResults[i][0], hybridScoreValue)
+    //                               ^ 0 here refers to "id"
+  }
+
+  const vectorResultsLength = vectorResults.length
+  for (let i = 0; i < vectorResultsLength; i++) {
+    const normalizedScore = normalizeScore(vectorResults[i][1], maxVectorScore)
+    //                                                      ^ 1 here refers to "score"
+    if (mergedResults.has(vectorResults[i][0])) {
+      let existingRes = mergedResults.get(vectorResults[i][0])
+      //                                                   ^ 0 here refers to "id"
+      mergedResults.set(vectorResults[i][0], (existingRes += hybridScore(0, normalizedScore, textWeight, vectorWeight)))
+      //                                 ^ 0 here refers to "id"
     } else {
-      addUnique(merged, addedIds, fulltext[i])
-      addUnique(merged, addedIds, vector[j])
-      i++
-      j++
+      mergedResults.set(vectorResults[i][0], hybridScore(0, normalizedScore, textWeight, vectorWeight))
+      //                                 ^ 0 here refers to "id"
     }
   }
 
-  // Add remaining elements from both arrays
-  while (i < fulltext.length) {
-    addUnique(merged, addedIds, fulltext[i])
-    i++
-  }
-  while (j < vector.length) {
-    addUnique(merged, addedIds, vector[j])
-    j++
-  }
-
-  return merged
+  return [...mergedResults].sort((a, b) => b[1] - a[1])
 }
 
-function addUnique(array: TokenScore[], addedIds: Map<number, boolean>, element: TokenScore) {
-  if (!addedIds.has(element[0])) {
-    array.push(element)
-    addedIds.set(element[0], true)
+function adjustWeightsBasedOnQuery(query: string) {
+  // In the next versions of Orama, we will ship a plugin containing a ML model to adjust the weights
+  // based on whether the query is keyword-focused, conceptual, etc.
+  // For now, we just return a fixed value.
+  return {
+    textWeight: 0.5,
+    vectorWeight: 0.5
   }
 }
