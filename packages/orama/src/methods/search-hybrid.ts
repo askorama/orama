@@ -1,4 +1,4 @@
-import type { AnyOrama, TypedDocument, SearchParamsHybrid, Results, TokenScore, Result, AnyDocument } from '../types.js'
+import type { AnyOrama, TypedDocument, SearchParamsHybrid, Results, TokenScore, Result } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getNanosecondsTime, safeArrayPush, formatNanoseconds, removeVectorsFromHits } from '../utils.js'
 import { intersectFilteredIDs } from '../components/filters.js'
@@ -90,7 +90,7 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
     groups = await getGroups<T, ResultDocument>(orama, uniqueTokenScores, params.groupBy)
   }
 
-  let results = (await fetchDocuments(orama, uniqueTokenScores, offset, limit)).filter(Boolean)
+  const results = (await fetchDocuments(orama, uniqueTokenScores, offset, limit)).filter(Boolean)
 
   if (orama.afterSearch) {
     await runAfterSearch(orama.afterSearch, orama, params, language, results as any)
@@ -270,7 +270,7 @@ function mergeAndRankResults(textResults: TokenScore[], vectorResults: TokenScor
   const maxVectorScore = Math.max(...vectorResults.map(([, score]) => score))
 
   const { textWeight, vectorWeight } = adjustWeightsBasedOnQuery(query)
-  let mergedResults = new Map()
+  const mergedResults = new Map()
 
   const textResultsLength = textResults.length
   for (let i = 0; i < textResultsLength; i++) {
@@ -299,6 +299,7 @@ function mergeAndRankResults(textResults: TokenScore[], vectorResults: TokenScor
   return [...mergedResults].sort((a, b) => b[1] - a[1])
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function adjustWeightsBasedOnQuery(query: string) {
   // In the next versions of Orama, we will ship a plugin containing a ML model to adjust the weights
   // based on whether the query is keyword-focused, conceptual, etc.

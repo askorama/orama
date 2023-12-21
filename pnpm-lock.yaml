@@ -605,11 +605,10 @@ importers:
         version: 5.0.3
 
   packages/plugin-secure-proxy:
-    dependencies:
+    devDependencies:
       '@orama/orama':
         specifier: workspace:*
         version: link:../orama
-    devDependencies:
       '@types/node':
         specifier: ^20.9.0
         version: 20.9.0

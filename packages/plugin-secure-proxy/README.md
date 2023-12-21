@@ -23,7 +23,7 @@ const db = await create({
   plugins: [
     pluginSecureProxy({
       apiKey: '<API-KEY>',
-      property: 'embeddings'
+      defaultProperty: 'embeddings'
     })
   ]
 })

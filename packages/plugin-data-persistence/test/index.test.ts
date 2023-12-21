@@ -1,4 +1,4 @@
-import { create, insert, Orama, search } from '@orama/orama'
+import { create, insert, search } from '@orama/orama'
 import t from 'tap'
 import { UNSUPPORTED_FORMAT, METHOD_MOVED } from '../src/errors.js'
 import {
@@ -310,6 +310,7 @@ t.test('json persistence', (t) => {
     })
 
     const qp2 = await search(db2, {
+      mode: 'vector',
       vector: {
         value: [1, 0, 0, 0, 0],
         property: 'vector'

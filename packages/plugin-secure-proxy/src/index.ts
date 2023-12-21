@@ -1,13 +1,4 @@
-import type {
-  AnyOrama,
-  SearchParamsHybrid,
-  SearchParamsVector,
-  SearchParams,
-  TypedDocument,
-  OramaPluginAsync,
-  OramaPluginSync,
-  OramaPlugin
-} from '@orama/orama'
+import type { AnyOrama, SearchParams, TypedDocument, OramaPluginAsync } from '@orama/orama'
 
 type InitResponse = {
   clientID: string
