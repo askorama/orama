@@ -32,10 +32,9 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
   params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
 
   const vectorProperties = Object.keys(orama.data.index.vectorIndexes)
-  const shouldRemoveVectors = !Boolean(params.includeVectors)
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
-  const { limit = 10, offset = 0, term, properties, threshold = 1, distinctOn } = params
+  const { limit = 10, offset = 0, term, properties, threshold = 1, distinctOn, includeVectors = false } = params
   const isPreflight = params.preflight === true
 
   const { index, docs } = orama.data
@@ -186,7 +185,7 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
     searchResult.hits = results.filter(Boolean)
 
     // Vectors can be very large, so we remove them from the result if not needed
-    if (shouldRemoveVectors) {
+    if (!includeVectors) {
       removeVectorsFromHits(searchResult, vectorProperties)
     }
   }

@@ -11,15 +11,6 @@ import { getInternalDocumentId, getDocumentIdFromInternalId } from '../component
 import { Language } from '../index.js'
 import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
 
-export type SearchVectorParams = {
-  vector: number[] | Float32Array
-  property: string
-  similarity?: number
-  limit?: number
-  offset?: number
-  includeVectors?: boolean
-}
-
 export async function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
   params: SearchParamsVector<T, ResultDocument>,

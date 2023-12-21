@@ -1,6 +1,6 @@
 import type { AnyOrama, TypedDocument, SearchParamsHybrid, Results, TokenScore, Result } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { getNanosecondsTime, safeArrayPush, formatNanoseconds } from '../utils.js'
+import { getNanosecondsTime, safeArrayPush, formatNanoseconds, removeVectorsFromHits } from '../utils.js'
 import { intersectFilteredIDs } from '../components/filters.js'
 import { prioritizeTokenScores } from '../components/algorithms.js'
 import { createError } from '../errors.js'
@@ -94,26 +94,14 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
   }
 
   let results = (await fetchDocuments(orama, uniqueTokenScores, offset, limit)).filter(Boolean)
-  if (!includeVectors) {
-    results = results.map((doc) => {
-      return {
-        id: doc.id,
-        score: doc.score,
-        document: {
-          ...doc.document,
-          // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-          [params.vector?.property!]: null
-        }
-      }
-    })
-  }
 
   if (orama.afterSearch) {
     await runAfterSearch(orama.afterSearch, orama, params, language, results as any)
   }
 
   const timeEnd = await getNanosecondsTime()
-  return {
+
+  const returningResults = {
     count: uniqueTokenScores.length,
     elapsed: {
       raw: Number(timeEnd - timeStart),
@@ -123,6 +111,13 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
     ...(facetsResults ? { facets: facetsResults } : {}),
     ...(groups ? { groups } : {})
   }
+
+  if (!includeVectors) {
+    const vectorProperties = Object.keys(orama.data.index.vectorIndexes)
+    removeVectorsFromHits(returningResults, vectorProperties)
+  }
+
+  return returningResults
 }
 
 async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
