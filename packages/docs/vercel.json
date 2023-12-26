@@ -1,3 +1,4 @@
 {
-  "framework": "vitepress"
+  "framework": "vitepress",
+  "cleanUrls": true
 }
