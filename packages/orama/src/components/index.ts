@@ -490,6 +490,11 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
   const ids = new Set<InternalDocumentID>()
 
   for (const key in searchResult) {
+    //if same key is in the Object.prototype, skip it
+    if(key in Object.prototype && Object.prototype[key] === searchResult[key]) {
+      continue;
+    }
+
     for (const id of searchResult[key]) {
       ids.add(id)
     }
