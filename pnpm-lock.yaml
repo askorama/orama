@@ -51,9 +51,6 @@ importers:
       eslint-plugin-promise:
         specifier: ^6.1.1
         version: 6.1.1(eslint@8.48.0)
-      execa:
-        specifier: ^6.1.0
-        version: 6.1.0
       husky:
         specifier: ^8.0.2
         version: 8.0.3
@@ -182,9 +179,6 @@ importers:
       cronometro:
         specifier: ^1.1.5
         version: 1.1.5
-      execa:
-        specifier: ^6.1.0
-        version: 6.1.0
       glob:
         specifier: ^9.2.3
         version: 9.3.0

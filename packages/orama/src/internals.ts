@@ -1,2 +1,3 @@
 export { boundedLevenshtein } from './components/levenshtein.js'
-export { formatBytes, formatNanoseconds, getNanosecondsTime, uniqueId } from './utils.js'
+export { formatBytes, formatNanoseconds, getNanosecondsTime, uniqueId, convertDistanceToMeters, safeArrayPush } from './utils.js'
+export { BM25 } from './components/algorithms.js'
