@@ -180,7 +180,8 @@ export default defineConfig({
           collapsed: false,
           items: [
             { text: 'Full-text search', link: '/cloud/performing-search/full-text-search.html' },
-            { text: 'Vector search', link: '/cloud/performing-search/vector-search.html' }
+            { text: 'Vector search', link: '/cloud/performing-search/vector-search.html' },
+            { text: 'Hybrid search', link: '/cloud/performing-search/hybrid-search.html' },
           ]
         },
         {
