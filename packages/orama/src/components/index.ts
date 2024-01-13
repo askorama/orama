@@ -57,7 +57,7 @@ import {
   searchByPolygon
 } from '../trees/bkd.js'
 
-import { convertDistanceToMeters, intersect, safeArrayPush } from '../utils.js'
+import { convertDistanceToMeters, intersect, safeArrayPush, getOwnProperty } from '../utils.js'
 import { BM25 } from './algorithms.js'
 import { getMagnitude } from './cosine-similarity.js'
 import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
@@ -489,14 +489,13 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
   const searchResult = radixFind(node, { term, exact, tolerance })
   const ids = new Set<InternalDocumentID>()
 
-  for (const key in searchResult) {
-    //if same key is in the Object.prototype, skip it
-    if(key in Object.prototype && Object.prototype[key] === searchResult[key]) {
-      continue;
-    }
+  for(const key in searchResult){
+    //skip keys inherited from prototype
+    const ownProperty = getOwnProperty(searchResult, key);
+    if(!ownProperty) continue;
 
-    for (const id of searchResult[key]) {
-      ids.add(id)
+    for (const id of searchResult[key]){
+        ids.add(id);
     }
   }
 
