@@ -22,8 +22,6 @@
 
 [![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/%40orama%2Forama?label=Bundle%20Size&link=https%3A%2F%2Fbundlephobia.com%2Fpackage%2F%40orama%2Forama%40latest)
-[![Open Bounties](https://img.shields.io/endpoint?url=https%3A%2F%2Fconsole.algora.io%2Fapi%2Fshields%2Foramasearch%2Fbounties%3Fstatus%3Dopen)](https://console.algora.io/org/oramasearch/bounties?status=open)
-[![Rewarded Bounties](https://img.shields.io/endpoint?url=https%3A%2F%2Fconsole.algora.io%2Fapi%2Fshields%2Foramasearch%2Fbounties%3Fstatus%3Dcompleted)](https://console.algora.io/org/oramasearch/bounties?status=completed)
 
 # Join Orama's Slack channel
 
@@ -34,6 +32,7 @@ the
 # Highlighted features
 
 - [Vector Search](https://docs.oramasearch.com/open-source/usage/search/vector-search)
+- [Hybrid Search](https://docs.oramasearch.com/open-source/usage/search/hybrid-search)
 - [Search filters](https://docs.oramasearch.com/open-source/usage/search/filters)
 - [Geosearch](https://docs.oramasearch.com/open-source/usage/search/geosearch)
 - [Facets](https://docs.oramasearch.com/open-source/usage/search/facets)
@@ -44,18 +43,10 @@ the
 
 # Installation
 
-You can install Orama using `npm`, `yarn`, `pnpm`:
+You can install Orama using `npm`, `yarn`, `pnpm`, `bun`:
 
 ```sh
 npm i @orama/orama
-```
-
-```sh
-yarn add @orama/orama
-```
-
-```sh
-pnpm add @orama/orama
 ```
 
 Or import it directly in a browser module:
@@ -70,6 +61,12 @@ Or import it directly in a browser module:
     </script>
   </body>
 </html>
+```
+
+With Deno, you can just use the same CDN URL or use npm specifiers:
+
+```js
+import { create, search, insert } from 'npm:@orama/orama'
 ```
 
 Read the complete documentation at [https://docs.oramasearch.com](https://docs.oramasearch.com).
@@ -95,10 +92,7 @@ const db = await create({
 })
 ```
 
-If you are using Node.js without ESM, please see the [usage with CommonJS](#usage-with-commonjs) section below on how to properly require Orama.
-
-Orama will only index string properties, but will allow you to set and store
-additional data if needed.
+Orama will only index properties specified in the schema but will allow you to set and store additional data if needed.
 
 Once the db instance is created, you can start adding some documents:
 
@@ -204,56 +198,61 @@ Result:
 }
 ```
 
-If you want to perform a vector search, you can use the `searchVector` function:
+# Performing hybrid and vector search
+
+Orama is a full-text and vector search engine. This allows you to adopt different kinds of search paradigms depending on your specific use case.
+
+To perform vector or hybrid search, you can use the same `search` method used for full-text search.
+
+You'll just have to specify which property you want to perform vector search on, and a vector to be used to perform vector similarity:
 
 ```js
 const searchResult = await searchVector(db, {
-  vector: [...], // OpenAI embedding or similar vector to be used as an input
-  property: 'embedding' // Property to search through. Mandatory for vector search
+  mode: 'vector', // or 'hybrid'
+  vector: {
+    value: [...], // OpenAI embedding or similar vector to be used as an input
+    property: 'embedding' // Property to search through. Mandatory for vector search
+  }
 })
 ```
 
-# Usage with CommonJS
-
-Orama is packaged as ES modules, suitable for Node.js, Deno, Bun and modern browsers.
-
-**In most cases, simply `import` or `@orama/orama` will suffice ✨.**
-
-In Node.js, when not using ESM (with `"type": "module"` in the `package.json`), you have several ways to properly require Orama.
-Starting with version 0.4.0 it becomes:
+If you're using the [Orama Secure AI Proxy](https://oramasearch.com/secure-ai-proxy) (highly recommended), you can skip the vector configuration at search time, since the official [Orama Secure AI Proxy plugin](https://www.npmjs.com/package/@orama/plugin-secure-proxy) will take care of it automatically for you:
 
 ```js
-async function main() {
-  const { create, insert } = await import('@orama/orama')
+import { create } from '@orama/orama'
+import { pluginSecureProxy } from '@orama/plugin-secure-proxy'
 
-  const db = create(/* ... */)
-  insert(db, {
-    /* ... */
-  })
-}
+const secureProxy = secureProxyPlugin({
+  apiKey: '<YOUR-PUBLIC-API-KEY>',
+  defaultProperty: 'embedding' // the default property to perform vector and hybrid search on
+})
 
-main().catch(console.error)
+const db = await create({
+  schema: {
+    name: 'string',
+    description: 'string',
+    price: 'number',
+    embedding: 'vector[1536]',
+    meta: {
+      rating: 'number',
+    },
+  },
+  plugins: [secureProxy]
+})
+
+const resultsHybrid = await search(db, {
+  mode: 'vector', // or 'hybrid'
+  term: 'Videogame for little kids with a passion about ice cream',
+  where: {
+    price: {
+      lte: 19.99
+    },
+    'meta.rating': {
+      gte: 4.5
+    }
+  }
+})
 ```
-
-## Use CJS requires
-
-Orama methods can be required as CommonJS modules by requiring from `@orama/orama`.
-
-```js
-const { create, insert } = require("@orama/orama")
-
-create(/* ... */)
-  .then(db => insert(db, { /* ... */ })
-  .catch(console.error)
-```
-
-Note that only main methods are supported so for internals and other supported exports you still have to use `await import`.
-
-# Community Rewards
-
-![Orama Community Rewards](https://raw.githubusercontent.com/oramasearch/orama/main/misc/readme/community-rewards.png)
-
-Are you using Orama in production? Have you written an article or made a YouTube video on Orama? [Contact us](mailto:info@oramasearch.com) to get some Orama swag in return!
 
 # Official Docs
 
