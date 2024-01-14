@@ -82,6 +82,19 @@ export async function formatBytes(bytes: number, decimals = 2): Promise<string> 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
+export function isInsideWebWorker(): boolean {
+  // @ts-expect-error - WebWorker global scope
+  return typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope
+}
+
+export function isInsideNode(): boolean {
+  return typeof process !== 'undefined' && process.release.name === 'node'
+}
+
+export function getNanosecondTimeViaPerformance() {
+  return BigInt(Math.floor(performance.now() * 1e6))
+}
+
 export async function formatNanoseconds(value: number | bigint): Promise<string> {
   if (typeof value === 'number') {
     value = BigInt(value)
@@ -99,12 +112,20 @@ export async function formatNanoseconds(value: number | bigint): Promise<string>
 }
 
 export async function getNanosecondsTime(): Promise<bigint> {
+  if (isInsideWebWorker()) {
+    return getNanosecondTimeViaPerformance()
+  }
+
+  if (isInsideNode()) {
+    return process.hrtime.bigint()
+  }
+
   if (typeof process !== 'undefined' && process.hrtime !== undefined) {
     return process.hrtime.bigint()
   }
 
   if (typeof performance !== 'undefined') {
-    return BigInt(Math.floor(performance.now() * 1e6))
+    return getNanosecondTimeViaPerformance()
   }
 
   // @todo: fallback to V8 native method to get microtime

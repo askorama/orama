@@ -791,6 +791,22 @@ t.test('fix-544', async (t) => {
   t.end()
 })
 
+t.test('fix-601', async t => {
+  const db = await create({
+    schema: {
+      name: 'string'
+    } as const
+  })
+
+  Object.prototype['examplePrototypeFunction'] = () => {};
+
+  await insert(db, { name: 'John Doe' });
+  const result = await search(db, { term: 'John Doe' });
+
+  t.equal(result.count, 1);
+  t.end()
+})
+
 t.test('full-text search with vector properties', async (t) => {
   t.test("shouldn't return vectors unless explicitly specified", async (t) => {
     const db = await create({
