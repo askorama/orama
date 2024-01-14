@@ -2,7 +2,7 @@
 outline: deep
 ---
 
-# Performing vector search on Orama Cloud
+# Performing hybrid search on Orama Cloud
 
 After deploying your index, Orama will distribute it to over 300 global points of presence across more than 100 countries worldwide. This will guarantee the lowest possible latency for any search query, at any scale.
 
@@ -16,7 +16,11 @@ You can find the guide on installing the SDK [here](/cloud/integrating-orama-clo
 
 Make sure you have the Orama SDK installed to start performing vector search at the edge!
 
-## Performing vector search
+## What is hybrid search?
+
+Hybrid search is a technique that merges full-text and vector search results into a unified list. It capitalizes on the strengths of both methods by balancing keyword-specific searches with the broader context of the overall query.
+
+## Performing hybrid search
 
 ::: info
 The following guide assumes that you have an **Open AI API key** set on Orama Cloud, as it is needed to perform transform text into embeddings at search time.
@@ -26,7 +30,7 @@ To perform a vector search with Orama Cloud, you need to populate an Orama index
 
 As an alternative, you can provide your own vectors while inserting new documents into an Orama index.
 
-Once you have at least one index containing vectors, you can perform vector search by using the `search` function:
+Once you have at least one index containing vectors, you can perform hybrid search by using the `search` function:
 
 ```ts
 import { OramaClient } from '@oramacloud/client'
@@ -38,9 +42,8 @@ const client = new OramaClient({
 
 const vectorSearchResults = await client.search({
   term: 'Super Mario videogame',
-  mode: 'vector',
-  similarity: 0.8, // Minimum similarity, between 0 and 1. Default is 0.8 (80% similar).
-  limit: 5         // How many results to return. Default is 10.
+  mode: 'hybrid',
+  limit: 5        // How many results to return. Default is 10.
 })
 ```
 

@@ -14,6 +14,7 @@ import type {
   SearchableType,
   SearchableValue,
   SearchContext,
+  SearchParamsFullText,
   Tokenizer,
   TokenScore,
   TypedDocument,
@@ -171,7 +172,7 @@ export async function removeTokenScoreParameters(index: Index, prop: string, tok
 }
 
 export async function calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-  context: SearchContext<T, ResultDocument>,
+  context: SearchContext<T, ResultDocument, SearchParamsFullText<T, ResultDocument>>,
   index: Index,
   prop: string,
   term: string,
@@ -471,7 +472,7 @@ export async function remove(
 }
 
 export async function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-  context: SearchContext<T, ResultDocument>,
+  context: SearchContext<T, ResultDocument, SearchParamsFullText<T, ResultDocument>>,
   index: Index,
   prop: string,
   term: string

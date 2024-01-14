@@ -7,7 +7,6 @@
 	"files": {
 		"ignore": [
 			".vscode/",
-			"**./tap",
 			"**/.docusaurus/",
 			"**/coverage",
 			"**/dist/",

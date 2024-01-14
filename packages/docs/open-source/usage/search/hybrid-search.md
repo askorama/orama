@@ -2,10 +2,9 @@
 outline: deep
 ---
 
-# Vector Search
-Being a vector database, Orama allows you to perform vector search natively.
+# Hybrid Search
 
-To perform search through vectors, you need to correctly configure your Orama schema, as described in the [create page](/open-source/usage/create).
+Hybrid search is an Orama feature that allows you to perform full-text and vector search in one unique query, combining the results to get the best of both worlds.
 
 ::: info Using Orama Secure Proxy
 Running hybrid search on the front-end requires a translation from text to vector.
@@ -15,20 +14,20 @@ If you're using systems such as OpenAI to generate text embeddings, this would p
 We highly recommend using the [Orama Secure Proxy Plugin](/open-source/plugins/plugin-secure-proxy.html) to mask your API Keys securely and prevent abuse of any kind.
 :::
 
+## Performing Hybrid Search
 
-## Performing Vector Search
-
-To perform vector search, you will need to use the same `search` method you're already using for full-text and hybrid search, which can be imported from `@orama/orama`:
+To perform hybrid search, you will need to use the same `search` method you're already using for full-text and vector search, which can be imported from `@orama/orama`:
 
 ```js copy
 import { search } from '@orama/orama'
 ```
 
-The key differences between running vector search and full-text search are:
+The key differences between running hybrid search and full-text search are:
 
-1. Instead of searching for a `term`, you will need to provide a `vector` object to search.
-2. You will need to specify the vector property you want to search on.
-3. At the time of writing, you can only search through one vector property at a time. If you think that this is too limiting, please open a [feature request](https://github.com/oramasearch/orama/issues/new?assignees=&labels=&projects=&template=feature_request.md&title=) to support multiple vector properties at search-time.
+1. Instead of searching for a `term` exclusively, you will also need to provide a `vector` object to search.
+2. You will need to set `mode` to `"hybrid"` when running search.
+3. You will need to specify the vector property you want to search on.
+4. At the time of writing, you can only search through one vector property at a time. If you think that this is too limiting, please open a [feature request](https://github.com/oramasearch/orama/issues/new?assignees=&labels=&projects=&template=feature_request.md&title=) to support multiple vector properties at search-time.
 
 Let's see a full example of how to perform vector search:
 
@@ -48,13 +47,14 @@ await insertMultiple(db, [
   { title: 'Oppenheimer',  embedding: [0.827391, 0.927381, 0.001982, 0.983821, 0.294841] },
 ])
 
-const results = await search(db, {
-  mode: 'vector',
+const results = await searchVector(db, {
+  mode: 'hybrid',
+  term: 'The Prestige'
   vector: {
     value: [0.938292, 0.284961, 0.248264, 0.748276, 0.264720],
     property: 'embedding',
   },
-  similarity: 0.85,      // Minimum similarity. Defaults to `0.8`
+  similarity: 0.85,      // Minimum vector search similarity. Defaults to `0.8`
   includeVectors: true,  // Defaults to `false`
   limit: 10,             // Defaults to `10`
   offset: 0,             // Defaults to `0`
@@ -62,12 +62,12 @@ const results = await search(db, {
 ```
 
 ::: info Tip!
-When running vector search using the secure proxy, you won't need to explicitly pass the `vector` configuration. Just run a simple search query!
+When running hybrid search using the secure proxy, you won't need to explicitly pass the `vector` configuration. Just run a simple search query!
 
 ```js
 const results = await search(db, {
-  mode: 'vector',
-  term: 'Videogame for little kids with a passion about ice cream'
+  mode: 'hybrid',
+  term: 'The Prestige'
 })
 ```
 
