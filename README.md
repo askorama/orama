@@ -33,13 +33,15 @@ the
 
 - [Vector Search](https://docs.oramasearch.com/open-source/usage/search/vector-search)
 - [Hybrid Search](https://docs.oramasearch.com/open-source/usage/search/hybrid-search)
-- [Search filters](https://docs.oramasearch.com/open-source/usage/search/filters)
+- [Search Filters](https://docs.oramasearch.com/open-source/usage/search/filters)
 - [Geosearch](https://docs.oramasearch.com/open-source/usage/search/geosearch)
 - [Facets](https://docs.oramasearch.com/open-source/usage/search/facets)
 - [Fields Boosting](https://docs.oramasearch.com/open-source/usage/search/fields-boosting)
-- [Typo tolerance](https://docs.oramasearch.com/open-source/usage/search/introduction#typo-tolerance)
-- [Exact match](https://docs.oramasearch.com/open-source/usage/search/introduction#exact-match)
+- [Typo Tolerance](https://docs.oramasearch.com/open-source/usage/search/introduction#typo-tolerance)
+- [Exact Match](https://docs.oramasearch.com/open-source/usage/search/introduction#exact-match)
+- [BM25](https://docs.oramasearch.com/open-source/usage/search/bm25-algorithm)
 - [Stemming and tokenization in 28 languages](https://docs.oramasearch.com/open-source/text-analysis/stemming)
+- [Plugin System](https://docs.oramasearch.com/open-source/plugins/introduction)
 
 # Installation
 
@@ -92,6 +94,22 @@ const db = await create({
 })
 ```
 
+Orama currently supports 10 different data types:
+
+| Type             | Description                                                                 | example                                                                     |
+| ---------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `string`         | A string of characters.                                                     | `'Hello world'`                                                             |
+| `number`         | A numeric value, either float or integer.                                   | `42`                                                                        |
+| `boolean`        | A boolean value.                                                            | `true`                                                                      |
+| `enum`           | An enum value.                                                              | `'drama'`                                                                   |
+| `geopoint`       | A geopoint value.                                                           | `{ lat: 40.7128, lon: 74.0060 }`                                            |
+| `string[]`       | An array of strings.                                                        | `['red', 'green', 'blue']`                                                  |
+| `number[]`       | An array of numbers.                                                        | `[42, 91, 28.5]`                                                            |
+| `boolean[]`      | An array of booleans.                                                       | `[true, false, false]`                                                      |
+| `enum[]`         | An array of enums.                                                          | `['comedy', 'action', 'romance']`                                           |
+| `vector[<size>]` | A vector of numbers to perform vector search on.                            | `[0.403, 0.192, 0.830]`                                                     |
+
+
 Orama will only index properties specified in the schema but will allow you to set and store additional data if needed.
 
 Once the db instance is created, you can start adding some documents:
@@ -137,7 +155,7 @@ const searchResult = await search(db, {
 ```
 
 In the case above, you will be searching for all the documents containing the
-word `headphones`, looking up in every schema property (AKA index):
+word `"headphones"`, looking up in every `string` property specified in the schema:
 
 ```js
 {
@@ -198,6 +216,22 @@ Result:
 }
 ```
 
+You can use non-string data to [filter](https://docs.oramasearch.com/open-source/usage/search/filters), [group](https://docs.oramasearch.com/open-source/usage/search/grouping), and create [facets](https://docs.oramasearch.com/open-source/usage/search/facets):
+
+```js
+const searchResult = await search(db, {
+  term: 'immersive sound quality',
+  where: {
+    price: {
+      lte: 199.99
+    },
+    rating: {
+      gt: 4
+    }
+  },
+})
+```
+
 # Performing hybrid and vector search
 
 Orama is a full-text and vector search engine. This allows you to adopt different kinds of search paradigms depending on your specific use case.
@@ -216,7 +250,7 @@ const searchResult = await searchVector(db, {
 })
 ```
 
-If you're using the [Orama Secure AI Proxy](https://oramasearch.com/secure-ai-proxy) (highly recommended), you can skip the vector configuration at search time, since the official [Orama Secure AI Proxy plugin](https://www.npmjs.com/package/@orama/plugin-secure-proxy) will take care of it automatically for you:
+If you're using the [Orama Secure AI Proxy](https://oramasearch.com/blog/announcing-the-orama-secure-ai-proxy) (highly recommended), you can skip the vector configuration at search time, since the official [Orama Secure AI Proxy plugin](https://www.npmjs.com/package/@orama/plugin-secure-proxy) will take care of it automatically for you:
 
 ```js
 import { create } from '@orama/orama'
@@ -254,9 +288,62 @@ const resultsHybrid = await search(db, {
 })
 ```
 
+# Performing Geosearch
+
+Orama supports Geosearch as a search filter. It will search through all the properties specified as `geopoint` in the schema:
+
+```js
+import { create, insert } from '@orama/orama'
+
+const db = await create({
+  schema: {
+    name: 'string',
+    location: 'geopoint'
+  }
+})
+
+await insert(db, { name: 'Duomo di Milano', location: { lat: 45.46409, lon: 9.19192 } })
+await insert(db, { name: 'Piazza Duomo',    location: { lat: 45.46416, lon: 9.18945 } })
+await insert(db, { name: 'Piazzetta Reale', location: { lat: 45.46339, lon: 9.19092 } })
+
+const searchResult = await search(db, {
+  term: 'Duomo',
+  where: {
+    location: {           // The property we want to filter by
+      radius: {           // The filter we want to apply (in that case: "radius")
+        coordinates: {    // The central coordinate
+          lat: 45.4648, 
+          lon: 9.18998
+        },
+        unit: 'm',        // The unit of measurement. The default is "m" (meters)
+        value: 1000,      // The radius length. In that case, 1km
+        inside: true      // Whether we want to return the documents inside or outside the radius. The default is "true"
+      }
+    }
+  }
+})
+```
+
+Orama Geosearch APIs support distance-based search (via `radius`), or polygon-based search (via `polygon`).
+
+By default, Orama will use the [**Haversine formula**](https://en.wikipedia.org/wiki/Haversine_formula) to perform Geosearch, but high-precision search can be enabled by passing the `highPrecision` option in your `radius` or `polygon` configuration. This will tell Orama to use the [**Vicenty Formulae**](https://en.wikipedia.org/wiki/Vincenty%27s_formulae) instead, which is more precise for longer distances.
+
+Read more in the [official docs](https://docs.oramasearch.com/open-source/usage/search/geosearch).
+
 # Official Docs
 
 Read the complete documentation at [https://docs.oramasearch.com](https://docs.oramasearch.com).
+
+# Official Orama Plugins
+
+- [Plugin Vitepress](https://docs.oramasearch.com/open-source/plugins/plugin-vitepress)
+- [Plugin Docusaurus](https://docs.oramasearch.com/open-source/plugins/plugin-docusaurus)
+- [Plugin Telemetry](https://docs.oramasearch.com/open-source/plugins/plugin-telemetry)
+- [Plugin Astro](https://docs.oramasearch.com/open-source/plugins/plugin-astro)
+- [Plugin Data Persistence](https://docs.oramasearch.com/open-source/plugins/plugin-data-persistence)
+- [Plugin Nextra](https://docs.oramasearch.com/open-source/plugins/plugin-nextra)
+
+Write your own plugin: [https://docs.oramasearch.com/open-source/plugins/writing-your-own-plugins](https://docs.oramasearch.com/open-source/plugins/writing-your-own-plugins)
 
 # License
 
