@@ -54,8 +54,8 @@ t.test('cosine similarity', (t) => {
       const similarVectors = findSimilarVectors(targetVector, vectors, targetVector.length)
 
       t.same(similarVectors.length, 2)
-      t.same(similarVectors[0].id, '2')
-      t.same(similarVectors[1].id, '3')
+      t.same(similarVectors[0][0], '2')
+      t.same(similarVectors[1][0], '3')
     })
   })
 })

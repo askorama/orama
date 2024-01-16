@@ -6,9 +6,7 @@ outline: deep
 
 Orama provides a simple search interface that allows you to search through your documents.
 
-::: tip NOTE
-Search is NOT case sensitive.
-:::
+With a unique API, you can perform **full-text**, **vector**, and **hybrid** search.
 
 ## Searching with Orama
 
@@ -274,3 +272,7 @@ When performing a search operation, the `elapsed` property will now return the f
   hits: [...]
 }
 ```
+
+## Caveats
+
+Search is **not** case sensitive.

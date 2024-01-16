@@ -22,7 +22,6 @@ const phrases = [
 ]
 
 t.test('radix tree', (t) => {
-
   t.test('should correctly find an element by prefix', (t) => {
     t.plan(1)
     const root = createNode()
@@ -152,34 +151,32 @@ t.test('radix tree', (t) => {
     })
   })
 
-
   //testcase doesnt pass even after PR#580
-  const words=[
-    { id:0,  word: 'apple' },
-    { id:1,  word: 'app' },
-    { id:2,  word: 'apply' },
-    { id:3,  word: 'apt' },
-    { id:4,  word: 'apex' },
-    { id:5,  word: 'about' },
-    { id:6,  word: 'again' }
+  const words = [
+    { id: 0, word: 'apple' },
+    { id: 1, word: 'app' },
+    { id: 2, word: 'apply' },
+    { id: 3, word: 'apt' },
+    { id: 4, word: 'apex' },
+    { id: 5, word: 'about' },
+    { id: 6, word: 'again' }
   ]
   t.test('test search with tolerance. should match all with prefix.', (t) => {
-
     const root = createNode()
 
     for (const { word, id } of words) {
       radixInsert(root, word, id)
     }
-    const result1 = radixFind(root, { term: 'app'})
-    const expected1={"apple":[0],"app":[1],"apply":[2]}
+    const result1 = radixFind(root, { term: 'app' })
+    const expected1 = { apple: [0], app: [1], apply: [2] }
     t.strictSame(result1, expected1)
 
-    const result2 = radixFind(root, { term: 'app' ,exact:false, tolerance:1})
-    const expected2={"apple":[0],"app":[1],"apply":[2], "apt":[3]}
+    const result2 = radixFind(root, { term: 'app', exact: false, tolerance: 1 })
+    const expected2 = { apple: [0], app: [1], apply: [2], apt: [3] }
     t.strictSame(result2, expected2)
 
-    const result3 = radixFind(root, { term: 'app' ,exact:false, tolerance:2})
-    const expected3={"apple":[0],"app":[1],"apply":[2], "apt":[3], "apex":[4]}
+    const result3 = radixFind(root, { term: 'app', exact: false, tolerance: 2 })
+    const expected3 = { apple: [0], app: [1], apply: [2], apt: [3], apex: [4] }
     t.strictSame(result3, expected3)
 
     t.end()

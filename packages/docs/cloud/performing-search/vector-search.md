@@ -24,7 +24,9 @@ The following guide assumes that you have an **Open AI API key** set on Orama Cl
 
 To perform a vector search with Orama Cloud, you need to populate an Orama index with vectors. Currently, this can be achieved through [automatic embeddings generation](/cloud/orama-ai/automatic-embeddings-generation) during the deployment process.
 
-Once you have at least one index containing vectors, you can perform vector search by using the `searchVector` function:
+As an alternative, you can provide your own vectors while inserting new documents into an Orama index.
+
+Once you have at least one index containing vectors, you can perform vector search by using the `search` function:
 
 ```ts
 import { OramaClient } from '@oramacloud/client'
@@ -34,10 +36,11 @@ const client = new OramaClient({
   api_key: ''
 })
 
-const vectorSearchResults = await client.searchVector({
+const vectorSearchResults = await client.search({
   term: 'Super Mario videogame',
-  threshold: 0.8, // Minimum similarity, between 0 and 1. Default is 0.8 (80% similar).
-  limit: 5        // How many results to return. Default is 10.
+  mode: 'vector',
+  similarity: 0.8, // Minimum similarity, between 0 and 1. Default is 0.8 (80% similar).
+  limit: 5         // How many results to return. Default is 10.
 })
 ```
 

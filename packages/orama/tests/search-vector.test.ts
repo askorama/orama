@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insertMultiple, searchVector } from '../src/index.js'
+import { create, insertMultiple, search } from '../src/index.js'
 
 t.test('create', (t) => {
   t.plan(3)
@@ -10,7 +10,7 @@ t.test('create', (t) => {
         title: 'string',
         description: 'string',
         embedding: 'vector[1536]'
-      }
+      } as const
     })
 
     t.ok(db, 'db instance created')
@@ -22,9 +22,8 @@ t.test('create', (t) => {
         schema: {
           title: 'string',
           description: 'string',
-          // @ts-expect-error error case
           embedding: 'vector[]'
-        }
+        } as const
       })
     } catch (err) {
       t.ok(err, 'error thrown')
@@ -37,9 +36,8 @@ t.test('create', (t) => {
         schema: {
           title: 'string',
           description: 'string',
-          // @ts-expect-error error case
           embedding: 'vector[foo]'
-        }
+        } as const
       })
     } catch (err) {
       t.ok(err, 'error thrown')
@@ -47,7 +45,7 @@ t.test('create', (t) => {
   })
 })
 
-t.test('searchVector', (t) => {
+t.test('search', (t) => {
   t.plan(4)
 
   t.test('should return the most similar vectors', async (t) => {
@@ -56,14 +54,17 @@ t.test('searchVector', (t) => {
     const db = await create({
       schema: {
         vector: 'vector[5]'
-      }
+      } as const
     })
 
     await insertMultiple(db, [{ vector: [1, 1, 1, 1, 1] }, { vector: [0, 1, 1, 1, 1] }, { vector: [0, 0, 1, 1, 1] }])
 
-    const results = await searchVector(db, {
-      vector: [1, 1, 1, 1, 1],
-      property: 'vector',
+    const results = await search(db, {
+      mode: 'vector',
+      vector: {
+        value: [1, 1, 1, 1, 1],
+        property: 'vector'
+      },
       includeVectors: true
     })
 
@@ -81,7 +82,7 @@ t.test('searchVector', (t) => {
         vectors: {
           embedding: 'vector[5]'
         }
-      }
+      } as const
     })
 
     await insertMultiple(db, [
@@ -90,9 +91,12 @@ t.test('searchVector', (t) => {
       { title: 'baz', vectors: { embedding: [0, 0, 1, 1, 1] } }
     ])
 
-    const results = await searchVector(db, {
-      vector: [1, 1, 1, 1, 1],
-      property: 'vectors.embedding',
+    const results = await search(db, {
+      mode: 'vector',
+      vector: {
+        value: [1, 1, 1, 1, 1],
+        property: 'vectors.embedding'
+      },
       includeVectors: true
     })
 
@@ -112,7 +116,7 @@ t.test('searchVector', (t) => {
             vectors: 'vector[5]'
           }
         }
-      }
+      } as const
     })
 
     await insertMultiple(db, [
@@ -121,9 +125,12 @@ t.test('searchVector', (t) => {
       { title: 'baz', deeply: { nested: { vectors: [0, 0, 1, 1, 1] } } }
     ])
 
-    const results = await searchVector(db, {
-      vector: [1, 1, 1, 1, 1],
-      property: 'deeply.nested.vectors',
+    const results = await search(db, {
+      mode: 'vector',
+      vector: {
+        value: [1, 1, 1, 1, 1],
+        property: 'deeply.nested.vectors'
+      },
       includeVectors: true
     })
 
@@ -142,7 +149,7 @@ t.test('searchVector', (t) => {
           embedding: 'vector[5]',
           embedding_2: 'vector[6]'
         }
-      }
+      } as const
     })
 
     await insertMultiple(db, [
@@ -151,15 +158,21 @@ t.test('searchVector', (t) => {
       { title: 'baz', vectors: { embedding: [0, 0, 1, 1, 1], embedding_2: [0.2, 0.2, 0.21, 0.21, 0.21, 0.21] } }
     ])
 
-    const results1 = await searchVector(db, {
-      vector: [1, 1, 1, 1, 1],
-      property: 'vectors.embedding',
+    const results1 = await search(db, {
+      mode: 'vector',
+      vector: {
+        value: [1, 1, 1, 1, 1],
+        property: 'vectors.embedding'
+      },
       includeVectors: true
     })
 
-    const results2 = await searchVector(db, {
-      vector: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
-      property: 'vectors.embedding_2',
+    const results2 = await search(db, {
+      mode: 'vector',
+      vector: {
+        value: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
+        property: 'vectors.embedding_2'
+      },
       includeVectors: true
     })
 
@@ -172,4 +185,73 @@ t.test('searchVector', (t) => {
     t.same((results2.hits[1].document as any).vectors.embedding_2, [0.2, 0.2, 0.21, 0.21, 0.21, 0.21])
     t.same((results2.hits[2].document as any).vectors.embedding_2, [0.2, 0.02, 0.1, 0.1, 0.1, 0.1])
   })
+})
+
+t.test('vector search with where clause', async (t) => {
+  const db = await create({
+    schema: {
+      embedding: 'vector[5]',
+      rating: 'number'
+    } as const
+  })
+
+  const [, id2] = await insertMultiple(db, [
+    { embedding: [1, 1, 1, 1, 1], rating: 4.5 },
+    { embedding: [0, 1, 1, 1, 1], rating: 4.3 },
+    { embedding: [0, 0, 1, 1, 1], rating: 4.1 }
+  ])
+
+  const results = await search(db, {
+    mode: 'vector',
+    vector: {
+      value: [1, 1, 1, 1, 1],
+      property: 'embedding'
+    },
+    where: {
+      rating: {
+        eq: 4.3
+      }
+    }
+  })
+
+  t.same(results.count, 1)
+  t.same(results.hits[0].id, id2)
+})
+
+t.test('vector search with facets', async (t) => {
+  const db = await create({
+    schema: {
+      embedding: 'vector[5]',
+      rating: 'number'
+    } as const
+  })
+
+  await insertMultiple(db, [
+    { embedding: [1, 1, 1, 1, 1], rating: 1 },
+    { embedding: [0, 1, 1, 1, 1], rating: 2 },
+    { embedding: [0, 0, 1, 1, 1], rating: 4 }
+  ])
+
+  const results = await search(db, {
+    mode: 'vector',
+    vector: {
+      value: [1, 1, 1, 1, 1],
+      property: 'embedding'
+    },
+    similarity: 0,
+    facets: {
+      rating: {
+        ranges: [
+          { from: 0, to: 1 },
+          { from: 1, to: 3 },
+          { from: 3, to: 5 }
+        ]
+      }
+    }
+  })
+
+  t.same(results.count, 3)
+  t.same(results.facets?.rating.values['0-1'], 1)
+  t.same(results.facets?.rating.values['1-3'], 2)
+  t.same(results.facets?.rating.values['3-5'], 1)
 })
