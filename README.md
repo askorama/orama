@@ -1,23 +1,23 @@
 <p align="center">
-  <img src="/misc/readme/orama-readme_logo-dark.png#gh-dark-mode-only" />
-  <img src="/misc/readme/orama-readme_logo-light.png#gh-light-mode-only" />
+  <img src="https://website-assets.oramasearch.com/orama-readme-dark.png#gh-dark-mode-only" />
+  <img src="https://website-assets.oramasearch.com/orama-readme-light.png#gh-light-mode-only" />
 </p>
-<br />
 <h4 align="center">
   <a href="https://oramasearch.com?utm_source=github">Website</a> •
   <a href="https://oramasearch.com/blog?utm_source=github">Blog</a> •
   <a href="https://docs.oramasearch.com?utm_source=github">Documentation</a> •
-  <a href="https://orama.to/slack">Slack</a>
+  <a href="https://orama.to/slack">Community Slack</a>
 </h4>
 <br />
 <p align="center">
-  A resilient, innovative and open-source full-text and vector search experience to achieve <br />
-  seamless integration with your infrastructure and data
+  Full-text, vector, and hybrid search with a unique API. <br />
+  On your browser, server, mobile app, or at the edge. <br />
+  In less than 2kb.
 </p>
 <br />
-<p align="center">
-  <img src="/misc/readme/orama-readme_runs-dark.png#gh-dark-mode-only" />
-  <img src="/misc/readme/orama-readme_runs-light.png#gh-light-mode-only" />
+<p align="center" style="margin-top:5px;margin-bottom:35px">
+  <img src="https://website-assets.oramasearch.com/orama-readme-runtime-dark.png#gh-dark-mode-only" />
+  <img src="https://website-assets.oramasearch.com/orama-readme-runtime-light.png#gh-light-mode-only" />
 </p>
 
 [![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
