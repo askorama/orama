@@ -1,6 +1,6 @@
 <p align="center">
-  <img src="https://website-assets.oramasearch.com/orama-readme-dark.png#gh-dark-mode-only" />
-  <img src="https://website-assets.oramasearch.com/orama-readme-light.png#gh-light-mode-only" />
+  <img src="/misc/orama-readme-dark.png#gh-dark-mode-only" />
+  <img src="/misc/orama-readme-light.png#gh-light-mode-only" />
 </p>
 <h4 align="center">
   <a href="https://oramasearch.com?utm_source=github">Website</a> •
@@ -16,8 +16,8 @@
 </p>
 <br />
 <p align="center" style="margin-top:5px;margin-bottom:35px">
-  <img src="https://website-assets.oramasearch.com/orama-readme-runtime-dark.png#gh-dark-mode-only" />
-  <img src="https://website-assets.oramasearch.com/orama-readme-runtime-light.png#gh-light-mode-only" />
+  <img src="/misc/orama-readme-runtime-dark.png#gh-dark-mode-only" />
+  <img src="/misc/orama-readme-runtime-light.png#gh-light-mode-only" />
 </p>
 
 [![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
