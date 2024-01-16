@@ -152,6 +152,7 @@ export default defineConfig({
               items: [
                 { text: 'Introduction', link: '/cloud/data-sources/native-integrations/introduction.html' },
                 { text: 'Shopify', link: '/cloud/data-sources/native-integrations/shopify.html' },
+                { text: 'ElasticPath', link: '/cloud/data-sources/native-integrations/elasticpath.html' },
                 { text: 'Docusaurus', link: '/cloud/data-sources/native-integrations/docusaurus.html' }
               ]
             },
