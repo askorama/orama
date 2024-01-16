@@ -91,7 +91,7 @@ const searchResult = await search(db, {
           lon: 9.18998
         },
         unit: 'm',        // The unit of measurement. The default is "m" (meters)
-        value: 100,       // The radius length. In that case, 1km
+        value: 1000,      // The radius length. In that case, 1km
         inside: true      // Whether we want to return the documents inside or outside the radius. The default is "true"
       }
     }
