@@ -88,7 +88,7 @@ export function isInsideWebWorker(): boolean {
 }
 
 export function isInsideNode(): boolean {
-  return typeof process !== 'undefined' && process.release.name === 'node'
+  return typeof process !== 'undefined' && process.release && process.release.name === 'node' 
 }
 
 export function getNanosecondTimeViaPerformance() {
