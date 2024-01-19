@@ -8,22 +8,18 @@ An Orama index is essentially a collection of Orama documents that share the fol
 
 - **Schema** \
 All documents in a given index must follow the same schema.
-- **Language** \
-Every index is associated with a language. This is used to determine the language of the documents in the index and to apply language-specific analyzers at index time and at search time.
-- **Components** \
-A component is a building block of an index. An example of component can be a tokenizer, stemmer, or a collection of stop-words.
+- **Embeddings configuration** \
+If you want to perform either vector or hybrid search on your index, you'll have to generate embeddings. 
 
 Depending on your subscription, you may have more or less limitations when it comes to indexes.
-,,
-| Subscription | Max. Indexes         | Max. Documents   | Max. Size | Max. data size in aggregate |
-| ------------ | -------------------- | ---------------- | --------- | --------------------------- |
-| Free         | Unlimited            | 10,000           | 10 MB     | 100 GB                      |
-| Pro          | Unlimited            | Unlimited        | Unlimited | Unlimited                   |
-| Enterprise   | Unlimited            | Unlimited        | Unlimited | Unlimited                   |
 
-Regardless of your subscription, you can create as many indexes as you want, as long as they don't exceed the maximum data size in aggregate.
+| Subscription | Max. Indexes         | Max. Documents   | Max. Size |
+| ------------ | -------------------- | ---------------- | --------- |
+| Free         | Unlimited            | 10,000           | 10 MB     |
+| Pro          | Unlimited            | 100,000          | 100MB     |
+| Enterprise   | Unlimited            | Unlimited        | Unlimited |
 
-By _**maximum data size in aggregate**_, we mean the sum of the sizes of all the documents in all the indexes you have created.
+Regardless of your subscription, you can create as many indexes as you want.
 
 ## Index Types
 
@@ -37,10 +33,8 @@ where the main purpose is to provide a fast and reliable search experience, with
 Orama Cloud integrates natively with many different data sources, including:
 
 - [Shopify](/cloud/data-sources/native-integrations/shopify)
+- [ElasticPath](/cloud/data-sources/native-integrations/elasticpath)
 - [Docusaurus](/cloud/data-sources/native-integrations/docusaurus)
-- _Strapi (coming soon)_
-- _Contentful (coming soon)_
-- _Storyblok (coming soon)_
 
 And many more to come.
 

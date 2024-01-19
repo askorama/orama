@@ -65,7 +65,7 @@ t.test('syncBoundedLevenshtein substrings are ok even if with tolerance pppppp',
   t.match(await boundedLevenshtein('Dhris', 'Cris', 0), { isBounded: false, distance: -1 })
   t.match(await boundedLevenshtein('Dhris', 'Cris', 1), { isBounded: false, distance: -1 })
   t.match(await boundedLevenshtein('Dhris', 'Cris', 2), { isBounded: true, distance: 2 })
-  
+
   t.match(await boundedLevenshtein('Dhris', 'Caig', 0), { isBounded: false, distance: -1 })
   t.match(await boundedLevenshtein('Dhris', 'Caig', 1), { isBounded: false, distance: -1 })
   t.match(await boundedLevenshtein('Dhris', 'Caig', 2), { isBounded: false, distance: -1 })

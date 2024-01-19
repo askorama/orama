@@ -53,8 +53,8 @@ t.test('getAllPluginsByHook', async (t) => {
       plugins: [plugin1(), plugin2(), plugin3()]
     })
 
-    const beforeInsertPlugins = getAllPluginsByHook(db, 'beforeInsert')
-    const afterSearchPlugins = getAllPluginsByHook(db, 'afterSearch')
+    const beforeInsertPlugins = await getAllPluginsByHook(db, 'beforeInsert')
+    const afterSearchPlugins = await getAllPluginsByHook(db, 'afterSearch')
 
     t.equal(beforeInsertPlugins.length, 3)
     t.equal(afterSearchPlugins.length, 2)
@@ -154,7 +154,7 @@ t.only('plugin', async (t) => {
 
     t.equal(data[0], '[Logger] beforeInsert: 1 - {"id":"1","name":"John Doe"}')
     t.equal(data[1], '[Logger] afterInsert: 1 - {"id":"1","name":"John Doe"}')
-    t.equal(data[2], '[Logger] beforeSearch: {"term":"john","relevance":{"k":1.2,"b":0.75,"d":0.5}}')
+    t.equal(data[2], '[Logger] beforeSearch: {"term":"john"}')
     t.equal(data[3], '[Logger] afterSearch: {"term":"john","relevance":{"k":1.2,"b":0.75,"d":0.5}} - undefined')
     t.equal(data[4], '[Logger] beforeInsertMultiple: [{"id":"2","name":"Jane Doe"},{"id":"3","name":"Jim Doe"}]')
     t.equal(data[9], '[Logger] afterInsertMultiple: [{"id":"2","name":"Jane Doe"},{"id":"3","name":"Jim Doe"}]')

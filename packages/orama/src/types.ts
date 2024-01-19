@@ -1,3 +1,4 @@
+import { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from './constants.js'
 import { DocumentsStore } from './components/documents-store.js'
 import { Index } from './components/index.js'
 import { DocumentID, InternalDocumentID, InternalDocumentIDStore } from './components/internal-document-id-store.js'
@@ -257,36 +258,55 @@ export type OnlyStrings<T extends any[]> = T[number] extends infer V ? (V extend
 
 export type SortByParams<T extends AnyOrama, ResultDocument> = SorterParams<T> | CustomSorterFunction<ResultDocument>
 
-export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> = {
+export type SearchMode = typeof MODE_FULLTEXT_SEARCH | typeof MODE_HYBRID_SEARCH | typeof MODE_VECTOR_SEARCH
+
+// eslint-disable-next-line
+export interface SearchParamsBase<T extends AnyOrama, ResultDocument = TypedDocument<T>> {}
+
+export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = TypedDocument<T>>
+  extends SearchParamsBase<T, ResultDocument> {
   /**
-   * The word to search.
+   * The term, sentence, or word to search.
    */
   term?: string
+
+  /**
+   * Search mode. Tell Orama to perform either a fulltext search, a vector search or a hybrid search.
+   * By default, Orama will perform a full-text search.
+   */
+  mode?: typeof MODE_FULLTEXT_SEARCH
+
   /**
    * The properties of the document to search in.
    */
   properties?: '*' | FlattenSchemaProperty<T>[]
+
   /**
    * The number of matched documents to return.
    */
   limit?: number
+
   /**
    * The number of matched documents to skip.
    */
   offset?: number
+
   /**
    * The key of the document used to sort the result.
    */
   sortBy?: SortByParams<T, ResultDocument>
+
   /**
    * Whether to match the term exactly.
    */
   exact?: boolean
+
   /**
    * The maximum [levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
    * between the term and the searchable property.
    */
   tolerance?: number
+
   /**
    * The BM25 parameters to use.
    *
@@ -304,6 +324,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    * @see https://en.wikipedia.org/wiki/Okapi_BM25
    */
   relevance?: BM25Params
+
   /**
    * The boost to apply to the properties.
    *
@@ -325,6 +346,7 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    * // In that case, the score of the 'title' property will be multiplied by 2.
    */
   boost?: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>
+
   /**
    * Facets configuration
    * Full documentation: https://docs.oramasearch.com/open-source/usage/search/facets
@@ -444,7 +466,245 @@ export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> 
    * // }
    */
   preflight?: boolean
+
+  /**
+   * Whether to include the vectors in the result.
+   * By default, Orama will not include the vectors, as they can be quite large.
+   * If set to "false" (default), vectors will be presented as "null".
+   */
+  includeVectors?: boolean
 }
+
+export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDocument<T>>
+  extends SearchParamsBase<T, ResultDocument> {
+  /**
+   * The vector used to perform vector similarity search.
+   * Since "mode" is set to "hybrid", Orama will perform a full-text search and a vector search,
+   * therefore, you have to provide a "term" property as well when setting the "vector" property.
+   *
+   * @example
+   * const result = await search(db, {
+   *  term: 'Noise cancelling headphones',
+   *  vector: {
+   *    value: [0.1, 0.2, 0.3],
+   *    property: 'embedding'
+   *  }
+   * })
+   */
+  vector?: {
+    value: Array<number> | VectorType
+    property: string
+  }
+
+  /**
+   * The term, sentence, or word to search.
+   * @example
+   * const result = await search(db, {
+   *   term: 'Noise cancelling headphones',
+   *   mode: 'hybrid',
+   * })
+   */
+  term: string
+
+  /**
+   * Search mode. Tell Orama to perform either a fulltext search, a vector search or a hybrid search.
+   * By default, Orama will perform a full-text search.
+   */
+  mode: typeof MODE_HYBRID_SEARCH
+
+  /**
+   * The properties of the document to search in (for the full-text search part).
+   */
+  properties?: '*' | FlattenSchemaProperty<T>[]
+
+  /**
+   * The BM25 parameters to use.
+   *
+   * k: Term frequency saturation parameter.
+   * The higher the value, the more important the term frequency becomes.
+   * The default value is 1.2. It should be set to a value between 1.2 and 2.0.
+   *
+   * b: Document length saturation impact. The higher the value, the more
+   * important the document length becomes. The default value is 0.75.
+   *
+   * d: Frequency normalization lower bound. Default value is 0.5.
+   *
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/BM25-algorithm
+   *
+   * @see https://en.wikipedia.org/wiki/Okapi_BM25
+   */
+  relevance?: BM25Params
+
+  /**
+   * The number of matched documents to return.
+   * By default, Orama will return 10 of each (10 for full-text search, and 10 for vector search).
+   */
+  limit?: number
+
+  /**
+   * The number of matched documents to skip.
+   * By default, Orama will skip 0 of each (0 for full-text search, and 0 for vector search).
+   */
+  offset?: number
+
+  /**
+   * Similarity threshold for the vector search.
+   * By default, Orama will use 0.8.
+   */
+  similarity?: number
+
+  /**
+   * Whether to include the vectors in the result.
+   * By default, Orama will not include the vectors, as they can be quite large.
+   * If set to "false" (default), vectors will be presented as "null".
+   */
+  includeVectors?: boolean
+
+  /**
+   * Groups configuration
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/grouping
+   */
+  groupBy?: GroupByParams<T, ResultDocument>
+
+  /**
+   * Filter the search results.
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/filters
+   */
+  where?: Partial<WhereCondition<T['schema']>>
+
+  /**
+   * Threshold to use for refining the search results.
+   * The threshold is a number between 0 and 1 that represents the minimum score of the documents to return.
+   * By default, the threshold is 1. Only applies to the full-text search.
+   *
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/threshold
+   */
+  threshold?: number
+
+  /**
+   * The boost to apply to the properties.
+   *
+   * The boost is a number that is multiplied to the score of the property.
+   * It can be used to give more importance to some properties. Only applies to the full-text search.
+   *
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/fields-boosting
+   */
+  boost?: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>
+
+  /**
+   * Facets configuration
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/facets
+   *
+   * A facet is a feature that allows users to narrow down their search results by specific
+   * attributes or characteristics, such as category, price, or location.
+   * This can help users find more relevant and specific results for their search query.
+   */
+  facets?: FacetsParams<T>
+}
+
+export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDocument<T>>
+  extends SearchParamsBase<T, ResultDocument> {
+  /**
+   * Search mode. Tell Orama to perform either a fulltext search, a vector search or a hybrid search.
+   * By default, Orama will perform a full-text search.
+   */
+  mode: typeof MODE_VECTOR_SEARCH
+
+  /**
+   * The search term. If used with the Orama Secure Proxy, this will be converted into a vector automatically for you.
+   *
+   * @example
+   * import { pluginSecureProxy } from '@orama/plugin-secure-proxy'
+   *
+   * const db = await create({
+   *   schema: {
+   *     title: 'string',
+   *     description: 'string',
+   *     embedding: 'vector[3]',
+   *   },
+   *   plugins: [
+   *     await pluginSecureProxy({ apiKey: '', defaultProperty: 'embedding' })
+   *   ]
+   * });
+   *
+   * const result = await search(db, {
+   *   mode: 'vector',
+   *   term: 'Noise cancelling headphones',
+   * });
+   */
+  term?: string
+
+  /**
+   * The vector used to perform vector similarity search.
+   *
+   * @example
+   * const db = await create({
+   *   schema: {
+   *     embeddings: 'vector[3]'
+   *   }
+   * })
+   *
+   * const result = await search(db, {
+   *   mode: 'vector',
+   *   vector {
+   *     value: [0.1, 0.2, 0.3],
+   *     property: 'embedding',
+   *   }
+   * })
+   */
+  vector?: {
+    value: Array<number> | VectorType
+    property: string
+  }
+
+  /**
+   * The minimum similarity score between the vector and the document.
+   * By default, Orama will use 0.8.
+   */
+  similarity?: number
+
+  /**
+   * Filter the search results.
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/filters
+   */
+  where?: Partial<WhereCondition<T['schema']>>
+
+  /**
+   * Facets configuration
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/facets
+   */
+  facets?: FacetsParams<T>
+
+  /**
+   * Groups configuration
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/grouping
+   */
+  groupBy?: GroupByParams<T, ResultDocument>
+
+  /**
+   * The number of matched documents to return.
+   * By default, Orama will return 10.
+   */
+  limit?: number
+
+  /**
+   * The number of matched documents to skip.
+   * By default, Orama will skip 0.
+   */
+  offset?: number
+
+  /**
+   * Whether to include the vectors in the result.
+   * By default, Orama will not include the vectors, as they can be quite large.
+   * If set to "false" (default), vectors will be presented as "null".
+   */
+  includeVectors?: boolean
+}
+
+export type SearchParams<T extends AnyOrama, ResultDocument = TypedDocument<T>> =
+  | SearchParamsFullText<T, ResultDocument>
+  | SearchParamsHybrid<T, ResultDocument>
+  | SearchParamsVector<T, ResultDocument>
 
 export type Result<Document> = {
   /**
@@ -474,19 +734,23 @@ export type GroupResult<Document> = {
   result: Result<Document>[]
 }[]
 
-export type TokenScore = [InternalDocumentID, number]
+export type TokenScore = [id: InternalDocumentID, score: number]
 
 export type TokenMap = Record<string, TokenScore[]>
 
 export type IndexMap = Record<string, TokenMap>
 
-export type SearchContext<T extends AnyOrama, ResultDocument = TypedDocument<T>> = {
+export type SearchContext<
+  T extends AnyOrama,
+  ResultDocument = TypedDocument<T>,
+  P = SearchParams<T, ResultDocument>
+> = {
   timeStart: bigint
   tokenizer: Tokenizer
   index: T['index']
   documentsStore: T['documentsStore']
   language: string | undefined
-  params: SearchParams<T, ResultDocument>
+  params: P
   docsCount: number
   uniqueDocsIDs: Record<number, number>
   indexMap: IndexMap
@@ -498,24 +762,64 @@ export type ElapsedTime = {
   formatted: string
 }
 
+export interface HybridResultsBase<Document> {
+  /**
+   * The number of all the matched documents, combining vector and full-text search. Will contain duplicated results between vector and full-text search.
+   */
+  count: number
+
+  /**
+   * All the matched elements from the full-text search.
+   */
+  hits: Result<Document>[]
+
+  /**
+   * The time taken to search.
+   */
+  elapsed: ElapsedTime
+
+  /**
+   * The facets results. Includes full-text search facets only.
+   */
+  facets?: FacetResult
+
+  /**
+   * The groups results. Includes full-text search groups only.
+   */
+  groups?: GroupResult<Document>
+}
+
+export interface HybridResultsCombine<Document> extends HybridResultsBase<Document> {
+  /**
+   * All the matched elements from the vector search.
+   */
+  hitsVector: Result<Document>[]
+}
+
 export type Results<Document> = {
   /**
    * The number of all the matched documents.
    */
   count: number
+
   /**
    * An array of matched documents taking `limit` and `offset` into account.
    */
   hits: Result<Document>[]
+
   /**
    * The time taken to search.
    */
   elapsed: ElapsedTime
+
   /**
    * The facets results.
    */
   facets?: FacetResult
 
+  /**
+   * The groups results.
+   */
   groups?: GroupResult<Document>
 }
 
@@ -938,7 +1242,7 @@ export type AnyOrama<TSchema = any> = FunctionComponents<TSchema> &
   ArrayCallbackComponents<any> &
   OramaID & { plugins: OramaPlugin[] }
 
-export type OramaPlugin = {
+export type OramaPluginSync = {
   name: string
   beforeInsert?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
   afterInsert?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
@@ -964,3 +1268,7 @@ export type OramaPlugin = {
   beforeUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
   afterUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
 }
+
+export type OramaPluginAsync = Promise<OramaPluginSync>
+
+export type OramaPlugin = OramaPluginSync | OramaPluginAsync

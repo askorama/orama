@@ -1,6 +1,6 @@
 {
   "name": "@orama/orama",
-  "version": "2.0.0-beta.11",
+  "version": "2.0.1",
   "type": "module",
   "description": "Next generation full-text and vector search engine, written in TypeScript",
   "sideEffects": false,
@@ -92,7 +92,6 @@
     "c8": "^7.12.0",
     "commitizen": "^4.2.6",
     "cronometro": "^1.1.5",
-    "execa": "^6.1.0",
     "glob": "^9.2.3",
     "prettier": "^2.8.1",
     "tap": "^18.6.1",

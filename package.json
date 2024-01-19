@@ -1,6 +1,6 @@
 {
   "name": "orama-monorepo",
-  "version": "2.0.0-beta.11",
+  "version": "2.0.1",
   "description": "Next generation full-text and vector search engine, written in TypeScript",
   "workspaces": [
     "packages/*",
@@ -44,7 +44,6 @@
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-n": "^16.0.2",
     "eslint-plugin-promise": "^6.1.1",
-    "execa": "^6.1.0",
     "husky": "^8.0.2",
     "lint-staged": "^13.1.0",
     "semver": "^7.3.8",

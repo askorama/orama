@@ -6,7 +6,6 @@ t.test('search method', (t) => {
   t.test('with term', async (t) => {
     const [db, id1, id2, id3, id4] = await createSimpleDB()
 
-    
     t.test('should return all the document on empty string', async (t) => {
       const result = await search(db, {
         term: ''
@@ -286,7 +285,6 @@ t.test('search method', (t) => {
       t.strictSame(new Set(tolerantSearch.hits.map((d) => d.id)), new Set([id1, id2]))
     })
 
-
     t.test('should correctly match with tolerance. even if prefix doesnt match.', async (t) => {
       const db = await create({
         schema: {
@@ -321,10 +319,9 @@ t.test('search method', (t) => {
       const result5 = await search(db, { term: 'Caig', tolerance: 1 })
       t.equal(result5.count, 1)
       t.end()
-      
     })
 
-    //issue#544 
+    //issue#544
     //bug both words apple and apply arent matching even after PR#580
     t.test('match exact prefix , along with tolerance', async (t) => {
       // Creating the database
@@ -340,18 +337,18 @@ t.test('search method', (t) => {
         }
       })
 
-      await insert(db, { word: 'apt' });
-      await insert(db, { word: 'apple' });
-      await insert(db, { word: 'app' });
-      await insert(db, { word: 'apply' });
-      await insert(db, { word: 'about' });
-      await insert(db, { word: 'again' });
+      await insert(db, { word: 'apt' })
+      await insert(db, { word: 'apple' })
+      await insert(db, { word: 'app' })
+      await insert(db, { word: 'apply' })
+      await insert(db, { word: 'about' })
+      await insert(db, { word: 'again' })
 
       // Searching for 'app' with a tolerance of 1
-      const result = await search(db, { term: 'app', tolerance: 1 });
+      const result = await search(db, { term: 'app', tolerance: 1 })
 
       //apt,app,apple,apply should match.
-      t.equal(result.count, 4, 'Should match 4 words for "app" with tolerance 1');
+      t.equal(result.count, 4, 'Should match 4 words for "app" with tolerance 1')
       t.end()
     })
     t.end()
@@ -766,20 +763,20 @@ t.test('search method', (t) => {
   t.end()
 })
 
-t.test('fix-544', async t => {
+t.test('fix-544', async (t) => {
   const db = await create({
     schema: {
-      name: 'string',
+      name: 'string'
     } as const,
     components: {
       tokenizer: {
         stemming: true,
-        stopWords: englishStopwords,
-      },
-    },
+        stopWords: englishStopwords
+      }
+    }
   })
 
-  await insert(db, { name: "Christopher" })
+  await insert(db, { name: 'Christopher' })
   let result
 
   result = await search(db, { term: 'Chris', tolerance: 0 })
@@ -787,11 +784,66 @@ t.test('fix-544', async t => {
 
   result = await search(db, { term: 'Chris', tolerance: 1 })
   t.equal(result.count, 1)
-  
+
   result = await search(db, { term: 'Chris', tolerance: 2 })
   t.equal(result.count, 1)
 
   t.end()
+})
+
+t.test('fix-601', async t => {
+  const db = await create({
+    schema: {
+      name: 'string'
+    } as const
+  })
+
+  Object.prototype['examplePrototypeFunction'] = () => {};
+
+  await insert(db, { name: 'John Doe' });
+  const result = await search(db, { term: 'John Doe' });
+
+  t.equal(result.count, 1);
+  t.end()
+})
+
+t.test('full-text search with vector properties', async (t) => {
+  t.test("shouldn't return vectors unless explicitly specified", async (t) => {
+    const db = await create({
+      schema: {
+        text: 'string',
+        embeddings: {
+          first: 'vector[2]',
+          second: 'vector[2]'
+        }
+      } as const
+    })
+
+    await insert(db, {
+      text: 'foo',
+      embeddings: {
+        first: [1, 2],
+        second: [3, 4]
+      }
+    })
+
+    await insert(db, {
+      text: 'bar',
+      embeddings: {
+        first: [5, 6],
+        second: [7, 8]
+      }
+    })
+
+    const result2 = await search(db, {
+      term: 'foo'
+    })
+
+    t.strictSame(
+      result2.hits.map((hit) => hit.document.embeddings),
+      [{ first: null, second: null }]
+    )
+  })
 })
 
 async function createSimpleDB() {

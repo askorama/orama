@@ -163,7 +163,7 @@ export async function create<
   }
 
   for (const hook of AVAILABLE_PLUGIN_HOOKS) {
-    orama[hook] = (orama[hook] ?? []).concat(getAllPluginsByHook(orama, hook))
+    orama[hook] = (orama[hook] ?? []).concat(await getAllPluginsByHook(orama, hook))
   }
 
   return orama

@@ -89,6 +89,7 @@ export default function SearchBar(): JSX.Element {
 
               const results = await oramaSearch(database, {
                 term,
+                mode: 'fulltext',
                 properties: ['sectionTitle', 'sectionContent', 'type']
               })
 

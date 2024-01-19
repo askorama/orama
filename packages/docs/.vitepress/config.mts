@@ -29,6 +29,7 @@ export default defineConfig({
   },
 
   vite: {
+    // @ts-ignore
     plugins: [OramaPlugin()]
   },
 
@@ -74,6 +75,7 @@ export default defineConfig({
               items: [
                 { text: 'Searching with Orama', link: '/open-source/usage/search/introduction.html' },
                 { text: 'Vector Search', link: '/open-source/usage/search/vector-search.html' },
+                { text: 'Hybrid Search', link: '/open-source/usage/search/hybrid-search.html' },
                 { text: 'Fields Boosting', link: '/open-source/usage/search/fields-boosting.html' },
                 { text: 'Facets', link: '/open-source/usage/search/facets.html' },
                 { text: 'Filters', link: '/open-source/usage/search/filters.html' },
@@ -104,6 +106,7 @@ export default defineConfig({
             { text: 'Writing your own plugins', link: '/open-source/plugins/writing-your-own-plugins.html' },
             { text: 'Plugin Vitepress', link: '/open-source/plugins/plugin-vitepress.html' },
             { text: 'Plugin Docusaurus', link: '/open-source/plugins/plugin-docusaurus.html' },
+            { text: 'Plugin Secure Proxy', link: '/open-source/plugins/plugin-secure-proxy.html' },
             { text: 'Plugin Telemetry', link: '/open-source/plugins/plugin-telemetry.html' },
             { text: 'Plugin Astro', link: '/open-source/plugins/plugin-astro.html' },
             { text: 'Plugin Data Persistence', link: '/open-source/plugins/plugin-data-persistence.html' },
@@ -149,6 +152,7 @@ export default defineConfig({
               items: [
                 { text: 'Introduction', link: '/cloud/data-sources/native-integrations/introduction.html' },
                 { text: 'Shopify', link: '/cloud/data-sources/native-integrations/shopify.html' },
+                { text: 'ElasticPath', link: '/cloud/data-sources/native-integrations/elasticpath.html' },
                 { text: 'Docusaurus', link: '/cloud/data-sources/native-integrations/docusaurus.html' }
               ]
             },
@@ -168,7 +172,8 @@ export default defineConfig({
         {
           text: 'Orama AI',
           items: [
-            { text: 'Automatic embeddings generation', link: '/cloud/orama-ai/automatic-embeddings-generation.html' }
+            { text: 'Automatic embeddings generation', link: '/cloud/orama-ai/automatic-embeddings-generation.html' },
+            { text: 'Orama Secure Proxy', link: '/cloud/orama-ai/orama-secure-proxy.html' }
           ]
         },
         {
@@ -176,7 +181,8 @@ export default defineConfig({
           collapsed: false,
           items: [
             { text: 'Full-text search', link: '/cloud/performing-search/full-text-search.html' },
-            { text: 'Vector search', link: '/cloud/performing-search/vector-search.html' }
+            { text: 'Vector search', link: '/cloud/performing-search/vector-search.html' },
+            { text: 'Hybrid search', link: '/cloud/performing-search/hybrid-search.html' },
           ]
         },
         {

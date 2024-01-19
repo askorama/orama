@@ -23,7 +23,7 @@ This plugin will look for all the `.md` files in your documentation directory an
 After the installation via the package manager of your choice, you can import the plugin in your `.vitepress/config.js` file:
 
 ```js
-import { OramaPlugin } from '@orama/plugin-nextra'
+import { OramaPlugin } from '@orama/plugin-vitepress'
 
 export default {
   // ...

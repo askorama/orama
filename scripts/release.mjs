@@ -14,6 +14,7 @@ const packages = [
   'plugin-nextra',
   'plugin-parsedoc',
   'plugin-telemetry',
+  'plugin-secure-proxy',
   'stemmers',
   'stopwords'
 ]

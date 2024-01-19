@@ -1,4 +1,4 @@
-import type { AnyDocument, GeosearchDistanceUnit, SearchableValue, TokenScore } from './types.js'
+import type { AnyDocument, GeosearchDistanceUnit, Results, SearchableValue, TokenScore } from './types.js'
 import { createError } from './errors.js'
 
 const baseId = Date.now().toString().slice(5)
@@ -82,6 +82,19 @@ export async function formatBytes(bytes: number, decimals = 2): Promise<string> 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
+export function isInsideWebWorker(): boolean {
+  // @ts-expect-error - WebWorker global scope
+  return typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope
+}
+
+export function isInsideNode(): boolean {
+  return typeof process !== 'undefined' && process.release && process.release.name === 'node' 
+}
+
+export function getNanosecondTimeViaPerformance() {
+  return BigInt(Math.floor(performance.now() * 1e6))
+}
+
 export async function formatNanoseconds(value: number | bigint): Promise<string> {
   if (typeof value === 'number') {
     value = BigInt(value)
@@ -99,12 +112,20 @@ export async function formatNanoseconds(value: number | bigint): Promise<string>
 }
 
 export async function getNanosecondsTime(): Promise<bigint> {
+  if (isInsideWebWorker()) {
+    return getNanosecondTimeViaPerformance()
+  }
+
+  if (isInsideNode()) {
+    return process.hrtime.bigint()
+  }
+
   if (typeof process !== 'undefined' && process.hrtime !== undefined) {
     return process.hrtime.bigint()
   }
 
   if (typeof performance !== 'undefined') {
-    return BigInt(Math.floor(performance.now() * 1e6))
+    return getNanosecondTimeViaPerformance()
   }
 
   // @todo: fallback to V8 native method to get microtime
@@ -292,4 +313,25 @@ export function convertDistanceToMeters(distance: number, unit: GeosearchDistanc
   }
 
   return distance * ratio
+}
+
+export function removeVectorsFromHits(searchResult: Results<AnyDocument>, vectorProperties: string[]): void {
+  searchResult.hits = searchResult.hits.map((result) => ({
+    ...result,
+    document: {
+      ...result.document,
+      // Remove embeddings from the result
+      ...vectorProperties.reduce((acc, prop) => {
+        const path = prop.split('.')
+        const lastKey = path.pop()!
+        let obj = acc
+        for (const key of path) {
+          obj[key] = obj[key] ?? {}
+          obj = obj[key] as any
+        }
+        obj[lastKey] = null
+        return acc
+      }, result.document)
+    }
+  }))
 }

@@ -71,6 +71,7 @@ function OramaSearchPlugin({ router, ...props }) {
     if (searchTerm) {
       searchWithHighlight(indexes[locale], {
         term: searchTerm,
+        mode: 'fulltext',
         limit: props.limitResults,
         boost: props.boost
       }).then((results) => {

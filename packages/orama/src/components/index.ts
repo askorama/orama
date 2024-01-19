@@ -14,6 +14,7 @@ import type {
   SearchableType,
   SearchableValue,
   SearchContext,
+  SearchParamsFullText,
   Tokenizer,
   TokenScore,
   TypedDocument,
@@ -57,7 +58,7 @@ import {
   searchByPolygon
 } from '../trees/bkd.js'
 
-import { convertDistanceToMeters, intersect, safeArrayPush } from '../utils.js'
+import { convertDistanceToMeters, intersect, safeArrayPush, getOwnProperty } from '../utils.js'
 import { BM25 } from './algorithms.js'
 import { getMagnitude } from './cosine-similarity.js'
 import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
@@ -171,7 +172,7 @@ export async function removeTokenScoreParameters(index: Index, prop: string, tok
 }
 
 export async function calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-  context: SearchContext<T, ResultDocument>,
+  context: SearchContext<T, ResultDocument, SearchParamsFullText<T, ResultDocument>>,
   index: Index,
   prop: string,
   term: string,
@@ -471,7 +472,7 @@ export async function remove(
 }
 
 export async function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-  context: SearchContext<T, ResultDocument>,
+  context: SearchContext<T, ResultDocument, SearchParamsFullText<T, ResultDocument>>,
   index: Index,
   prop: string,
   term: string
@@ -489,9 +490,13 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
   const searchResult = radixFind(node, { term, exact, tolerance })
   const ids = new Set<InternalDocumentID>()
 
-  for (const key in searchResult) {
-    for (const id of searchResult[key]) {
-      ids.add(id)
+  for(const key in searchResult){
+    //skip keys inherited from prototype
+    const ownProperty = getOwnProperty(searchResult, key);
+    if(!ownProperty) continue;
+
+    for (const id of searchResult[key]){
+        ids.add(id);
     }
   }
 
