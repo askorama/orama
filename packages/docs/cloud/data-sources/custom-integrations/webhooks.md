@@ -63,11 +63,29 @@ For example, if you want your live index to only contains the two following docu
 
 You can use the **snapshot** API to bulk update the live index:
 
-```bash
+:::code-group
+
+```bash [cURL]
 curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/snapshot \
   -H "authorization: Bearer $PRIVATE_API_KEY" ]
   -d '[ { "id": "1", "name": "John Doe", "age": 30 }, { "id": "2", "name": "Jane Doe", "age": 25 } ]'
 ```
+
+```js [JavaScript]
+fetch(`https://api.oramasearch.com/api/v1/webhooks/${INDEX_ID}/snapshot`, {
+  method: 'POST',
+  headers: {
+    'authorization': `Bearer ${PRIVATE_API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify([
+    { id: 1, name: 'John Doe', age: 30 },
+    { id: 2, name: 'Jane Doe', age: 25 }
+  ])
+})
+```
+
+:::
 
 ## Updating, removing, inserting elements in a live index
 
@@ -87,21 +105,55 @@ Let's say you want to add a new document:
 
 you can use the **notify** API to put that operation in queue for the next deployment:
 
-```bash
+:::code-group
+
+```bash [cURL]
 curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
   -H "authorization: Bearer $PRIVATE_API_KEY" \
   -d '{ "upsert": [{ "id": "3", "name": "Rick Morty", "age": 80 }] }'
 ```
 
+```js [JavaScript]
+fetch(`https://api.oramasearch.com/api/v1/webhooks/${INDEX_ID}/notify`, {
+  method: 'POST',
+  headers: {
+    'authorization': `Bearer ${PRIVATE_API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    upsert: [{ id: '3', name: 'Rick Morty', age: 80 }]
+  })
+})
+```
+
+:::
+
 as you can see, you'll need to pass an array of objects to an `upsert` operation (will do that based on the `id` field). If Orama find that document, it will update it, otherwise it will insert a new one.
 
 You can always remove an existing document by using the `remove` operation. For example, this is how you can remove the document with id `"2"`:
 
-```bash
+:::code-group
+
+```bash [cURL]
 curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
   -H "authorization: Bearer $PRIVATE_API_KEY" \
   -d '{ "remove": ["2"] }'
 ```
+
+```js [JavaScript]
+fetch(`https://api.oramasearch.com/api/v1/webhooks/${INDEX_ID}/notify`, {
+  method: 'POST',
+  headers: {
+    'authorization': `Bearer ${PRIVATE_API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    remove: ['2']
+  })
+})
+```
+
+:::
 
 ## Deploying the index
 
@@ -109,10 +161,24 @@ After you have inserted a snapshot or put a number of insert, remove, or update 
 
 You can easily do that via the deploy API:
 
-```bash
+:::code-group
+
+```bash [cURL]
 curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/deploy \
   -X POST \
   -H "Authorization: Bearer $PRIVATE_API_KEY"
 ```
+
+```js [JavaScript]
+fetch(`https://api.oramasearch.com/api/v1/webhooks/${INDEX_ID}/deploy`, {
+  method: 'POST',
+  headers: {
+    'authorization': `Bearer ${PRIVATE_API_KEY}`,
+    'Content-Type': 'application/json'
+  }
+})
+```
+
+:::
 
 This will trigger a new deployment and will make the new index available worldwide in just a few minutes.

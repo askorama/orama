@@ -81,8 +81,104 @@ With the default configuration, the users can perform at most 100 requests every
 
 Make sure to configure these limits accordingly to your traffic patterns!
 
-## Performing hybrid and vector search
+### Encrypting chat messages and prompts
 
-Once the Orama Secure Proxy is configured, you can finally perform vector and hybrid search from the frontend securely.
+By selecting the "Encrypt chat messages" option, the Secure Proxy will provide end-to-end encryption for all your messages. This feature helps to protect your custom prompts, which are part of your intellectual property.
 
-If you're using Orama Open Source, install the `@orama/plugin-secure-proxy` and follow the instructions provided in the [official documentation page](/open-source/plugins/plugin-secure-proxy.html).
+## Using the Secure Proxy
+
+The Secure Proxy can be used in two ways:
+
+1. Using the `@orama/plugin-secure-proxy` npm package (see [the official plugin documentation](/open-source/plugins/plugin-secure-proxy.html) for details). This will allow you to perform hybrid and vector search with your Orama OSS instance with very little configuration.
+2. Using the `@oramacloud/client` npm package.
+
+By utilizing the `@oramacloud/client` npm package, you can generate embeddings and interact with OpenAI's GPT browser models without exposing your OpenAI API key or prompts to your users.
+
+### Generating embeddings
+
+To generate text embeddings, simply import the OramaProxy class, initialize it, and call the generateEmbeddings method:
+
+```js
+import { OramaProxy } from '@oramacloud/client'
+
+const proxy = new OramaProxy({
+  api_key: '<YOUR API KEY>'
+})
+
+const embeddings = await proxy.generateEmbeddings(
+  'Red leather shoes',
+  'orama/gte-small' // Specify the model you want to use
+)
+
+console.log(embeddings)
+// [-0.019633075, -0.00820422, -0.013555876, -0.011825735, 0.006641511, -0.012948156, ...]
+```
+
+Available models are:
+
+- `orama/gte-small`
+- `openai/text-embedding-ada-002`
+
+More models and providers will come soon.
+
+### Performing chat completion requests
+
+Thanks to the Orama Secure Proxy, you can execute chat completion requests directly from your browsers.
+
+You can accomplish this in two ways: either store the entire response in a single variable, or stream the response from OpenAI using asynchronous iterators.
+
+**Using a single variable**:
+
+```js
+import { OramaProxy } from '@oramacloud/client' 
+
+const proxy = new OramaProxy({
+  api_key: '<YOUR API KEY>'
+})
+
+const chatParams = {
+  model '<YOUR API KEY>',
+  messages: [{ role: 'user', content: 'Who is Michael Scott?' }]
+}
+
+const response = await proxy.chat(chatParams)
+console.log(response)
+
+// "Michael Scott is a fictional character from the television show "The Office" (US version) ..."
+```
+
+**Using async iterators**:
+
+```js
+import { OramaProxy } from '@oramacloud/client' 
+
+const proxy = new OramaProxy({
+  api_key: 'zrqplaxa-H46c3f-D9vk8Fg_eJlomMP3'
+})
+
+const chatParams = {
+  model 'openai/gpt-4',
+  messages: [{ role: 'user', content: 'Who is Michael Scott?' }]
+}
+
+for await (const message of proxy.chatStream(chatParams)) {
+  console.log(message)
+}
+
+// Michael
+// Scott is
+// a fictional
+//  character from the
+//  television show 
+// "The
+// Office" (US
+// version)
+// ...
+```
+
+In both cases, the available models are:
+
+- `openai/gpt-4-1106-preview`
+- `openai/gpt-4`
+- `openai/gpt-3.5-turbo`
+- `openai/gpt-3.5-turbo-16k`
