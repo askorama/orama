@@ -175,3 +175,10 @@ for await (const message of proxy.chatStream(chatParams)) {
 // version)
 // ...
 ```
+
+In both cases, the available models are:
+
+- `openai/gpt-4-1106-preview`
+- `openai/gpt-4`
+- `openai/gpt-3.5-turbo`
+- `openai/gpt-3.5-turbo-16k`
