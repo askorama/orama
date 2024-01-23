@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useMemo, useState } from 'react'
 import useBaseUrl from '@docusaurus/useBaseUrl'
 import useIsBrowser from '@docusaurus/useIsBrowser'

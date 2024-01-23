@@ -1,36 +1,39 @@
 import { readFileSync, writeFileSync } from 'node:fs'
+import type { Plugin } from '@docusaurus/types'
 import { cp } from 'node:fs/promises'
 import { gzip as gzipCB } from 'node:zlib'
 import { promisify } from 'node:util'
 import { resolve } from 'node:path'
+// @ts-ignore
 import { presets } from '@orama/searchbox'
 import { create, insertMultiple, save } from '@orama/orama'
 import { JSDOM } from 'jsdom'
 import MarkdownIt from 'markdown-it'
 import matter from 'gray-matter'
+import { LoadedContent, type LoadedVersion } from "@docusaurus/plugin-content-docs"
 
-export default function OramaPluginDocusaurus(ctx, options) {
-  let versions = []
+export default function OramaPluginDocusaurus(ctx: { siteDir: any; generatedFilesDir: any }): Plugin {
+  let versions: any[] = []
 
   return {
     name: '@orama/plugin-docusaurus-v3',
 
-    getPathsToWatch() {
-      return [getThemePath()]
+    getThemePath() {
+      return '../lib/theme';
     },
 
-    getThemePath() {
-      return getThemePath()
+    getTypeScriptThemePath() {
+      return '../src/theme';
     },
 
     getClientModules() {
-      return [resolve(getThemePath(), 'SearchBar/index.css')]
+      return ['../lib/theme/SearchBar/index.css'];
     },
 
     async contentLoaded({ actions, allContent }) {
       const isDevelopment = process.env.NODE_ENV === 'development'
 
-      const loadedVersions = allContent['docusaurus-plugin-content-docs']?.default?.loadedVersions
+      const loadedVersions = (allContent['docusaurus-plugin-content-docs']?.default as LoadedContent)?.loadedVersions
       versions = loadedVersions.map((v) => v.versionName)
 
       await Promise.all(
@@ -62,18 +65,18 @@ export default function OramaPluginDocusaurus(ctx, options) {
   }
 }
 
-async function buildDevSearchData(siteDir, generatedFilesDir, allContent, version) {
+async function buildDevSearchData(siteDir: string, generatedFilesDir: string, allContent: any, version: string) {
   const loadedVersion = allContent['docusaurus-plugin-content-docs']?.default?.loadedVersions?.find(
-    (v) => v.versionName === version
+    (v: LoadedVersion) => v.versionName === version
   )
-  const blogs = allContent['docusaurus-plugin-content-blog']?.default?.blogPosts?.map(({ metadata }) => metadata) ?? []
+  const blogs = allContent['docusaurus-plugin-content-blog']?.default?.blogPosts?.map(({ metadata }: any) => metadata) ?? []
   const pages = allContent['docusaurus-plugin-content-pages']?.default ?? []
   const docs = loadedVersion?.docs ?? []
 
   const oramaDocs = [
-    ...(await Promise.all(blogs.map((data) => generateDocs(siteDir, data, version)))),
-    ...(await Promise.all(pages.map((data) => generateDocs(siteDir, data, version)))),
-    ...(await Promise.all(docs.map((data) => generateDocs(siteDir, data, version))))
+    ...(await Promise.all(blogs.map((data: any) => generateDocs(siteDir, data)))),
+    ...(await Promise.all(pages.map((data: any) => generateDocs(siteDir, data)))),
+    ...(await Promise.all(docs.map((data: any) => generateDocs(siteDir, data))))
   ]
     .flat()
     .map((data) => ({
@@ -88,7 +91,7 @@ async function buildDevSearchData(siteDir, generatedFilesDir, allContent, versio
     schema: presets.docs.schema
   })
 
-  await insertMultiple(db, oramaDocs)
+  await insertMultiple(db, oramaDocs as any)
 
   const serializedOrama = JSON.stringify(await save(db))
   const gzipedOrama = await gzip(serializedOrama)
@@ -96,9 +99,7 @@ async function buildDevSearchData(siteDir, generatedFilesDir, allContent, versio
   writeFileSync(indexPath(generatedFilesDir, version), gzipedOrama)
 }
 
-async function generateDocs(siteDir, content, version) {
-  const { title, permalink, source } = content
-
+async function generateDocs(siteDir: string, { title, permalink, source }: Record<string, string>) {
   const fileContent = readFileSync(source.replace('@site', siteDir), 'utf-8')
   const contentWithoutFrontMatter = matter(fileContent).content
 
@@ -109,27 +110,27 @@ async function generateDocs(siteDir, content, version) {
   })
 }
 
-function parseHTMLContent({ html, path, originalTitle }) {
+function parseHTMLContent({ html, path, originalTitle }: {html: any, path: any, originalTitle: any }) {
   const dom = new JSDOM(html)
   const document = dom.window.document
 
-  const sections = []
+  const sections: { originalTitle: any; title: string; header: string; content: string; path: any }[] = []
 
   const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6')
   headers.forEach((header) => {
-    const sectionTitle = header.textContent.trim()
+    const sectionTitle = header.textContent?.trim()
     const headerTag = header.tagName.toLowerCase()
     let sectionContent = ''
 
     let sibling = header.nextElementSibling
     while (sibling && !['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(sibling.tagName)) {
-      sectionContent += sibling.textContent.trim() + '\n'
+      sectionContent += sibling.textContent?.trim() + '\n'
       sibling = sibling.nextElementSibling
     }
 
     sections.push({
       originalTitle,
-      title: sectionTitle,
+      title: sectionTitle ?? '',
       header: headerTag,
       content: sectionContent,
       path
@@ -139,12 +140,8 @@ function parseHTMLContent({ html, path, originalTitle }) {
   return sections
 }
 
-function indexPath(outDir, version) {
+function indexPath(outDir: string, version: string) {
   return resolve(outDir, 'orama-search-index-@VERSION@.json.gz'.replace('@VERSION@', version))
 }
 
 const gzip = promisify(gzipCB)
-
-function getThemePath() {
-  return new URL('../client/theme', import.meta.url).pathname
-}
