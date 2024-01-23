@@ -507,7 +507,13 @@
     "title": "Fire Emblem: Three Houses",
     "description": "Here, order is maintained by the Church of Seiros, which hosts the prestigious Officer’s Academy within its headquarters. You are invited to teach one of its three mighty houses, each comprised of students brimming with personality and represented by a royal from one of three territories. As their professor, you must lead your students in their academic lives and in turn-based, tactical RPG battles wrought with strategic, new twists to overcome. Which house, and which path, will you choose?",
     "rating": 4,
-    "genres": ["Adventure", "RPG", "Strategy", "Tactical", "Turn Based Strategy"]
+    "genres": [
+      "Adventure",
+      "RPG",
+      "Strategy",
+      "Tactical",
+      "Turn Based Strategy"
+    ]
   },
   {
     "title": "Grand Theft Auto: San Andreas",
@@ -543,7 +549,13 @@
     "title": "Fire Emblem Engage",
     "description": "Become the Divine Dragon and save the continent of Elyos!\n             \n\n              Summon valiant heroes like Marth & Celica alongside a new cast of characters and engage in turn-based, tactical combat against a great evil in this new Fire Emblem story.",
     "rating": 3.9,
-    "genres": ["Adventure", "RPG", "Strategy", "Tactical", "Turn Based Strategy"]
+    "genres": [
+      "Adventure",
+      "RPG",
+      "Strategy",
+      "Tactical",
+      "Turn Based Strategy"
+    ]
   },
   {
     "title": "Pokémon Violet",
@@ -1107,7 +1119,13 @@
     "title": "Plants vs. Zombies",
     "description": "Zombies are invading your home, and the only defense is your arsenal of plants! Armed with an alien nursery-worth of zombie-zapping plants like peashooters and cherry bombs, you'll need to think fast and plant faster to stop dozens of types of zombies dead in their tracks.",
     "rating": 3.7,
-    "genres": ["Puzzle", "Real Time Strategy", "Simulator", "Strategy", "Tactical"]
+    "genres": [
+      "Puzzle",
+      "Real Time Strategy",
+      "Simulator",
+      "Strategy",
+      "Tactical"
+    ]
   },
   {
     "title": "Ori and the Blind Forest",
@@ -1689,7 +1707,14 @@
     "title": "Needy Streamer Overload",
     "description": "NEEDY STREAMER OVERLOAD is a “multi-ending ADV” depicting daily life with “OMGkawaiiAngel-chan”, a young girl with a rather extreme need for approval attempting to become the #1 “Internet Angel” (streamer).",
     "rating": 3.5,
-    "genres": ["Adventure", "Indie", "Point-and-Click", "RPG", "Simulator", "Visual Novel"]
+    "genres": [
+      "Adventure",
+      "Indie",
+      "Point-and-Click",
+      "RPG",
+      "Simulator",
+      "Visual Novel"
+    ]
   },
   {
     "title": "Borderlands",
@@ -1911,7 +1936,13 @@
     "title": "Digimon Survive",
     "description": "This is a story of survival in a strange new world.\n             \n\n              Celebrating the 20th Anniversary of the Digimon Anime, Digimon Survive presents a brand-new adventure set in a mysterious world with characters designed by Uichi Ukumo, and music by the much-acclaimed Tomoki Miyoshi.\n             \n\n              Digimon Survive sees a brand-new group of teenagers, led by Takuma Momozuka, get lost on a school camping trip, finding them transported to a strange new world of monsters and danger.\n             \n\n              As they fight their way back home through an animated world of difficult decisions and deadly battles, players’ choices throughout the game will impact the evolution of their monster allies, and the final ending. Battles in the game are fought in 2D, in a more classic SRPG style.",
     "rating": 3.4,
-    "genres": ["Adventure", "RPG", "Simulator", "Strategy", "Turn Based Strategy"]
+    "genres": [
+      "Adventure",
+      "RPG",
+      "Simulator",
+      "Strategy",
+      "Turn Based Strategy"
+    ]
   },
   {
     "title": "Spiritfarer",
@@ -3411,7 +3442,14 @@
     "title": "Needy Streamer Overload",
     "description": "NEEDY STREAMER OVERLOAD is a “multi-ending ADV” depicting daily life with “OMGkawaiiAngel-chan”, a young girl with a rather extreme need for approval attempting to become the #1 “Internet Angel” (streamer).",
     "rating": 3.5,
-    "genres": ["Adventure", "Indie", "Point-and-Click", "RPG", "Simulator", "Visual Novel"]
+    "genres": [
+      "Adventure",
+      "Indie",
+      "Point-and-Click",
+      "RPG",
+      "Simulator",
+      "Visual Novel"
+    ]
   },
   {
     "title": "Borderlands",
@@ -3524,7 +3562,7 @@
   {
     "title": "Final Fantasy XVI",
     "description": "Final Fantasy XVI is an upcoming action role-playing game developed and published by Square Enix. It is the sixteenth game in the mainline Final Fantasy series and will be released for the PlayStation 5. It is being produced by Naoki Yoshida and directed by Hiroshi Takai.",
-    "rating": null,
+    "rating": 3.5,
     "genres": ["RPG"]
   },
   {
@@ -3657,7 +3695,15 @@
     "title": "Into the Breach",
     "description": "The remnants of human civilization are threatened by gigantic creatures breeding beneath the earth. You must control powerful mechs from the future to hold off this alien threat. Each attempt to save the world presents a new randomly generated challenge in this turn-based strategy game from the makers of FTL.",
     "rating": 3.9,
-    "genres": ["Card & Board Game", "Indie", "Puzzle", "RPG", "Simulator", "Strategy", "Turn Based Strategy"]
+    "genres": [
+      "Card & Board Game",
+      "Indie",
+      "Puzzle",
+      "RPG",
+      "Simulator",
+      "Strategy",
+      "Turn Based Strategy"
+    ]
   },
   {
     "title": "Marvel Snap",
@@ -3896,7 +3942,7 @@
   {
     "title": "Death Stranding 2",
     "description": "",
-    "rating": null,
+    "rating": 3.5,
     "genres": ["Adventure", "Shooter"]
   },
   {
@@ -4280,7 +4326,7 @@
   {
     "title": "Final Fantasy VII Rebirth",
     "description": "This next standalone chapter in the FINAL FANTASY VII remake trilogy",
-    "rating": null,
+    "rating": 3.5,
     "genres": [""]
   },
   {
@@ -4299,7 +4345,14 @@
     "title": "Utawarerumono: Mask of Truth",
     "description": "\"The epic story of Utawarerumono comes to an end in Mask of Truth, as the fate of the world will be determined by warring nations. The game features exciting SRPG battles, a colorful cast of new/familiar faces that will determine the fate of their world, a rousing original soundtrack, and the dramatic conclusion to the journey of Haku.\n             \n\n              After the events of Mask of Deception, Haku is destined to rally the nation of Ennakamuy to fight against the evil forces that now control the Yamato throne. With everything on the line, Haku and his friends must do everything in their power to ensure that the future of Yamato triumphs over the true evil that lurks in the depth of the darkness.\"",
     "rating": 4.4,
-    "genres": ["Adventure", "RPG", "Simulator", "Strategy", "Tactical", "Visual Novel"]
+    "genres": [
+      "Adventure",
+      "RPG",
+      "Simulator",
+      "Strategy",
+      "Tactical",
+      "Visual Novel"
+    ]
   },
   {
     "title": "Hitman World of Assassination",
@@ -4316,7 +4369,7 @@
   {
     "title": "Lies of P",
     "description": "Inspired by the familiar story of Pinocchio, Lies of P is an action souls-like game set in a dark Belle Époque world. Guide Pinocchio on his unrelenting journey to become human.",
-    "rating": null,
+    "rating": 3.5,
     "genres": ["RPG"]
   },
   {
@@ -4358,7 +4411,7 @@
   {
     "title": "Judas",
     "description": "A disintegrating starship. A desperate escape plan. You are the mysterious and troubled Judas. Your only hope for survival is to make or break alliances with your worst enemies. Will you work together to fix what you broke – or will you leave it to burn?",
-    "rating": null,
+    "rating": 3.5,
     "genres": ["Adventure", "Shooter"]
   },
   {
@@ -4478,7 +4531,7 @@
   {
     "title": "Like a Dragon Gaiden: The Man Who Erased His Name",
     "description": "This game covers Kiryu's story between Yakuza 7 and Like a Dragon 8.",
-    "rating": null,
+    "rating": 3.5,
     "genres": ["Adventure", "Brawler", "RPG"]
   },
   {
@@ -5834,7 +5887,7 @@
   {
     "title": "The Legend of Zelda: Tears of the Kingdom",
     "description": "The Legend of Zelda: Tears of the Kingdom is the sequel to The Legend of Zelda: Breath of the Wild. The setting for Link’s adventure has been expanded to include the skies above the vast lands of Hyrule.",
-    "rating": null,
+    "rating": 3.5,
     "genres": ["Adventure", "RPG"]
   },
   {
@@ -6782,7 +6835,7 @@
   {
     "title": "Star Wars Jedi: Survivor",
     "description": "The story of Cal Kestis continues in Star Wars Jedi: Survivor, a third-person, galaxy-spanning, action-adventure game from Respawn Entertainment, developed in collaboration with Lucasfilm Games. This narratively driven, single-player title picks up five years after the events of Star Wars Jedi: Fallen Order and follows Cal’s increasingly desperate fight as the galaxy descends further into darkness. Pushed to the edges of the galaxy by the Empire, Cal will find himself surrounded by threats new and familiar. As one of the last surviving Jedi Knights, Cal is driven to make a stand during the galaxy’s darkest times — but how far is he willing to go to protect himself, his crew, and the legacy of the Jedi Order?",
-    "rating": null,
+    "rating": 3.5,
     "genres": ["Adventure"]
   },
   {
@@ -6915,7 +6968,13 @@
     "title": "Spore",
     "description": "From Single Cell to Galactic God, evolve your creature in a universe of your own creations. Play through Spore's five evolutionary stages: Cell, Creature, Tribe, Civilization, and Space. Each stage has its own unique style, challenges, and goals.",
     "rating": 3.3,
-    "genres": ["Adventure", "Real Time Strategy", "RPG", "Simulator", "Strategy"]
+    "genres": [
+      "Adventure",
+      "Real Time Strategy",
+      "RPG",
+      "Simulator",
+      "Strategy"
+    ]
   },
   {
     "title": "Dwarf Fortress",
@@ -6962,7 +7021,7 @@
   {
     "title": "We Love Katamari Reroll + Royal Reverie",
     "description": "We Love Katamari Reroll + Royal Reverie is a remake of the PS2 game We Love Katamari.",
-    "rating": null,
+    "rating": 3.5,
     "genres": ["Adventure", "Puzzle"]
   },
   {
@@ -7214,7 +7273,7 @@
   {
     "title": "Earthblade",
     "description": "You are Névoa, an enigmatic child of Fate returning at long last to Earth, in this explor-action platformer from the creators of Celeste. Earthblade's lush pixel art world offers seamless exploration, challenging combat, and countless mysteries to pick apart.",
-    "rating": null,
+    "rating": 3.5,
     "genres": ["Adventure", "Indie", "RPG"]
   },
   {
@@ -7317,7 +7376,13 @@
     "title": "World of Horror",
     "description": "Experience the quiet terror of this 1-bit love letter to Junji Ito and H.P. Lovecraft. Navigate a hellish roguelite reality with turn-based combat and unforgiving choices. Experiment with your deck of event cards to discover new forms of cosmic horror in every playthrough. The inevitable awaits...",
     "rating": 3.7,
-    "genres": ["Adventure", "Indie", "Point-and-Click", "RPG", "Turn Based Strategy"]
+    "genres": [
+      "Adventure",
+      "Indie",
+      "Point-and-Click",
+      "RPG",
+      "Turn Based Strategy"
+    ]
   },
   {
     "title": "Fire Emblem: Shadow Dragon",
@@ -7832,7 +7897,7 @@
   {
     "title": "Diablo IV",
     "description": "Endless demons to slaughter. Deep customization through Talents, Skill Points, Runes, and Legendary loot. Randomized dungeons contained in a dynamic open world. Survive and conquer darkness—or succumb to the shadows.",
-    "rating": null,
+    "rating": 3.5,
     "genres": ["Brawler", "RPG"]
   },
   {
@@ -8048,7 +8113,7 @@
   {
     "title": "Pac-Man in a Tin",
     "description": "Pac-Man in a Tin is a pocket-sized tin contains the classic arcade game in all its 8-bit glory.",
-    "rating": null,
+    "rating": 3.5,
     "genres": ["Arcade"]
   },
   {
@@ -8096,7 +8161,7 @@
   {
     "title": "Pokémon Añil",
     "description": "Pokémon Añil is the fourth video game created by EricLostie after \"Pokémon Opalo\". Kanto returns, but this time from a perspective never seen before, with a much deeper story and improved graphics.",
-    "rating": null,
+    "rating": 3.5,
     "genres": ["RPG"]
   },
   {
@@ -9063,7 +9128,13 @@
     "title": "Baldur's Gate 3",
     "description": "An ancient evil has returned to Baldur's Gate, intent on devouring it from the inside out. The fate of Faerun lies in your hands. Alone, you may resist. But together, you can overcome.",
     "rating": 4.1,
-    "genres": ["Adventure", "RPG", "Strategy", "Tactical", "Turn Based Strategy"]
+    "genres": [
+      "Adventure",
+      "RPG",
+      "Strategy",
+      "Tactical",
+      "Turn Based Strategy"
+    ]
   },
   {
     "title": "The LEGO Movie Videogame",
