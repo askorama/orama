@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
 
-Orama plugin for generating embeddings securely on the front-end.
+Orama plugin for generating embeddings and performing vector/hybrid search securely on the front-end.
 
 # Usage
 

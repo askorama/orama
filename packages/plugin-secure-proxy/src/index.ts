@@ -10,6 +10,7 @@ export type SecureProxyPluginOptions = {
 export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): Promise<OramaPluginAsync> {
   if (!pluginParams.apiKey) throw new Error('Missing "apiKey" parameter for plugin-telemetry')
   if (!pluginParams.defaultProperty) throw new Error('Missing "defaultProperty" parameter for plugin-telemetry')
+  if (!pluginParams.model) throw new Error('Missing "model" parameter for plugin-telemetry')
 
   const proxy = new OramaProxy({
     api_key: pluginParams.apiKey,
@@ -36,7 +37,8 @@ export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions):
 
       if (!params.vector) {
         params.vector = {
-          // @ts-expect-error - vector param is not present in full-text search
+          // eslint-disable-next-line
+          // @ts-ignore
           property: params?.vector?.property ?? pluginParams.defaultProperty,
           value: embeddings
         }
