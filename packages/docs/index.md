@@ -12,9 +12,6 @@ hero:
     - theme: alt
       text: View on GitHub
       link: https://github.com/oramasearch/orama
-  image:
-    src: /misc/orama-card.png
-    alt: Orama
 
 features:
   - title: Hybrid model
