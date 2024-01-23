@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -599,6 +599,10 @@ importers:
         version: 5.0.3
 
   packages/plugin-secure-proxy:
+    dependencies:
+      '@oramacloud/client':
+        specifier: ^1.0.3
+        version: 1.0.3(typescript@5.0.3)
     devDependencies:
       '@orama/orama':
         specifier: workspace:*
@@ -7048,6 +7052,11 @@ packages:
     engines: {node: '>= 16.0.0'}
     dev: false
 
+  /@orama/orama@2.0.1:
+    resolution: {integrity: sha512-9HUHToE93yvDGcmnEELNynG4kmzSrhSElnfLN9UFPO9ZwfHVPp1NvALli7rm1F/Bqdgi6YM6dEXKmPJUQnwiHg==}
+    engines: {node: '>= 16.0.0'}
+    dev: false
+
   /@orama/searchbox@1.0.0-beta.11(@orama/highlight@0.1.2)(@orama/orama@packages+orama)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.0)(@preact/signals@1.2.2)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.2):
     resolution: {integrity: sha512-+zai6c0N31A+m0W3rU+JiiY9Lp7VYURmc+GMmzQhwv0ny9SbZLDZ5lliPenqoR/B0Si9RI/4IPHVJ4AsY9D+vg==}
     peerDependencies:
@@ -7102,6 +7111,17 @@ packages:
     resolution: {integrity: sha512-yubgcBA1LrxpxkJlc4KG+pafHaKaQhmm/xG2cAtQtHKNQULcSHYpWUoKoypoj4XQxFHb9QoTSl2HptXXZFYX6g==}
     dependencies:
       '@orama/orama': 1.2.11
+      '@paralleldrive/cuid2': 2.2.2
+      react: 18.2.0
+      vue: 3.3.10(typescript@5.0.3)
+    transitivePeerDependencies:
+      - typescript
+    dev: false
+
+  /@oramacloud/client@1.0.3(typescript@5.0.3):
+    resolution: {integrity: sha512-M2YCrms2x7uJdf/Q/LiDPMOe7AwY9iJbetcY3noKfHEMNmk7oQLSpLZ+1qjacj9H3iEFabtcF2jhDdodixYhDg==}
+    dependencies:
+      '@orama/orama': 2.0.1
       '@paralleldrive/cuid2': 2.2.2
       react: 18.2.0
       vue: 3.3.10(typescript@5.0.3)

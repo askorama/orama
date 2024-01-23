@@ -18,16 +18,24 @@ const db = await create({
   schema: {
     title: 'string',
     description: 'string',
-    embeddings: 'vector[1536]'
+    embeddings: 'vector[384]'
   },
   plugins: [
     pluginSecureProxy({
       apiKey: '<API-KEY>',
-      defaultProperty: 'embeddings'
+      defaultProperty: 'embeddings',
+      model: 'orama/gte-small'
     })
   ]
 })
 ```
+
+Available models:
+
+- `orama/gte-small`. 384 dimensions.
+- `openai/text-embedding-ada-002`. 1536 dimensions.
+
+Mode models coming soon!
 
 For the full configuration guide of this plugin, please follow the [official plugin documentation](https://docs.oramasearch.com/open-source/plugins/plugin-secure-proxy).
 
