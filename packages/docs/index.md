@@ -13,7 +13,7 @@ hero:
       text: View on GitHub
       link: https://github.com/oramasearch/orama
   image:
-    src: /orama-icon-large.png
+    src: /misc/orama-card.png
     alt: Orama
 
 features:
