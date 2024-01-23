@@ -429,10 +429,10 @@ importers:
         specifier: ^0.1.2
         version: 0.1.2
       '@orama/orama':
-        specifier: workspace:*
+        specifier: ^2.0.1
         version: link:../orama
       '@orama/plugin-parsedoc':
-        specifier: workspace:*
+        specifier: ^2.0.1
         version: link:../plugin-parsedoc
       '@orama/searchbox':
         specifier: 1.0.0-beta.11
@@ -452,6 +452,9 @@ importers:
       pako:
         specifier: ^2.1.0
         version: 2.1.0
+      tslib:
+        specifier: ^2.6.0
+        version: 2.6.2
       vfile-message:
         specifier: ^3.1.4
         version: 3.1.4
@@ -4743,7 +4746,7 @@ packages:
       react-dom: 17.0.2(react@17.0.2)
       remark-emoji: 2.2.0
       stringify-object: 3.3.0
-      tslib: 2.5.3
+      tslib: 2.6.2
       unified: 9.2.2
       unist-util-visit: 2.0.3
       url-loader: 4.1.1(file-loader@6.2.0)(webpack@5.89.0)
@@ -4866,7 +4869,7 @@ packages:
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
       reading-time: 1.5.0
-      tslib: 2.5.3
+      tslib: 2.6.2
       unist-util-visit: 2.0.3
       utility-types: 3.10.0
       webpack: 5.89.0(@swc/core@1.3.27)
@@ -4954,7 +4957,7 @@ packages:
       lodash: 4.17.21
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
-      tslib: 2.5.3
+      tslib: 2.6.2
       utility-types: 3.10.0
       webpack: 5.89.0(@swc/core@1.3.27)
     transitivePeerDependencies:
@@ -5032,7 +5035,7 @@ packages:
       fs-extra: 10.1.0
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
-      tslib: 2.5.3
+      tslib: 2.6.2
       webpack: 5.89.0(@swc/core@1.3.27)
     transitivePeerDependencies:
       - '@parcel/css'
@@ -5560,7 +5563,7 @@ packages:
         optional: true
     dependencies:
       '@docusaurus/types': 2.4.3(@swc/core@1.3.27)(react-dom@17.0.2)(react@17.0.2)
-      tslib: 2.5.3
+      tslib: 2.6.2
     dev: false
 
   /@docusaurus/utils-common@3.0.1(@docusaurus/types@3.0.1):
@@ -5635,7 +5638,7 @@ packages:
       micromatch: 4.0.5
       resolve-pathname: 3.0.0
       shelljs: 0.8.5
-      tslib: 2.5.3
+      tslib: 2.6.2
       url-loader: 4.1.1(file-loader@6.2.0)(webpack@5.89.0)
       webpack: 5.89.0(@swc/core@1.3.27)
     transitivePeerDependencies:
@@ -7047,7 +7050,7 @@ packages:
   /@orama/highlight@0.1.2:
     resolution: {integrity: sha512-B48PnxFwRRHBeEIkmKI38tZmpQDWdt6o4bch5dZaChdZh0pwPHtostMv++eVlNv3/qLtfcdLoSYHWvoN9Mp0Lw==}
     dependencies:
-      '@orama/orama': 2.0.0-beta.10
+      '@orama/orama': 2.0.1
     dev: false
 
   /@orama/orama@1.2.11:
@@ -7055,8 +7058,8 @@ packages:
     engines: {node: '>= 16.0.0'}
     dev: false
 
-  /@orama/orama@2.0.0-beta.10:
-    resolution: {integrity: sha512-gZGuEiOVx1iYJS+qPxHivikViY/3B9YN4nYCPUEdE2XoqsptrjjY4HT82lc4OfXA6gHKp4x/A4fuRTiGHlUktQ==}
+  /@orama/orama@2.0.1:
+    resolution: {integrity: sha512-9HUHToE93yvDGcmnEELNynG4kmzSrhSElnfLN9UFPO9ZwfHVPp1NvALli7rm1F/Bqdgi6YM6dEXKmPJUQnwiHg==}
     engines: {node: '>= 16.0.0'}
     dev: false
 
@@ -16540,7 +16543,7 @@ packages:
   /lower-case@2.0.2:
     resolution: {integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==}
     dependencies:
-      tslib: 2.5.3
+      tslib: 2.6.2
     dev: false
 
   /lowercase-keys@1.0.0:
@@ -21011,7 +21014,7 @@ packages:
   /rxjs@7.8.1:
     resolution: {integrity: sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==}
     dependencies:
-      tslib: 2.5.3
+      tslib: 2.6.2
 
   /s.color@0.0.15:
     resolution: {integrity: sha512-AUNrbEUHeKY8XsYr/DYpl+qk5+aM+DChopnWOPEzn8YKzOhv4l2zH6LzZms3tOZP3wwdOyc0RmTciyi46HLIuA==}
@@ -22695,6 +22698,7 @@ packages:
 
   /tslib@2.5.3:
     resolution: {integrity: sha512-mSxlJJwl3BMEQCUNnxXBU9jP4JBktcEGhURcPR6VQVlnP0FdDEsIaz0C35dXNGLyRfrATNofF0F5p2KPxQgB+w==}
+    dev: false
 
   /tslib@2.6.2:
     resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
