@@ -429,10 +429,10 @@ importers:
         specifier: ^0.1.2
         version: 0.1.2
       '@orama/orama':
-        specifier: ^2.0.1
+        specifier: workspace:*
         version: link:../orama
       '@orama/plugin-parsedoc':
-        specifier: ^2.0.1
+        specifier: workspace:*
         version: link:../plugin-parsedoc
       '@orama/searchbox':
         specifier: 1.0.0-beta.11
