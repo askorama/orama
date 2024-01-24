@@ -614,6 +614,10 @@ importers:
         version: 5.0.3
 
   packages/plugin-secure-proxy:
+    dependencies:
+      '@oramacloud/client':
+        specifier: ^1.0.4
+        version: 1.0.4(typescript@5.0.3)
     devDependencies:
       '@orama/orama':
         specifier: workspace:*
@@ -7117,6 +7121,17 @@ packages:
     resolution: {integrity: sha512-yubgcBA1LrxpxkJlc4KG+pafHaKaQhmm/xG2cAtQtHKNQULcSHYpWUoKoypoj4XQxFHb9QoTSl2HptXXZFYX6g==}
     dependencies:
       '@orama/orama': 1.2.11
+      '@paralleldrive/cuid2': 2.2.2
+      react: 18.2.0
+      vue: 3.3.10(typescript@5.0.3)
+    transitivePeerDependencies:
+      - typescript
+    dev: false
+
+  /@oramacloud/client@1.0.4(typescript@5.0.3):
+    resolution: {integrity: sha512-AsIJBwbUzZWfEtuR78WOOXD4ckjXpgw97scxkqmzp6/Gghp+smWb3pVNnqc16vavNnNJuwMDcL44S874JrWqkA==}
+    dependencies:
+      '@orama/orama': 2.0.1
       '@paralleldrive/cuid2': 2.2.2
       react: 18.2.0
       vue: 3.3.10(typescript@5.0.3)
