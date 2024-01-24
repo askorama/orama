@@ -137,7 +137,7 @@ const proxy = new OramaProxy({
 })
 
 const chatParams = {
-  model '<YOUR API KEY>',
+  model 'openai/gpt-4',
   messages: [{ role: 'user', content: 'Who is Michael Scott?' }]
 }
 
