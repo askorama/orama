@@ -601,8 +601,8 @@ importers:
   packages/plugin-secure-proxy:
     dependencies:
       '@oramacloud/client':
-        specifier: ^1.0.3
-        version: 1.0.3(typescript@5.0.3)
+        specifier: ^1.0.4
+        version: 1.0.4(typescript@5.0.3)
     devDependencies:
       '@orama/orama':
         specifier: workspace:*
@@ -7039,16 +7039,11 @@ packages:
   /@orama/highlight@0.1.2:
     resolution: {integrity: sha512-B48PnxFwRRHBeEIkmKI38tZmpQDWdt6o4bch5dZaChdZh0pwPHtostMv++eVlNv3/qLtfcdLoSYHWvoN9Mp0Lw==}
     dependencies:
-      '@orama/orama': 2.0.0-beta.10
+      '@orama/orama': 2.0.1
     dev: false
 
   /@orama/orama@1.2.11:
     resolution: {integrity: sha512-0yDcWgxOX0je18Z5dR64r4L3Jzm6bDNIpqM7qSu7H+9qhf6EsnlJbICrjt/oJ+WYnwiog4T0OXduVfLwAX+NVA==}
-    engines: {node: '>= 16.0.0'}
-    dev: false
-
-  /@orama/orama@2.0.0-beta.10:
-    resolution: {integrity: sha512-gZGuEiOVx1iYJS+qPxHivikViY/3B9YN4nYCPUEdE2XoqsptrjjY4HT82lc4OfXA6gHKp4x/A4fuRTiGHlUktQ==}
     engines: {node: '>= 16.0.0'}
     dev: false
 
@@ -7118,8 +7113,8 @@ packages:
       - typescript
     dev: false
 
-  /@oramacloud/client@1.0.3(typescript@5.0.3):
-    resolution: {integrity: sha512-M2YCrms2x7uJdf/Q/LiDPMOe7AwY9iJbetcY3noKfHEMNmk7oQLSpLZ+1qjacj9H3iEFabtcF2jhDdodixYhDg==}
+  /@oramacloud/client@1.0.4(typescript@5.0.3):
+    resolution: {integrity: sha512-AsIJBwbUzZWfEtuR78WOOXD4ckjXpgw97scxkqmzp6/Gghp+smWb3pVNnqc16vavNnNJuwMDcL44S874JrWqkA==}
     dependencies:
       '@orama/orama': 2.0.1
       '@paralleldrive/cuid2': 2.2.2

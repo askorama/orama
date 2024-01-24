@@ -56,6 +56,6 @@
     "extends": "src/tests/config/tap.yml"
   },
   "dependencies": {
-    "@oramacloud/client": "^1.0.3"
+    "@oramacloud/client": "^1.0.4"
   }
 }
