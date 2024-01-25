@@ -28,7 +28,8 @@ import { pluginSecureProxy } from '@orama/plugin-secure-proxy'
 
 const secureProxy = secureProxyPlugin({
   apiKey: 'YOUR API KEY',
-  defaultProperty: 'embeddings'
+  defaultProperty: 'embeddings',
+  model: 'openai/text-embedding-ada-002'
 })
 
 const db = await create({
@@ -40,6 +41,15 @@ const db = await create({
   plugins: [secureProxy]
 })
 ```
+
+## Available models
+
+Right now, the Orama Secure Proxy Plugin supports two different models for generating embeddings:
+
+| Model name                     | Provider | Dimensions |
+| ------------------------------ | -------- | ---------- |
+| `orama/gte-small               | Orama    | 384        |
+| `openai/text-embedding-ada-002 | Openai   | 1536       |
 
 ## Running queries
 

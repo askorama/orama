@@ -6,7 +6,7 @@ outline: deep
 
 With Orama Cloud, you can automatically generate embeddings from your data at deployment.
 
-This guide will walk you through the process of creating embeddings using Open AI. We plan to support additional models in the near future.
+This guide will walk you through the process of creating embeddings using the **Orama Native Embeddings** or **Open AI** model. We plan to support additional models in the near future.
 
 ## What are text embeddings?
 
@@ -21,6 +21,28 @@ For a deeper understanding of text embeddings, the Tensorflow website offers a f
 ## Automatic embeddings generation with Orama Cloud
 
 Creating text embeddings from a given text or set of texts can be complex. However, Orama Cloud simplifies this process by enabling automatic generation of these embeddings each time you deploy a new index. This makes it remarkably easy to conduct semantic searches through your data at a remarkable speed.
+
+## Using the Orama Native Embeddings
+
+To perform vector and hybrid searches on your data using the **Orama Native Embeddings**, no configuration is necessary.
+
+When creating or editing an index, simply select an Orama embedding model. This will automatically generate embeddings from your data:
+
+<ZoomImg
+  src='/cloud/guides/automatic-embeddings-generation/orama-native-embeddings.png'
+  alt='Automatic embeddings generation via Orama Native Embeddings'
+/>
+
+Indexes that have automatic embeddings generation enabled will display the icon and the name of the used model in the index list:
+
+<ZoomImg
+  src='/cloud/guides/automatic-embeddings-generation/orama-native-embeddings-label.png'
+  alt='Automatic embeddings generation via Orama Native Embeddings, list view'
+/>
+
+## Using OpenAI
+
+If you prefer to use OpenAI's models, the following section will guide you through the necessary configuration.
 
 ### Connecting to OpenAI
 
@@ -40,7 +62,7 @@ As soon as you have your OpenAI API Key ready, you can add it to Orama Cloud by 
   alt='Adding OpenAI API Key to Orama Cloud'
 />
 
-After adding your API key, you won't be able to view it again due to security measures. You can always delete it, though this is discouraged because all operations dependent on vector search will cease to function. Alternatively, you can replace it with a new key.
+After adding your API key, you won't be able to view it again for security reasons. While you can delete it, this is not recommended as all operations dependent on vector search will cease to function. Alternatively, you may choose to replace it with a new key.
 
 <ZoomImg
   src='/cloud/guides/automatic-embeddings-generation/open-ai-api-key.png'
@@ -60,14 +82,14 @@ Once you have your dataset ready, you can create a new Index:
   alt='Creating a new index on Orama Cloud'
 />
 
-After uploading the file, you can enable the "AI Search". This feature will scan the `"string"` properties in your schema and automatically select them to generate embeddings. You can always select or deselect different properties as needed.
+After uploading the file, you can enable the **Automatic Embeddings Generation** feature. This feature will scan the `"string"` properties in your schema and automatically select them to generate embeddings. You can always select or deselect different properties as needed.
 
 <ZoomImg
   src='/cloud/guides/automatic-embeddings-generation/enable-orama-ai.png'
   alt='Enablin Orama AI on Orama Cloud'
 />
 
-Once you have deployed your index containing embeddings, you can locate it in the indexes list where the "AI Search" column is marked with the icon of the chosen model, such as OpenAI.
+Once you have deployed your index containing embeddings, you can locate it in the indexes list where the "Embeddings" column is marked with the icon of the chosen model, such as OpenAI.
 
 Congratulations! You've just deployed your first automatically-generated embeddings on Orama Cloud!
 
@@ -76,3 +98,9 @@ Congratulations! You've just deployed your first automatically-generated embeddi
 Now that you have your embeddings distributed on Orama Cloud, you can use the [official JavaScript client](/cloud/integrating-orama-cloud/javascript-sdk) to perform vector search on them.
 
 Read more about performing vector search on Orama Cloud [here](/cloud/performing-search/vector-search).
+
+## Pricing
+
+Orama includes embedding generation in its "AI interactions" count. The **Free Unlimited** plan offers a limit of 1,000,000 (one million) AI interactions per month. The **Pro Unlimited** plan includes 1,000,000 AI interactions per month (with no extra charge for exceeding this quota in free months). The **Enterprise** plan provides unlimited AI interactions.
+
+For more precise pricing, please refer to the official [pricing page](https://oramasearch.com/pricing).

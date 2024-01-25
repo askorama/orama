@@ -1,6 +1,6 @@
 {
   "name": "@orama/plugin-secure-proxy",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Orama plugin for generating embeddings securely on the front-end",
   "keywords": [
     "orama",
@@ -41,8 +41,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/node": "^20.9.0",
     "@orama/orama": "workspace:*",
+    "@types/node": "^20.9.0",
     "c8": "^7.12.0",
     "sinon": "^17.0.1",
     "tap": "^18.6.1",
@@ -54,5 +54,8 @@
   },
   "tap": {
     "extends": "src/tests/config/tap.yml"
+  },
+  "dependencies": {
+    "@oramacloud/client": "^1.0.4"
   }
 }

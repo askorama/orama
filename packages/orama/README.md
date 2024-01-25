@@ -242,7 +242,8 @@ import { pluginSecureProxy } from '@orama/plugin-secure-proxy'
 
 const secureProxy = secureProxyPlugin({
   apiKey: '<YOUR-PUBLIC-API-KEY>',
-  defaultProperty: 'embedding' // the default property to perform vector and hybrid search on
+  defaultProperty: 'embedding', // the default property to perform vector and hybrid search on
+  model: 'openai/text-embedding-ada-002' // the model to use to generate embeddings
 })
 
 const db = await create({
