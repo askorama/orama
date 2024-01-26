@@ -9,15 +9,6 @@ interface AstroPage {
   pathname: string
 }
 
-interface AstroConfigDoneArgs {
-  config: AstroConfig
-}
-
-interface AstroBuildDoneArgs {
-  pages: AstroPage[]
-  routes: RouteData[]
-}
-
 const isWindows = process.platform === 'win32'
 const joinPath = (isWindows ? path.win32 : path).join
 
@@ -114,10 +105,10 @@ export function createPlugin(options: Record<string, OramaOptions>): AstroIntegr
   return {
     name: PKG_NAME,
     hooks: {
-      'astro:config:done': function ({ config: cfg }: AstroConfigDoneArgs): void {
+      'astro:config:done': function ({ config: cfg }): void {
         config = cfg
       },
-      'astro:build:done': async function ({ pages, routes, dir }: AstroBuildDoneArgs): Promise<void> {
+      'astro:build:done': async function ({ pages, routes, dir }): Promise<void> {
         const assetsDir = joinPath(config.outDir.pathname, 'assets').slice(isWindows ? 1 : 0)
         if (!existsSync(assetsDir)) {
           mkdirSync(assetsDir)
