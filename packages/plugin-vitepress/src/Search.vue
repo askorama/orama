@@ -13,7 +13,7 @@ onMounted(async () => {
 
   RegisterSearchBox({
     oramaInstance: oramaInstance.default,
-    preset: presets.docusaurus.name,
+    preset: presets.docs.name,
     show: false
   })
 })
