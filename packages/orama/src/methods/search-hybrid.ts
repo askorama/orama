@@ -1,4 +1,4 @@
-import type { AnyOrama, TypedDocument, SearchParamsHybrid, Results, TokenScore, Result } from '../types.js'
+import type { AnyOrama, TypedDocument, SearchParamsHybrid, Results, TokenScore, Result, HybridWeights } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getNanosecondsTime, safeArrayPush, formatNanoseconds, removeVectorsFromHits } from '../utils.js'
 import { intersectFilteredIDs } from '../components/filters.js'
@@ -32,7 +32,8 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
   ])
 
   const { index, docs } = orama.data
-  let uniqueTokenScores = mergeAndRankResults(fullTextIDs, vectorIDs, params.term ?? '')
+  const hybridWeights = params.hybridWeights
+  let uniqueTokenScores = mergeAndRankResults(fullTextIDs, vectorIDs, params.term ?? '', hybridWeights)
 
   // @todo avoid tokenize twice
   const tokens = await orama.tokenizer.tokenize(params.term ?? '', language)
@@ -265,11 +266,12 @@ function hybridScore(textScore: number, vectorScore: number, textWeight: number,
   return textScore * textWeight + vectorScore * vectorWeight
 }
 
-function mergeAndRankResults(textResults: TokenScore[], vectorResults: TokenScore[], query: string) {
+function mergeAndRankResults(textResults: TokenScore[], vectorResults: TokenScore[], query: string, hybridWeights: HybridWeights | undefined) {
   const maxTextScore = Math.max(...textResults.map(([, score]) => score))
   const maxVectorScore = Math.max(...vectorResults.map(([, score]) => score))
+  const hasHybridWeights = hybridWeights && hybridWeights.text && hybridWeights.vector
 
-  const { textWeight, vectorWeight } = getQueryWeights(query)
+  const { text: textWeight, vector: vectorWeight } = hasHybridWeights ? hybridWeights : getQueryWeights(query)
   const mergedResults = new Map()
 
   const textResultsLength = textResults.length
@@ -300,12 +302,12 @@ function mergeAndRankResults(textResults: TokenScore[], vectorResults: TokenScor
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getQueryWeights(query: string) {
+function getQueryWeights(query: string): HybridWeights {
   // In the next versions of Orama, we will ship a plugin containing a ML model to adjust the weights
   // based on whether the query is keyword-focused, conceptual, etc.
   // For now, we just return a fixed value.
   return {
-    textWeight: 0.5,
-    vectorWeight: 0.5
+    text: 0.5,
+    vector: 0.5
   }
 }
