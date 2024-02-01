@@ -47,7 +47,7 @@ await insertMultiple(db, [
   { title: 'Oppenheimer',  embedding: [0.827391, 0.927381, 0.001982, 0.983821, 0.294841] },
 ])
 
-const results = await searchVector(db, {
+const results = await search(db, {
   mode: 'hybrid',
   term: 'The Prestige'
   vector: {
