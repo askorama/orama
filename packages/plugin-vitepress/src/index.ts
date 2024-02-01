@@ -38,10 +38,10 @@ async function createOramaContentLoader(paths: string[], root: string) {
     .flat()
 
   const db = await create({
-    schema: presets.docusaurus.schema
+    schema: presets.docs.schema
   })
 
-  // @ts-ignore
+  // @ts-expect-error - can't strongly type contents here
   await insertMultiple(db, contents)
 
   return persist(db, 'json', 'browser')
