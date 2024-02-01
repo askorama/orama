@@ -164,4 +164,37 @@ t.test('hybrid search', async (t) => {
     t.equal(page3.hits[0].document.number, 4)
     t.equal(page3.hits[1].document.number, 5)
   })
+
+  t.test('should use custom weights correctly', async t => {
+    const db = await create({
+      schema: {
+        text: 'string',
+        embedding: 'vector[5]',
+        number: 'number'
+      } as const
+    })
+
+    await insertMultiple(db, [
+      { text: 'hello world', embedding: [0, 41, 10, 39, 12 ], number: 1 },
+      { text: 'hello world', embedding: [1, 2, 3, 4, 4], number: 2 }
+    ])
+
+    const results = await search(db, {
+      mode: 'hybrid',
+      term: 'hello world',
+      vector: {
+        value: [1, 2, 3, 4, 5],
+        property: 'embedding'
+      },
+      similarity: 1,
+      hybridWeights: {
+        text: 1, // only consider text, which is identical for both documents
+        vector: 0
+      }
+    })
+
+    t.equal(results.count, 2)
+    t.equal(results.hits[0].score, 0.5)
+    t.equal(results.hits[1].score, 0.5)
+  })
 })

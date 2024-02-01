@@ -99,3 +99,28 @@ The returning object will be exactly the same as the one we would expect when pe
 ```
 
 Since vectors can be quite large, you can also choose to not include them in the response by setting `includeVectors` to `false` (default behavior).
+
+## Custom hybrid weights
+
+By default, Orama performs full-text and vector searches concurrently. Then, it aggregates the results and uses default weights to determine which result is more important (the full-text or the vector one) in the final list of results.
+
+You can customize these weights by passing a `hybridWeights` property to the search function:
+
+```js
+const results = await search(db, {
+  mode: 'hybrid',
+  term: 'The Prestige',
+  vector: {
+    value: [0.912729, 0.49271, 0.291728, 0.93819, 0.53618],
+    property: 'embedding'
+  },
+  hybridWeights: {
+    text: 0.8,
+    vector: 0.2
+  }
+})
+```
+
+By default, Orama assigns `0.5` to `text` and `0.5` to `vector`. This means that full-text results and vector results carry the same weight.
+
+However, in the example above, we adjust these weights to `{ text: 0.8, vector: 0.2 }`. This implies that full-text search results will hold more relevance than vector search results in the final list.
