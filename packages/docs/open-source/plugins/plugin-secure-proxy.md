@@ -46,10 +46,14 @@ const db = await create({
 
 Right now, the Orama Secure Proxy Plugin supports two different models for generating embeddings:
 
-| Model name                     | Provider | Dimensions |
-| ------------------------------ | -------- | ---------- |
-| `orama/gte-small               | Orama    | 384        |
-| `openai/text-embedding-ada-002 | Openai   | 1536       |
+| Model name                       | Provider | Dimensions |
+| -------------------------------- | -------- | ---------- |
+| `orama/gte-small`                | Orama    | 384        |
+| `orama/gte-medium`               | Orama    | 768        |
+| `orama/gte-large`                | Orama    | 1024       |
+| `openai/text-embedding-ada-002`  | Openai   | 1536       |
+| `openai/text-embedding-3-small`  | Openai   | 1536       |
+| `openai/text-embedding-3-large`  | Openai   | 3072       |
 
 ## Running queries
 
