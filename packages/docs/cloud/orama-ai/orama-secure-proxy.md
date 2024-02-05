@@ -117,7 +117,11 @@ console.log(embeddings)
 Available models are:
 
 - `orama/gte-small`
+- `orama/gte-medium`
+- `orama/gte-large`
 - `openai/text-embedding-ada-002`
+- `openai/text-embedding-3-small`
+- `openai/text-embedding-3-large`
 
 More models and providers will come soon.
 

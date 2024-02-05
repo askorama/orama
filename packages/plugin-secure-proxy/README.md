@@ -32,8 +32,14 @@ const db = await create({
 
 Available models:
 
-- `orama/gte-small`. 384 dimensions.
-- `openai/text-embedding-ada-002`. 1536 dimensions.
+| Model name                       | Provider | Dimensions |
+| -------------------------------- | -------- | ---------- |
+| `orama/gte-small`                | Orama    | 384        |
+| `orama/gte-medium`               | Orama    | 768        |
+| `orama/gte-large`                | Orama    | 1024       |
+| `openai/text-embedding-ada-002`  | Openai   | 1536       |
+| `openai/text-embedding-3-small`  | Openai   | 1536       |
+| `openai/text-embedding-3-large`  | Openai   | 3072       |
 
 Mode models coming soon!
 
