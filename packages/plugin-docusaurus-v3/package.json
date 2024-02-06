@@ -1,6 +1,6 @@
 {
   "name": "@orama/plugin-docusaurus-v3",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Docusaurus plugin for local search powered by orama",
   "keywords": [
     "orama",
@@ -29,7 +29,7 @@
     "@orama/highlight": "^0.1.2",
     "@orama/orama": "workspace:*",
     "@orama/plugin-parsedoc": "workspace:*",
-    "@orama/searchbox": "1.0.0-beta.11",
+    "@orama/searchbox": "1.0.0-beta.12",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
     "jsdom": "^23.0.1",

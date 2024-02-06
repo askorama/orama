@@ -12,6 +12,11 @@ export type SingleOrArray<T> = T | T[]
 
 export type SyncOrAsyncValue<T = void> = T | PromiseLike<T>
 
+export type HybridWeights = {
+  text: number
+  vector: number
+}
+
 // Given a type T, return a new type with:
 // - the concatenation of nested properties as key
 // - the type of the nested property as value
@@ -600,6 +605,14 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
    * This can help users find more relevant and specific results for their search query.
    */
   facets?: FacetsParams<T>
+
+  /**
+   * Hybrid search weights.
+   * By default, Orama will use 0.5 for the full-text search and 0.5 for the vector search, which means that both will have the same importance.
+   * You can change the weights to give more importance to the full-text search or the vector search.
+   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/hybrid-search
+   */
+  hybridWeights?: HybridWeights
 }
 
 export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDocument<T>>

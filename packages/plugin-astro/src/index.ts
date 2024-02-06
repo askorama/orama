@@ -9,15 +9,6 @@ interface AstroPage {
   pathname: string
 }
 
-interface AstroConfigDoneArgs {
-  config: AstroConfig
-}
-
-interface AstroBuildDoneArgs {
-  pages: AstroPage[]
-  routes: RouteData[]
-}
-
 const isWindows = process.platform === 'win32'
 const joinPath = (isWindows ? path.win32 : path).join
 
@@ -56,7 +47,8 @@ const h1Converter = compile({
 async function prepareOramaDb(
   dbConfig: OramaOptions,
   pages: AstroPage[],
-  routes: RouteData[]
+  routes: RouteData[],
+  dir: URL
 ): Promise<Orama<PageIndexSchema, any, any, any>> {
   const contentConverter = compile({
     baseElements: {
@@ -65,8 +57,7 @@ async function prepareOramaDb(
   })
 
   // All routes are in the same folder, we can use the first one to get the basePath
-  const baseUrl = routes[0].distURL?.pathname?.replace(/\/$/, '').split('dist/').at(0) as string
-  const basePath = `${baseUrl}dist/`.slice(isWindows ? 1 : 0)
+  const basePath = dir.pathname.slice(isWindows ? 1 : 0)
   const pathsToBeIndexed = pages
     .filter(({ pathname }) => dbConfig.pathMatcher.test(pathname))
     .map(({ pathname }) => {
@@ -114,17 +105,17 @@ export function createPlugin(options: Record<string, OramaOptions>): AstroIntegr
   return {
     name: PKG_NAME,
     hooks: {
-      'astro:config:done': function ({ config: cfg }: AstroConfigDoneArgs): void {
+      'astro:config:done': function ({ config: cfg }): void {
         config = cfg
       },
-      'astro:build:done': async function ({ pages, routes }: AstroBuildDoneArgs): Promise<void> {
+      'astro:build:done': async function ({ pages, routes, dir }): Promise<void> {
         const assetsDir = joinPath(config.outDir.pathname, 'assets').slice(isWindows ? 1 : 0)
         if (!existsSync(assetsDir)) {
           mkdirSync(assetsDir)
         }
 
         for (const [dbName, dbConfig] of Object.entries(options)) {
-          const namedDb = await prepareOramaDb(dbConfig, pages, routes)
+          const namedDb = await prepareOramaDb(dbConfig, pages, routes, dir)
 
           writeFileSync(joinPath(assetsDir, `oramaDB_${dbName}.json`), JSON.stringify(await saveOramaDB(namedDb)), {
             encoding: 'utf8'
