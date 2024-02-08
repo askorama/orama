@@ -64,4 +64,8 @@ export const SPLITTERS: Record<Language, RegExp> = {
 
 export const SUPPORTED_LANGUAGES = Object.keys(STEMMERS)
 
+export function getLocale(language: string | undefined) {
+  return language !== undefined && SUPPORTED_LANGUAGES.includes(language) ? STEMMERS[language] : undefined
+}
+
 export type Language = (typeof SUPPORTED_LANGUAGES)[number]

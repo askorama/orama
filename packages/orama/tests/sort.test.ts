@@ -80,7 +80,9 @@ t.test('search with sortBy', (t) => {
         resultAsc.hits.map((d) => d.id),
         ascExpected
       )
-      let resultDesc = await search(db, { sortBy: { property: 'number', order: 'DESC' } })
+      let resultDesc = await search(db, {
+        sortBy: { property: 'number', order: 'DESC' }
+      })
       t.strictSame(
         resultDesc.hits.map((d) => d.id),
         descExpected
@@ -97,7 +99,9 @@ t.test('search with sortBy', (t) => {
           resultAsc.hits.map((d) => d.id),
           ascExpected
         )
-        resultDesc = await search(db, { sortBy: { property: 'number', order: 'DESC' } })
+        resultDesc = await search(db, {
+          sortBy: { property: 'number', order: 'DESC' }
+        })
         t.strictSame(
           resultDesc.hits.map((d) => d.id),
           descExpected
@@ -174,7 +178,9 @@ t.test('search with sortBy', (t) => {
         resultAsc.hits.map((d) => d.id),
         ascExpected
       )
-      let resultDesc = await search(db, { sortBy: { property: 'string', order: 'DESC' } })
+      let resultDesc = await search(db, {
+        sortBy: { property: 'string', order: 'DESC' }
+      })
       t.strictSame(
         resultDesc.hits.map((d) => d.id),
         descExpected
@@ -191,7 +197,9 @@ t.test('search with sortBy', (t) => {
           resultAsc.hits.map((d) => d.id),
           ascExpected
         )
-        resultDesc = await search(db, { sortBy: { property: 'string', order: 'DESC' } })
+        resultDesc = await search(db, {
+          sortBy: { property: 'string', order: 'DESC' }
+        })
         t.strictSame(
           resultDesc.hits.map((d) => d.id),
           descExpected
@@ -201,6 +209,37 @@ t.test('search with sortBy', (t) => {
       t.end()
     })
 
+    t.end()
+  })
+
+  t.test('on intl language', async (t) => {
+    const db = await create({
+      schema: {
+        string: 'string'
+      },
+      language: 'norwegian'
+    })
+    const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
+      { string: 'å' },
+      { string: 'a' },
+      { string: 'ø' },
+      { string: 'o' },
+      { string: 'æ' },
+      {}
+    ])
+
+    t.test('should short using locale - asc', async (t) => {
+      const result = await search(db, {
+        sortBy: {
+          property: 'string'
+        }
+      })
+      t.strictSame(
+        result.hits.map((d) => d.id),
+        [id2, id4, id5, id3, id1, id6]
+      )
+      t.end()
+    })
     t.end()
   })
 
@@ -268,7 +307,9 @@ t.test('search with sortBy', (t) => {
         resultAsc.hits.map((d) => d.id),
         ascExpected
       )
-      let resultDesc = await search(db, { sortBy: { property: 'boolean', order: 'DESC' } })
+      let resultDesc = await search(db, {
+        sortBy: { property: 'boolean', order: 'DESC' }
+      })
       t.strictSame(
         resultDesc.hits.map((d) => d.id),
         descExpected
@@ -285,7 +326,9 @@ t.test('search with sortBy', (t) => {
           resultAsc.hits.map((d) => d.id),
           ascExpected
         )
-        resultDesc = await search(db, { sortBy: { property: 'boolean', order: 'DESC' } })
+        resultDesc = await search(db, {
+          sortBy: { property: 'boolean', order: 'DESC' }
+        })
         t.strictSame(
           resultDesc.hits.map((d) => d.id),
           descExpected
@@ -579,9 +622,7 @@ function shuffle(array) {
   while (currentIndex != 0) {
     // Pick a remaining element.
     randomIndex = Math.floor(Math.random() * currentIndex)
-    currentIndex--
-
-    // And swap it with the current element.
+    currentIndex-- // And swap it with the current element.
     ;[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]
   }
 
