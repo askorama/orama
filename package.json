@@ -1,6 +1,6 @@
 {
   "name": "orama-monorepo",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Next generation full-text and vector search engine, written in TypeScript",
   "workspaces": [
     "packages/*",
