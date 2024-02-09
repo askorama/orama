@@ -4,19 +4,20 @@ import {
   AnySorterStore,
   ISorter,
   SearchableType,
-  SortType,
-  SortValue,
   SorterConfig,
-  SorterParams
+  SorterParams,
+  SortType,
+  SortValue
 } from '../types.js'
 import { isVectorType } from './defaults.js'
 import {
   DocumentID,
+  getInternalDocumentId,
   InternalDocumentID,
-  InternalDocumentIDStore,
-  getInternalDocumentId
+  InternalDocumentIDStore
 } from './internal-document-id-store.js'
 import { safeArrayPush } from '../utils.js'
+import { getLocale } from './tokenizer/languages.js'
 
 interface PropertySort<K> {
   docs: Map<InternalDocumentID, number>
@@ -162,7 +163,7 @@ function stringSort(
   value: [InternalDocumentID, SortValue],
   d: [InternalDocumentID, SortValue]
 ): number {
-  return (value[1] as string).localeCompare(d[1] as string, language)
+  return (value[1] as string).localeCompare(d[1] as string, getLocale(language))
 }
 
 function numberSort(value: [InternalDocumentID, SortValue], d: [InternalDocumentID, SortValue]): number {
