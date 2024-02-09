@@ -36,11 +36,11 @@ const results = await search(db, {
   properties: ['description'],
   facets: {
     'categories.primary': {
-      size: 3,
+      limit: 3,
       order: 'DESC',
     },
     'categories.secondary': {
-      size: 2,
+      limit: 2,
       order: 'DESC',
     },
     rating: {
@@ -109,11 +109,10 @@ If a property is specified as `string` in the schema, the facet will accept the 
 configuration:
 
 | Property | Type     | Default | Description                                         |
-| -------- | -------- | ------- | --------------------------------------------------- |
-| `size`   | `number` | `10`    | Number of values to return.                         |
-| `order`  | `string` | `DESC`  | Order of the values. Can be either `ASC` or `DESC`. |
-| `limit`  | `number` | `100`   | Maximum number of values to consider.               |
-| `offset` | `number` | `0`     | Number of values to skip.                           |
+| -------- | -------- | ------ |-----------------------------------------------------|
+| `order`  | `string` | `DESC` | Order of the values. Can be either `ASC` or `DESC`. |
+| `limit`  | `number` | `10`   | Maximum number of values to return.                 |
+| `offset` | `number` | `0`    | Number of values to skip.                           |
 
 In the search result, `string` facets will be returned as an `object` with the following properties:
 

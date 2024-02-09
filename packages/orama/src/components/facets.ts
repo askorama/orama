@@ -102,10 +102,9 @@ export async function getFacets<T extends AnyOrama>(
   for (const facet of facetKeys) {
     // Count the number of values for each facet
     facets[facet].count = Object.keys(facets[facet].values).length
-
     // Sort only string-based facets
     if (properties[facet] === 'string') {
-      const stringFacetDefinition = facetsConfig as StringFacetDefinition
+      const stringFacetDefinition = facetsConfig[facet] as StringFacetDefinition
 
       facets[facet].values = Object.fromEntries(
         Object.entries(facets[facet].values)
