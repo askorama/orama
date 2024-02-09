@@ -19,7 +19,7 @@
     "markdown-it": "^13.0.2",
     "medium-zoom": "^1.1.0",
     "slugify": "^1.6.6",
-    "vite": "^4.1.4"
+    "vite": "^4.5.2"
   },
   "devDependencies": {
     "@preact/signals-core": "^1.5.0",
