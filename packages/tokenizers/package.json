@@ -6,8 +6,8 @@
   "sideEffects": false,
   "exports": {
     "./mandarin": {
-      "types": "./src/tokenizer-mandarin/pkg/tokenizer_mandarin.d.ts",
-      "import": "./src/tokenizer-mandarin/pkg/tokenizer_mandarin.js"
+      "types": "./dist/tokenizer_mandarin.d.ts",
+      "import": "./dist/tokenizer_mandarin.js"
     }
   },
   "files": ["dist"],
@@ -19,7 +19,7 @@
     "url": "https://github.com/oramasearch/orama"
   },
   "scripts": {
-    "build": "node scripts/build.js",
+    "build": "node ./scripts/build.mjs",
     "lint": "exit 0;",
     "test": "exit 0;",
     "ci": "npm run test"
