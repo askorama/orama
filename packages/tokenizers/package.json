@@ -1,0 +1,47 @@
+{
+  "name": "@orama/tokenizers",
+  "version": "2.0.5",
+  "type": "module",
+  "description": "Additional tokenizers for Orama",
+  "sideEffects": false,
+  "exports": {
+    "./mandarin": {
+      "types": "./dist/tokenizer_mandarin.d.ts",
+      "import": "./dist/tokenizer_mandarin.js"
+    }
+  },
+  "files": ["dist"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oramasearch/orama"
+  },
+  "bugs": {
+    "url": "https://github.com/oramasearch/orama"
+  },
+  "scripts": {
+    "build": "node ./scripts/build.mjs",
+    "lint": "exit 0;",
+    "test": "exit 0;",
+    "ci": "npm run test"
+  },
+  "keywords": [
+    "full-text search",
+    "search",
+    "fuzzy search",
+    "typo-tolerant search",
+    "full-text",
+    "vector search",
+    "stemming",
+    "tokenizers"
+  ],
+  "author": {
+    "name": "Michele Riva",
+    "email": "michele.riva@oramasearch.com",
+    "url": "https://github.com/MicheleRiva",
+    "author": true
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 18.0.0"
+  }
+}

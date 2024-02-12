@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -747,6 +747,8 @@ importers:
       '@swc/core':
         specifier: ^1.3.27
         version: 1.3.27
+
+  packages/tokenizers: {}
 
   sandboxes/plugin-docusaurus-v3-sandbox:
     dependencies:
