@@ -10,15 +10,18 @@ Available tokenizers:
 Usage:
 
 ```js
-import init, { tokenize } from '@orama/tokenizes/mandarin'
+import { create } from '@orama/orama'
+import { createTokenizer } from '@orama/tokenizes/mandarin'
 
-await init() // Initialize the WebAssembly module
-
-const hmm = true // Use Hidden Markov Model or not (suggested: true)
-const tokens = await tokenize('我是一名软件工程师', hmm)
-
-console.log(tokens)
-// ["我","是","一名","软件","工程师"]
+const db = await create({
+  schema: {
+    myProperty: 'string',
+    anotherProperty: 'number'
+  },
+  components: {
+    tokenizer: await createTokenizer()
+  }
+})
 ```
 
 # License

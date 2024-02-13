@@ -32,4 +32,4 @@ fs.cpSync(mandarinTokenizerWasmPath, mandarinTokenizerDistPath, {
   recursive: true
 })
 
-childProcess.execFileSync(`cd ${mandarinTokenizerDistPath} && npx tsup --format cjs,esm,iife tokenizer.ts --outDir .`)
+childProcess.execSync(`cd ${mandarinTokenizerDistPath} && npx tsup --format cjs,esm,iife --outDir . tokenizer.ts`)
