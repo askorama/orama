@@ -1,4 +1,0 @@
-{
-  "reporter": ["text", "html"],
-  "exclude": ["dist", "tests"]
-}

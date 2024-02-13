@@ -626,7 +626,7 @@ t.test('sort should be consistent after update', async (t) => {
   await insertMultiple(db, [
     { id: '1', name: 'a', createdAt: 1 },
     { id: '2', name: 'b', createdAt: 2 },
-    { id: '3', name: 'c', createdAt: 3 },
+    { id: '3', name: 'c', createdAt: 3 }
   ])
 
   const resultBefore = await search(db, {

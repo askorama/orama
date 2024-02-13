@@ -34,20 +34,14 @@ async function tokenizeInternal(
   language?: TLanguage,
   prop?: string
 ): Promise<string[]> {
-  if (language && language !== tokenizerLanguage) {
-    throw new Error(
-      `You can't use the ${language} language with the ${tokenizerLanguage} tokenizer. Only ${tokenizerLanguage} is supported.`
-    )
-  }
-
   /* c8 ignore next 3 */
   if (typeof input !== 'string') {
     return [input]
   }
 
   let tokens: string[]
-  if (prop && this.tokenizeSkipProperties.has(prop)) {
-    tokens = [this.normalizeToken.bind(this, prop ?? '')(input)]
+  if (prop && this?.tokenizeSkipProperties?.has(prop)) {
+    tokens = [this?.normalizeToken?.bind(this, prop ?? '')(input)]
   } else {
     tokens = await tokenize(input, true)
   }

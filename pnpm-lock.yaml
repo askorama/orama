@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
 
 settings:
   autoInstallPeers: true
@@ -812,15 +812,6 @@ importers:
       '@docusaurus/types':
         specifier: 3.0.1
         version: 3.0.1(@swc/core@1.3.27)(react-dom@18.2.0)(react@18.2.0)
-
-  sandboxes/test:
-    dependencies:
-      '@orama/orama':
-        specifier: workspace:*
-        version: link:../../packages/orama
-      '@orama/tokenizers':
-        specifier: workspace:*
-        version: link:../../packages/tokenizers
 
 packages:
 

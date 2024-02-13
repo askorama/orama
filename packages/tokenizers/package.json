@@ -26,7 +26,7 @@
   },
   "scripts": {
     "build": "node ./scripts/build.mjs",
-    "test": "exit 0;"
+    "test": "npm run build && node ./tests/mandarin.test.js"
   },
   "keywords": [
     "full-text search",
@@ -36,7 +36,9 @@
     "full-text",
     "vector search",
     "stemming",
-    "tokenizers"
+    "tokenizers",
+    "mandarin",
+    "chinese"
   ],
   "author": {
     "name": "Michele Riva",
@@ -49,6 +51,7 @@
     "node": ">= 18.0.0"
   },
   "devDependencies": {
+    "tap": "^18.6.1",
     "tsup": "^7.2.0",
     "tsx": "^4.7.1"
   }
