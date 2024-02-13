@@ -238,8 +238,6 @@ async function remove(sorter: Sorter, prop: string, id: DocumentID) {
 
   s.docs.delete(internalId)
   s.orderedDocsToRemove.set(internalId, true)
-
-  // ensureOrderedDocsAreDeletedByProperty(sorter, prop)
 }
 
 async function sortBy<T extends AnyOrama>(
