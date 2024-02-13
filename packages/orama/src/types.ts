@@ -6,6 +6,8 @@ import { Sorter } from './components/sorter.js'
 import { Language } from './components/tokenizer/languages.js'
 import { Point } from './trees/bkd.js'
 
+export type { DefaultTokenizer } from './components/tokenizer/index.js'
+
 export type Nullable<T> = T | null
 
 export type SingleOrArray<T> = T | T[]

@@ -4,7 +4,7 @@ import { replaceDiacritics } from './diacritics.js'
 import { Language, SPLITTERS, SUPPORTED_LANGUAGES } from './languages.js'
 import { stemmer as english } from './english-stemmer.js'
 
-interface DefaultTokenizer extends Tokenizer {
+export interface DefaultTokenizer extends Tokenizer {
   language: Language
   stemmer?: Stemmer
   tokenizeSkipProperties: Set<string>
@@ -15,7 +15,7 @@ interface DefaultTokenizer extends Tokenizer {
   normalizeToken(this: DefaultTokenizer, token: string, prop: string | undefined): string
 }
 
-function normalizeToken(this: DefaultTokenizer, prop: string, token: string): string {
+export function normalizeToken(this: DefaultTokenizer, prop: string, token: string): string {
   const key = `${this.language}:${prop}:${token}`
 
   if (this.normalizationCache.has(key)) {
