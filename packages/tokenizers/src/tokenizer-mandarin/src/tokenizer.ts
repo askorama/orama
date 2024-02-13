@@ -2,6 +2,8 @@ import type { DefaultTokenizerConfig, DefaultTokenizer } from '@orama/orama'
 import { normalizeToken } from '@orama/orama/internals'
 // @ts-expect-error - this file is gonna be moved inside the `pkg` folder at build time
 import init, { tokenize } from './tokenizer_mandarin.js'
+// @ts-expect-error - this file is gonna be created at build time
+import { wasm } from './tokenizer_mandarin_bg_wasm_arr.js'
 
 const tokenizerLanguage = 'mandarin'
 
@@ -60,7 +62,7 @@ async function tokenizeInternal(
 }
 
 export async function createTokenizer(config: MandarinTokenizerConfig = defaultConfig): Promise<DefaultTokenizer> {
-  await init()
+  await init(wasm)
 
   const tokenizerConfig = {
     tokenize: tokenizeInternal,

@@ -32,4 +32,9 @@ fs.cpSync(mandarinTokenizerWasmPath, mandarinTokenizerDistPath, {
   recursive: true
 })
 
+const r = fs.readFileSync('./dist/tokenizer-mandarin/tokenizer_mandarin_bg.wasm')
+const b = new Uint8Array(r)
+const rr = `export const wasm = new Uint8Array([${b.join(',')}]);`
+fs.writeFileSync('./dist/tokenizer-mandarin/tokenizer_mandarin_bg_wasm_arr.js', rr)
+
 childProcess.execSync(`cd ${mandarinTokenizerDistPath} && npx tsup --format cjs,esm,iife --outDir . tokenizer.ts`)

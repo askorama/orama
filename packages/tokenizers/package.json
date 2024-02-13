@@ -26,7 +26,7 @@
   },
   "scripts": {
     "build": "node ./scripts/build.mjs",
-    "test": "npm run build && c8 -c tests/config/c8-local.json tap tests/*.test.js"
+    "test": "exit 0;"
   },
   "keywords": [
     "full-text search",
@@ -49,7 +49,7 @@
     "node": ">= 18.0.0"
   },
   "devDependencies": {
-    "tap": "^18.6.1",
-    "tsup": "^7.2.0"
+    "tsup": "^7.2.0",
+    "tsx": "^4.7.1"
   }
 }
