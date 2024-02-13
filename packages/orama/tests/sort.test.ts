@@ -1,12 +1,12 @@
 import t from 'tap'
-import { create, insert, insertMultiple, load, remove, save, search } from '../src/index.js'
+import { create, insert, insertMultiple, load, remove, save, search, update } from '../src/index.js'
 
 t.test('search with sortBy', (t) => {
   t.test('on number', async (t) => {
     const db = await create({
       schema: {
         number: 'number'
-      }
+      } as const
     })
     const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
       { number: 5 },
@@ -62,7 +62,7 @@ t.test('search with sortBy', (t) => {
 
     t.test('should work correctly also after removal', async (t) => {
       const db = await create({
-        schema: { number: 'number' }
+        schema: { number: 'number' } as const
       })
       const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
         { number: 5 },
@@ -118,7 +118,7 @@ t.test('search with sortBy', (t) => {
     const db = await create({
       schema: {
         string: 'string'
-      }
+      } as const
     })
     const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
       { string: 'a' },
@@ -160,7 +160,7 @@ t.test('search with sortBy', (t) => {
       const db = await create({
         schema: {
           string: 'string'
-        }
+        } as const
       })
       const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
         { string: 'a' },
@@ -216,7 +216,7 @@ t.test('search with sortBy', (t) => {
     const db = await create({
       schema: {
         string: 'string'
-      },
+      } as const,
       language: 'norwegian'
     })
     const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
@@ -247,7 +247,7 @@ t.test('search with sortBy', (t) => {
     const db = await create({
       schema: {
         boolean: 'boolean'
-      }
+      } as const
     })
     const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
       { boolean: true },
@@ -289,7 +289,7 @@ t.test('search with sortBy', (t) => {
       const db = await create({
         schema: {
           boolean: 'boolean'
-        }
+        } as const
       })
       const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
         { boolean: true },
@@ -347,7 +347,7 @@ t.test('search with sortBy', (t) => {
         obj: {
           number: 'number'
         }
-      }
+      } as const
     })
     const [id1, id2, id3, id4, id5, id6, id7] = await insertMultiple(db, [
       { obj: { number: 5 } },
@@ -409,7 +409,7 @@ t.test('search with sortBy', (t) => {
     const db = await create({
       schema: {
         number: 'number'
-      }
+      } as const
     })
     await t.rejects(search(db, { sortBy: { property: 'foobar' } as any }))
 
@@ -420,7 +420,7 @@ t.test('search with sortBy', (t) => {
     const db = await create({
       schema: {
         number: 'number'
-      },
+      } as const,
       sort: {
         unsortableProperties: ['number']
       }
@@ -434,7 +434,7 @@ t.test('search with sortBy', (t) => {
     const db = await create({
       schema: {
         string: 'string'
-      }
+      } as const
     })
     const [id1, id2, id3, id4, id5, id6] = await insertMultiple(db, [
       { string: 'a' },
@@ -473,7 +473,7 @@ t.test('serialize work fine', async (t) => {
         rating: 'number',
         favorite: 'boolean'
       }
-    }
+    } as const
   })
   const id = await insert(db, {
     title: 'The title',
@@ -515,7 +515,7 @@ t.test('disabled', async (t) => {
   const db = await create({
     schema: {
       number: 'number'
-    },
+    } as const,
     sort: {
       enabled: false
     }
@@ -532,7 +532,7 @@ t.test('disabled', async (t) => {
   const db2 = await create({
     schema: {
       number: 'number'
-    },
+    } as const,
     sort: {
       enabled: false
     }
@@ -568,7 +568,7 @@ t.test('search with sortBy should be consistent ignoring the insert order', asyn
       schema: {
         id: 'string',
         number: 'number'
-      }
+      } as const
     })
 
     const d = shuffle([...docs])
@@ -592,7 +592,7 @@ t.test('search with sortBy should be consistent ignoring the insert order', asyn
       schema: {
         id: 'string',
         number: 'number'
-      }
+      } as const
     })
 
     const d = shuffle([...docs])
@@ -612,6 +612,64 @@ t.test('search with sortBy should be consistent ignoring the insert order', asyn
   }
 
   t.end()
+})
+
+// https://github.com/oramasearch/orama/issues/629
+t.test('sort should be consistent after update', async (t) => {
+  const db = await create({
+    schema: {
+      id: 'string',
+      name: 'string',
+      createdAt: 'number'
+    } as const
+  })
+  await insertMultiple(db, [
+    { id: '1', name: 'a', createdAt: 1 },
+    { id: '2', name: 'b', createdAt: 2 },
+    { id: '3', name: 'c', createdAt: 3 },
+  ])
+
+  const resultBefore = await search(db, {
+    sortBy: {
+      property: 'createdAt'
+    }
+  })
+
+  t.strictSame(
+    resultBefore.hits.map((d) => d.document.name),
+    ['a', 'b', 'c']
+  )
+  t.strictSame(
+    resultBefore.hits.map((d) => d.id),
+    ['1', '2', '3']
+  )
+  t.strictSame(
+    resultBefore.hits.map((d) => d.document.id),
+    ['1', '2', '3']
+  )
+
+  // Just update keeping the same document
+  await update(db, '2', resultBefore.hits.find((d) => d.id === '2')!.document)
+
+  const resultAfter = await search(db, {
+    sortBy: {
+      property: 'createdAt'
+    }
+  })
+
+  // The order should be the same
+  t.strictSame(
+    resultAfter.hits.map((d) => d.document.name),
+    ['a', 'b', 'c']
+  )
+  t.strictSame(
+    resultAfter.hits.map((d) => d.id),
+    ['1', '2', '3']
+  )
+  t.strictSame(
+    resultAfter.hits.map((d) => d.document.id),
+    ['1', '2', '3']
+  )
 })
 
 function shuffle(array) {
