@@ -6,7 +6,7 @@ import type {
   uniqueId as esmUniqueId,
   safeArrayPush as esmSafeArrayPush,
   convertDistanceToMeters as esmConvertDistanceToMeters,
-  BM25 as esmBM25,
+  BM25 as esmBM25
 } from '../internals.js'
 
 let _esmBoundedLevenshtein: typeof esmBoundedLevenshtein

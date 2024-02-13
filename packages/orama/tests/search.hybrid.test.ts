@@ -165,7 +165,7 @@ t.test('hybrid search', async (t) => {
     t.equal(page3.hits[1].document.number, 5)
   })
 
-  t.test('should use custom weights correctly', async t => {
+  t.test('should use custom weights correctly', async (t) => {
     const db = await create({
       schema: {
         text: 'string',
@@ -175,7 +175,7 @@ t.test('hybrid search', async (t) => {
     })
 
     await insertMultiple(db, [
-      { text: 'hello world', embedding: [0, 41, 10, 39, 12 ], number: 1 },
+      { text: 'hello world', embedding: [0, 41, 10, 39, 12], number: 1 },
       { text: 'hello world', embedding: [1, 2, 3, 4, 4], number: 2 }
     ])
 

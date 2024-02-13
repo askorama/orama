@@ -13,7 +13,7 @@ export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions):
   if (!pluginParams.model) throw new Error('Missing "model" parameter for plugin-telemetry')
 
   const proxy = new OramaProxy({
-    api_key: pluginParams.apiKey,
+    api_key: pluginParams.apiKey
   })
 
   return {

@@ -490,13 +490,13 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
   const searchResult = radixFind(node, { term, exact, tolerance })
   const ids = new Set<InternalDocumentID>()
 
-  for(const key in searchResult){
+  for (const key in searchResult) {
     //skip keys inherited from prototype
-    const ownProperty = getOwnProperty(searchResult, key);
-    if(!ownProperty) continue;
+    const ownProperty = getOwnProperty(searchResult, key)
+    if (!ownProperty) continue
 
-    for (const id of searchResult[key]){
-        ids.add(id);
+    for (const id of searchResult[key]) {
+      ids.add(id)
     }
   }
 

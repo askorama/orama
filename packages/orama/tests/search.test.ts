@@ -791,19 +791,19 @@ t.test('fix-544', async (t) => {
   t.end()
 })
 
-t.test('fix-601', async t => {
+t.test('fix-601', async (t) => {
   const db = await create({
     schema: {
       name: 'string'
     } as const
   })
 
-  Object.prototype['examplePrototypeFunction'] = () => {};
+  Object.prototype['examplePrototypeFunction'] = () => {}
 
-  await insert(db, { name: 'John Doe' });
-  const result = await search(db, { term: 'John Doe' });
+  await insert(db, { name: 'John Doe' })
+  const result = await search(db, { term: 'John Doe' })
 
-  t.equal(result.count, 1);
+  t.equal(result.count, 1)
   t.end()
 })
 
