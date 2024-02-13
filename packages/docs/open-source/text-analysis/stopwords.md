@@ -91,6 +91,7 @@ As for now, Orama supports 29 languages when it comes to stop-words removal:
 - Arabic
 - Armenian
 - Bulgarian
+- Chinese (Mandarin - stemmer not supported)
 - Danish
 - Dutch
 - English
@@ -103,7 +104,6 @@ As for now, Orama supports 29 languages when it comes to stop-words removal:
 - Indonesian
 - Irish
 - Italian
-- Mandarin (stemmer not supported)
 - Nepali
 - Norwegian
 - Portuguese

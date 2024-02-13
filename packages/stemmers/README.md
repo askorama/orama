@@ -7,6 +7,7 @@ Right now, Orama supports 29 languages and stemmers out of the box:
 - Arabic
 - Armenian
 - Bulgarian
+- Chinese (Mandarin - stemmer not supported)
 - Danish
 - Dutch
 - English
@@ -19,7 +20,6 @@ Right now, Orama supports 29 languages and stemmers out of the box:
 - Indonesian
 - Irish
 - Italian
-- Mandarin (stemmer not supported)
 - Nepali
 - Norwegian
 - Portuguese

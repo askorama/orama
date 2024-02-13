@@ -5,6 +5,7 @@ This package provides support for stop-words removal in 29 languages:
 - Arabic
 - Armenian
 - Bulgarian
+- Chinese (Mandarin - stemmer not supported)
 - Danish
 - Dutch
 - English
@@ -17,7 +18,6 @@ This package provides support for stop-words removal in 29 languages:
 - Indonesian
 - Irish
 - Italian
-- Mandarin
 - Nepali
 - Norwegian
 - Portuguese

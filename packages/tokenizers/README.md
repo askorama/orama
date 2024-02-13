@@ -3,7 +3,7 @@
 This package provides support for additional tokenizers for the Orama Search Engine.
 
 Available tokenizers:
-- Mandarin
+- Chinese (Mandarin - stemmer not supported)
 - Japanese (work in progress)
 - Korean (work in progress)
 
