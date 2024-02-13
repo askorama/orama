@@ -47,8 +47,6 @@ t.test('Mandarin tokenizer', async (t) => {
 
   const resultsGuangzhou = await search(db, { term: '广州', threshold: 0 })
 
-  console.log(JSON.stringify(resultsGuangzhou, null, 2))
-
   t.equal(resultsGuangzhou.count, 2)
   t.equal(getHitsNames(resultsGuangzhou.hits).join(', '), '广州, 广州中医药大学')
 
