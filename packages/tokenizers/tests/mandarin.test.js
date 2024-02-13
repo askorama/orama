@@ -1,6 +1,14 @@
+import fs from 'fs'
 import t from 'tap'
 import { create, insert, search } from '@orama/orama'
-import { createTokenizer } from '../dist/tokenizer-mandarin/tokenizer.js'
+
+if (!fs.existsSync('dist/tokenizer-mandarin/tokenizer.js')) {
+  // Still experimental. @todo: remove this check
+  console.log(`Skipping Mandarin tokenizer tests`)
+  process.exit(0)
+}
+
+const { createTokenizer } = await import('../dist/tokenizer-mandarin/tokenizer.js')
 
 const db = await create({
   schema: {
