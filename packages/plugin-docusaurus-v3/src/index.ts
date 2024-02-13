@@ -10,7 +10,7 @@ import { create, insertMultiple, save } from '@orama/orama'
 import { JSDOM } from 'jsdom'
 import MarkdownIt from 'markdown-it'
 import matter from 'gray-matter'
-import { LoadedContent, type LoadedVersion } from "@docusaurus/plugin-content-docs"
+import { LoadedContent, type LoadedVersion } from '@docusaurus/plugin-content-docs'
 
 export default function OramaPluginDocusaurus(ctx: { siteDir: any; generatedFilesDir: any }): Plugin {
   let versions: any[] = []
@@ -19,15 +19,15 @@ export default function OramaPluginDocusaurus(ctx: { siteDir: any; generatedFile
     name: '@orama/plugin-docusaurus-v3',
 
     getThemePath() {
-      return '../lib/theme';
+      return '../lib/theme'
     },
 
     getTypeScriptThemePath() {
-      return '../src/theme';
+      return '../src/theme'
     },
 
     getClientModules() {
-      return ['../lib/theme/SearchBar/index.css'];
+      return ['../lib/theme/SearchBar/index.css']
     },
 
     async contentLoaded({ actions, allContent }) {
@@ -69,7 +69,8 @@ async function buildDevSearchData(siteDir: string, generatedFilesDir: string, al
   const loadedVersion = allContent['docusaurus-plugin-content-docs']?.default?.loadedVersions?.find(
     (v: LoadedVersion) => v.versionName === version
   )
-  const blogs = allContent['docusaurus-plugin-content-blog']?.default?.blogPosts?.map(({ metadata }: any) => metadata) ?? []
+  const blogs =
+    allContent['docusaurus-plugin-content-blog']?.default?.blogPosts?.map(({ metadata }: any) => metadata) ?? []
   const pages = allContent['docusaurus-plugin-content-pages']?.default ?? []
   const docs = loadedVersion?.docs ?? []
 
@@ -110,7 +111,7 @@ async function generateDocs(siteDir: string, { title, permalink, source }: Recor
   })
 }
 
-function parseHTMLContent({ html, path, originalTitle }: {html: any, path: any, originalTitle: any }) {
+function parseHTMLContent({ html, path, originalTitle }: { html: any; path: any; originalTitle: any }) {
   const dom = new JSDOM(html)
   const document = dom.window.document
 

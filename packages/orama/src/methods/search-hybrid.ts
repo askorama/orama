@@ -1,4 +1,12 @@
-import type { AnyOrama, TypedDocument, SearchParamsHybrid, Results, TokenScore, Result, HybridWeights } from '../types.js'
+import type {
+  AnyOrama,
+  TypedDocument,
+  SearchParamsHybrid,
+  Results,
+  TokenScore,
+  Result,
+  HybridWeights
+} from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getNanosecondsTime, safeArrayPush, formatNanoseconds, removeVectorsFromHits } from '../utils.js'
 import { intersectFilteredIDs } from '../components/filters.js'
@@ -266,7 +274,12 @@ function hybridScore(textScore: number, vectorScore: number, textWeight: number,
   return textScore * textWeight + vectorScore * vectorWeight
 }
 
-function mergeAndRankResults(textResults: TokenScore[], vectorResults: TokenScore[], query: string, hybridWeights: HybridWeights | undefined) {
+function mergeAndRankResults(
+  textResults: TokenScore[],
+  vectorResults: TokenScore[],
+  query: string,
+  hybridWeights: HybridWeights | undefined
+) {
   const maxTextScore = Math.max(...textResults.map(([, score]) => score))
   const maxVectorScore = Math.max(...vectorResults.map(([, score]) => score))
   const hasHybridWeights = hybridWeights && hybridWeights.text && hybridWeights.vector

@@ -507,13 +507,7 @@
     "title": "Fire Emblem: Three Houses",
     "description": "Here, order is maintained by the Church of Seiros, which hosts the prestigious Officer’s Academy within its headquarters. You are invited to teach one of its three mighty houses, each comprised of students brimming with personality and represented by a royal from one of three territories. As their professor, you must lead your students in their academic lives and in turn-based, tactical RPG battles wrought with strategic, new twists to overcome. Which house, and which path, will you choose?",
     "rating": 4,
-    "genres": [
-      "Adventure",
-      "RPG",
-      "Strategy",
-      "Tactical",
-      "Turn Based Strategy"
-    ]
+    "genres": ["Adventure", "RPG", "Strategy", "Tactical", "Turn Based Strategy"]
   },
   {
     "title": "Grand Theft Auto: San Andreas",
@@ -549,13 +543,7 @@
     "title": "Fire Emblem Engage",
     "description": "Become the Divine Dragon and save the continent of Elyos!\n             \n\n              Summon valiant heroes like Marth & Celica alongside a new cast of characters and engage in turn-based, tactical combat against a great evil in this new Fire Emblem story.",
     "rating": 3.9,
-    "genres": [
-      "Adventure",
-      "RPG",
-      "Strategy",
-      "Tactical",
-      "Turn Based Strategy"
-    ]
+    "genres": ["Adventure", "RPG", "Strategy", "Tactical", "Turn Based Strategy"]
   },
   {
     "title": "Pokémon Violet",
@@ -1119,13 +1107,7 @@
     "title": "Plants vs. Zombies",
     "description": "Zombies are invading your home, and the only defense is your arsenal of plants! Armed with an alien nursery-worth of zombie-zapping plants like peashooters and cherry bombs, you'll need to think fast and plant faster to stop dozens of types of zombies dead in their tracks.",
     "rating": 3.7,
-    "genres": [
-      "Puzzle",
-      "Real Time Strategy",
-      "Simulator",
-      "Strategy",
-      "Tactical"
-    ]
+    "genres": ["Puzzle", "Real Time Strategy", "Simulator", "Strategy", "Tactical"]
   },
   {
     "title": "Ori and the Blind Forest",
@@ -1707,14 +1689,7 @@
     "title": "Needy Streamer Overload",
     "description": "NEEDY STREAMER OVERLOAD is a “multi-ending ADV” depicting daily life with “OMGkawaiiAngel-chan”, a young girl with a rather extreme need for approval attempting to become the #1 “Internet Angel” (streamer).",
     "rating": 3.5,
-    "genres": [
-      "Adventure",
-      "Indie",
-      "Point-and-Click",
-      "RPG",
-      "Simulator",
-      "Visual Novel"
-    ]
+    "genres": ["Adventure", "Indie", "Point-and-Click", "RPG", "Simulator", "Visual Novel"]
   },
   {
     "title": "Borderlands",
@@ -1936,13 +1911,7 @@
     "title": "Digimon Survive",
     "description": "This is a story of survival in a strange new world.\n             \n\n              Celebrating the 20th Anniversary of the Digimon Anime, Digimon Survive presents a brand-new adventure set in a mysterious world with characters designed by Uichi Ukumo, and music by the much-acclaimed Tomoki Miyoshi.\n             \n\n              Digimon Survive sees a brand-new group of teenagers, led by Takuma Momozuka, get lost on a school camping trip, finding them transported to a strange new world of monsters and danger.\n             \n\n              As they fight their way back home through an animated world of difficult decisions and deadly battles, players’ choices throughout the game will impact the evolution of their monster allies, and the final ending. Battles in the game are fought in 2D, in a more classic SRPG style.",
     "rating": 3.4,
-    "genres": [
-      "Adventure",
-      "RPG",
-      "Simulator",
-      "Strategy",
-      "Turn Based Strategy"
-    ]
+    "genres": ["Adventure", "RPG", "Simulator", "Strategy", "Turn Based Strategy"]
   },
   {
     "title": "Spiritfarer",
@@ -3442,14 +3411,7 @@
     "title": "Needy Streamer Overload",
     "description": "NEEDY STREAMER OVERLOAD is a “multi-ending ADV” depicting daily life with “OMGkawaiiAngel-chan”, a young girl with a rather extreme need for approval attempting to become the #1 “Internet Angel” (streamer).",
     "rating": 3.5,
-    "genres": [
-      "Adventure",
-      "Indie",
-      "Point-and-Click",
-      "RPG",
-      "Simulator",
-      "Visual Novel"
-    ]
+    "genres": ["Adventure", "Indie", "Point-and-Click", "RPG", "Simulator", "Visual Novel"]
   },
   {
     "title": "Borderlands",
@@ -3695,15 +3657,7 @@
     "title": "Into the Breach",
     "description": "The remnants of human civilization are threatened by gigantic creatures breeding beneath the earth. You must control powerful mechs from the future to hold off this alien threat. Each attempt to save the world presents a new randomly generated challenge in this turn-based strategy game from the makers of FTL.",
     "rating": 3.9,
-    "genres": [
-      "Card & Board Game",
-      "Indie",
-      "Puzzle",
-      "RPG",
-      "Simulator",
-      "Strategy",
-      "Turn Based Strategy"
-    ]
+    "genres": ["Card & Board Game", "Indie", "Puzzle", "RPG", "Simulator", "Strategy", "Turn Based Strategy"]
   },
   {
     "title": "Marvel Snap",
@@ -4345,14 +4299,7 @@
     "title": "Utawarerumono: Mask of Truth",
     "description": "\"The epic story of Utawarerumono comes to an end in Mask of Truth, as the fate of the world will be determined by warring nations. The game features exciting SRPG battles, a colorful cast of new/familiar faces that will determine the fate of their world, a rousing original soundtrack, and the dramatic conclusion to the journey of Haku.\n             \n\n              After the events of Mask of Deception, Haku is destined to rally the nation of Ennakamuy to fight against the evil forces that now control the Yamato throne. With everything on the line, Haku and his friends must do everything in their power to ensure that the future of Yamato triumphs over the true evil that lurks in the depth of the darkness.\"",
     "rating": 4.4,
-    "genres": [
-      "Adventure",
-      "RPG",
-      "Simulator",
-      "Strategy",
-      "Tactical",
-      "Visual Novel"
-    ]
+    "genres": ["Adventure", "RPG", "Simulator", "Strategy", "Tactical", "Visual Novel"]
   },
   {
     "title": "Hitman World of Assassination",
@@ -6968,13 +6915,7 @@
     "title": "Spore",
     "description": "From Single Cell to Galactic God, evolve your creature in a universe of your own creations. Play through Spore's five evolutionary stages: Cell, Creature, Tribe, Civilization, and Space. Each stage has its own unique style, challenges, and goals.",
     "rating": 3.3,
-    "genres": [
-      "Adventure",
-      "Real Time Strategy",
-      "RPG",
-      "Simulator",
-      "Strategy"
-    ]
+    "genres": ["Adventure", "Real Time Strategy", "RPG", "Simulator", "Strategy"]
   },
   {
     "title": "Dwarf Fortress",
@@ -7376,13 +7317,7 @@
     "title": "World of Horror",
     "description": "Experience the quiet terror of this 1-bit love letter to Junji Ito and H.P. Lovecraft. Navigate a hellish roguelite reality with turn-based combat and unforgiving choices. Experiment with your deck of event cards to discover new forms of cosmic horror in every playthrough. The inevitable awaits...",
     "rating": 3.7,
-    "genres": [
-      "Adventure",
-      "Indie",
-      "Point-and-Click",
-      "RPG",
-      "Turn Based Strategy"
-    ]
+    "genres": ["Adventure", "Indie", "Point-and-Click", "RPG", "Turn Based Strategy"]
   },
   {
     "title": "Fire Emblem: Shadow Dragon",
@@ -9128,13 +9063,7 @@
     "title": "Baldur's Gate 3",
     "description": "An ancient evil has returned to Baldur's Gate, intent on devouring it from the inside out. The fate of Faerun lies in your hands. Alone, you may resist. But together, you can overcome.",
     "rating": 4.1,
-    "genres": [
-      "Adventure",
-      "RPG",
-      "Strategy",
-      "Tactical",
-      "Turn Based Strategy"
-    ]
+    "genres": ["Adventure", "RPG", "Strategy", "Tactical", "Turn Based Strategy"]
   },
   {
     "title": "The LEGO Movie Videogame",
