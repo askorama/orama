@@ -1,6 +1,5 @@
-import T from './dist/tokenizer-mandarin/tokenizer.js'
+import {createTokenizer} from './dist/tokenizer-mandarin/tokenizer.mjs'
 
-const { createTokenizer } = T
 console.log(createTokenizer)
 
 const t = await createTokenizer({ language: 'mandarin' })
