@@ -16,7 +16,8 @@ const packages = [
   'plugin-telemetry',
   'plugin-secure-proxy',
   'stemmers',
-  'stopwords'
+  'stopwords',
+  'tokenizers'
 ]
 
 function step(message) {
