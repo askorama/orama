@@ -137,6 +137,15 @@ async function insert(sorter: Sorter, prop: string, id: DocumentID, value: SortV
   const internalId = getInternalDocumentId(sorter.sharedInternalDocumentStore, id)
   const s = sorter.sorts[prop]
 
+  // This happen during a document updating
+  // Because we re-use the same internalId
+  // We need to clean-up the data structure before re-inserting
+  // to avoid duplicates in the orderedDocs array
+  // See: https://github.com/oramasearch/orama/issues/629
+  if (s.orderedDocsToRemove.has(internalId)) {
+    ensureOrderedDocsAreDeletedByProperty(sorter, prop)
+  }
+
   s.docs.set(internalId, s.orderedDocs.length)
   s.orderedDocs.push([internalId, value])
 }
@@ -229,6 +238,8 @@ async function remove(sorter: Sorter, prop: string, id: DocumentID) {
 
   s.docs.delete(internalId)
   s.orderedDocsToRemove.set(internalId, true)
+
+  // ensureOrderedDocsAreDeletedByProperty(sorter, prop)
 }
 
 async function sortBy<T extends AnyOrama>(
