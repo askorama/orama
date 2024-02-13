@@ -87,6 +87,11 @@
       "import": "./dist/lt.js",
       "require": "./dist/lt.cjs"
     },
+    "./mandarin": {
+      "types": "./dist/zh.d.ts",
+      "import": "./dist/zh.js",
+      "require": "./dist/zh.cjs"
+    },
     "./nepali": {
       "types": "./dist/np.d.ts",
       "import": "./dist/np.js",

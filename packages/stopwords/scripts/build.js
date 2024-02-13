@@ -23,6 +23,7 @@ const stemmers = {
   irish: 'ie',
   italian: 'it',
   lithuanian: 'lt',
+  mandarin: 'zh',
   nepali: 'np',
   norwegian: 'no',
   portuguese: 'pt',

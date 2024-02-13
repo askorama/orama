@@ -6,11 +6,17 @@
   "sideEffects": false,
   "exports": {
     "./mandarin": {
-      "types": "./dist/tokenizer_mandarin.d.ts",
-      "import": "./dist/tokenizer_mandarin.js"
+      "types": "./dist/tokenizer-mandarin/tokenizer.d.ts",
+      "import": "./dist/tokenizer-mandarin/tokenizer.mjs",
+      "require": "./dist/tokenizer-mandarin/tokenizer.js"
     }
   },
-  "files": ["dist"],
+  "dependencies": {
+    "@orama/orama": "workspace:*"
+  },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/oramasearch/orama"
@@ -43,5 +49,8 @@
   "license": "Apache-2.0",
   "engines": {
     "node": ">= 18.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^7.2.0"
   }
 }

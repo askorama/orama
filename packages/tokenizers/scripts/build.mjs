@@ -13,6 +13,8 @@ const tokenizersBaseURL = new URL('../src', import.meta.url).pathname
 const mandarinTokenizerPath = path.join(tokenizersBaseURL, 'tokenizer-mandarin')
 const mandarinTokenizerWasmPath = path.join(mandarinTokenizerPath, 'pkg')
 const mandarinTokenizerDistPath = path.join(tokenizersBaseURL, '../dist/tokenizer-mandarin')
+const mandarinTokenizerWrapperPath = path.join(tokenizersBaseURL, 'tokenizer-mandarin/src/tokenizer.ts')
+const mandarinTokenizerWrapperDistPath = path.join(mandarinTokenizerDistPath, 'tokenizer.ts')
 
 if (fs.existsSync(outdirBaseURL)) {
   fs.rmdirSync(outdirBaseURL, { recursive: true })
@@ -22,6 +24,12 @@ fs.mkdirSync(outdirBaseURL)
 
 childProcess.execSync(`cd ${mandarinTokenizerPath} && wasm-pack build --target web`)
 
+fs.cpSync(mandarinTokenizerWrapperPath, mandarinTokenizerWrapperDistPath, {
+  recursive: true
+})
+
 fs.cpSync(mandarinTokenizerWasmPath, mandarinTokenizerDistPath, {
   recursive: true
 })
+
+childProcess.execFileSync(`cd ${mandarinTokenizerDistPath} && npx tsup --format cjs,esm,iife tokenizer.ts --outDir .`)
