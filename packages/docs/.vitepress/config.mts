@@ -87,6 +87,14 @@ export default defineConfig({
                 { text: 'BM25', link: '/open-source/usage/search/bm25-algorithm.html' }
               ]
             },
+            {
+              text: 'Supported languages',
+              collapsed: true,
+              items: [
+                { text: 'Officially Supported Languages', link: '/open-source/supported-languages/index.html' },
+                { text: 'Using Chinese with Orama',       link: '/open-source/supported-languages/using-chinese-with-orama.html' },
+              ]
+            },
             { text: 'TypeScript', link: '/open-source/usage/typescript.html' }
           ]
         },

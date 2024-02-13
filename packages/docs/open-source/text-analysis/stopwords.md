@@ -86,11 +86,12 @@ const db = await create({
 
 ## Supported languages
 
-As for now, Orama supports 28 languages when it comes to stop-words removal:
+As for now, Orama supports 29 languages when it comes to stop-words removal:
 
 - Arabic
 - Armenian
 - Bulgarian
+- Chinese (Mandarin - stemmer not supported)
 - Danish
 - Dutch
 - English
