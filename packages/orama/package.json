@@ -58,7 +58,8 @@
     "search",
     "fuzzy search",
     "typo-tolerant search",
-    "full-text"
+    "full-text",
+    "answer engine"
   ],
   "author": {
     "name": "Michele Riva",
@@ -100,7 +101,7 @@
     "tcompare": "^6.0.0",
     "tsd": "^0.29.0",
     "tsx": "^3.12.1",
-    "typescript": "^5.0.0",
+    "typescript": "^5.0.4",
     "vite": "^4.1.4"
   },
   "engines": {
