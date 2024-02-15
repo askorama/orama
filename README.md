@@ -65,10 +65,10 @@ Or import it directly in a browser module:
 </html>
 ```
 
-With Deno, you can just use the same CDN URL or use npm specifiers:
+With Deno, you can just use the same CDN URL or use JSR specifiers:
 
 ```js
-import { create, search, insert } from 'npm:@orama/orama'
+import { create, search, insert } from 'jsr:@orama/orama'
 ```
 
 Read the complete documentation at [https://docs.oramasearch.com](https://docs.oramasearch.com).
