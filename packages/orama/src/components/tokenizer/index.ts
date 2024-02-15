@@ -1,8 +1,8 @@
-import { createError } from '../../errors.js'
-import { Stemmer, Tokenizer, DefaultTokenizerConfig } from '../../types.js'
-import { replaceDiacritics } from './diacritics.js'
-import { Language, SPLITTERS, SUPPORTED_LANGUAGES } from './languages.js'
-import { stemmer as english } from './english-stemmer.js'
+import { createError } from '../../errors.ts'
+import { Stemmer, Tokenizer, DefaultTokenizerConfig } from '../../types.ts'
+import { replaceDiacritics } from './diacritics.ts'
+import { Language, SPLITTERS, SUPPORTED_LANGUAGES } from './languages.ts'
+import { stemmer as english } from './english-stemmer.ts'
 
 export interface DefaultTokenizer extends Tokenizer {
   language: Language

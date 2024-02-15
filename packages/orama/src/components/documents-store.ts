@@ -1,10 +1,10 @@
-import { AnyDocument, AnyDocumentStore, AnyOrama, IDocumentsStore, TypedDocument } from '../types.js'
+import { AnyDocument, AnyDocumentStore, AnyOrama, IDocumentsStore, TypedDocument } from '../types.ts'
 import {
   DocumentID,
   InternalDocumentID,
   InternalDocumentIDStore,
   getInternalDocumentId
-} from './internal-document-id-store.js'
+} from './internal-document-id-store.ts'
 
 export interface DocumentsStore extends AnyDocumentStore {
   sharedInternalDocumentStore: InternalDocumentIDStore

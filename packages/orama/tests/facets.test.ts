@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert, insertMultiple, search } from '../src/index.js'
+import { create, insert, insertMultiple, search } from '../src/index.ts'
 
 t.test('facets', (t) => {
   t.test('should generate correct facets', async (t) => {

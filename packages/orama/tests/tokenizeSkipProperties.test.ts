@@ -1,5 +1,5 @@
 import t from 'tap'
-import { Orama, create, insert, search } from '../src/index.js'
+import { Orama, create, insert, search } from '../src/index.ts'
 
 t.test('tokenizeSkipProperties', (t) => {
   t.test('skipProperties', async (t) => {

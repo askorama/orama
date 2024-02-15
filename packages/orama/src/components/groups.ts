@@ -1,5 +1,5 @@
-import { createError } from '../errors.js'
-import { getNested, intersect, safeArrayPush } from '../utils.js'
+import { createError } from '../errors.ts'
+import { getNested, intersect, safeArrayPush } from '../utils.ts'
 import type {
   AnyDocument,
   AnyOrama,
@@ -11,9 +11,9 @@ import type {
   SearchableType,
   TokenScore,
   TypedDocument
-} from '../types.js'
-import { getDocumentIdFromInternalId } from './internal-document-id-store.js'
-import { Point } from '../trees/bkd.js'
+} from '../types.ts'
+import { getDocumentIdFromInternalId } from './internal-document-id-store.ts'
+import { Point } from '../trees/bkd.ts'
 
 interface PropertyGroup {
   property: string

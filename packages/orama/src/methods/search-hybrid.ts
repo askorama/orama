@@ -6,19 +6,19 @@ import type {
   TokenScore,
   Result,
   HybridWeights
-} from '../types.js'
-import type { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { getNanosecondsTime, safeArrayPush, formatNanoseconds, removeVectorsFromHits } from '../utils.js'
-import { intersectFilteredIDs } from '../components/filters.js'
-import { prioritizeTokenScores } from '../components/algorithms.js'
-import { createError } from '../errors.js'
-import { createSearchContext, defaultBM25Params } from './search.js'
-import { getFacets } from '../components/facets.js'
-import { getGroups } from '../components/groups.js'
-import { findSimilarVectors } from '../components/cosine-similarity.js'
-import { getInternalDocumentId } from '../components/internal-document-id-store.js'
-import { fetchDocuments } from './search.js'
-import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
+} from '../types.ts'
+import type { InternalDocumentID } from '../components/internal-document-id-store.ts'
+import { getNanosecondsTime, safeArrayPush, formatNanoseconds, removeVectorsFromHits } from '../utils.ts'
+import { intersectFilteredIDs } from '../components/filters.ts'
+import { prioritizeTokenScores } from '../components/algorithms.ts'
+import { createError } from '../errors.ts'
+import { createSearchContext, defaultBM25Params } from './search.ts'
+import { getFacets } from '../components/facets.ts'
+import { getGroups } from '../components/groups.ts'
+import { findSimilarVectors } from '../components/cosine-similarity.ts'
+import { getInternalDocumentId } from '../components/internal-document-id-store.ts'
+import { fetchDocuments } from './search.ts'
+import { runBeforeSearch, runAfterSearch } from '../components/hooks.ts'
 
 export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,

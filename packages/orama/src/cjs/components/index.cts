@@ -9,7 +9,7 @@ import {
   load as esmLoad,
   save as esmSave,
   createIndex as esmCreateIndex
-} from '../../components/index.js'
+} from '../../components/index.ts'
 
 let _esmCreate: typeof esmCreate
 let _esmInsert: typeof esmInsert
@@ -24,7 +24,7 @@ let _esmCreateIndex: typeof esmCreateIndex
 
 export async function create(...args: Parameters<typeof esmCreate>): ReturnType<typeof esmCreate> {
   if (!_esmCreate) {
-    const imported = await import('../../components/index.js')
+    const imported = await import('../../components/index.ts')
     _esmCreate = imported.create
   }
 
@@ -33,7 +33,7 @@ export async function create(...args: Parameters<typeof esmCreate>): ReturnType<
 
 export async function insert(...args: Parameters<typeof esmInsert>): ReturnType<typeof esmInsert> {
   if (!_esmInsert) {
-    const imported = await import('../../components/index.js')
+    const imported = await import('../../components/index.ts')
     _esmInsert = imported.insert
   }
 
@@ -42,7 +42,7 @@ export async function insert(...args: Parameters<typeof esmInsert>): ReturnType<
 
 export async function remove(...args: Parameters<typeof esmRemove>): ReturnType<typeof esmRemove> {
   if (!_esmRemove) {
-    const imported = await import('../../components/index.js')
+    const imported = await import('../../components/index.ts')
     _esmRemove = imported.remove
   }
 
@@ -51,7 +51,7 @@ export async function remove(...args: Parameters<typeof esmRemove>): ReturnType<
 
 export async function search(...args: Parameters<typeof esmSearch>): ReturnType<typeof esmSearch> {
   if (!_esmSearch) {
-    const imported = await import('../../components/index.js')
+    const imported = await import('../../components/index.ts')
     _esmSearch = imported.search
   }
 
@@ -62,7 +62,7 @@ export async function searchByWhereClause(
   ...args: Parameters<typeof esmSearchByWhereClause>
 ): ReturnType<typeof esmSearchByWhereClause> {
   if (!_esmSearchByWhereClause) {
-    const imported = await import('../../components/index.js')
+    const imported = await import('../../components/index.ts')
     _esmSearchByWhereClause = imported.searchByWhereClause
   }
 
@@ -73,7 +73,7 @@ export async function getSearchableProperties(
   ...args: Parameters<typeof esmGetSearchableProperties>
 ): ReturnType<typeof esmGetSearchableProperties> {
   if (!_esmGetSearchableProperties) {
-    const imported = await import('../../components/index.js')
+    const imported = await import('../../components/index.ts')
     _esmGetSearchableProperties = imported.getSearchableProperties
   }
 
@@ -84,7 +84,7 @@ export async function getSearchablePropertiesWithTypes(
   ...args: Parameters<typeof esmGetSearchablePropertiesWithTypes>
 ): ReturnType<typeof esmGetSearchablePropertiesWithTypes> {
   if (!_esmGetSearchablePropertiesWithTypes) {
-    const imported = await import('../../components/index.js')
+    const imported = await import('../../components/index.ts')
     _esmGetSearchablePropertiesWithTypes = imported.getSearchablePropertiesWithTypes
   }
 
@@ -93,7 +93,7 @@ export async function getSearchablePropertiesWithTypes(
 
 export async function load(...args: Parameters<typeof esmLoad>): ReturnType<typeof esmLoad> {
   if (!_esmLoad) {
-    const imported = await import('../../components/index.js')
+    const imported = await import('../../components/index.ts')
     _esmLoad = imported.load
   }
 
@@ -102,7 +102,7 @@ export async function load(...args: Parameters<typeof esmLoad>): ReturnType<type
 
 export async function save(...args: Parameters<typeof esmSave>): ReturnType<typeof esmSave> {
   if (!_esmSave) {
-    const imported = await import('../../components/index.js')
+    const imported = await import('../../components/index.ts')
     _esmSave = imported.save
   }
 
@@ -111,7 +111,7 @@ export async function save(...args: Parameters<typeof esmSave>): ReturnType<type
 
 export async function createIndex(...args: Parameters<typeof esmCreateIndex>): ReturnType<typeof esmCreateIndex> {
   if (!_esmCreateIndex) {
-    const imported = await import('../../components/index.js')
+    const imported = await import('../../components/index.ts')
     _esmCreateIndex = imported.createIndex
   }
 

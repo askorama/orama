@@ -1,8 +1,8 @@
-import { runMultipleHook, runSingleHook } from '../components/hooks.js'
-import { createError } from '../errors.js'
-import { AnyOrama, PartialSchemaDeep, TypedDocument } from '../types.js'
-import { innerInsertMultiple, insert } from './insert.js'
-import { remove, removeMultiple } from './remove.js'
+import { runMultipleHook, runSingleHook } from '../components/hooks.ts'
+import { createError } from '../errors.ts'
+import { AnyOrama, PartialSchemaDeep, TypedDocument } from '../types.ts'
+import { innerInsertMultiple, insert } from './insert.ts'
+import { remove, removeMultiple } from './remove.ts'
 
 export async function update<T extends AnyOrama>(
   orama: T,

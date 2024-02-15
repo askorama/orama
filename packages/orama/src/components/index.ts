@@ -21,8 +21,8 @@ import type {
   VectorIndex,
   VectorType,
   WhereCondition
-} from '../types.js'
-import { createError } from '../errors.js'
+} from '../types.ts'
+import { createError } from '../errors.ts'
 import {
   create as avlCreate,
   find as avlFind,
@@ -32,7 +32,7 @@ import {
   RootNode as AVLRootNode,
   rangeSearch as avlRangeSearch,
   removeDocument as avlRemoveDocument
-} from '../trees/avl.js'
+} from '../trees/avl.ts'
 import {
   create as flatCreate,
   filter as flatFilter,
@@ -40,14 +40,14 @@ import {
   insert as flatInsert,
   removeDocument as flatRemoveDocument,
   FlatTree
-} from '../trees/flat.js'
+} from '../trees/flat.ts'
 import {
   create as radixCreate,
   find as radixFind,
   insert as radixInsert,
   Node as RadixNode,
   removeDocumentByWord as radixRemoveDocument
-} from '../trees/radix.js'
+} from '../trees/radix.ts'
 import {
   create as bkdCreate,
   insert as bkdInsert,
@@ -56,18 +56,18 @@ import {
   Point as BKDGeoPoint,
   searchByRadius,
   searchByPolygon
-} from '../trees/bkd.js'
+} from '../trees/bkd.ts'
 
-import { convertDistanceToMeters, intersect, safeArrayPush, getOwnProperty } from '../utils.js'
-import { BM25 } from './algorithms.js'
-import { getMagnitude } from './cosine-similarity.js'
-import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
+import { convertDistanceToMeters, intersect, safeArrayPush, getOwnProperty } from '../utils.ts'
+import { BM25 } from './algorithms.ts'
+import { getMagnitude } from './cosine-similarity.ts'
+import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.ts'
 import {
   DocumentID,
   getInternalDocumentId,
   InternalDocumentID,
   InternalDocumentIDStore
-} from './internal-document-id-store.js'
+} from './internal-document-id-store.ts'
 
 export type FrequencyMap = {
   [property: string]: {

@@ -62,7 +62,7 @@ export const SPLITTERS: Record<Language, RegExp> = {
   sanskrit: /[^a-z0-9A-Zāīūṛḷṃṁḥśṣṭḍṇṅñḻḹṝ]+/gim
 }
 
-export const SUPPORTED_LANGUAGES = Object.keys(STEMMERS)
+export const SUPPORTED_LANGUAGES: (keyof typeof STEMMERS)[] = Object.keys(STEMMERS)
 
 export function getLocale(language: string | undefined) {
   return language !== undefined && SUPPORTED_LANGUAGES.includes(language) ? STEMMERS[language] : undefined

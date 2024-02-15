@@ -1,5 +1,5 @@
 import t from 'tap'
-import { formatBytes, formatNanoseconds, getOwnProperty, getNested, flattenObject } from '../src/utils.js'
+import { formatBytes, formatNanoseconds, getOwnProperty, getNested, flattenObject } from '../src/utils.ts'
 
 t.test('utils', (t) => {
   t.plan(5)

@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert, getByID, update, updateMultiple, count } from '../src/index.js'
+import { create, insert, getByID, update, updateMultiple, count } from '../src/index.ts'
 
 t.test('update method', (t) => {
   t.plan(1)

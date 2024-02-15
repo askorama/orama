@@ -1,11 +1,11 @@
-import { runMultipleHook, runSingleHook } from '../components/hooks.js'
+import { runMultipleHook, runSingleHook } from '../components/hooks.ts'
 import {
   DocumentID,
   getDocumentIdFromInternalId,
   getInternalDocumentId
-} from '../components/internal-document-id-store.js'
-import { trackRemoval } from '../components/sync-blocking-checker.js'
-import { AnyOrama } from '../types.js'
+} from '../components/internal-document-id-store.ts'
+import { trackRemoval } from '../components/sync-blocking-checker.ts'
+import { AnyOrama } from '../types.ts'
 
 export async function remove<T extends AnyOrama>(
   orama: T,

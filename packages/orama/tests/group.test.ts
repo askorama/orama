@@ -1,5 +1,5 @@
 import t from 'tap'
-import { GroupResult, create, insertMultiple, search } from '../src/index.js'
+import { GroupResult, create, insertMultiple, search } from '../src/index.ts'
 
 t.test('search with groupBy', async (t) => {
   const [db] = await createDb()

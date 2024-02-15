@@ -1,5 +1,5 @@
 import t from 'tap'
-import { findSimilarVectors, getMagnitude } from '../src/components/cosine-similarity.js'
+import { findSimilarVectors, getMagnitude } from '../src/components/cosine-similarity.ts'
 
 function toF32(vector: number[]): Float32Array {
   return new Float32Array(vector)

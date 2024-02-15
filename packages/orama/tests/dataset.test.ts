@@ -1,7 +1,7 @@
 import t from 'tap'
 import { stopwords as englishStopwords } from '@orama/stopwords/english'
-import { DocumentsStore } from '../src/components/documents-store.js'
-import { AnyDocument, create, insertMultiple, remove, Results, search } from '../src/index.js'
+import { DocumentsStore } from '../src/components/documents-store.ts'
+import { AnyDocument, create, insertMultiple, remove, Results, search } from '../src/index.ts'
 import dataset from './datasets/events.json' assert { type: 'json' }
 import snapshots from './snapshots/events.json' assert { type: 'json' }
 

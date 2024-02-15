@@ -1,4 +1,4 @@
-import { AnyOrama } from '../types.js'
+import { AnyOrama } from '../types.ts'
 
 export type DocumentID = string | number
 export type InternalDocumentID = number

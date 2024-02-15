@@ -1,4 +1,4 @@
-import { InternalDocumentID } from './internal-document-id-store.js'
+import { InternalDocumentID } from './internal-document-id-store.ts'
 
 export function intersectFilteredIDs(
   filtered: InternalDocumentID[],

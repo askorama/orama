@@ -1,5 +1,5 @@
-import type { AnyDocument, GeosearchDistanceUnit, Results, SearchableValue, TokenScore } from './types.js'
-import { createError } from './errors.js'
+import type { AnyDocument, GeosearchDistanceUnit, Results, SearchableValue, TokenScore } from './types.ts'
+import { createError } from './errors.ts'
 
 const baseId = Date.now().toString().slice(5)
 let lastId = 0

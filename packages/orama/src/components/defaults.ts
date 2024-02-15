@@ -1,5 +1,5 @@
-import { createError } from '../errors.js'
-import { Point } from '../trees/bkd.js'
+import { createError } from '../errors.ts'
+import { Point } from '../trees/bkd.ts'
 import {
   AnyDocument,
   AnyOrama,
@@ -9,10 +9,10 @@ import {
   SearchableType,
   TypedDocument,
   Vector
-} from '../types.js'
-import { formatNanoseconds, uniqueId } from '../utils.js'
+} from '../types.ts'
+import { formatNanoseconds, uniqueId } from '../utils.ts'
 
-export { getDocumentProperties } from '../utils.js'
+export { getDocumentProperties } from '../utils.ts'
 
 export async function formatElapsedTime(n: bigint): Promise<ElapsedTime> {
   return {

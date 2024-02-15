@@ -9,7 +9,7 @@ import {
   greaterThan,
   lessThan,
   rangeSearch
-} from '../src/trees/zip.js'
+} from '../src/trees/zip.ts'
 
 t.test('ZIP Tree', (t) => {
   t.plan(7)

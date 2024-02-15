@@ -30,7 +30,7 @@ import { stopwords as swedishStopwords } from '@orama/stopwords/swedish'
 import { stopwords as ukrainianStopwords } from '@orama/stopwords/ukrainian'
 import { stopwords as tamilStopwords } from '@orama/stopwords/tamil'
 
-import { createTokenizer } from '../src/components/tokenizer/index.js'
+import { createTokenizer } from '../src/components/tokenizer/index.ts'
 
 t.test('Tokenizer', async (t) => {
   t.plan(21)

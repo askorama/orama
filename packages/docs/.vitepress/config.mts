@@ -92,7 +92,10 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Officially Supported Languages', link: '/open-source/supported-languages/index.html' },
-                { text: 'Using Chinese with Orama',       link: '/open-source/supported-languages/using-chinese-with-orama.html' },
+                {
+                  text: 'Using Chinese with Orama',
+                  link: '/open-source/supported-languages/using-chinese-with-orama.html'
+                }
               ]
             },
             { text: 'TypeScript', link: '/open-source/usage/typescript.html' }

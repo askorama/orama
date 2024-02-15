@@ -1,5 +1,5 @@
 import t from 'tap'
-import { count, getByID, create, insert } from '../src/index.js'
+import { count, getByID, create, insert } from '../src/index.ts'
 
 t.test('count', async (t) => {
   t.plan(2)

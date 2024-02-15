@@ -1,6 +1,6 @@
-import { createError } from '../errors.js'
-import { TokenScore, BM25Params } from '../types.js'
-import { InternalDocumentID } from './internal-document-id-store.js'
+import { createError } from '../errors.ts'
+import { TokenScore, BM25Params } from '../types.ts'
+import { InternalDocumentID } from './internal-document-id-store.ts'
 
 export function prioritizeTokenScores(
   arrays: TokenScore[][],
@@ -101,7 +101,7 @@ export function BM25(
   fieldLength: number,
   averageFieldLength: number,
   BM25Params: Required<BM25Params>
-) {
+): number {
   const { k, b, d } = BM25Params
   const idf = Math.log(1 + (docsCount - matchingCount + 0.5) / (matchingCount + 0.5))
   return (idf * (d + tf * (k + 1))) / (tf + k * (1 - b + (b * fieldLength) / averageFieldLength))

@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert, search } from '../src/index.js'
+import { create, insert, search } from '../src/index.ts'
 
 t.test('should only return results with all the search terms (exact match)', async (t) => {
   t.plan(4)

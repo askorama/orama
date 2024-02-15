@@ -1,12 +1,12 @@
-import { formatElapsedTime, getDocumentIndexId, getDocumentProperties, validateSchema } from '../components/defaults.js'
-import { DocumentsStore, createDocumentsStore } from '../components/documents-store.js'
-import { AVAILABLE_PLUGIN_HOOKS, getAllPluginsByHook } from '../components/plugins.js'
-import { FUNCTION_COMPONENTS, OBJECT_COMPONENTS } from '../components/hooks.js'
-import { Index, createIndex } from '../components/index.js'
-import { createInternalDocumentIDStore } from '../components/internal-document-id-store.js'
-import { Sorter, createSorter } from '../components/sorter.js'
-import { createTokenizer } from '../components/tokenizer/index.js'
-import { createError } from '../errors.js'
+import { formatElapsedTime, getDocumentIndexId, getDocumentProperties, validateSchema } from '../components/defaults.ts'
+import { DocumentsStore, createDocumentsStore } from '../components/documents-store.ts'
+import { AVAILABLE_PLUGIN_HOOKS, getAllPluginsByHook } from '../components/plugins.ts'
+import { FUNCTION_COMPONENTS, OBJECT_COMPONENTS } from '../components/hooks.ts'
+import { Index, createIndex } from '../components/index.ts'
+import { createInternalDocumentIDStore } from '../components/internal-document-id-store.ts'
+import { Sorter, createSorter } from '../components/sorter.ts'
+import { createTokenizer } from '../components/tokenizer/index.ts'
+import { createError } from '../errors.ts'
 import {
   Components,
   FunctionComponents,
@@ -17,8 +17,8 @@ import {
   OramaPlugin,
   SorterConfig,
   Tokenizer
-} from '../types.js'
-import { uniqueId } from '../utils.js'
+} from '../types.ts'
+import { uniqueId } from '../utils.ts'
 
 interface CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter> {
   schema: OramaSchema

@@ -1,5 +1,5 @@
-import type { Nullable, GenericSorting } from '../types.js'
-import type { InternalDocumentID } from '../components/internal-document-id-store.js'
+import type { Nullable, GenericSorting } from '../types.ts'
+import type { InternalDocumentID } from '../components/internal-document-id-store.ts'
 
 export interface Point {
   lon: number

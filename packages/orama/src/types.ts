@@ -1,12 +1,12 @@
-import { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from './constants.js'
-import { DocumentsStore } from './components/documents-store.js'
-import { Index } from './components/index.js'
-import { DocumentID, InternalDocumentID, InternalDocumentIDStore } from './components/internal-document-id-store.js'
-import { Sorter } from './components/sorter.js'
-import { Language } from './components/tokenizer/languages.js'
-import { Point } from './trees/bkd.js'
+import { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from './constants.ts'
+import { DocumentsStore } from './components/documents-store.ts'
+import { Index } from './components/index.ts'
+import { DocumentID, InternalDocumentID, InternalDocumentIDStore } from './components/internal-document-id-store.ts'
+import { Sorter } from './components/sorter.ts'
+import { Language } from './components/tokenizer/languages.ts'
+import { Point } from './trees/bkd.ts'
 
-export type { DefaultTokenizer } from './components/tokenizer/index.js'
+export type { DefaultTokenizer } from './components/tokenizer/index.ts'
 
 export type Nullable<T> = T | null
 

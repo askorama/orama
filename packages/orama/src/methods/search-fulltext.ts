@@ -6,17 +6,17 @@ import type {
   CustomSorterFunctionItem,
   TokenScore,
   ElapsedTime
-} from '../types.js'
-import type { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { getInternalDocumentId } from '../components/internal-document-id-store.js'
-import { getNanosecondsTime, removeVectorsFromHits, safeArrayPush, sortTokenScorePredicate } from '../utils.js'
-import { intersectFilteredIDs } from '../components/filters.js'
-import { prioritizeTokenScores } from '../components/algorithms.js'
-import { createError } from '../errors.js'
-import { createSearchContext, defaultBM25Params, fetchDocumentsWithDistinct, fetchDocuments } from './search.js'
-import { getFacets } from '../components/facets.js'
-import { getGroups } from '../components/groups.js'
-import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
+} from '../types.ts'
+import type { InternalDocumentID } from '../components/internal-document-id-store.ts'
+import { getInternalDocumentId } from '../components/internal-document-id-store.ts'
+import { getNanosecondsTime, removeVectorsFromHits, safeArrayPush, sortTokenScorePredicate } from '../utils.ts'
+import { intersectFilteredIDs } from '../components/filters.ts'
+import { prioritizeTokenScores } from '../components/algorithms.ts'
+import { createError } from '../errors.ts'
+import { createSearchContext, defaultBM25Params, fetchDocumentsWithDistinct, fetchDocuments } from './search.ts'
+import { getFacets } from '../components/facets.ts'
+import { getGroups } from '../components/groups.ts'
+import { runBeforeSearch, runAfterSearch } from '../components/hooks.ts'
 
 export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,

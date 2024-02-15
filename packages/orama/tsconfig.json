@@ -13,7 +13,9 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "moduleResolution": "nodenext"
+    "moduleResolution": "nodenext",
+    "allowImportingTsExtensions": true,
+    "emitDeclarationOnly": true
   },
   "include": ["src/*.ts", "src/**/*.ts"]
 }

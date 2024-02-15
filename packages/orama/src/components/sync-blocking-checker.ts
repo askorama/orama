@@ -1,4 +1,4 @@
-import { AnyOrama, kInsertions, kRemovals } from '../types.js'
+import { AnyOrama, kInsertions, kRemovals } from '../types.ts'
 
 // Web platforms don't have process. React-Native doesn't have process.emitWarning.
 const warn =

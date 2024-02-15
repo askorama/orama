@@ -1,4 +1,4 @@
-import { AnyOrama, TypedDocument } from '../types.js'
+import { AnyOrama, TypedDocument } from '../types.ts'
 
 export function getByID<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
   db: T,

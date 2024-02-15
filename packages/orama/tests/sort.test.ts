@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert, insertMultiple, load, remove, save, search, update } from '../src/index.js'
+import { create, insert, insertMultiple, load, remove, save, search, update } from '../src/index.ts'
 
 t.test('search with sortBy', (t) => {
   t.test('on number', async (t) => {

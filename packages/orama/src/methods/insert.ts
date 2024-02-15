@@ -1,9 +1,9 @@
-import { isArrayType, isGeoPointType, isVectorType } from '../components.js'
-import { runMultipleHook, runSingleHook } from '../components/hooks.js'
-import { trackInsertion } from '../components/sync-blocking-checker.js'
-import { createError } from '../errors.js'
-import { Point } from '../trees/bkd.js'
-import { AnyOrama, PartialSchemaDeep, SortValue, TypedDocument } from '../types.js'
+import { isArrayType, isGeoPointType, isVectorType } from '../components.ts'
+import { runMultipleHook, runSingleHook } from '../components/hooks.ts'
+import { trackInsertion } from '../components/sync-blocking-checker.ts'
+import { createError } from '../errors.ts'
+import { Point } from '../trees/bkd.ts'
+import { AnyOrama, PartialSchemaDeep, SortValue, TypedDocument } from '../types.ts'
 
 export async function insert<T extends AnyOrama>(
   orama: T,

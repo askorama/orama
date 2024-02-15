@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insertMultiple, search } from '../src/index.js'
+import { create, insertMultiple, search } from '../src/index.ts'
 
 t.test('create', (t) => {
   t.plan(3)
