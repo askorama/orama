@@ -2,7 +2,7 @@
   {
     "test": ".*\\.ts$",
     "env": {
-      "targets": "node >= 16"
+      "targets": "node >= 18"
     },
     "jsc": {
       "target": "es2022",
@@ -25,7 +25,7 @@
       "ignoreDynamic": true
     },
     "env": {
-      "targets": "node >= 16"
+      "targets": "node >= 18"
     },
     "jsc": {
       "target": "es2022",
