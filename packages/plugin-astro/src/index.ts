@@ -100,16 +100,11 @@ async function prepareOramaDb(
 }
 
 export function createPlugin(options: Record<string, OramaOptions>): AstroIntegration {
-  let config: AstroConfig
-
   return {
     name: PKG_NAME,
     hooks: {
-      'astro:config:done': function ({ config: cfg }): void {
-        config = cfg
-      },
       'astro:build:done': async function ({ pages, routes, dir }): Promise<void> {
-        const assetsDir = joinPath(config.outDir.pathname, 'assets').slice(isWindows ? 1 : 0)
+        const assetsDir = joinPath(dir.pathname, 'assets').slice(isWindows ? 1 : 0)
         if (!existsSync(assetsDir)) {
           mkdirSync(assetsDir)
         }
