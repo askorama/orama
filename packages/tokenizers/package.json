@@ -1,21 +1,21 @@
 {
   "name": "@orama/tokenizers",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "type": "module",
   "description": "Additional tokenizers for Orama",
   "sideEffects": false,
   "exports": {
     "./mandarin": {
-      "types": "./dist/tokenizer-mandarin/tokenizer.d.ts",
-      "import": "./dist/tokenizer-mandarin/tokenizer.mjs",
-      "require": "./dist/tokenizer-mandarin/tokenizer.js"
+      "types": "./build/tokenizer-mandarin/tokenizer.d.ts",
+      "import": "./build/tokenizer-mandarin/tokenizer.mjs",
+      "require": "./build/tokenizer-mandarin/tokenizer.js"
     }
   },
   "dependencies": {
     "@orama/orama": "workspace:*"
   },
   "files": [
-    "dist"
+    "build"
   ],
   "repository": {
     "type": "git",

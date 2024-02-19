@@ -1,6 +1,6 @@
 {
   "name": "@orama/orama",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "type": "module",
   "description": "Next generation full-text and vector search engine, written in TypeScript",
   "sideEffects": false,
@@ -92,7 +92,6 @@
     "auto-changelog": "^2.4.0",
     "c8": "^7.12.0",
     "commitizen": "^4.2.6",
-    "cronometro": "^1.1.5",
     "glob": "^9.2.3",
     "jscodeshift": "^0.15.1",
     "prettier": "^2.8.1",
@@ -102,8 +101,7 @@
     "tcompare": "^6.0.0",
     "tsd": "^0.29.0",
     "tsx": "^3.12.1",
-    "typescript": "^5.0.4",
-    "vite": "^4.1.4"
+    "typescript": "^5.0.4"
   },
   "engines": {
     "node": ">= 16.0.0"
