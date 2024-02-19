@@ -43,6 +43,7 @@
     "dev": "swc -s -w --extensions .ts,.cts -d dist src",
     "prebuild": "npm run lint",
     "build": "node scripts/build.js && jscodeshift -t scripts/postbuild.cjs --extensions=js,cjs dist",
+    "build:babel": " babel src --extensions \".ts,.tsx\" --out-dir dist",
     "lint": "eslint src tests --ext .js,.ts,.cts",
     "test": "c8 -c tests/config/c8-local.json tap tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --no-color tests/*.test.ts",
