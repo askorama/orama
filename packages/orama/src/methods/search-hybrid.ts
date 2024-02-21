@@ -132,7 +132,7 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
   language?: string
 ): Promise<TokenScore[]> {
   const timeStart = await getNanosecondsTime()
-  params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
+  params.relevance = Object.assign(defaultBM25Params, params.relevance ?? {})
 
   const { term, properties, threshold = 1 } = params
 

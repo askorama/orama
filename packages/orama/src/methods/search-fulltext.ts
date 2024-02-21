@@ -29,7 +29,7 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
     await runBeforeSearch(orama.beforeSearch, orama, params, language)
   }
 
-  params.relevance = Object.assign(params.relevance ?? {}, defaultBM25Params)
+  params.relevance = Object.assign(defaultBM25Params, params.relevance ?? {})
 
   const vectorProperties = Object.keys(orama.data.index.vectorIndexes)
 
