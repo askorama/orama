@@ -19,7 +19,8 @@ export const AVAILABLE_PLUGIN_HOOKS = [
   'beforeUpdateMultiple',
   'afterUpdateMultiple',
   'beforeLoad',
-  'afterLoad'
+  'afterLoad',
+  'afterCreate',
 ] as const
 
 export async function getAllPluginsByHook<T extends AnyOrama>(

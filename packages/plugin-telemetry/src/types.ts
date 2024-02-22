@@ -4,17 +4,11 @@ export type Optional<T = unknown> = T | undefined
 
 export interface SearchEvent {
   rawSearchString?: string
-  query: SearchParams<AnyOrama, unknown>
+  query: SearchParams<AnyOrama>
   resultsCount: number
   roundTripTime: number
   searchedAt: Date
   cached?: boolean
-}
-
-export interface ICollector {
-  endpoint: string
-  deploymentID: string
-  index: string
 }
 
 export interface TelemetryConfig {
