@@ -89,10 +89,10 @@ export function prioritizeTokenScores(
     lastTokenWithAllKeywords = 0
   }
 
-  const resultsWithIdAndScore: [number, number][] = [];
+  const resultsWithIdAndScore: [number, number][] = new Array(keywordsPerToken.length);
   for (let i = 0; i < keywordsPerToken.length; i++) {
-    resultsWithIdAndScore.push([keywordsPerToken[i][0], keywordsPerToken[i][1]]);
-  }
+    resultsWithIdAndScore[i] = [keywordsPerToken[i][0], keywordsPerToken[i][1]];
+
 
   // If threshold is 0, it means we will only return all the results that contains ALL the search terms (exact match)
   if (threshold === 0) {
