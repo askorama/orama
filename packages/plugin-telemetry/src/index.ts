@@ -25,11 +25,12 @@ export function pluginTelemetry(params: PluginTelemetryParams) {
   const afterSearch: OramaPluginSync['afterSearch'] = <T extends AnyOrama>(orama: T, params: SearchParams<T>, language: string | undefined, results: Results<AnyDocument>) => {
     collector?.add({
       query: params as any,
-      resultsCount: results.hits.length,
+      resultsCount: results.count,
       roundTripTime: Math.round(results.elapsed.raw / 1_000_000), // nanoseconds to milliseconds
       searchedAt: new Date(),
       cached: false,
-      rawSearchString: params.term
+      rawSearchString: params.term,
+      results: results.hits?.map((hit) => ({ id: hit.id, score: hit.score }))
     })
   }
 

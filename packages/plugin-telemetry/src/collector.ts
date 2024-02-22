@@ -35,6 +35,7 @@ export class Collector {
       resultsCount: data.resultsCount,
       roundTripTime: data.roundTripTime,
       searchedAt: data.searchedAt,
+      results: data.results,
       // The referer is different for every event:
       // the user can search in different pages of the website
       // and the referer will be different for each page
