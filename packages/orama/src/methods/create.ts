@@ -155,7 +155,7 @@ export async function create<
     formatElapsedTime,
     id,
     plugins,
-    version: '', // await getVersion(),
+    version: getVersion()
   } as unknown as Orama<OramaSchema, TIndex, TDocumentStore, TSorter>
 
   orama.data = {
@@ -174,4 +174,8 @@ export async function create<
   }
 
   return orama
+}
+
+function getVersion() {
+  return '{{VERSION}}'
 }
