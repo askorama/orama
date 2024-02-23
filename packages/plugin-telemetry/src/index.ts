@@ -1,45 +1,55 @@
-import type { AnyOrama, Results, SearchParamsFullText, Language } from '@orama/orama'
-import type { Optional } from './types.js'
+import type { AnyOrama, Results, SearchParams, OramaPluginSync, AnyDocument } from '@orama/orama'
 import { Collector } from './collector.js'
-import { DEFAULT_TELEMETRY_FLUSH_INTERVAL, DEFAULT_TELEMETRY_FLUSH_SIZE } from './const.js'
+import { DEFAULT_TELEMETRY_FLUSH_INTERVAL, DEFAULT_TELEMETRY_FLUSH_SIZE, DEFAULT_TELEMETRY_ENDPOINT, DEFAULT_ORAMA_DEPLOYMENT_ID, DEFAULT_ORAMA_VERSION } from './const.js'
 
 export interface PluginTelemetryParams {
   apiKey: string
-  endpoint: string
+  indexId: string
+  deploymentId?: string
+  oramaId?: string
+  endpoint?: string
   flushInterval?: number
   flushSize?: number
 }
 
 export function pluginTelemetry(params: PluginTelemetryParams) {
+  if (!params.apiKey) throw new Error('Missing apiKey for plugin-telemetry')
+  if (!params.indexId) throw new Error('Missing indexId for plugin-telemetry')
+
   const flushInterval = params.flushInterval || DEFAULT_TELEMETRY_FLUSH_INTERVAL
   const flushSize = params.flushSize || DEFAULT_TELEMETRY_FLUSH_SIZE
+  const endpoint = params.endpoint || DEFAULT_TELEMETRY_ENDPOINT
+  const deploymentId = params.deploymentId || DEFAULT_ORAMA_DEPLOYMENT_ID
+  let collector: Collector | undefined
 
-  if (!params.apiKey) throw new Error('Missing apiKey for plugin-telemetry')
-  if (!params.endpoint) throw new Error('Missing endpoint for plugin-telemetry')
+  const afterSearch: OramaPluginSync['afterSearch'] = <T extends AnyOrama>(orama: T, params: SearchParams<T>, language: string | undefined, results: Results<AnyDocument>) => {
+    collector?.add({
+      query: params as any,
+      resultsCount: results.count,
+      roundTripTime: Math.round(results.elapsed.raw / 1_000_000), // nanoseconds to milliseconds
+      searchedAt: new Date(),
+      cached: false,
+      rawSearchString: params.term,
+      results: results.hits?.map((hit) => ({ id: hit.id, score: hit.score }))
+    })
+  }
 
-  const collector = Collector.create({
-    id: params.endpoint,
-    endpoint: params.endpoint,
-    api_key: params.apiKey,
-    flushSize,
-    flushInterval
-  })
+  const afterCreate: OramaPluginSync['afterCreate'] = <T extends AnyOrama>(orama: T) => {
+    collector = Collector.create({
+      endpoint,
+      indexId: params.indexId,
+      deploymentId,
+      oramaId: orama.id,
+      oramaVersion: orama.version || DEFAULT_ORAMA_VERSION,
+      apiKey: params.apiKey,
+      flushSize,
+      flushInterval,
+    })
+  }
 
   return {
     name: 'plugin-telemetry',
-    afterSearch: (
-      orama: AnyOrama,
-      query: SearchParamsFullText<AnyOrama, unknown>,
-      language: Optional<Language>,
-      results: Results<unknown>
-    ) => {
-      collector.add({
-        query,
-        resultsCount: results.count,
-        roundTripTime: results.elapsed.raw,
-        searchedAt: new Date(),
-        rawSearchString: query.term
-      })
-    }
+    afterSearch,
+    afterCreate,
   }
 }

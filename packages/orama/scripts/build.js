@@ -86,6 +86,18 @@ async function cjs() {
   ])
 }
 
+async function replaceVersion() {
+  const packageJson = await readFile(resolve(rootDir, 'package.json'), 'utf-8')
+  const { version } = JSON.parse(packageJson)
+
+  const VERSION_PLACEHOLDER = '{{VERSION}}'
+  const createFilePath = resolve(destinationDir, 'methods', 'create.js')
+
+  await replaceInFile(createFilePath, [
+    [VERSION_PLACEHOLDER, version]
+  ])
+}
+
 async function main() {
   // Remove and recreate destination directory
   await rm(destinationDir, { recursive: true, force: true })
@@ -93,7 +105,13 @@ async function main() {
 
   // Compile different versions
   await esm()
+
+  // Replace version placeholder in esm
+  // cjs inherits the version from esm
+  await replaceVersion()
+
   await cjs()
+
 }
 
 await main()

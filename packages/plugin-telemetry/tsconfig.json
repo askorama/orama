@@ -1,20 +1,18 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "target": "ES5",
-    "module": "NodeNext",
+    "target": "ESNext",
+    "module": "ESNext",
     "outDir": "dist",
-    "jsx": "react",
-    "noImplicitAny": false,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "noImplicitAny": false,
     "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "sourceMap": true,
-    "moduleResolution": "nodenext"
+    "sourceMap": true
   },
   "include": ["src/*.ts", "src/**/*.ts", "src/*.tsx", "src/**/*.tsx"]
 }
