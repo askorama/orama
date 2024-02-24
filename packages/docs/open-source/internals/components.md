@@ -364,7 +364,7 @@ const movieDB = await create({
   },
   components: {
     validateSchema(doc) {
-      return typeof doc.name === 'string && typeof doc.director === 'string'
+      return typeof doc.name === 'string' && typeof doc.director === 'string'
     }
   }
 })
