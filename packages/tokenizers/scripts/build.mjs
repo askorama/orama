@@ -2,8 +2,12 @@ import path from 'node:path'
 import fs from 'node:fs'
 import childProcess from 'node:child_process'
 
-if (process.env.GITHUB_ACTIONS) {
-  console.log('Skipping build in CI')
+const isWasmPackInstalled = await checkWasmPackInstalled()
+  
+if (!isWasmPackInstalled) {
+  console.warn('!! WARNING')
+  console.warn('!! Compilation of the Mandarin tokenizer requires wasm-pack to be installed.')
+  console.warn('!! No wasm-pack installation found. Skipping build.')
   process.exit(0)
 }
 
@@ -40,3 +44,15 @@ const rr = `export const wasm = new Uint8Array([${b.join(',')}]);`
 fs.writeFileSync('./build/tokenizer-mandarin/tokenizer_mandarin_bg_wasm_arr.js', rr)
 
 childProcess.execSync(`cd ${mandarinTokenizerDistPath} && npx tsup --format cjs,esm,iife --outDir . tokenizer.ts`)
+
+async function checkWasmPackInstalled() {
+  return new Promise((resolve) => {
+    childProcess.exec('wasm-pack --version', (err) => {
+      if (err) {
+        resolve(false)
+      } else {
+        resolve(true)
+      }
+    })
+  })
+}
