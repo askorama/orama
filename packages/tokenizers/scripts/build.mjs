@@ -47,7 +47,7 @@ childProcess.execSync(`cd ${mandarinTokenizerDistPath} && npx tsup --format cjs,
 
 async function checkWasmPackInstalled() {
   return new Promise((resolve) => {
-    childProcess.exec('wasm-pac2k --version', (err) => {
+    childProcess.exec('wasm-pack --version', (err) => {
       if (err) {
         resolve(false)
       } else {
