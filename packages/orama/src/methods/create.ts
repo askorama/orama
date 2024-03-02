@@ -1,7 +1,7 @@
 import { formatElapsedTime, getDocumentIndexId, getDocumentProperties, validateSchema } from '../components/defaults.ts'
 import { DocumentsStore, createDocumentsStore } from '../components/documents-store.ts'
 import { AVAILABLE_PLUGIN_HOOKS, getAllPluginsByHook } from '../components/plugins.ts'
-import { FUNCTION_COMPONENTS, OBJECT_COMPONENTS } from '../components/hooks.ts'
+import { FUNCTION_COMPONENTS, OBJECT_COMPONENTS, runAfterCreate } from '../components/hooks.ts'
 import { Index, createIndex } from '../components/index.ts'
 import { createInternalDocumentIDStore } from '../components/internal-document-id-store.ts'
 import { Sorter, createSorter } from '../components/sorter.ts'
@@ -151,9 +151,11 @@ export async function create<
     afterRemoveMultiple: [],
     afterUpdateMultiple: [],
     beforeUpdateMultiple: [],
+    afterCreate: [],
     formatElapsedTime,
     id,
-    plugins
+    plugins,
+    version: getVersion()
   } as unknown as Orama<OramaSchema, TIndex, TDocumentStore, TSorter>
 
   orama.data = {
@@ -166,5 +168,14 @@ export async function create<
     orama[hook] = (orama[hook] ?? []).concat(await getAllPluginsByHook(orama, hook))
   }
 
+  const afterCreate = orama['afterCreate']
+  if (afterCreate) {
+    await runAfterCreate(afterCreate, orama)
+  }
+
   return orama
+}
+
+function getVersion() {
+  return '{{VERSION}}'
 }

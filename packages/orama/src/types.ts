@@ -886,6 +886,10 @@ export type BeforeSearch<T extends AnyOrama> = (
   language: string | undefined
 ) => SyncOrAsyncValue
 
+export type AfterCreate<T extends AnyOrama> = (
+  db: T,
+) => SyncOrAsyncValue
+
 export type IIndexInsertOrRemoveHookFunction = <R = void>(
   index: AnyIndexStore,
   prop: string,
@@ -1120,6 +1124,10 @@ export interface SingleOrArrayCallbackComponents<T extends AnyOrama> {
    * More details {@link MultipleCallbackComponent}
    */
   afterUpdateMultiple: SingleOrArray<MultipleCallbackComponent<T>>
+  /**
+   * More details {@link AfterCreate}
+   */
+  afterCreate: SingleOrArray<AfterCreate<T>>
 }
 
 export interface ArrayCallbackComponents<T extends AnyOrama> {
@@ -1179,6 +1187,10 @@ export interface ArrayCallbackComponents<T extends AnyOrama> {
    * More details {@link MultipleCallbackComponent}
    */
   afterUpdateMultiple: MultipleCallbackComponent<T>[]
+  /**
+   * More details {@link AfterCreate}
+   */
+  afterCreate: AfterCreate<T>[]
 }
 
 export type Components<T extends AnyOrama, TSchema, TIndex, TDocumentStore, TSorter> = Partial<
@@ -1196,6 +1208,7 @@ type Internals<
   TDocumentStore extends AnyDocumentStore,
   TSorter extends AnySorterStore
 > = {
+  version: string
   schema: TSchema
   typeSchema: Schema<TSchema>
   tokenizer: Tokenizer
@@ -1282,6 +1295,7 @@ export type OramaPluginSync = {
   afterRemoveMultiple?: <T extends AnyOrama>(orama: T, ids: string[]) => SyncOrAsyncValue
   beforeUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
   afterUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
+  afterCreate?: <T extends AnyOrama>(orama: T) => SyncOrAsyncValue
 }
 
 export type OramaPluginAsync = Promise<OramaPluginSync>

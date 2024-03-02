@@ -6,7 +6,8 @@ import {
   Results,
   SearchParams,
   SingleCallbackComponent,
-  TypedDocument
+  TypedDocument,
+  AfterCreate
 } from '../types.ts'
 
 export const OBJECT_COMPONENTS = ['tokenizer', 'index', 'documentsStore', 'sorter']
@@ -67,5 +68,15 @@ export async function runBeforeSearch<T extends AnyOrama>(
   const hooksLength = hooks.length
   for (let i = 0; i < hooksLength; i++) {
     await hooks[i](db, params, language)
+  }
+}
+
+export async function runAfterCreate<T extends AnyOrama>(
+  hooks: AfterCreate<T>[],
+  db: T,
+): Promise<void> {
+  const hooksLength = hooks.length
+  for (let i = 0; i < hooksLength; i++) {
+    await hooks[i](db)
   }
 }

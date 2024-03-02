@@ -1,26 +1,25 @@
-import type { SearchEvent, ICollector, TelemetryConfig } from './types.js'
+import type { SearchEvent, TelemetryConfig } from './types.js'
 import { sendBeacon } from './polyfills.js'
+import { TELEMETRY_OSS_SOURCE } from './const.js'
 
 type Data = object[]
 
 export interface CollectorConstructor extends TelemetryConfig {
-  id: string
   endpoint: string
-  api_key: string
+  apiKey: string
+  deploymentId: string
+  oramaId: string
+  oramaVersion: string
+  indexId: string
 }
 
 export class Collector {
   private data: Data
-  private params?: ICollector
   private readonly config: CollectorConstructor
 
   private constructor(config: CollectorConstructor) {
     this.data = []
     this.config = config
-  }
-
-  public setParams(params: ICollector): void {
-    this.params = params
   }
 
   public static create(config: CollectorConstructor): Collector {
@@ -36,19 +35,20 @@ export class Collector {
       resultsCount: data.resultsCount,
       roundTripTime: data.roundTripTime,
       searchedAt: data.searchedAt,
+      results: data.results,
       // The referer is different for every event:
       // the user can search in different pages of the website
       // and the referer will be different for each page
       referer: typeof location !== 'undefined' ? location.toString() : undefined
     })
 
-    if (this.params != null && this.data.length >= this.config.flushSize) {
+    if (this.data.length >= this.config.flushSize) {
       this.flush()
     }
   }
 
   public flush(): void {
-    if (this.params == null || this.data.length === 0) {
+    if (this.data.length === 0) {
       return
     }
 
@@ -58,11 +58,11 @@ export class Collector {
     this.data = []
 
     const body = {
-      source: 'fe',
-      deploymentID: this.params.deploymentID,
-      index: this.params.index,
-      oramaId: this.config.id,
-      oramaVersion: '@todo: add version',
+      source: TELEMETRY_OSS_SOURCE,
+      deploymentID: this.config.deploymentId,
+      index: this.config.indexId,
+      oramaId: this.config.oramaId,
+      oramaVersion: this.config.oramaVersion,
       // The user agent is the same for every event
       // Because we use "application/x-www-form-urlencoded",
       // the browser doens't send the user agent automatically
@@ -70,7 +70,7 @@ export class Collector {
       events: data
     }
 
-    sendBeacon(this.params.endpoint + `?api-key=${this.config.api_key}`, JSON.stringify(body))
+    sendBeacon(this.config.endpoint + `?api-key=${this.config.apiKey}`, JSON.stringify(body))
   }
 
   private start(): void {
