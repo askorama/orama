@@ -11,7 +11,7 @@ Usage:
 
 ```js
 import { create } from '@orama/orama'
-import { createTokenizer } from '@orama/tokenizes/mandarin'
+import { createTokenizer } from '@orama/tokenizers/mandarin'
 
 const db = await create({
   schema: {
