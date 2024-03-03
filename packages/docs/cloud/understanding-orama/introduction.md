@@ -15,7 +15,7 @@ Its numerous features include:
 - Full-text search
 - Vector search
 - Hybrid search
-- Stemming and tokenizing in 29 languages
+- Stemming and tokenizing in 30 languages
 - Geosearch
 - Query filters
 - Facets

@@ -82,6 +82,11 @@
       "import": "./dist/it.js",
       "require": "./dist/it.cjs"
     },
+    "./japanese": {
+      "types": "./dist/ja.d.ts",
+      "import": "./dist/ja.js",
+      "require": "./dist/ja.cjs"
+    },
     "./lithuanian": {
       "types": "./dist/lt.d.ts",
       "import": "./dist/lt.js",

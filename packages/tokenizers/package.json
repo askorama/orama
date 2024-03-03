@@ -5,6 +5,11 @@
   "description": "Additional tokenizers for Orama",
   "sideEffects": false,
   "exports": {
+    "./japanese": {
+      "types": "./build/tokenizer-japanese/tokenizer.d.ts",
+      "import": "./build/tokenizer-japanese/tokenizer.mjs",
+      "require": "./build/tokenizer-japanese/tokenizer.js"
+    },
     "./mandarin": {
       "types": "./build/tokenizer-mandarin/tokenizer.d.ts",
       "import": "./build/tokenizer-mandarin/tokenizer.mjs",
@@ -26,7 +31,7 @@
   },
   "scripts": {
     "build": "node ./scripts/build.mjs",
-    "test": "npm run build && node ./tests/mandarin.test.js"
+    "test": "node ./tests/japanese.test.js && node ./tests/japanese.test.js"
   },
   "keywords": [
     "full-text search",

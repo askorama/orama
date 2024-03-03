@@ -38,7 +38,7 @@ const db = create({
 })
 ```
 
-Right now, Orama supports 29 languages and stemmers out of the box:
+Right now, Orama supports 30 languages and stemmers out of the box:
 
 - Arabic
 - Armenian

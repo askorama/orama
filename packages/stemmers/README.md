@@ -2,7 +2,7 @@
 
 Orama can analyze the input and perform a `stemming` operation, which allows the engine to perform more optimized queries, as well as save indexing space.
 
-Right now, Orama supports 29 languages and stemmers out of the box:
+Right now, Orama supports 30 languages and stemmers out of the box:
 
 - Arabic
 - Armenian
