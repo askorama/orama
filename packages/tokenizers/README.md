@@ -3,8 +3,8 @@
 This package provides support for additional tokenizers for the Orama Search Engine.
 
 Available tokenizers:
-- Chinese (Mandarin)
-- Japanese
+- Chinese (Mandarin, experimental)
+- Japanese (experimental)
 - Korean (work in progress)
 
 Usage:

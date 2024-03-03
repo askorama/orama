@@ -95,6 +95,10 @@ export default defineConfig({
                 {
                   text: 'Using Chinese with Orama',
                   link: '/open-source/supported-languages/using-chinese-with-orama.html'
+                },
+                {
+                  text: 'Using Japanese with Orama',
+                  link: '/open-source/supported-languages/using-japanese-with-orama.html'
                 }
               ]
             },
