@@ -20,6 +20,7 @@ Right now, Orama supports 30 languages and stemmers out of the box:
 - Indonesian
 - Irish
 - Italian
+- Japanese
 - Nepali
 - Norwegian
 - Portuguese
