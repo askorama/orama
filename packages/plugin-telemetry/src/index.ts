@@ -2,9 +2,12 @@ import type { AnyOrama, Results, SearchParams, OramaPluginSync, AnyDocument } fr
 import { Collector } from './collector.js'
 import { DEFAULT_TELEMETRY_FLUSH_INTERVAL, DEFAULT_TELEMETRY_FLUSH_SIZE, DEFAULT_TELEMETRY_ENDPOINT, DEFAULT_ORAMA_DEPLOYMENT_ID, DEFAULT_ORAMA_VERSION } from './const.js'
 
+const PLUGIN_NAME = 'plugin-telemetry'
+
 export interface PluginTelemetryParams {
   apiKey: string
   indexId: string
+  enabled?: boolean
   deploymentId?: string
   oramaId?: string
   endpoint?: string
@@ -13,6 +16,13 @@ export interface PluginTelemetryParams {
 }
 
 export function pluginTelemetry(params: PluginTelemetryParams) {
+  if (params.enabled === false) {
+    // We register the plugin but we don't do anything
+    return {
+      name: PLUGIN_NAME
+    }
+  }
+
   if (!params.apiKey) throw new Error('Missing apiKey for plugin-telemetry')
   if (!params.indexId) throw new Error('Missing indexId for plugin-telemetry')
 
@@ -48,7 +58,7 @@ export function pluginTelemetry(params: PluginTelemetryParams) {
   }
 
   return {
-    name: 'plugin-telemetry',
+    name: PLUGIN_NAME,
     afterSearch,
     afterCreate,
   }
