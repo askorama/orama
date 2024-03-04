@@ -4,32 +4,33 @@
   "type": "module",
   "description": "Next generation full-text and vector search engine, written in TypeScript",
   "sideEffects": false,
-  "main": "./dist/cjs/index.cjs",
+  "main": "./dist-cjs/index.cjs",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/cjs/index.cjs"
+      "types": "./dist-esm/index.d.ts",
+      "import": "./dist-esm/index.js",
+      "require": "./dist-cjs/index.cjs"
     },
     "./internals": {
-      "types": "./dist/internals.d.ts",
-      "import": "./dist/internals.js",
-      "require": "./dist/cjs/internals.cjs"
+      "types": "./dist-esm/internals.d.ts",
+      "import": "./dist-esm/internals.js",
+      "require": "./dist-cjs/internals.cjs"
     },
     "./components": {
-      "types": "./dist/components.d.ts",
-      "import": "./dist/components.js",
-      "require": "./dist/cjs/components.cjs"
+      "types": "./dist-esm/components.d.ts",
+      "import": "./dist-esm/components.js",
+      "require": "./dist-cjs/components.cjs"
     },
     "./trees": {
-      "types": "./dist/trees.d.ts",
-      "import": "./dist/trees.js",
-      "require": "./dist/cjs/trees.cjs"
+      "types": "./dist-esm/trees.d.ts",
+      "import": "./dist-esm/trees.js",
+      "require": "./dist-cjs/trees.cjs"
     }
   },
-  "types": "./dist/index.d.ts",
+  "types": "./dist-esm/index.d.ts",
   "files": [
-    "dist"
+    "dist-esm",
+    "dist-cjs"
   ],
   "repository": {
     "type": "git",
@@ -39,8 +40,6 @@
     "url": "https://github.com/oramasearch/orama"
   },
   "scripts": {
-    "predev": "rm -rf dist && mkdir dist",
-    "dev": "swc -s -w --extensions .ts,.cts -d dist src",
     "prebuild": "npm run lint",
     "build": "npm run build:babel:esm && npm run build:babel:cjs && npm run build:types:esm && npm run build:types:cjs",
     "build:babel:esm": "rimraf dist-esm && babel src --extensions \".ts\" --out-dir dist-esm",
