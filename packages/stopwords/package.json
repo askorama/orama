@@ -1,6 +1,6 @@
 {
   "name": "@orama/stopwords",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "type": "module",
   "description": "Stop-words for Orama",
   "sideEffects": false,
@@ -81,6 +81,11 @@
       "types": "./dist/it.d.ts",
       "import": "./dist/it.js",
       "require": "./dist/it.cjs"
+    },
+    "./japanese": {
+      "types": "./dist/ja.d.ts",
+      "import": "./dist/ja.js",
+      "require": "./dist/ja.cjs"
     },
     "./lithuanian": {
       "types": "./dist/lt.d.ts",

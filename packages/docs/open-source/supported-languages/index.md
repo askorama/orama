@@ -4,13 +4,15 @@ outline: deep
 
 # Officially Supported Languages
 
-Right now, Orama supports 29 languages out of the box in 8 different alphabets. \
+Right now, Orama supports 30 languages out of the box in 8 different alphabets. \
 For every language, Orama provides a default tokenizer, stop-words, and stemmer.
 
-::: tip 🇨🇳 A note on Chinese
-At the time of writing, Chinese (Mandarin) is the only exception, since Orama provides everything by default but the stemmer.
+::: tip 🇨🇳🇯🇵 A note on Chinese and Japanese
+At the time of writing, Chinese (Mandarin) and Japanese are the only exception, since Orama provides everything by default but the stemmer.
 
-Since Chinese logograms follow different rules than other alphabets, you will need to import a dedicated tokenizer for it. [Read more here](/open-source/supported-languages/using-chinese-with-orama.html).
+Since Chinese and Japanese logograms follow different rules than other alphabets, you will need to import a dedicated tokenizer for it.
+
+Read more here about Chinese [here](/open-source/supported-languages/using-chinese-with-orama.html) and about Japanese [here](/open-source/supported-languages/using-japanese-with-orama.html).
 :::
 
 ### Latin Alphabet
@@ -87,3 +89,4 @@ Since Chinese logograms follow different rules than other alphabets, you will ne
 | Language               | Tokenizer | Stop-words | Stemmer |
 | ---------------------- | --------- | ---------- | --------|
 | Chinese (Mandarin)     | ✅        | ✅          | ❌      |
+| Japanese               | ✅        | ✅          | ❌      |

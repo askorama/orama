@@ -24,7 +24,7 @@ the
 - [Typo Tolerance](https://docs.oramasearch.com/open-source/usage/search/introduction#typo-tolerance)
 - [Exact Match](https://docs.oramasearch.com/open-source/usage/search/introduction#exact-match)
 - [BM25](https://docs.oramasearch.com/open-source/usage/search/bm25-algorithm)
-- [Stemming and tokenization in 29 languages](https://docs.oramasearch.com/open-source/text-analysis/stemming)
+- [Stemming and tokenization in 30 languages](https://docs.oramasearch.com/open-source/text-analysis/stemming)
 - [Plugin System](https://docs.oramasearch.com/open-source/plugins/introduction)
 
 # Installation

@@ -3,15 +3,15 @@
 This package provides support for additional tokenizers for the Orama Search Engine.
 
 Available tokenizers:
-- Chinese (Mandarin - stemmer not supported)
-- Japanese (work in progress)
+- Chinese (Mandarin, experimental)
+- Japanese (experimental)
 - Korean (work in progress)
 
 Usage:
 
 ```js
 import { create } from '@orama/orama'
-import { createTokenizer } from '@orama/tokenizes/mandarin'
+import { createTokenizer } from '@orama/tokenizers/mandarin'
 
 const db = await create({
   schema: {
