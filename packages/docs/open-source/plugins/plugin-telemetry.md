@@ -40,3 +40,27 @@ await insertMultiple(db, [
 // Collects telemetry data and sends it to Orama Cloud
 await search(db, { term: 'foo' })
 ```
+
+## Disabling Telemetry
+
+By default, Orama is shipped without telemetry plugin. If you want to enable it, you need to explicitly add it to your configuration as described above.
+
+Anyway, you can disable it by passing `enabled: false` to the `pluginTelemetry` function in your configuration, like this:
+
+```js
+import { Orama } from '@orama/core';
+import { pluginTelemetry } from '@orama/plugin-telemetry';
+
+const db = await create({
+  schema: { name: 'string' } as const,
+  plugins: [
+    pluginTelemetry({
+      apiKey: 'your-api-key',
+      indexId: 'your-index-id',
+      enabled: false, // <--- disable telemetry
+    })
+  ]
+})
+```
+
+This flag is useful when you want to disable telemetry in development environment, for example.
