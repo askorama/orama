@@ -1,3 +1,5 @@
+// Legacy build system. Keep for reference.
+
 import glob from 'glob'
 import { spawn } from 'node:child_process'
 import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
