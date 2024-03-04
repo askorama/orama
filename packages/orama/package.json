@@ -4,30 +4,30 @@
   "type": "module",
   "description": "Next generation full-text and vector search engine, written in TypeScript",
   "sideEffects": false,
-  "main": "./dist-cjs/index.cjs",
+  "main": "./dist/script/index.js",
   "exports": {
     ".": {
-      "types": "./dist-esm/index.d.ts",
-      "import": "./dist-esm/index.js",
-      "require": "./dist-cjs/index.cjs"
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/script/index.js"
     },
     "./internals": {
-      "types": "./dist-esm/internals.d.ts",
-      "import": "./dist-esm/internals.js",
-      "require": "./dist-cjs/internals.cjs"
+      "types": "./dist/esm/internals.d.ts",
+      "import": "./dist/esm/internals.js",
+      "require": "./dist/script/internals.js"
     },
     "./components": {
-      "types": "./dist-esm/components.d.ts",
-      "import": "./dist-esm/components.js",
-      "require": "./dist-cjs/components.cjs"
+      "types": "./dist/esm/components.d.ts",
+      "import": "./dist/esm/components.js",
+      "require": "./dist/script/components.js"
     },
     "./trees": {
-      "types": "./dist-esm/trees.d.ts",
-      "import": "./dist-esm/trees.js",
-      "require": "./dist-cjs/trees.cjs"
+      "types": "./dist/esm/trees.d.ts",
+      "import": "./dist/esm/trees.js",
+      "require": "./dist/script/trees.js"
     }
   },
-  "types": "./dist-esm/index.d.ts",
+  "types": "./dist/esm/index.d.ts",
   "files": [
     "dist-esm",
     "dist-cjs"
@@ -41,7 +41,8 @@
   },
   "scripts": {
     "prebuild": "npm run lint",
-    "build": "npm run build:babel:esm && npm run build:babel:cjs && npm run build:types:esm && npm run build:types:cjs",
+    "build": "deno run -A dnt.ts",
+    "--build": "npm run build:babel:esm && npm run build:babel:cjs && npm run build:types:esm && npm run build:types:cjs",
     "build:babel:esm": "rimraf dist-esm && babel src --extensions \".ts\" --out-dir dist-esm",
     "build:babel:cjs": "rimraf dist-cjs && babel src/cjs --extensions \".ts,.cts\" --out-dir dist-cjs",
     "build:types:esm": "tsc -p . --emitDeclarationOnly --declarationDir dist-esm",
