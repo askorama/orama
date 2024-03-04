@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insertMultiple, search } from '@orama/orama'
+import { OramaPluginSync, create, insertMultiple, search } from '@orama/orama'
 import { http, HttpResponse } from "msw";
 import { setupServer, SetupServerApi } from "msw/node";
 
@@ -31,6 +31,9 @@ t.test('telemetry-plugin', async (t) => {
       })
     ]
   })
+  t.equal(db.plugins.length, 1)
+  t.notSame((db.plugins[0] as OramaPluginSync).afterCreate, undefined)
+  t.notSame((db.plugins[0] as OramaPluginSync).afterSearch, undefined)
 
   await insertMultiple(db, [
     { name: 'foo' },
@@ -89,6 +92,24 @@ t.test('telemetry-plugin', async (t) => {
   })
 
   t.end()
+})
+
+t.test('enabled: false', async (t) => {
+  const db = await create({
+    schema: { name: 'string' } as const,
+    plugins: [
+      pluginTelemetry({
+        apiKey: API_KEY,
+        indexId: INDEX_ID,
+        enabled: false
+      })
+    ]
+  })
+
+  // The plugin is registered but it doesn't do anything
+  t.equal(db.plugins.length, 1)
+  t.same((db.plugins[0] as OramaPluginSync).afterCreate, undefined)
+  t.same((db.plugins[0] as OramaPluginSync).afterSearch, undefined)
 })
 
 t.test('throw error', async (t) => {
