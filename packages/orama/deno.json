@@ -1,6 +1,6 @@
 {
   "name": "@orama/orama",
-  "version": "2.0.6",
+  "version": "2.0.9",
   "exports": {
     ".": "./src/index.ts",
     "./internals": "./src/internals.ts",
