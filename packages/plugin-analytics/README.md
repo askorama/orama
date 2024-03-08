@@ -1,8 +1,8 @@
-# Orama Telemetry Plugin
+# Orama Analytics Plugin
 
 [![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
 
-Official plugin to provide telemetry data on your searches.
+Official plugin to provide analytics data on your searches.
 
 # Usage
 
@@ -12,7 +12,7 @@ To use the Orama Telemetry Plugin, you will need to sign up for a free account a
 
 ```js
 import { create, insert, search } from '@orama/orama'
-import { pluginTelemetry } from '@orama/plugin-telemetry'
+import { pluginAnalytics} from '@orama/plugin-analytics'
 
 const db = await create({
   schema: {
@@ -20,7 +20,7 @@ const db = await create({
     description: 'string'
   },
   plugins: [
-    pluginTelemetry({
+    pluginAnalytics({
       apiKey: '<API-KEY>',
       endpoint: '<ENDPOINT>'
     })

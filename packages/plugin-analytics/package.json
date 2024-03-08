@@ -1,7 +1,7 @@
 {
-  "name": "@orama/plugin-telemetry",
+  "name": "@orama/plugin-analytics",
   "version": "2.0.9",
-  "description": "Orama plugin for providing telemetry data on your searches",
+  "description": "Orama plugin for providing analytics data on your searches",
   "keywords": [
     "orama",
     "telemetry",

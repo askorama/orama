@@ -3,14 +3,14 @@ import { OramaPluginSync, create, insertMultiple, search } from '@orama/orama'
 import { http, HttpResponse } from "msw";
 import { setupServer, SetupServerApi } from "msw/node";
 
-import { pluginTelemetry } from '../index.js'
+import { pluginAnalytics } from '../index.js'
 import { DEFAULT_ORAMA_DEPLOYMENT_ID } from '../const.js';
 
 const FAKE_ENDPOINT = 'http://localhost:3000/sso_collect'
 const API_KEY = 'the-api-key'
 const INDEX_ID = 'the-index-id'
 
-t.test('telemetry-plugin', async (t) => {
+t.test('analytics-plugin', async (t) => {
   const invocations: MockedRequest[] = []
   const server = getServer(invocations)
   await server.listen()
@@ -22,7 +22,7 @@ t.test('telemetry-plugin', async (t) => {
   const db = await create({
     schema: { name: 'string' } as const,
     plugins: [
-      pluginTelemetry({
+      pluginAnalytics({
         apiKey: API_KEY,
         indexId: INDEX_ID,
         flushInterval: 100,
@@ -98,7 +98,7 @@ t.test('enabled: false', async (t) => {
   const db = await create({
     schema: { name: 'string' } as const,
     plugins: [
-      pluginTelemetry({
+      pluginAnalytics({
         apiKey: API_KEY,
         indexId: INDEX_ID,
         enabled: false
@@ -114,10 +114,10 @@ t.test('enabled: false', async (t) => {
 
 t.test('throw error', async (t) => {
   t.test('if apiKey is missing', async (t) => {
-    t.throws(() => pluginTelemetry({ indexId: 'a' } as any), /Missing apiKey for plugin-telemetry/)
+    t.throws(() => pluginAnalytics({ indexId: 'a' } as any), /Missing apiKey for plugin-analytics/)
   })
   t.test('if indexId is missing', async (t) => {
-    t.throws(() => pluginTelemetry({ apiKey: 'a' } as any), /Missing indexId for plugin-telemetry/)
+    t.throws(() => pluginAnalytics({ apiKey: 'a' } as any), /Missing indexId for plugin-analytics/)
   })
 })
 

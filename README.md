@@ -339,7 +339,7 @@ Read the complete documentation at [https://docs.oramasearch.com](https://docs.o
 
 - [Plugin Vitepress](https://docs.oramasearch.com/open-source/plugins/plugin-vitepress)
 - [Plugin Docusaurus](https://docs.oramasearch.com/open-source/plugins/plugin-docusaurus)
-- [Plugin Telemetry](https://docs.oramasearch.com/open-source/plugins/plugin-telemetry)
+- [Plugin Analytics](https://docs.oramasearch.com/open-source/plugins/plugin-analytics)
 - [Plugin Astro](https://docs.oramasearch.com/open-source/plugins/plugin-astro)
 - [Plugin Data Persistence](https://docs.oramasearch.com/open-source/plugins/plugin-data-persistence)
 - [Plugin Nextra](https://docs.oramasearch.com/open-source/plugins/plugin-nextra)

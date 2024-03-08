@@ -12,7 +12,7 @@ export interface SearchEvent {
   cached?: boolean
 }
 
-export interface TelemetryConfig {
+export interface AnalyticsConfig {
   flushInterval: number
   flushSize: number
 }
