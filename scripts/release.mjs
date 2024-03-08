@@ -13,7 +13,7 @@ const packages = [
   'plugin-match-highlight',
   'plugin-nextra',
   'plugin-parsedoc',
-  'plugin-telemetry',
+  'plugin-analytics',
   'plugin-secure-proxy',
   'stemmers',
   'stopwords',
