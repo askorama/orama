@@ -1,4 +1,4 @@
-export * from './components/defaults.cjs'
-export * as documentsStore from './components/documents-store.cjs'
-export * as index from './components/index.cjs'
-export * as tokenizer from './components/tokenizer.cjs'
+export * from './components/defaults.cts'
+export * as documentsStore from './components/documents-store.cts'
+export * as index from './components/index.cts'
+export * as tokenizer from './components/tokenizer.cts'

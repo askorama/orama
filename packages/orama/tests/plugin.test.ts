@@ -9,8 +9,8 @@ import {
   update,
   removeMultiple,
   updateMultiple
-} from '../src/index.js'
-import { getAllPluginsByHook } from '../src/components/plugins.js'
+} from '../src/index.ts'
+import { getAllPluginsByHook } from '../src/components/plugins.ts'
 
 t.test('getAllPluginsByHook', async (t) => {
   t.plan(1)

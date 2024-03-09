@@ -1,7 +1,7 @@
-import type { Point } from './bkd.js'
-import { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { EnumArrComparisonOperator, EnumComparisonOperator, Nullable, ScalarSearchableValue } from '../types.js'
-import { intersect, safeArrayPush } from '../utils.js'
+import type { Point } from './bkd.ts'
+import { InternalDocumentID } from '../components/internal-document-id-store.ts'
+import { EnumArrComparisonOperator, EnumComparisonOperator, Nullable, ScalarSearchableValue } from '../types.ts'
+import { intersect, safeArrayPush } from '../utils.ts'
 
 export interface FlatTree {
   numberToDocumentId: Map<ScalarSearchableValue, InternalDocumentID[]>

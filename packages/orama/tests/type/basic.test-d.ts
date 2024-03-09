@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { expectType } from 'tsd'
 import type { Orama, Results, SearchParams, TypedDocument } from '../../src/types.d.ts'
-import { create, insert, search } from '../../src/index.js'
+import { create, insert, search } from '../../src/index.ts'
 
 const movieSchema = {
   title: 'string',

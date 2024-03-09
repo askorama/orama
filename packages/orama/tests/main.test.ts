@@ -1,6 +1,6 @@
 import t from 'tap'
-import { create, insert, search } from '../src/index.js'
-import { SUPPORTED_LANGUAGES } from '../src/components/tokenizer/languages.js'
+import { create, insert, search } from '../src/index.ts'
+import { SUPPORTED_LANGUAGES } from '../src/components/tokenizer/languages.ts'
 
 t.test('language', (t) => {
   t.plan(5)

@@ -8,7 +8,7 @@ import {
   load as esmLoad,
   save as esmSave,
   createDocumentsStore as esmCreateDocumentsStore
-} from '../../components/documents-store.js'
+} from '../../components/documents-store.ts'
 
 let _esmCreate: typeof esmCreate
 let _esmGet: typeof esmGet
@@ -22,7 +22,7 @@ let _esmCreateDocumentsStore: typeof esmCreateDocumentsStore
 
 export async function create(...args: Parameters<typeof esmCreate>): ReturnType<typeof esmCreate> {
   if (!_esmCreate) {
-    const imported = await import('../../components/documents-store.js')
+    const imported = await import('../../components/documents-store.ts')
     _esmCreate = imported.create
   }
 
@@ -31,7 +31,7 @@ export async function create(...args: Parameters<typeof esmCreate>): ReturnType<
 
 export async function get(...args: Parameters<typeof esmGet>): ReturnType<typeof esmGet> {
   if (!_esmGet) {
-    const imported = await import('../../components/documents-store.js')
+    const imported = await import('../../components/documents-store.ts')
     _esmGet = imported.get
   }
 
@@ -40,7 +40,7 @@ export async function get(...args: Parameters<typeof esmGet>): ReturnType<typeof
 
 export async function getMultiple(...args: Parameters<typeof esmGetMultiple>): ReturnType<typeof esmGetMultiple> {
   if (!_esmGetMultiple) {
-    const imported = await import('../../components/documents-store.js')
+    const imported = await import('../../components/documents-store.ts')
     _esmGetMultiple = imported.getMultiple
   }
 
@@ -49,7 +49,7 @@ export async function getMultiple(...args: Parameters<typeof esmGetMultiple>): R
 
 export async function store(...args: Parameters<typeof esmStore>): ReturnType<typeof esmStore> {
   if (!_esmStore) {
-    const imported = await import('../../components/documents-store.js')
+    const imported = await import('../../components/documents-store.ts')
     _esmStore = imported.store
   }
 
@@ -58,7 +58,7 @@ export async function store(...args: Parameters<typeof esmStore>): ReturnType<ty
 
 export async function remove(...args: Parameters<typeof esmRemove>): ReturnType<typeof esmRemove> {
   if (!_esmRemove) {
-    const imported = await import('../../components/documents-store.js')
+    const imported = await import('../../components/documents-store.ts')
     _esmRemove = imported.remove
   }
 
@@ -67,7 +67,7 @@ export async function remove(...args: Parameters<typeof esmRemove>): ReturnType<
 
 export async function count(...args: Parameters<typeof esmCount>): ReturnType<typeof esmCount> {
   if (!_esmCount) {
-    const imported = await import('../../components/documents-store.js')
+    const imported = await import('../../components/documents-store.ts')
     _esmCount = imported.count
   }
 
@@ -76,7 +76,7 @@ export async function count(...args: Parameters<typeof esmCount>): ReturnType<ty
 
 export async function load(...args: Parameters<typeof esmLoad>): ReturnType<typeof esmLoad> {
   if (!_esmLoad) {
-    const imported = await import('../../components/documents-store.js')
+    const imported = await import('../../components/documents-store.ts')
     _esmLoad = imported.load
   }
 
@@ -85,7 +85,7 @@ export async function load(...args: Parameters<typeof esmLoad>): ReturnType<type
 
 export async function save(...args: Parameters<typeof esmSave>): ReturnType<typeof esmSave> {
   if (!_esmSave) {
-    const imported = await import('../../components/documents-store.js')
+    const imported = await import('../../components/documents-store.ts')
     _esmSave = imported.save
   }
 
@@ -96,7 +96,7 @@ export async function createDocumentsStore(
   ...args: Parameters<typeof esmCreateDocumentsStore>
 ): ReturnType<typeof esmCreateDocumentsStore> {
   if (!_esmCreateDocumentsStore) {
-    const imported = await import('../../components/documents-store.js')
+    const imported = await import('../../components/documents-store.ts')
     _esmCreateDocumentsStore = imported.createDocumentsStore
   }
 

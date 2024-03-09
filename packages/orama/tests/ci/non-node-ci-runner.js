@@ -2,7 +2,7 @@
 
 import tape from 'tape'
 import { strict, has } from 'tcompare'
-import { files } from '../../dist/tests/_tests.js'
+import { files } from '../../dist/tests/_tests.ts'
 
 /* Compatibility with Tap */
 tape.Test.prototype.strictSame = function _strictSame(a, b, msg, extra) {
@@ -145,7 +145,7 @@ stream.on('data', function (row) {
 })
 
 for (const file of files) {
-  tape.test(file.replace('../../dist/', '').replace('.js', '.ts'), async (t) => {
+  tape.test(file.replace('../../dist/', '').replace('.ts', '.ts'), async (t) => {
     globalThis.t = t
 
     await import(file)

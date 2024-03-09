@@ -1,6 +1,6 @@
 import t from 'tap'
 import { stopwords as englishStopwords } from '@orama/stopwords/english'
-import { create, getByID, insert, insertMultiple, search } from '../src/index.js'
+import { create, getByID, insert, insertMultiple, search } from '../src/index.ts'
 
 t.test('search method', (t) => {
   t.test('with term', async (t) => {

@@ -10,7 +10,7 @@ import {
   greaterThan,
   lessThan,
   rangeSearch
-} from '../src/trees/avl.js'
+} from '../src/trees/avl.ts'
 
 t.test('AVL Tree', (t) => {
   t.plan(8)

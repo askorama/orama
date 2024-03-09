@@ -1,5 +1,5 @@
 import t from 'tap'
-import { search, insertMultiple, create } from '../src/index.js'
+import { search, insertMultiple, create } from '../src/index.ts'
 
 t.test('hybrid search', async (t) => {
   t.test('should return results', async (t) => {

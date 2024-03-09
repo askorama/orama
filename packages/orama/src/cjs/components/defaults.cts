@@ -3,7 +3,7 @@ import type {
   getDocumentIndexId as esmGetDocumentIndexId,
   getDocumentProperties as esmGetDocumentProperties,
   validateSchema as esmValidateSchema
-} from '../../components/defaults.js'
+} from '../../components/defaults.ts'
 
 let _esmFormatElapsedTime: typeof esmFormatElapsedTime
 let _esmGetDocumentIndexId: typeof esmGetDocumentIndexId
@@ -14,7 +14,7 @@ export async function formatElapsedTime(
   ...args: Parameters<typeof esmFormatElapsedTime>
 ): ReturnType<typeof esmFormatElapsedTime> {
   if (!_esmFormatElapsedTime) {
-    const imported = await import('../../components/defaults.js')
+    const imported = await import('../../components/defaults.ts')
     _esmFormatElapsedTime = imported.formatElapsedTime
   }
 
@@ -25,7 +25,7 @@ export async function getDocumentIndexId(
   ...args: Parameters<typeof esmGetDocumentIndexId>
 ): ReturnType<typeof esmGetDocumentIndexId> {
   if (!_esmGetDocumentIndexId) {
-    const imported = await import('../../components/defaults.js')
+    const imported = await import('../../components/defaults.ts')
     _esmGetDocumentIndexId = imported.getDocumentIndexId
   }
 
@@ -36,7 +36,7 @@ export async function getDocumentProperties(
   ...args: Parameters<typeof esmGetDocumentProperties>
 ): ReturnType<typeof esmGetDocumentProperties> {
   if (!_esmGetDocumentProperties) {
-    const imported = await import('../../components/defaults.js')
+    const imported = await import('../../components/defaults.ts')
     _esmGetDocumentProperties = imported.getDocumentProperties
   }
 
@@ -47,7 +47,7 @@ export async function validateSchema(
   ...args: Parameters<typeof esmValidateSchema>
 ): ReturnType<typeof esmValidateSchema> {
   if (!_esmValidateSchema) {
-    const imported = await import('../../components/defaults.js')
+    const imported = await import('../../components/defaults.ts')
     _esmValidateSchema = imported.validateSchema
   }
 

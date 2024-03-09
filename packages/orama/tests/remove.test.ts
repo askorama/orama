@@ -1,5 +1,5 @@
 import t from 'tap'
-import { Index } from '../src/components/index.js'
+import { Index } from '../src/components/index.ts'
 import {
   SearchParams,
   TypedDocument,
@@ -10,7 +10,7 @@ import {
   remove,
   removeMultiple,
   search
-} from '../src/index.js'
+} from '../src/index.ts'
 
 t.test('remove method', (t) => {
   t.test('removes the given document', async (t) => {

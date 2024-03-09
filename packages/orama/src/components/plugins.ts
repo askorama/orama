@@ -1,5 +1,5 @@
-import type { AnyOrama, OramaPlugin } from '../types.js'
-import { createError } from '../errors.js'
+import type { AnyOrama, OramaPlugin } from '../types.ts'
+import { createError } from '../errors.ts'
 
 export type AvailablePluginHooks = (typeof AVAILABLE_PLUGIN_HOOKS)[number]
 

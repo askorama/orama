@@ -3,10 +3,10 @@ import {
   documentsStore as defaultDocumentsStore,
   index as defaultIndex,
   sorter as defaultSorter
-} from '../src/components.js'
-import { DocumentsStore } from '../src/components/documents-store.js'
-import { DocumentID, InternalDocumentIDStore } from '../src/components/internal-document-id-store.js'
-import { Sorter } from '../src/components/sorter.js'
+} from '../src/components.ts'
+import { DocumentsStore } from '../src/components/documents-store.ts'
+import { DocumentID, InternalDocumentIDStore } from '../src/components/internal-document-id-store.ts'
+import { Sorter } from '../src/components/sorter.ts'
 import {
   AnyDocument,
   AnyDocumentStore,
@@ -21,7 +21,7 @@ import {
   remove,
   save,
   search
-} from '../src/index.js'
+} from '../src/index.ts'
 
 t.test('index', (t) => {
   t.test('should allow custom component', async (t) => {

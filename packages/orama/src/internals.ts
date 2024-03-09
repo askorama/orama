@@ -1,4 +1,4 @@
-export { boundedLevenshtein } from './components/levenshtein.js'
+export { boundedLevenshtein } from './components/levenshtein.ts'
 export {
   formatBytes,
   formatNanoseconds,
@@ -6,6 +6,6 @@ export {
   uniqueId,
   convertDistanceToMeters,
   safeArrayPush
-} from './utils.js'
-export { BM25 } from './components/algorithms.js'
-export { normalizeToken } from './components/tokenizer/index.js'
+} from './utils.ts'
+export { BM25 } from './components/algorithms.ts'
+export { normalizeToken } from './components/tokenizer/index.ts'

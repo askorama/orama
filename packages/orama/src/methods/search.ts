@@ -1,6 +1,6 @@
-import { InternalDocumentID, getDocumentIdFromInternalId } from '../components/internal-document-id-store.js'
-import { createError } from '../errors.js'
-import { getNested } from '../utils.js'
+import { InternalDocumentID, getDocumentIdFromInternalId } from '../components/internal-document-id-store.ts'
+import { createError } from '../errors.ts'
+import { getNested } from '../utils.ts'
 import type {
   AnyOrama,
   BM25Params,
@@ -17,11 +17,11 @@ import type {
   TokenMap,
   Tokenizer,
   TypedDocument
-} from '../types.js'
-import { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from '../constants.js'
-import { fullTextSearch } from './search-fulltext.js'
-import { searchVector } from './search-vector.js'
-import { hybridSearch } from './search-hybrid.js'
+} from '../types.ts'
+import { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from '../constants.ts'
+import { fullTextSearch } from './search-fulltext.ts'
+import { searchVector } from './search-vector.ts'
+import { hybridSearch } from './search-hybrid.ts'
 
 export const defaultBM25Params: BM25Params = {
   k: 1.2,

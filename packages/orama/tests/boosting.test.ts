@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert, search } from '../src/index.js'
+import { create, insert, search } from '../src/index.ts'
 
 t.test('boosting', (t) => {
   t.plan(1)
@@ -12,7 +12,7 @@ t.test('boosting', (t) => {
         id: 'string',
         title: 'string',
         description: 'string'
-      }
+      } as const
     })
 
     await insert(db, {

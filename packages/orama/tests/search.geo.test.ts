@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert, search } from '../src/index.js'
+import { create, insert, search } from '../src/index.ts'
 
 t.test('geosearch', (t) => {
   t.plan(5)

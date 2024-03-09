@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create } from '../src/methods/create.js'
+import { create } from '../src/methods/create.ts'
 
 t.test('create method', (t) => {
   t.test('should provide an unique ID for the instance', async (t) => {

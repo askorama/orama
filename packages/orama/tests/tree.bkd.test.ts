@@ -7,7 +7,7 @@ import {
   removeDocByID,
   getDocIDsByCoordinates,
   contains
-} from '../src/trees/bkd.js'
+} from '../src/trees/bkd.ts'
 
 const coordinates = [
   {

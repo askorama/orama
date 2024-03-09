@@ -7,7 +7,7 @@ import type {
   safeArrayPush as esmSafeArrayPush,
   convertDistanceToMeters as esmConvertDistanceToMeters,
   BM25 as esmBM25
-} from '../internals.js'
+} from '../internals.ts'
 
 let _esmBoundedLevenshtein: typeof esmBoundedLevenshtein
 let _esmFormatBytes: typeof esmFormatBytes
@@ -22,7 +22,7 @@ export async function boundedLevenshtein(
   ...args: Parameters<typeof esmBoundedLevenshtein>
 ): ReturnType<typeof esmBoundedLevenshtein> {
   if (!_esmBoundedLevenshtein) {
-    const imported = await import('../internals.js')
+    const imported = await import('../internals.ts')
     _esmBoundedLevenshtein = imported.boundedLevenshtein
   }
 
@@ -31,7 +31,7 @@ export async function boundedLevenshtein(
 
 export async function formatBytes(...args: Parameters<typeof esmFormatBytes>): ReturnType<typeof esmFormatBytes> {
   if (!_esmFormatBytes) {
-    const imported = await import('../internals.js')
+    const imported = await import('../internals.ts')
     _esmFormatBytes = imported.formatBytes
   }
 
@@ -42,7 +42,7 @@ export async function formatNanoseconds(
   ...args: Parameters<typeof esmFormatNanoseconds>
 ): ReturnType<typeof esmFormatNanoseconds> {
   if (!_esmFormatNanoseconds) {
-    const imported = await import('../internals.js')
+    const imported = await import('../internals.ts')
     _esmFormatNanoseconds = imported.formatNanoseconds
   }
 
@@ -53,7 +53,7 @@ export async function getNanosecondsTime(
   ...args: Parameters<typeof esmGetNanosecondsTime>
 ): ReturnType<typeof esmGetNanosecondsTime> {
   if (!_esmGetNanosecondsTime) {
-    const imported = await import('../internals.js')
+    const imported = await import('../internals.ts')
     _esmGetNanosecondsTime = imported.getNanosecondsTime
   }
 
@@ -62,7 +62,7 @@ export async function getNanosecondsTime(
 
 export async function uniqueId(...args: Parameters<typeof esmUniqueId>): ReturnType<typeof esmUniqueId> {
   if (!_esmUniqueId) {
-    const imported = await import('../internals.js')
+    const imported = await import('../internals.ts')
     _esmUniqueId = imported.uniqueId
   }
 
@@ -71,7 +71,7 @@ export async function uniqueId(...args: Parameters<typeof esmUniqueId>): ReturnT
 
 export async function safeArrayPush(...args: Parameters<typeof esmSafeArrayPush>): Promise<void> {
   if (!_esmSafeArrayPush) {
-    const imported = await import('../internals.js')
+    const imported = await import('../internals.ts')
     _esmSafeArrayPush = imported.safeArrayPush
   }
 
@@ -80,7 +80,7 @@ export async function safeArrayPush(...args: Parameters<typeof esmSafeArrayPush>
 
 export async function convertDistanceToMeters(...args: Parameters<typeof esmConvertDistanceToMeters>): Promise<number> {
   if (!_esmConvertDistanceToMeters) {
-    const imported = await import('../internals.js')
+    const imported = await import('../internals.ts')
     _esmConvertDistanceToMeters = imported.convertDistanceToMeters
   }
 
@@ -89,7 +89,7 @@ export async function convertDistanceToMeters(...args: Parameters<typeof esmConv
 
 export async function BM25(...args: Parameters<typeof esmBM25>): Promise<number> {
   if (!_esmBM25) {
-    const imported = await import('../internals.js')
+    const imported = await import('../internals.ts')
     _esmBM25 = imported.BM25
   }
 

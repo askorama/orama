@@ -1,4 +1,4 @@
-import { Nullable } from '../types.js'
+import { Nullable } from '../types.ts'
 
 interface Node<V = unknown> {
   // Left child

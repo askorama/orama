@@ -1,4 +1,4 @@
-import { createError } from '../errors.js'
+import { createError } from '../errors.ts'
 import {
   AnyOrama,
   AnySorterStore,
@@ -8,16 +8,16 @@ import {
   SorterParams,
   SortType,
   SortValue
-} from '../types.js'
-import { isVectorType } from './defaults.js'
+} from '../types.ts'
+import { isVectorType } from './defaults.ts'
 import {
   DocumentID,
   getInternalDocumentId,
   InternalDocumentID,
   InternalDocumentIDStore
-} from './internal-document-id-store.js'
-import { safeArrayPush } from '../utils.js'
-import { getLocale } from './tokenizer/languages.js'
+} from './internal-document-id-store.ts'
+import { safeArrayPush } from '../utils.ts'
+import { getLocale } from './tokenizer/languages.ts'
 
 interface PropertySort<K> {
   docs: Map<InternalDocumentID, number>

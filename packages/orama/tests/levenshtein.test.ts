@@ -1,5 +1,5 @@
 import t from 'tap'
-import { boundedLevenshtein, levenshtein } from '../src/components/levenshtein.js'
+import { boundedLevenshtein, levenshtein } from '../src/components/levenshtein.ts'
 
 t.test('levenshtein', (t) => {
   t.plan(3)

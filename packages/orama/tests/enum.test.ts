@@ -10,7 +10,7 @@ import {
   remove,
   save,
   search
-} from '../src/index.js'
+} from '../src/index.ts'
 
 t.test('enum', async (t) => {
   t.test('filter', async (t) => {

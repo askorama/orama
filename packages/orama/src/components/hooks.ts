@@ -8,7 +8,7 @@ import {
   SingleCallbackComponent,
   TypedDocument,
   AfterCreate
-} from '../types.js'
+} from '../types.ts'
 
 export const OBJECT_COMPONENTS = ['tokenizer', 'index', 'documentsStore', 'sorter']
 

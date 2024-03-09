@@ -1,4 +1,4 @@
-import { createError } from '../errors.js'
+import { createError } from '../errors.ts'
 import type {
   AnyOrama,
   FacetResult,
@@ -8,8 +8,8 @@ import type {
   SearchableValue,
   StringFacetDefinition,
   TokenScore
-} from '../types.js'
-import { getNested } from '../utils.js'
+} from '../types.ts'
+import { getNested } from '../utils.ts'
 
 type FacetValue = string | boolean | number
 

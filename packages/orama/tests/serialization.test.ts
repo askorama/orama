@@ -1,10 +1,10 @@
 import t from 'tap'
-import { DocumentsStore } from '../src/components/documents-store.js'
-import { Index } from '../src/components/index.js'
-import { getInternalDocumentId } from '../src/components/internal-document-id-store.js'
-import { Result, create, insert, load, save, search } from '../src/index.js'
-import { Node as RadixNode, contains as trieContains } from '../src/trees/radix.js'
-import type { AnyDocument } from '../src/types.js'
+import { DocumentsStore } from '../src/components/documents-store.ts'
+import { Index } from '../src/components/index.ts'
+import { getInternalDocumentId } from '../src/components/internal-document-id-store.ts'
+import { Result, create, insert, load, save, search } from '../src/index.ts'
+import { Node as RadixNode, contains as trieContains } from '../src/trees/radix.ts'
+import type { AnyDocument } from '../src/types.ts'
 
 function extractOriginalDoc(result: Result<AnyDocument>[]): AnyDocument[] {
   return result.map(({ document }: AnyDocument) => document)

@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insert, search, remove } from '../src/index.js'
+import { create, insert, search, remove } from '../src/index.ts'
 
 async function createSimpleDB() {
   let i = 0

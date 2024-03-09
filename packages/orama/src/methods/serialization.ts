@@ -1,5 +1,5 @@
-import { Language } from '../index.js'
-import { AnyOrama } from '../types.js'
+import { Language } from '../index.ts'
+import { AnyOrama } from '../types.ts'
 
 export interface RawData {
   internalDocumentIDStore: unknown

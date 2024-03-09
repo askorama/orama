@@ -6,7 +6,7 @@ import {
   insert as radixInsert,
   removeDocumentByWord as radixRemoveDocumentByWord,
   removeWord as radixRemoveWord
-} from '../src/trees/radix.js'
+} from '../src/trees/radix.ts'
 
 const phrases = [
   { id: 1, doc: 'the quick, brown fox' },

@@ -1,5 +1,5 @@
-import { Nullable } from '../types.js'
-import { safeArrayPush } from '../utils.js'
+import { Nullable } from '../types.ts'
+import { safeArrayPush } from '../utils.ts'
 
 export interface Node<K, V> {
   // Node key

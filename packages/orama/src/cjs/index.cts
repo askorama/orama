@@ -1,11 +1,11 @@
-import type { create as esmCreate } from '../methods/create.js'
-import type { count as esmCount, getByID as esmGetByID } from '../methods/docs.js'
-import type { insert as esmInsert, insertMultiple as esminsertMultiple } from '../methods/insert.js'
-import type { remove as esmRemove, removeMultiple as esmRemoveMultiple } from '../methods/remove.js'
-import type { search as esmSearch } from '../methods/search.js'
-import type { searchVector as esmSearchVector } from '../methods/search-vector.js'
-import type { load as esmLoad, save as esmSave } from '../methods/serialization.js'
-import type { update as esmUpdate, updateMultiple as esmUpdateMultiple } from '../methods/update.js'
+import type { create as esmCreate } from '../methods/create.ts'
+import type { count as esmCount, getByID as esmGetByID } from '../methods/docs.ts'
+import type { insert as esmInsert, insertMultiple as esminsertMultiple } from '../methods/insert.ts'
+import type { remove as esmRemove, removeMultiple as esmRemoveMultiple } from '../methods/remove.ts'
+import type { search as esmSearch } from '../methods/search.ts'
+import type { searchVector as esmSearchVector } from '../methods/search-vector.ts'
+import type { load as esmLoad, save as esmSave } from '../methods/serialization.ts'
+import type { update as esmUpdate, updateMultiple as esmUpdateMultiple } from '../methods/update.ts'
 
 let _esmCount: typeof esmCount
 let _esmCreate: typeof esmCreate
@@ -23,7 +23,7 @@ let _esmSearchVector: typeof esmSearchVector
 
 export async function count(...args: Parameters<typeof esmCount>): ReturnType<typeof esmCount> {
   if (!_esmCount) {
-    const imported = await import('../methods/docs.js')
+    const imported = await import('../methods/docs.ts')
     _esmCount = imported.count
   }
 
@@ -32,7 +32,7 @@ export async function count(...args: Parameters<typeof esmCount>): ReturnType<ty
 
 export async function create(...args: Parameters<typeof esmCreate>): ReturnType<typeof esmCreate> {
   if (!_esmCreate) {
-    const imported = await import('../methods/create.js')
+    const imported = await import('../methods/create.ts')
     _esmCreate = imported.create
   }
 
@@ -41,7 +41,7 @@ export async function create(...args: Parameters<typeof esmCreate>): ReturnType<
 
 export async function getByID(...args: Parameters<typeof esmGetByID>): ReturnType<typeof esmGetByID> {
   if (!_esmGetByID) {
-    const imported = await import('../methods/docs.js')
+    const imported = await import('../methods/docs.ts')
     _esmGetByID = imported.getByID
   }
 
@@ -50,7 +50,7 @@ export async function getByID(...args: Parameters<typeof esmGetByID>): ReturnTyp
 
 export async function insert(...args: Parameters<typeof esmInsert>): ReturnType<typeof esmInsert> {
   if (!_esmInsert) {
-    const imported = await import('../methods/insert.js')
+    const imported = await import('../methods/insert.ts')
     _esmInsert = imported.insert
   }
 
@@ -61,7 +61,7 @@ export async function insertMultiple(
   ...args: Parameters<typeof esminsertMultiple>
 ): ReturnType<typeof esminsertMultiple> {
   if (!_esmInsertMultiple) {
-    const imported = await import('../methods/insert.js')
+    const imported = await import('../methods/insert.ts')
     _esmInsertMultiple = imported.insertMultiple
   }
 
@@ -70,7 +70,7 @@ export async function insertMultiple(
 
 export async function load(...args: Parameters<typeof esmLoad>): ReturnType<typeof esmLoad> {
   if (!_esmLoad) {
-    const imported = await import('../methods/serialization.js')
+    const imported = await import('../methods/serialization.ts')
     _esmLoad = imported.load
   }
 
@@ -79,7 +79,7 @@ export async function load(...args: Parameters<typeof esmLoad>): ReturnType<type
 
 export async function remove(...args: Parameters<typeof esmRemove>): ReturnType<typeof esmRemove> {
   if (!_esmRemove) {
-    const imported = await import('../methods/remove.js')
+    const imported = await import('../methods/remove.ts')
     _esmRemove = imported.remove
   }
 
@@ -90,7 +90,7 @@ export async function removeMultiple(
   ...args: Parameters<typeof esmRemoveMultiple>
 ): ReturnType<typeof esmRemoveMultiple> {
   if (!_esmRemoveMultiple) {
-    const imported = await import('../methods/remove.js')
+    const imported = await import('../methods/remove.ts')
     _esmRemoveMultiple = imported.removeMultiple
   }
 
@@ -99,7 +99,7 @@ export async function removeMultiple(
 
 export async function save(...args: Parameters<typeof esmSave>): ReturnType<typeof esmSave> {
   if (!_esmSave) {
-    const imported = await import('../methods/serialization.js')
+    const imported = await import('../methods/serialization.ts')
     _esmSave = imported.save
   }
 
@@ -108,7 +108,7 @@ export async function save(...args: Parameters<typeof esmSave>): ReturnType<type
 
 export async function search(...args: Parameters<typeof esmSearch>): ReturnType<typeof esmSearch> {
   if (!_esmSearch) {
-    const imported = await import('../methods/search.js')
+    const imported = await import('../methods/search.ts')
     _esmSearch = imported.search
   }
 
@@ -117,7 +117,7 @@ export async function search(...args: Parameters<typeof esmSearch>): ReturnType<
 
 export async function update(...args: Parameters<typeof esmUpdate>): ReturnType<typeof esmUpdate> {
   if (!_esmUpdate) {
-    const imported = await import('../methods/update.js')
+    const imported = await import('../methods/update.ts')
     _esmUpdate = imported.update
   }
 
@@ -128,7 +128,7 @@ export async function updateMultiple(
   ...args: Parameters<typeof esmUpdateMultiple>
 ): ReturnType<typeof esmUpdateMultiple> {
   if (!_esmUpdateMultiple) {
-    const imported = await import('../methods/update.js')
+    const imported = await import('../methods/update.ts')
     _esmUpdateMultiple = imported.updateMultiple
   }
 
@@ -137,7 +137,7 @@ export async function updateMultiple(
 
 export async function searchVector(...args: Parameters<typeof esmSearchVector>): ReturnType<typeof esmSearchVector> {
   if (!_esmSearchVector) {
-    const imported = await import('../methods/search-vector.js')
+    const imported = await import('../methods/search-vector.ts')
     _esmSearchVector = imported.searchVector
   }
 

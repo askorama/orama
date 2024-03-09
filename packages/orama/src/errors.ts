@@ -1,5 +1,5 @@
-import { SUPPORTED_LANGUAGES } from './components/tokenizer/languages.js'
-import { sprintf } from './utils.js'
+import { SUPPORTED_LANGUAGES } from './components/tokenizer/languages.ts'
+import { sprintf } from './utils.ts'
 
 const allLanguages = SUPPORTED_LANGUAGES.join('\n - ')
 

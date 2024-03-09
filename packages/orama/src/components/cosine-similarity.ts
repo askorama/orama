@@ -1,4 +1,4 @@
-import type { Magnitude, VectorType } from '../types.js'
+import type { Magnitude, VectorType } from '../types.ts'
 
 export type SimilarVector = [string, number]
 

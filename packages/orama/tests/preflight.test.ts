@@ -1,7 +1,7 @@
 import t from 'tap'
-import { create } from '../src/methods/create.js'
-import { insert } from '../src/methods/insert.js'
-import { search } from '../src/methods/search.js'
+import { create } from '../src/methods/create.ts'
+import { insert } from '../src/methods/insert.ts'
+import { search } from '../src/methods/search.ts'
 
 t.test('preflight request', async (t) => {
   t.plan(4)
