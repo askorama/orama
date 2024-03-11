@@ -1,10 +1,10 @@
-import type { SearchEvent, TelemetryConfig } from './types.js'
+import type { SearchEvent, AnalyticsConfig } from './types.js'
 import { sendBeacon } from './polyfills.js'
-import { TELEMETRY_OSS_SOURCE } from './const.js'
+import { ANALYTICS_OSS_SOURCE } from './const.js'
 
 type Data = object[]
 
-export interface CollectorConstructor extends TelemetryConfig {
+export interface CollectorConstructor extends AnalyticsConfig {
   endpoint: string
   apiKey: string
   deploymentId: string
@@ -58,7 +58,7 @@ export class Collector {
     this.data = []
 
     const body = {
-      source: TELEMETRY_OSS_SOURCE,
+      source: ANALYTICS_OSS_SOURCE,
       deploymentID: this.config.deploymentId,
       index: this.config.indexId,
       oramaId: this.config.oramaId,
