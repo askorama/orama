@@ -8,9 +8,9 @@ export type SecureProxyPluginOptions = {
 }
 
 export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): Promise<OramaPluginAsync> {
-  if (!pluginParams.apiKey) throw new Error('Missing "apiKey" parameter for plugin-telemetry')
-  if (!pluginParams.defaultProperty) throw new Error('Missing "defaultProperty" parameter for plugin-telemetry')
-  if (!pluginParams.model) throw new Error('Missing "model" parameter for plugin-telemetry')
+  if (!pluginParams.apiKey) throw new Error('Missing "apiKey" parameter for plugin-secure-proxy')
+  if (!pluginParams.defaultProperty) throw new Error('Missing "defaultProperty" parameter for plugin-secure-proxy')
+  if (!pluginParams.model) throw new Error('Missing "model" parameter for plugin-secure-proxy')
 
   const proxy = new OramaProxy({
     api_key: pluginParams.apiKey

@@ -9,7 +9,7 @@ export default defineConfig({
   sourcemap: true,
   minify: true,
   format: ['cjs', 'esm', 'iife'],
-  globalName: 'pluginTelemetry',
+  globalName: 'pluginSecureProxy',
   dts: true,
   clean: true,
   bundle: true,
