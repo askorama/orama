@@ -2,7 +2,7 @@ import fs from 'fs'
 import t from 'tap'
 import { create, insert, search } from '@orama/orama'
 
-if (!fs.existsSync('build/tokenizer-japanese/tokenizer.js')) {
+if (!fs.existsSync('build/tokenizer-japanese/tokenizer.js') && process.env.TEST_TOKENIZERS !== '1') {
   // Still experimental. @todo: remove this check
   console.log(`Skipping Japanese tokenizer tests`)
   process.exit(0)
