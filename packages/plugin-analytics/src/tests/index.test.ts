@@ -13,10 +13,12 @@ const INDEX_ID = 'the-index-id'
 t.test('analytics-plugin', async (t) => {
   const invocations: MockedRequest[] = []
   const server = getServer(invocations)
-  await server.listen()
-  t.teardown(async () => {
-    await server.resetHandlers()
-    await server.close()
+  
+  server.listen()
+
+  t.teardown(() => {
+    server.resetHandlers()
+    server.close()
   })
 
   const db = await create({
