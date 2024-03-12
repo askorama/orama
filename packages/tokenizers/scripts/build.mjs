@@ -2,6 +2,11 @@ import path from 'node:path'
 import fs from 'node:fs'
 import childProcess from 'node:child_process'
 
+if (process.env.BUILD_TOKENIZERS !== '1') {
+  console.log('Skipping build for custom tokenizers.')
+  process.exit(0)
+}
+
 const isWasmPackInstalled = await checkWasmPackInstalled()
 
 const languages = ['mandarin', 'japanese']

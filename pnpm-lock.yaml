@@ -200,6 +200,46 @@ importers:
         specifier: ^5.0.0
         version: 5.0.3
 
+  packages/plugin-analytics:
+    dependencies:
+      '@orama/orama':
+        specifier: workspace:*
+        version: link:../orama
+    devDependencies:
+      '@types/node':
+        specifier: ^20.9.0
+        version: 20.11.19
+      c8:
+        specifier: ^7.12.0
+        version: 7.12.0
+      msw:
+        specifier: ^2.2.1
+        version: 2.2.1(typescript@5.3.3)
+      sinon:
+        specifier: ^17.0.1
+        version: 17.0.1
+      tap:
+        specifier: ^18.7.1
+        version: 18.7.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)(typescript@5.3.3)
+      tap-mocha-reporter:
+        specifier: ^5.0.3
+        version: 5.0.3
+      tape:
+        specifier: ^5.6.1
+        version: 5.6.1
+      ts-standard:
+        specifier: ^12.0.2
+        version: 12.0.2(typescript@5.3.3)
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(@swc/core@1.3.27)(ts-node@10.9.1)(typescript@5.3.3)
+      tsx:
+        specifier: '4'
+        version: 4.7.1
+      typescript:
+        specifier: ^5.0.0
+        version: 5.3.3
+
   packages/plugin-astro:
     dependencies:
       '@orama/orama':
@@ -639,46 +679,6 @@ importers:
       typescript:
         specifier: ^5.0.0
         version: 5.0.3
-
-  packages/plugin-telemetry:
-    dependencies:
-      '@orama/orama':
-        specifier: workspace:*
-        version: link:../orama
-    devDependencies:
-      '@types/node':
-        specifier: ^20.9.0
-        version: 20.9.0
-      c8:
-        specifier: ^7.12.0
-        version: 7.12.0
-      msw:
-        specifier: ^2.2.1
-        version: 2.2.1(typescript@5.2.2)
-      sinon:
-        specifier: ^17.0.1
-        version: 17.0.1
-      tap:
-        specifier: ^18.6.1
-        version: 18.6.1(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)
-      tap-mocha-reporter:
-        specifier: ^5.0.3
-        version: 5.0.3
-      tape:
-        specifier: ^5.6.1
-        version: 5.6.1
-      ts-standard:
-        specifier: ^12.0.2
-        version: 12.0.2(typescript@5.2.2)
-      tsup:
-        specifier: ^7.2.0
-        version: 7.2.0(@swc/core@1.3.27)(ts-node@10.9.1)(typescript@5.2.2)
-      tsx:
-        specifier: '4'
-        version: 4.7.1
-      typescript:
-        specifier: ^5.0.0
-        version: 5.2.2
 
   packages/plugin-vitepress:
     dependencies:
@@ -4146,10 +4146,10 @@ packages:
       '@commitlint/execute-rule': 17.4.0
       '@commitlint/resolve-extends': 17.4.4
       '@commitlint/types': 17.4.4
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
       chalk: 4.1.2
       cosmiconfig: 8.2.0
-      cosmiconfig-typescript-loader: 4.3.0(@types/node@20.9.0)(cosmiconfig@8.2.0)(ts-node@10.9.1)(typescript@5.3.3)
+      cosmiconfig-typescript-loader: 4.3.0(@types/node@20.11.19)(cosmiconfig@8.2.0)(ts-node@10.9.1)(typescript@5.3.3)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -6781,6 +6781,38 @@ packages:
       v8-compile-cache-lib: 3.0.1
     dev: true
 
+  /@isaacs/ts-node-temp-fork-for-pr-2009@10.9.5(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.3.3):
+    resolution: {integrity: sha512-hEDlwpHhIabtB+Urku8muNMEkGui0LVGlYLS3KoB9QBDf0Pw3r7q0RrfoQmFuk8CvRpGzErO3/vLQd9Ys+/g4g==}
+    hasBin: true
+    peerDependencies:
+      '@swc/core': '>=1.2.50'
+      '@swc/wasm': '>=1.2.50'
+      '@types/node': '*'
+      typescript: '>=4.2'
+    peerDependenciesMeta:
+      '@swc/core':
+        optional: true
+      '@swc/wasm':
+        optional: true
+      typescript:
+        optional: true
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@swc/core': 1.3.27
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@tsconfig/node18': 18.2.2
+      '@tsconfig/node20': 20.1.2
+      '@types/node': 20.11.19
+      acorn: 8.10.0
+      acorn-walk: 8.2.0
+      arg: 4.1.3
+      diff: 4.0.2
+      make-error: 1.3.6
+      typescript: 5.3.3
+      v8-compile-cache-lib: 3.0.1
+    dev: true
+
   /@isaacs/ts-node-temp-fork-for-pr-2009@10.9.5(@swc/core@1.3.27)(@types/node@20.9.0)(typescript@5.0.3):
     resolution: {integrity: sha512-hEDlwpHhIabtB+Urku8muNMEkGui0LVGlYLS3KoB9QBDf0Pw3r7q0RrfoQmFuk8CvRpGzErO3/vLQd9Ys+/g4g==}
     hasBin: true
@@ -6863,7 +6895,7 @@ packages:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.4
       '@types/istanbul-reports': 3.0.1
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
       '@types/yargs': 17.0.24
       chalk: 4.1.2
     dev: false
@@ -7886,6 +7918,16 @@ packages:
       function-loop: 4.0.0
     dev: true
 
+  /@tapjs/after-each@1.1.19(@tapjs/core@1.5.1):
+    resolution: {integrity: sha512-fRJ0HZVIEZXaxbbf34hSLfVyBO4+bTCXtEnYULa5XaJKInujjgvO4qn5+mf1718/txSd/PfqDTZJQ0XEhOAx2g==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      function-loop: 4.0.0
+    dev: true
+
   /@tapjs/after@1.1.17(@tapjs/core@1.4.6):
     resolution: {integrity: sha512-14qeP+mHZ8nIMDGtdCwTgvKclLlHxfARMTasb9fw//tmF/8ZDZhTemtCDxAP75wihxy5P7nzVZo/6TpVeOZrwg==}
     engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
@@ -7893,6 +7935,16 @@ packages:
       '@tapjs/core': 1.4.6
     dependencies:
       '@tapjs/core': 1.4.6(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
+      is-actual-promise: 1.0.1
+    dev: true
+
+  /@tapjs/after@1.1.19(@tapjs/core@1.5.1):
+    resolution: {integrity: sha512-F7U8EtO2gP9XwQciXGsoukmLlyDS+DaLRPaAbtBsSlhREa8J7N51l4FUVhNzVirF4FiONoat+2yNWwXrTz8uGA==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
       is-actual-promise: 1.0.1
     dev: true
 
@@ -7912,6 +7964,22 @@ packages:
       - react-dom
     dev: true
 
+  /@tapjs/asserts@1.1.19(@tapjs/core@1.5.1)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-gLe6665IickyPgz/YBi/Q7pC1YJ/IKL+eedUyvD13xPaePWo+aC7aRywYsjyrP6ZERGHr1EoFf3GQm7kVuX8mQ==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/stack': 1.2.7
+      is-actual-promise: 1.0.1
+      tcompare: 6.4.5(react-dom@18.2.0)(react@18.2.0)
+      trivial-deferred: 2.0.0
+    transitivePeerDependencies:
+      - react
+      - react-dom
+    dev: true
+
   /@tapjs/before-each@1.1.17(@tapjs/core@1.4.6):
     resolution: {integrity: sha512-d2Um3Y2j0m563QNsSxczh+QeSg5sBngnBFGOelUtQVqmq91oNWU/7mY1pwN6ip8mMIQYD75CIhq5/Z57DGomWQ==}
     engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
@@ -7919,6 +7987,16 @@ packages:
       '@tapjs/core': 1.4.6
     dependencies:
       '@tapjs/core': 1.4.6(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
+      function-loop: 4.0.0
+    dev: true
+
+  /@tapjs/before-each@1.1.19(@tapjs/core@1.5.1):
+    resolution: {integrity: sha512-f66mi7OWhSgn3+zETVwkzXZLS5Laq6kgQELw+lGWqkkcPU7+AbQcToS5f+uP9Yi3vdKsXJuQGyAjtbGpAzXcsg==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
       function-loop: 4.0.0
     dev: true
 
@@ -7932,6 +8010,16 @@ packages:
       is-actual-promise: 1.0.1
     dev: true
 
+  /@tapjs/before@1.1.19(@tapjs/core@1.5.1):
+    resolution: {integrity: sha512-MeZ19uKhjp1+k1HWgo4T5bBm3lw32eqOUc+wud8lt2NOiiR9VnQ/v3mYPoeQc9xCwnm6fynx2KBIr7a+LSbwxQ==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      is-actual-promise: 1.0.1
+    dev: true
+
   /@tapjs/config@2.4.14(@tapjs/core@1.4.6)(@tapjs/test@1.3.17):
     resolution: {integrity: sha512-dkjPVJGbLJC9BxCAxudAGiijnKc6XcQbpBSMAGJ/+VoRSqXlPkMWz0d8Ad3rNt7s+g2GBEWBx1kV7wcKtLlxmw==}
     engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
@@ -7941,6 +8029,22 @@ packages:
     dependencies:
       '@tapjs/core': 1.4.6(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
       '@tapjs/test': 1.3.17(@swc/core@1.3.27)(@tapjs/core@1.4.6)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
+      chalk: 5.3.0
+      jackspeak: 2.3.6
+      polite-json: 4.0.1
+      tap-yaml: 2.2.1
+      walk-up-path: 3.0.1
+    dev: true
+
+  /@tapjs/config@2.4.16(@tapjs/core@1.5.1)(@tapjs/test@1.4.1):
+    resolution: {integrity: sha512-mQgr2POUf5tb3xfMAVg5fBp9AelscaAfpsT1kCa5b/JWsiJ2EBEVOXgqPWqp++y/MGltFXo52vZiWpdlyr0M5w==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+      '@tapjs/test': 1.4.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/test': 1.4.1(@swc/core@1.3.27)(@tapjs/core@1.5.1)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
       chalk: 5.3.0
       jackspeak: 2.3.6
       polite-json: 4.0.1
@@ -7996,6 +8100,30 @@ packages:
       - react-dom
     dev: true
 
+  /@tapjs/core@1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-8h9Ys/K6lFU2RcMaDkGRpYn9lWIJfzKv73dykokz7VDHAs+mXWm2cFRWv/2fl2k9jKAiRmnOkVFvr4gUoAZw7g==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    dependencies:
+      '@tapjs/processinfo': 3.1.7
+      '@tapjs/stack': 1.2.7
+      '@tapjs/test': 1.4.1(@swc/core@1.3.27)(@tapjs/core@1.5.1)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      async-hook-domain: 4.0.1
+      diff: 5.1.0
+      is-actual-promise: 1.0.1
+      minipass: 7.0.4
+      signal-exit: 4.1.0
+      tap-parser: 15.3.1
+      tap-yaml: 2.2.1
+      tcompare: 6.4.5(react-dom@18.2.0)(react@18.2.0)
+      trivial-deferred: 2.0.0
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - react
+      - react-dom
+    dev: true
+
   /@tapjs/error-serdes@1.2.1:
     resolution: {integrity: sha512-/7eLEcrGo+Qz3eWrjkhDC+VSEOjabkkzr9eRADeU+OLFeZaik8L/GRk0SGhnp4YsQkv0jcNV00A42bEx2HIZcw==}
     engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
@@ -8012,6 +8140,15 @@ packages:
       '@tapjs/core': 1.4.6(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
     dev: true
 
+  /@tapjs/filter@1.2.19(@tapjs/core@1.5.1):
+    resolution: {integrity: sha512-+TEHxnLCRyqhAAe9kdmpNcNwFkA4wPRDARz05N8ypXGYswQtd3O2xpzkavVXuH4YKE4yjAz4L2OtwWJvoSprOA==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+    dev: true
+
   /@tapjs/fixture@1.2.17(@tapjs/core@1.4.6):
     resolution: {integrity: sha512-eOOQxtsEcQ/sBxaZhpqdF9DCNxXAvLuiE5HgyL6d1eB4eceu57uIUKK7NDtFVv+vlbQH/NoiSTxmN/IBRbKT8w==}
     engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
@@ -8019,6 +8156,17 @@ packages:
       '@tapjs/core': 1.4.6
     dependencies:
       '@tapjs/core': 1.4.6(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
+      mkdirp: 3.0.1
+      rimraf: 5.0.5
+    dev: true
+
+  /@tapjs/fixture@1.2.19(@tapjs/core@1.5.1):
+    resolution: {integrity: sha512-ds6KDw1kEGNHJuIIJz736wqaq8J1aVf2cF9jKKKq+E8KR+yoldISBiuxtWGBbMdE79/jMlDgkWp0dc7+juckYQ==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
       mkdirp: 3.0.1
       rimraf: 5.0.5
     dev: true
@@ -8034,6 +8182,17 @@ packages:
       '@tapjs/stack': 1.2.7
     dev: true
 
+  /@tapjs/intercept@1.2.19(@tapjs/core@1.5.1):
+    resolution: {integrity: sha512-vss1a16flkREYrF38Bx+2Ry5gTgOVRJxL0dkgooXtiOnrG5pBW6p0Ykv7zIqPac+ZvO1GiD529FPtDz2iE8IWw==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/after': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/stack': 1.2.7
+    dev: true
+
   /@tapjs/mock@1.2.15(@tapjs/core@1.4.6):
     resolution: {integrity: sha512-uXfVNDAMAbCGOu46B9jbryTau2pLSQjCdWnkAm/OUgZh/OtO0i7OORz9HdEPfEF2tuy1tLo9+vsCZm3lPU5F7w==}
     engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
@@ -8042,6 +8201,19 @@ packages:
     dependencies:
       '@tapjs/after': 1.1.17(@tapjs/core@1.4.6)
       '@tapjs/core': 1.4.6(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/stack': 1.2.7
+      resolve-import: 1.4.5
+      walk-up-path: 3.0.1
+    dev: true
+
+  /@tapjs/mock@1.3.1(@tapjs/core@1.5.1):
+    resolution: {integrity: sha512-9p38tQP4zC2lbbxqwO6xDokiG4uaj+ju5U2Zey/D3MfwXeReIRRSjYipqCM/VEfM729/yobncuPt1tElbRazYw==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/after': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
       '@tapjs/stack': 1.2.7
       resolve-import: 1.4.5
       walk-up-path: 3.0.1
@@ -8059,8 +8231,30 @@ packages:
       tap-parser: 15.3.1
     dev: true
 
+  /@tapjs/node-serialize@1.3.1(@tapjs/core@1.5.1):
+    resolution: {integrity: sha512-Ays/DRLTngIZ5UkIBgXvkghkpwr4tx/h+9K/J6KjombyUhLMXk6vJvuNXGhsAXBns9XAbiZva3Btv5fQb7ZQKg==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/error-serdes': 1.2.1
+      '@tapjs/stack': 1.2.7
+      tap-parser: 15.3.1
+    dev: true
+
   /@tapjs/processinfo@3.1.6:
     resolution: {integrity: sha512-ktDsaf79wJsLaoG1Pp+stHSRf6a1k/JydoRAaYVG5iJnd3DooL6yewZsciUi2yiN/WQc5tAXCIFTXL4uXGB8LA==}
+    engines: {node: '>=16.17'}
+    dependencies:
+      pirates: 4.0.6
+      process-on-spawn: 1.0.0
+      signal-exit: 4.1.0
+      uuid: 8.3.2
+    dev: true
+
+  /@tapjs/processinfo@3.1.7:
+    resolution: {integrity: sha512-SI5RJQ5HnUKEWnHSAF6hOm6XPdnjZ+CJzIaVHdFebed8iDAPTqb+IwMVu9yq9+VQ7FRsMMlgLL2SW4rss2iJbQ==}
     engines: {node: '>=16.17'}
     dependencies:
       pirates: 4.0.6
@@ -8077,6 +8271,35 @@ packages:
     dependencies:
       '@tapjs/config': 2.4.14(@tapjs/core@1.4.6)(@tapjs/test@1.3.17)
       '@tapjs/core': 1.4.6(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/stack': 1.2.7
+      chalk: 5.3.0
+      ink: 4.4.1(react@18.2.0)
+      minipass: 7.0.4
+      ms: 2.1.3
+      patch-console: 2.0.0
+      prismjs-terminal: 1.2.3
+      react: 18.2.0
+      string-length: 6.0.0
+      tap-parser: 15.3.1
+      tap-yaml: 2.2.1
+      tcompare: 6.4.5(react-dom@18.2.0)(react@18.2.0)
+    transitivePeerDependencies:
+      - '@tapjs/test'
+      - '@types/react'
+      - bufferutil
+      - react-devtools-core
+      - react-dom
+      - utf-8-validate
+    dev: true
+
+  /@tapjs/reporter@1.3.17(@tapjs/core@1.5.1)(@tapjs/test@1.4.1)(react-dom@18.2.0):
+    resolution: {integrity: sha512-swXCshDeHZPJQHeB68WUpEAo7tJk62KHvHg04/7xeqPiEM6//i36j+YaMcg7/RPt8N3srZ2iPFsTd2abLdrvFg==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/config': 2.4.16(@tapjs/core@1.5.1)(@tapjs/test@1.4.1)
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
       '@tapjs/stack': 1.2.7
       chalk: 5.3.0
       ink: 4.4.1(react@18.2.0)
@@ -8194,6 +8417,54 @@ packages:
       - utf-8-validate
     dev: true
 
+  /@tapjs/run@1.5.1(@swc/core@1.3.27)(@tapjs/core@1.5.1)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-kCHj9CYfA43rFN4eQI0my4jOV8E2b/lejZo9yQWBJR8QYp11GtTUxTMS9rGu1j7/vO22ydQDl8N+D3iWL04/fg==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    hasBin: true
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/after': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/before': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/config': 2.4.16(@tapjs/core@1.5.1)(@tapjs/test@1.4.1)
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/processinfo': 3.1.7
+      '@tapjs/reporter': 1.3.17(@tapjs/core@1.5.1)(@tapjs/test@1.4.1)(react-dom@18.2.0)
+      '@tapjs/spawn': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/stdin': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/test': 1.4.1(@swc/core@1.3.27)(@tapjs/core@1.5.1)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      c8: 8.0.1
+      chalk: 5.3.0
+      chokidar: 3.5.3
+      foreground-child: 3.1.1
+      glob: 10.3.10
+      minipass: 7.0.4
+      mkdirp: 3.0.1
+      opener: 1.5.2
+      pacote: 17.0.5
+      resolve-import: 1.4.5
+      rimraf: 5.0.5
+      semver: 7.5.4
+      signal-exit: 4.1.0
+      tap-parser: 15.3.1
+      tap-yaml: 2.2.1
+      tcompare: 6.4.5(react-dom@18.2.0)(react@18.2.0)
+      trivial-deferred: 2.0.0
+      which: 4.0.0
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - '@types/react'
+      - bluebird
+      - bufferutil
+      - react
+      - react-devtools-core
+      - react-dom
+      - supports-color
+      - utf-8-validate
+    dev: true
+
   /@tapjs/snapshot@1.2.17(@tapjs/core@1.4.6)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-xDHys854ZA8s/1uCkE5PgBz4H1vYKChD6a4xjLVkaoRxpBHVp/IJZCD+8d69DRGnyuA4x2MGh0JLClTA9bLGrA==}
     engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
@@ -8201,6 +8472,21 @@ packages:
       '@tapjs/core': 1.4.6
     dependencies:
       '@tapjs/core': 1.4.6(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
+      is-actual-promise: 1.0.1
+      tcompare: 6.4.5(react-dom@18.2.0)(react@18.2.0)
+      trivial-deferred: 2.0.0
+    transitivePeerDependencies:
+      - react
+      - react-dom
+    dev: true
+
+  /@tapjs/snapshot@1.2.19(@tapjs/core@1.5.1)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-DsrDqqnBFQUyUc3Gs+Divl35Bje9vg4u04nFnalYHXLQuBBXJgwPhUrXWBZOtUBObPz++xMjcPF03h0iUhcHFw==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
       is-actual-promise: 1.0.1
       tcompare: 6.4.5(react-dom@18.2.0)(react@18.2.0)
       trivial-deferred: 2.0.0
@@ -8218,6 +8504,15 @@ packages:
       '@tapjs/core': 1.4.6(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
     dev: true
 
+  /@tapjs/spawn@1.1.19(@tapjs/core@1.5.1):
+    resolution: {integrity: sha512-2BvkoVDxkgnW4s3i2lvfm5XV5wWNfFLdsutmoLCWeZRM4e/csfEKL2bpNKmMHCozR6A9+RjTTzRx0f8lCDiUIg==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+    dev: true
+
   /@tapjs/stack@1.2.7:
     resolution: {integrity: sha512-7qUDWDmd+y7ZQ0vTrDTvFlWnJ+ND32NemS5HVuT1ZggHtBwJ62PQHIyCx/B5RopETBb6NvFPfUE21yTiex9Jkw==}
     engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
@@ -8230,6 +8525,15 @@ packages:
       '@tapjs/core': 1.4.6
     dependencies:
       '@tapjs/core': 1.4.6(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
+    dev: true
+
+  /@tapjs/stdin@1.1.19(@tapjs/core@1.5.1):
+    resolution: {integrity: sha512-fu7eZ6zIGMTbZ5+cA/0m1V2+iBkE4BcMQMK9epVTQYBcvmE0+dWk4NDetgb/ULM2jXmyLIEF52sAItjlTMtGEQ==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
     dev: true
 
   /@tapjs/test@1.3.17(@swc/core@1.3.27)(@tapjs/core@1.4.6)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0):
@@ -8314,6 +8618,47 @@ packages:
       - react-dom
     dev: true
 
+  /@tapjs/test@1.4.1(@swc/core@1.3.27)(@tapjs/core@1.5.1)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-V/KirBPxcSYg0MAFkjoIRIelQSJ0Fi4cGI5C0EeGNM4PIUc0jPrPPNggACsuDx2Eb0EW9+hpjIlmx4DwkTa93g==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    hasBin: true
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@isaacs/ts-node-temp-fork-for-pr-2009': 10.9.5(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.2.2)
+      '@tapjs/after': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/after-each': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/asserts': 1.1.19(@tapjs/core@1.5.1)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/before': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/before-each': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/filter': 1.2.19(@tapjs/core@1.5.1)
+      '@tapjs/fixture': 1.2.19(@tapjs/core@1.5.1)
+      '@tapjs/intercept': 1.2.19(@tapjs/core@1.5.1)
+      '@tapjs/mock': 1.3.1(@tapjs/core@1.5.1)
+      '@tapjs/node-serialize': 1.3.1(@tapjs/core@1.5.1)
+      '@tapjs/snapshot': 1.2.19(@tapjs/core@1.5.1)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/spawn': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/stdin': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/typescript': 1.4.1(@swc/core@1.3.27)(@tapjs/core@1.5.1)(@types/node@20.11.19)(typescript@5.2.2)
+      '@tapjs/worker': 1.1.19(@tapjs/core@1.5.1)
+      glob: 10.3.10
+      jackspeak: 2.3.6
+      mkdirp: 3.0.1
+      resolve-import: 1.4.5
+      rimraf: 5.0.5
+      sync-content: 1.0.2
+      tap-parser: 15.3.1
+      tshy: 1.12.0
+      typescript: 5.2.2
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - react
+      - react-dom
+    dev: true
+
   /@tapjs/typescript@1.3.6(@swc/core@1.3.27)(@tapjs/core@1.4.6)(@types/node@20.11.19)(typescript@5.0.3):
     resolution: {integrity: sha512-bHqQb06HcD1vFvSwElH0WK4cnCNthvA5OX/KBs5w1TNFHIeRHemp/hsSnGSNDwYwDETuOxD68rDZNTpNbzysBg==}
     engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
@@ -8374,6 +8719,36 @@ packages:
       - typescript
     dev: true
 
+  /@tapjs/typescript@1.4.1(@swc/core@1.3.27)(@tapjs/core@1.5.1)(@types/node@20.11.19)(typescript@5.2.2):
+    resolution: {integrity: sha512-ZffgdAyxhotOgsOD0P/ZBIz00ze/G3AdK0Ude2sE/+g8AZSNA55bJAarhkjtecEtCWftEdpmCt8eac2TloZ7+A==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@isaacs/ts-node-temp-fork-for-pr-2009': 10.9.5(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.2.2)
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - typescript
+    dev: true
+
+  /@tapjs/typescript@1.4.1(@swc/core@1.3.27)(@tapjs/core@1.5.1)(@types/node@20.11.19)(typescript@5.3.3):
+    resolution: {integrity: sha512-ZffgdAyxhotOgsOD0P/ZBIz00ze/G3AdK0Ude2sE/+g8AZSNA55bJAarhkjtecEtCWftEdpmCt8eac2TloZ7+A==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@isaacs/ts-node-temp-fork-for-pr-2009': 10.9.5(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.3.3)
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - typescript
+    dev: true
+
   /@tapjs/worker@1.1.17(@tapjs/core@1.4.6):
     resolution: {integrity: sha512-DCRzEBT+OgP518rQqzlX6KawvGTegkeEjPVa/TB6Iifj8WOHJ+XtunkR7riIRGEoCEOMD49DCJXj70c+XP0jNw==}
     engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
@@ -8381,6 +8756,15 @@ packages:
       '@tapjs/core': 1.4.6
     dependencies:
       '@tapjs/core': 1.4.6(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
+    dev: true
+
+  /@tapjs/worker@1.1.19(@tapjs/core@1.5.1):
+    resolution: {integrity: sha512-/Dj2c2NfC6tWTdqWOmw9qwJUBWpCTXr+Y1nWKGxzUWWWMaz4Y6BEK5OG7wbt4o2xDU/ljH0BzE3QYYyGTDhh6g==}
+    engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
+    peerDependencies:
+      '@tapjs/core': 1.5.1
+    dependencies:
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
     dev: true
 
   /@trysound/sax@0.2.0:
@@ -8469,26 +8853,26 @@ packages:
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
     dependencies:
       '@types/connect': 3.4.35
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
     dev: false
 
   /@types/bonjour@3.5.10:
     resolution: {integrity: sha512-p7ienRMiS41Nu2/igbJxxLDWrSZ0WxM8UQgCeO9KhoVF7cOVFkrKsiDr1EsJIla8vV3oEEjGcz11jc5yimhzZw==}
     dependencies:
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
     dev: false
 
   /@types/connect-history-api-fallback@1.5.0:
     resolution: {integrity: sha512-4x5FkPpLipqwthjPsF7ZRbOv3uoLUFkTA9G9v583qi4pACvq0uTELrB8OLUzPWUI4IJIyvM85vzkV1nyiI2Lig==}
     dependencies:
       '@types/express-serve-static-core': 4.17.35
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
     dev: false
 
   /@types/connect@3.4.35:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
     dev: false
 
   /@types/cookie@0.6.0:
@@ -8535,7 +8919,7 @@ packages:
   /@types/express-serve-static-core@4.17.35:
     resolution: {integrity: sha512-wALWQwrgiB2AWTT91CB62b6Yt0sNHpznUXeZEcnPU3DRdlDIz74x8Qg1UUYKSVFi+va5vKOLYRBI1bRKiLLKIg==}
     dependencies:
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
       '@types/qs': 6.9.7
       '@types/range-parser': 1.2.4
       '@types/send': 0.17.1
@@ -8554,7 +8938,7 @@ packages:
     resolution: {integrity: sha512-8bVUjXZvJacUFkJXHdyZ9iH1Eaj5V7I8c4NdH5sQJsdXkqT4CA5Dhb4yb4VE/3asyx4L9ayZr1NIhTsWHczmMw==}
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
     dev: true
 
   /@types/gtag.js@0.0.12:
@@ -8589,7 +8973,7 @@ packages:
   /@types/http-proxy@1.17.11:
     resolution: {integrity: sha512-HC8G7c1WmaF2ekqpnFq626xd3Zz0uvaqFmBJNRZCGEZCXkvSdJoNFn/8Ygbd9fKNQj8UzLdCETaI0UWPAjK7IA==}
     dependencies:
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
     dev: false
 
   /@types/istanbul-lib-coverage@2.0.4:
@@ -8629,7 +9013,7 @@ packages:
   /@types/keyv@3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
 
   /@types/linkify-it@3.0.5:
     resolution: {integrity: sha512-yg6E+u0/+Zjva+buc3EIb+29XEg4wltq7cSmd4Uc2EE/1nUVmxyzpX6gUXD0V8jIrG0r7YeOGVIbYRkxeooCtw==}
@@ -8705,7 +9089,6 @@ packages:
     resolution: {integrity: sha512-7xMnVEcZFu0DikYjWOlRq7NTPETrm7teqUT2WkQjrTIkEgUyyGdWsj/Zg8bEJt5TNklzbPD1X3fqfsHw3SpapQ==}
     dependencies:
       undici-types: 5.26.5
-    dev: true
 
   /@types/node@20.5.1:
     resolution: {integrity: sha512-4tT2UrL5LBqDwoed9wZ6N3umC4Yhz3W3FloMmiiG4JwmUJWpie0c7lcnUNd4gtMKuDEO4wRVS8B6Xa0uMRsMKg==}
@@ -8799,7 +9182,7 @@ packages:
   /@types/responselike@1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
 
   /@types/retry@0.12.0:
     resolution: {integrity: sha512-wWKOClTTiizcZhXnPY4wikVAwmdYHp8q6DmC+EJUzAMsycb7HB32Kh9RN4+0gExjmPmZSAQjgURXIGATPegAvA==}
@@ -8808,7 +9191,7 @@ packages:
   /@types/sax@1.2.7:
     resolution: {integrity: sha512-rO73L89PJxeYM3s3pPPjiPgVVcymqU490g0YO5n5By0k2Erzj6tay/4lr1CHAAU4JyOWd1rpQ8bCf6cZfHU96A==}
     dependencies:
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
     dev: false
 
   /@types/scheduler@0.16.3:
@@ -8822,7 +9205,7 @@ packages:
     resolution: {integrity: sha512-Cwo8LE/0rnvX7kIIa3QHCkcuF21c05Ayb0ZfxPiv0W8VRiZiNW/WuRupHKpqqGVGf7SUA44QSOUKaEd9lIrd/Q==}
     dependencies:
       '@types/mime': 1.3.2
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
     dev: false
 
   /@types/serve-index@1.9.1:
@@ -8835,13 +9218,13 @@ packages:
     resolution: {integrity: sha512-NUo5XNiAdULrJENtJXZZ3fHtfMolzZwczzBbnAeBbqBwG+LaG6YaJtuwzwGSQZ2wsCrxjEhNNjAkKigy3n8teQ==}
     dependencies:
       '@types/mime': 3.0.1
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
     dev: false
 
   /@types/sockjs@0.3.33:
     resolution: {integrity: sha512-f0KEEe05NvUnat+boPTZ0dgaLZ4SfSouXUgv5noUiefG2ajgKjmETo9ZJyuqsl7dfl2aHlLJUiki6B4ZYldiiw==}
     dependencies:
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
     dev: false
 
   /@types/statuses@2.0.4:
@@ -8875,7 +9258,7 @@ packages:
   /@types/ws@8.5.5:
     resolution: {integrity: sha512-lwhs8hktwxSjf9UaZ9tG5M03PGogvFaH8gUgLNbN9HKIg0dvv6q+gkSuJ8HN4/VbyxkuLzCjlN7GquQ0gUJfIg==}
     dependencies:
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
     dev: false
 
   /@types/yargs-parser@21.0.0:
@@ -8917,7 +9300,7 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/eslint-plugin@5.46.1(@typescript-eslint/parser@5.48.2)(eslint@8.48.0)(typescript@5.2.2):
+  /@typescript-eslint/eslint-plugin@5.46.1(@typescript-eslint/parser@5.48.2)(eslint@8.48.0)(typescript@5.3.3):
     resolution: {integrity: sha512-YpzNv3aayRBwjs4J3oz65eVLXc9xx0PDbIRisHj+dYhvBn02MjYOD96P8YGiWEIFBrojaUjxvkaUpakD82phsA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -8930,18 +9313,18 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.48.2(eslint@8.48.0)(typescript@5.2.2)
+      '@typescript-eslint/parser': 5.48.2(eslint@8.48.0)(typescript@5.3.3)
       '@typescript-eslint/scope-manager': 5.46.1
-      '@typescript-eslint/type-utils': 5.46.1(eslint@8.48.0)(typescript@5.2.2)
-      '@typescript-eslint/utils': 5.46.1(eslint@8.48.0)(typescript@5.2.2)
+      '@typescript-eslint/type-utils': 5.46.1(eslint@8.48.0)(typescript@5.3.3)
+      '@typescript-eslint/utils': 5.46.1(eslint@8.48.0)(typescript@5.3.3)
       debug: 4.3.4
       eslint: 8.48.0
       ignore: 5.2.4
       natural-compare-lite: 1.4.0
       regexpp: 3.2.0
       semver: 7.5.4
-      tsutils: 3.21.0(typescript@5.2.2)
-      typescript: 5.2.2
+      tsutils: 3.21.0(typescript@5.3.3)
+      typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9015,7 +9398,7 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/parser@5.48.2(eslint@8.48.0)(typescript@5.2.2):
+  /@typescript-eslint/parser@5.48.2(eslint@8.48.0)(typescript@5.3.3):
     resolution: {integrity: sha512-38zMsKsG2sIuM5Oi/olurGwYJXzmtdsHhn5mI/pQogP+BjYVkK5iRazCQ8RGS0V+YLk282uWElN70zAAUmaYHw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -9029,10 +9412,10 @@ packages:
     dependencies:
       '@typescript-eslint/scope-manager': 5.48.2
       '@typescript-eslint/types': 5.48.2
-      '@typescript-eslint/typescript-estree': 5.48.2(typescript@5.2.2)
+      '@typescript-eslint/typescript-estree': 5.48.2(typescript@5.3.3)
       debug: 4.3.4
       eslint: 8.48.0
-      typescript: 5.2.2
+      typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9059,7 +9442,7 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/parser@5.48.2(eslint@8.55.0)(typescript@5.2.2):
+  /@typescript-eslint/parser@5.48.2(eslint@8.55.0)(typescript@5.3.3):
     resolution: {integrity: sha512-38zMsKsG2sIuM5Oi/olurGwYJXzmtdsHhn5mI/pQogP+BjYVkK5iRazCQ8RGS0V+YLk282uWElN70zAAUmaYHw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -9073,10 +9456,10 @@ packages:
     dependencies:
       '@typescript-eslint/scope-manager': 5.48.2
       '@typescript-eslint/types': 5.48.2
-      '@typescript-eslint/typescript-estree': 5.48.2(typescript@5.2.2)
+      '@typescript-eslint/typescript-estree': 5.48.2(typescript@5.3.3)
       debug: 4.3.4
       eslint: 8.55.0
-      typescript: 5.2.2
+      typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9158,7 +9541,7 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/type-utils@5.46.1(eslint@8.48.0)(typescript@5.2.2):
+  /@typescript-eslint/type-utils@5.46.1(eslint@8.48.0)(typescript@5.3.3):
     resolution: {integrity: sha512-V/zMyfI+jDmL1ADxfDxjZ0EMbtiVqj8LUGPAGyBkXXStWmCUErMpW873zEHsyguWCuq2iN4BrlWUkmuVj84yng==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -9170,12 +9553,12 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/typescript-estree': 5.46.1(typescript@5.2.2)
-      '@typescript-eslint/utils': 5.46.1(eslint@8.48.0)(typescript@5.2.2)
+      '@typescript-eslint/typescript-estree': 5.46.1(typescript@5.3.3)
+      '@typescript-eslint/utils': 5.46.1(eslint@8.48.0)(typescript@5.3.3)
       debug: 4.3.4
       eslint: 8.48.0
-      tsutils: 3.21.0(typescript@5.2.2)
-      typescript: 5.2.2
+      tsutils: 3.21.0(typescript@5.3.3)
+      typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9243,7 +9626,7 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/typescript-estree@5.46.1(typescript@5.2.2):
+  /@typescript-eslint/typescript-estree@5.46.1(typescript@5.3.3):
     resolution: {integrity: sha512-j9W4t67QiNp90kh5Nbr1w92wzt+toiIsaVPnEblB2Ih2U9fqBTyqV9T3pYWZBRt6QoMh/zVWP59EpuCjc4VRBg==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -9258,8 +9641,8 @@ packages:
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.5.4
-      tsutils: 3.21.0(typescript@5.2.2)
-      typescript: 5.2.2
+      tsutils: 3.21.0(typescript@5.3.3)
+      typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9285,7 +9668,7 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/typescript-estree@5.48.2(typescript@5.2.2):
+  /@typescript-eslint/typescript-estree@5.48.2(typescript@5.3.3):
     resolution: {integrity: sha512-bibvD3z6ilnoVxUBFEgkO0k0aFvUc4Cttt0dAreEr+nrAHhWzkO83PEVVuieK3DqcgL6VAK5dkzK8XUVja5Zcg==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -9300,8 +9683,8 @@ packages:
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.5.4
-      tsutils: 3.21.0(typescript@5.2.2)
-      typescript: 5.2.2
+      tsutils: 3.21.0(typescript@5.3.3)
+      typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9371,7 +9754,7 @@ packages:
       - typescript
     dev: true
 
-  /@typescript-eslint/utils@5.46.1(eslint@8.48.0)(typescript@5.2.2):
+  /@typescript-eslint/utils@5.46.1(eslint@8.48.0)(typescript@5.3.3):
     resolution: {integrity: sha512-RBdBAGv3oEpFojaCYT4Ghn4775pdjvwfDOfQ2P6qzNVgQOVrnSPe5/Pb88kv7xzYQjoio0eKHKB9GJ16ieSxvA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -9384,7 +9767,7 @@ packages:
       '@types/semver': 7.5.0
       '@typescript-eslint/scope-manager': 5.46.1
       '@typescript-eslint/types': 5.46.1
-      '@typescript-eslint/typescript-estree': 5.46.1(typescript@5.2.2)
+      '@typescript-eslint/typescript-estree': 5.46.1(typescript@5.3.3)
       eslint: 8.48.0
       eslint-scope: 5.1.1
       eslint-utils: 3.0.0(eslint@8.48.0)
@@ -10331,7 +10714,7 @@ packages:
       strip-ansi: 7.1.0
       supports-esm: 1.0.0
       tsconfig-resolver: 3.0.1
-      typescript: 5.2.2
+      typescript: 5.3.3
       unist-util-visit: 4.1.2
       vfile: 5.3.7
       vite: 4.1.4(@types/node@20.9.0)
@@ -11112,11 +11495,6 @@ packages:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
 
-  /chalk@5.2.0:
-    resolution: {integrity: sha512-ree3Gqw/nazQAPuJJEy+avdl7QfZMcUvmHIKgEZkGL+xOBzRvup5Hxo6LHuMceSxOabuJLJm5Yp/92R9eMmMvA==}
-    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
-    dev: false
-
   /chalk@5.3.0:
     resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
@@ -11701,6 +12079,24 @@ packages:
   /core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
 
+  /cosmiconfig-typescript-loader@4.3.0(@types/node@20.11.19)(cosmiconfig@8.2.0)(ts-node@10.9.1)(typescript@5.3.3):
+    resolution: {integrity: sha512-NTxV1MFfZDLPiBMjxbHRwSh5LaLcPMwNdCutmnHJCKoVnlvldPWlllonKwrsRJ5pYZBIBGRWWU2tfvzxgeSW5Q==}
+    engines: {node: '>=12', npm: '>=6'}
+    peerDependencies:
+      '@types/node': '*'
+      cosmiconfig: '>=7'
+      ts-node: '>=10'
+      typescript: '>=3'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      '@types/node': 20.11.19
+      cosmiconfig: 8.2.0
+      ts-node: 10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@5.0.3)
+      typescript: 5.3.3
+    dev: true
+
   /cosmiconfig-typescript-loader@4.3.0(@types/node@20.5.1)(cosmiconfig@8.2.0)(ts-node@10.9.1)(typescript@5.3.3):
     resolution: {integrity: sha512-NTxV1MFfZDLPiBMjxbHRwSh5LaLcPMwNdCutmnHJCKoVnlvldPWlllonKwrsRJ5pYZBIBGRWWU2tfvzxgeSW5Q==}
     engines: {node: '>=12', npm: '>=6'}
@@ -11719,24 +12115,6 @@ packages:
       typescript: 5.3.3
     dev: true
     optional: true
-
-  /cosmiconfig-typescript-loader@4.3.0(@types/node@20.9.0)(cosmiconfig@8.2.0)(ts-node@10.9.1)(typescript@5.3.3):
-    resolution: {integrity: sha512-NTxV1MFfZDLPiBMjxbHRwSh5LaLcPMwNdCutmnHJCKoVnlvldPWlllonKwrsRJ5pYZBIBGRWWU2tfvzxgeSW5Q==}
-    engines: {node: '>=12', npm: '>=6'}
-    peerDependencies:
-      '@types/node': '*'
-      cosmiconfig: '>=7'
-      ts-node: '>=10'
-      typescript: '>=3'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      '@types/node': 20.9.0
-      cosmiconfig: 8.2.0
-      ts-node: 10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@5.0.3)
-      typescript: 5.3.3
-    dev: true
 
   /cosmiconfig@6.0.0:
     resolution: {integrity: sha512-xb3ZL6+L8b9JLLCx3ZdoZy4+2ECphCMo2PwqgP1tlfVq6M6YReyzBJtvWWtbDSpNr9hn96pkCiZqUcFEc+54Qg==}
@@ -13047,7 +13425,7 @@ packages:
       - supports-color
     dev: true
 
-  /eslint-config-standard-with-typescript@23.0.0(@typescript-eslint/eslint-plugin@5.46.1)(eslint-plugin-import@2.29.0)(eslint-plugin-n@15.7.0)(eslint-plugin-promise@6.1.1)(eslint@8.55.0)(typescript@5.2.2):
+  /eslint-config-standard-with-typescript@23.0.0(@typescript-eslint/eslint-plugin@5.46.1)(eslint-plugin-import@2.29.0)(eslint-plugin-n@15.7.0)(eslint-plugin-promise@6.1.1)(eslint@8.55.0)(typescript@5.3.3):
     resolution: {integrity: sha512-iaaWifImn37Z1OXbNW1es7KI+S7D408F9ys0bpaQf2temeBWlvb0Nc5qHkOgYaRb5QxTZT32GGeN1gtswASOXA==}
     peerDependencies:
       '@typescript-eslint/eslint-plugin': ^5.0.0
@@ -13062,14 +13440,14 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/eslint-plugin': 5.46.1(@typescript-eslint/parser@5.48.2)(eslint@8.48.0)(typescript@5.2.2)
-      '@typescript-eslint/parser': 5.48.2(eslint@8.55.0)(typescript@5.2.2)
+      '@typescript-eslint/eslint-plugin': 5.46.1(@typescript-eslint/parser@5.48.2)(eslint@8.48.0)(typescript@5.3.3)
+      '@typescript-eslint/parser': 5.48.2(eslint@8.55.0)(typescript@5.3.3)
       eslint: 8.55.0
       eslint-config-standard: 17.0.0(eslint-plugin-import@2.29.0)(eslint-plugin-n@15.7.0)(eslint-plugin-promise@6.1.1)(eslint@8.55.0)
       eslint-plugin-import: 2.29.0(@typescript-eslint/parser@5.48.2)(eslint@8.48.0)
       eslint-plugin-n: 15.7.0(eslint@8.48.0)
       eslint-plugin-promise: 6.1.1(eslint@8.48.0)
-      typescript: 5.2.2
+      typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -13237,7 +13615,7 @@ packages:
       eslint-import-resolver-webpack:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.48.2(eslint@8.48.0)(typescript@5.0.3)
+      '@typescript-eslint/parser': 5.48.2(eslint@8.48.0)(typescript@5.3.3)
       debug: 3.2.7
       eslint: 8.48.0
       eslint-import-resolver-node: 0.3.9
@@ -13408,7 +13786,7 @@ packages:
       eslint:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.48.2(eslint@8.48.0)(typescript@5.0.3)
+      '@typescript-eslint/parser': 5.48.2(eslint@8.48.0)(typescript@5.3.3)
       array-includes: 3.1.7
       array.prototype.findlastindex: 1.2.3
       array.prototype.flat: 1.3.2
@@ -13839,7 +14217,7 @@ packages:
     resolution: {integrity: sha512-EzV94NYKoO09GLXGjXj9JIlXijVck4ONSr5wiCWDvhsvj5jxSrzTmRU/9C1DyB6uToszLs8aifA6NQ7lEQdvFw==}
     engines: {node: '>= 0.8'}
     dependencies:
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
       require-like: 0.1.2
     dev: false
 
@@ -16340,7 +16718,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       '@jest/types': 29.5.0
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
       chalk: 4.1.2
       ci-info: 3.8.0
       graceful-fs: 4.2.11
@@ -16351,7 +16729,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -16359,7 +16737,7 @@ packages:
     resolution: {integrity: sha512-NcrQnevGoSp4b5kg+akIpthoAFHxPBcb5P6mYPY0fUNT+sSvmtu6jlkEle3anczUKIKEbMxFimk9oTP/tpIPgA==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
-      '@types/node': 20.9.0
+      '@types/node': 20.11.19
       jest-util: 29.5.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
@@ -16813,7 +17191,7 @@ packages:
     resolution: {integrity: sha512-l0x2DvrW294C9uDCoQe1VSU4gf529FkSZ6leBl4TiqZH/e+0R7hSfHQBNut2mNygDgHwvYHfFLn6Oxb3VWj2rA==}
     engines: {node: '>=12'}
     dependencies:
-      chalk: 5.2.0
+      chalk: 5.3.0
       is-unicode-supported: 1.3.0
     dev: false
 
@@ -18287,7 +18665,7 @@ packages:
   /ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  /msw@2.2.1(typescript@5.2.2):
+  /msw@2.2.1(typescript@5.3.3):
     resolution: {integrity: sha512-DCsZAQwan+2onEcpD86fiEnCKW4IvYzqcwDq/2TIoeNrmBqNp/mJW4wHQyxcoYrRPwgujin7wDFflqiSO1iT/w==}
     engines: {node: '>=18'}
     hasBin: true
@@ -18314,7 +18692,7 @@ packages:
       path-to-regexp: 6.2.1
       strict-event-emitter: 0.5.1
       type-fest: 4.10.3
-      typescript: 5.2.2
+      typescript: 5.3.3
       yargs: 17.7.2
     dev: true
 
@@ -18860,7 +19238,7 @@ packages:
     resolution: {integrity: sha512-ERAyNnZOfqM+Ao3RAvIXkYh5joP220yf59gVe2X/cI6SiCxIdi4c9HZKZD8R6q/RDXEje1THBju6iExiSsgJaQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
-      chalk: 5.2.0
+      chalk: 5.3.0
       cli-cursor: 4.0.0
       cli-spinners: 2.9.0
       is-interactive: 2.0.0
@@ -22468,29 +22846,29 @@ packages:
       - utf-8-validate
     dev: true
 
-  /tap@18.6.1(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2):
-    resolution: {integrity: sha512-5cBQhJ1gdbsrTR3tA5kZZTts0HyOML6bcM7pEF7GF8d6y1ajfRMjbInS1Ty7/x2Ip0ko3cY1dYjPJ9JFNPsm7w==}
+  /tap@18.7.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-QFRQlVHkCTqtbvt1Lsxq74eNb7PTfAuVJPKr3x8Pua8jG09VkupVAKmSFV1RLH3uk8JUxyZWkU/EmVdNhW+quA==}
     engines: {node: 16 >=16.17.0 || 18 >= 18.6.0 || >=20}
     hasBin: true
     dependencies:
-      '@tapjs/after': 1.1.17(@tapjs/core@1.4.6)
-      '@tapjs/after-each': 1.1.17(@tapjs/core@1.4.6)
-      '@tapjs/asserts': 1.1.17(@tapjs/core@1.4.6)(react-dom@18.2.0)(react@18.2.0)
-      '@tapjs/before': 1.1.17(@tapjs/core@1.4.6)
-      '@tapjs/before-each': 1.1.17(@tapjs/core@1.4.6)
-      '@tapjs/core': 1.4.6(@swc/core@1.3.27)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
-      '@tapjs/filter': 1.2.17(@tapjs/core@1.4.6)
-      '@tapjs/fixture': 1.2.17(@tapjs/core@1.4.6)
-      '@tapjs/intercept': 1.2.17(@tapjs/core@1.4.6)
-      '@tapjs/mock': 1.2.15(@tapjs/core@1.4.6)
-      '@tapjs/node-serialize': 1.2.6(@tapjs/core@1.4.6)
-      '@tapjs/run': 1.4.16(@swc/core@1.3.27)(@tapjs/core@1.4.6)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
-      '@tapjs/snapshot': 1.2.17(@tapjs/core@1.4.6)(react-dom@18.2.0)(react@18.2.0)
-      '@tapjs/spawn': 1.1.17(@tapjs/core@1.4.6)
-      '@tapjs/stdin': 1.1.17(@tapjs/core@1.4.6)
-      '@tapjs/test': 1.3.17(@swc/core@1.3.27)(@tapjs/core@1.4.6)(@types/node@20.9.0)(react-dom@18.2.0)(react@18.2.0)
-      '@tapjs/typescript': 1.3.6(@swc/core@1.3.27)(@tapjs/core@1.4.6)(@types/node@20.9.0)(typescript@5.2.2)
-      '@tapjs/worker': 1.1.17(@tapjs/core@1.4.6)
+      '@tapjs/after': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/after-each': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/asserts': 1.1.19(@tapjs/core@1.5.1)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/before': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/before-each': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/core': 1.5.1(@swc/core@1.3.27)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/filter': 1.2.19(@tapjs/core@1.5.1)
+      '@tapjs/fixture': 1.2.19(@tapjs/core@1.5.1)
+      '@tapjs/intercept': 1.2.19(@tapjs/core@1.5.1)
+      '@tapjs/mock': 1.3.1(@tapjs/core@1.5.1)
+      '@tapjs/node-serialize': 1.3.1(@tapjs/core@1.5.1)
+      '@tapjs/run': 1.5.1(@swc/core@1.3.27)(@tapjs/core@1.5.1)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/snapshot': 1.2.19(@tapjs/core@1.5.1)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/spawn': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/stdin': 1.1.19(@tapjs/core@1.5.1)
+      '@tapjs/test': 1.4.1(@swc/core@1.3.27)(@tapjs/core@1.5.1)(@types/node@20.11.19)(react-dom@18.2.0)(react@18.2.0)
+      '@tapjs/typescript': 1.4.1(@swc/core@1.3.27)(@tapjs/core@1.5.1)(@types/node@20.11.19)(typescript@5.3.3)
+      '@tapjs/worker': 1.1.19(@tapjs/core@1.5.1)
       resolve-import: 1.4.5
     transitivePeerDependencies:
       - '@swc/core'
@@ -22925,7 +23303,7 @@ packages:
       - supports-color
     dev: true
 
-  /ts-standard@12.0.2(typescript@5.2.2):
+  /ts-standard@12.0.2(typescript@5.3.3):
     resolution: {integrity: sha512-XX2wrB9fKKTfBj4yD3ABm9iShzZcS2iWcPK8XzlBvuL20+wMiLgiz/k5tXgZwTaYq5wRhbks1Y9PelhujF/9ag==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     hasBin: true
@@ -22935,11 +23313,11 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/eslint-plugin': 5.46.1(@typescript-eslint/parser@5.48.2)(eslint@8.48.0)(typescript@5.2.2)
-      '@typescript-eslint/parser': 5.48.2(eslint@8.48.0)(typescript@5.2.2)
+      '@typescript-eslint/eslint-plugin': 5.46.1(@typescript-eslint/parser@5.48.2)(eslint@8.48.0)(typescript@5.3.3)
+      '@typescript-eslint/parser': 5.48.2(eslint@8.48.0)(typescript@5.3.3)
       eslint: 8.55.0
       eslint-config-standard-jsx: 11.0.0(eslint-plugin-react@7.33.2)(eslint@8.55.0)
-      eslint-config-standard-with-typescript: 23.0.0(@typescript-eslint/eslint-plugin@5.46.1)(eslint-plugin-import@2.29.0)(eslint-plugin-n@15.7.0)(eslint-plugin-promise@6.1.1)(eslint@8.55.0)(typescript@5.2.2)
+      eslint-config-standard-with-typescript: 23.0.0(@typescript-eslint/eslint-plugin@5.46.1)(eslint-plugin-import@2.29.0)(eslint-plugin-n@15.7.0)(eslint-plugin-promise@6.1.1)(eslint@8.55.0)(typescript@5.3.3)
       eslint-plugin-import: 2.29.0(@typescript-eslint/parser@5.48.2)(eslint@8.48.0)
       eslint-plugin-n: 15.7.0(eslint@8.48.0)
       eslint-plugin-promise: 6.1.1(eslint@8.48.0)
@@ -22947,7 +23325,7 @@ packages:
       minimist: 1.2.8
       pkg-conf: 4.0.0
       standard-engine: 15.1.0
-      typescript: 5.2.2
+      typescript: 5.3.3
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -22969,7 +23347,7 @@ packages:
       '@types/json5': 0.0.30
       '@types/resolve': 1.20.2
       json5: 2.2.3
-      resolve: 1.22.2
+      resolve: 1.22.8
       strip-bom: 4.0.0
       type-fest: 0.13.1
     dev: false
@@ -22986,6 +23364,23 @@ packages:
       meow: 9.0.0
       path-exists: 4.0.0
       read-pkg-up: 7.0.1
+    dev: true
+
+  /tshy@1.12.0:
+    resolution: {integrity: sha512-WooNSTc+uyjLseTdzUFa4Lx3KYMcwxdrJMsWacl39BlfKZKhr30gLjAJkTQWHFkmAO+dj0L4P2jxiIrOo81V3w==}
+    engines: {node: 16 >=16.17 || 18 >=18.15.0 || >=20.6.1}
+    hasBin: true
+    dependencies:
+      chalk: 5.3.0
+      chokidar: 3.5.3
+      foreground-child: 3.1.1
+      mkdirp: 3.0.1
+      polite-json: 4.0.1
+      resolve-import: 1.4.5
+      rimraf: 5.0.5
+      sync-content: 1.0.2
+      typescript: 5.3.3
+      walk-up-path: 3.0.1
     dev: true
 
   /tshy@1.8.2:
@@ -23052,7 +23447,7 @@ packages:
       - ts-node
     dev: true
 
-  /tsup@7.2.0(@swc/core@1.3.27)(ts-node@10.9.1)(typescript@5.2.2):
+  /tsup@7.2.0(@swc/core@1.3.27)(ts-node@10.9.1)(typescript@5.3.3):
     resolution: {integrity: sha512-vDHlczXbgUvY3rWvqFEbSqmC1L7woozbzngMqTtL2PGBODTtWlRwGDDawhvWzr5c1QjKe4OAKqJGfE1xeXUvtQ==}
     engines: {node: '>=16.14'}
     hasBin: true
@@ -23083,7 +23478,7 @@ packages:
       source-map: 0.8.0-beta.0
       sucrase: 3.34.0
       tree-kill: 1.2.2
-      typescript: 5.2.2
+      typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
       - ts-node
@@ -23102,7 +23497,7 @@ packages:
       typescript: 5.0.3
     dev: true
 
-  /tsutils@3.21.0(typescript@5.2.2):
+  /tsutils@3.21.0(typescript@5.3.3):
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}
     engines: {node: '>= 6'}
     peerDependencies:
@@ -23112,7 +23507,7 @@ packages:
         optional: true
     dependencies:
       tslib: 1.14.1
-      typescript: 5.2.2
+      typescript: 5.3.3
     dev: true
 
   /tsx@3.12.2:
@@ -23351,7 +23746,6 @@ packages:
     resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
     engines: {node: '>=14.17'}
     hasBin: true
-    dev: true
 
   /uc.micro@1.0.6:
     resolution: {integrity: sha512-8Y75pvTYkLJW2hWQHXxoqRgV7qb9B+9vFEtidML+7koHUFapnVJAZ6cKs+Qjz5Aw3aZWHMC6u0wJE3At+nSGwA==}

@@ -122,7 +122,7 @@ export default defineConfig({
             { text: 'Plugin Vitepress', link: '/open-source/plugins/plugin-vitepress.html' },
             { text: 'Plugin Docusaurus', link: '/open-source/plugins/plugin-docusaurus.html' },
             { text: 'Plugin Secure Proxy', link: '/open-source/plugins/plugin-secure-proxy.html' },
-            { text: 'Plugin Telemetry', link: '/open-source/plugins/plugin-telemetry.html' },
+            { text: 'Plugin Analytics', link: '/open-source/plugins/plugin-analytics.html' },
             { text: 'Plugin Astro', link: '/open-source/plugins/plugin-astro.html' },
             { text: 'Plugin Data Persistence', link: '/open-source/plugins/plugin-data-persistence.html' },
             { text: 'Plugin Match Highlight', link: '/open-source/plugins/plugin-match-highlight.html' },
