@@ -1,6 +1,6 @@
 {
   "name": "@orama/plugin-docusaurus-v3",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "description": "Docusaurus plugin for local search powered by orama",
   "keywords": [
     "orama",
