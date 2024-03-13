@@ -30,7 +30,15 @@ export default defineConfig({
 
   vite: {
     // @ts-ignore
-    plugins: [OramaPlugin()]
+    plugins: [
+      OramaPlugin({
+        analytics: {
+          enabled: true,
+          apiKey: "RyOLWQiirzaGlsGuAcspAQ2YneslhTZo",
+          indexId: "gjhul99bf9wnpook7nbwezg7",
+        }
+      })
+    ]
   },
 
   rewrites: {

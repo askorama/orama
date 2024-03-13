@@ -8,6 +8,14 @@ import { persist } from '@orama/plugin-data-persistence'
 import slugify from 'slugify'
 import { readFileSync } from 'fs'
 
+type OramaPluginOptions = {
+  analytics?: {
+    enabled: boolean
+    apiKey: string
+    indexId: string
+  }
+}
+
 type OramaSchema = {
   title: string
   content: string
@@ -93,7 +101,7 @@ function formatForOrama(data: Array<ParserResult>): Array<OramaSchema> {
   }
 }
 
-export function OramaPlugin(): Plugin {
+export function OramaPlugin(pluginOptions: OramaPluginOptions = {}): Plugin {
   let resolveConfig: any
   const virtualModuleId = 'virtual:search-data'
   const resolvedVirtualModuleId = `\0${virtualModuleId}`
@@ -151,7 +159,8 @@ export function OramaPlugin(): Plugin {
 
       return `
         const data = ${JSON.stringify(await createOramaContentLoader(pages, root))};
-        export default data;
+        const analytics = ${JSON.stringify(pluginOptions.analytics)};
+        export default { data, analytics };
       `
     }
   }

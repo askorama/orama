@@ -9,12 +9,15 @@ $.colorScheme.value = VPData.isDark.value ? 'dark' : 'light'
 
 onMounted(async () => {
   // @ts-expect-error - virtual:search-data is not globally defined
-  const oramaInstance = await import('virtual:search-data')
+  const oramaPluginData = await import('virtual:search-data')
+  const oramaInstance = oramaPluginData.default.data
+  const oramaAnalytics = oramaPluginData.default.analytics
 
   RegisterSearchBox({
-    oramaInstance: oramaInstance.default,
+    oramaInstance: oramaInstance,
     preset: presets.docs.name,
-    show: false
+    show: false,
+    analytics: oramaAnalytics,
   })
 })
 </script>
