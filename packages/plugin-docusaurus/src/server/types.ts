@@ -19,8 +19,13 @@ export interface SectionSchema extends AnyDocument {
 
 export type RawDataWithPositions = RawData & { positions: Record<string, Record<string, Record<string, Position[]>>> }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface PluginOptions {}
+export interface PluginOptions {
+  analytics?: {
+    enabled: boolean
+    apiKey: string
+    indexId: string
+  }
+}
 
 export interface PluginData {
   searchData: Record<string, { data: ArrayBuffer }>

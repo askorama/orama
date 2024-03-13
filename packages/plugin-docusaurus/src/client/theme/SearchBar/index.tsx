@@ -8,7 +8,8 @@ import useBaseUrl from '@docusaurus/useBaseUrl'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import { usePluginData } from '@docusaurus/useGlobalData'
 import useIsBrowser from '@docusaurus/useIsBrowser'
-import { AnyDocument, create, load, Orama, RawData, search as oramaSearch } from '@orama/orama'
+import { AnyDocument, OramaPlugin, create, load, Orama, RawData, search as oramaSearch } from '@orama/orama'
+import { pluginAnalytics, PluginAnalyticsParams } from '@orama/plugin-analytics'
 import { Highlight } from '@orama/highlight'
 import { ungzip } from 'pako'
 import { createElement, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -31,7 +32,7 @@ export default function SearchBar(): JSX.Element {
   const { siteConfig } = useDocusaurusContext()
   const containerRef = useRef<HTMLDivElement>(null)
   const { colorMode } = useColorMode()
-  const { searchData } = usePluginData(PLUGIN_NAME) as PluginData
+  const { searchData, analytics } = usePluginData(PLUGIN_NAME) as PluginData & { analytics: PluginAnalyticsParams }
   const [database, setDatabase] = useState<Orama<AnyDocument>>()
   const searchBaseUrl = useBaseUrl(INDEX_FILE)
   const versions = useVersions(undefined)
@@ -161,7 +162,13 @@ export default function SearchBar(): JSX.Element {
       const deflated = ungzip(buffer, { to: 'string' })
       const data: RawData = JSON.parse(deflated)
 
-      const _db = await create({ schema })
+      const pluginAnalyticsConfig =
+        analytics ? pluginAnalytics(analytics) : ({} as OramaPlugin)
+
+      const _db = await create({
+        schema,
+        plugins: [pluginAnalyticsConfig]
+      })
 
       await load(_db, data)
 

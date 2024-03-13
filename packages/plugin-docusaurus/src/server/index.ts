@@ -201,6 +201,7 @@ function docusaurusOramaPlugin(context: LoadContext, options: PluginOptions): Pl
 
       if (isDevelopment) {
         actions.setGlobalData({
+          analytics: options.analytics,
           searchData: Object.fromEntries(
             await Promise.all(
               versions.map(async (version) => {
