@@ -34,9 +34,7 @@ const config = {
     locales: ['en'],
   },
 
-  plugins: [
-    '@orama/plugin-docusaurus-v3'
-  ],
+  plugins: ['@orama/plugin-docusaurus-v3'],
 
   presets: [
     [

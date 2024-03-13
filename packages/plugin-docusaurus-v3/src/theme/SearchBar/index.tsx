@@ -17,7 +17,7 @@ export function OramaSearch() {
   const activeVersion = useActiveVersion(undefined)
   const versions = useVersions(undefined)
   const { preferredVersion } = useDocsPreferredVersion()
-  const { searchData } = usePluginData('@orama/plugin-docusaurus-v3')
+  const { searchData, analytics } = usePluginData('@orama/plugin-docusaurus-v3')
   const { colorMode } = useColorMode()
 
   const version = useMemo(() => {
@@ -90,7 +90,8 @@ export function OramaSearch() {
           oramaInstance,
           preset: presets.docs.name,
           show: false,
-          colorScheme: colorMode
+          colorScheme: colorMode,
+          analytics
         })
       }
     }

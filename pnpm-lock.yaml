@@ -467,12 +467,15 @@ importers:
       '@orama/orama':
         specifier: workspace:*
         version: link:../orama
+      '@orama/plugin-analytics':
+        specifier: workspace:*
+        version: link:../plugin-analytics
       '@orama/plugin-parsedoc':
         specifier: workspace:*
         version: link:../plugin-parsedoc
       '@orama/searchbox':
-        specifier: 1.0.0-beta.12
-        version: 1.0.0-beta.12(@orama/highlight@0.1.2)(@orama/orama@packages+orama)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.0)(@preact/signals@1.2.2)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.2)
+        specifier: 1.0.0-beta.13
+        version: 1.0.0-beta.13(@orama/highlight@0.1.2)(@orama/orama@packages+orama)(@oramacloud/client@1.0.0-beta.21)(@preact/signals-core@1.5.0)(@preact/signals@1.2.2)(postcss@8.4.32)(preact-custom-element@4.3.0)(preact@10.19.2)
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
@@ -7707,7 +7710,7 @@ packages:
       '@orama/highlight': 0.1.2
       '@orama/orama': link:packages/orama
       '@orama/plugin-analytics': 2.0.10
-      '@oramacloud/client': 1.0.0-beta.21(typescript@5.2.2)
+      '@oramacloud/client': 1.0.0-beta.21(typescript@5.0.3)
       '@preact/signals': 1.2.2(preact@10.19.2)
       '@preact/signals-core': 1.5.0
       object-to-css-variables: 0.2.1
@@ -7726,17 +7729,6 @@ packages:
       '@paralleldrive/cuid2': 2.2.2
       react: 18.2.0
       vue: 3.3.10(typescript@5.0.3)
-    transitivePeerDependencies:
-      - typescript
-    dev: false
-
-  /@oramacloud/client@1.0.0-beta.21(typescript@5.2.2):
-    resolution: {integrity: sha512-yubgcBA1LrxpxkJlc4KG+pafHaKaQhmm/xG2cAtQtHKNQULcSHYpWUoKoypoj4XQxFHb9QoTSl2HptXXZFYX6g==}
-    dependencies:
-      '@orama/orama': 1.2.11
-      '@paralleldrive/cuid2': 2.2.2
-      react: 18.2.0
-      vue: 3.3.10(typescript@5.2.2)
     transitivePeerDependencies:
       - typescript
     dev: false
