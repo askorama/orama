@@ -12,7 +12,15 @@ import MarkdownIt from 'markdown-it'
 import matter from 'gray-matter'
 import { LoadedContent, type LoadedVersion } from '@docusaurus/plugin-content-docs'
 
-export default function OramaPluginDocusaurus(ctx: { siteDir: any; generatedFilesDir: any }): Plugin {
+type PluginOptions = {
+  analytics?: {
+    enabled: boolean
+    apiKey: string
+    indexId: string
+  }
+}
+
+export default function OramaPluginDocusaurus(ctx: { siteDir: any; generatedFilesDir: any }, options: PluginOptions): Plugin {
   let versions: any[] = []
 
   return {
@@ -42,6 +50,7 @@ export default function OramaPluginDocusaurus(ctx: { siteDir: any; generatedFile
 
       if (isDevelopment) {
         actions.setGlobalData({
+          analytics: options.analytics,
           searchData: Object.fromEntries(
             await Promise.all(
               versions.map(async (version) => {
