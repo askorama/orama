@@ -1,6 +1,3 @@
-
-  
-  ```md
 ---
 outline: deep
 ---
@@ -103,6 +100,5 @@ This function is used to ensure that the search index file is properly named and
 
 By leveraging these core functions, the `@orama/plugin-docusaurus` plugin provides a seamless way to index your Docusaurus website content and offer a robust text search experience to your visitors.
 
-```
   
   
