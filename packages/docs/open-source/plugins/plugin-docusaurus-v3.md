@@ -1,7 +1,3 @@
-
-  
-  Here's the updated documentation with the necessary changes to reflect support for Docusaurus 3:
-
 ---
 outline: deep
 ---
