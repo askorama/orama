@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useEffect, useMemo, useState } from 'react'
 import useBaseUrl from '@docusaurus/useBaseUrl'
+import { useLocation } from "@docusaurus/router"
 import useIsBrowser from '@docusaurus/useIsBrowser'
 import { useActiveVersion, useVersions } from '@docusaurus/plugin-content-docs/client'
 import { useColorMode, useDocsPreferredVersion } from '@docusaurus/theme-common'
@@ -11,13 +12,15 @@ import '@orama/searchbox/dist/index.css'
 
 export function OramaSearch() {
   const [oramaInstance, setOramaInstance] = useState(null)
+  const { pathname } = useLocation();
 
+  const { searchData, analytics, pluginContentDocsIds } = usePluginData('@orama/plugin-docusaurus-v3')
+  const pluginId = pluginContentDocsIds.filter((id: string) => pathname.includes(id))[0] || pluginContentDocsIds[0]
   const baseURL = useBaseUrl('orama-search-index-@VERSION@.json.gz')
   const isBrowser = useIsBrowser()
-  const activeVersion = useActiveVersion(undefined)
-  const versions = useVersions(undefined)
-  const { preferredVersion } = useDocsPreferredVersion()
-  const { searchData, analytics } = usePluginData('@orama/plugin-docusaurus-v3')
+  const activeVersion = useActiveVersion(pluginId)
+  const versions = useVersions(pluginId)
+  const { preferredVersion } = useDocsPreferredVersion(pluginId)
   const { colorMode } = useColorMode()
 
   const version = useMemo(() => {
@@ -101,7 +104,7 @@ export function OramaSearch() {
     <div>
       <button className="DocSearch DocSearch-Button" onClick={() => $.setShow(true)}>
         <span className="DocSearch-Button-Container">
-          <svg width="20" height="20" class="DocSearch-Search-Icon" viewBox="0 0 20 20">
+          <svg width="20" height="20" className="DocSearch-Search-Icon" viewBox="0 0 20 20">
             <path
               d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z"
               stroke="currentColor"
