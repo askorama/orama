@@ -21,6 +21,7 @@ import { SearchResults } from '@theme/SearchResults'
 // @ts-expect-error Resolve at runtime
 import { SearchResult } from '@theme/SearchResult'
 import { Hit, INDEX_FILE, PLUGIN_NAME, PluginData, schema } from '../../../server/types.js'
+import { useLocation } from "@docusaurus/router"
 
 const highlighter = new Highlight({
   CSSClass: 'aa-ItemContentHighlight',
@@ -29,15 +30,17 @@ const highlighter = new Highlight({
 
 export default function SearchBar(): JSX.Element {
   const isBrowser = useIsBrowser()
+  const { searchData, analytics, pluginContentDocsIds } = usePluginData(PLUGIN_NAME) as PluginData & { analytics: PluginAnalyticsParams }
   const { siteConfig } = useDocusaurusContext()
+  const { pathname } = useLocation();
+  const pluginId = pluginContentDocsIds.filter((id: string) => pathname.includes(id))[0] || pluginContentDocsIds[0]
   const containerRef = useRef<HTMLDivElement>(null)
   const { colorMode } = useColorMode()
-  const { searchData, analytics } = usePluginData(PLUGIN_NAME) as PluginData & { analytics: PluginAnalyticsParams }
   const [database, setDatabase] = useState<Orama<AnyDocument>>()
   const searchBaseUrl = useBaseUrl(INDEX_FILE)
-  const versions = useVersions(undefined)
-  const activeVersion = useActiveVersion(undefined)
-  const { preferredVersion } = useDocsPreferredVersion()
+  const versions = useVersions(pluginId)
+  const activeVersion = useActiveVersion(pluginId)
+  const { preferredVersion } = useDocsPreferredVersion(pluginId)
 
   const version = useMemo(() => {
     if (!isBrowser) {
