@@ -340,8 +340,6 @@ t.test('boolean filters', async (t) => {
 })
 
 t.test('string filters', async (t) => {
-  t.plan(9)
-
   const db = await create({
     schema: {
       id: 'string',
@@ -415,6 +413,15 @@ t.test('string filters', async (t) => {
   })
 
   t.equal(r3.count, 0)
+
+  const r4 = await search(db, {
+    term: '',
+    where: {
+      name: []
+    }
+  })
+
+  t.equal(r4.count, 0)
 })
 
 t.test('string filters with stemming', async (t) => {
