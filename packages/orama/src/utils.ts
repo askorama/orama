@@ -112,6 +112,7 @@ export async function formatNanoseconds(value: number | bigint): Promise<string>
   return `${value / second}s`
 }
 
+// TODO: none of these operations is async. Should we change the signature of this function?
 export async function getNanosecondsTime(): Promise<bigint> {
   if (isInsideWebWorker()) {
     return getNanosecondTimeViaPerformance()
@@ -121,7 +122,7 @@ export async function getNanosecondsTime(): Promise<bigint> {
     return process.hrtime.bigint()
   }
 
-  if (typeof process !== 'undefined' && process.hrtime !== undefined) {
+  if (process?.hrtime) {
     return process.hrtime.bigint()
   }
 
