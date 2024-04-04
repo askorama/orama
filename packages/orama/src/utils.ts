@@ -31,7 +31,8 @@ export function safeArrayPush<T>(arr: T[], newArr: T[]): void {
   if (newArr.length < MAX_ARGUMENT_FOR_STACK) {
     Array.prototype.push.apply(arr, newArr)
   } else {
-    for (let i = 0; i < newArr.length; i += MAX_ARGUMENT_FOR_STACK) {
+    const newArrLength = newArr.length;
+    for (let i = 0; i < newArrLength; i += MAX_ARGUMENT_FOR_STACK) {
       Array.prototype.push.apply(arr, newArr.slice(i, i + MAX_ARGUMENT_FOR_STACK))
     }
   }
