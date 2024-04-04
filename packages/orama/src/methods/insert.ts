@@ -19,6 +19,9 @@ export async function insert<T extends AnyOrama>(
   return innerInsert(orama, doc, language, skipHooks)
 }
 
+const ENUM_TYPE = new Set(['enum', 'enum[]'])
+const STRING_NUMBER_TYPE = new Set(['string', 'number'])
+
 async function innerInsert<T extends AnyOrama>(
   orama: T,
   doc: PartialSchemaDeep<TypedDocument<T>>,
@@ -73,10 +76,7 @@ async function innerInsert<T extends AnyOrama>(
       continue
     }
 
-    if (
-      (expectedType === 'enum' || expectedType === 'enum[]') &&
-      (actualType === 'string' || actualType === 'number')
-    ) {
+    if (ENUM_TYPE.has(expectedType) && STRING_NUMBER_TYPE.has(actualType)) {
       continue
     }
 
@@ -162,8 +162,9 @@ export async function insertMultiple<T extends AnyOrama>(
 
   // Validate all documents before the insertion
   const docsLength = docs.length
+  const oramaSchema = orama.schema
   for (let i = 0; i < docsLength; i++) {
-    const errorProperty = await orama.validateSchema(docs[i], orama.schema)
+    const errorProperty = await orama.validateSchema(docs[i], oramaSchema)
     if (errorProperty) {
       throw createError('SCHEMA_VALIDATION_FAILURE', errorProperty)
     }
@@ -184,14 +185,13 @@ export async function innerInsertMultiple<T extends AnyOrama>(
     batchSize = 1000
   }
 
-  timeout = timeout || 0
+  timeout ??= 0
 
   const ids: string[] = []
   await new Promise<void>((resolve, reject) => {
     let i = 0
     async function _insertMultiple() {
-      const batch = docs.slice(i * batchSize!, (i + 1) * batchSize!)
-      i++
+      const batch = docs.slice(i * batchSize!, (++i) * batchSize!)
 
       if (!batch.length) {
         return resolve()
