@@ -165,10 +165,8 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
   }
 
   let results
-  if (!isPreflight && distinctOn) {
-    results = await fetchDocumentsWithDistinct(orama, uniqueDocsArray, offset, limit, distinctOn)
-  } else if (!isPreflight) {
-    results = await fetchDocuments(orama, uniqueDocsArray, offset, limit)
+  if(!isPreflight) {
+    results = await (distinctOn ? fetchDocumentsWithDistinct(orama, uniqueDocsArray, offset, limit, distinctOn) : fetchDocuments(orama, uniqueDocsArray, offset, limit))
   }
 
   const searchResult: Results<ResultDocument> = {
