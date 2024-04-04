@@ -89,8 +89,9 @@ export function prioritizeTokenScores(
     lastTokenWithAllKeywords = 0
   }
 
-  const resultsWithIdAndScore: [number, number][] = new Array(keywordsPerToken.length);
-  for (let i = 0; i < keywordsPerToken.length; i++) {
+  const keywordsPerTokenLength = keywordsPerToken.length
+  const resultsWithIdAndScore: [number, number][] = new Array(keywordsPerTokenLength);
+  for (let i = 0; i < keywordsPerTokenLength; i++) {
     resultsWithIdAndScore[i] = [keywordsPerToken[i][0], keywordsPerToken[i][1]];
   }
 
@@ -103,9 +104,9 @@ export function prioritizeTokenScores(
   // For example, if threshold is 0.5, we will return all the results that contains at least 50% of the search terms
   // (fuzzy match with a minimum threshold)
   const thresholdLength =
-    lastTokenWithAllKeywords + Math.ceil((threshold * 100 * (results.length - lastTokenWithAllKeywords)) / 100)
+    lastTokenWithAllKeywords + Math.ceil((threshold * 100 * (allResults - lastTokenWithAllKeywords)) / 100)
 
-  return resultsWithIdAndScore.slice(0, results.length + thresholdLength)
+  return resultsWithIdAndScore.slice(0, allResults + thresholdLength)
 }
 
 export function BM25(
@@ -114,9 +115,8 @@ export function BM25(
   docsCount: number,
   fieldLength: number,
   averageFieldLength: number,
-  BM25Params: Required<BM25Params>
+  { k, b, d }: Required<BM25Params>
 ) {
-  const { k, b, d } = BM25Params
   const idf = Math.log(1 + (docsCount - matchingCount + 0.5) / (matchingCount + 0.5))
   return (idf * (d + tf * (k + 1))) / (tf + k * (1 - b + (b * fieldLength) / averageFieldLength))
 }
