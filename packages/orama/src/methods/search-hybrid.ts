@@ -134,10 +134,10 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
   const timeStart = await getNanosecondsTime()
   params.relevance = Object.assign(defaultBM25Params, params.relevance ?? {})
 
-  const { term, properties, threshold = 1 } = params
+  const { term = '', properties, threshold = 1 } = params
 
   const { index, docs } = orama.data
-  const tokens = await orama.tokenizer.tokenize(term ?? '', language)
+  const tokens = await orama.tokenizer.tokenize(term, language)
 
   // Get searchable string properties
   let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
@@ -154,11 +154,13 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
 
   if (properties && properties !== '*') {
     for (const prop of properties) {
+      // TODO: since propertiesToSearch.includes is repeated multiple times, maybe we should move it in a Set first?
       if (!propertiesToSearch.includes(prop as string)) {
         throw createError('UNKNOWN_INDEX', prop as string, propertiesToSearch.join(', '))
       }
     }
 
+    // TODO: since properties.includes is repeated multiple times, maybe we should move it in a Set first?
     propertiesToSearch = propertiesToSearch.filter((prop: string) => (properties as string[]).includes(prop))
   }
 
@@ -300,14 +302,12 @@ function mergeAndRankResults(
   for (let i = 0; i < vectorResultsLength; i++) {
     const normalizedScore = normalizeScore(vectorResults[i][1], maxVectorScore)
     //                                                      ^ 1 here refers to "score"
-    if (mergedResults.has(vectorResults[i][0])) {
-      let existingRes = mergedResults.get(vectorResults[i][0])
-      //                                                   ^ 0 here refers to "id"
-      mergedResults.set(vectorResults[i][0], (existingRes += hybridScore(0, normalizedScore, textWeight, vectorWeight)))
-      //                                 ^ 0 here refers to "id"
+    const resultId = vectorResults[i][0]
+    if (mergedResults.has(resultId)) {
+      let existingRes = mergedResults.get(resultId)
+      mergedResults.set(resultId, (existingRes += hybridScore(0, normalizedScore, textWeight, vectorWeight)))
     } else {
-      mergedResults.set(vectorResults[i][0], hybridScore(0, normalizedScore, textWeight, vectorWeight))
-      //                                 ^ 0 here refers to "id"
+      mergedResults.set(resultId, hybridScore(0, normalizedScore, textWeight, vectorWeight))
     }
   }
 
