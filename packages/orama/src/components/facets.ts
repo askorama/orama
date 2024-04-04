@@ -98,7 +98,7 @@ export async function getFacets<T extends AnyOrama>(
     }
   }
 
-  // We are looping again with the same previous keys, should we creat a single loop instead?
+  // TODO: We are looping again with the same previous keys, should we creat a single loop instead?
   for (const facet of facetKeys) {
     // Count the number of values for each facet
     facets[facet].count = Object.keys(facets[facet].values).length
