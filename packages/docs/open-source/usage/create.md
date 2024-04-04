@@ -75,7 +75,7 @@ const movieDB = await create({
   },
 })
 
-await insert(db, {
+await insert(movieDB, {
   title: 'The Godfather',
   plot: 'The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.',
   cast: {
