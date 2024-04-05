@@ -3,9 +3,9 @@
   <img src="/misc/readme/orama-readme-light.png#gh-light-mode-only" />
 </p>
 <h4 align="center">
-  <a href="https://oramasearch.com?utm_source=github">Website</a> •
-  <a href="https://oramasearch.com/blog?utm_source=github">Blog</a> •
-  <a href="https://docs.oramasearch.com?utm_source=github">Documentation</a> •
+  <a href="https://askorama.ai?utm_source=github">Website</a> •
+  <a href="https://askorama.ai/blog?utm_source=github">Blog</a> •
+  <a href="https://docs.askorama.ai?utm_source=github">Documentation</a> •
   <a href="https://orama.to/slack">Community Slack</a>
 </h4>
 <br />
@@ -31,17 +31,17 @@ the
 
 # Highlighted features
 
-- [Vector Search](https://docs.oramasearch.com/open-source/usage/search/vector-search)
-- [Hybrid Search](https://docs.oramasearch.com/open-source/usage/search/hybrid-search)
-- [Search Filters](https://docs.oramasearch.com/open-source/usage/search/filters)
-- [Geosearch](https://docs.oramasearch.com/open-source/usage/search/geosearch)
-- [Facets](https://docs.oramasearch.com/open-source/usage/search/facets)
-- [Fields Boosting](https://docs.oramasearch.com/open-source/usage/search/fields-boosting)
-- [Typo Tolerance](https://docs.oramasearch.com/open-source/usage/search/introduction#typo-tolerance)
-- [Exact Match](https://docs.oramasearch.com/open-source/usage/search/introduction#exact-match)
-- [BM25](https://docs.oramasearch.com/open-source/usage/search/bm25-algorithm)
-- [Stemming and tokenization in 30 languages](https://docs.oramasearch.com/open-source/text-analysis/stemming)
-- [Plugin System](https://docs.oramasearch.com/open-source/plugins/introduction)
+- [Vector Search](https://docs.askorama.ai/open-source/usage/search/vector-search)
+- [Hybrid Search](https://docs.askorama.ai/open-source/usage/search/hybrid-search)
+- [Search Filters](https://docs.askorama.ai/open-source/usage/search/filters)
+- [Geosearch](https://docs.askorama.ai/open-source/usage/search/geosearch)
+- [Facets](https://docs.askorama.ai/open-source/usage/search/facets)
+- [Fields Boosting](https://docs.askorama.ai/open-source/usage/search/fields-boosting)
+- [Typo Tolerance](https://docs.askorama.ai/open-source/usage/search/introduction#typo-tolerance)
+- [Exact Match](https://docs.askorama.ai/open-source/usage/search/introduction#exact-match)
+- [BM25](https://docs.askorama.ai/open-source/usage/search/bm25-algorithm)
+- [Stemming and tokenization in 30 languages](https://docs.askorama.ai/open-source/text-analysis/stemming)
+- [Plugin System](https://docs.askorama.ai/open-source/plugins/introduction)
 
 # Installation
 
@@ -71,7 +71,7 @@ With Deno, you can just use the same CDN URL or use npm specifiers:
 import { create, search, insert } from 'npm:@orama/orama'
 ```
 
-Read the complete documentation at [https://docs.oramasearch.com](https://docs.oramasearch.com).
+Read the complete documentation at [https://docs.askorama.ai](https://docs.askorama.ai).
 
 # Usage
 
@@ -216,7 +216,7 @@ Result:
 }
 ```
 
-You can use non-string data to [filter](https://docs.oramasearch.com/open-source/usage/search/filters), [group](https://docs.oramasearch.com/open-source/usage/search/grouping), and create [facets](https://docs.oramasearch.com/open-source/usage/search/facets):
+You can use non-string data to [filter](https://docs.askorama.ai/open-source/usage/search/filters), [group](https://docs.askorama.ai/open-source/usage/search/grouping), and create [facets](https://docs.askorama.ai/open-source/usage/search/facets):
 
 ```js
 const searchResult = await search(db, {
@@ -250,7 +250,7 @@ const searchResult = await searchVector(db, {
 })
 ```
 
-If you're using the [Orama Secure AI Proxy](https://oramasearch.com/blog/announcing-the-orama-secure-ai-proxy) (highly recommended), you can skip the vector configuration at search time, since the official [Orama Secure AI Proxy plugin](https://www.npmjs.com/package/@orama/plugin-secure-proxy) will take care of it automatically for you:
+If you're using the [Orama Secure AI Proxy](https://askorama.ai/blog/announcing-the-orama-secure-ai-proxy) (highly recommended), you can skip the vector configuration at search time, since the official [Orama Secure AI Proxy plugin](https://www.npmjs.com/package/@orama/plugin-secure-proxy) will take care of it automatically for you:
 
 ```js
 import { create } from '@orama/orama'
@@ -329,22 +329,22 @@ Orama Geosearch APIs support distance-based search (via `radius`), or polygon-ba
 
 By default, Orama will use the [**Haversine formula**](https://en.wikipedia.org/wiki/Haversine_formula) to perform Geosearch, but high-precision search can be enabled by passing the `highPrecision` option in your `radius` or `polygon` configuration. This will tell Orama to use the [**Vicenty Formulae**](https://en.wikipedia.org/wiki/Vincenty%27s_formulae) instead, which is more precise for longer distances.
 
-Read more in the [official docs](https://docs.oramasearch.com/open-source/usage/search/geosearch).
+Read more in the [official docs](https://docs.askorama.ai/open-source/usage/search/geosearch).
 
 # Official Docs
 
-Read the complete documentation at [https://docs.oramasearch.com](https://docs.oramasearch.com).
+Read the complete documentation at [https://docs.askorama.ai](https://docs.askorama.ai).
 
 # Official Orama Plugins
 
-- [Plugin Vitepress](https://docs.oramasearch.com/open-source/plugins/plugin-vitepress)
-- [Plugin Docusaurus](https://docs.oramasearch.com/open-source/plugins/plugin-docusaurus)
-- [Plugin Analytics](https://docs.oramasearch.com/open-source/plugins/plugin-analytics)
-- [Plugin Astro](https://docs.oramasearch.com/open-source/plugins/plugin-astro)
-- [Plugin Data Persistence](https://docs.oramasearch.com/open-source/plugins/plugin-data-persistence)
-- [Plugin Nextra](https://docs.oramasearch.com/open-source/plugins/plugin-nextra)
+- [Plugin Vitepress](https://docs.askorama.ai/open-source/plugins/plugin-vitepress)
+- [Plugin Docusaurus](https://docs.askorama.ai/open-source/plugins/plugin-docusaurus)
+- [Plugin Analytics](https://docs.askorama.ai/open-source/plugins/plugin-analytics)
+- [Plugin Astro](https://docs.askorama.ai/open-source/plugins/plugin-astro)
+- [Plugin Data Persistence](https://docs.askorama.ai/open-source/plugins/plugin-data-persistence)
+- [Plugin Nextra](https://docs.askorama.ai/open-source/plugins/plugin-nextra)
 
-Write your own plugin: [https://docs.oramasearch.com/open-source/plugins/writing-your-own-plugins](https://docs.oramasearch.com/open-source/plugins/writing-your-own-plugins)
+Write your own plugin: [https://docs.askorama.ai/open-source/plugins/writing-your-own-plugins](https://docs.askorama.ai/open-source/plugins/writing-your-own-plugins)
 
 # License
 
