@@ -71,10 +71,7 @@ export async function runBeforeSearch<T extends AnyOrama>(
   }
 }
 
-export async function runAfterCreate<T extends AnyOrama>(
-  hooks: AfterCreate<T>[],
-  db: T,
-): Promise<void> {
+export async function runAfterCreate<T extends AnyOrama>(hooks: AfterCreate<T>[], db: T): Promise<void> {
   const hooksLength = hooks.length
   for (let i = 0; i < hooksLength; i++) {
     await hooks[i](db)

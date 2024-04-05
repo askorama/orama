@@ -14,7 +14,9 @@ import { getNested } from '../utils.js'
 type FacetValue = string | boolean | number
 
 function sortingPredicateBuilder(order: FacetSorting = 'desc') {
-  return order.toLowerCase() === 'asc' ? (a: [string, number], b: [string, number]) => a[1] - b[1] : (a: [string, number], b: [string, number]) => b[1] - a[1]
+  return order.toLowerCase() === 'asc'
+    ? (a: [string, number], b: [string, number]) => a[1] - b[1]
+    : (a: [string, number], b: [string, number]) => b[1] - a[1]
 }
 
 export async function getFacets<T extends AnyOrama>(
@@ -30,15 +32,15 @@ export async function getFacets<T extends AnyOrama>(
   const properties = await orama.index.getSearchablePropertiesWithTypes(orama.data.index)
 
   for (const facet of facetKeys) {
-    let values;
+    let values
 
     // Hack to guarantee the same order of ranges as specified by the user
     // TODO: Revisit this once components land
     if (properties[facet] === 'number') {
       const { ranges } = facetsConfig[facet] as NumberFacetDefinition
-      const rangesLength = ranges.length;
-      const tmp: [string, number][] = Array.from({length: rangesLength})
-      for(let i = 0; i < rangesLength; i++) {
+      const rangesLength = ranges.length
+      const tmp: [string, number][] = Array.from({ length: rangesLength })
+      for (let i = 0; i < rangesLength; i++) {
         const range = ranges[i]
         tmp[i] = [`${range.from}-${range.to}`, 0]
       }

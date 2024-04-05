@@ -191,7 +191,7 @@ export async function innerInsertMultiple<T extends AnyOrama>(
   await new Promise<void>((resolve, reject) => {
     let i = 0
     async function _insertMultiple() {
-      const batch = docs.slice(i * batchSize!, (++i) * batchSize!)
+      const batch = docs.slice(i * batchSize!, ++i * batchSize!)
 
       if (!batch.length) {
         return resolve()

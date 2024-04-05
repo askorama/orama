@@ -1,6 +1,12 @@
 import type { AnyOrama, Results, SearchParams, OramaPluginSync, AnyDocument } from '@orama/orama'
 import { Collector } from './collector.js'
-import { DEFAULT_ANALYTICS_FLUSH_INTERVAL, DEFAULT_ANALYTICS_FLUSH_SIZE, DEFAULT_ANALYTICS_ENDPOINT, DEFAULT_ORAMA_DEPLOYMENT_ID, DEFAULT_ORAMA_VERSION } from './const.js'
+import {
+  DEFAULT_ANALYTICS_FLUSH_INTERVAL,
+  DEFAULT_ANALYTICS_FLUSH_SIZE,
+  DEFAULT_ANALYTICS_ENDPOINT,
+  DEFAULT_ORAMA_DEPLOYMENT_ID,
+  DEFAULT_ORAMA_VERSION
+} from './const.js'
 
 const PLUGIN_NAME = 'plugin-analytics'
 
@@ -32,7 +38,12 @@ export function pluginAnalytics(params: PluginAnalyticsParams) {
   const deploymentId = params.deploymentId || DEFAULT_ORAMA_DEPLOYMENT_ID
   let collector: Collector | undefined
 
-  const afterSearch: OramaPluginSync['afterSearch'] = <T extends AnyOrama>(orama: T, params: SearchParams<T>, language: string | undefined, results: Results<AnyDocument>) => {
+  const afterSearch: OramaPluginSync['afterSearch'] = <T extends AnyOrama>(
+    orama: T,
+    params: SearchParams<T>,
+    language: string | undefined,
+    results: Results<AnyDocument>
+  ) => {
     collector?.add({
       query: params as any,
       resultsCount: results.count,
@@ -53,13 +64,13 @@ export function pluginAnalytics(params: PluginAnalyticsParams) {
       oramaVersion: orama.version || DEFAULT_ORAMA_VERSION,
       apiKey: params.apiKey,
       flushSize,
-      flushInterval,
+      flushInterval
     })
   }
 
   return {
     name: PLUGIN_NAME,
     afterSearch,
-    afterCreate,
+    afterCreate
   }
 }

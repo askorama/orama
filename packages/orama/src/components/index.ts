@@ -347,15 +347,7 @@ export async function insert(
     return insertVector(index, prop, value as number[] | Float32Array, id)
   }
 
-  const insertScalar = insertScalarBuilder(
-    implementation,
-    index,
-    prop,
-    id,
-    language,
-    tokenizer,
-    docsCount
-  )
+  const insertScalar = insertScalarBuilder(implementation, index, prop, id, language, tokenizer, docsCount)
 
   if (!isArrayType(schemaType)) {
     return insertScalar(value)

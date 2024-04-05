@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useEffect, useMemo, useState } from 'react'
 import useBaseUrl from '@docusaurus/useBaseUrl'
-import { useLocation } from "@docusaurus/router"
+import { useLocation } from '@docusaurus/router'
 import useIsBrowser from '@docusaurus/useIsBrowser'
 import { useActiveVersion, useVersions } from '@docusaurus/plugin-content-docs/client'
 import { useColorMode, useDocsPreferredVersion } from '@docusaurus/theme-common'
@@ -12,7 +12,7 @@ import '@orama/searchbox/dist/index.css'
 
 export function OramaSearch() {
   const [oramaInstance, setOramaInstance] = useState(null)
-  const { pathname } = useLocation();
+  const { pathname } = useLocation()
 
   const { searchData, analytics, pluginContentDocsIds } = usePluginData('@orama/plugin-docusaurus-v3')
   const pluginId = pluginContentDocsIds.filter((id: string) => pathname.includes(id))[0] || pluginContentDocsIds[0]

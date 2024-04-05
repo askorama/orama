@@ -29,7 +29,7 @@ export interface PluginOptions {
 
 export interface PluginData {
   searchData: Record<string, { data: ArrayBuffer }>
-  versions: DocsVersion[],
+  versions: DocsVersion[]
   pluginContentDocsIds: string[]
 }
 
