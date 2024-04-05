@@ -886,9 +886,7 @@ export type BeforeSearch<T extends AnyOrama> = (
   language: string | undefined
 ) => SyncOrAsyncValue
 
-export type AfterCreate<T extends AnyOrama> = (
-  db: T,
-) => SyncOrAsyncValue
+export type AfterCreate<T extends AnyOrama> = (db: T) => SyncOrAsyncValue
 
 export type IIndexInsertOrRemoveHookFunction = <R = void>(
   index: AnyIndexStore,

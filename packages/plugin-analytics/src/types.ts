@@ -8,7 +8,7 @@ export interface SearchEvent {
   resultsCount: number
   roundTripTime: number
   searchedAt: Date
-  results: { id: string, score: number }[]
+  results: { id: string; score: number }[]
   cached?: boolean
 }
 

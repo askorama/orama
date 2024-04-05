@@ -20,7 +20,10 @@ type PluginOptions = {
   }
 }
 
-export default function OramaPluginDocusaurus(ctx: { siteDir: any; generatedFilesDir: any }, options: PluginOptions): Plugin {
+export default function OramaPluginDocusaurus(
+  ctx: { siteDir: any; generatedFilesDir: any },
+  options: PluginOptions
+): Plugin {
   let versions: any[] = []
 
   return {
@@ -41,11 +44,14 @@ export default function OramaPluginDocusaurus(ctx: { siteDir: any; generatedFile
     async contentLoaded({ actions, allContent }) {
       const isDevelopment = process.env.NODE_ENV === 'development'
       const pluginContentDocsIds = Object.keys(allContent['docusaurus-plugin-content-docs'] ?? {})
-      const loadedVersions = (allContent['docusaurus-plugin-content-docs']?.[pluginContentDocsIds[0]] as LoadedContent)?.loadedVersions
+      const loadedVersions = (allContent['docusaurus-plugin-content-docs']?.[pluginContentDocsIds[0]] as LoadedContent)
+        ?.loadedVersions
       versions = loadedVersions.map((v) => v.versionName)
 
       await Promise.all(
-        versions.map((version) => buildDevSearchData(ctx.siteDir, ctx.generatedFilesDir, allContent, version, pluginContentDocsIds))
+        versions.map((version) =>
+          buildDevSearchData(ctx.siteDir, ctx.generatedFilesDir, allContent, version, pluginContentDocsIds)
+        )
       )
 
       if (isDevelopment) {
@@ -75,7 +81,13 @@ export default function OramaPluginDocusaurus(ctx: { siteDir: any; generatedFile
   }
 }
 
-async function buildDevSearchData(siteDir: string, generatedFilesDir: string, allContent: any, version: string, pluginContentDocsIds: string[]) {
+async function buildDevSearchData(
+  siteDir: string,
+  generatedFilesDir: string,
+  allContent: any,
+  version: string,
+  pluginContentDocsIds: string[]
+) {
   const blogs: any[] = []
   const pages: any[] = []
   const docs: any[] = []
@@ -83,7 +95,9 @@ async function buildDevSearchData(siteDir: string, generatedFilesDir: string, al
     const loadedVersion = allContent['docusaurus-plugin-content-docs']?.[key]?.loadedVersions?.find(
       (v: LoadedVersion) => v.versionName === version
     )
-    blogs.push(...(allContent['docusaurus-plugin-content-blog']?.[key]?.blogPosts?.map(({ metadata }: any) => metadata) ?? []))
+    blogs.push(
+      ...(allContent['docusaurus-plugin-content-blog']?.[key]?.blogPosts?.map(({ metadata }: any) => metadata) ?? [])
+    )
     pages.push(...(allContent['docusaurus-plugin-content-pages']?.[key] ?? []))
     docs.push(...(loadedVersion?.docs ?? []))
   })

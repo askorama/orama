@@ -34,8 +34,8 @@ export default defineConfig({
       OramaPlugin({
         analytics: {
           enabled: true,
-          apiKey: "RyOLWQiirzaGlsGuAcspAQ2YneslhTZo",
-          indexId: "gjhul99bf9wnpook7nbwezg7",
+          apiKey: 'RyOLWQiirzaGlsGuAcspAQ2YneslhTZo',
+          indexId: 'gjhul99bf9wnpook7nbwezg7'
         }
       })
     ]

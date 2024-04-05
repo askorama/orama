@@ -1,10 +1,10 @@
 import t from 'tap'
 import { OramaPluginSync, create, insertMultiple, search } from '@orama/orama'
-import { http, HttpResponse } from "msw";
-import { setupServer, SetupServerApi } from "msw/node";
+import { http, HttpResponse } from 'msw'
+import { setupServer, SetupServerApi } from 'msw/node'
 
 import { pluginAnalytics } from '../index.js'
-import { DEFAULT_ORAMA_DEPLOYMENT_ID } from '../const.js';
+import { DEFAULT_ORAMA_DEPLOYMENT_ID } from '../const.js'
 
 const FAKE_ENDPOINT = 'http://localhost:3000/sso_collect'
 const API_KEY = 'the-api-key'
@@ -13,7 +13,7 @@ const INDEX_ID = 'the-index-id'
 t.test('analytics-plugin', async (t) => {
   const invocations: MockedRequest[] = []
   const server = getServer(invocations)
-  
+
   server.listen()
 
   t.teardown(() => {
@@ -37,11 +37,7 @@ t.test('analytics-plugin', async (t) => {
   t.notSame((db.plugins[0] as OramaPluginSync).afterCreate, undefined)
   t.notSame((db.plugins[0] as OramaPluginSync).afterSearch, undefined)
 
-  await insertMultiple(db, [
-    { name: 'foo' },
-    { name: 'bar' },
-    { name: 'baz' },
-  ])
+  await insertMultiple(db, [{ name: 'foo' }, { name: 'bar' }, { name: 'baz' }])
 
   await search(db, { term: 'foo' })
 
@@ -128,11 +124,11 @@ function getServer(invocations: MockedRequest[]): SetupServerApi {
     http.post(FAKE_ENDPOINT, async (req) => {
       invocations.push({
         url: req.request.url.toString(),
-        body: await req.request.json() as object,
-      });
-      return HttpResponse.json();
-    }),
-  );
+        body: (await req.request.json()) as object
+      })
+      return HttpResponse.json()
+    })
+  )
 }
 
 interface MockedRequest {

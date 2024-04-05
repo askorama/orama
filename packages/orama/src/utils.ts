@@ -31,7 +31,8 @@ export function safeArrayPush<T>(arr: T[], newArr: T[]): void {
   if (newArr.length < MAX_ARGUMENT_FOR_STACK) {
     Array.prototype.push.apply(arr, newArr)
   } else {
-    for (let i = 0; i < newArr.length; i += MAX_ARGUMENT_FOR_STACK) {
+    const newArrLength = newArr.length
+    for (let i = 0; i < newArrLength; i += MAX_ARGUMENT_FOR_STACK) {
       Array.prototype.push.apply(arr, newArr.slice(i, i + MAX_ARGUMENT_FOR_STACK))
     }
   }
@@ -111,6 +112,7 @@ export async function formatNanoseconds(value: number | bigint): Promise<string>
   return `${value / second}s`
 }
 
+// TODO: none of these operations is async. Should we change the signature of this function?
 export async function getNanosecondsTime(): Promise<bigint> {
   if (isInsideWebWorker()) {
     return getNanosecondTimeViaPerformance()
@@ -120,7 +122,7 @@ export async function getNanosecondsTime(): Promise<bigint> {
     return process.hrtime.bigint()
   }
 
-  if (typeof process !== 'undefined' && process.hrtime !== undefined) {
+  if (process?.hrtime) {
     return process.hrtime.bigint()
   }
 

@@ -20,7 +20,6 @@ if (fs.existsSync(outdirBaseURL)) {
 fs.mkdirSync(outdirBaseURL)
 
 for (const language of languages) {
-
   if (!isWasmPackInstalled) {
     console.warn('!! WARNING')
     console.warn(`!! Compilation of the **${language}** tokenizer requires wasm-pack to be installed.`)
@@ -29,30 +28,30 @@ for (const language of languages) {
   }
 
   const tokenizersBaseURL = new URL('../src', import.meta.url).pathname
-  
+
   const tokenizerPath = path.join(tokenizersBaseURL, `tokenizer-${language}`)
   const tokenizerWasmPath = path.join(tokenizerPath, 'pkg')
   const tokenizerDistPath = path.join(tokenizersBaseURL, `../build/tokenizer-${language}`)
   const tokenizerWrapperPath = path.join(tokenizersBaseURL, `tokenizer-${language}/src/tokenizer.ts`)
   const tokenizerWrapperDistPath = path.join(tokenizerDistPath, 'tokenizer.ts')
-  
+
   childProcess.execSync(`cd ${tokenizerPath} && wasm-pack build --target web`)
-  
+
   fs.cpSync(tokenizerWrapperPath, tokenizerWrapperDistPath, {
     recursive: true
   })
-  
+
   fs.cpSync(tokenizerWasmPath, tokenizerDistPath, {
     recursive: true
   })
-  
+
   fs.rmSync(path.join(tokenizerDistPath, '.gitignore'))
-  
+
   const r = fs.readFileSync(`./build/tokenizer-${language}/tokenizer_${language}_bg.wasm`)
   const b = new Uint8Array(r)
   const rr = `export const wasm = new Uint8Array([${b.join(',')}]);`
   fs.writeFileSync(`./build/tokenizer-${language}/tokenizer_${language}_bg_wasm_arr.js`, rr)
-  
+
   childProcess.execSync(`cd ${tokenizerDistPath} && npx tsup --format cjs,esm,iife --outDir . tokenizer.ts`)
 }
 

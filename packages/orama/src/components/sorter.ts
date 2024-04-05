@@ -151,11 +151,7 @@ async function insert(sorter: Sorter, prop: string, id: DocumentID, value: SortV
 }
 
 function ensureIsSorted(sorter: Sorter): void {
-  if (sorter.isSorted) {
-    return
-  }
-
-  if (!sorter.enabled) {
+  if (sorter.isSorted || !sorter.enabled) {
     return
   }
 

@@ -286,48 +286,48 @@ export async function create<T extends AnyOrama, TSchema extends T['schema']>(
   return index
 }
 
-async function insertScalar(
+function insertScalarBuilder(
   implementation: IIndex<Index>,
   index: Index,
   prop: string,
   id: DocumentID,
-  value: SearchableValue,
-  schemaType: ScalarSearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number
-): Promise<void> {
-  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
+) {
+  return async (value: SearchableValue): Promise<void> => {
+    const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
-  const { type, node } = index.indexes[prop]
-  switch (type) {
-    case 'Bool': {
-      node[value ? 'true' : 'false'].push(internalId)
-      break
-    }
-    case 'AVL': {
-      avlInsert(node, value as number, [internalId])
-      break
-    }
-    case 'Radix': {
-      const tokens = await tokenizer.tokenize(value as string, language, prop)
-      await implementation.insertDocumentScoreParameters(index, prop, internalId, tokens, docsCount)
-
-      for (const token of tokens) {
-        await implementation.insertTokenScoreParameters(index, prop, internalId, tokens, token)
-
-        radixInsert(node, token, internalId)
+    const { type, node } = index.indexes[prop]
+    switch (type) {
+      case 'Bool': {
+        node[value ? 'true' : 'false'].push(internalId)
+        break
       }
+      case 'AVL': {
+        avlInsert(node, value as number, [internalId])
+        break
+      }
+      case 'Radix': {
+        const tokens = await tokenizer.tokenize(value as string, language, prop)
+        await implementation.insertDocumentScoreParameters(index, prop, internalId, tokens, docsCount)
 
-      break
-    }
-    case 'Flat': {
-      flatInsert(node, value as ScalarSearchableType, internalId)
-      break
-    }
-    case 'BKD': {
-      bkdInsert(node, value as unknown as BKDGeoPoint, [internalId])
-      break
+        for (const token of tokens) {
+          await implementation.insertTokenScoreParameters(index, prop, internalId, tokens, token)
+
+          radixInsert(node, token, internalId)
+        }
+
+        break
+      }
+      case 'Flat': {
+        flatInsert(node, value as ScalarSearchableType, internalId)
+        break
+      }
+      case 'BKD': {
+        bkdInsert(node, value as unknown as BKDGeoPoint, [internalId])
+        break
+      }
     }
   }
 }
@@ -347,26 +347,16 @@ export async function insert(
     return insertVector(index, prop, value as number[] | Float32Array, id)
   }
 
-  if (!isArrayType(schemaType)) {
-    return insertScalar(
-      implementation,
-      index,
-      prop,
-      id,
-      value,
-      schemaType as ScalarSearchableType,
-      language,
-      tokenizer,
-      docsCount
-    )
-  }
+  const insertScalar = insertScalarBuilder(implementation, index, prop, id, language, tokenizer, docsCount)
 
-  const innerSchemaType = getInnerType(schemaType as ArraySearchableType)
+  if (!isArrayType(schemaType)) {
+    return insertScalar(value)
+  }
 
   const elements = value as Array<string | number | boolean>
   const elementsLength = elements.length
   for (let i = 0; i < elementsLength; i++) {
-    await insertScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer, docsCount)
+    await insertScalar(elements[i])
   }
 }
 

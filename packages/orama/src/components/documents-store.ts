@@ -36,9 +36,10 @@ export async function getMultiple<T extends AnyOrama, ResultDocument extends Typ
   store: DocumentsStore,
   ids: DocumentID[]
 ): Promise<(ResultDocument | undefined)[]> {
-  const found: (ResultDocument | undefined)[] = Array.from({ length: ids.length })
+  const idsLength = ids.length
+  const found: (ResultDocument | undefined)[] = Array.from({ length: idsLength })
 
-  for (let i = 0; i < ids.length; i++) {
+  for (let i = 0; i < idsLength; i++) {
     const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, ids[i])
     found[i] = store.docs[internalId]
   }
