@@ -21,32 +21,33 @@
     "watch": "tsc --watch"
   },
   "dependencies": {
-    "@docusaurus/plugin-content-docs": "^3.0.1",
-    "@docusaurus/theme-common": "^3.0.1",
-    "@orama/highlight": "^0.1.2",
+    "@orama/highlight": "^0.1.5",
     "@orama/orama": "workspace:*",
     "@orama/plugin-analytics": "workspace:*",
     "@orama/plugin-parsedoc": "workspace:*",
-    "@orama/searchbox": "1.0.0-beta.13",
+    "@orama/searchbox": "^1.0.0-rc13",
+    "@oramacloud/client": "^1.0.14",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
-    "jsdom": "^23.0.1",
+    "jsdom": "^23.2.0",
     "markdown-it": "^13.0.2",
     "pako": "^2.1.0",
-    "vfile-message": "^3.1.4",
-    "tslib": "^2.6.0"
+    "tslib": "^2.6.2",
+    "vfile-message": "^3.1.4"
   },
   "devDependencies": {
-    "@docusaurus/types": "^3.0.1",
     "@types/jsdom": "^21.1.6",
     "@types/markdown-it": "^13.0.7",
-    "@types/pako": "^2.0.0",
+    "@types/pako": "^2.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "peerDependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "@docusaurus/plugin-content-docs": ">= 3.2.0",
+    "@docusaurus/theme-common": ">= 3.2.0",
+    "@docusaurus/types": ">= 3.2.0",
+    "react": ">= 18.0.0",
+    "react-dom": ">= 18.0.0"
   },
   "publishConfig": {
     "access": "public"
