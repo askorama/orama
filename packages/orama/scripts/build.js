@@ -93,9 +93,7 @@ async function replaceVersion() {
   const VERSION_PLACEHOLDER = '{{VERSION}}'
   const createFilePath = resolve(destinationDir, 'methods', 'create.js')
 
-  await replaceInFile(createFilePath, [
-    [VERSION_PLACEHOLDER, version]
-  ])
+  await replaceInFile(createFilePath, [[VERSION_PLACEHOLDER, version]])
 }
 
 async function main() {
@@ -111,7 +109,6 @@ async function main() {
   await replaceVersion()
 
   await cjs()
-
 }
 
 await main()

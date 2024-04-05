@@ -93,20 +93,20 @@ export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocume
         continue
       }
       const keyValue = typeof value !== 'boolean' ? value : '' + value
-      if (typeof group.perValue[keyValue as GroupableType] === 'undefined') {
-        group.perValue[keyValue as GroupableType] = {
-          indexes: [],
-          count: 0
-        }
+      const perValue = group.perValue[keyValue as GroupableType] ?? {
+        indexes: [],
+        count: 0
       }
-      if (group.perValue[keyValue as GroupableType].count >= returnedCount) {
+      if (perValue.count >= returnedCount) {
         // We stop early because for this value we react the limit
         continue
       }
 
       // We use the index to keep track of the original order
-      group.perValue[keyValue as GroupableType].indexes.push(j)
-      group.perValue[keyValue as GroupableType].count++
+      perValue.indexes.push(j)
+      perValue.count++
+
+      group.perValue[keyValue as GroupableType] = perValue
 
       values.add(value)
     }

@@ -2,10 +2,7 @@
   "name": "@orama/plugin-docusaurus",
   "version": "2.0.12",
   "description": "Docusaurus plugin for local search powered by orama",
-  "keywords": [
-    "orama",
-    "docusaurus"
-  ],
+  "keywords": ["orama", "docusaurus"],
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/orama/plugin-docusaurus/issues"
@@ -30,9 +27,7 @@
     }
   },
   "types": "./dist/server/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "dev": "swc --delete-dir-on-start -s -w --extensions .ts,.tsx,.cts -d dist src",
     "prebuild": "npm run lint",

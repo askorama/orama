@@ -10,7 +10,7 @@ defineProps({
 const imgRef = ref(null)
 
 onMounted(() => {
-  mediumZoom(imgRef.value, { background: 'var(--vp-c-bg)' });
+  mediumZoom(imgRef.value, { background: 'var(--vp-c-bg)' })
 })
 </script>
 

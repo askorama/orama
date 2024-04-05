@@ -91,57 +91,64 @@ console.log('TAP version 13')
 
 stream.on('data', function (row) {
   switch (row.type) {
-    case 'test': {
-      const parent = row.parent ?? -1
+    case 'test':
+      {
+        const parent = row.parent ?? -1
 
-      if (parent !== -1 && !tests[parent].started) {
-        tests[parent].started = true
-        console.log(`${pad(tests[parent].level)}# Subtest: ${tests[parent].name}`)
+        if (parent !== -1 && !tests[parent].started) {
+          tests[parent].started = true
+          console.log(`${pad(tests[parent].level)}# Subtest: ${tests[parent].name}`)
+        }
+
+        const newTest = createTestContext(row.name, parent, tests[parent].level + 1)
+        newTest.index = tests[parent].subtests.length
+        tests[parent].subtests.push(row.id)
+        tests[row.id] = newTest
+        currentTest = row.id
       }
+      break
+    case 'assert':
+      {
+        const test = tests[currentTest]
 
-      const newTest = createTestContext(row.name, parent, tests[parent].level + 1)
-      newTest.index = tests[parent].subtests.length
-      tests[parent].subtests.push(row.id)
-      tests[row.id] = newTest
-      currentTest = row.id
-    }
-    break
-    case 'assert': {
-      const test = tests[currentTest]
+        if (!test.started) {
+          tests[currentTest].started = true
+          console.log(`${pad(test.level)}# Subtest: ${test.name}`)
+        }
 
-      if (!test.started) {
-        tests[currentTest].started = true
-        console.log(`${pad(test.level)}# Subtest: ${test.name}`)
+        tests[currentTest].subtests.push(row)
+
+        if (!row.ok) {
+          tests[currentTest].failed = true
+        }
+
+        console.log(
+          `${pad(test.level + 1)}${row.ok ? 'ok' : 'not ok'} ${row.id + 1} - ${
+            row.error ? row.error.message : row.name
+          }`
+        )
+
+        if (row.error) {
+          console.log(
+            padString(`---\nstack: |\n${row.error.stack.replaceAll(/(^.)/gm, '  $1')}\n...`, test.level + 1, 2)
+          )
+        }
       }
+      break
+    case 'end':
+      {
+        const test = tests[currentTest]
 
-      tests[currentTest].subtests.push(row)
+        if (test.failed) {
+          tests[test.parent].failed = true
+        }
 
-      if (!row.ok) {
-        tests[currentTest].failed = true
+        console.log(`${pad(test.level + 1)}1..${test.subtests.length}`)
+        console.log(`${pad(test.level)}${test.failed ? 'not ok' : 'ok'} ${test.index + 1} - ${test.name}\n`)
+
+        currentTest = tests[currentTest].parent
       }
-
-      console.log(
-        `${pad(test.level + 1)}${row.ok ? 'ok' : 'not ok'} ${row.id + 1} - ${row.error ? row.error.message : row.name}`
-      )
-
-      if (row.error) {
-        console.log(padString(`---\nstack: |\n${row.error.stack.replaceAll(/(^.)/gm, '  $1')}\n...`, test.level + 1, 2))
-      }
-    }
-    break
-    case 'end': {
-      const test = tests[currentTest]
-
-      if (test.failed) {
-        tests[test.parent].failed = true
-      }
-
-      console.log(`${pad(test.level + 1)}1..${test.subtests.length}`)
-      console.log(`${pad(test.level)}${test.failed ? 'not ok' : 'ok'} ${test.index + 1} - ${test.name}\n`)
-
-      currentTest = tests[currentTest].parent
-    }
-    break
+      break
   }
 })
 

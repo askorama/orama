@@ -123,7 +123,13 @@ async function generateDocument(
   return sections
 }
 
-async function buildDevSearchData(siteDir: string, outDir: string, allContent: any, version: string, pluginContentDocsIds: string[]): Promise<void> {
+async function buildDevSearchData(
+  siteDir: string,
+  outDir: string,
+  allContent: any,
+  version: string,
+  pluginContentDocsIds: string[]
+): Promise<void> {
   const blogs: any[] = []
   const pages: any[] = []
   const docs: any[] = []
@@ -131,7 +137,9 @@ async function buildDevSearchData(siteDir: string, outDir: string, allContent: a
     const loadedVersion = allContent['docusaurus-plugin-content-docs']?.[key]?.loadedVersions?.find(
       (v: LoadedVersion) => v.versionName === version
     )
-    blogs.push(...(allContent['docusaurus-plugin-content-blog']?.[key]?.blogPosts?.map(({ metadata }: any) => metadata) ?? []))
+    blogs.push(
+      ...(allContent['docusaurus-plugin-content-blog']?.[key]?.blogPosts?.map(({ metadata }: any) => metadata) ?? [])
+    )
     pages.push(...(allContent['docusaurus-plugin-content-pages']?.[key] ?? []))
     docs.push(...(loadedVersion?.docs ?? []))
   })
@@ -190,12 +198,15 @@ function docusaurusOramaPlugin(context: LoadContext, options: PluginOptions): Pl
     async contentLoaded({ actions, allContent }) {
       const isDevelopment = process.env.NODE_ENV === 'development'
       const pluginContentDocsIds = Object.keys(allContent['docusaurus-plugin-content-docs'] ?? {})
-      const loadedVersions = (allContent['docusaurus-plugin-content-docs']?.[pluginContentDocsIds[0]] as LoadedContent)?.loadedVersions
+      const loadedVersions = (allContent['docusaurus-plugin-content-docs']?.[pluginContentDocsIds[0]] as LoadedContent)
+        ?.loadedVersions
       versions = loadedVersions.map((v) => v.versionName)
 
       // Build all versions
       await Promise.all(
-        versions.map((version) => buildDevSearchData(context.siteDir, context.generatedFilesDir, allContent, version, pluginContentDocsIds))
+        versions.map((version) =>
+          buildDevSearchData(context.siteDir, context.generatedFilesDir, allContent, version, pluginContentDocsIds)
+        )
       )
 
       for (const name of versions) {

@@ -11,9 +11,10 @@ export function intersectFilteredIDs(
     map.set(id, true)
   }
 
-  for (const [id, score] of lookedUp) {
+  for (const looked of lookedUp) {
+    const [id] = looked
     if (map.has(id)) {
-      result.push([id, score])
+      result.push(looked)
       map.delete(id)
     }
   }

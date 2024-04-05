@@ -131,8 +131,7 @@ export async function removeMultiple<T extends AnyOrama>(
   await new Promise<void>((resolve, reject) => {
     let i = 0
     async function _insertMultiple() {
-      const batch = ids.slice(i * batchSize!, (i + 1) * batchSize!)
-      i++
+      const batch = ids.slice(i * batchSize!, ++i * batchSize!)
 
       if (!batch.length) {
         return resolve()

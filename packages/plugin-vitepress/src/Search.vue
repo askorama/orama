@@ -1,7 +1,7 @@
 <script lang='ts' setup>
-import { onMounted } from "vue"
-import { useData } from "vitepress"
-import { RegisterSearchBox, presets, signals as $ } from "@orama/searchbox"
+import { onMounted } from 'vue'
+import { useData } from 'vitepress'
+import { RegisterSearchBox, presets, signals as $ } from '@orama/searchbox'
 
 const VPData = useData()
 
@@ -17,7 +17,7 @@ onMounted(async () => {
     oramaInstance: oramaInstance,
     preset: presets.docs.name,
     show: false,
-    analytics: oramaAnalytics,
+    analytics: oramaAnalytics
   })
 })
 </script>

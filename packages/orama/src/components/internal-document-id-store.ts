@@ -30,10 +30,12 @@ export function load<T extends AnyOrama>(orama: T, raw: unknown): void {
 
   orama.internalDocumentIDStore.idToInternalId.clear()
   orama.internalDocumentIDStore.internalIdToId = []
+  const internalIdToIdLength = internalIdToId.length
 
-  for (let i = 0; i < internalIdToId.length; i++) {
-    orama.internalDocumentIDStore.idToInternalId.set(internalIdToId[i], i + 1)
-    orama.internalDocumentIDStore.internalIdToId.push(internalIdToId[i])
+  for (let i = 0; i < internalIdToIdLength; i++) {
+    const internalIdItem = internalIdToId[i]
+    orama.internalDocumentIDStore.idToInternalId.set(internalIdItem, i + 1)
+    orama.internalDocumentIDStore.internalIdToId.push(internalIdItem)
   }
 }
 
