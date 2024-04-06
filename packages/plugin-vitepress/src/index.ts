@@ -35,14 +35,14 @@ const md = new MarkdownIt({
   html: true
 })
 
-async function createOramaContentLoader(paths: string[], root: string) {
+async function createOramaContentLoader(paths: string[], root: string, base: string) {
   const contents = paths
     .map((file) => ({
       path: file.replace(root, '').replace('.md', ''),
       html: md.render(readFileSync(file, 'utf-8'), '')
     }))
     .map(parseHTMLContent)
-    .map(formatForOrama)
+    .map((data) => formatForOrama(data, base))
     .flat()
 
   const db = await create({
@@ -84,7 +84,7 @@ function parseHTMLContent({ html, path }: { html: string; path: string }): Array
   return sections
 }
 
-function formatForOrama(data: Array<ParserResult>): Array<OramaSchema> {
+function formatForOrama(data: Array<ParserResult>, base: string): Array<OramaSchema> {
   try {
     const firstH1Header = data.find((section) => section.header === 'h1')
 
@@ -92,13 +92,17 @@ function formatForOrama(data: Array<ParserResult>): Array<OramaSchema> {
       title: res.title,
       content: res.content,
       section: firstH1Header!.title.replace(/\s$/, ''),
-      path: res?.path + '#' + slugify.default(res.title, { lower: true }),
+      path: base + res?.path + '#' + slugify.default(res.title, { lower: true }),
       category: ''
     }))
   } catch (error) {
     console.error(error)
     return []
   }
+}
+
+function removeTrailingSlash(value: string) {
+  return value.endsWith('/') ? value.slice(0, -1) : value
 }
 
 export function OramaPlugin(pluginOptions: OramaPluginOptions = {}): Plugin {
@@ -155,10 +159,11 @@ export function OramaPlugin(pluginOptions: OramaPluginOptions = {}): Plugin {
       if (id !== resolvedVirtualModuleId) return
 
       const root = resolveConfig.vitepress.root
+      const base = removeTrailingSlash(resolveConfig.vitepress.userConfig?.base ?? '')
       const pages = resolveConfig.vitepress.pages.map((page: string) => `${root}/${page}`)
 
       return `
-        const data = ${JSON.stringify(await createOramaContentLoader(pages, root))};
+        const data = ${JSON.stringify(await createOramaContentLoader(pages, root, base))};
         const analytics = ${JSON.stringify(pluginOptions.analytics)};
         export default { data, analytics };
       `
