@@ -169,6 +169,7 @@ export default defineConfig({
           text: 'Data Sources',
           collapsed: false,
           items: [
+            { text: 'Introduction to data sources', link: '/cloud/data-sources/introduction-to-data-sources' },
             {
               text: 'Native Integrations',
               collapsed: true,
