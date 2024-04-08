@@ -60,7 +60,7 @@ plugins: [
       cloud: {
         indexId: process.env.ORAMA_CLOUD_INDEX_ID, // Env variable suggested
         oramaCloudAPIKey: process.env.ORAMA_CLOUD_API_KEY, // Env variable suggested
-        deploy: false, // Enables deploy while building/starting
+        deploy: true, // Enables deploy while building/starting
       },
     },
   ],
