@@ -122,7 +122,7 @@ export async function getNanosecondsTime(): Promise<bigint> {
     return process.hrtime.bigint()
   }
 
-  if (process?.hrtime) {
+  if (typeof process !== 'undefined' && typeof process?.hrtime?.bigint === 'function') {
     return process.hrtime.bigint()
   }
 
