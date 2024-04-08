@@ -43,9 +43,9 @@ export async function loggedOperation(preMessage: string, fn: () => Promise<any>
   }
 }
 
-export async function checkIndexAccess(baseUrl: string, APIKey: string, indexId: string) {
+export async function fetchEndpointConfig(baseUrl: string, APIKey: string, indexId: string) {
   const result = await loggedOperation(
-    'Start: Check index access',
+    'Start: Fetch index endpoint config',
     async () =>  await restFetcher(
       `${baseUrl}/api/v1/indexes/get-index?id=${indexId}`,
       {
@@ -54,10 +54,10 @@ export async function checkIndexAccess(baseUrl: string, APIKey: string, indexId:
         }
       }
     ),
-    'End: Check index access (success)'
+    'End: Fetch index endpoint config (success)'
   )
 
-  return { endpoint: result?.api_endpoint, api_key: result?.api_key }
+  return { endpoint: result?.api_endpoint, public_api_key: result?.api_key }
 }
 
 export async function createSnapshot(baseUrl: string, APIKey: string, indexId: string, documents: any[]) {
