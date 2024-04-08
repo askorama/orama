@@ -9,7 +9,7 @@ import { create, insertMultiple, save } from "@orama/orama"
 import { JSDOM } from "jsdom"
 import MarkdownIt from "markdown-it"
 import matter from "gray-matter"
-import { checkIndexAccess, createSnapshot, deployIndex } from "./utils"
+import { createSnapshot, deployIndex, fetchEndpointConfig } from "./utils"
 
 type CloudConfig = {
   deploy: boolean,
@@ -131,7 +131,7 @@ export default function OramaPluginDocusaurus(ctx: {
           category: data.category
         }))
 
-      await deployData({
+      const endpointConfig = await deployData({
         oramaDocs,
         generatedFilesDir: ctx.generatedFilesDir,
         version: "current",
@@ -147,8 +147,8 @@ export default function OramaPluginDocusaurus(ctx: {
         analytics: options.analytics,
         ...(options.cloud && {
           endpoint: {
-            url: options.cloud.endpoint,
-            key: options.cloud.public_api_key
+            url: endpointConfig?.endpoint,
+            key: endpointConfig?.public_api_key
           }
         }),
       })
@@ -248,11 +248,15 @@ async function deployData({
   const { ORAMA_CLOUD_BASE_URL } = process.env
   const baseUrl = ORAMA_CLOUD_BASE_URL || "https://cloud.oramasearch.com"
 
-  if (deployConfig?.enabled) {
-    await checkIndexAccess(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!)
-    await createSnapshot(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!, oramaDocs)
-    await deployIndex(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!)
+  if (deployConfig) {
+    const endpointConfig = await fetchEndpointConfig(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!)
 
+    if (deployConfig.enabled) {
+      await createSnapshot(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!, oramaDocs)
+      await deployIndex(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!)
+    }
+
+    return endpointConfig
   } else {
     const db = await create({
       schema: { ...presets.docs.schema, version: "enum" }
@@ -263,5 +267,7 @@ async function deployData({
     const serializedOrama = JSON.stringify(await save(db))
     const gzipedOrama = gzip(serializedOrama)
     writeFileSync(indexPath(generatedFilesDir, version), gzipedOrama)
+
+    return undefined
   }
 }
