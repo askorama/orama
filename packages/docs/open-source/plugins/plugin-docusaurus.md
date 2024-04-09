@@ -58,7 +58,7 @@ plugins: [
     "@orama/plugin-docusaurus-v3",
     {
       cloud: {
-        indexId: process.env.ORAMA_CLOUD_INDEX_ID, // Env variable suggested
+        indexId: "<your_orama_index_id>",
         oramaCloudAPIKey: process.env.ORAMA_CLOUD_API_KEY, // Env variable suggested
         deploy: true, // Enables deploy while building/starting
       },
@@ -75,5 +75,9 @@ To get this variables first create a new integration for HTTP Integrations in he
 And then docusaurus:
 
 ![select Docusaurus](/oss/docussarus-2.png)
+
+On the next page you will see all the variables you need to get you up and running:
+
+![the variables](/oss/docussarus-3.png)
 
 And you are set, if you set deploy to true your index will update whenever you build the website and there are changes to your pages.
