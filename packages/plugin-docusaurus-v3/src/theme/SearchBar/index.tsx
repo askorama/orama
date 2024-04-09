@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react"
 import useBaseUrl from "@docusaurus/useBaseUrl"
 import { useLocation } from "@docusaurus/router"
 import useIsBrowser from "@docusaurus/useIsBrowser"
-import { useActiveVersion } from "@docusaurus/plugin-content-docs/client"
+import { useActiveVersion, useVersions } from "@docusaurus/plugin-content-docs/client"
 import { useColorMode, useDocsPreferredVersion } from "@docusaurus/theme-common"
 import { usePluginData } from "@docusaurus/useGlobalData"
 import { ungzip } from "pako"
@@ -12,6 +12,15 @@ import { OramaClient } from "@oramacloud/client"
 import { create, insertMultiple } from "@orama/orama"
 import { pluginAnalytics } from "@orama/plugin-analytics"
 import "@orama/searchbox/dist/index.css"
+
+interface PluginData {
+  searchData: {
+    current: { data: ArrayBuffer } | null
+  },
+  endpoint: { url: string, key: string } | null,
+  analytics: { apiKey: string, indexId: string, enabled: boolean } | null,
+  docsInstances: string[]
+}
 
 export function OramaSearch() {
   const [searchBoxConfig, setSearchBoxConfig] = useState(null)
@@ -22,14 +31,15 @@ export function OramaSearch() {
     endpoint,
     analytics,
     docsInstances
-  } = usePluginData("@orama/plugin-docusaurus-v3")
+  }: PluginData  = usePluginData("@orama/plugin-docusaurus-v3") as PluginData
   const pluginId = docsInstances.filter((id: string) => pathname.includes(id))[0] || docsInstances[0]
   const baseURL = useBaseUrl("orama-search-index-current.json.gz")
   const isBrowser = useIsBrowser()
   const { colorMode } = useColorMode()
+  const versions = useVersions(pluginId)
   const activeVersion = useActiveVersion(pluginId)
   const { preferredVersion } = useDocsPreferredVersion(pluginId)
-  const currentVersion = activeVersion || preferredVersion
+  const currentVersion = activeVersion || preferredVersion || versions[0]
 
   useEffect(() => {
     async function loadOrama() {
@@ -63,12 +73,13 @@ export function OramaSearch() {
         const db = await create({
           schema: { ...presets.docs.schema, version: "enum" },
           plugins: [
-            ...(analytics && [
+            ...(analytics ? [
               pluginAnalytics({
                 apiKey: analytics.apiKey,
                 indexId: analytics.indexId,
+                enabled: analytics.enabled,
               })
-            ] ?? [])
+            ] : [])
           ]
         })
 
