@@ -155,7 +155,7 @@ export default function OramaPluginDocusaurus(ctx: {
     },
 
     async postBuild({ outDir }) {
-      await cp(indexPath(ctx.generatedFilesDir, "current"), indexPath(outDir, "current"))
+      !options.cloud && await cp(indexPath(ctx.generatedFilesDir, "current"), indexPath(outDir, "current"))
     }
   }
 }
