@@ -9,7 +9,7 @@ This plugin can be used in OSS mode where you host the documents, or in cloud mo
 
 ## Pre-requisites
 
-In order guarantee a correct functionality of the plugin, you need to have the `@docusaurus/core` at least in the version `3.0.0`.
+In order guarantee a correct functionality of the plugin, you need to have the `@docusaurus/core` at least in the version `3.2.0`.
 
 ::: warning
 This plugin do not support Docusaurus v2. Use [`@orama/plugin-docusaurus`](https://www.npmjs.com/package/@orama/plugin-docusaurus) instead.
@@ -72,8 +72,8 @@ To get this variables first create a new integration for HTTP Integrations in he
 
 ![select integrations](/oss/docussarus-1.png)
 
-And then docussarus:
+And then docusaurus:
 
-![select Docussarus](/oss/docussarus-2.png)
+![select Docusaurus](/oss/docussarus-2.png)
 
 And you are set, if you set deploy to true your index will update whenever you build the website and there are changes to your pages.
