@@ -153,15 +153,16 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
   }
 
   if (properties && properties !== '*') {
+    const propertiesToSearchSet = new Set(propertiesToSearch)
+    const propertiesSet = new Set(properties as string[])
+    
     for (const prop of properties) {
-      // TODO: since propertiesToSearch.includes is repeated multiple times, maybe we should move it in a Set first?
-      if (!propertiesToSearch.includes(prop as string)) {
+      if (!propertiesToSearchSet.has(prop as string)) {
         throw createError('UNKNOWN_INDEX', prop as string, propertiesToSearch.join(', '))
       }
     }
 
-    // TODO: since properties.includes is repeated multiple times, maybe we should move it in a Set first?
-    propertiesToSearch = propertiesToSearch.filter((prop: string) => (properties as string[]).includes(prop))
+    propertiesToSearch = propertiesToSearch.filter((prop: string) => propertiesSet.has(prop))
   }
 
   // Create the search context and the results
@@ -195,9 +196,10 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
           safeArrayPush(context.indexMap[prop][term], scoreList)
         }
       } else {
-        context.indexMap[prop][''] = []
+        const indexMapContent = []
+        context.indexMap[prop][''] = indexMapContent
         const scoreList = await orama.index.search(context, index, prop, '')
-        safeArrayPush(context.indexMap[prop][''], scoreList)
+        safeArrayPush(indexMapContent, scoreList)
       }
 
       const docIds = context.indexMap[prop]
@@ -209,11 +211,7 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
       for (let i = 0; i < uniqueDocsLength; i++) {
         const [id, score] = uniqueDocs[i]
         const prevScore = context.uniqueDocsIDs[id]
-        if (prevScore) {
-          context.uniqueDocsIDs[id] = prevScore + score + 0.5
-        } else {
-          context.uniqueDocsIDs[id] = score
-        }
+        context.uniqueDocsIDs[id] = prevScore ? prevScore + score + 0.5 : score
       }
     }
   } else if (tokens.length === 0 && term) {
