@@ -13,10 +13,16 @@ import { getNested } from '../utils.js'
 
 type FacetValue = string | boolean | number
 
+function sortAsc(a: [string, number], b: [string, number]) {
+  return a[1] - b[1]
+}
+
+function sortDesc(a: [string, number], b: [string, number]) {
+  return b[1] - a[1]
+}
+
 function sortingPredicateBuilder(order: FacetSorting = 'desc') {
-  return order.toLowerCase() === 'asc'
-    ? (a: [string, number], b: [string, number]) => a[1] - b[1]
-    : (a: [string, number], b: [string, number]) => b[1] - a[1]
+  return order.toLowerCase() === 'asc' ? sortAsc : sortDesc
 }
 
 export async function getFacets<T extends AnyOrama>(
@@ -67,21 +73,22 @@ export async function getFacets<T extends AnyOrama>(
       switch (propertyType) {
         case 'number': {
           const ranges = (facetsConfig[facet] as NumberFacetDefinition).ranges
-          calculateNumberFacet(ranges, facetValues, facetValue as number)
+          calculateNumberFacetBuilder(ranges, facetValues)(facetValue as number)
           break
         }
         case 'number[]': {
           const alreadyInsertedValues = new Set<string>()
           const ranges = (facetsConfig[facet] as NumberFacetDefinition).ranges
+          const calculateNumberFacet = calculateNumberFacetBuilder(ranges, facetValues, alreadyInsertedValues)
           for (const v of facetValue as Array<number>) {
-            calculateNumberFacet(ranges, facetValues, v, alreadyInsertedValues)
+            calculateNumberFacet(v)
           }
           break
         }
         case 'boolean':
         case 'enum':
         case 'string': {
-          calculateBooleanStringOrEnumFacet(facetValues, facetValue as FacetValue, propertyType)
+          calculateBooleanStringOrEnumFacetBuilder(facetValues, propertyType)(facetValue as FacetValue)
           break
         }
         case 'boolean[]':
@@ -89,8 +96,9 @@ export async function getFacets<T extends AnyOrama>(
         case 'string[]': {
           const alreadyInsertedValues = new Set<string>()
           const innerType = propertyType === 'boolean[]' ? 'boolean' : 'string'
+          const calculateBooleanStringOrEnumFacet = calculateBooleanStringOrEnumFacetBuilder(facetValues, innerType, alreadyInsertedValues)
           for (const v of facetValue as Array<FacetValue>) {
-            calculateBooleanStringOrEnumFacet(facetValues, v, innerType, alreadyInsertedValues)
+            calculateBooleanStringOrEnumFacet(v)
           }
           break
         }
@@ -102,15 +110,16 @@ export async function getFacets<T extends AnyOrama>(
 
   // TODO: We are looping again with the same previous keys, should we creat a single loop instead?
   for (const facet of facetKeys) {
+    const currentFacet = facets[facet]
     // Count the number of values for each facet
-    facets[facet].count = Object.keys(facets[facet].values).length
+    currentFacet.count = Object.keys(currentFacet.values).length
     // Sort only string-based facets
     if (properties[facet] === 'string') {
       const stringFacetDefinition = facetsConfig[facet] as StringFacetDefinition
       const sortingPredicate = sortingPredicateBuilder(stringFacetDefinition.sort)
 
-      facets[facet].values = Object.fromEntries(
-        Object.entries(facets[facet].values)
+      currentFacet.values = Object.fromEntries(
+        Object.entries(currentFacet.values)
           .sort(sortingPredicate)
           .slice(stringFacetDefinition.offset ?? 0, stringFacetDefinition.limit ?? 10)
       )
@@ -120,41 +129,44 @@ export async function getFacets<T extends AnyOrama>(
   return facets
 }
 
-function calculateNumberFacet(
+function calculateNumberFacetBuilder(
   ranges: NumberFacetDefinition['ranges'],
   values: Record<string, number>,
-  facetValue: number,
   alreadyInsertedValues?: Set<string>
 ) {
-  for (const range of ranges) {
-    const value = `${range.from}-${range.to}`
-    if (alreadyInsertedValues?.has(value)) {
-      continue
-    }
-
-    if (facetValue >= range.from && facetValue <= range.to) {
-      if (values[value] === undefined) {
-        values[value] = 1
-      } else {
-        values[value]++
-
-        alreadyInsertedValues?.add(value)
+  return (facetValue: number) => {
+    for (const range of ranges) {
+      const value = `${range.from}-${range.to}`
+      if (alreadyInsertedValues?.has(value)) {
+        continue
+      }
+  
+      if (facetValue >= range.from && facetValue <= range.to) {
+        if (values[value] === undefined) {
+          values[value] = 1
+        } else {
+          values[value]++
+  
+          alreadyInsertedValues?.add(value)
+        }
       }
     }
   }
 }
 
-function calculateBooleanStringOrEnumFacet(
+function calculateBooleanStringOrEnumFacetBuilder(
   values: Record<string, number>,
-  facetValue: FacetValue,
   propertyType: 'string' | 'boolean' | 'enum',
   alreadyInsertedValues?: Set<string>
 ) {
-  // String or boolean based facets
-  const value = facetValue?.toString() ?? (propertyType === 'boolean' ? 'false' : '')
-  if (alreadyInsertedValues?.has(value)) {
-    return
+  const defaultValue = (propertyType === 'boolean' ? 'false' : '')
+  return (facetValue: FacetValue) => {
+    // String or boolean based facets
+    const value = facetValue?.toString() ?? defaultValue
+    if (alreadyInsertedValues?.has(value)) {
+      return
+    }
+    values[value] = (values[value] ?? 0) + 1
+    alreadyInsertedValues?.add(value)
   }
-  values[value] = (values[value] ?? 0) + 1
-  alreadyInsertedValues?.add(value)
 }
