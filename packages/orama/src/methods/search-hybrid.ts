@@ -153,15 +153,16 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
   }
 
   if (properties && properties !== '*') {
+    const propertiesToSearchSet = new Set(propertiesToSearch)
+    const propertiesSet = new Set(properties as string[])
+    
     for (const prop of properties) {
-      // TODO: since propertiesToSearch.includes is repeated multiple times, maybe we should move it in a Set first?
-      if (!propertiesToSearch.includes(prop as string)) {
+      if (!propertiesToSearchSet.has(prop as string)) {
         throw createError('UNKNOWN_INDEX', prop as string, propertiesToSearch.join(', '))
       }
     }
 
-    // TODO: since properties.includes is repeated multiple times, maybe we should move it in a Set first?
-    propertiesToSearch = propertiesToSearch.filter((prop: string) => (properties as string[]).includes(prop))
+    propertiesToSearch = propertiesToSearch.filter((prop: string) => propertiesSet.has(prop))
   }
 
   // Create the search context and the results
@@ -195,9 +196,10 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
           safeArrayPush(context.indexMap[prop][term], scoreList)
         }
       } else {
-        context.indexMap[prop][''] = []
+        const indexMapContent = []
+        context.indexMap[prop][''] = indexMapContent
         const scoreList = await orama.index.search(context, index, prop, '')
-        safeArrayPush(context.indexMap[prop][''], scoreList)
+        safeArrayPush(indexMapContent, scoreList)
       }
 
       const docIds = context.indexMap[prop]
@@ -209,11 +211,7 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
       for (let i = 0; i < uniqueDocsLength; i++) {
         const [id, score] = uniqueDocs[i]
         const prevScore = context.uniqueDocsIDs[id]
-        if (prevScore) {
-          context.uniqueDocsIDs[id] = prevScore + score + 0.5
-        } else {
-          context.uniqueDocsIDs[id] = score
-        }
+        context.uniqueDocsIDs[id] = prevScore ? prevScore + score + 0.5 : score
       }
     }
   } else if (tokens.length === 0 && term) {
@@ -263,8 +261,14 @@ export async function getVectorSearchIDs<T extends AnyOrama, ResultDocument = Ty
   return minMaxScoreNormalization(uniqueIDs)
 }
 
+function extractScore([, score]: TokenScore) {
+  return score
+}
+
 function minMaxScoreNormalization(results: TokenScore[]): TokenScore[] {
-  const maxScore = Math.max(...results.map(([, score]) => score))
+  // In this case I disabled the `prefer-spread` rule because spread seems to be slower
+  // eslint-disable-next-line prefer-spread
+  const maxScore = Math.max.apply(Math, results.map(extractScore))
   return results.map(([id, score]) => [id, score / maxScore] as TokenScore)
 }
 
@@ -272,8 +276,8 @@ function normalizeScore(score: number, maxScore: number) {
   return score / maxScore
 }
 
-function hybridScore(textScore: number, vectorScore: number, textWeight: number, vectorWeight: number) {
-  return textScore * textWeight + vectorScore * vectorWeight
+function hybridScoreBuilder(textWeight: number, vectorWeight: number) {
+  return (textScore: number, vectorScore: number) => textScore * textWeight + vectorScore * vectorWeight
 }
 
 function mergeAndRankResults(
@@ -281,34 +285,31 @@ function mergeAndRankResults(
   vectorResults: TokenScore[],
   query: string,
   hybridWeights: HybridWeights | undefined
-) {
-  const maxTextScore = Math.max(...textResults.map(([, score]) => score))
-  const maxVectorScore = Math.max(...vectorResults.map(([, score]) => score))
+) { 
+  // eslint-disable-next-line prefer-spread
+  const maxTextScore = Math.max.apply(Math, textResults.map(extractScore))
+  // eslint-disable-next-line prefer-spread
+  const maxVectorScore = Math.max.apply(Math, vectorResults.map(extractScore))
   const hasHybridWeights = hybridWeights && hybridWeights.text && hybridWeights.vector
 
   const { text: textWeight, vector: vectorWeight } = hasHybridWeights ? hybridWeights : getQueryWeights(query)
   const mergedResults = new Map()
 
   const textResultsLength = textResults.length
+  const hybridScore = hybridScoreBuilder(textWeight, vectorWeight)
   for (let i = 0; i < textResultsLength; i++) {
-    const normalizedScore = normalizeScore(textResults[i][1], maxTextScore)
-    //                                                    ^ 1 here refers to "score"
-    const hybridScoreValue = hybridScore(normalizedScore, 0, textWeight, vectorWeight)
-    mergedResults.set(textResults[i][0], hybridScoreValue)
-    //                               ^ 0 here refers to "id"
+    const [id, score] = textResults[i]
+    const normalizedScore = normalizeScore(score, maxTextScore)
+    const hybridScoreValue = hybridScore(normalizedScore, 0)
+    mergedResults.set(id, hybridScoreValue)
   }
 
   const vectorResultsLength = vectorResults.length
   for (let i = 0; i < vectorResultsLength; i++) {
-    const normalizedScore = normalizeScore(vectorResults[i][1], maxVectorScore)
-    //                                                      ^ 1 here refers to "score"
-    const resultId = vectorResults[i][0]
-    if (mergedResults.has(resultId)) {
-      let existingRes = mergedResults.get(resultId)
-      mergedResults.set(resultId, (existingRes += hybridScore(0, normalizedScore, textWeight, vectorWeight)))
-    } else {
-      mergedResults.set(resultId, hybridScore(0, normalizedScore, textWeight, vectorWeight))
-    }
+    const [resultId, score] = vectorResults[i]
+    const normalizedScore = normalizeScore(score, maxVectorScore)
+    const existingRes = mergedResults.get(resultId) ?? 0
+    mergedResults.set(resultId, existingRes + hybridScore(0, normalizedScore))
   }
 
   return [...mergedResults].sort((a, b) => b[1] - a[1])
