@@ -477,8 +477,8 @@ importers:
         specifier: workspace:*
         version: link:../plugin-parsedoc
       '@orama/searchbox':
-        specifier: ^1.0.0-rc14
-        version: 1.0.0-rc14(@orama/highlight@0.1.5)(@orama/orama@packages+orama)(@oramacloud/client@1.0.14)(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1)(@r2wc/react-to-web-component@2.0.3)(react-dom@18.2.0)(react-markdown@9.0.1)(react@18.2.0)(typescript@5.0.3)
+        specifier: ^1.0.0-rc20
+        version: 1.0.0-rc20(@orama/highlight@0.1.5)(@orama/orama@packages+orama)(@oramacloud/client@1.0.14)(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1)(@r2wc/react-to-web-component@2.0.3)(react-dom@18.2.0)(react-markdown@9.0.1)(react@18.2.0)(typescript@5.0.3)
       '@oramacloud/client':
         specifier: ^1.0.14
         version: 1.0.14(typescript@5.0.3)
@@ -7726,14 +7726,25 @@ packages:
     engines: {node: '>= 16.0.0'}
     dev: false
 
+  /@orama/orama@2.0.15:
+    resolution: {integrity: sha512-9C11pL4kE2wdfsngnOwaZ4Hh5x76EI8KUQEf0DoxU4E/ytE8u8utFeisJIbaSMyjVofRvmWUyXeDzxFNnkhvvw==}
+    engines: {node: '>= 16.0.0'}
+    dev: false
+
   /@orama/plugin-analytics@2.0.12:
     resolution: {integrity: sha512-zI1FWdMCgvk7XHdJzDqyNMDfMbNt2fe7WKOFWBMbWvRx+EFUiLGyRZtMlvXVSWeGqMetYjM+fPqamSn4VDi0Ug==}
     dependencies:
       '@orama/orama': 2.0.12
     dev: false
 
-  /@orama/plugin-secure-proxy@2.0.12(typescript@5.0.3):
-    resolution: {integrity: sha512-aYfZCKMMrjJdUsuotHcfwIB5eEm3eqNSW/Vjo2MjpM/6eO8a3MlA/E4rmJFiDlsd8hsKVhSdT+sBDgm8zYZEPQ==}
+  /@orama/plugin-analytics@2.0.15:
+    resolution: {integrity: sha512-R8ixYIi6vCHwKbu/pW1gy2td3Wg8pHQkrkjiHOiQHta+IwNF8RPTjSKBJPpFlcPtZU7oNEJDrvVp7zpX88Q1bg==}
+    dependencies:
+      '@orama/orama': 2.0.15
+    dev: false
+
+  /@orama/plugin-secure-proxy@2.0.15(typescript@5.0.3):
+    resolution: {integrity: sha512-EwPPqMVFr7p2dv1UIINjaQEqQ7BIf71wWG3EjD6Gme7CX0NjV0gs3p4jkOPrnvS5zJ5CPiFbn4bCvYLWe6uhWg==}
     dependencies:
       '@oramacloud/client': 1.0.14(typescript@5.0.3)
     transitivePeerDependencies:
@@ -7791,11 +7802,11 @@ packages:
       - postcss
     dev: false
 
-  /@orama/searchbox@1.0.0-rc14(@orama/highlight@0.1.5)(@orama/orama@packages+orama)(@oramacloud/client@1.0.14)(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1)(@r2wc/react-to-web-component@2.0.3)(react-dom@18.2.0)(react-markdown@9.0.1)(react@18.2.0)(typescript@5.0.3):
-    resolution: {integrity: sha512-0P3CSWZEyo+Nw9okA/kWp29leln3sY3noTgoMqysfk9wzLoMRdVS27OBxJYdbk6ZoEFJY0oMSSColEmG84hG4g==}
+  /@orama/searchbox@1.0.0-rc20(@orama/highlight@0.1.5)(@orama/orama@packages+orama)(@oramacloud/client@1.0.14)(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1)(@r2wc/react-to-web-component@2.0.3)(react-dom@18.2.0)(react-markdown@9.0.1)(react@18.2.0)(typescript@5.0.3):
+    resolution: {integrity: sha512-3JRSlolw8/63DPTbre7dBhaxIu1lKI7/q4eFC8rzwPt4kj/MWPU80P8tbzNBomCQ4iRRY8wHEpsly4cePq/UKg==}
     peerDependencies:
-      '@orama/highlight': ^0.1.5
-      '@orama/orama': 2.0.12
+      '@orama/highlight': ^0.1.6
+      '@orama/orama': 2.0.14
       '@oramacloud/client': 1.0.14
       '@preact/signals-core': ^1.6.0
       '@preact/signals-react': ^2.0.1
@@ -7806,8 +7817,8 @@ packages:
     dependencies:
       '@orama/highlight': 0.1.5
       '@orama/orama': link:packages/orama
-      '@orama/plugin-analytics': 2.0.12
-      '@orama/plugin-secure-proxy': 2.0.12(typescript@5.0.3)
+      '@orama/plugin-analytics': 2.0.15
+      '@orama/plugin-secure-proxy': 2.0.15(typescript@5.0.3)
       '@oramacloud/client': 1.0.14(typescript@5.0.3)
       '@phosphor-icons/react': 2.1.4(react-dom@18.2.0)(react@18.2.0)
       '@preact/signals-core': 1.6.0
