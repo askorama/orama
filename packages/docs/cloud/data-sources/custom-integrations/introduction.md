@@ -14,8 +14,8 @@ As for today, we support 4 different ways to feed Orama with your data:
 
 - [JSON File Upload](./json-file)
 - [CSV FIle Upload](./csv-file)
-- [REST API](./rest-api)
-- [WebHooks](./webhooks) (work in progress)
+- [REST API](./rest-api) (work in progress)
+- [WebHooks](./webhooks)
 
 You can use any of the above methods to feed Orama with your data. You can even use all of them at the same time on different indexes.
 
