@@ -2,21 +2,28 @@
 outline: deep
 ---
 
-# Import a JSON file to Orama Cloud
+# Import a CSV file to Orama Cloud
 
-With Orama Cloud, you can upload a JSON file as a data source.
+With Orama Cloud, you can upload a CSV file as a data source.
 Once you upload it to Orama Cloud, it will be distributed in our Global Search Network, making it available in 300 global locations worldwide.
 
 You can follow along with this guide by downloading the following example JSON file: [example dataset](https://docs.oramasearch.com/cloud/guides/json-file/dog_breeds.json)
 
 ## Creating the index
 
-As always, you can create a new Orama Cloud index by going to [https://cloud.oramasearch.com/indexes/new](https://cloud.oramasearch.com/indexes/new).
+As always, you can create a new Orama Cloud index by going to [https://cloud.oramasearch.com/indexes](https://cloud.oramasearch.com/indexes).
 
-Once you're there, you will be presented with the following screen:
+In this page click on the `Add new index` button and choose: `Import Data from files`.
 
 <ZoomImg
-  src='/cloud/guides/json-file/orama-cloud-index-creation.webp'
+  src='/cloud/guides/json-file/1.png'
+  alt='Orama cloud indexes page'
+/>
+
+Once you clicked on `Import Data from files` you will be presented with the following page:
+
+<ZoomImg
+  src='/cloud/guides/json-file/orama-cloud-index-creation.png'
   alt='Create a new JSON File index with Orama Cloud'
 />
 
