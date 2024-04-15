@@ -70,14 +70,23 @@ plugins: [
 
 To get this variables first create a new integration for HTTP Integrations in here:
 
-![select integrations](/oss/docussarus-1.png)
+<ZoomImg
+  src='/oss/docussarus-1.png'
+  alt='select integrations'
+/>
 
 And then docusaurus:
 
-![select Docusaurus](/oss/docussarus-2.png)
+<ZoomImg
+  src='/oss/docussarus-2.png'
+  alt='Select Docusaurus'
+/>
 
 On the next page you will see all the variables you need to get you up and running:
 
-![the variables](/oss/docussarus-3.png)
+<ZoomImg
+  src='/oss/docussarus-3.png'
+  alt="the variables"
+/>
 
 And you are set, if you set deploy to true your index will update whenever you build the website and there are changes to your pages.
