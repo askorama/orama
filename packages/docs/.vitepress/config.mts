@@ -85,6 +85,7 @@ export default defineConfig({
                 { text: 'Vector Search', link: '/open-source/usage/search/vector-search.html' },
                 { text: 'Hybrid Search', link: '/open-source/usage/search/hybrid-search.html' },
                 { text: 'Fields Boosting', link: '/open-source/usage/search/fields-boosting.html' },
+                { text: 'Custom Search Priority', link: '/open-source/usage/search/custom-search-priority.html' },
                 { text: 'Facets', link: '/open-source/usage/search/facets.html' },
                 { text: 'Filters', link: '/open-source/usage/search/filters.html' },
                 { text: 'GeoSearch', link: '/open-source/usage/search/geosearch.html' },
