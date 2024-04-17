@@ -207,7 +207,8 @@ export default defineConfig({
           items: [
             { text: 'Full-text search', link: '/cloud/performing-search/full-text-search.html' },
             { text: 'Vector search', link: '/cloud/performing-search/vector-search.html' },
-            { text: 'Hybrid search', link: '/cloud/performing-search/hybrid-search.html' }
+            { text: 'Hybrid search', link: '/cloud/performing-search/hybrid-search.html' },
+            { text: 'Custom Search Priority', link: '/cloud/performing-search/custom-search-priority.html' },
           ]
         },
         {
