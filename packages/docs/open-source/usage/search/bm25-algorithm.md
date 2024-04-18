@@ -13,27 +13,6 @@ BM25 has become a popular algorithm for search engine ranking due to its flexibi
 You can edit the BM25 parameters by using the `relevance` property in the `search`
 configuration object.
 
-```javascript copy
-const searchResult = await search(movieDB, {
-  term: 'Chris',
-  properties: ['director'],
-  relevance: {
-    // Term frequency saturation parameter.
-    // Default value: 1.2
-    // Recommended value: between 1.2 and 2
-    k: 1.2,
-
-    // Length normalization parameter.
-    // Default value: 0.75
-    // Recommended value: > 0.75
-    b: 0.75,
-
-    // Frequency normalization lower bound.
-    // Default value: 0.5
-    // Recommended value: between 0.5 and 1
-    d: 0.5,
-  },
-})
-```
+<<< @/snippets/open-source/search.js#bm25
 
 You can learn more about the BM25 algorithm in the [Okapi BM25 Wikipedia](https://en.wikipedia.org/wiki/Okapi_BM25) page.

@@ -12,36 +12,7 @@ To run a preflight search, you can use the `preflight: boolean` property when us
 
 Let's see it in action:
 
-```javascript
-import { create, insert, search } from '@orama/orama'
-
-const db = await create({
-  schema: {
-    title: 'string'
-  }
-})
-
-await insert(db, { title: 'Red headphones' })
-await insert(db, { title: 'Green headphones' })
-await insert(db, { title: 'Blue headphones' })
-await insert(db, { title: 'Yellow headphones' })
-
-const results = await search(db, {
-  term: 'headphones',
-  preflight: true
-})
-
-console.log(results)
-
-// {
-//   elapsed: {
-//     raw: 181208,
-//     formatted: '181μs' 
-//   }
-//   hits: []
-//   count: 4
-// }
-```
+<<< @/snippets/open-source/search.js#preflight
 
 The `results` object will return a standard Orama response, but the `hits` property will be an empty array.
 

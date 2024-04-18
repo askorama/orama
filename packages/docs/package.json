@@ -15,19 +15,19 @@
     "@orama/plugin-vitepress": "workspace:*",
     "@orama/searchbox": "1.0.0-beta.12",
     "@vitejs/plugin-vue": "^4.5.1",
-    "jsdom": "^23.0.1",
-    "markdown-it": "^13.0.2",
+    "jsdom": "^24.0.0",
+    "markdown-it": "^14.1.0",
     "medium-zoom": "^1.1.0",
     "slugify": "^1.6.6",
     "vite": "^4.5.3"
   },
   "devDependencies": {
-    "@preact/signals-core": "^1.5.0",
+    "@preact/signals-core": "^1.6.0",
     "@types/jsdom": "^21.1.6",
-    "@types/markdown-it": "^13.0.7",
-    "vitepress": "1.0.0-rc.31"
+    "@types/markdown-it": "^14.0.1",
+    "vitepress": "1.1.1"
   },
   "peerDependencies": {
-    "vue": "^3.0.0"
+    "vue": "^3.4.23"
   }
 }
