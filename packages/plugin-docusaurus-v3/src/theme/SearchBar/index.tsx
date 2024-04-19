@@ -1,24 +1,24 @@
 // @ts-nocheck
-import React, { useEffect, useState } from "react"
-import useBaseUrl from "@docusaurus/useBaseUrl"
-import { useLocation } from "@docusaurus/router"
-import useIsBrowser from "@docusaurus/useIsBrowser"
-import { useActiveVersion, useVersions } from "@docusaurus/plugin-content-docs/client"
-import { useColorMode, useDocsPreferredVersion } from "@docusaurus/theme-common"
-import { usePluginData } from "@docusaurus/useGlobalData"
-import { ungzip } from "pako"
-import { SearchBox, SearchButton, presets } from "@orama/searchbox"
-import { OramaClient } from "@oramacloud/client"
-import { create, insertMultiple } from "@orama/orama"
-import { pluginAnalytics } from "@orama/plugin-analytics"
-import "@orama/searchbox/dist/index.css"
+import React, { useEffect, useState } from 'react'
+import useBaseUrl from '@docusaurus/useBaseUrl'
+import { useLocation } from '@docusaurus/router'
+import useIsBrowser from '@docusaurus/useIsBrowser'
+import { useActiveVersion, useVersions } from '@docusaurus/plugin-content-docs/client'
+import { useColorMode, useDocsPreferredVersion } from '@docusaurus/theme-common'
+import { usePluginData } from '@docusaurus/useGlobalData'
+import { ungzip } from 'pako'
+import { SearchBox, SearchButton, presets } from '@orama/searchbox'
+import { OramaClient } from '@oramacloud/client'
+import { create, insertMultiple } from '@orama/orama'
+import { pluginAnalytics } from '@orama/plugin-analytics'
+import '@orama/searchbox/dist/index.css'
 
 interface PluginData {
   searchData: {
     current: { data: ArrayBuffer } | null
-  },
-  endpoint: { url: string, key: string } | null,
-  analytics: { apiKey: string, indexId: string, enabled: boolean } | null,
+  }
+  endpoint: { url: string; key: string } | null
+  analytics: { apiKey: string; indexId: string; enabled: boolean } | null
   docsInstances: string[]
 }
 
@@ -26,14 +26,11 @@ export function OramaSearch() {
   const [searchBoxConfig, setSearchBoxConfig] = useState(null)
   const { pathname } = useLocation()
 
-  const {
-    searchData,
-    endpoint,
-    analytics,
-    docsInstances
-  }: PluginData  = usePluginData("@orama/plugin-docusaurus-v3") as PluginData
+  const { searchData, endpoint, analytics, docsInstances }: PluginData = usePluginData(
+    '@orama/plugin-docusaurus-v3'
+  ) as PluginData
   const pluginId = docsInstances.filter((id: string) => pathname.includes(id))[0] || docsInstances[0]
-  const baseURL = useBaseUrl("orama-search-index-current.json.gz")
+  const baseURL = useBaseUrl('orama-search-index-current.json.gz')
   const isBrowser = useIsBrowser()
   const { colorMode } = useColorMode()
   const versions = useVersions(pluginId)
@@ -67,19 +64,21 @@ export function OramaSearch() {
           buffer = await searchResponse.arrayBuffer()
         }
 
-        const deflated = ungzip(buffer, { to: "string" })
+        const deflated = ungzip(buffer, { to: 'string' })
         const parsedDeflated = JSON.parse(deflated)
 
         const db = await create({
-          schema: { ...presets.docs.schema, version: "enum" },
+          schema: { ...presets.docs.schema, version: 'enum' },
           plugins: [
-            ...(analytics ? [
-              pluginAnalytics({
-                apiKey: analytics.apiKey,
-                indexId: analytics.indexId,
-                enabled: analytics.enabled,
-              })
-            ] : [])
+            ...(analytics
+              ? [
+                  pluginAnalytics({
+                    apiKey: analytics.apiKey,
+                    indexId: analytics.indexId,
+                    enabled: analytics.enabled
+                  })
+                ]
+              : [])
           ]
         })
 
@@ -96,14 +95,14 @@ export function OramaSearch() {
     }
 
     loadOrama().catch((error) => {
-      console.error("Cannot load search index.", error)
+      console.error('Cannot load search index.', error)
     })
   }, [isBrowser])
 
   const searchParams = {
     ...(currentVersion && {
       where: {
-        version: { "eq": currentVersion.name }
+        version: { eq: currentVersion.name }
       }
     })
   }
@@ -112,12 +111,7 @@ export function OramaSearch() {
     <div>
       <SearchButton colorScheme={colorMode} className="DocSearch-Button" />
       {searchBoxConfig && (
-        <SearchBox
-          {...searchBoxConfig}
-          colorScheme={colorMode}
-          searchParams={searchParams}
-          facetProperty="category"
-        />
+        <SearchBox {...searchBoxConfig} colorScheme={colorMode} searchParams={searchParams} facetProperty="category" />
       )}
     </div>
   )

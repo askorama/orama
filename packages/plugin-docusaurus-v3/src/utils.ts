@@ -5,7 +5,6 @@ export const restFetcher = async <T = unknown>(url: string, options?: any): Prom
     throw new Error(`Request failed (network error): ${await response.text()}`)
   } else if (response.status >= 400) {
     const error = new Error(`Request failed (HTTP error ${response.status})}`)
-
     ;(error as any).response = response
 
     throw error
@@ -46,14 +45,12 @@ export async function loggedOperation(preMessage: string, fn: () => Promise<any>
 export async function fetchEndpointConfig(baseUrl: string, APIKey: string, indexId: string) {
   const result = await loggedOperation(
     'Start: Fetch index endpoint config',
-    async () =>  await restFetcher(
-      `${baseUrl}/api/v1/indexes/get-index?id=${indexId}`,
-      {
+    async () =>
+      await restFetcher(`${baseUrl}/api/v1/indexes/get-index?id=${indexId}`, {
         headers: {
           Authorization: `Bearer ${APIKey}`
         }
-      }
-    ),
+      }),
     'End: Fetch index endpoint config (success)'
   )
 
@@ -64,13 +61,9 @@ export async function createSnapshot(baseUrl: string, APIKey: string, indexId: s
   await loggedOperation(
     'Start: Create snapshot',
     async () =>
-      await postFetcher(
-        `${baseUrl}/api/v1/webhooks/${indexId}/snapshot`,
-        documents,
-        {
-          Authorization: `Bearer ${APIKey}`
-        }
-      ),
+      await postFetcher(`${baseUrl}/api/v1/webhooks/${indexId}/snapshot`, documents, {
+        Authorization: `Bearer ${APIKey}`
+      }),
     'End: Create snapshot (success)'
   )
 }
