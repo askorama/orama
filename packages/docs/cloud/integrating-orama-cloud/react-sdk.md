@@ -41,7 +41,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 );
 ```
 
-After this is done you are ready to use the `useSearch` hook anywhere in your application to interact with the Orama Cloud API.
+After completing this step, you can use the `useSearch` hook anywhere in your application to interact with the Orama Cloud API.
 
 You can always find your public API key and endpoint in the Orama Dashboard. Here is an example of what it looks like:
 
@@ -108,4 +108,4 @@ function Search() {
 }
 ```
 
-You can read the full documentation on vector search using the JavaScript API [here](/cloud/performing-search/vector-search) and remember that anything that can be passed to `client.search` can be passed to `useSearch`.
+You can read the full documentation on vector search using the JavaScript API [here](/cloud/performing-search/vector-search) and remember that anything you can pass to `client.search` you can also pass to `useSearch`.

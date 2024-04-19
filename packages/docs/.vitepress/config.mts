@@ -405,6 +405,10 @@ export default defineConfig({
               text: "React SDK",
               link: "/cloud/integrating-orama-cloud/react-sdk.html",
             },
+            {
+              text: "Vue SDK",
+              link: "/cloud/integrating-orama-cloud/vue-sdk.html",
+            },
           ],
         },
       ],
