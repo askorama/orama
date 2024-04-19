@@ -96,11 +96,7 @@ export async function getFacets<T extends AnyOrama>(
         case 'string[]': {
           const alreadyInsertedValues = new Set<string>()
           const innerType = propertyType === 'boolean[]' ? 'boolean' : 'string'
-          const calculateBooleanStringOrEnumFacet = calculateBooleanStringOrEnumFacetBuilder(
-            facetValues,
-            innerType,
-            alreadyInsertedValues
-          )
+          const calculateBooleanStringOrEnumFacet = calculateBooleanStringOrEnumFacetBuilder(facetValues, innerType, alreadyInsertedValues)
           for (const v of facetValue as Array<FacetValue>) {
             calculateBooleanStringOrEnumFacet(v)
           }
@@ -144,13 +140,13 @@ function calculateNumberFacetBuilder(
       if (alreadyInsertedValues?.has(value)) {
         continue
       }
-
+  
       if (facetValue >= range.from && facetValue <= range.to) {
         if (values[value] === undefined) {
           values[value] = 1
         } else {
           values[value]++
-
+  
           alreadyInsertedValues?.add(value)
         }
       }
@@ -163,7 +159,7 @@ function calculateBooleanStringOrEnumFacetBuilder(
   propertyType: 'string' | 'boolean' | 'enum',
   alreadyInsertedValues?: Set<string>
 ) {
-  const defaultValue = propertyType === 'boolean' ? 'false' : ''
+  const defaultValue = (propertyType === 'boolean' ? 'false' : '')
   return (facetValue: FacetValue) => {
     // String or boolean based facets
     const value = facetValue?.toString() ?? defaultValue

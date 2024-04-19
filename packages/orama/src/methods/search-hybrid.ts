@@ -155,7 +155,7 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
   if (properties && properties !== '*') {
     const propertiesToSearchSet = new Set(propertiesToSearch)
     const propertiesSet = new Set(properties as string[])
-
+    
     for (const prop of properties) {
       if (!propertiesToSearchSet.has(prop as string)) {
         throw createError('UNKNOWN_INDEX', prop as string, propertiesToSearch.join(', '))
@@ -285,7 +285,7 @@ function mergeAndRankResults(
   vectorResults: TokenScore[],
   query: string,
   hybridWeights: HybridWeights | undefined
-) {
+) { 
   // eslint-disable-next-line prefer-spread
   const maxTextScore = Math.max.apply(Math, textResults.map(extractScore))
   // eslint-disable-next-line prefer-spread
