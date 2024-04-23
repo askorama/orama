@@ -158,7 +158,7 @@ export function OramaPlugin(pluginOptions: OramaPluginOptions = {}): Plugin {
     async load(this, id) {
       if (id !== resolvedVirtualModuleId) return
 
-      const root = resolveConfig.vitepress.root
+      const root = resolveConfig.vitepress.srcDir || resolveConfig.vitepress.root
       const base = removeTrailingSlash(resolveConfig.vitepress.userConfig?.base ?? '')
       const pages = resolveConfig.vitepress.pages.map((page: string) => `${root}/${page}`)
 
