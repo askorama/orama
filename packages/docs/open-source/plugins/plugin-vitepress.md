@@ -27,10 +27,11 @@ import { OramaPlugin } from '@orama/plugin-vitepress'
 
 export default {
   // ...
-  vite: {
-    plugins: [OramaPlugin()],
-  },
-  // ...
+  extends: {
+    vite: {
+      plugins: [OramaPlugin()],
+    },
+  }
 }
 ```
 
