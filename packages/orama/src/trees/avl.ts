@@ -122,24 +122,30 @@ export function rangeSearch<K, V>(node: RootNode<K, V>, min: K, max: K): V {
 export function greaterThan<K, V>(node: RootNode<K, V>, key: K, inclusive = false): V {
   const result: V[] = []
 
-  function traverse(node: Node<K, V>) {
-    if (node === null) {
-      return
+  if (node === null) return result as V;
+
+  const stack: Array<Node<K, V>> = [node.root]
+
+  while (stack.length > 0) {
+    const node = stack.pop()
+    if (!node) {
+      continue;
     }
 
     if (inclusive && node.k >= key) {
       safeArrayPush(result, node.v as V[])
     }
-
     if (!inclusive && node.k > key) {
       safeArrayPush(result, node.v as V[])
     }
 
-    traverse(node.l as Node<K, V>)
-    traverse(node.r as Node<K, V>)
+    if (node.r !== null) {
+      stack.push(node.r)
+    }
+    if (node.l !== null) {
+      stack.push(node.l)
+    }
   }
-
-  traverse(node.root)
 
   return result as V
 }
