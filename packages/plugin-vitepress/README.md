@@ -18,10 +18,11 @@ import { OramaPlugin } from '@orama/plugin-vitepress'
 
 export default defineConfig({
   // ...
-  vite: {
-    plugins: [OramaPlugin()]
-  },
-  // ...
+  extends: {
+    vite: {
+      plugins: [OramaPlugin()]
+    },
+  }
 })
 ```
 
