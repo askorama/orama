@@ -357,6 +357,7 @@ export default defineConfig({
         },
         {
           text: 'Orama AI',
+          collapsed: false,
           items: [
             {
               text: 'Automatic embeddings generation',
@@ -365,6 +366,20 @@ export default defineConfig({
             {
               text: 'Orama Secure Proxy',
               link: '/cloud/orama-ai/orama-secure-proxy.html'
+            }
+          ]
+        },
+        {
+          text: 'Answer Engine',
+          collapsed: false,
+          items: [
+            {
+              text: 'Introduction',
+              link: '/cloud/answer-engine/introduction.html'
+            },
+            {
+              text: 'Creating an Answer Session',
+              link: '/cloud/answer-engine/creating-an-answer-session.html'
             }
           ]
         },
