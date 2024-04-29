@@ -124,7 +124,7 @@ export function greaterThan<K, V>(node: RootNode<K, V>, key: K, inclusive = fals
 
   if (node === null) return result as V;
 
-  const stack: Array<Node<K, V>> = [node.root]
+  const stack: Array<Nullable<Node<K, V>>> = [node.root]
 
   while (stack.length > 0) {
     const node = stack.pop()
@@ -139,12 +139,8 @@ export function greaterThan<K, V>(node: RootNode<K, V>, key: K, inclusive = fals
       safeArrayPush(result, node.v as V[])
     }
 
-    if (node.r !== null) {
-      stack.push(node.r)
-    }
-    if (node.l !== null) {
-      stack.push(node.l)
-    }
+    stack.push(node.r)
+    stack.push(node.l)
   }
 
   return result as V
@@ -153,24 +149,26 @@ export function greaterThan<K, V>(node: RootNode<K, V>, key: K, inclusive = fals
 export function lessThan<K, V>(node: RootNode<K, V>, key: K, inclusive = false): V {
   const result: V[] = []
 
-  function traverse(node: Node<K, V>) {
-    if (node === null) {
-      return
+  if (node === null) return result as V;
+
+  const stack: Array<Nullable<Node<K, V>>> = [node.root]
+
+  while (stack.length > 0) {
+    const node = stack.pop()
+    if (!node) {
+      continue;
     }
 
     if (inclusive && node.k <= key) {
       safeArrayPush(result, node.v as V[])
     }
-
     if (!inclusive && node.k < key) {
       safeArrayPush(result, node.v as V[])
     }
 
-    traverse(node.l as Node<K, V>)
-    traverse(node.r as Node<K, V>)
+    stack.push(node.r)
+    stack.push(node.l)
   }
-
-  traverse(node.root)
 
   return result as V
 }
