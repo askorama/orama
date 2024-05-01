@@ -1,6 +1,6 @@
 {
   "name": "@orama/docs",
-  "version": "2.0.16",
+  "version": "2.0.17",
   "description": "Documentation for Orama",
   "private": true,
   "type": "module",
