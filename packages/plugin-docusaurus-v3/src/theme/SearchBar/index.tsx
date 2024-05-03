@@ -53,7 +53,7 @@ export function OramaSearch() {
       } else {
         let buffer
 
-        if (searchData.current) {
+        if (searchData?.current) {
           buffer = searchData.current.data
         } else {
           const searchResponse = await fetch(baseURL)
