@@ -631,9 +631,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
   }
 
   // AND operation: calculate the intersection between all the IDs in filterMap
-  const result = intersect(Object.values(filtersMap))
-
-  return result
+  return intersect(Object.values(filtersMap))
 }
 
 export async function getSearchableProperties(index: Index): Promise<string[]> {
