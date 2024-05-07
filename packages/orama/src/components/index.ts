@@ -553,7 +553,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
           highPrecision
         )
         // @todo: convert this into a for loop
-        safeArrayPush(filtersMap[param], ids.map(({ docIDs }) => docIDs).flat())
+        safeArrayPush(filtersMap[param], ids.flatMap(({ docIDs }) => docIDs))
       } else {
         const {
           coordinates,
@@ -562,7 +562,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
         } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
         const ids = searchByPolygon(node.root, coordinates as BKDGeoPoint[], inside, undefined, highPrecision)
         // @todo: convert this into a for loop
-        safeArrayPush(filtersMap[param], ids.map(({ docIDs }) => docIDs).flat())
+        safeArrayPush(filtersMap[param], ids.flatMap(({ docIDs }) => docIDs))
       }
 
       continue
