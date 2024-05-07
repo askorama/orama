@@ -587,11 +587,9 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
     }
 
     if (type === 'Flat') {
-      if (isArray) {
-        safeArrayPush(filtersMap[param], flatFilterArr(node, operation as EnumArrComparisonOperator))
-      } else {
-        safeArrayPush(filtersMap[param], flatFilter(node, operation as EnumComparisonOperator))
-      }
+      const flatOperation = isArray ? flatFilterArr : flatFilter
+      safeArrayPush(filtersMap[param], flatOperation(node, operation as EnumComparisonOperator & EnumArrComparisonOperator))
+
       continue
     }
 

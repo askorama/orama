@@ -1,22 +1,22 @@
-import type {
-  AnyOrama,
-  TypedDocument,
-  SearchParamsFullText,
-  Results,
-  CustomSorterFunctionItem,
-  TokenScore,
-  ElapsedTime
-} from '../types.js'
+import { prioritizeTokenScores } from '../components/algorithms.js'
+import { getFacets } from '../components/facets.js'
+import { intersectFilteredIDs } from '../components/filters.js'
+import { getGroups } from '../components/groups.js'
+import { runAfterSearch, runBeforeSearch } from '../components/hooks.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getInternalDocumentId } from '../components/internal-document-id-store.js'
-import { getNanosecondsTime, removeVectorsFromHits, safeArrayPush, sortTokenScorePredicate } from '../utils.js'
-import { intersectFilteredIDs } from '../components/filters.js'
-import { prioritizeTokenScores } from '../components/algorithms.js'
 import { createError } from '../errors.js'
-import { createSearchContext, defaultBM25Params, fetchDocumentsWithDistinct, fetchDocuments } from './search.js'
-import { getFacets } from '../components/facets.js'
-import { getGroups } from '../components/groups.js'
-import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
+import type {
+  AnyOrama,
+  CustomSorterFunctionItem,
+  ElapsedTime,
+  Results,
+  SearchParamsFullText,
+  TokenScore,
+  TypedDocument
+} from '../types.js'
+import { getNanosecondsTime, removeVectorsFromHits, safeArrayPush, sortTokenScorePredicate } from '../utils.js'
+import { createSearchContext, defaultBM25Params, fetchDocuments, fetchDocumentsWithDistinct } from './search.js'
 
 export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
@@ -86,11 +86,12 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
 
   const tokensLength = tokens.length
 
-  if (tokensLength || (properties && properties.length > 0)) {
+  if (tokensLength || properties?.length) {
     // Now it's time to loop over all the indices and get the documents IDs for every single term
     const indexesLength = propertiesToSearch.length
     for (let i = 0; i < indexesLength; i++) {
       const prop = propertiesToSearch[i]
+      const docIds = context.indexMap[prop]
 
       if (tokensLength !== 0) {
         for (let j = 0; j < tokensLength; j++) {
@@ -99,15 +100,14 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
           // Lookup
           const scoreList = await orama.index.search(context, index, prop, term)
 
-          safeArrayPush(context.indexMap[prop][term], scoreList)
+          safeArrayPush(docIds[term], scoreList)
         }
       } else {
-        context.indexMap[prop][''] = []
+        docIds[''] = []
         const scoreList = await orama.index.search(context, index, prop, '')
-        safeArrayPush(context.indexMap[prop][''], scoreList)
+        safeArrayPush(docIds[''], scoreList)
       }
 
-      const docIds = context.indexMap[prop]
       const vals = Object.values(docIds)
       context.docsIntersection[prop] = prioritizeTokenScores(vals, params?.boost?.[prop] ?? 1, threshold, tokensLength)
       const uniqueDocs = context.docsIntersection[prop]
