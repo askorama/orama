@@ -553,7 +553,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
           highPrecision
         )
         // @todo: convert this into a for loop
-        safeArrayPush(filtersMap[param], ids.map(({ docIDs }) => docIDs).flat())
+        safeArrayPush(filtersMap[param], ids.flatMap(({ docIDs }) => docIDs))
       } else {
         const {
           coordinates,
@@ -562,7 +562,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
         } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
         const ids = searchByPolygon(node.root, coordinates as BKDGeoPoint[], inside, undefined, highPrecision)
         // @todo: convert this into a for loop
-        safeArrayPush(filtersMap[param], ids.map(({ docIDs }) => docIDs).flat())
+        safeArrayPush(filtersMap[param], ids.flatMap(({ docIDs }) => docIDs))
       }
 
       continue
@@ -587,11 +587,9 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
     }
 
     if (type === 'Flat') {
-      if (isArray) {
-        safeArrayPush(filtersMap[param], flatFilterArr(node, operation as EnumArrComparisonOperator))
-      } else {
-        safeArrayPush(filtersMap[param], flatFilter(node, operation as EnumComparisonOperator))
-      }
+      const flatOperation = isArray ? flatFilterArr : flatFilter
+      safeArrayPush(filtersMap[param], flatOperation(node, operation as EnumComparisonOperator & EnumArrComparisonOperator))
+
       continue
     }
 
@@ -633,9 +631,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
   }
 
   // AND operation: calculate the intersection between all the IDs in filterMap
-  const result = intersect(Object.values(filtersMap))
-
-  return result
+  return intersect(Object.values(filtersMap))
 }
 
 export async function getSearchableProperties(index: Index): Promise<string[]> {

@@ -42,8 +42,7 @@ async function createOramaContentLoader(paths: string[], root: string, base: str
       html: md.render(readFileSync(file, 'utf-8'), '')
     }))
     .map(parseHTMLContent)
-    .map((data) => formatForOrama(data, base))
-    .flat()
+    .flatMap((data) => formatForOrama(data, base))
 
   const db = await create({
     schema: presets.docs.schema

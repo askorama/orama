@@ -118,9 +118,7 @@ export default function OramaPluginDocusaurus(ctx: {
         }
       })
 
-      const oramaDocs = [
-        ...await Promise.all(allOramaDocsPromises)
-      ]
+      const oramaDocs = (await Promise.all(allOramaDocsPromises))
         .flat()
         .map((data) => ({
           title: data.title,
