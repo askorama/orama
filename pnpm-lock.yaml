@@ -157,6 +157,15 @@ importers:
       '@astrojs/tailwind':
         specifier: ^5.1.0
         version: 5.1.0(astro@4.7.1(@types/node@20.11.19)(terser@5.17.7)(typescript@5.4.5))(tailwindcss@3.4.3(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.4.5)))(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.4.5))
+      '@orama/orama':
+        specifier: ^2.0.18
+        version: 2.0.18
+      '@orama/plugin-astro':
+        specifier: ^2.0.18
+        version: 2.0.18(astro@4.7.1(@types/node@20.11.19)(terser@5.17.7)(typescript@5.4.5))
+      '@orama/searchbox':
+        specifier: 1.0.0-rc27
+        version: 1.0.0-rc27(@orama/highlight@0.1.5)(@orama/orama@2.0.18)(@oramacloud/client@1.0.14(typescript@5.4.5))(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1(react@18.3.1))(@r2wc/react-to-web-component@2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react-markdown@9.0.1(@types/react@18.3.1)(react@18.3.1))(react@18.3.1)(typescript@5.4.5)
       '@types/react':
         specifier: ^18.3.1
         version: 18.3.1
@@ -166,6 +175,9 @@ importers:
       astro:
         specifier: ^4.3.5
         version: 4.7.1(@types/node@20.11.19)(terser@5.17.7)(typescript@5.4.5)
+      html-to-text:
+        specifier: ^9.0.3
+        version: 9.0.3
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -3904,11 +3916,21 @@ packages:
     resolution: {integrity: sha512-9C11pL4kE2wdfsngnOwaZ4Hh5x76EI8KUQEf0DoxU4E/ytE8u8utFeisJIbaSMyjVofRvmWUyXeDzxFNnkhvvw==}
     engines: {node: '>= 16.0.0'}
 
+  '@orama/orama@2.0.18':
+    resolution: {integrity: sha512-KSty7+r8JxXv3iCuhLqQfwMvUiSWnXPaTPQPPoVPpwdvynEKcp1JNWKzTMB2tISDggf8jKhQXHEP3QXlGkvvtA==}
+    engines: {node: '>= 16.0.0'}
+
   '@orama/plugin-analytics@2.0.12':
     resolution: {integrity: sha512-zI1FWdMCgvk7XHdJzDqyNMDfMbNt2fe7WKOFWBMbWvRx+EFUiLGyRZtMlvXVSWeGqMetYjM+fPqamSn4VDi0Ug==}
 
   '@orama/plugin-analytics@2.0.15':
     resolution: {integrity: sha512-R8ixYIi6vCHwKbu/pW1gy2td3Wg8pHQkrkjiHOiQHta+IwNF8RPTjSKBJPpFlcPtZU7oNEJDrvVp7zpX88Q1bg==}
+
+  '@orama/plugin-astro@2.0.18':
+    resolution: {integrity: sha512-1OXWiWnp9mDxg18/Zk+IVK3jOf0jBvj1jF0i661D9oiXFKHj/sPmJu3heMegBxhdhPOJQl35OPpkmmo9GIjNiQ==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      astro: ^2.0.4
 
   '@orama/plugin-secure-proxy@2.0.15':
     resolution: {integrity: sha512-EwPPqMVFr7p2dv1UIINjaQEqQ7BIf71wWG3EjD6Gme7CX0NjV0gs3p4jkOPrnvS5zJ5CPiFbn4bCvYLWe6uhWg==}
@@ -3937,6 +3959,19 @@ packages:
 
   '@orama/searchbox@1.0.0-rc20':
     resolution: {integrity: sha512-3JRSlolw8/63DPTbre7dBhaxIu1lKI7/q4eFC8rzwPt4kj/MWPU80P8tbzNBomCQ4iRRY8wHEpsly4cePq/UKg==}
+    peerDependencies:
+      '@orama/highlight': ^0.1.6
+      '@orama/orama': 2.0.14
+      '@oramacloud/client': 1.0.14
+      '@preact/signals-core': ^1.6.0
+      '@preact/signals-react': ^2.0.1
+      '@r2wc/react-to-web-component': ^2.0.3
+      react: ^18.2.0
+      react-dom: ^18.2.0
+      react-markdown: ^9.0.1
+
+  '@orama/searchbox@1.0.0-rc27':
+    resolution: {integrity: sha512-qMHVbQKVLG6pDT8vDu6ctaoAG7NkjzdvpHDUFD+nuxoMXOGPd6A+8em1tkU4YCgZ/l+zZafaQNfsGl+ONO9eHg==}
     peerDependencies:
       '@orama/highlight': ^0.1.6
       '@orama/orama': 2.0.14
@@ -18657,15 +18692,17 @@ snapshots:
 
   '@orama/highlight@0.1.2':
     dependencies:
-      '@orama/orama': 2.0.12
+      '@orama/orama': 2.0.18
 
   '@orama/highlight@0.1.5':
     dependencies:
-      '@orama/orama': 2.0.12
+      '@orama/orama': 2.0.18
 
   '@orama/orama@2.0.12': {}
 
   '@orama/orama@2.0.15': {}
+
+  '@orama/orama@2.0.18': {}
 
   '@orama/plugin-analytics@2.0.12':
     dependencies:
@@ -18674,6 +18711,12 @@ snapshots:
   '@orama/plugin-analytics@2.0.15':
     dependencies:
       '@orama/orama': 2.0.15
+
+  '@orama/plugin-astro@2.0.18(astro@4.7.1(@types/node@20.11.19)(terser@5.17.7)(typescript@5.4.5))':
+    dependencies:
+      '@orama/orama': 2.0.18
+      astro: 4.7.1(@types/node@20.11.19)(terser@5.17.7)(typescript@5.4.5)
+      html-to-text: 9.0.3
 
   '@orama/plugin-secure-proxy@2.0.15(typescript@5.4.5)':
     dependencies:
@@ -18735,13 +18778,36 @@ snapshots:
       - babel-plugin-macros
       - typescript
 
+  '@orama/searchbox@1.0.0-rc27(@orama/highlight@0.1.5)(@orama/orama@2.0.18)(@oramacloud/client@1.0.14(typescript@5.4.5))(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1(react@18.3.1))(@r2wc/react-to-web-component@2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react-markdown@9.0.1(@types/react@18.3.1)(react@18.3.1))(react@18.3.1)(typescript@5.4.5)':
+    dependencies:
+      '@orama/highlight': 0.1.5
+      '@orama/orama': 2.0.18
+      '@orama/plugin-analytics': 2.0.15
+      '@orama/plugin-secure-proxy': 2.0.15(typescript@5.4.5)
+      '@oramacloud/client': 1.0.14(typescript@5.4.5)
+      '@phosphor-icons/react': 2.1.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@preact/signals-core': 1.6.0
+      '@preact/signals-react': 2.0.1(react@18.3.1)
+      '@r2wc/react-to-web-component': 2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      classnames: 2.5.1
+      dedent: 1.5.1(babel-plugin-macros@3.1.0)
+      lodash.debounce: 4.0.8
+      object-to-css-variables: 0.2.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-markdown: 9.0.1(@types/react@18.3.1)(react@18.3.1)
+      react-syntax-highlighter: 15.5.0(react@18.3.1)
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - typescript
+
   '@orama/stemmers@2.0.12': {}
 
   '@orama/stopwords@2.0.12': {}
 
   '@oramacloud/client@1.0.14(typescript@5.2.2)':
     dependencies:
-      '@orama/orama': 2.0.12
+      '@orama/orama': 2.0.18
       '@orama/stemmers': 2.0.12
       '@orama/stopwords': 2.0.12
       '@paralleldrive/cuid2': 2.2.2
@@ -18755,7 +18821,7 @@ snapshots:
 
   '@oramacloud/client@1.0.14(typescript@5.4.5)':
     dependencies:
-      '@orama/orama': 2.0.12
+      '@orama/orama': 2.0.18
       '@orama/stemmers': 2.0.12
       '@orama/stopwords': 2.0.12
       '@paralleldrive/cuid2': 2.2.2
@@ -18769,7 +18835,7 @@ snapshots:
 
   '@oramacloud/client@1.0.4(typescript@5.0.3)':
     dependencies:
-      '@orama/orama': 2.0.12
+      '@orama/orama': 2.0.18
       '@paralleldrive/cuid2': 2.2.2
       react: 18.2.0
       vue: 3.3.10(typescript@5.0.3)
@@ -18801,6 +18867,11 @@ snapshots:
     dependencies:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+
+  '@phosphor-icons/react@2.1.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -18843,6 +18914,12 @@ snapshots:
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
 
+  '@preact/signals-react@2.0.1(react@18.3.1)':
+    dependencies:
+      '@preact/signals-core': 1.6.0
+      react: 18.3.1
+      use-sync-external-store: 1.2.0(react@18.3.1)
+
   '@preact/signals@1.2.2(preact@10.19.2)':
     dependencies:
       '@preact/signals-core': 1.6.0
@@ -18855,6 +18932,12 @@ snapshots:
       '@r2wc/core': 1.0.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+
+  '@r2wc/react-to-web-component@2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@r2wc/core': 1.0.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   '@rollup/rollup-android-arm-eabi@4.17.2':
     optional: true
@@ -28707,6 +28790,23 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  react-markdown@9.0.1(@types/react@18.3.1)(react@18.3.1):
+    dependencies:
+      '@types/hast': 3.0.3
+      '@types/react': 18.3.1
+      devlop: 1.1.0
+      hast-util-to-jsx-runtime: 2.2.0
+      html-url-attributes: 3.0.0
+      mdast-util-to-hast: 13.0.2
+      react: 18.3.1
+      remark-parse: 11.0.0
+      remark-rehype: 11.0.0
+      unified: 11.0.4
+      unist-util-visit: 5.0.0
+      vfile: 6.0.1
+    transitivePeerDependencies:
+      - supports-color
+
   react-reconciler@0.29.0(react@18.2.0):
     dependencies:
       loose-envify: 1.4.0
@@ -28782,6 +28882,15 @@ snapshots:
       lowlight: 1.20.0
       prismjs: 1.29.0
       react: 18.2.0
+      refractor: 3.6.0
+
+  react-syntax-highlighter@15.5.0(react@18.3.1):
+    dependencies:
+      '@babel/runtime': 7.23.2
+      highlight.js: 10.7.3
+      lowlight: 1.20.0
+      prismjs: 1.29.0
+      react: 18.3.1
       refractor: 3.6.0
 
   react-textarea-autosize@8.5.3(@types/react@18.3.1)(react@17.0.2):
@@ -31440,6 +31549,10 @@ snapshots:
   use-sync-external-store@1.2.0(react@18.2.0):
     dependencies:
       react: 18.2.0
+
+  use-sync-external-store@1.2.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
 
   util-deprecate@1.0.2: {}
 

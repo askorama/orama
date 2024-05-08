@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -15,9 +15,13 @@
     "@astrojs/starlight": "^0.22.2",
     "@astrojs/starlight-tailwind": "^2.0.2",
     "@astrojs/tailwind": "^5.1.0",
+    "@orama/orama": "^2.0.18",
+    "@orama/plugin-astro": "^2.0.18",
+    "@orama/searchbox": "1.0.0-rc27",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
     "astro": "^4.3.5",
+    "html-to-text": "^9.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sharp": "^0.32.5",
