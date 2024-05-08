@@ -1,6 +1,8 @@
 ---
 title: Custom Search Priority
 ---
+import { Aside } from '@astrojs/starlight/components';
+
 
 Custom search priority is a merchandising feature that lets you control which search results should be boosted or penalized during a search. This can be especially useful for e-commerce sites. For instance, when a user searches for "t-shirt", you might want to prioritize a new item over an older one.
 
@@ -56,11 +58,11 @@ Orama will utilize these numbers during the sorting process. So, when it's time 
 
 For example, when a user searches for "red jacket", and these two documents each have a score of `4.9`, the first document's score will be multiplied by `2`, yielding a total score of `9.8`. The second document's score, however, will be multiplied by `0.5`, resulting in a final score of `2.45`.
 
-::: warning
+<Aside type="caution">
 Please note that `_omc` is a reserved property in the Orama schema, and you don't need to manually define it. \
 If Orama finds it inside your document, it will use it for scoring your document at sort-time. \
 If `_omc` is not found, no multiplier coefficent will be used for that document.
-:::
+</Aside>
 
 ## Production usage examples
 
@@ -70,7 +72,7 @@ For instance, on a documentation website, you could assign a low `omc` value to 
 
 An intriguing example is the **JSR** (**JavaScript Registry**), a fresh alternative to the **NPM** JavaScript package registry. It's powered by both **Deno** and **Orama**!
 
-<ZoomImg
+<img
   src='/cloud/guides/custom-search-priority/deno-jsr-orama.png'
   alt='An example package on JSR with a 100% quality score'
 />

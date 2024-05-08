@@ -1,6 +1,7 @@
 ---
 title: Automatic embeddings generation
 ---
+import { Aside } from '@astrojs/starlight/components';
 
 With Orama Cloud, you can automatically generate embeddings from your data at deployment.
 
@@ -26,14 +27,14 @@ To perform vector and hybrid searches on your data using the **Orama Native Embe
 
 When creating or editing an index, simply select an Orama embedding model. This will automatically generate embeddings from your data:
 
-<ZoomImg
+<img
   src='/cloud/guides/automatic-embeddings-generation/orama-native-embeddings.png'
   alt='Automatic embeddings generation via Orama Native Embeddings'
 />
 
 Indexes that have automatic embeddings generation enabled will display the icon and the name of the used model in the index list:
 
-<ZoomImg
+<img
   src='/cloud/guides/automatic-embeddings-generation/orama-native-embeddings-label.png'
   alt='Automatic embeddings generation via Orama Native Embeddings, list view'
 />
@@ -44,10 +45,10 @@ If you prefer to use OpenAI's models, the following section will guide you throu
 
 ### Connecting to OpenAI
 
-::: info
+<Aside type="note">
 To use this feature, you will need an OpenAI account and an OpenAI API Key.
 We will support more providers soon.
-:::
+</Aside>
 
 Before you can start generating embeddings, you need to connect to OpenAI. This requires adding an OpenAI API Key to Orama Cloud.
 
@@ -55,14 +56,14 @@ We will encrypt this API Key and store it securely. For safety reasons, we recom
 
 As soon as you have your OpenAI API Key ready, you can add it to Orama Cloud by going to [https://cloud.oramasearch.com/developer-tools](https://cloud.oramasearch.com/developer-tools), and selecting "OpenAI API key" from the left menu.
 
-<ZoomImg
+<img
   src='/cloud/guides/automatic-embeddings-generation/automatic-embeddings-generation.png'
   alt='Adding OpenAI API Key to Orama Cloud'
 />
 
 After adding your API key, you won't be able to view it again for security reasons. While you can delete it, this is not recommended as all operations dependent on vector search will cease to function. Alternatively, you may choose to replace it with a new key.
 
-<ZoomImg
+<img
   src='/cloud/guides/automatic-embeddings-generation/open-ai-api-key.png'
   alt='Your OpenAI API Key'
 />
@@ -75,14 +76,14 @@ You can download the same JSON file here: [download dataset](/cloud/guides/examp
 
 Once you have your dataset ready, you can create a new Index:
 
-<ZoomImg
+<img
   src='/cloud/guides/automatic-embeddings-generation/new-index.png'
   alt='Creating a new index on Orama Cloud'
 />
 
 After uploading the file, you can enable the **Automatic Embeddings Generation** feature. This feature will scan the `"string"` properties in your schema and automatically select them to generate embeddings. You can always select or deselect different properties as needed.
 
-<ZoomImg
+<img
   src='/cloud/guides/automatic-embeddings-generation/enable-orama-ai.png'
   alt='Enablin Orama AI on Orama Cloud'
 />

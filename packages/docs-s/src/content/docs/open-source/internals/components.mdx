@@ -1,6 +1,7 @@
 ---
 title: Components
 ---
+import { Aside } from '@astrojs/starlight/components';
 
 Orama can be completely customized and extended by using its components architecture.
 
@@ -66,7 +67,7 @@ The tokenizer is used to tokenize documents fields and search terms. To customiz
 - `language` (string): The language supported by the tokenizer.
 - `normalizationCache` (Map): It can used to cache tokens normalization.
 
-<Callout type="warning">The `tokenize` function **CANNOT** be async.</Callout>
+<Aside type="caution">The `tokenize` function **CANNOT** be async.</Aside>
 
 In other words, a tokenizer must satisfy the following interface:
 
@@ -533,10 +534,10 @@ This also implies that when you invoke this function you should always use `awai
 
 If your component needs to store some data in the orama database, you have to add a new field in the `Data` interface in `src/types.ts`.
 
-<Callout type="warning">
+<Aside type="caution">
 To avoid compatibility problems, only modify the data in the new field you define.
 Any component functions should accept the data as first argument instead of the full database if possible.
-</Callout>
+</Aside>
 
 Example:
 
@@ -563,7 +564,7 @@ interface Data<I extends OpaqueIndex, D extends OpaqueDocumentStore> {
 
 Create a file (or folder if appropriate) under the `src/components` folder with appropriate exports.
 
-<Callout type="warning">Remember to export both individual functions and the default object (or creation factory function) to allow users to compose different components.</Callout>
+<Aside type="caution">Remember to export both individual functions and the default object (or creation factory function) to allow users to compose different components.</Aside>
 
 Example (`../components/shiningDetector.js`):
 
@@ -616,7 +617,7 @@ export async function create({ schema, language, components }: CreateArguments):
 
 Call your component's functions where appropriate!
 
-<Callout type="info">Yes, we know the example below is completely useless and silly. 😁</Callout>
+<Aside>Yes, we know the example below is completely useless and silly. 😁</Aside>
 
 Example:
 

@@ -13,6 +13,18 @@ summary {
   }
 }
 
+.sl-markdown-content ul,
+.sl-markdown-content ul li {
+  list-style-type: disc;
+  padding: revert;
+}
+
+.sl-markdown-content ol,
+.sl-markdown-content ol li {
+  list-style-type: decimal;
+  padding: revert;
+}
+
 h1,
 h2,
 h3,

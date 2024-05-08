@@ -1,6 +1,7 @@
 ---
 title: Data Persistence
 ---
+import { Aside } from '@astrojs/starlight/components';
 
 The `plugin-data-persistence` plugin allows you to persist your Orama database to disk or in-memory
 and restore it later.
@@ -76,10 +77,10 @@ await search(newInstance, {
 
 ## Persisting the database to disk (server usage)
 
-<Callout type="warning">
+<Aside type="caution">
   The following methods are meant for server-side usage only and will throw an exception when used on browsers and runtimes without
   a Node.js-compatible `fs` module.
-</Callout>
+</Aside>
 
 Now we have a Orama instance containing three quotes. We can use the
 `plugin-data-persistence` plugin to save the database to a file:

@@ -175,6 +175,9 @@ importers:
       sharp:
         specifier: ^0.32.5
         version: 0.32.6
+      starlight-image-zoom:
+        specifier: ^0.3.0
+        version: 0.3.0(@astrojs/starlight@0.22.2(astro@4.7.1(@types/node@20.11.19)(terser@5.17.7)(typescript@5.4.5)))
       tailwindcss:
         specifier: ^3.4.3
         version: 3.4.3(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.4.5))
@@ -11847,6 +11850,12 @@ packages:
   standard-engine@15.1.0:
     resolution: {integrity: sha512-VHysfoyxFu/ukT+9v49d4BRXIokFRZuH3z1VRxzFArZdjSCFpro6rEIU3ji7e4AoAtuSfKBkiOmsrDqKW5ZSRw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+
+  starlight-image-zoom@0.3.0:
+    resolution: {integrity: sha512-m2B+JUs+5S443rgSyvcq8XO7Ax8yFGgPsDvoXg0JzCmJXleyz43WSOzvGiLF/Z7sCIWDNqCmbZFecOXYwOxHwQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@astrojs/starlight': '>=0.20.0'
 
   state-toggle@1.0.3:
     resolution: {integrity: sha512-d/5Z4/2iiCnHw6Xzghyhb+GcmF89bxwgXG60wjIiZaxnymbyOmI8Hk4VqHXiVVp6u2ysaskFfXg3ekCj4WNftQ==}
@@ -30068,6 +30077,13 @@ snapshots:
       minimist: 1.2.8
       pkg-conf: 3.1.0
       xdg-basedir: 4.0.0
+
+  starlight-image-zoom@0.3.0(@astrojs/starlight@0.22.2(astro@4.7.1(@types/node@20.11.19)(terser@5.17.7)(typescript@5.4.5))):
+    dependencies:
+      '@astrojs/starlight': 0.22.2(astro@4.7.1(@types/node@20.11.19)(terser@5.17.7)(typescript@5.4.5))
+      rehype-raw: 7.0.0
+      unist-util-visit: 5.0.0
+      unist-util-visit-parents: 6.0.1
 
   state-toggle@1.0.3: {}
 

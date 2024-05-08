@@ -1,7 +1,7 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import react from "@astrojs/react";
-
+import starlightImageZoom from "starlight-image-zoom";
 import tailwind from "@astrojs/tailwind";
 
 // https://astro.build/config
@@ -9,6 +9,7 @@ export default defineConfig({
   site: "https://docs.oramasearch.com",
   integrations: [
     starlight({
+      plugins: [starlightImageZoom()],
       title: "Orama Docs",
       description: "Search, everywhere",
       social: {
@@ -373,6 +374,7 @@ export default defineConfig({
         baseUrl: "https://github.com/askorama/orama/edit/main/packages/docs",
       },
     }),
+
     react(),
     tailwind({ applyBaseStyles: false }),
   ],

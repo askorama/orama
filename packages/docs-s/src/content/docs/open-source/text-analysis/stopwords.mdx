@@ -1,17 +1,19 @@
 ---
 title: Stop-words
 ---
+import { Aside } from '@astrojs/starlight/components';
 
-::: info What are stopwords?
+
+
+<Aside title='What are stopwords?'>
 The words which are generally filtered out before processing a natural language are called **stop words**. These are
 actually the most common words in any language (like articles, prepositions, pronouns, conjunctions, etc) and does not
 add much information to the text. Examples of a few stop words in English are “the”, “a”, “an”, “so”, “what”.
-:::
+</Aside>
 
-::: warning
+<Aside type="caution">
 Note that as of Orama 1.0.7, stop-words are shipped via a separate `@orama/stopwords` package.
-:::
-
+</Aside>
 Orama provides support for stop-words removal via the `@orama/stopwords` package.
 
 ```bash copy

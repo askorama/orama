@@ -61,8 +61,9 @@ await insert(db, {
 Given the points above, we can picture them on a map as follows:
 
 <br />
-<iframe src="https://www.google.com/maps/d/u/1/embed?mid=17HjdYi0C1MS7Zi8nBmJu1mE3kVzG3gk&ehbc=2E312F&noprof=1" width="100%" height="480" /> 
-<br />
+<iframe src="https://www.google.com/maps/d/u/1/embed?mid=17HjdYi0C1MS7Zi8nBmJu1mE3kVzG3gk&ehbc=2E312F&noprof=1" width="100%" style="height: 480px" /> 
+
+
 To avoid confusion, please note that Orama is a full-text and vector search library. We do not provide the tools to draw on maps.
 
 Now that we have some data, let's see how we can perform geosearch queries.
@@ -110,9 +111,10 @@ The geopoint `{ lat: 45.4648, lon: 9.18998 }` represents the entrance of the **V
 
 If we follow the configuration above, we are asking Orama to return all the documents that are within 100 meters from the Gallery, as shown in the following map:
 
-<br />
-<iframe src="https://www.google.com/maps/d/u/1/embed?mid=1VHfh2Dd7JVT2xCBNl1aBktxt4qag2vk&ehbc=2E312F&noprof=1" width="100%" height="480" />
-<br />
+
+
+<iframe src="https://www.google.com/maps/d/u/1/embed?mid=1VHfh2Dd7JVT2xCBNl1aBktxt4qag2vk&ehbc=2E312F&noprof=1" width="100%" style="height: 480px"  />
+
 
 The query above will return only one result indeed: the **Piazza Duomo** document.
 
@@ -165,9 +167,9 @@ const searchResult = await search(db, {
 
 If we try to draw the polygon above on our map, we will get the following result:
 
-<br />
-<iframe src="https://www.google.com/maps/d/u/1/embed?mid=1RbUtX13X4WXI4VH46P2nuwomvkxk7Ds&ehbc=2E312F&noprof=1" width="100%" height="480"></iframe>
-<br />
+
+<iframe src="https://www.google.com/maps/d/u/1/embed?mid=1RbUtX13X4WXI4VH46P2nuwomvkxk7Ds&ehbc=2E312F&noprof=1" width="100%" style="height: 480px" ></iframe>
+
 
 The query above will return only one result: **Piazza Duomo**. This is because it will filter all the documents inside the polygon whose `name` property contains the term `"Duomo"`.
 
