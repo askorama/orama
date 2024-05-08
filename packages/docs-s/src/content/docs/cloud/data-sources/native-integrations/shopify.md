@@ -1,0 +1,114 @@
+---
+title: Connect Orama Cloud to Shopify
+---
+
+Orama Cloud integrates natively with Shopify via the **official Orama data source**. \
+This guide will walk you through the steps to connect your Shopify store to Orama Cloud.
+
+You will need to have a Shopify account to use this integration. If you don't have one, you'll be able to create one during the installation process.
+
+This integration is compatible with the **Orama Free plan**. You don't need a credit card to use it.
+
+## Requirements
+
+To connect your Shopify store to Orama Cloud, you will need to have a Shopify account and a Shopify pro plan.
+
+If you already have a Shopify account and storefront, you can use it. If you don't have one, you'll be able to create one during the installation process.
+
+In this guide, we will show you how to get the following required data from Shopify:
+
+- **Shopify Access Token** \
+  Learn how to get your Shopify access token [here](#getting-your-shopify-access-token).
+- **Shopify Shop Domain** \
+  Your Shopify store subdomain in the following format: `[your-shopify-store-subdomain].myshopify.com`
+
+Once you have these two pieces of information, you will be able to connect your Shopify store to Orama Cloud.
+
+## Getting your Shopify Access Token
+
+A Shopify access token is utilized to validate requests made to the Shopify API, ensuring secure interaction with the API.
+
+Orama will employ your Shopify access token with read-only access to retrieve and index your store data in Orama Cloud.
+
+You can follow the [official Shopify documentation](https://shopify.dev/docs/apps/auth/admin-app-access-tokens) to generate a private app and get your access token.
+
+As an alternative, you can install the official [headless](https://apps.shopify.com/headless) app, which will simplify the process of generating a private app and getting your access token:
+
+<ZoomImg
+  src='/cloud/guides/shopify/headless-app.webp'
+  alt='Shopify Headless App'
+/>
+
+Clicking on "Install" will take you to the installation process. Click on "Add to sales channel" to finally install the app:
+
+<ZoomImg
+  src='/cloud/guides/shopify/headless-app-installation.webp'
+  alt='Shopify Headless App installation process'
+/>
+
+Now you need to create a new storefront. Click on "Create storefront":
+
+<ZoomImg
+  src='/cloud/guides/shopify/headless-app-create-storefront.webp'
+  alt='Shopify Headless App create storefront'
+/>
+
+Now that you created a new storefront, you will be presented with the following screen.
+
+In the "Storefront API" section, click on "Manage" to access your storefront API settings.
+
+<ZoomImg
+  src='/cloud/guides/shopify/headless-app-storefront-created.webp'
+  alt='Shopify Headless App storefront API'
+/>
+
+You can finally copy the access token from the "Public access token" field:
+
+<ZoomImg
+  src='/cloud/guides/shopify/headless-app-access-token.webp'
+  alt='Shopify Headless App copy access token'
+/>
+
+If you need to refer to the public access token again, you can go to `https://[your-shopify-store-subdomain].myshopify.com/admin/headless_storefronts`.
+
+## Connecting Shopify to Orama
+
+Now that you have your Shopify access token, you can create an index on Orama Cloud.
+
+To do that, go to your [dashboard](https://cloud.oramasearch.com/indexes) and click on "Create new":
+
+<ZoomImg
+  src='/cloud/guides/shopify/orama-new-index.webp'
+  alt='Create new Orama index'
+/>
+
+Select "Shopify" as the data source, add a new name for your index, and click on "Create index":
+
+<ZoomImg
+  src='/cloud/guides/shopify/orama-new-index-shopify.webp'
+  alt='Create new Orama index with Shopify'
+/>
+
+Now you need to add your Shopify access token and shop domain to your index:
+
+<ZoomImg
+  src='/cloud/guides/shopify/orama-new-index-shopify-feed.webp'
+  alt='Feed your Orama index'
+/>
+
+Once you click on "Save and deploy", Orama will start indexing your Shopify store data.
+
+<ZoomImg
+  src='/cloud/guides/shopify/orama-deployed.webp'
+  alt='Index deployed'
+/>
+
+Congrats! You have successfully connected your Shopify store to Orama Cloud. From now on, Orama will check your Shopify store for updates every minute.
+
+## Integrating Orama Cloud into your app
+
+Now that you have your index deployed, you can start using it in your app.
+
+Orama Cloud provides an official SDK for JavaScript that runs on every JavaScript runtime. You can use it to query your data.
+
+To learn more about the SDK, check out the [documentation](/cloud/integrating-orama-cloud/javascript-sdk).

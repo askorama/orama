@@ -1,0 +1,14 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+
+import MobileMenuFooter from '@astrojs/starlight/components/MobileMenuFooter.astro';
+import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
+
+
+const sidebar = (Astro.props.sidebar.filter(k => Astro.props.slug.startsWith("open-source") ? k.label === "open-source" : k.label === "cloud")[0] as any).entries
+
+---
+<SidebarSublist sublist={sidebar} />
+<div class="md:sl-hidden">
+	<MobileMenuFooter {...Astro.props} />
+</div>

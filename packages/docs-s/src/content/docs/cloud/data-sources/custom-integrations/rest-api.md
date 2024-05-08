@@ -1,0 +1,52 @@
+---
+title: Connect Orama Cloud to a REST API
+---
+
+Another way to use Orama and get your data indexed is to import the data using your own REST API.
+
+In this example I will be using a project I created that already has an API endpoint at: [https://letsplayretro.games/api/nes/all](https://letsplayretro.games/api/nes/all?results=999), this particular endpoint gather all the games for the original [Nintendo Entertainment System](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) into one nice JSON structure.
+
+To start indexing this data let's go into the dashboard and click on `Add a new Index` and then on `HTTP Integrations`:
+
+<ZoomImg
+  src='/cloud/guides/rest/1.png'
+  alt='Click on the button saying Add a new index'
+/>
+
+You will then will be presented with a page that asks some questions about your new index and like the name and a description that is optional, in my case I named the index it `NES Games` but you may call it anything.
+After that is done you can click on `REST API` and we are ready to create our Index:
+
+<ZoomImg
+  src='/cloud/guides/rest/2.png'
+  alt='Create a new REST Api index with Orama Cloud'
+/>
+
+This page is where we will tell Orama the location of the Endpoint we want it to get the data from, and we want to use the data at [https://letsplayretro.games/api/nes/all](https://letsplayretro.games/api/nes/all?results=999), in our case the endpoint does not require any authorization but if it did this where you could give us a header to send in the request.
+
+The next step is to tell orama where our documents are in the Endpoint's JSON, if you open the endpoint you can see they are all in an array called `games`, so in our path we want to get everything inside of `games`, to represent that in JSONPath we write `$.games.*`.
+
+Final step before we deploy our Index is to specify the properties that Orama should consider when performing a search.
+This doesn't mean that these properties will be the only ones returned, but rather that when searching for a specific term like "mario", Orama will only search within these properties.
+In our case, we only want to use the `name` property, which is a string. Let's add that and we will be ready to deploy our index:
+
+<ZoomImg
+  src='/cloud/guides/rest/3.png'
+  alt='Deploy your index'
+/>
+
+After waiting a bit we should get back a success message and our API Key and Endpoint that we can use within our app.
+
+<ZoomImg
+  src='/cloud/guides/rest/4.png'
+  alt='Deployed index'
+/>
+
+That's it! We have deployed an index with a REST API datasource
+
+## Integrating Orama Cloud into your app
+
+Now that you have your index deployed, you can start using it in your app.
+
+Orama Cloud provides an official SDK for JavaScript that runs on every JavaScript runtime. You can use it to query your data.
+
+To learn more about the SDK, check out the [documentation](/cloud/integrating-orama-cloud/javascript-sdk).
