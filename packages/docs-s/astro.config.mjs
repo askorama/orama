@@ -12,6 +12,58 @@ export default defineConfig({
       plugins: [starlightImageZoom()],
       title: "Orama Docs",
       description: "Search, everywhere",
+      favicon: "/favicon.png",
+      head: [
+        {
+          tag: "link",
+          attrs: {
+            rel: "apple-touch-icon",
+            sizes: "180x180",
+            href: "/apple-touch-icon.png",
+          },
+        },
+        {
+          tag: "link",
+          attrs: {
+            rel: "icon",
+            type: "image/png",
+            sizes: "32x32",
+            href: "/favicon-32x32.png",
+          },
+        },
+        {
+          tag: "link",
+          attrs: {
+            rel: "icon",
+            type: "image/png",
+            sizes: "16x16",
+            href: "/favicon-16x16.png",
+          },
+        },
+        {
+          tag: "link",
+          attrs: {
+            rel: "mask-icon",
+            href: "/safari-pinned-tab.svg",
+            color: "#3a0839",
+          },
+        },
+        {
+          tag: "meta",
+          attrs: { name: "theme-color", content: "#000" },
+        },
+        {
+          tag: "script",
+          attrs: {
+            async: "",
+            src: "https://www.googletagmanager.com/gtag/js?id=G-V30F6HTKBF",
+          },
+        },
+        {
+          tag: "script",
+          content: `window.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag('js', new Date());\ngtag('config', 'G-V30F6HTKBF');`,
+        },
+      ],
       social: {
         github: "https://github.com/oramasearch/orama",
         slack: "https://orama.to/slack",
