@@ -3,27 +3,9 @@ import React, { useEffect, useState } from "react";
 import { createOramaIndex } from "./utils/index.js";
 import { SearchBox, SearchButton } from "@orama/searchbox/dist/index.js";
 
-export type OramaSearchProps = {
-  limitResults: number;
-  boost: {
-    title: number;
-    description: number;
-    content: number;
-  };
-};
-
 const indexes = {};
 
-const defaultProps: OramaSearchProps = {
-  limitResults: 30,
-  boost: {
-    title: 2,
-    description: 1,
-    content: 1,
-  },
-};
-
-export function OramaSearch(props = defaultProps) {
+export function OramaSearch(props) {
   const router = useRouter();
 
   return router?.isReady ? (
@@ -31,10 +13,10 @@ export function OramaSearch(props = defaultProps) {
   ) : null;
 }
 
-function OramaSearchPlugin({ router, ...props }) {
+function OramaSearchPlugin({ router }) {
   const [, setIndexing] = useState(false);
 
-  const { basePath, locale = "en-US", asPath } = router;
+  const { basePath, locale = "en-US" } = router;
 
   // As soon as the page loads, we create the index on the client-side
   useEffect(() => {
