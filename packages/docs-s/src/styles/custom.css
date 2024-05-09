@@ -13,6 +13,11 @@ summary {
   }
 }
 
+.sl-markdown-content starlight-tabs ul li,
+.sl-markdown-content starlight-tabs ul {
+  @apply list-none m-0 p-0;
+}
+
 .sl-markdown-content ul,
 .sl-markdown-content ul li {
   list-style-type: disc;

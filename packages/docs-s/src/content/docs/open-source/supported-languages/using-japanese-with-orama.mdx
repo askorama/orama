@@ -1,25 +1,23 @@
 ---
 title: Using Japanese with Orama
 ---
+import Install from '../../../../components/Install.astro'
+import {Aside} from '@astrojs/starlight/components'
 
 At the time of writing, Orama supports Japanese via a custom tokenizer, which is part of the `@orama/tokenizers` package.
 
-:::warning
+<Aside type="caution">
 The Japanese tokenizer is a compiled WASM from the [lindera](https://github.com/lindera-morphology/lindera) Rust project.
 It can be quite large and its usage on the browser is discouraged.
-:::
+</Aside>
 
 To get started, make sure to install all the dependencies you need:
 
-```sh
-npm i @orama/orama @orama/tokenizers
-```
+<Install pkg="@orama/orama @orama/tokenizers" />
 
 If you want to add Japanese stop-words as well, install the `@orama/stopwords` package too:
 
-```sh
-npm i @orama/stopwords
-```
+<Install pkg="@orama/stopwords" />
 
 Now you're ready to get started with Orama:
 

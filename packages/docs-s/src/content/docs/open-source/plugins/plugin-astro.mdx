@@ -1,6 +1,8 @@
 ---
 title: Astro plugin
 ---
+import { Code } from '@astrojs/starlight/components';
+import Install from '../../../../components/Install.astro'
 
 The plugin-astro plugin allows you to index the content of your Astro websites and offer text search to your visitors.
 
@@ -8,9 +10,7 @@ The plugin-astro plugin allows you to index the content of your Astro websites a
 
 You can install the plugin using any major Node.js package manager:
 
-```sh
-npm i @orama/plugin-astro
-```
+<Install pkg="@orama/plugin-astro" />
 
 ## Usage
 
@@ -19,9 +19,7 @@ There are two main aspects to consider when using this plugin:
 - DB generation
 - Loading DBs & performing searches
 
-```javascript copy
-// In `astro.config.mjs`
-import orama from "@orama/plugin-astro";
+<Code code={`import orama from "@orama/plugin-astro";
 
 // https://astro.build/config
 export default defineConfig({
@@ -41,8 +39,7 @@ export default defineConfig({
       },
     }),
   ],
-});
-```
+});`} lang="js" title={`astro.config.mjs`} />
 
 When running the `astro build` command, a new DB file will be persisted in the `dist/assets` directory. For the particular case of this example, it will be saved in the file `dist/assets/oramaDB_mydb.json`.
 

@@ -23,7 +23,7 @@ There are two main aspects to consider when using this plugin:
 
 ```javascript copy
 // In `astro.config.mjs`
-import orama from '@orama/plugin-astro'
+import orama from "@orama/plugin-astro";
 
 // https://astro.build/config
 export default defineConfig({
@@ -35,15 +35,15 @@ export default defineConfig({
         pathMatcher: /blog\/[0-9]{4}\/[0-9]{2}\/[0-9]{2}\/.+$/,
 
         // Optional. 'english' by default
-        language: 'spanish',
+        language: "spanish",
 
         // Optional. ['body'] by default. Use it to constraint what is used to
         // index a page.
-        contentSelectors: ['h1', 'main'],
+        contentSelectors: ["h1", "main"],
       },
     }),
   ],
-})
+});
 ```
 
 When running the `astro build` command, a new DB file will be persisted in the `dist/assets` directory. For the particular case of this example, it will be saved in the file `dist/assets/oramaDB_mydb.json`.

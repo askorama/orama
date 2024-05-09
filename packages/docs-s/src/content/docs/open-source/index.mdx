@@ -1,6 +1,8 @@
 ---
 title: Getting Started with Orama
 ---
+import Install from '../../../components/Install.astro'
+import {Code} from '@astrojs/starlight/components'
 
 Orama is a fast, batteries-included, full-text and vector search engine entirely written in TypeScript, with zero dependencies. <br /><br />
 
@@ -54,14 +56,11 @@ A JavaScript runtime is the **only** requirement. Orama has been designed to wor
 
 You can install Orama using npm, yarn, pnpm:
 
-```sh
-npm i @orama/orama
-```
+<Install pkg="@orama/orama" />
 
 Or import it directly in a browser module:
 
-```html copy
-<html>
+<Code title='index.html' code={`<html>
   <body>
     <script type="module">
       import {
@@ -73,8 +72,7 @@ Or import it directly in a browser module:
       // ...
     </script>
   </body>
-</html>
-```
+</html>`} lang="html"/>
 
 ## Basic usage
 
