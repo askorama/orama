@@ -5,7 +5,6 @@ import { HighlightedDocument } from "./HighlightedDocument.js";
 import { Result, TypedDocument } from "@orama/orama";
 import { NextraOrama } from "../utils/index.js";
 import { Position } from "@orama/plugin-match-highlight";
-import useHover from "../utils/useHover.js";
 
 export const SearchResult = ({ document, positions }) => {
   const [hovered, setHovered] = useState(false);

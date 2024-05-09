@@ -1,9 +1,10 @@
 import { useRouter } from "next/router.js";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export const useFocus = ({ inputRef }) => {
   const { asPath } = useRouter();
   const [hasFocus, setHasFocus] = useState(false);
+
   // If the user presses ESC, we close the search box
   useEffect(() => {
     if (document.activeElement === inputRef.current) {
