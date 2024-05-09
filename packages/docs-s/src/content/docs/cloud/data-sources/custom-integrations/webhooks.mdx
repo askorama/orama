@@ -65,7 +65,7 @@ You can use the **snapshot** API to bulk update the live index:
 <Tabs>
 <TabItem label="cURL">
 
-```bash [cURL]
+```bash
 curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/snapshot \
   -H "authorization: Bearer $PRIVATE_API_KEY" ]
   -d '[ { "id": "1", "name": "John Doe", "age": 30 }, { "id": "2", "name": "Jane Doe", "age": 25 } ]'
