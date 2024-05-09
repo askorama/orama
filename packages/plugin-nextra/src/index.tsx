@@ -46,8 +46,7 @@ function OramaSearchPlugin({ router }) {
         backdrop
         colorScheme="system"
         resultsMap={{
-          path: "url",
-          description: "content",
+          description: "description",
         }}
       />
       <SearchButton colorScheme="system" />

@@ -6,8 +6,8 @@ export type NextraOrama = Orama<typeof defaultSchema>;
 const defaultSchema = {
   id: "string",
   title: "string",
-  url: "string",
-  content: "string",
+  path: "string",
+  description: "string",
 } as const;
 
 export async function createOramaIndex(basePath, locale): Promise<NextraOrama> {
@@ -24,15 +24,14 @@ export async function createOramaIndex(basePath, locale): Promise<NextraOrama> {
   const documents: TypedDocument<NextraOrama>[] = [];
 
   for (const path of paths) {
-    const url = path;
     const title = data[path].title;
-    const content = data[path].data[""];
+    const description = data[path].data[""];
 
     documents.push({
-      id: url,
+      id: path,
       title,
-      url,
-      content,
+      path,
+      description,
     });
 
     const sectionData = data[path].data;
@@ -40,13 +39,13 @@ export async function createOramaIndex(basePath, locale): Promise<NextraOrama> {
 
     for (const sectionTitle in sectionData) {
       const [hash, title] = sectionTitle.split("#");
-      const content = sectionData[sectionTitle];
+      const description = sectionData[sectionTitle];
 
       documents.push({
-        id: `${url}#${hash}`,
+        id: `${path}#${hash}`,
         title,
-        url: `${url}#${hash}`,
-        content,
+        path: `${path}#${hash}`,
+        description,
       });
     }
   }
