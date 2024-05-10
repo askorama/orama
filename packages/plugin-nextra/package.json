@@ -1,6 +1,6 @@
 {
   "name": "@orama/plugin-nextra",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Nextra plugin for local search powered by orama",
   "keywords": [
     "orama",
@@ -24,7 +24,6 @@
   ],
   "scripts": {
     "build": "swc --delete-dir-on-start --extensions .ts,.tsx,.cts -d dist src",
-    "postbuilda": "tsc -p . --emitDeclarationOnly",
     "lint": "eslint src --ext .js,.ts,.cts"
   },
   "dependencies": {

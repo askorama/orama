@@ -554,11 +554,11 @@ importers:
   packages/plugin-nextra:
     dependencies:
       '@orama/orama':
-        specifier: workspace:*
-        version: link:../orama
+        specifier: 2.0.18
+        version: 2.0.18
       '@orama/plugin-match-highlight':
-        specifier: workspace:*
-        version: link:../plugin-match-highlight
+        specifier: 2.0.18
+        version: 2.0.18
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -3451,11 +3451,18 @@ packages:
     resolution: {integrity: sha512-9C11pL4kE2wdfsngnOwaZ4Hh5x76EI8KUQEf0DoxU4E/ytE8u8utFeisJIbaSMyjVofRvmWUyXeDzxFNnkhvvw==}
     engines: {node: '>= 16.0.0'}
 
+  '@orama/orama@2.0.18':
+    resolution: {integrity: sha512-KSty7+r8JxXv3iCuhLqQfwMvUiSWnXPaTPQPPoVPpwdvynEKcp1JNWKzTMB2tISDggf8jKhQXHEP3QXlGkvvtA==}
+    engines: {node: '>= 16.0.0'}
+
   '@orama/plugin-analytics@2.0.12':
     resolution: {integrity: sha512-zI1FWdMCgvk7XHdJzDqyNMDfMbNt2fe7WKOFWBMbWvRx+EFUiLGyRZtMlvXVSWeGqMetYjM+fPqamSn4VDi0Ug==}
 
   '@orama/plugin-analytics@2.0.15':
     resolution: {integrity: sha512-R8ixYIi6vCHwKbu/pW1gy2td3Wg8pHQkrkjiHOiQHta+IwNF8RPTjSKBJPpFlcPtZU7oNEJDrvVp7zpX88Q1bg==}
+
+  '@orama/plugin-match-highlight@2.0.18':
+    resolution: {integrity: sha512-Xe+K+HzkB/SqZwHJ0ItSPt9fEyF1WTATAFhgBTwi5U+JSnOF3gvM5lbcIWFEUVaC8oWc2CCsUJLinWHPFh3xVQ==}
 
   '@orama/plugin-secure-proxy@2.0.15':
     resolution: {integrity: sha512-EwPPqMVFr7p2dv1UIINjaQEqQ7BIf71wWG3EjD6Gme7CX0NjV0gs3p4jkOPrnvS5zJ5CPiFbn4bCvYLWe6uhWg==}
@@ -17170,6 +17177,8 @@ snapshots:
 
   '@orama/orama@2.0.15': {}
 
+  '@orama/orama@2.0.18': {}
+
   '@orama/plugin-analytics@2.0.12':
     dependencies:
       '@orama/orama': 2.0.12
@@ -17177,6 +17186,10 @@ snapshots:
   '@orama/plugin-analytics@2.0.15':
     dependencies:
       '@orama/orama': 2.0.15
+
+  '@orama/plugin-match-highlight@2.0.18':
+    dependencies:
+      '@orama/orama': 2.0.18
 
   '@orama/plugin-secure-proxy@2.0.15(typescript@5.4.5)':
     dependencies:
@@ -17272,7 +17285,7 @@ snapshots:
 
   '@oramacloud/client@1.0.4(typescript@5.0.3)':
     dependencies:
-      '@orama/orama': 2.0.12
+      '@orama/orama': 2.0.18
       '@paralleldrive/cuid2': 2.2.2
       react: 18.3.1
       vue: 3.3.10(typescript@5.0.3)
