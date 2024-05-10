@@ -90,7 +90,7 @@ function formatForOrama(data: Array<ParserResult>, base: string): Array<OramaSch
     return data.map((res) => ({
       title: res.title,
       content: res.content,
-      section: firstH1Header!.title.replace(/\s$/, ''),
+      section: (firstH1Header?.title || "").replace(/\s$/, ""),
       path: base + res?.path + '#' + slugify.default(res.title, { lower: true }),
       category: ''
     }))
