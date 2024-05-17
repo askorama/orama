@@ -1,33 +1,32 @@
 {
-  "name": "@orama/docs",
-  "version": "2.0.18",
-  "description": "Documentation for Orama",
-  "private": true,
+  "name": "docs-s",
   "type": "module",
+  "version": "0.0.1",
   "scripts": {
-    "dev": "vitepress dev",
-    "build": "vitepress build",
-    "preview": "vitepress preview"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
   "dependencies": {
-    "@orama/orama": "workspace:*",
-    "@orama/plugin-data-persistence": "workspace:*",
-    "@orama/plugin-vitepress": "workspace:*",
-    "@orama/searchbox": "1.0.0-beta.12",
-    "@vitejs/plugin-vue": "^4.5.1",
-    "jsdom": "^23.0.1",
-    "markdown-it": "^13.0.2",
-    "medium-zoom": "^1.1.0",
-    "slugify": "^1.6.6",
-    "vite": "^4.5.3"
-  },
-  "devDependencies": {
-    "@preact/signals-core": "^1.5.0",
-    "@types/jsdom": "^21.1.6",
-    "@types/markdown-it": "^13.0.7",
-    "vitepress": "1.0.0-rc.31"
-  },
-  "peerDependencies": {
-    "vue": "^3.0.0"
+    "@astrojs/check": "^0.6.0",
+    "@astrojs/react": "^3.3.2",
+    "@astrojs/starlight": "^0.22.2",
+    "@astrojs/starlight-tailwind": "^2.0.2",
+    "@astrojs/tailwind": "^5.1.0",
+    "@orama/orama": "^2.0.18",
+    "@orama/plugin-astro": "^2.0.18",
+    "@orama/searchbox": "1.0.0-rc27",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "astro": "^4.3.5",
+    "html-to-text": "^9.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sharp": "^0.32.5",
+    "starlight-image-zoom": "^0.3.0",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.4.5"
   }
 }
