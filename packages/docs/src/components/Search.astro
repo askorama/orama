@@ -5,19 +5,22 @@
   import { RegisterSearchBox, RegisterSearchButton } from "@orama/searchbox";
   import "@orama/searchbox/dist/index.css";
   import { getOramaDB } from "../../plugins/client";
+
   try {
     const client = await getOramaDB("docs");
     RegisterSearchBox({
       oramaInstance: client,
       backdrop: true,
-      colorScheme: "system",
+      colorScheme: localStorage.getItem("starlight-theme") || "system",
       resultsMap: {
         description: "content",
       },
       setResultTitle: (doc) => doc.title.split("| Orama Docs")[0],
     });
 
-    RegisterSearchButton({ colorScheme: "system" });
+    RegisterSearchButton({
+      colorScheme: localStorage.getItem("starlight-theme") || "system",
+    });
   } catch (error) {
     console.log(error);
   }
