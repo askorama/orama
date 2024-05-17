@@ -7,20 +7,22 @@
   import { getOramaDB } from "../../plugins/client";
 
   try {
+    const userTheme = localStorage.getItem("starlight-theme");
+    const colorTheme = {
+      colorScheme: userTheme !== "auto" ? userTheme : "system",
+    };
     const client = await getOramaDB("docs");
     RegisterSearchBox({
       oramaInstance: client,
       backdrop: true,
-      colorScheme: localStorage.getItem("starlight-theme") || "system",
+      ...colorTheme,
       resultsMap: {
         description: "content",
       },
       setResultTitle: (doc) => doc.title.split("| Orama Docs")[0],
     });
 
-    RegisterSearchButton({
-      colorScheme: localStorage.getItem("starlight-theme") || "system",
-    });
+    RegisterSearchButton(colorTheme);
   } catch (error) {
     console.log(error);
   }
