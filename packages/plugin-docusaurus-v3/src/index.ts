@@ -100,6 +100,7 @@ export default function OramaPluginDocusaurus(
             })
             break
           case 'blogs':
+            if (!value) break;
             const blogsInstances = Object.keys(value)
             blogsInstances.forEach(async (instance) => {
               const loadedInstance = value[instance]
