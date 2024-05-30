@@ -70,7 +70,7 @@ async function loadFileSystem(runtime: Runtime): Promise<FileSystem> {
     /* c8 ignore next 13 */
     case 'deno': {
       // @ts-expect-error Deno allows TS imports
-      const { resolve } = await import('https://deno.land/std/path/mod.ts')
+      const { resolve } = await import(/* webpackIgnore: true */ 'https://deno.land/std/path/mod.ts')
 
       // @ts-expect-error Deno is only available in Deno
       const { cwd, readTextFile: readFile, writeTextFile: writeFile } = Deno

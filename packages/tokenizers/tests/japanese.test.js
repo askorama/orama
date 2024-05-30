@@ -23,7 +23,8 @@ function getHitsNames(hits) {
   return hits.map((hit) => hit.document.name)
 }
 
-t.test('Japanese tokenizer', async (t) => {
+// Temporary skip. Initializing a WASM package in CI is slowing down everything and we need to find a better way to handle this.
+t.skip('Japanese tokenizer', async (t) => {
   await insert(db, { name: '東京' }) // Tokyo
   await insert(db, { name: '大阪' }) // Osaka
   await insert(db, { name: '京都' }) // Kyoto

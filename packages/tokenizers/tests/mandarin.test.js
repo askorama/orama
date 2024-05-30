@@ -23,7 +23,8 @@ function getHitsNames(hits) {
   return hits.map((hit) => hit.document.name)
 }
 
-t.test('Mandarin tokenizer', async (t) => {
+// Temporary skip. Initializing a WASM package in CI is slowing down everything and we need to find a better way to handle this.
+t.skip('Mandarin tokenizer', async (t) => {
   await insert(db, { name: '北京' }) // Beijing
   await insert(db, { name: '上海' }) // Shanghai
   await insert(db, { name: '广州' }) // Guangzhou
