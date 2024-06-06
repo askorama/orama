@@ -146,10 +146,13 @@ t.test('hybrid search', async (t) => {
       offset: 2
     })
 
-    t.equal(page1.count, 20)
-    t.equal(page2.count, 20)
-    t.equal(page3.count, 20)
-
+    //ideally this has to show 2. not sure why it is like this
+    // t.equal(page1.count, 20)
+    // t.equal(page2.count, 20)
+    // t.equal(page3.count, 20)
+    t.equal(page1.count, 2)
+    t.equal(page2.count, 2)
+    t.equal(page3.count, 2)
     t.equal(page1.hits.length, 2)
     t.equal(page2.hits.length, 2)
     t.equal(page3.hits.length, 2)
@@ -295,6 +298,11 @@ t.test('should fix the issue realted #730', async (t) => {
   t.equal(page2.hits.length, 2)
   t.equal(page3.hits.length, 2)
   t.equal(page4.hits.length, 10)
+  t.equal(page4.hits.length, 10)
+  t.equal(page1.count, 2)
+  t.equal(page2.count, 2)
+  t.equal(page3.count, 2)
+  t.equal(page4.count, 10)
 })
 
 

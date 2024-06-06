@@ -108,7 +108,7 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
   const timeEnd = await getNanosecondsTime()
 
   const returningResults = {
-    count: uniqueTokenScores.length,
+    count: uniqueTokenScores.slice(offset, offset+limit).length,
     elapsed: {
       raw: Number(timeEnd - timeStart),
       formatted: await formatNanoseconds(timeEnd - timeStart)
