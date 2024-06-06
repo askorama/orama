@@ -99,7 +99,14 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
     groups = await getGroups<T, ResultDocument>(orama, uniqueTokenScores, params.groupBy)
   }
 
-  const results = (await fetchDocuments(orama, uniqueTokenScores, offset, limit)).filter(Boolean)
+  let results;
+  if (hasFilters) {
+    // keeping offset at 0 as pagination is already applied at intersectFilteredIDs function call above
+    results = (await fetchDocuments(orama, uniqueTokenScores, 0, limit)).filter(Boolean)
+  } else {
+    results = (await fetchDocuments(orama, uniqueTokenScores, offset, limit)).filter(Boolean)
+  }
+
 
   if (orama.afterSearch) {
     await runAfterSearch(orama.afterSearch, orama, params, language, results as any)

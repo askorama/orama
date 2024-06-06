@@ -197,4 +197,93 @@ t.test('hybrid search', async (t) => {
     t.equal(results.hits[0].score, 0.5)
     t.equal(results.hits[1].score, 0.5)
   })
+
+  t.test('testing hybrid search with a combination of \'where\' clause + \'limit\' + \'offset\'. ', async (t) => {
+    const db = await create({
+      schema: {
+        text: 'string',
+        embedding: 'vector[5]',
+        number: 'number',
+        itemId: 'string'
+      } as const
+    })
+
+    await insertMultiple(db, [
+      { text: "hello world", itemId: "1", embedding: [1, 2, 3, 4, 5], number: 1 },
+      { text: "hello there", itemId: "1", embedding: [1, 2, 3, 4, 4], number: 2 },
+      { text: "hello there", itemId: "1", embedding: [1, 2, 3, 4, 4], number: 3 },
+      { text: "hello there", itemId: "1", embedding: [1, 2, 3, 4, 4], number: 4 },
+      { text: "hello there", itemId: "1", embedding: [1, 2, 3, 4, 4], number: 5 },
+      { text: "hello there", itemId: "1", embedding: [1, 2, 3, 4, 4], number: 6 }
+    ]);
+
+    const page1 = await search(db, {
+      mode: 'hybrid',
+      term: 'hello there',
+      where: {
+        itemId: '1'
+      },
+      vector: {
+        property: 'embedding',
+        value: [1, 2, 3, 4, 4],
+      },
+      similarity: 0.5,
+      limit: 2,
+      offset: 0,
+    })
+
+    t.equal(page1.count, 2)
+    t.equal(page1.hits[0].document.itemId, '1')
+    t.equal(page1.hits[0].document.number, 2)
+    t.equal(page1.hits[0].score, 1)
+    t.equal(page1.hits[1].document.itemId, '1')
+    t.equal(page1.hits[1].document.number, 3)
+    t.equal(page1.hits[1].score, 1)
+
+    const page2 = await search(db, {
+      mode: 'hybrid',
+      term: 'hello there',
+      where: {
+        itemId: '1'
+      },
+      vector: {
+        value: [1, 2, 3, 4, 4],
+        property: 'embedding'
+      },
+      similarity: 0.5,
+      limit: 2,
+      offset: 1,
+    })
+
+    t.equal(page2.count, 2)
+    t.equal(page2.hits[0].document.itemId, '1')
+    t.equal(page2.hits[0].document.number, 3)
+    t.equal(page2.hits[0].score, 1)
+    t.equal(page2.hits[1].document.itemId, '1')
+    t.equal(page2.hits[1].document.number, 4)
+    t.equal(page2.hits[1].score, 1)
+
+    const page3 = await search(db, {
+      mode: 'hybrid',
+      term: 'hello there',
+      where: {
+        itemId: '1'
+      },
+      vector: {
+        value: [1, 2, 3, 4, 4],
+        property: 'embedding'
+      },
+      similarity: 0.5,
+      limit: 2,
+      offset: 2,
+    })
+
+    t.equal(page3.count, 2)
+    t.equal(page3.hits[0].document.itemId, '1')
+    t.equal(page3.hits[0].document.number, 4)
+    t.equal(page3.hits[0].score, 1)
+    t.equal(page3.hits[1].document.itemId, '1')
+    t.equal(page3.hits[1].document.number, 5)
+    t.equal(page3.hits[1].score, 1)
+  })
 })
