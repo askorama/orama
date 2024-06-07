@@ -18,7 +18,7 @@ Now you're ready to get started with Orama:
 
 ```js
 import { create, insert, search } from '@orama/orama'
-import { createTokenizer } from '@orama/tokenizers'
+import { createTokenizer } from '@orama/tokenizers/mandarin'
 import { stopwords as mandarinStopwords } from '@orama/stopwords/mandarin'
 
 const db = await create({

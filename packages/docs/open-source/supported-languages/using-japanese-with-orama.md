@@ -23,7 +23,7 @@ Now you're ready to get started with Orama:
 
 ```js
 import { create, insert, search } from '@orama/orama'
-import { createTokenizer } from '@orama/tokenizers'
+import { createTokenizer } from '@orama/tokenizers/japanese'
 import { stopwords as japaneseStopwords } from '@orama/stopwords/japanese'
 
 const db = await create({
