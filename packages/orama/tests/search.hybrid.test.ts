@@ -214,7 +214,8 @@ t.test('hybrid search', async (t) => {
       { text: "hello there", itemId: "1", embedding: [1, 2, 3, 4, 4], number: 3 },
       { text: "hello there", itemId: "1", embedding: [1, 2, 3, 4, 4], number: 4 },
       { text: "hello there", itemId: "1", embedding: [1, 2, 3, 4, 4], number: 5 },
-      { text: "hello there", itemId: "1", embedding: [1, 2, 3, 4, 4], number: 6 }
+      { text: "hello there", itemId: "1", embedding: [1, 2, 3, 4, 4], number: 6 },
+      { text: "random text", itemId: "2", embedding: [1, 2, 3, 4, 4], number: 7 }
     ]);
 
     const page1 = await search(db, {
@@ -232,7 +233,7 @@ t.test('hybrid search', async (t) => {
       offset: 0,
     })
 
-    t.equal(page1.count, 2)
+    t.equal(page1.count, 6)
     t.equal(page1.hits[0].document.itemId, '1')
     t.equal(page1.hits[0].document.number, 2)
     t.equal(page1.hits[0].score, 1)
@@ -255,7 +256,7 @@ t.test('hybrid search', async (t) => {
       offset: 1,
     })
 
-    t.equal(page2.count, 2)
+    t.equal(page2.count, 6)
     t.equal(page2.hits[0].document.itemId, '1')
     t.equal(page2.hits[0].document.number, 3)
     t.equal(page2.hits[0].score, 1)
@@ -278,7 +279,7 @@ t.test('hybrid search', async (t) => {
       offset: 2,
     })
 
-    t.equal(page3.count, 2)
+    t.equal(page3.count, 6)
     t.equal(page3.hits[0].document.itemId, '1')
     t.equal(page3.hits[0].document.number, 4)
     t.equal(page3.hits[0].score, 1)

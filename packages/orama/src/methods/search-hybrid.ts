@@ -83,9 +83,12 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
   const hasFilters = Object.keys(params.where ?? {}).length > 0
   let whereFiltersIDs: InternalDocumentID[] = []
 
+  let uniqueTokenScoresLengthWithAppliedFilters;
   if (hasFilters) {
     whereFiltersIDs = await orama.index.searchByWhereClause(context, index, params.where!)
-    uniqueTokenScores = intersectFilteredIDs(whereFiltersIDs, uniqueTokenScores).slice(offset, offset + limit)
+    uniqueTokenScores = intersectFilteredIDs(whereFiltersIDs, uniqueTokenScores)
+    uniqueTokenScoresLengthWithAppliedFilters = uniqueTokenScores.length;
+    uniqueTokenScores = uniqueTokenScores.slice(offset, offset + limit);
   }
 
   let facetsResults: any
@@ -115,7 +118,7 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
   const timeEnd = await getNanosecondsTime()
 
   const returningResults = {
-    count: uniqueTokenScores.length,
+    count: hasFilters ? uniqueTokenScoresLengthWithAppliedFilters : uniqueTokenScores.length,
     elapsed: {
       raw: Number(timeEnd - timeStart),
       formatted: await formatNanoseconds(timeEnd - timeStart)
