@@ -198,7 +198,7 @@ t.test('hybrid search', async (t) => {
   })
 })
 
-t.test('should fix the issue realted #730', async (t) => {
+t.test('should correctly paginate the results with a where clause', async (t) => {
   const db = await create({
     schema: {
       text: "string",
@@ -294,6 +294,17 @@ t.test('should fix the issue realted #730', async (t) => {
   t.equal(page2.hits.length, 2)
   t.equal(page3.hits.length, 2)
   t.equal(page4.hits.length, 10)
+
+
+  t.equal(page1.hits[0].document.number, 2)
+  t.equal(page1.hits[1].document.number, 3)
+
+  t.equal(page2.hits[0].document.number, 3)
+  t.equal(page2.hits[1].document.number, 4)
+
+  t.equal(page3.hits[0].document.number, 4)
+  t.equal(page3.hits[1].document.number, 5)
+  
   t.equal(page1.count, 20)
   t.equal(page2.count, 20)
   t.equal(page3.count, 20)
