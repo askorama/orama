@@ -4,7 +4,6 @@
   "description": "Documentation for Orama",
   "private": true,
   "type": "module",
-  "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -19,19 +18,19 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.7.0",
-    "@astrojs/react": "^3.4.0",
-    "@astrojs/starlight": "^0.23.2",
+    "@astrojs/react": "^3.5.0",
+    "@astrojs/starlight": "^0.24.1",
     "@astrojs/starlight-tailwind": "^2.0.3",
     "@astrojs/tailwind": "^5.1.0",
     "@orama/orama": "^2.0.19",
     "@orama/plugin-astro": "^2.0.19",
-    "@orama/searchbox": "1.0.0-rc34",
-    "astro": "^4.9.2",
+    "@orama/searchbox": "1.0.0-rc37",
+    "astro": "^4.10.2",
     "html-to-text": "^9.0.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sharp": "^0.33.4",
     "starlight-image-zoom": "^0.5.0",
-    "tailwindcss": "^3.4.3"
+    "tailwindcss": "^3.4.4"
   }
 }
