@@ -2,7 +2,7 @@
 import type { Props } from "@astrojs/starlight/props";
 
 import LanguageSelect from "@astrojs/starlight/components/LanguageSelect.astro";
-import Search from "./Search.astro";
+import { Search } from "./Search.jsx";
 import SiteTitle from "@astrojs/starlight/components/SiteTitle.astro";
 import SocialIcons from "@astrojs/starlight/components/SocialIcons.astro";
 import ThemeSelect from "@astrojs/starlight/components/ThemeSelect.astro";
@@ -14,7 +14,7 @@ import ThemeSelect from "@astrojs/starlight/components/ThemeSelect.astro";
       <SiteTitle {...Astro.props} />
     </div>
     <div class="flex min-w-[200px]">
-      <Search {...Astro.props} />
+      <Search client:load />
     </div>
   </div>
   <nav>
