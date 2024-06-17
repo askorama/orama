@@ -16,15 +16,13 @@ export interface DefaultTokenizer extends Tokenizer {
 }
 
 export function normalizeToken(this: DefaultTokenizer, prop: string, token: string): string {
-  const key = `${this.language}:${prop}:${token}`
-
-  if (this.normalizationCache.has(key)) {
-    return this.normalizationCache.get(key)!
+  if (this.normalizationCache.has(token)) {
+    return this.normalizationCache.get(token)!
   }
 
   // Remove stopwords if enabled
-  if (this.stopWords?.includes(token)) {
-    this.normalizationCache.set(key, '')
+  if (this.stopWords?.has(token)) {
+    this.normalizationCache.set(token, '')
     return ''
   }
 
@@ -34,7 +32,7 @@ export function normalizeToken(this: DefaultTokenizer, prop: string, token: stri
   }
 
   token = replaceDiacritics(token)
-  this.normalizationCache.set(key, token)
+  this.normalizationCache.set(token, token)
   return token
 }
 
