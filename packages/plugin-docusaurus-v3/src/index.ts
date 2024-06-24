@@ -293,8 +293,9 @@ async function deployData({
   if (deployConfig) {
     const endpointConfig = await fetchEndpointConfig(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!)
 
+    await createSnapshot(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!, oramaDocs)
+
     if (deployConfig.enabled) {
-      await createSnapshot(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!, oramaDocs)
       await deployIndex(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!)
     }
 
