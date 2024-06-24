@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cp src/theme/SearchBar/*.css lib/theme/SearchBar
+cp src/theme/SearchBar/*.css dist/theme/SearchBar
