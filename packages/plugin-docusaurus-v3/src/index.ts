@@ -133,16 +133,20 @@ export default function OramaPluginDocusaurus(
         }
       })
 
-      const oramaDocs = (await Promise.all(allOramaDocsPromises)).flat().filter(data => !!data.content && !!data.title).map((data) => {
-        return ({
-          title: data.title,
-          content: data.content,
-          section: data.originalTitle,
-          version: data.version,
-          path: data.path,
-          category: data.category
-        })
-      })
+      const oramaDocs = (await Promise.all(allOramaDocsPromises)).flat().reduce((acc, curr) => {
+        if (!!curr.title && !!curr.content) {
+          acc.push({
+            title: curr.title,
+            content: curr.content,
+            section: curr.originalTitle,
+            version: curr.version,
+            path: curr.path,
+            category: curr.category
+          })
+        }
+
+        return acc
+      }, [])
 
       if (isDevelopment) {
         actions.setGlobalData({
