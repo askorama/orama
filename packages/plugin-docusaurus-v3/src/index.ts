@@ -41,7 +41,7 @@ export default function OramaPluginDocusaurus(
     name: "@orama/plugin-docusaurus-v3",
 
     getThemePath() {
-      return "../lib/theme"
+      return "../dist/theme"
     },
 
     getTypeScriptThemePath() {
@@ -49,7 +49,7 @@ export default function OramaPluginDocusaurus(
     },
 
     getClientModules() {
-      return ["../lib/theme/SearchBar/index.css"]
+      return ["../dist/theme/SearchBar/index.css"]
     },
 
     async allContentLoaded({ actions, allContent }) {
