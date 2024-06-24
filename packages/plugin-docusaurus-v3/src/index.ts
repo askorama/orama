@@ -53,7 +53,7 @@ export default function OramaPluginDocusaurus(
     },
 
     async allContentLoaded({ actions, allContent }) {
-      const isDevelopment = process.env.NODE_ENV === "development"
+      const isDevelopment = !options.cloud?.oramaCloudAPIKey
       const docsInstances: string[] = []
       const oramaCloudAPIKey = options.cloud?.oramaCloudAPIKey
       const searchDataConfig = [
@@ -144,28 +144,30 @@ export default function OramaPluginDocusaurus(
         })
       })
 
-      const endpointConfig = await deployData({
-        oramaDocs,
-        generatedFilesDir: ctx.generatedFilesDir,
-        version: "current",
-        deployConfig
-      })
+      if (isDevelopment) {
+        actions.setGlobalData({
+          searchData: Object.fromEntries([["current", readFileSync(indexPath(ctx.generatedFilesDir, "current"))]]),
+          docsInstances,
+          availableVersions: versions
+        })
+      } else {
+        const endpointConfig = await deployData({
+          oramaDocs,
+          generatedFilesDir: ctx.generatedFilesDir,
+          version: "current",
+          deployConfig
+        })
 
-      actions.setGlobalData({
-        ...(isDevelopment &&
-          !options.cloud && {
-            searchData: Object.fromEntries([["current", readFileSync(indexPath(ctx.generatedFilesDir, "current"))]])
-          }),
-        docsInstances,
-        availableVersions: versions,
-        analytics: options.analytics,
-        ...(options.cloud && {
+        actions.setGlobalData({
+          docsInstances,
+          availableVersions: versions,
+          analytics: options.analytics,
           endpoint: {
             url: endpointConfig?.endpoint,
             key: endpointConfig?.public_api_key
           }
         })
-      })
+      }
     },
 
     async postBuild({ outDir }) {
