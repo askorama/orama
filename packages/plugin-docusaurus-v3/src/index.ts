@@ -11,8 +11,13 @@ import MarkdownIt from "markdown-it"
 import matter from "gray-matter"
 import { createSnapshot, deployIndex, fetchEndpointConfig } from "./utils"
 
+enum DeployType {
+  SNAPSHOT_ONLY = "snapshot-only",
+  DEFAULT = "default"
+}
+
 type CloudConfig = {
-  deploy: boolean
+  deploy: DeployType | false
   endpoint: string
   indexId: string
   oramaCloudAPIKey?: string
@@ -67,12 +72,6 @@ export default function OramaPluginDocusaurus(
           pages: allContent["docusaurus-plugin-content-pages"]
         }
       ]
-
-      const deployConfig = options.cloud && {
-        enabled: options.cloud.deploy,
-        oramaCloudAPIKey,
-        indexId: options.cloud.indexId
-      }
       const allOramaDocsPromises: Promise<any>[] = []
 
       searchDataConfig.forEach((config) => {
@@ -155,6 +154,12 @@ export default function OramaPluginDocusaurus(
           availableVersions: versions
         })
       } else {
+        const deployConfig = options.cloud && {
+          indexId: options.cloud.indexId,
+          oramaCloudAPIKey,
+          type: options.cloud.deploy
+        }
+
         const endpointConfig = await deployData({
           oramaDocs,
           generatedFilesDir: ctx.generatedFilesDir,
@@ -282,24 +287,27 @@ async function deployData({
   deployConfig:
     | {
     indexId: string
-    enabled: boolean
     oramaCloudAPIKey: string | undefined
+    type: DeployType | false
   }
     | undefined
 }) {
   const { ORAMA_CLOUD_BASE_URL } = process.env
   const baseUrl = ORAMA_CLOUD_BASE_URL || "https://cloud.oramasearch.com"
 
-  if (deployConfig) {
-    const endpointConfig = await fetchEndpointConfig(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!)
+  if (deployConfig?.type) {
+    if (deployConfig.type === DeployType.DEFAULT || deployConfig.type === DeployType.SNAPSHOT_ONLY) {
+      const endpointConfig = await fetchEndpointConfig(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!)
 
-    await createSnapshot(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!, oramaDocs)
+      await createSnapshot(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!, oramaDocs)
 
-    if (deployConfig.enabled) {
-      await deployIndex(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!)
+      if (deployConfig.type === DeployType.DEFAULT) {
+        await deployIndex(baseUrl, deployConfig.oramaCloudAPIKey!, deployConfig.indexId!)
+      }
+      return endpointConfig
+    } else {
+      throw new Error("Invalid deploy type")
     }
-
-    return endpointConfig
   } else {
     const db = await create({
       schema: { ...presets.docs.schema, version: "enum" }
