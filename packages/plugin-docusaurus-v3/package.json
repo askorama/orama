@@ -27,7 +27,7 @@
     "@orama/orama": "workspace:*",
     "@orama/plugin-analytics": "workspace:*",
     "@orama/plugin-parsedoc": "workspace:*",
-    "@orama/searchbox": "^1.0.0-rc20",
+    "@orama/searchbox": "^1.0.0-rc44",
     "@oramacloud/client": "^1.0.14",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
