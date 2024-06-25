@@ -114,12 +114,10 @@ export interface Index extends AnyIndexStore {
 export async function insertDocumentScoreParameters(
   index: Index,
   prop: string,
-  id: DocumentID,
+  internalId: DocumentID,
   tokens: string[],
   docsCount: number
 ): Promise<void> {
-  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
-
   index.avgFieldLength[prop] = ((index.avgFieldLength[prop] ?? 0) * (docsCount - 1) + tokens.length) / docsCount
   index.fieldLengths[prop][internalId] = tokens.length
   index.frequencies[prop][internalId] = {}
@@ -128,7 +126,7 @@ export async function insertDocumentScoreParameters(
 export async function insertTokenScoreParameters(
   index: Index,
   prop: string,
-  id: DocumentID,
+  internalId: DocumentID,
   tokens: string[],
   token: string
 ): Promise<void> {
@@ -140,7 +138,6 @@ export async function insertTokenScoreParameters(
     }
   }
 
-  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
   const tf = tokenFrequency / tokens.length
 
   index.frequencies[prop][internalId]![token] = tf
