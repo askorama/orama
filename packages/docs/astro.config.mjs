@@ -66,9 +66,9 @@ export default defineConfig({
         },
       ],
       social: {
-        github: "https://github.com/oramasearch/orama",
+        github: "https://github.com/askorama/orama",
         slack: "https://orama.to/slack",
-        twitter: "https://twitter.com/OramaSearch",
+        twitter: "https://twitter.com/askorama",
       },
       customCss: ["./src/tailwind.css", "./src/styles/custom.css"],
       logo: {
