@@ -66,20 +66,12 @@ import { search } from '@orama/orama'
 
 const resultsHybrid = await search(db, {
   mode: 'hybrid',
-  term: 'Videogame for little kids with a passion about ice cream' // [!code ++]
-  vector: { // [!code --]
-    value: [0.9272643, 0.182738, 0.192031, 0.998761], // [!code --]
-    property: 'embeddings' // [!code --]
-  }
+  term: 'Videogame for little kids with a passion about ice cream'
 })
 
 const resultsVector = await search(db, {
   mode: 'vector',
-  term: 'Videogame for little kids with a passion about ice cream' // [!code ++]
-  vector: { // [!code --]
-    value: [0.9272643, 0.182738, 0.192031, 0.998761], // [!code --]
-    property: 'embeddings' // [!code --]
-  }
+  term: 'Videogame for little kids with a passion about ice cream'
 })
 ```
 

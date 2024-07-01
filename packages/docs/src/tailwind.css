@@ -1,15 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root {
-  --sl-color-bg-nav: #27232e;
-  --sl-color-bg: #201c27;
-  --sl-color-bg-sidebar: #27232e;
-}
-
-:root[data-theme='light'] {
-  --sl-color-bg-nav: #fff;
-  --sl-color-bg: #fbfbfb;
-  --sl-color-bg-sidebar: #fff;
-}

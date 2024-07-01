@@ -1,13 +1,8 @@
 ---
 title: Creating an Answer Session
 ---
-import { Aside } from '@astrojs/starlight/components';
 
-<Aside type="caution" title='Beta feature'>
-This is a beta feature. Please report any error on our [Slack channel](https://orama.to/slack).
-</Aside>
-
-Once you have properly set up your index, you will be able to engage in dynamic conversations with it.
+Once you have set up your index, you will be able to engage in dynamic conversations with it.
 
 The Orama SDK exposes a very convenient function for performing highly dynamic generative AI experiences with your data through the `answerSession` API.
 
@@ -33,6 +28,7 @@ const answerSession = orama.createAnswerSession({
     onMessageLoading: (loading) => console.log({ loading }),
     onAnswerAborted: (aborted) => console.log({ aborted }),
     onSourceChange: (sources) => console.log({ sources }),
+    onQueryTranslated: (query) => console.log({ query }),
   },
 });
 
@@ -151,6 +147,25 @@ await answerSession.ask({
   term: "What is Orama?",
 });
 ```
+
+`onQueryTranslated`. Gets triggered when Orama successfully translates a natural language query into a search query. This is useful when you want to know how Orama interprets the user's input. It adapts to your index schema and returns the most relevant search query.
+
+```js
+
+const answerSession = orama.createAnswerSession({
+  events: {
+    onQueryTranslated: (query) => {
+      console.log(query);
+      // { term: 'Halfpipe skateboard', where: { price: { lt: 100 } } }
+    },
+  },
+});
+
+await answerSession.ask({
+  term: "What's the best skateboard for halfpipes under $100?",
+});
+```
+
 
 ## Asking a Question
 
