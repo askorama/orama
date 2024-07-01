@@ -6,6 +6,8 @@ import { Sorter } from './components/sorter.js'
 import { Language } from './components/tokenizer/languages.js'
 import { Point } from './trees/bkd.js'
 
+export { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from './constants.js'
+
 export type { DefaultTokenizer } from './components/tokenizer/index.js'
 
 export type Nullable<T> = T | null

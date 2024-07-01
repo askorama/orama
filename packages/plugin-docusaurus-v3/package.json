@@ -1,6 +1,6 @@
 {
   "name": "@orama/plugin-docusaurus-v3",
-  "version": "2.0.20",
+  "version": "2.0.21",
   "description": "Docusaurus plugin for local search powered by orama",
   "keywords": ["orama", "docusaurus"],
   "license": "Apache-2.0",
@@ -13,8 +13,8 @@
     "url": "git+https://github.com/orama/orama.git"
   },
   "sideEffects": false,
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "postbuild": "sh scripts/postbuild.sh",
@@ -27,7 +27,7 @@
     "@orama/orama": "workspace:*",
     "@orama/plugin-analytics": "workspace:*",
     "@orama/plugin-parsedoc": "workspace:*",
-    "@orama/searchbox": "^1.0.0-rc20",
+    "@orama/searchbox": "^1.0.0-rc44",
     "@oramacloud/client": "^1.0.14",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",

@@ -486,8 +486,8 @@ importers:
         specifier: workspace:*
         version: link:../plugin-parsedoc
       '@orama/searchbox':
-        specifier: ^1.0.0-rc20
-        version: 1.0.0-rc20(@orama/highlight@0.1.5)(@orama/orama@packages+orama)(@oramacloud/client@1.0.14(typescript@5.4.5))(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1(react@18.3.1))(@r2wc/react-to-web-component@2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react-markdown@9.0.1(@types/react@18.3.3)(react@18.3.1))(react@18.3.1)(typescript@5.4.5)
+        specifier: ^1.0.0-rc44
+        version: 1.0.0-rc47(@orama/highlight@0.1.5)(@orama/orama@packages+orama)(@oramacloud/client@1.0.14(typescript@5.4.5))(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1(react@18.3.1))(@r2wc/react-to-web-component@2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-markdown@9.0.1(@types/react@18.3.3)(react@18.3.1))(react@18.3.1)(typescript@5.4.5)
       '@oramacloud/client':
         specifier: ^1.0.14
         version: 1.0.14(typescript@5.4.5)
@@ -4182,8 +4182,15 @@ packages:
     resolution: {integrity: sha512-9nlF5iYUghewRt2TDmAJO5TN4hYFPhql4d2ZAdJYJtGSIi2BZjMNQIqQ874w0q/rur67wp0AWLb020EakEN0aA==}
     engines: {node: '>= 16.0.0'}
 
+  '@orama/orama@2.0.21':
+    resolution: {integrity: sha512-XZpyjyNw4Mcpg94+gUvxmyyiFTZAdXvJ1aFPqHABarofu86oNwZL5tQUIj84xa1lrQiaeSxNKNBw0w4y5We5Yg==}
+    engines: {node: '>= 16.0.0'}
+
   '@orama/plugin-analytics@2.0.18':
     resolution: {integrity: sha512-E6C1kLjf7Db3QTeww3L5Iooa2lFL/jp+uNgaGSNBfHR+kUi/pnifmtFAItIQ12ZIa6bv07UvbhWhDMELQcz//A==}
+
+  '@orama/plugin-analytics@2.0.21':
+    resolution: {integrity: sha512-DSLNZY7B41HYY9WQaVHhASNCimsL72l0pXU0HvkMDAou6XJcDcjBWmU60OtSSjL18QBVET/CSCWACDUmwULd8g==}
 
   '@orama/plugin-astro@2.0.19':
     resolution: {integrity: sha512-tjAbdOrVANb0HkakPnkbVeU20drAH7bLPJyw2eWglv0Ip40AFNm2WTqyP+9k6Kcs4RTeVTU7alk6PRvlS8OCLA==}
@@ -4191,11 +4198,11 @@ packages:
     peerDependencies:
       astro: ^2.0.4
 
-  '@orama/plugin-secure-proxy@2.0.15':
-    resolution: {integrity: sha512-EwPPqMVFr7p2dv1UIINjaQEqQ7BIf71wWG3EjD6Gme7CX0NjV0gs3p4jkOPrnvS5zJ5CPiFbn4bCvYLWe6uhWg==}
-
   '@orama/plugin-secure-proxy@2.0.19':
     resolution: {integrity: sha512-ED6e3AFJugoplaiYVgAHHjrCmQR8qY3YHyT5kk59MwAIHrK5Ag4ISJpDv4RgUQZUeHr4CHNbqlLbJEr87/ccBA==}
+
+  '@orama/plugin-secure-proxy@2.0.21':
+    resolution: {integrity: sha512-nIiBkmTDrHSA14Q/IhuNENvr78aQ98RRqqXjrF+YTQwTXpaDTqPyaXxzL6byW+Qplumeh7VeI+M+Jca2WcRauQ==}
 
   '@orama/searchbox@1.0.0-beta.13':
     resolution: {integrity: sha512-u1KntN2l1Dg52/UVwh9wZdu8eG/kmk42FjgWZ7ExM+CMZCr6aatAHVPuZnecDZGHV4/t4XV4W9tGgvZ1MxnsJg==}
@@ -4207,19 +4214,6 @@ packages:
       '@preact/signals-core': ^1.5.0
       preact: ^10.19.1
       preact-custom-element: ^4.3.0
-
-  '@orama/searchbox@1.0.0-rc20':
-    resolution: {integrity: sha512-3JRSlolw8/63DPTbre7dBhaxIu1lKI7/q4eFC8rzwPt4kj/MWPU80P8tbzNBomCQ4iRRY8wHEpsly4cePq/UKg==}
-    peerDependencies:
-      '@orama/highlight': ^0.1.6
-      '@orama/orama': 2.0.14
-      '@oramacloud/client': 1.0.14
-      '@preact/signals-core': ^1.6.0
-      '@preact/signals-react': ^2.0.1
-      '@r2wc/react-to-web-component': ^2.0.3
-      react: ^18.2.0
-      react-dom: ^18.2.0
-      react-markdown: ^9.0.1
 
   '@orama/searchbox@1.0.0-rc37':
     resolution: {integrity: sha512-Quy7jX6KLe6fKD1Bxy+dONlaht+mbeXGwuD6gdVhDE09vDjIm7Yj+1FQKTtxXHRdOYvF15BOaquIVTgCpfo1Tw==}
@@ -4234,6 +4228,20 @@ packages:
       react-dom: ^18.3.1
       react-markdown: ^9.0.1
       react-syntax-highlighter: ^15.5.0
+
+  '@orama/searchbox@1.0.0-rc47':
+    resolution: {integrity: sha512-YJoVO50MipEvMnK5XrnZ58YQ4i1g6kP/zrACsNi9AQHQyDwbw/UaoTR+0ymPlaC5avCKsY/RpcVQLIOc6nTUaQ==}
+    peerDependencies:
+      '@orama/highlight': ^0.1.6
+      '@orama/orama': 2.0.19
+      '@oramacloud/client': 1.2.3
+      '@preact/signals-core': ^1.6.0
+      '@preact/signals-react': ^2.0.1
+      '@r2wc/react-to-web-component': ^2.0.3
+      react: ^18.3.1
+      react-dom: ^18.3.1
+      react-markdown: ^9.0.1
+      react-syntax-highlighter: npm:@fengkx/react-syntax-highlighter@15.6.1
 
   '@orama/stemmers@2.0.12':
     resolution: {integrity: sha512-CZOeBZLhq+rBWmgvVMMf3qOIm2aX9hLNe1FN1YNWKONjvQRxa33nmCU8k4gCB8c0g6Nmd+d8P1TDfDoNJtcrWw==}
@@ -4279,13 +4287,6 @@ packages:
 
   '@paralleldrive/cuid2@2.2.2':
     resolution: {integrity: sha512-ZOBkgDwEdoYVlSeRbYYXs0S9MejQofiVYoTbKzy/6GQa39/q5tQU2IX46+shYnUkpEl3wc+J6wRlar7r2EK2xA==}
-
-  '@phosphor-icons/react@2.1.4':
-    resolution: {integrity: sha512-EeNwgcg1aeK5vG/JYVTullnZzk5zjftOrjLb1iYetyhn5ImFFREc+xG0FAB/dAY277DGDSF8pNdNbqG1SUKIxQ==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      react: '>= 16.8'
-      react-dom: '>= 16.8'
 
   '@phosphor-icons/react@2.1.5':
     resolution: {integrity: sha512-B7vRm/w+P/+eavWZP5CB5Ul0ffK4Y7fpd/auWKuGvm+8pVgAJzbOK8O0s+DqzR+TwWkh5pHtJTuoAtaSvgCPzg==}
@@ -7052,14 +7053,6 @@ packages:
 
   dedent@0.7.0:
     resolution: {integrity: sha512-Q6fKUPqnAHAyhiUgFU7BUzLiv0kd8saH9al7tnu5Q/okj6dnupxyTgFIBjVzJATdfIAm9NAsvXNzjaKa+bxVyA==}
-
-  dedent@1.5.1:
-    resolution: {integrity: sha512-+LxW+KLWxu3HW3M2w2ympwtqPrqYRzU8fqi6Fhd18fBALe15blJPI/I4+UHveMVG6lJqB4JNd4UG0S5cnVHwIg==}
-    peerDependencies:
-      babel-plugin-macros: ^3.1.0
-    peerDependenciesMeta:
-      babel-plugin-macros:
-        optional: true
 
   deep-equal@2.2.1:
     resolution: {integrity: sha512-lKdkdV6EOGoVn65XaOsPdH4rMxTZOnmFyuIkMjM1i5HHCbfjC97dawgTAy0deYNfuqUqW+Q5VrVaQYtUpSd6yQ==}
@@ -14453,7 +14446,7 @@ snapshots:
       '@babel/helper-optimise-call-expression': 7.22.5
       '@babel/helper-replace-supers': 7.22.20(@babel/core@7.24.5)
       '@babel/helper-skip-transparent-expression-wrappers': 7.22.5
-      '@babel/helper-split-export-declaration': 7.24.5
+      '@babel/helper-split-export-declaration': 7.22.6
       semver: 6.3.1
 
   '@babel/helper-create-class-features-plugin@7.22.5(@babel/core@7.22.5)':
@@ -14562,8 +14555,8 @@ snapshots:
   '@babel/helper-define-polyfill-provider@0.4.3(@babel/core@7.24.5)':
     dependencies:
       '@babel/core': 7.24.5
-      '@babel/helper-compilation-targets': 7.23.6
-      '@babel/helper-plugin-utils': 7.24.5
+      '@babel/helper-compilation-targets': 7.22.15
+      '@babel/helper-plugin-utils': 7.22.5
       debug: 4.3.4
       lodash.debounce: 4.0.8
       resolve: 1.22.8
@@ -15415,7 +15408,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.24.5
       '@babel/helper-environment-visitor': 7.22.20
-      '@babel/helper-plugin-utils': 7.24.5
+      '@babel/helper-plugin-utils': 7.22.5
       '@babel/helper-remap-async-to-generator': 7.22.20(@babel/core@7.24.5)
       '@babel/plugin-syntax-async-generators': 7.8.4(@babel/core@7.24.5)
 
@@ -15490,7 +15483,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.24.5
       '@babel/helper-create-class-features-plugin': 7.22.15(@babel/core@7.24.5)
-      '@babel/helper-plugin-utils': 7.24.5
+      '@babel/helper-plugin-utils': 7.22.5
 
   '@babel/plugin-transform-class-static-block@7.22.5(@babel/core@7.22.5)':
     dependencies:
@@ -15547,13 +15540,13 @@ snapshots:
     dependencies:
       '@babel/core': 7.24.5
       '@babel/helper-annotate-as-pure': 7.22.5
-      '@babel/helper-compilation-targets': 7.23.6
+      '@babel/helper-compilation-targets': 7.22.15
       '@babel/helper-environment-visitor': 7.22.20
       '@babel/helper-function-name': 7.23.0
       '@babel/helper-optimise-call-expression': 7.22.5
-      '@babel/helper-plugin-utils': 7.24.5
+      '@babel/helper-plugin-utils': 7.22.5
       '@babel/helper-replace-supers': 7.22.20(@babel/core@7.24.5)
-      '@babel/helper-split-export-declaration': 7.24.5
+      '@babel/helper-split-export-declaration': 7.22.6
       globals: 11.12.0
 
   '@babel/plugin-transform-computed-properties@7.22.5(@babel/core@7.22.5)':
@@ -15605,7 +15598,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.24.5
       '@babel/helper-create-regexp-features-plugin': 7.22.15(@babel/core@7.24.5)
-      '@babel/helper-plugin-utils': 7.24.5
+      '@babel/helper-plugin-utils': 7.22.5
 
   '@babel/plugin-transform-duplicate-keys@7.22.5(@babel/core@7.22.5)':
     dependencies:
@@ -15656,7 +15649,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.24.5
       '@babel/helper-builder-binary-assignment-operator-visitor': 7.22.15
-      '@babel/helper-plugin-utils': 7.24.5
+      '@babel/helper-plugin-utils': 7.22.5
 
   '@babel/plugin-transform-export-namespace-from@7.22.5(@babel/core@7.22.5)':
     dependencies:
@@ -20091,9 +20084,15 @@ snapshots:
 
   '@orama/orama@2.0.19': {}
 
+  '@orama/orama@2.0.21': {}
+
   '@orama/plugin-analytics@2.0.18':
     dependencies:
       '@orama/orama': 2.0.18
+
+  '@orama/plugin-analytics@2.0.21':
+    dependencies:
+      '@orama/orama': 2.0.21
 
   '@orama/plugin-astro@2.0.19(astro@4.10.2(@types/node@20.11.19)(terser@5.17.7)(typescript@5.4.5))':
     dependencies:
@@ -20101,13 +20100,13 @@ snapshots:
       astro: 4.10.2(@types/node@20.11.19)(terser@5.17.7)(typescript@5.4.5)
       html-to-text: 9.0.5
 
-  '@orama/plugin-secure-proxy@2.0.15(typescript@5.4.5)':
+  '@orama/plugin-secure-proxy@2.0.19(typescript@5.4.5)':
     dependencies:
       '@oramacloud/client': 1.0.14(typescript@5.4.5)
     transitivePeerDependencies:
       - typescript
 
-  '@orama/plugin-secure-proxy@2.0.19(typescript@5.4.5)':
+  '@orama/plugin-secure-proxy@2.0.21(typescript@5.4.5)':
     dependencies:
       '@oramacloud/client': 1.0.14(typescript@5.4.5)
     transitivePeerDependencies:
@@ -20129,29 +20128,6 @@ snapshots:
     transitivePeerDependencies:
       - postcss
 
-  '@orama/searchbox@1.0.0-rc20(@orama/highlight@0.1.5)(@orama/orama@packages+orama)(@oramacloud/client@1.0.14(typescript@5.4.5))(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1(react@18.3.1))(@r2wc/react-to-web-component@2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react-markdown@9.0.1(@types/react@18.3.3)(react@18.3.1))(react@18.3.1)(typescript@5.4.5)':
-    dependencies:
-      '@orama/highlight': 0.1.5
-      '@orama/orama': link:packages/orama
-      '@orama/plugin-analytics': 2.0.18
-      '@orama/plugin-secure-proxy': 2.0.15(typescript@5.4.5)
-      '@oramacloud/client': 1.0.14(typescript@5.4.5)
-      '@phosphor-icons/react': 2.1.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@preact/signals-core': 1.6.0
-      '@preact/signals-react': 2.0.1(react@18.3.1)
-      '@r2wc/react-to-web-component': 2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      classnames: 2.5.1
-      dedent: 1.5.1(babel-plugin-macros@3.1.0)
-      lodash.debounce: 4.0.8
-      object-to-css-variables: 0.2.1
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      react-markdown: 9.0.1(@types/react@18.3.3)(react@18.3.1)
-      react-syntax-highlighter: 15.5.0(react@18.3.1)
-    transitivePeerDependencies:
-      - babel-plugin-macros
-      - typescript
-
   '@orama/searchbox@1.0.0-rc37(@orama/highlight@0.1.5)(@orama/orama@2.0.19)(@oramacloud/client@1.0.14(typescript@5.4.5))(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1(react@18.3.1))(@r2wc/react-to-web-component@2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-markdown@9.0.1(@types/react@18.3.3)(react@18.3.1))(react-syntax-highlighter@15.5.0(react@18.3.1))(react@18.3.1)(typescript@5.4.5)':
     dependencies:
       '@orama/highlight': 0.1.5
@@ -20172,6 +20148,28 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       react-markdown: 9.0.1(@types/react@18.3.3)(react@18.3.1)
       react-syntax-highlighter: 15.5.0(react@18.3.1)
+    transitivePeerDependencies:
+      - typescript
+
+  '@orama/searchbox@1.0.0-rc47(@orama/highlight@0.1.5)(@orama/orama@packages+orama)(@oramacloud/client@1.0.14(typescript@5.4.5))(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1(react@18.3.1))(@r2wc/react-to-web-component@2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-markdown@9.0.1(@types/react@18.3.3)(react@18.3.1))(react@18.3.1)(typescript@5.4.5)':
+    dependencies:
+      '@orama/highlight': 0.1.5
+      '@orama/orama': link:packages/orama
+      '@orama/plugin-analytics': 2.0.21
+      '@orama/plugin-secure-proxy': 2.0.21(typescript@5.4.5)
+      '@oramacloud/client': 1.0.14(typescript@5.4.5)
+      '@phosphor-icons/react': 2.1.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@preact/signals-core': 1.6.0
+      '@preact/signals-react': 2.0.1(react@18.3.1)
+      '@r2wc/react-to-web-component': 2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      classnames: 2.5.1
+      lodash.debounce: 4.0.8
+      lodash.omit: 4.5.0
+      markdown-to-jsx: 7.4.7(react@18.3.1)
+      object-to-css-variables: 0.2.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-markdown: 9.0.1(@types/react@18.3.3)(react@18.3.1)
     transitivePeerDependencies:
       - typescript
 
@@ -20236,11 +20234,6 @@ snapshots:
   '@paralleldrive/cuid2@2.2.2':
     dependencies:
       '@noble/hashes': 1.3.2
-
-  '@phosphor-icons/react@2.1.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
 
   '@phosphor-icons/react@2.1.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -24519,10 +24512,6 @@ snapshots:
 
   dedent@0.7.0: {}
 
-  dedent@1.5.1(babel-plugin-macros@3.1.0):
-    optionalDependencies:
-      babel-plugin-macros: 3.1.0
-
   deep-equal@2.2.1:
     dependencies:
       array-buffer-byte-length: 1.0.0
@@ -26055,7 +26044,7 @@ snapshots:
 
   fork-ts-checker-webpack-plugin@6.5.3(eslint@8.48.0)(typescript@5.0.3)(webpack@5.89.0(@swc/core@1.3.27)):
     dependencies:
-      '@babel/code-frame': 7.24.2
+      '@babel/code-frame': 7.22.13
       '@types/json-schema': 7.0.12
       chalk: 4.1.2
       chokidar: 3.6.0
@@ -33395,7 +33384,7 @@ snapshots:
   vite@4.5.3(@types/node@20.9.0)(terser@5.17.7):
     dependencies:
       esbuild: 0.18.20
-      postcss: 8.4.38
+      postcss: 8.4.32
       rollup: 3.29.4
     optionalDependencies:
       '@types/node': 20.9.0
