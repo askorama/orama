@@ -8,18 +8,22 @@ import SocialIcons from "@astrojs/starlight/components/SocialIcons.astro";
 import ThemeSelect from "@astrojs/starlight/components/ThemeSelect.astro";
 ---
 
-<div class="header flex justify-between gap-8">
-  <div class="flex grow gap-8 items-center">
-    <div class="title-wrapper flex">
+<div class="header flex sm:justify-between justify-start sm:gap-8 gap-2">
+  <div class="flex sm:grow sm:gap-8 gap-2 items-center">
+    <div class="title-wrapper hidden sm:flex">
       <SiteTitle {...Astro.props} />
     </div>
-    <div class="flex min-w-[200px]">
+    <div class="flex min-w-[151px] sm:min-w-[200px]">
       <Search client:load />
     </div>
   </div>
   <nav>
-    <a href="/open-source/"> <span>Open Source</span></a>
-    <a href="/cloud/"> <span>Orama Cloud</span></a>
+    <a class="sm:text-base text-xs" href="/open-source/">
+      <span>Open Source</span></a
+    >
+    <a class="sm:text-base text-xs" href="/cloud/">
+      <span><span class="hidden sm:inline">Orama</span> Cloud</span></a
+    >
   </nav>
   <div class="sl-hidden md:sl-flex right-group">
     <div class="sl-flex social-icons">
@@ -33,7 +37,6 @@ import ThemeSelect from "@astrojs/starlight/components/ThemeSelect.astro";
 <style>
   .header {
     gap: var(--sl-nav-gap);
-    justify-content: space-between;
     align-items: center;
     height: 100%;
   }
