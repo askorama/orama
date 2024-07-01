@@ -2,24 +2,12 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import react from "@astrojs/react";
 import starlightImageZoom from "starlight-image-zoom";
-import orama from "./plugins";
 import tailwind from "@astrojs/tailwind";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://docs.oramasearch.com",
+  site: "https://docs.askorama.ai",
   integrations: [
-    orama({
-      // We can generate more than one DB, with different configurations
-      docs: {
-        // Required. Only pages matching this path regex will be indexed
-        pathMatcher: /(cloud|open-source)\/*/,
-
-        // // Optional. ['body'] by default. Use it to constraint what is used to
-        // // index a page.
-        contentSelectors: [".sl-markdown-content"],
-      },
-    }),
     starlight({
       pagefind: false,
       plugins: [starlightImageZoom()],
@@ -78,9 +66,9 @@ export default defineConfig({
         },
       ],
       social: {
-        github: "https://github.com/oramasearch/orama",
+        github: "https://github.com/askorama/orama",
         slack: "https://orama.to/slack",
-        twitter: "https://twitter.com/OramaSearch",
+        twitter: "https://twitter.com/askorama",
       },
       customCss: ["./src/tailwind.css", "./src/styles/custom.css"],
       logo: {

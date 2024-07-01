@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
+import { OramaClient } from "@oramacloud/client"
 import { SearchBox, SearchButton } from "@orama/searchbox";
 import "@orama/searchbox/dist/index.css";
-import { getOramaDB } from "../../plugins/client";
+
+export const client = new OramaClient({
+  api_key: 'P9buEfpy8rWvT265McikCG1tP4pT6cBg',
+  endpoint: 'https://cloud.orama.run/v1/indexes/askorama-ai-development-uc6oxa'
+})
 
 export const Search = () => {
-  const [theme, setTheme] = useState();
-  const [client, setClient] = useState();
+  const [theme, setTheme] = useState('dark');
 
   const initSearchBox = async () => {
     try {
       setTheme(document.documentElement.dataset.theme);
-      const db = await getOramaDB("docs");
-      setClient(db);
     } catch (error) {
       console.log(error);
     }
@@ -41,7 +43,7 @@ export const Search = () => {
     };
   }, []);
 
-  return client ? (
+  return (
     <>
       <SearchBox
         {...{
@@ -56,5 +58,5 @@ export const Search = () => {
       />
       <SearchButton colorScheme={theme} />
     </>
-  ) : null;
+  )
 };

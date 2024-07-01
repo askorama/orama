@@ -80,7 +80,7 @@ export function SearchBarFooter({ translations = {} }: SearchBarFooterProps): JS
           <span>{closeText}</span>
         </li>
       </ul>
-      <a className="aa-FooterSearchCredit" href={'https://oramasearch.com'} target="_blank" rel="noopener noreferrer">
+      <a className="aa-FooterSearchCredit" href={'https://askorama.com'} target="_blank" rel="noopener noreferrer">
         <span>{searchByText}</span>
         {colorMode === 'dark' ? <OramaLogoDark /> : <OramaLogoLight />}
       </a>

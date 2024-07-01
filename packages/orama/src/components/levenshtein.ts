@@ -31,7 +31,7 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
 
   // if string A is subfix of B, we consider the distance 0
   // because we search for prefix!
-  // fix https://github.com/oramasearch/orama/issues/544
+  // fix https://github.com/askorama/orama/issues/544
   if (startIdx === lenA) {
     return 0
   }
