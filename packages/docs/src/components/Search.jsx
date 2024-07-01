@@ -8,23 +8,24 @@ export const client = new OramaClient({
   endpoint: "https://cloud.orama.run/v1/indexes/askorama-ai-development-uc6oxa",
 });
 
-export const Search = () => {
+export function Search() {
   const [theme, setTheme] = useState();
 
-  const initSearchBox = async () => {
+  function initSearchBox() {
     try {
       setTheme(document.documentElement.dataset.theme);
     } catch (error) {
       console.log(error);
     }
-  };
+  }
 
   useEffect(() => {
     initSearchBox();
   }, []);
 
   useEffect(() => {
-    const callback = (mutationList) => {
+
+    function callback(mutationList) {
       for (const mutation of mutationList) {
         if (
           mutation.type === "attributes" &&
@@ -33,7 +34,7 @@ export const Search = () => {
           setTheme(document.documentElement.dataset.theme);
         }
       }
-    };
+    }
 
     const observer = new MutationObserver(callback);
     observer.observe(document.documentElement, { attributes: true });
@@ -58,7 +59,12 @@ export const Search = () => {
           setResultTitle: (doc) => doc.title.split("| Orama Docs")[0],
         }}
       />
-      <SearchButton colorScheme={theme} />
+      <SearchButton colorScheme={theme} themeConfig={{
+        dark: {
+          '--search-btn-background-color': '#201c27',
+          '--search-btn-background-color-hover': '#201c27',
+        }
+      }} />
     </>
   );
 };

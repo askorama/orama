@@ -11,8 +11,8 @@ export default defineConfig({
     starlight({
       pagefind: false,
       plugins: [starlightImageZoom()],
-      title: "Orama Docs",
-      description: "Search, everywhere",
+      title: "Orama",
+      description: "Your product answer engine.",
       favicon: "/favicon.png",
       head: [
         {

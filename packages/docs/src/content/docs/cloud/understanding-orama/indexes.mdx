@@ -2,22 +2,21 @@
 title: Orama Cloud Indexes
 ---
 
-An Orama index is essentially a collection of Orama documents that share the following properties:
-
-- **Schema** \
-  All documents in a given index must follow the same schema.
-- **Embeddings configuration** \
-  If you want to perform either vector or hybrid search on your index, you'll have to generate embeddings.
+An Orama index is essentially a collection of Orama documents that share a common schema.
 
 Depending on your subscription, you may have more or less limitations when it comes to indexes.
 
-| Subscription | Max. Indexes | Max. Documents | Max. Size |
-| ------------ | ------------ | -------------- | --------- |
-| Free         | Unlimited    | 10,000         | 10 MB     |
-| Pro          | Unlimited    | 100,000        | 100MB     |
-| Enterprise   | Unlimited    | Unlimited      | Unlimited |
+| Subscription | Max. Indexes | Max. Documents per index | Total deployments per month |
+| ------------ | ------------ | ------------------------ | --------------------------- |
+| Free         | 5            | 100,000                  | 150                         |
+| Hobby        | 10           | 250,000                  | 250                         |
+| Pro          | 25           | 1,000,000                | 2,500                       |
+| Premium      | 100          | 5,000,000                | 10,000                      |
+| Enterprise   | Unlimited    | Unlimited                | Unlimited                   |
 
-Regardless of your subscription, you can create as many indexes as you want.
+Regardless of your subscription, you can perform an unlimited number of search queries and answers generations on your indexes.
+
+Deployments are to be considered globally, meaning that if you have 5 indexes and deploy all of them simultaneously, it will count as 5 deployments.
 
 ## Index Types
 
