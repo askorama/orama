@@ -1,22 +1,22 @@
 ---
-import type { Props } from "@astrojs/starlight/props";
-import type { RegisterSearchBoxProps } from "@orama/searchbox";
-import CallToAction from "@astrojs/starlight/components/CallToAction.astro";
-import { SearchBox } from "@orama/searchbox";
+import type { Props } from '@astrojs/starlight/props'
+import type { RegisterSearchBoxProps } from '@orama/searchbox'
+import CallToAction from '@astrojs/starlight/components/CallToAction.astro'
+import { SearchBox } from '@orama/searchbox'
 
-const { data } = Astro.props.entry;
-const { title = data.title, tagline, actions = [] } = data.hero || {};
+const { data } = Astro.props.entry
+const { title = data.title, tagline, actions = [] } = data.hero || {}
 
-let rawHtml: string | undefined;
+let rawHtml: string | undefined
 
 const searchBoxProps: RegisterSearchBoxProps = {
   show: true,
   cloudConfig: {
     key: 'P9buEfpy8rWvT265McikCG1tP4pT6cBg',
-    url: 'https://cloud.orama.run/v1/indexes/askorama-ai-development-uc6oxa',
+    url: 'https://cloud.orama.run/v1/indexes/askorama-ai-development-uc6oxa'
   },
-  backdrop: false,
-};
+  backdrop: false
+}
 ---
 
 <div class="hero">

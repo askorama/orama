@@ -9,9 +9,11 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "format": "bunx @biomejs/biome format src --write"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.7.3",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "typescript": "^5.4.5"
