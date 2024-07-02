@@ -1,0 +1,181 @@
+---
+import type { Props } from '@astrojs/starlight/props'
+import type { RegisterSearchBoxProps } from '@orama/searchbox'
+import CallToAction from '@astrojs/starlight/components/CallToAction.astro'
+import { SearchBox } from '@orama/searchbox'
+
+const { data } = Astro.props.entry
+const { title = data.title, tagline, actions = [] } = data.hero || {}
+
+let rawHtml: string | undefined
+
+const searchBoxProps: RegisterSearchBoxProps = {
+  show: true,
+  cloudConfig: {
+    key: 'P9buEfpy8rWvT265McikCG1tP4pT6cBg',
+    url: 'https://cloud.orama.run/v1/indexes/askorama-ai-development-uc6oxa'
+  },
+  backdrop: false
+}
+---
+
+<div class="hero">
+  {rawHtml && <div class="hero-html sl-flex" set:html={rawHtml} />}
+  <div class="sl-flex stack">
+    <div class="sl-flex copy">
+      <h1 class="title" id={"PAGE_TITLE_ID"} data-page-title set:html={title} />
+      {tagline && <div class="tagline" set:html={tagline} />}
+
+      <SearchBox {...searchBoxProps} />
+    </div>
+    {
+      actions.length > 0 && (
+        <div class="sl-flex actions">
+          {actions.map(({ text, ...attrs }) => (
+            // @ts-ignore
+            <CallToAction {...attrs} set:html={text} />
+          ))}
+        </div>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .hero {
+    display: grid;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .hero > .hero-html {
+    object-fit: contain;
+    width: min(70%, 20rem);
+    height: auto;
+    margin-inline: auto;
+  }
+
+  .stack {
+    flex-direction: column;
+    gap: clamp(1.5rem, calc(1.5rem + 1vw), 2rem);
+    text-align: center;
+  }
+
+  .copy {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .copy > * {
+    max-width: 50ch;
+  }
+
+  h1.title {
+    max-width: 392px;
+    letter-spacing: -0.4px;
+    line-height: 40px;
+    font-size: 32px;
+    font-weight: 700;
+    white-space: pre-wrap;
+    background: -webkit-linear-gradient(120deg, #bd34fe 30%, #41d1ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  @media (min-width: 640px) {
+    h1.title {
+      max-width: 576px;
+      line-height: 56px;
+      font-size: 48px;
+    }
+  }
+
+  @media (min-width: 960px) {
+    h1.title {
+      line-height: 64px;
+      font-size: 56px;
+    }
+  }
+
+  h2.description {
+    max-width: 392px;
+    letter-spacing: -0.4px;
+    line-height: 40px;
+    font-size: 32px;
+    font-weight: 700;
+    white-space: pre-wrap;
+    margin-top: -24px;
+  }
+  @media (min-width: 640px) {
+    h2.description {
+      max-width: 576px;
+      line-height: 56px;
+      font-size: 48px;
+    }
+  }
+  @media (min-width: 960px) {
+    h2.description {
+      line-height: 64px;
+      font-size: 56px;
+    }
+  }
+
+  .tagline {
+    max-width: 392px;
+    line-height: 28px;
+    font-size: 18px;
+    font-weight: 500;
+    white-space: pre-wrap;
+    color: var(--sl-color-gray-2);
+  }
+
+  @media (min-width: 640px) {
+    .tagline {
+      max-width: 576px;
+      line-height: 32px;
+      font-size: 20px;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .tagline {
+      line-height: 36px;
+      font-size: 24px;
+    }
+  }
+
+  .actions {
+    gap: 1rem 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  @media (min-width: 50rem) {
+    .hero {
+      grid-template-columns: 7fr 4fr;
+      gap: 3%;
+      padding-block: clamp(2.5rem, calc(1rem + 10vmin), 10rem);
+    }
+
+    .hero > img,
+    .hero > .hero-html {
+      order: 2;
+      width: min(100%, 25rem);
+    }
+
+    .stack {
+      text-align: start;
+    }
+
+    .copy {
+      align-items: flex-start;
+    }
+
+    .actions {
+      justify-content: flex-start;
+    }
+  }
+</style>

@@ -31,10 +31,10 @@
   "files": ["dist"],
   "repository": {
     "type": "git",
-    "url": "https://github.com/oramasearch/orama"
+    "url": "https://github.com/askorama/orama"
   },
   "bugs": {
-    "url": "https://github.com/oramasearch/orama"
+    "url": "https://github.com/askorama/orama"
   },
   "scripts": {
     "predev": "rm -rf dist && mkdir dist",
