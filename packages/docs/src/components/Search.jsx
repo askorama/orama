@@ -26,7 +26,7 @@ export function Search() {
   useEffect(() => {
     function callback(mutationList) {
       for (const mutation of mutationList) {
-        if (mutation.type === 'attributes' && mutation.attributeName == 'data-theme') {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
           setTheme(document.documentElement.dataset.theme)
         }
       }
