@@ -36,17 +36,20 @@ async function getAllRenderedDocs() {
 }
 
 function parseDoc(path: string) {
-  const content = readFileSync(path, 'utf-8')
-  const fullPath = `http://localhost:3000${path.replace(baseURL, '').replace(/^\/(open-source|cloud)/, '')}`
+  const content = readFileSync(path, 'utf-8') 
+  const isCloud = path.replace(baseURL, '').startsWith('/cloud')
+  const fullPath = `http://localhost:3000${path.replace(baseURL, '').replace(/^\/(open-source|cloud)/, '').replace('.html', '').replace(/\/index$/, '')}`
 
   return generalPurposeCrawler(fullPath, content, {
     parseCodeBlocks: true,
-  })
+  }).map((doc) => ({
+    ...doc,
+    path: `/${isCloud ? 'cloud' : 'open-source'}${doc.path}`,
+  }))
 }
 
 async function getAllParsedDocuments() {
   const { cloud, oss } = await getAllRenderedDocs()
-
   const cloudDocs = (await Promise.all(cloud.map(parseDoc))).flat().map((doc) => ({ ...doc, category: 'Cloud', section: unslugify(doc.section) }))
   const ossDocs = (await Promise.all(oss.map(parseDoc))).flat().map((doc) => ({ ...doc, category: 'Open Source', section: unslugify(doc.section) }))
   
@@ -69,4 +72,6 @@ async function updateOramaCloud(docs: GeneralPurposeCrawlerResult[]) {
 
 const docs = await getAllParsedDocuments()
 
-await updateOramaCloud(docs)
+console.log(docs)
+
+// await updateOramaCloud(docs)

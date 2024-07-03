@@ -10,6 +10,16 @@ export const client = new OramaClient({
 
 export function Search() {
   const [theme, setTheme] = useState()
+  const [currentCategory, setCurrentCategory] = useState(null)
+
+  function getCurrentCategory() {
+    const url = new URL(window.location.href).pathname
+
+    if (url.startsWith('/cloud')) return 'Cloud'
+    if (url.startsWith('/open-source')) return 'Open Source'
+
+    return null
+  }
 
   function initSearchBox() {
     try {
@@ -35,10 +45,19 @@ export function Search() {
     const observer = new MutationObserver(callback)
     observer.observe(document.documentElement, { attributes: true })
 
+    const category = getCurrentCategory()
+    setCurrentCategory(category)
+
     return () => {
       observer.disconnect()
     }
   }, [])
+
+  const oramaWhere = currentCategory ? {
+    category: {
+      eq: currentCategory
+    }
+  } : {}
 
   if (!theme) return null
 
@@ -51,6 +70,9 @@ export function Search() {
           colorScheme: theme,
           resultsMap: {
             description: 'content'
+          },
+          searchParams: {
+            where: oramaWhere
           },
           setResultTitle: (doc) => doc.title.split('| Orama Docs')[0]
         }}
