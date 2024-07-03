@@ -265,12 +265,20 @@ export default defineConfig({
           label: "cloud",
           items: [
             {
+              label: "Orama Cloud",
+              link: "/cloud",
+            },
+            {
               label: "Understanding Orama",
               collapsed: false,
               items: [
                 {
                   label: "Introduction",
                   link: "/cloud/understanding-orama/introduction.html",
+                  badge: {
+                    text: 'Start here!',
+                    variant: 'tip'
+                  }
                 },
                 {
                   label: "Indexes",
@@ -298,7 +306,7 @@ export default defineConfig({
             },
             {
               label: "Data Sources",
-              collapsed: false,
+              collapsed: true,
               items: [
                 {
                   label: "Introduction to data sources",
@@ -356,7 +364,7 @@ export default defineConfig({
             },
             {
               label: "Orama AI",
-              collapsed: false,
+              collapsed: true,
               items: [
                 {
                   label: "Automatic embeddings generation",
@@ -370,7 +378,11 @@ export default defineConfig({
             },
             {
               label: "Answer Engine",
-              collapsed: false,
+              collapsed: true,
+              badge: {
+                text: "New!",
+                variant: "success"
+              },
               items: [
                 {
                   label: "Introduction",
@@ -384,7 +396,7 @@ export default defineConfig({
             },
             {
               label: "Performing search",
-              collapsed: false,
+              collapsed: true,
               items: [
                 {
                   label: "Full-text search",
@@ -406,6 +418,7 @@ export default defineConfig({
             },
             {
               label: "Integrating Orama Cloud",
+              collapsed: true,
               items: [
                 {
                   label: "JavaScript SDK",
