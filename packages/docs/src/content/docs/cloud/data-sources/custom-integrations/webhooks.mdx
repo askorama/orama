@@ -63,31 +63,29 @@ For example, if you want your live index to only contains the two following docu
 You can use the **snapshot** API to bulk update the live index:
 
 <Tabs>
-<TabItem label="cURL">
+  <TabItem label="JavaScript">
+    ```js
+    import { CloudManager } from '@oramacloud/client'
 
-```bash
-curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/snapshot \
-  -H "authorization: Bearer $PRIVATE_API_KEY" ]
-  -d '[ { "id": "1", "name": "John Doe", "age": 30 }, { "id": "2", "name": "Jane Doe", "age": 25 } ]'
-```
-</TabItem>
-<TabItem label="JavaScript">
+    const oramaCloudManager = new CloudManager({
+      api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
+    })
 
-```js
-fetch(`https://api.oramasearch.com/api/v1/webhooks/${INDEX_ID}/snapshot`, {
-  method: "POST",
-  headers: {
-    authorization: `Bearer ${PRIVATE_API_KEY}`,
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify([
-    { id: 1, name: "John Doe", age: 30 },
-    { id: 2, name: "Jane Doe", age: 25 },
-  ]),
-});
-```
+    const myIndex = oramaCloudManager.index('my-index-id')
 
-</TabItem>
+    await myIndex.snapshot([
+      { id: 1, name: "John Doe", age: 30 },
+      { id: 2, name: "Jane Doe", age: 25 },
+    ])
+    ```
+  </TabItem>
+  <TabItem label="cURL">
+    ```bash
+    curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/snapshot \
+      -H "authorization: Bearer $PRIVATE_API_KEY" ]
+      -d '[ { "id": "1", "name": "John Doe", "age": 30 }, { "id": "2", "name": "Jane Doe", "age": 25 } ]'
+    ```
+  </TabItem>
 </Tabs>
 
 ## Updating, removing, inserting elements in a live index
@@ -108,69 +106,58 @@ Let's say you want to add a new document:
 
 you can use the **notify** API to put that operation in queue for the next deployment:
 
-
 <Tabs>
-<TabItem label="cURL">
+  <TabItem label="JavaScript">
+    ```js
+    import { CloudManager } from '@oramacloud/client'
 
+    const oramaCloudManager = new CloudManager({
+      api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
+    })
 
-```bash
-curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
-  -H "authorization: Bearer $PRIVATE_API_KEY" \
-  -d '{ "upsert": [{ "id": "3", "name": "Rick Morty", "age": 80 }] }'
-```
+    const myIndex = oramaCloudManager.index('my-index-id')
 
-</TabItem>
-<TabItem label="JavaScript">
-
-```js
-fetch(`https://api.oramasearch.com/api/v1/webhooks/${INDEX_ID}/notify`, {
-  method: "POST",
-  headers: {
-    authorization: `Bearer ${PRIVATE_API_KEY}`,
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    upsert: [{ id: "3", name: "Rick Morty", age: 80 }],
-  }),
-});
-```
-
-</TabItem>
+    await myIndex.notify({
+      upsert: [{ id: "3", name: "Rick Morty", age: 80 }],
+    })
+    ```
+  </TabItem>
+  <TabItem label="cURL">
+    ```bash
+    curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
+      -H "authorization: Bearer $PRIVATE_API_KEY" \
+      -d '{ "upsert": [{ "id": "3", "name": "Rick Morty", "age": 80 }] }'
+    ```
+  </TabItem>
 </Tabs>
-
 
 as you can see, you'll need to pass an array of objects to an `upsert` operation (will do that based on the `id` field). If Orama find that document, it will update it, otherwise it will insert a new one.
 
 You can always remove an existing document by using the `remove` operation. For example, this is how you can remove the document with id `"2"`:
 
-
 <Tabs>
-<TabItem label="cURL">
+  <TabItem label="JavaScript">
+    ```js
+    import { CloudManager } from '@oramacloud/client'
 
+    const oramaCloudManager = new CloudManager({
+      api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
+    })
 
-```bash
-curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
-  -H "authorization: Bearer $PRIVATE_API_KEY" \
-  -d '{ "remove": ["2"] }'
-```
+    const myIndex = oramaCloudManager.index('my-index-id')
 
-</TabItem>
-<TabItem label="JavaScript">
-
-```js
-fetch(`https://api.oramasearch.com/api/v1/webhooks/${INDEX_ID}/notify`, {
-  method: "POST",
-  headers: {
-    authorization: `Bearer ${PRIVATE_API_KEY}`,
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    remove: ["2"],
-  }),
-});
-```
-
-</TabItem>
+    await myIndex.notify({
+      remove: ["2"],
+    })
+    ```
+  </TabItem>
+  <TabItem label="cURL">
+    ```bash
+    curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
+      -H "authorization: Bearer $PRIVATE_API_KEY" \
+      -d '{ "remove": ["2"] }'
+    ```
+  </TabItem>
 </Tabs>
 
 ## Deploying the index
@@ -181,28 +168,87 @@ You can easily do that via the deploy API:
 
 
 <Tabs>
-<TabItem label="cURL">
+  <TabItem label="JavaScript">
+    ```js
+    import { CloudManager } from '@oramacloud/client'
 
-```bash
-curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/deploy \
-  -X POST \
-  -H "Authorization: Bearer $PRIVATE_API_KEY"
-```
+    const oramaCloudManager = new CloudManager({
+      api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
+    })
 
-</TabItem>
-<TabItem label="JavaScript">
+    const myIndex = oramaCloudManager.index('my-index-id')
 
-```js
-fetch(`https://api.oramasearch.com/api/v1/webhooks/${INDEX_ID}/deploy`, {
-  method: "POST",
-  headers: {
-    authorization: `Bearer ${PRIVATE_API_KEY}`,
-    "Content-Type": "application/json",
-  },
-});
-```
-
-</TabItem>
+    await myIndex.deploy()
+    ```
+  </TabItem>
+  <TabItem label="cURL">
+    ```bash
+    curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/deploy \
+      -X POST \
+      -H "Authorization: Bearer $PRIVATE_API_KEY"
+    ```
+  </TabItem>
 </Tabs>
 
 This will trigger a new deployment and will make the new index available worldwide in just a few minutes.
+
+## Clearing the index on next deployment
+
+Sometimes, you may want to re-insert all the documents in the index, and to do that, you will first need to tell Orama to clear the index on the next deployment.
+
+You can do that by using the `clear` API, or by creating an empty snapshot:
+
+<Tabs>
+  <TabItem label="JavaScript">
+    ```js
+    import { CloudManager } from '@oramacloud/client'
+
+    const oramaCloudManager = new CloudManager({
+      api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
+    })
+
+    const myIndex = oramaCloudManager.index('my-index-id')
+
+    await myIndex.clear()
+    ```
+  </TabItem>
+  <TabItem label="cURL">
+    ```bash
+    curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/snapshot \
+      -H "authorization: Bearer $PRIVATE_API_KEY" ]
+      -d '[]'
+    ```
+  </TabItem>
+</Tabs>
+
+This will clear the index on the next deployment, and you can then insert a new snapshot or a number of operations to update the index. This ensures that old data is not present in the index anymore.
+
+## Check if there are pending operations
+
+If you lost track of the operatiosn you ran via the SDK or APIs, you can always check if there are pending operations in the queue by using the `hasPendingOperations` API:
+
+<Tabs>
+  <TabItem label="JavaScript">
+    ```js
+    import { CloudManager } from '@oramacloud/client'
+
+    const oramaCloudManager = new CloudManager({
+      api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
+    })
+
+    const myIndex = oramaCloudManager.index('my-index-id')
+
+    const hasPendingOperations = await myIndex.hasPendingOperations()
+    console.log(hasPendingOperations)
+    // true or false
+    ```
+  </TabItem>
+  <TabItem label="cURL">
+    ```bash
+    # Beware: this API will be renamed to "/has-pending-operations" in the future.
+    # We recommend using the SDK instead.
+    curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/has-data \
+      -H "authorization: Bearer $PRIVATE_API_KEY" ]
+    ```
+  </TabItem>
+</Tabs>
