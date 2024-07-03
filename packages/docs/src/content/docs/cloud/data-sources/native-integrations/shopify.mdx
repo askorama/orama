@@ -75,31 +75,40 @@ If you need to refer to the public access token again, you can go to `https://[y
 
 Now that you have your Shopify access token, you can create an index on Orama Cloud.
 
-To do that, go to your [dashboard](https://cloud.oramasearch.com/indexes) and click on "Create new":
+To do that, go to your [dashboard](https://cloud.orama.com/indexes) and click on "Import data from e-commerce":
 
 <img
-  src='/cloud/guides/shopify/orama-new-index.webp'
+  src='/cloud/guides/shopify/orama-new-index.png'
   alt='Create new Orama index'
 />
 
-Select "Shopify" as the data source, add a new name for your index, and click on "Create index":
+Click on the Shopify logo to create a new Shopify index:
 
 <img
-  src='/cloud/guides/shopify/orama-new-index-shopify.webp'
+  src='/cloud/guides/shopify/orama-new-index-shopify.png'
   alt='Create new Orama index with Shopify'
 />
 
-Now you need to add your Shopify access token and shop domain to your index:
+Give your index a name and click on "Create index":
 
 <img
-  src='/cloud/guides/shopify/orama-new-index-shopify-feed.webp'
-  alt='Feed your Orama index'
+  src='/cloud/guides/shopify/orama-shopify-config.png'
+  alt='Give your index a name'
+/>
+
+Now you need to add your Shopify access token and shop domain to your index.
+
+You will also need to select the embedding model used to perform vector and hybrid search. By default, **Orama GTE-small** is selected, and we recommend using it for most use cases, as it's free, faster, and more optimized than OpenAI's models.
+
+<img
+  src='/cloud/guides/shopify/orama-new-index-shopify-feed.png'
+  alt='Connect Orama to Shopify'
 />
 
 Once you click on "Save and deploy", Orama will start indexing your Shopify store data.
 
 <img
-  src='/cloud/guides/shopify/orama-deployed.webp'
+  src='/cloud/guides/shopify/orama-deployed.png'
   alt='Index deployed'
 />
 
