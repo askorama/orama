@@ -10,6 +10,12 @@ const baseURL = new URL('../dist', import.meta.url).pathname
 const docsCloud = `${baseURL}/cloud/**/*.html`
 const docsOSS = `${baseURL}/open-source/**/*.html`
 
+const isGitHubAction = Boolean(process.env.GITHUB_ACTIONS)
+
+if (isGitHubAction) {
+  process.exit(0)
+}
+
 function unslugify(slug: string) {
   return slug
     .toLowerCase()
