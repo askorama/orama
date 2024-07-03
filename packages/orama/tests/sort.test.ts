@@ -614,7 +614,7 @@ t.test('search with sortBy should be consistent ignoring the insert order', asyn
   t.end()
 })
 
-// https://github.com/oramasearch/orama/issues/629
+// https://github.com/askorama/orama/issues/629
 t.test('sort should be consistent after update', async (t) => {
   const db = await create({
     schema: {

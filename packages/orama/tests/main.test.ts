@@ -168,7 +168,7 @@ t.test('should search numbers in supported languages', async (t) => {
   t.end()
 })
 
-//  Tests for https://github.com/OramaSearch/orama/issues/230
+//  Tests for https://github.com/askorama/orama/issues/230
 t.test('should correctly search accented words in Italian', async (t) => {
   const db = await create({
     schema: {
@@ -189,7 +189,7 @@ t.test('should correctly search accented words in Italian', async (t) => {
   t.equal(searchResult.count, 1)
 })
 
-//  Tests for https://github.com/OramaSearch/orama/issues/230
+//  Tests for https://github.com/askorama/orama/issues/230
 t.test('should correctly search accented words in English', async (t) => {
   const db = await create({
     schema: {
@@ -210,7 +210,7 @@ t.test('should correctly search accented words in English', async (t) => {
   t.equal(searchResult.count, 1)
 })
 
-//  Tests for https://github.com/OramaSearch/orama/issues/230
+//  Tests for https://github.com/askorama/orama/issues/230
 t.test('should correctly search accented words in Dutch', async (t) => {
   const db = await create({
     schema: {

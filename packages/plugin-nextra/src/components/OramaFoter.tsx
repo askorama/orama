@@ -8,7 +8,7 @@ export const OramaFooter = ({ results }) => {
         <b>{results.count}</b> result{results.count > 1 && "s"} found in{" "}
         <b>{results.elapsed.formatted}</b>. Powered by{" "}
         <a
-          href="https://oramasearch.com?utm_source=nextra_plugin"
+          href="https://askorama.com?utm_source=nextra_plugin"
           target="_blank"
           className="nx-text-primary-600"
         >

@@ -1,0 +1,95 @@
+summary {
+  display: flex;
+}
+
+.site-title img {
+  height: 24px;
+}
+
+@media (min-width: 50rem) {
+  .grid-home .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+.sl-markdown-content starlight-tabs ul li,
+.sl-markdown-content starlight-tabs ul {
+  @apply list-none m-0 p-0;
+}
+
+.sl-markdown-content ul,
+.sl-markdown-content ul li {
+  list-style-type: disc;
+  padding: revert;
+}
+
+.sl-markdown-content ol,
+.sl-markdown-content ol li {
+  list-style-type: decimal;
+  padding: revert;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: revert;
+  font-weight: revert;
+}
+
+.grid-home .card-grid .card .title span {
+  line-height: 24px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.grid-home .card-grid .card .body {
+  flex-grow: 1;
+  padding-top: 8px;
+  line-height: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--sl-color-gray-2);
+}
+
+starlight-theme-select svg.label-icon {
+  @apply hidden;
+}
+
+:root {
+  --sl-color-bg-nav: #27232e;
+  --sl-color-bg: #201c27;
+  --sl-color-bg-sidebar: #27232e;
+
+  --sl-color-blue-low: #2F3243;
+  --sl-color-blue-high: #75C0F7;
+  --sl-color-blue: #75C0F7;
+
+  --sl-color-text-accent: #D1BDFB;
+
+  --sl-color-hairline-light: #514D56;
+
+  --sl-color-orange-low: #422F25;
+  --sl-color-orange-high: #F19A69;
+  --sl-color-orange: #F19A69;
+}
+
+:root[data-theme='light'] {
+  --sl-color-bg-nav: #fff;
+  --sl-color-bg: #fbfbfb;
+  --sl-color-bg-sidebar: #fff;
+
+  --sl-color-text-accent: #7241D6;
+
+  --sl-color-hairline-light: #CCD5E0;
+
+  --sl-color-blue-low: #F1F9FE;
+  --sl-color-blue-high: #0275C8;
+  --sl-color-blue: #0275C8;
+
+  --sl-color-orange-low: #FFF8EE;
+  --sl-color-orange-high: #B8541C;
+  --sl-color-orange: #F19A69;
+}

@@ -9,7 +9,7 @@ export interface SearchNoResultsProps {
 export function SearchNoResults({ query }: SearchNoResultsProps): JSX.Element {
   return (
     <ColorModeProvider>
-      {query && <div className="aa-NoResults">No results found.</div>}
+      {query ? <div className="aa-NoResults">No results found.</div> : ''}
       <SearchBarFooter />
     </ColorModeProvider>
   )
