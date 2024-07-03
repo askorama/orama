@@ -97,10 +97,10 @@ importers:
         specifier: ^0.7.0
         version: 0.7.0(typescript@5.5.2)
       '@astrojs/react':
-        specifier: ^3.5.0
+        specifier: ^3.6.0
         version: 3.6.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)(vite@4.5.3)
       '@astrojs/starlight':
-        specifier: ^0.24.1
+        specifier: ^0.24.5
         version: 0.24.5(astro@4.11.3)
       '@astrojs/starlight-tailwind':
         specifier: ^2.0.3
@@ -108,21 +108,24 @@ importers:
       '@astrojs/tailwind':
         specifier: ^5.1.0
         version: 5.1.0(astro@4.11.3)(tailwindcss@3.4.4)(ts-node@10.9.1)
+      '@orama/crawly':
+        specifier: ^0.0.5
+        version: 0.0.5
       '@orama/orama':
-        specifier: ^2.0.19
+        specifier: ^2.0.21
         version: link:../orama
-      '@orama/plugin-astro':
-        specifier: ^2.0.19
-        version: link:../plugin-astro
       '@orama/searchbox':
         specifier: 1.0.0-rc48
-        version: 1.0.0-rc48(@orama/highlight@0.1.6)(@orama/orama@packages+orama)(@oramacloud/client@1.3.1)(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1)(@r2wc/react-to-web-component@2.0.3)(react-dom@18.3.1)(react-markdown@9.0.1)(react-syntax-highlighter@15.5.0)(react@18.3.1)(typescript@5.5.2)
+        version: 1.0.0-rc48(@orama/highlight@0.1.6)(@orama/orama@packages+orama)(@oramacloud/client@1.3.2)(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1)(@r2wc/react-to-web-component@2.0.3)(react-dom@18.3.1)(react-markdown@9.0.1)(react-syntax-highlighter@15.5.0)(react@18.3.1)(typescript@5.5.2)
       '@oramacloud/client':
-        specifier: ^1.3.1
-        version: 1.3.1(typescript@5.5.2)
+        specifier: ^1.3.2
+        version: 1.3.2(typescript@5.5.2)
       astro:
-        specifier: ^4.10.2
+        specifier: ^4.11.3
         version: 4.11.3(@types/node@20.9.0)(typescript@5.5.2)
+      globby:
+        specifier: ^14.0.2
+        version: 14.0.2
       html-to-text:
         specifier: ^9.0.5
         version: 9.0.5
@@ -154,6 +157,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.0
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.5
       typescript:
         specifier: ^5.4.5
         version: 5.5.2
@@ -1343,7 +1349,7 @@ packages:
       rehype: 13.0.1
       rehype-format: 5.0.0
       remark-directive: 3.0.0
-      unified: 11.0.4
+      unified: 11.0.5
       unist-util-visit: 5.0.0
       vfile: 6.0.1
     transitivePeerDependencies:
@@ -1420,7 +1426,7 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       '@babel/highlight': 7.24.7
-      picocolors: 1.0.0
+      picocolors: 1.0.1
     dev: false
 
   /@babel/compat-data@7.22.5:
@@ -2139,7 +2145,7 @@ packages:
       '@babel/helper-validator-identifier': 7.24.7
       chalk: 2.4.2
       js-tokens: 4.0.0
-      picocolors: 1.0.0
+      picocolors: 1.0.1
     dev: false
 
   /@babel/parser@7.22.5:
@@ -8561,7 +8567,7 @@ packages:
   /@mdx-js/mdx@3.0.1:
     resolution: {integrity: sha512-eIQ4QTrOWyL3LWEe/bu6Taqzq2HQvHcyTMaOrI95P2/LmJE7AsfPfgJGuFLPVqBUE1BC1rik3VIhU+s9u72arA==}
     dependencies:
-      '@types/estree': 1.0.1
+      '@types/estree': 1.0.5
       '@types/estree-jsx': 1.0.0
       '@types/hast': 3.0.4
       '@types/mdx': 2.0.5
@@ -8577,9 +8583,9 @@ packages:
       periscopic: 3.1.0
       remark-mdx: 3.0.0
       remark-parse: 11.0.0
-      remark-rehype: 11.0.0
+      remark-rehype: 11.1.0
       source-map: 0.7.4
-      unified: 11.0.4
+      unified: 11.0.5
       unist-util-position-from-estree: 2.0.0
       unist-util-stringify-position: 4.0.0
       unist-util-visit: 5.0.0
@@ -8832,6 +8838,13 @@ packages:
     resolution: {integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==}
     dev: true
 
+  /@orama/crawly@0.0.5:
+    resolution: {integrity: sha512-Gk0MBHOdPiF41G6PKinykBbhN28n4RGws51UGWiHcbRQuzT+IdOtRwBbMJLnbHvBShs8QHXeCheWL0Hcj8ftIg==}
+    dependencies:
+      cheerio: 1.0.0-rc.12
+      slugify: 1.6.6
+    dev: false
+
   /@orama/highlight@0.1.2:
     resolution: {integrity: sha512-B48PnxFwRRHBeEIkmKI38tZmpQDWdt6o4bch5dZaChdZh0pwPHtostMv++eVlNv3/qLtfcdLoSYHWvoN9Mp0Lw==}
     dependencies:
@@ -8874,7 +8887,7 @@ packages:
   /@orama/plugin-secure-proxy@2.0.20(typescript@5.0.3):
     resolution: {integrity: sha512-i90sBn2PPASx0S8aEbDasaFuj9uc0U/Ui1fQX2iTg/9VUAmYPt0DZCfhszQXOr84nCSCEKMd8BkeQmzuj/RmIg==}
     dependencies:
-      '@oramacloud/client': 1.3.1(typescript@5.0.3)
+      '@oramacloud/client': 1.3.2(typescript@5.0.3)
     transitivePeerDependencies:
       - encoding
       - typescript
@@ -8883,7 +8896,7 @@ packages:
   /@orama/plugin-secure-proxy@2.0.20(typescript@5.5.2):
     resolution: {integrity: sha512-i90sBn2PPASx0S8aEbDasaFuj9uc0U/Ui1fQX2iTg/9VUAmYPt0DZCfhszQXOr84nCSCEKMd8BkeQmzuj/RmIg==}
     dependencies:
-      '@oramacloud/client': 1.3.1(typescript@5.5.2)
+      '@oramacloud/client': 1.3.2(typescript@5.5.2)
     transitivePeerDependencies:
       - encoding
       - typescript
@@ -8951,7 +8964,7 @@ packages:
       - typescript
     dev: false
 
-  /@orama/searchbox@1.0.0-rc48(@orama/highlight@0.1.6)(@orama/orama@packages+orama)(@oramacloud/client@1.3.1)(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1)(@r2wc/react-to-web-component@2.0.3)(react-dom@18.3.1)(react-markdown@9.0.1)(react-syntax-highlighter@15.5.0)(react@18.3.1)(typescript@5.5.2):
+  /@orama/searchbox@1.0.0-rc48(@orama/highlight@0.1.6)(@orama/orama@packages+orama)(@oramacloud/client@1.3.2)(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1)(@r2wc/react-to-web-component@2.0.3)(react-dom@18.3.1)(react-markdown@9.0.1)(react-syntax-highlighter@15.5.0)(react@18.3.1)(typescript@5.5.2):
     resolution: {integrity: sha512-zUdLPjwTvDmRwYked//nwu02AY+/7B4PZXMnW6lZsUFfiPgYBElURKYNUMHXMHy112dp2TEqWrIwsJT/EPGyMQ==}
     peerDependencies:
       '@orama/highlight': ^0.1.6
@@ -8969,7 +8982,7 @@ packages:
       '@orama/orama': link:packages/orama
       '@orama/plugin-analytics': 2.0.20
       '@orama/plugin-secure-proxy': 2.0.20(typescript@5.5.2)
-      '@oramacloud/client': 1.3.1(typescript@5.5.2)
+      '@oramacloud/client': 1.3.2(typescript@5.5.2)
       '@phosphor-icons/react': 2.1.6(react-dom@18.3.1)(react@18.3.1)
       '@preact/signals-core': 1.6.0
       '@preact/signals-react': 2.0.1(react@18.3.1)
@@ -9024,8 +9037,8 @@ packages:
       - typescript
     dev: false
 
-  /@oramacloud/client@1.3.1(typescript@5.0.3):
-    resolution: {integrity: sha512-XftPaZSzlei0UGpirphPT7tcMysp9AfypsZ6Y6gqE5zQ8xfbzGdL3fWLBMocfjO9zPt0WCWjajx/5uGFgPYHzw==}
+  /@oramacloud/client@1.3.2(typescript@5.0.3):
+    resolution: {integrity: sha512-veF5z2T8YTOYvHe2a9Ls9NneyND8KHq67ij5RUsKH+tmbri2SIIRJwJ/38YmZpTur60QVhbsHxxQ5Hh76ZkqvA==}
     dependencies:
       '@orama/orama': 2.0.21
       '@paralleldrive/cuid2': 2.2.2
@@ -9038,8 +9051,8 @@ packages:
       - typescript
     dev: false
 
-  /@oramacloud/client@1.3.1(typescript@5.5.2):
-    resolution: {integrity: sha512-XftPaZSzlei0UGpirphPT7tcMysp9AfypsZ6Y6gqE5zQ8xfbzGdL3fWLBMocfjO9zPt0WCWjajx/5uGFgPYHzw==}
+  /@oramacloud/client@1.3.2(typescript@5.5.2):
+    resolution: {integrity: sha512-veF5z2T8YTOYvHe2a9Ls9NneyND8KHq67ij5RUsKH+tmbri2SIIRJwJ/38YmZpTur60QVhbsHxxQ5Hh76ZkqvA==}
     dependencies:
       '@orama/orama': 2.0.21
       '@paralleldrive/cuid2': 2.2.2
@@ -9136,7 +9149,7 @@ packages:
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
     dependencies:
       cross-spawn: 7.0.3
-      fast-glob: 3.2.12
+      fast-glob: 3.3.2
       is-glob: 4.0.3
       open: 9.1.0
       picocolors: 1.0.0
@@ -9550,6 +9563,11 @@ packages:
   /@sindresorhus/is@5.6.0:
     resolution: {integrity: sha512-TV7t8GKYaJWsn00tFDqBw8+Uqmr8A0fRU1tvTQhyZzGv0sJCGRQL3JGMI3ucuKo3XIZdUP+Lx7/gh2t3lewy7g==}
     engines: {node: '>=14.16'}
+    dev: false
+
+  /@sindresorhus/merge-streams@2.3.0:
+    resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
+    engines: {node: '>=18'}
     dev: false
 
   /@sinonjs/commons@2.0.0:
@@ -10959,7 +10977,6 @@ packages:
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
     dependencies:
       '@types/unist': 3.0.2
-    dev: false
 
   /@types/history@4.7.11:
     resolution: {integrity: sha512-qjDJRrmvBMiTx+jyLxvLfJU7UznFuokDv4f3WRuriHKERccVpFU+8XMQUAbDzoiJCsmexxRExQeMwwCdamSKDA==}
@@ -14462,7 +14479,7 @@ packages:
     peerDependencies:
       webpack: ^5.1.0
     dependencies:
-      fast-glob: 3.2.12
+      fast-glob: 3.3.2
       glob-parent: 6.0.2
       globby: 13.1.4
       normalize-path: 3.0.0
@@ -15416,6 +15433,11 @@ packages:
     dependencies:
       is-obj: 2.0.0
     dev: false
+
+  /dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
+    engines: {node: '>=12'}
+    dev: true
 
   /dotignore@0.1.2:
     resolution: {integrity: sha512-UGGGWfSauusaVJC+8fgV+NVvBXkCTmVv7sk6nojDZZvuOUNGUy0Zk4UpHQD6EDjS0jpBwcACvH4eofvyzBcRDw==}
@@ -17741,10 +17763,22 @@ packages:
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
       dir-glob: 3.0.1
-      fast-glob: 3.2.12
+      fast-glob: 3.3.2
       ignore: 5.2.4
       merge2: 1.4.1
       slash: 4.0.0
+    dev: false
+
+  /globby@14.0.2:
+    resolution: {integrity: sha512-s3Fq41ZVh7vbbe2PN3nrW7yC7U7MFVc5c98/iTl9c2GawNMKx/J648KQRW6WKkuU8GIbbh2IXfIRQjOZnXcTnw==}
+    engines: {node: '>=18'}
+    dependencies:
+      '@sindresorhus/merge-streams': 2.3.0
+      fast-glob: 3.3.2
+      ignore: 5.2.4
+      path-type: 5.0.0
+      slash: 5.1.0
+      unicorn-magic: 0.1.0
     dev: false
 
   /gopd@1.0.1:
@@ -18103,7 +18137,7 @@ packages:
   /hast-util-parse-selector@4.0.0:
     resolution: {integrity: sha512-wkQCkSYoOGCRKERFWcxMVMOcYE2K1AaNLU8DXS9arxnLOUEWbOXKXiJUNzEpqZ3JOKpnha3jkFrumEjVliDe7A==}
     dependencies:
-      '@types/hast': 3.0.3
+      '@types/hast': 3.0.4
 
   /hast-util-phrasing@3.0.1:
     resolution: {integrity: sha512-6h60VfI3uBQUxHqTyMymMZnEbNl1XmEGtOxxKYL7stY2o601COo62AWAYBQR9lZbYXYSBoxag8UpPRXK+9fqSQ==}
@@ -20302,7 +20336,7 @@ packages:
   /mdast-util-directive@3.0.0:
     resolution: {integrity: sha512-JUpYOqKI4mM3sZcNxmF/ox04XYFFkNwr0CFlrQIkCwbvH0xzMCqkMqAde9wRd80VAhaUrwFwKm2nxretdT1h7Q==}
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       '@types/unist': 3.0.2
       devlop: 1.1.0
       mdast-util-from-markdown: 2.0.0
@@ -20395,7 +20429,7 @@ packages:
   /mdast-util-gfm-autolink-literal@2.0.0:
     resolution: {integrity: sha512-FyzMsduZZHSc3i0Px3PQcBT4WJY/X/RCtEJKuybiC6sjPqLv7h1yqAkmILZtuxMSsUyaLUWNp71+vQH2zqp5cg==}
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       ccount: 2.0.1
       devlop: 1.1.0
       mdast-util-find-and-replace: 3.0.1
@@ -20413,7 +20447,7 @@ packages:
   /mdast-util-gfm-footnote@2.0.0:
     resolution: {integrity: sha512-5jOT2boTSVkMnQ7LTrd6n/18kqwjmuYqo7JUPe+tRCY6O7dAuTFMtTPauYYrMPpox9hlN0uOx/FL8XvEfG9/mQ==}
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       devlop: 1.1.0
       mdast-util-from-markdown: 2.0.0
       mdast-util-to-markdown: 2.1.0
@@ -20432,7 +20466,7 @@ packages:
   /mdast-util-gfm-strikethrough@2.0.0:
     resolution: {integrity: sha512-mKKb915TF+OC5ptj5bJ7WFRPdYtuHv0yTRxK2tJvi+BDqbkiG7h7u/9SI89nRAYcmap2xHQL9D+QG/6wSrTtXg==}
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       mdast-util-from-markdown: 2.0.0
       mdast-util-to-markdown: 2.1.0
     transitivePeerDependencies:
@@ -20453,7 +20487,7 @@ packages:
   /mdast-util-gfm-table@2.0.0:
     resolution: {integrity: sha512-78UEvebzz/rJIxLvE7ZtDd/vIQ0RHv+3Mh5DR96p7cS7HsBhYIICDBCu8csTNWNO6tBWfqXPWekRuj2FNOGOZg==}
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       devlop: 1.1.0
       markdown-table: 3.0.3
       mdast-util-from-markdown: 2.0.0
@@ -20472,7 +20506,7 @@ packages:
   /mdast-util-gfm-task-list-item@2.0.0:
     resolution: {integrity: sha512-IrtvNvjxC1o06taBAVJznEnkiHxLFTzgonUdy8hzFVeDun0uTjxxrRGVaNFqkU1wJR3RBPEfsxmU6jDWPofrTQ==}
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       devlop: 1.1.0
       mdast-util-from-markdown: 2.0.0
       mdast-util-to-markdown: 2.1.0
@@ -20576,7 +20610,7 @@ packages:
   /mdast-util-phrasing@4.0.0:
     resolution: {integrity: sha512-xadSsJayQIucJ9n053dfQwVu1kuXg7jCTdYsMK8rqzKZh52nLfSH/k0sAxE0u+pj/zKZX+o5wB+ML5mRayOxFA==}
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       unist-util-is: 6.0.0
     dev: false
 
@@ -20634,7 +20668,7 @@ packages:
   /mdast-util-to-markdown@2.1.0:
     resolution: {integrity: sha512-SR2VnIEdVNCJbP6y7kVTJgPLifdr8WEU440fQec7qHoHOUz/oJ2jmNRqdDQ3rbiStOXb2mCDGTuwsK5OPUgYlQ==}
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       '@types/unist': 3.0.2
       longest-streak: 3.1.0
       mdast-util-phrasing: 4.0.0
@@ -22642,6 +22676,11 @@ packages:
   /path-type@4.0.0:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
+
+  /path-type@5.0.0:
+    resolution: {integrity: sha512-5HviZNaZcfqP95rwpv+1HDgUamezbqdSYTyzjTvwtJSnIH+3vnbmWsItli8OFEndS984VT55M3jduxZbX351gg==}
+    engines: {node: '>=12'}
+    dev: false
 
   /peberminta@0.8.0:
     resolution: {integrity: sha512-YYEs+eauIjDH5nUEGi18EohWE0nV2QbGTqmxQcqgZ/0g+laPCQmuIqq7EBLVi9uim9zMgfJv0QBZEnQ3uHw/Tw==}
@@ -24839,10 +24878,10 @@ packages:
   /remark-directive@3.0.0:
     resolution: {integrity: sha512-l1UyWJ6Eg1VPU7Hm/9tt0zKtReJQNOA4+iDMAxTyZNWnJnFlbS/7zhiel/rogTLQ2vMYwDzSJa4BiVNqGlqIMA==}
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       mdast-util-directive: 3.0.0
       micromark-extension-directive: 3.0.0
-      unified: 11.0.4
+      unified: 11.0.5
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -25185,7 +25224,7 @@ packages:
     dependencies:
       '@types/nlcst': 2.0.3
       parse-latin: 7.0.0
-      unified: 11.0.4
+      unified: 11.0.5
     dev: false
 
   /retext-smartypants@5.2.0:
@@ -25218,7 +25257,7 @@ packages:
     dependencies:
       '@types/nlcst': 2.0.3
       nlcst-to-string: 4.0.0
-      unified: 11.0.4
+      unified: 11.0.5
     dev: false
 
   /retext@8.1.0:
@@ -25236,7 +25275,7 @@ packages:
       '@types/nlcst': 2.0.3
       retext-latin: 4.0.0
       retext-stringify: 4.0.0
-      unified: 11.0.4
+      unified: 11.0.5
     dev: false
 
   /retry@0.12.0:
@@ -25901,6 +25940,11 @@ packages:
   /slash@4.0.0:
     resolution: {integrity: sha512-3dOsAHXXUkQTpOYcoAxLIorMTp4gIQr5IW3iVb7A7lFIp0VHhnynm9izx6TssdrIcVIESAlVjtnO2K8bg+Coew==}
     engines: {node: '>=12'}
+    dev: false
+
+  /slash@5.1.0:
+    resolution: {integrity: sha512-ZA6oR3T/pEyuqwMgAKT0/hAv8oAXckzbkmR0UkUosQ+Mc4RxGoJkRmwHgHufaenlyAgE1Mxgpdcrf75y6XcnDg==}
+    engines: {node: '>=14.16'}
     dev: false
 
   /slice-ansi@3.0.0:
@@ -27696,6 +27740,11 @@ packages:
   /unicode-property-aliases-ecmascript@2.1.0:
     resolution: {integrity: sha512-6t3foTQI9qne+OZoVQB/8x8rk2k1eVy1gRXhV3oFQ5T6R1dqQ1xtin3XqSlx3+ATBkliTaR/hHyJBm+LVPNM8w==}
     engines: {node: '>=4'}
+
+  /unicorn-magic@0.1.0:
+    resolution: {integrity: sha512-lRfVq8fE8gz6QMBuDM6a+LO3IAzTi05H6gCVaUpir2E1Rwpo4ZUog45KpNXKC/Mn3Yb9UDuHumeFTo9iV/D9FQ==}
+    engines: {node: '>=18'}
+    dev: false
 
   /unified@10.1.2:
     resolution: {integrity: sha512-pUSWAi/RAnVy1Pif2kAoeWNBa3JVrx0MId2LASj8G+7AiHWoKZNTomq6LG326T68U7/e263X6fTdcXIy7XnF7Q==}

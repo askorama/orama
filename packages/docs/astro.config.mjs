@@ -7,6 +7,11 @@ import tailwind from "@astrojs/tailwind";
 // https://astro.build/config
 export default defineConfig({
   site: "https://docs.askorama.ai",
+  vite: {
+    ssr: {
+      noExternal: ['nanoid']
+    }
+  },
   integrations: [
     starlight({
       pagefind: false,

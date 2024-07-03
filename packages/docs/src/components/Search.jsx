@@ -4,8 +4,8 @@ import { SearchBox, SearchButton } from '@orama/searchbox'
 import '@orama/searchbox/dist/index.css'
 
 export const client = new OramaClient({
-  api_key: 'P9buEfpy8rWvT265McikCG1tP4pT6cBg',
-  endpoint: 'https://cloud.orama.run/v1/indexes/askorama-ai-development-uc6oxa'
+  api_key: 'NKiqTJnwnKsQCdxN7RyOBJgeoW5hJ594',
+  endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-bzo330'
 })
 
 export function Search() {
