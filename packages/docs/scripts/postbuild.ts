@@ -72,6 +72,4 @@ async function updateOramaCloud(docs: GeneralPurposeCrawlerResult[]) {
 
 const docs = await getAllParsedDocuments()
 
-console.log(docs)
-
-// await updateOramaCloud(docs)
+await updateOramaCloud(docs)
