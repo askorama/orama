@@ -7,10 +7,10 @@ import Install from '../../../../../components/Install.astro'
 
 ## Pre-requisites
 
-In order guarantee a correct functionality of the plugin, you need to have the `@docusaurus/core` at least in the version `3.2.0`.
+To guarantee the plugin's correct functionality, you need to have the `@docusaurus/core` package at least in version `3.2.0`.
 
 <Aside type="caution">
-This plugin do not support Docusaurus v2. Use [`@orama/plugin-docusaurus`](https://www.npmjs.com/package/@orama/plugin-docusaurus) instead.
+This plugin doesn't support Docusaurus v2. Use [`@orama/plugin-docusaurus`](https://www.npmjs.com/package/@orama/plugin-docusaurus) instead.
 </Aside>
 
 ## Installation
@@ -21,7 +21,7 @@ You can install the plugin using any major Node.js package manager:
 
 ## Usage
 
-To use the plugin you will need to add it to your docusaurus list of plugins:
+To use the plugin you will need to add it to your Docusaurus list of plugins:
 
 <Code lang="js" title="docusaurus.config.js" code={`
 plugins: [
@@ -38,25 +38,27 @@ plugins: [
 ];
 `} />
 
-To get this variables first create a new integration for HTTP Integrations in here:
+You can get these variables in your Orama Cloud dashboard, right after creating a new index. Just click on "HTTP integrations":
 
 <img
-  src='/oss/docussarus-1.png'
+  src='/cloud/guides/docusaurus/empty.png'
   alt='select integrations'
 />
 
-And then docusaurus:
+And choose "Docusaurus":
 
 <img
-  src='/oss/docussarus-2.png'
-  alt='Select Docusaurus'
+  src='/cloud/guides/docusaurus/choose-docusaurus.png'
+  alt='Select Docusaurus as a data source'
 />
 
-On the next page you will see all the variables you need to get you up and running:
+As soon as you click on "create index", Orama will give you all the variables you need to set up the plugin: 
 
 <img
-  src='/oss/docussarus-3.png'
-  alt="the variables"
+  src='/cloud/guides/docusaurus/env-variables.png'
+  alt="Docusaurus variables shown on Orama Cloud"
 />
 
-And you are set, if you set deploy to true your index will update whenever you build the website and there are changes to your pages.
+Once you configured your `docusaurus.config.js` file, Orama will update the index with the data from your Docusaurus project at build time.
+
+The plugin will also automatically install the Orama searchbox on your documentation, so there's no need to add it manually!
