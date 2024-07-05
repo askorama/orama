@@ -117,9 +117,8 @@ you can use the **notify** API to put that operation in queue for the next deplo
 
     const myIndex = oramaCloudManager.index('my-index-id')
 
-    await myIndex.notify({
-      upsert: [{ id: "3", name: "Rick Morty", age: 80 }],
-    })
+    await myIndex.insert([{ id: "3", name: "Rick Morty", age: 80 }])
+    await myIndex.update([{ id: "3", name: "Rick Doe", age: 75 }])
     ```
   </TabItem>
   <TabItem label="cURL">
@@ -146,9 +145,7 @@ You can always remove an existing document by using the `remove` operation. For 
 
     const myIndex = oramaCloudManager.index('my-index-id')
 
-    await myIndex.notify({
-      remove: ["2"],
-    })
+    await myIndex.remove(["2"])
     ```
   </TabItem>
   <TabItem label="cURL">
