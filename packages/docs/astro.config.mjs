@@ -400,6 +400,28 @@ export default defineConfig({
               ],
             },
             {
+              label: "Audience Management",
+              collapsed: true,
+              badge: {
+                text: "New!",
+                variant: "success"
+              },
+              items: [
+                {
+                  label: "Introduction",
+                  link: "/cloud/audience-management/introduction.html",
+                },
+                {
+                  label: "User Segmentation",
+                  link: "/cloud/audience-management/user-segmentation.html",
+                },
+                {
+                  label: "Triggers",
+                  link: "/cloud/audience-management/triggers.html",
+                },
+              ]
+            },
+            {
               label: "Performing search",
               collapsed: true,
               items: [
