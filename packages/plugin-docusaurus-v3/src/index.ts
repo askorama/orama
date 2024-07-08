@@ -99,6 +99,7 @@ export default function OramaPluginDocusaurus(
             })
             break
           case "blogs":
+            if (!value) break
             Object.keys(value).forEach(async (instance) => {
               const loadedInstance = value[instance]
               allOramaDocsPromises.push(
@@ -114,6 +115,7 @@ export default function OramaPluginDocusaurus(
             })
             break
           case "pages":
+            if (!value) break
             Object.keys(value).forEach(async (instance) => {
               const loadedInstance = value[instance]
               allOramaDocsPromises.push(
