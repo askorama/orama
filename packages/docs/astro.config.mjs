@@ -279,11 +279,7 @@ export default defineConfig({
               items: [
                 {
                   label: "Introduction",
-                  link: "/cloud/understanding-orama/introduction.html",
-                  badge: {
-                    text: 'Start here!',
-                    variant: 'tip'
-                  }
+                  link: "/cloud/understanding-orama/introduction.html"
                 },
                 {
                   label: "Indexes",
