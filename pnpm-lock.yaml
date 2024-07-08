@@ -123,6 +123,9 @@ importers:
       astro:
         specifier: ^4.11.3
         version: 4.11.3(@types/node@20.9.0)(typescript@5.5.2)
+      astro-og-canvas:
+        specifier: ^0.5.3
+        version: 0.5.3(astro@4.11.3)
       globby:
         specifier: ^14.0.2
         version: 14.0.2
@@ -12163,7 +12166,7 @@ packages:
     dependencies:
       '@vue/compiler-ssr': 3.4.29
       '@vue/shared': 3.4.29
-      vue: 3.4.29(typescript@5.2.2)
+      vue: 3.4.29(typescript@5.5.2)
     dev: false
 
   /@vue/shared@3.3.10:
@@ -12444,6 +12447,10 @@ packages:
     dependencies:
       '@webassemblyjs/ast': 1.11.6
       '@xtuc/long': 4.2.2
+
+  /@webgpu/types@0.1.21:
+    resolution: {integrity: sha512-pUrWq3V5PiSGFLeLxoGqReTZmiiXwY3jRkIG5sLLKjyqNxrwm/04b4nw7LSmGWJcKk59XOM/YRTUwOzo4MMlow==}
+    dev: false
 
   /@xtuc/ieee754@1.2.0:
     resolution: {integrity: sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==}
@@ -12902,6 +12909,18 @@ packages:
     dependencies:
       astro: 4.11.3(@types/node@20.9.0)(typescript@5.5.2)
       rehype-expressive-code: 0.35.3
+    dev: false
+
+  /astro-og-canvas@0.5.3(astro@4.11.3):
+    resolution: {integrity: sha512-xy4k3D/fq4vq71B8CKsqBRuAd2kRJjMaeOMH9EFVtPPqudrDGXG2k87SdxPr5FATvttWpIjYplqK/vYJAoZ2DA==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      astro: ^3.0.0 || ^4.0.0
+    dependencies:
+      astro: 4.11.3(@types/node@20.9.0)(typescript@5.5.2)
+      canvaskit-wasm: 0.39.1
+      deterministic-object-hash: 2.0.2
+      entities: 4.5.0
     dev: false
 
   /astro@2.0.2(@types/node@20.9.0):
@@ -13826,6 +13845,12 @@ packages:
 
   /caniuse-lite@1.0.30001638:
     resolution: {integrity: sha512-5SuJUJ7cZnhPpeLHaH0c/HPAnAHZvS6ElWyHK9GSIbVOQABLzowiI2pjmpvZ1WEbkyz46iFd4UXlOHR5SqgfMQ==}
+    dev: false
+
+  /canvaskit-wasm@0.39.1:
+    resolution: {integrity: sha512-Gy3lCmhUdKq+8bvDrs9t8+qf7RvcjuQn+we7vTVVyqgOVO1UVfHpsnBxkTZw+R4ApEJ3D5fKySl9TU11hmjl/A==}
+    dependencies:
+      '@webgpu/types': 0.1.21
     dev: false
 
   /capital-case@1.0.4:

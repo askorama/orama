@@ -6,7 +6,7 @@ import tailwind from "@astrojs/tailwind";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://docs.askorama.ai",
+  site: "https://docs.orama.com",
   vite: {
     ssr: {
       noExternal: ['nanoid']
@@ -86,6 +86,7 @@ export default defineConfig({
         Hero: "./src/components/Hero.astro",
         Header: "./src/components/Header.astro",
         Search: "./src/components/Search.astro",
+        Head: "./src/components/Head.astro",
       },
       sidebar: [
         {
