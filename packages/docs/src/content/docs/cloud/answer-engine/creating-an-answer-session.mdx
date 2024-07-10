@@ -22,8 +22,13 @@ const orama = new OramaClient({
 });
 
 const answerSession = orama.createAnswerSession({
+  // optional
+  userContext: "The user is a very skilled programmer but has never used Orama before.",
+  // optional
   inferenceType: "documentation",
+  // optional
   initialMessages: [],
+  // optional
   events: {
     onMessageChange: (messages) => console.log({ messages }),
     onMessageLoading: (loading) => console.log({ loading }),
@@ -39,6 +44,30 @@ await answerSession.ask({
 ```
 
 All the parameters above are optional, but you may need to use them to create great answer sessions for your users. Let’s see them in detail.
+
+### `userContext`
+
+`userContext` is a string or an object that describes the user’s context. This is useful when you want to provide a more personalized experience to your users. For example, if you know that the user is a beginner in programming, you can provide a more detailed explanation of the concepts you’re talking about. This is optional, but it’s a good practice to provide it.
+
+If we pretend to be an online music store, and we know who the logged in user is, we could provide the following user context:
+
+```js
+const answerSession = orama.createAnswerSession({
+  userContext: 'The user is called John Doe and he loves rock music. He has been a customer for 5 years.'
+})
+```
+
+If we prefer, we can also use an object to provide a more structured context:
+
+```js
+const answerSession = orama.createAnswerSession({
+  userContext: {
+    name: 'John Doe',
+    musicTaste: ['Rock', 'Punk', 'Metal'],
+    customerSince: 2019
+  }
+})
+```
 
 ### `inferenceType`
 
@@ -167,7 +196,6 @@ await answerSession.ask({
 });
 ```
 
-
 ## Asking a Question
 
 With the Orama JavaScript SDK, you can ask questions in two different ways:
@@ -207,6 +235,33 @@ for await (const msg of answer) {
 // ation answer
 //  engine
 ```
+
+## Providing User Data for a specific answer
+
+When you ask a question, you can provide additional user data to the answer session. This is useful when you want to provide a more personalized experience to your users. For example, if you know that the user is a beginner in programming, you can provide a more detailed explanation of the concepts you’re talking about:
+
+```js
+const answer = await answerSession.ask({
+  term: "What is Orama?",
+  userData: {
+    userLevel: "beginner"
+  }
+});
+```
+
+Just like the `userContext`, the `userData` can be a string or an object:
+
+```js
+const answer = await answerSession.ask({
+  term: "What is Orama?",
+  userData: "The user is a beginner in programming"
+});
+```
+
+The main difference between `userContext` and `userData` is that the `userData` is specific to a single answer request, while the `userContext` is global to the entire answer session.
+
+Of course, Orama will remember the `userData` in subsequent answer requests, but will tend to forget it after a while. So, if that data is important to you, you should either provide it in every answer request, or use the `userContext` instead.
+
 
 ## Aborting Answers Generation
 
