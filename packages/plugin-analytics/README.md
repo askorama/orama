@@ -8,7 +8,7 @@ Official plugin to provide analytics data on your searches.
 
 For the complete usage guide, please refer to the [official plugin documentation](https://docs.oramasearch.com/open-source/plugins/plugin-analytics).
 
-To use the Orama Analytics Plugin, you will need to sign up for a free account at [https://cloud.oramasearch.com](https://cloud.oramasearch.com)
+To use the Orama Analytics Plugin, you will need to sign up for a free account at [https://cloud.orama.com](https://cloud.orama.com)
 
 ```js
 import { create, insert, search } from '@orama/orama'

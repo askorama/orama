@@ -6,7 +6,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 With Orama Cloud, you can automatically generate embeddings from your data at deployment.
 
-This guide will walk you through the process of creating embeddings using the **Orama Native Embeddings** or **Open AI** model. We plan to support additional models in the near future.
+This guide will walk you through the process of creating embeddings using the **Orama Native Embeddings** or **OpenAI** model. We plan to support additional models in the near future.
 
 ## What are text embeddings?
 
@@ -21,6 +21,9 @@ For a deeper understanding of text embeddings, the Tensorflow website offers a f
 ## Automatic embeddings generation with Orama Cloud
 
 Creating text embeddings from a given text or set of texts can be complex. However, Orama Cloud simplifies this process by enabling automatic generation of these embeddings each time you deploy a new index. This makes it remarkably easy to conduct semantic searches through your data at a remarkable speed.
+
+Not only Orama Cloud will take care of embedding generation, but it will also apply **NLP-based chunking** on your data, making sure that large documents are split into smaller, semantically meaningful chunks within a specific number of tokens.
+This will ensure that even for large texts, the LLM used to generate embeddings will have full context and won't cut off the text in the middle of a sentence when the token limit is reached.
 
 ## Using the Orama Native Embeddings
 
@@ -55,7 +58,7 @@ Before you can start generating embeddings, you need to connect to OpenAI. This 
 
 We will encrypt this API Key and store it securely. For safety reasons, we recommend creating a new API Key specifically for Orama Cloud from the OpenAI dashboard.
 
-As soon as you have your OpenAI API Key ready, you can add it to Orama Cloud by going to [https://cloud.oramasearch.com/developer-tools](https://cloud.oramasearch.com/developer-tools), and selecting "OpenAI API key" from the left menu.
+As soon as you have your OpenAI API Key ready, you can add it to Orama Cloud by going to [https://cloud.orama.com/developer-tools](https://cloud.orama.com/developer-tools), and selecting "OpenAI API key" from the left menu.
 
 <img
   src='/cloud/guides/automatic-embeddings-generation/automatic-embeddings-generation.png'
@@ -71,7 +74,7 @@ After adding your API key, you won't be able to view it again for security reaso
 
 ### Creating the embeddings
 
-You can now create a new index by going to [https://cloud.oramasearch.com/indexes/new](https://cloud.oramasearch.com/indexes/new). For this guide, we will use a simple JSON file as a data source.
+You can now create a new index by going to [https://cloud.orama.com/indexes/new](https://cloud.orama.com/indexes/new). For this guide, we will use a simple JSON file as a data source.
 
 You can download the same JSON file here: [download dataset](/cloud/guides/example-datasets/games.json).
 

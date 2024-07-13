@@ -295,7 +295,7 @@ async function deployData({
     | undefined
 }) {
   const { ORAMA_CLOUD_BASE_URL } = process.env
-  const baseUrl = ORAMA_CLOUD_BASE_URL || "https://cloud.oramasearch.com"
+  const baseUrl = ORAMA_CLOUD_BASE_URL || "https://cloud.orama.com"
 
   if (deployConfig?.type) {
     if (deployConfig.type === DeployType.DEFAULT || deployConfig.type === DeployType.SNAPSHOT_ONLY) {

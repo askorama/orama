@@ -8,7 +8,7 @@ Orama plugin for generating embeddings and performing vector/hybrid search secur
 
 For the complete usage guide, please refer to the [official plugin documentation](https://docs.oramasearch.com/open-source/plugins/plugin-secure-proxy).
 
-To use the Orama Secure Proxy Plugin, you will need to sign up for a free account at [https://cloud.oramasearch.com](https://cloud.oramasearch.com)
+To use the Orama Secure Proxy Plugin, you will need to sign up for a free account at [https://cloud.orama.com](https://cloud.orama.com)
 
 ```js
 import { create, insert, search } from '@orama/orama'
