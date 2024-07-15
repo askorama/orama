@@ -9,7 +9,7 @@ A data source, as the name suggests, refers to the original source from which da
 
 Orama offers built-in integrations with Shopify, Docusaurus, and Elasticpath, and continues to expand its native integrations to additional platforms.
 
-If you're interested in integrating Orama into a project, but your data source isn't included in the list of native integrations, don't fret! You can always utilize the WebHook and REST APIs to supply Orama with your own data.
+If you're interested in integrating Orama into a project, but your data source isn't included in the list of native integrations, don't fret! You can always utilize the REST APIs and remote JSON to supply Orama with your own data.
 
 ## Choosing the right data source
 
@@ -19,12 +19,12 @@ Thanks to our powerful dashboard, you can easily import any JSON or CSV file and
 
 If you want to learn more about importing JSON and CSV files, read the dedicated guide [here](https://www.notion.so/Introduction-to-data-sources-f337ecfcb7644de591e3fbdd730e7882?pvs=21).
 
-If you need to regularly update the Orama index for production-grade workflows, or on a demand basis, we highly recommend considering the [WebHook data source](https://www.notion.so/Introduction-to-data-sources-f337ecfcb7644de591e3fbdd730e7882?pvs=21).
+If you need to regularly update the Orama index for production-grade workflows, or on a demand basis, we highly recommend considering feeding your index via [REST APIs](https://www.notion.so/Introduction-to-data-sources-f337ecfcb7644de591e3fbdd730e7882?pvs=21).
 
-This is the datasource that powers big, traffic-intense websites such as https://nodejs.org, https://jsr.io, and https://docs.solidjs.com.
+This is the data source that powers big, traffic-intense websites such as https://nodejs.org, https://jsr.io, https://docs.deno.com, https://tanstack.com, and https://docs.solidjs.com.
 
 By utilizing this data source, you can decide when to redeploy the index or only update a segment of it.
 
-Typically, you might set up a cron job to periodically update the index based on your needs. However, with our WebHook APIs, you also have the option to trigger updates on demand.
+Typically, you might set up a cron job to periodically update the index based on your needs. However, with our REST APIs, you also have the option to trigger updates on demand.
 
 If you still have doubts about the right data source for you after reading this guide, join our Community Slack channel at [https://orama.to/slack](https://orama.to/slack). We'd be happy to help you and your team get started with Orama.
