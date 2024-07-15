@@ -8,7 +8,7 @@ export const client = new OramaClient({
   endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-bzo330'
 })
 
-export function Search() {
+export function Search(props) {
   const [theme, setTheme] = useState()
   const [currentCategory, setCurrentCategory] = useState(null)
 

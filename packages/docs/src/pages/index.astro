@@ -1,0 +1,77 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { YouTube } from 'astro-embed';
+---
+
+<StarlightPage
+  frontmatter={{
+    title: 'Orama',
+    template: 'splash',
+    editUrl: false,
+  }}
+  hasSidebar={false}
+>
+
+  <div class="hero-lead-text-container">
+    <img src="/logo-orama-dark.svg" alt="Orama" class="logo" />
+    <p class="description"> Full-text, vector, and hybrid search in any JavaScript runtime. </p>
+  </div>
+
+  <div class="youtube-embed">
+    <YouTube id='MKWf3R4GI48' posterQuality='high' class='embed' />
+  </div>
+
+</StarlightPage>
+
+<style is:global>
+  body:not(:has(#starlight__sidebar)) .content-panel:has(h1#_top) {
+    display: none;
+  }
+
+  body:not(:has(#starlight__sidebar)) .content-panel {
+    border: none;
+  }
+
+  .content-panel {
+    position: relative;
+    background-image: url('/misc/bg-home-alt.png');
+    background-size: cover;
+    background-position: center;
+    color: #c1c3c7;
+  }
+
+  .hero-lead-text-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 44px;
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .logo {
+    width: 250px;
+
+    @media (max-width: 768px) {
+      width: 180px;
+    }
+  }
+
+  .hero-lead-text-container .description {
+    margin-top: 12px;
+    text-align: center;
+  }
+
+  .youtube-embed {
+    margin-top: 50px !important;
+  }
+
+  .youtube-embed .embed {
+    width: 720px;
+    max-width: 90%;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+
+</style>
