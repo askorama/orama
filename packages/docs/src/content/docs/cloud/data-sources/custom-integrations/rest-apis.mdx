@@ -1,18 +1,18 @@
 ---
-title: Webhook
-description: Learn how to use the Webhook data source to deploy and manage an index on Orama Cloud.
+title: REST APIs
+description: Learn how to feed data into Orama Cloud using REST APIs
 ---
 import { Tabs, TabItem, Code } from "@astrojs/starlight/components";
 
-Webhooks provide an effective means of interacting with your Orama index.
+REST APIs provide an effective means of interacting with your Orama index.
 
 They allow you to update, insert, and remove data from your index seamlessly. The system then queues these changes until you request a redeploy.
 
-This guide will show you how to utilize the Webhook data source for deploying and managing an index on Orama Cloud.
+This guide will show you how to utilize the Orama REST APIs for deploying and managing an index on Orama Cloud.
 
-## Creating an index with Webhook as a data source
+## Creating an index and feeding it via REST APIs
 
-Firstly, create a new index using "Webhook" as a data source. You can find it under "custom data sources."
+Firstly, create a new index using "REST API" as a data source. You can find it under "custom data sources."
 
 After creating it, you will need to construct the searchable properties schema. Remember, only include the properties you plan to use for searching or filtering.
 
@@ -24,16 +24,16 @@ We will also enable [automatic embeddings generation](/cloud/orama-ai/automatic-
 
 <img
   src='/cloud/guides/webhook/schema.png'
-  alt='Webhook index schema'
+  alt='REST APIs index schema'
 />
 
-After we completed this step, we can save the configuration by clicking on "Save".
+After we complete this step, we can save the configuration by clicking on "Save".
 
 This will bring us to the following screen, where we can find some instructions on how to deploy and update an index via webhooks:
 
 <img
   src='/cloud/guides/webhook/instruction.png'
-  alt='Webhook instructions'
+  alt='REST APIs instructions'
 />
 
 From here, we can choose two different ways of updating an index.
@@ -42,7 +42,7 @@ To run the following APIs, get an Orama API Key in the [developers tools section
 
 ## Inserting a snapshot
 
-A snapshot is a complete override of a given index. It means you bulk upload a number of documents, which entirely sobstitute the live index all at once.
+A snapshot is a complete override of a given index. It means you bulk upload a number of documents, which entirely substitute the live index all at once.
 
 For example, if you want your live index to only contains the two following documents:
 

@@ -1,11 +1,11 @@
 ---
-title: Connect Orama Cloud to a REST API
-description: Learn how to connect Orama Cloud to a REST API.
+title: Connect Orama Cloud to a remote JSON data source
+description: Learn how to connect Orama Cloud to a remote JSON data source
 ---
 
-Another way to use Orama and get your data indexed is to import the data using your own REST API.
+Another way to use Orama and get your data indexed is to import the data using a remote JSON data source.
 
-In this example I will be using a project I created that already has an API endpoint at: [https://letsplayretro.games/api/nes/all](https://letsplayretro.games/api/nes/all?results=999), this particular endpoint gather all the games for the original [Nintendo Entertainment System](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) into one nice JSON structure.
+In this example I will be using a project I created that already has an API endpoint at: [https://letsplayretro.games/api/nes/all](https://letsplayretro.games/api/nes/all?results=999), this particular endpoint gathers all the games for the original [Nintendo Entertainment System](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) into one nice JSON structure.
 
 To start indexing this data let's go into the dashboard and click on `Add a new Index` and then on `HTTP Integrations`:
 
@@ -14,12 +14,12 @@ To start indexing this data let's go into the dashboard and click on `Add a new 
   alt='Create a new index with Orama Cloud'
 />
 
-You will be presented with a page that asks some questions about your new index and like the name and a description that is optional, in my case I named the index it `NES Games` but you may call it anything.
-After that is done you can click on `REST API` and we are ready to create our Index:
+You will be presented with a page that asks some questions about your new index and like the name and an optional description, in my case I named the index `NES Games` but you may call it anything.
+After that is done you can click on `Remote JSON` and we are ready to create our Index:
 
 <img
   src='/cloud/guides/rest/2.png'
-  alt='Create a new REST API index with Orama Cloud'
+  alt='Create a new Remote JSON index with Orama Cloud'
 />
 
 This page is where we will tell Orama the location of the Endpoint we want it to get the data from, and we want to use the data at [https://letsplayretro.games/api/nes/all](https://letsplayretro.games/api/nes/all?results=999), in our case the endpoint does not require any authorization but if it did this where you could give us a header to send in the request.
@@ -42,7 +42,7 @@ After waiting a bit we should get back a success message and our API Key and End
   alt='Deployed index'
 />
 
-That's it! We have deployed an index with a REST API datasource
+That's it! We have deployed an index with a REST API data source.
 
 ## Integrating Orama Cloud into your app
 

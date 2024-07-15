@@ -345,12 +345,12 @@ export default defineConfig({
                       link: "/cloud/data-sources/custom-integrations/introduction.html",
                     },
                     {
-                      label: "REST API",
-                      link: "/cloud/data-sources/custom-integrations/rest-api.html",
+                      label: "Remote JSON",
+                      link: "/cloud/data-sources/custom-integrations/remote-json.html",
                     },
                     {
-                      label: "Webhook",
-                      link: "/cloud/data-sources/custom-integrations/webhooks.html",
+                      label: "REST APIs",
+                      link: "/cloud/data-sources/custom-integrations/rest-apis.html",
                     },
                     {
                       label: "JSON File",
