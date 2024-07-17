@@ -59,6 +59,8 @@ export function Search(props) {
     }
   } : {}
 
+  const facetProperty = ['Cloud', 'Open Source'].includes(currentCategory) ? 'section' : 'category'
+
   if (!theme) return null
 
   return (
@@ -68,6 +70,7 @@ export function Search(props) {
           oramaInstance: client,
           backdrop: true,
           colorScheme: theme,
+          facetProperty,
           resultsMap: {
             description: 'content'
           },

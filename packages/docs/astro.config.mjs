@@ -379,6 +379,24 @@ export default defineConfig({
               ],
             },
             {
+              label: "Performing search",
+              collapsed: true,
+              items: [
+                {
+                  label: "Full-text search",
+                  link: "/cloud/performing-search/full-text-search.html",
+                },
+                {
+                  label: "Vector search",
+                  link: "/cloud/performing-search/vector-search.html",
+                },
+                {
+                  label: "Hybrid search",
+                  link: "/cloud/performing-search/hybrid-search.html",
+                }
+              ],
+            },
+            {
               label: "Answer Engine",
               collapsed: true,
               badge: {
@@ -417,28 +435,6 @@ export default defineConfig({
                   link: "/cloud/audience-management/triggers.html",
                 },
               ]
-            },
-            {
-              label: "Performing search",
-              collapsed: true,
-              items: [
-                {
-                  label: "Full-text search",
-                  link: "/cloud/performing-search/full-text-search.html",
-                },
-                {
-                  label: "Vector search",
-                  link: "/cloud/performing-search/vector-search.html",
-                },
-                {
-                  label: "Hybrid search",
-                  link: "/cloud/performing-search/hybrid-search.html",
-                },
-                {
-                  label: "Custom Search Priority",
-                  link: "/cloud/performing-search/custom-search-priority.html",
-                },
-              ],
             },
             {
               label: "Integrating Orama Cloud",
