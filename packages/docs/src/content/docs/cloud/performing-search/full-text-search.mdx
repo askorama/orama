@@ -3,6 +3,7 @@ title: Performing full-text search on Orama Cloud
 description: Learn how to perform full-text search on Orama Cloud.
 ---
 import { Aside } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 After deploying your index, Orama will distribute it to over 300 global points of presence across more than 100 countries worldwide. This will guarantee the lowest possible latency for any search query, at any scale.
 
@@ -14,33 +15,92 @@ This SDK manages connection, cache, telemetry, and type safety for all your sear
 You can find the guide on installing the SDK [here](/cloud/integrating-orama-cloud/javascript-sdk).
 </Aside>
 
-Make sure you have the Orama SDK installed to start performing full-text search at a massive scale!
+Make sure you have the Orama SDK installed to start performing full-text, vector, and hybrid search at a massive scale!
 
-## Full-text search with Orama Cloud
+## Full-text, vector, and hybrid search with Orama Cloud
 
-Once you have your SDK installed, you can use it in every JavaScript runtime (browser, server, mobile apps, etc.).
+Once you have your SDK for your preferred language installed, you can start performing full-text, vector, and hybrid search queries on Orama Cloud.
 
 The client exposes a simple `search` method that can be used to query the index:
 
-```typescript copy
-import { OramaClient } from "@oramacloud/client";
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```typescript copy
+    import { OramaClient } from "@oramacloud/client";
 
-const client = new OramaClient({
-  endpoint: "",
-  api_key: "",
-});
+    const client = new OramaClient({
+      endpoint: "",
+      api_key: "",
+    });
 
-const results = await client.search({
-  term: "red shoes",
-  where: {
-    price: {
-      gt: 99.99,
-    },
-  },
-});
-```
+    const results = await client.search({
+      term: "red shoes",
+      mode: "fulltext", // optional, default is "fulltext" but can also be "vector" or "hybrid"
+      where: {
+        price: {
+          gt: 99.99,
+        },
+      },
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    import OramaCloud
 
-The `search` method exposes the same interface you're used to implement with OSS Orama. That means that you can perform full-text query, group, sort, filter, run preflight requests, adjust the threshold, run pagination, etc.
+    struct MyDoc: Encodable & Decodable {
+      let title: String
+      let description: String
+    }
+
+    let clientParams = OramaClientParams(endpoint: "", apiKey: "")
+    let orama = OramaClient(params: clientParams)
+
+    let searchParams = ClientSearchParams.builder(
+        term: "What is Orama?",
+        mode: .fulltext // optional, default is .fulltext but can also be .vector or .hybrid
+      )
+      .limit(10) // optional
+      .offset(0) // optional
+      .returning(["title", "description"]) // optional
+      .build()
+
+    let searchResults: SearchResults<MyDoc> = try await orama.search(query: searchParams)
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    use OramaCloud\Client;
+    use OramaCloud\Client\Query;
+    use OramaCloud\Client\QueryParams/WhereOperator;
+    use OramaCloud\Client\QueryParams/SortByOrder;
+
+    $client = new Client([
+      'api_key' => '<Your Orama Cloud API Key>',
+      'endpoint' => '<Your Orama Cloud Endpoint>'
+    ]);
+
+    $query = (new Query('red shoes', 'fulltext')) // 'fulltext' is optional, but can also be "vector" or "hybrid"
+        ->where('price', WhereOperator::LTE, 9.99)
+        ->where('gender', WhereOperator::EQ, 'unisex')
+        ->sortBy('price' SortByOrder::DESC)
+        ->limit(5)
+        ->offset(1);
+
+    $results = $client->search($query);
+    ```
+  </TabItem>
+</Tabs>
 
 ## Sorting
 
@@ -50,59 +110,113 @@ To perform sorting, Orama Cloud uses the properties defined in the `schema` to k
 At the time of writing, Orama Cloud only supports sorting on `number` properties.
 </Aside>
 
-```javascript copy
-const db = await create({
-  schema: {
-    title: "string",
-    year: "number",
-    inPromotion: "boolean",
-    meta: {
-      tag: "string",
-      rating: "number",
-      favorite: "boolean",
-    },
-  },
-});
+Considering the following schema:
 
-const results = await search(db, {
-  term: "prestige",
-  sortBy: {
-    property: "year",
-    order: "desc" // optional, default is "asc" 
-  },
-});
+```json copy
+{
+  "title": "string",
+  "year": "number",
+  "inPromotion": "boolean",
+  "meta": {
+    "tag": "string",
+    "rating": "number",
+    "favorite": "boolean"
+  }
+}
 ```
+
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const results = await client.search({
+      term: "prestige",
+      sortBy: {
+        property: "year",
+        order: "desc" // optional, default is "asc" 
+      },
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 With Orama Cloud, you can set up to three sorting properties. This means that you can sort by up to three properties at the same time.
 
-```javascript copy
-const db = await create({
-  schema: {
-    title: "string",
-    year: "number",
-    inPromotion: "boolean",
-    meta: {
-      tag: "string",
-      rating: "number",
-      favorite: "boolean",
-    },
-  },
-});
+So, considering the following schema: 
 
-const results = await search(db, {
-  term: "prestige",
-  sortBy: [
-    {
-      property: "year",
-      order: "desc"
-    },
-    {
-      property: "meta.rating",
-      order: "desc"
-    }
-  ]
-});
+```json copy
+{
+  "title": "string",
+  "year": "number",
+  "inPromotion": "boolean",
+  "meta": {
+    "tag": "string",
+    "rating": "number",
+    "favorite": "boolean"
+  }
+}
 ```
+
+You can sort by `year` and `meta.rating` at the same time:
+
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const results = await client.search({
+      term: "prestige",
+      sortBy: [
+        {
+          property: "year",
+          order: "desc"
+        },
+        {
+          property: "meta.rating",
+          order: "desc"
+        }
+      ]
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 In that case, "year" will be the primary sorting property, and "meta.rating" will be the secondary sorting property. In case of a tie, the secondary sorting property will be used to break the tie.
 
@@ -114,89 +228,133 @@ With the Orama Faceted Search API, users can filter their search results by vari
 
 Given the following Orama schema:
 
-```js
-import { create } from "@orama/orama";
-
-const db = await create({
-  schema: {
-    title: "string",
-    description: "string",
-    categories: {
-      primary: "string",
-      secondary: "string",
-    },
-    rating: "number",
-    isFavorite: "boolean",
-  },
-});
-```
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```json
+    {
+      title: "string",
+      description: "string",
+      categories: {
+        primary: "string",
+        secondary: "string",
+      },
+      rating: "number",
+      isFavorite: "boolean",
+    }
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 Orama will be able to generate facets at search-time based on the schema. To do so, we need to specify the `facets` property in the `search` configuration:
 
-```js
-const results = await search(db, {
-  term: "Movie about cars and racing",
-  properties: ["description"],
-  facets: {
-    "categories.primary": {
-      limit: 3,
-      order: "DESC",
-    },
-    "categories.secondary": {
-      limit: 2,
-      order: "DESC",
-    },
-    rating: {
-      ranges: [
-        { from: 0, to: 3 },
-        { from: 3, to: 7 },
-        { from: 7, to: 10 },
-      ],
-    },
-    isFavorite: {
-      true: true,
-      false: true,
-    },
-  },
-});
-```
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```js
+    const results = await client.search({
+      term: "Movie about cars and racing",
+      properties: ["description"],
+      facets: {
+        "categories.primary": {
+          limit: 3,
+          order: "DESC",
+        },
+        "categories.secondary": {
+          limit: 2,
+          order: "DESC",
+        },
+        rating: {
+          ranges: [
+            { from: 0, to: 3 },
+            { from: 3, to: 7 },
+            { from: 7, to: 10 },
+          ],
+        },
+        isFavorite: {
+          true: true,
+          false: true,
+        },
+      },
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 This will generate the following result:
 
-```js
+```json
 {
-  elapsed: ...,
-  count: ...,
-  hits: { ... },
-  facets: {
-    'categories.first': {
-      count: 14,
-      values: {
-        'Action': 4,
-        'Adventure': 3,
-        'Comedy': 2,
+  "elapsed": ...,
+  "count": ...,
+  "hits": { ... },
+  "facets": {
+    "categories.first": {
+      "count": 14,
+      "values": {
+        "Action": 4,
+        "Adventure": 3,
+        "Comedy": 2,
       }
     },
-    'categories.second': {
-      count: 14,
-      values: {
-        'Cars': 4,
-        'Racing': 3,
+    "categories.second": {
+      "count": 14,
+      "values": {
+        "Cars": 4,
+        "Racing": 3,
       }
     },
-    rating: {
-      count: 3,
-      values: {
-        '0-3': 5,
-        '3-7': 15,
-        '7-10': 80,
+    "rating": {
+      "count": 3,
+      "values": {
+        "0-3": 5,
+        "3-7": 15,
+        "7-10": 80,
       }
     },
-    isFavorite: {
-      count: 2,
-      values: {
-        'true': 5,
-        'false': 95,
+    "isFavorite": {
+      "count": 2,
+      "values": {
+        "true": 5,
+        "false": 95,
       }
     },
   }
@@ -218,13 +376,13 @@ configuration:
 
 In the search result, `string` facets will be returned as an `object` with the following properties:
 
-```js
+```json
 {
-  count: 14,            // Total number of values, now limited to 3 (size)
-  values: {
-    'Action': 4,        // Number of documents that have this value
-    'Adventure': 3,     // Number of documents that have this value
-    'Comedy': 2,        // Number of documents that have this value
+  "count": 14,           // Total number of values, now limited to 3 (size)
+  "values": {
+    "Action": 4,        // Number of documents that have this value
+    "Adventure": 3,     // Number of documents that have this value
+    "Comedy": 2,        // Number of documents that have this value
   }
 }
 ```
@@ -247,13 +405,13 @@ Each range is an `object` with the following properties:
 
 In the search result, `number` facets will be returned as an `object` with the following properties:
 
-```js
+```json
 {
-  count: 3,      // Total number of ranges
-  values: {
-    '0-3': 5,    // Number of documents that have a value between 0 and 3 (inclusive)
-    '3-7': 15,   // Number of documents that have a value between 3 and 7 (inclusive)
-    '7-10': 80,  // Number of documents that have a value between 7 and 10 (inclusive)
+  "count": 3,    // Total number of ranges
+  "values": {
+    "0-3": 5,    // Number of documents that have a value between 0 and 3 (inclusive)
+    "3-7": 15,   // Number of documents that have a value between 3 and 7 (inclusive)
+    "7-10": 80,  // Number of documents that have a value between 7 and 10 (inclusive)
   }
 }
 ```
@@ -273,12 +431,12 @@ configuration:
 
 In the search result, `boolean` facets will be returned as an `object` with the following properties:
 
-```js
+```json
 {
-  count: 2,       // Total number of values
-  values: {
-    'true': 5,    // Number of documents that have a `true` value
-    'false': 95,  // Number of documents that have a `false` value
+  "count": 2,      // Total number of values
+  "values": {
+    "true": 5,    // Number of documents that have a `true` value
+    "false": 95,  // Number of documents that have a `false` value
   }
 }
 ```
@@ -288,46 +446,13 @@ In the search result, `boolean` facets will be returned as an `object` with the 
 If a property is specified as `enum` in the schema, no configuration is required.
 In the search result, `enum` facets will be returned as an `object` with the following properties:
 
-```js
-{
-  count: 9,            // Total number of values
-  values: {
-    'Action': 4,        // Number of documents that have this value
-    'Adventure': 3,     // Number of documents that have this value
-    'Comedy': 2,        // Number of documents that have this value
-  }
-}
-```
-
-### How facets works on array fields
-
-Orama treats each array element as a single element of the facet:
-
-```javascript copy
-const db = await create({
-  schema: {
-    name: "string[]",
-  },
-});
-await insert(db, {
-  name: ["Albus", "Percival Wulfric Brian"],
-});
-
-const results = await search(db, {
-  facets: {
-    name: {},
-  },
-});
-```
-
-`result.facets` is the following object:
-
 ```json
 {
-  "count": 2,
+  "count": 9,           // Total number of values
   "values": {
-    "Albus": 1,
-    "Percival Wulfric Brian": 1
+    "Action": 4,        // Number of documents that have this value
+    "Adventure": 3,     // Number of documents that have this value
+    "Comedy": 2,        // Number of documents that have this value
   }
 }
 ```
@@ -341,39 +466,57 @@ Depending on the type of the property, you can use different operators.
 
 ### Filtering by string properties
 
-On string properties it performs an exact matching on tokens so it is advised to disable stemming for the properties
+On `string` properties it performs an exact matching on tokens so it is advised to disable stemming for the properties
 you want to use filters on (when using the default tokenizer you can provide the `stemmerSkipProperties` configuration property).
 
 If we consider the following schema:
 
-```javascript copy
-const db = await create({
-  schema: {
-    title: "string",
-    tag: "string",
-  },
-  components: {
-    tokenizer: {
-      stemming: true,
-      stemmerSkipProperties: ["tag"],
-    },
-  },
-});
-
-const results = await search(db, {
-  term: "prestige",
-  where: {
-    tag: "new",
-  },
-});
+```json copy
+{
+  "title": "string",
+  "tag": "string",
+}
 ```
+
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```js
+    const results = client.search({
+      term: "prestige",
+      where: {
+        tag: "new",
+      },
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 The `results` will contain all documents that contain the word `prestige` in the `title` property and have `tags` property equal to `new`.
 
 You can also specify a list of string, in this case, it will return all documents that contain at least one of the values provided:
 
 ```javascript copy
-const results = await search(db, {
+const results = await client.search({
   term: "prestige",
   where: {
     tag: ["favorite", "new"],
@@ -381,9 +524,9 @@ const results = await search(db, {
 });
 ```
 
-### Filtering by number properties
+### Filtering by `number` properties
 
-The number properties support the following operators:
+The `number` properties supports the following operators:
 
 | Operator  | Description                    | Example                           |
 | --------- | ------------------------------ | --------------------------------- |
@@ -394,55 +537,100 @@ The number properties support the following operators:
 | `eq`      | Equal to                       | `year: { eq: 2000 }`              |
 | `between` | Between two values (inclusive) | `year: { between: [2000, 2008] }` |
 
-```javascript copy
-const db = await create({
-  schema: {
-    id: "string",
-    title: "string",
-    year: "number",
-    meta: {
-      rating: "number",
-      length: "number",
-      favorite: "boolean",
-      tags: "string",
-    },
-  },
-  components: {
-    tokenizer: {
-      stemming: true,
-      stemmerSkipProperties: ["meta.tags"],
-    },
-  },
-});
+So, considering the following schema:
 
-const results = await search(db, {
-  term: "prestige",
-  where: {
-    year: {
-      gte: 2000,
-    },
-    "meta.rating": {
-      between: [5, 10],
-    },
-    "meta.length": {
-      lte: 60,
-    },
-  },
-});
+```json copy
+{
+  "title": "string",
+  "year": "number",
+  "meta": {
+    "rating": "number",
+    "length": "number",
+    "favorite": "boolean",
+    "tags": "string",
+  }
+}
 ```
+
+You can filter the results by the `meta.rating` property as follows:
+
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const results = await client.search({
+      term: "prestige",
+      where: {
+        year: {
+          gte: 2000,
+        },
+        "meta.rating": {
+          between: [5, 10],
+        },
+        "meta.length": {
+          lte: 60,
+        },
+      },
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 ### Filtering by boolean properties
 
 For boolean properties, you can simply set the property to `true` or `false`:
 
-```javascript copy
-const results = await search(db, {
-  term: "prestige",
-  where: {
-    "meta.favorite": true,
-  },
-});
-```
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const results = await client.search({
+      term: "prestige",
+      where: {
+        "meta.favorite": true,
+      },
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 ### Filtering by enum properties
 
@@ -468,25 +656,21 @@ Geosearch is a feature that allows you to filter your search results by distance
 
 To perform geosearch queries, you first have to define a new `geopoint` property inside your schema definition when creating your Orama instance:
 
-```javascript
-import { create } from "@orama/orama";
-
-const db = await create({
-  schema: {
-    name: "string",
-    location: "geopoint",
-  },
-});
+```json
+{
+  "name": "string",
+  "location": "geopoint",
+}
 ```
 
 ### What are geopoints
 
 A geopoint is an object with two properties: `lat` and `lon`, which are both numbers. For reference, the following is a valid geopoint:
 
-```javascript
+```json
 {
-  lat: 45.46409,
-  lon: 9.19192
+  "lat": 45.46409,
+  "lon": 9.19192
 }
 ```
 
@@ -494,30 +678,41 @@ As you may guess, `lat` stands for latitude, and `lon` for longitude. The values
 
 ### Inserting documents with geopoints
 
-You can insert documents with geopoints as you would with any other property:
+When inserting documents containing geopoints, you'll have to provide the `lat` and `lon` properties as floating-point numbers. For example, considering the following schema:
 
-```javascript
-import { create, insert } from "@orama/orama";
+```json copy
+{
+  "name": "string",
+  "location": "geopoint"
+}
+```
 
-const db = await create({
-  schema: {
-    name: "string",
-    location: "geopoint",
+We would have to insert the following docs:
+
+```json
+[
+  {
+    "name": "Duomo di Milano",
+    "location": {
+      "lat": 45.46409,
+      "lon": 9.19192
+    }
   },
-});
-
-await insert(db, {
-  name: "Duomo di Milano",
-  location: { lat: 45.46409, lon: 9.19192 },
-});
-await insert(db, {
-  name: "Piazza Duomo",
-  location: { lat: 45.46416, lon: 9.18945 },
-});
-await insert(db, {
-  name: "Piazzetta Reale",
-  location: { lat: 45.46339, lon: 9.19092 },
-});
+  {
+    "name": "Piazza Duomo",
+    "location": {
+      "lat": 45.46416,
+      "lon": 9.18945
+    }
+  },
+  {
+    "name": "Piazzetta Reale",
+    "location": {
+      "lat": 45.46339,
+      "lon": 9.19092
+    }
+  }
+]
 ```
 
 Given the points above, we can picture them on a map as follows:
@@ -542,32 +737,47 @@ When filtering by bounding polygon, we select a polygon on the map, and we retur
 
 To filter by distance, we use the `radius` property. Let's see how it works:
 
-```javascript
-import { create, insert, search } from '@orama/orama'
-
-const db = await create({ ... })
-
-await insert(db, { ... })
-await insert(db, { ... })
-await insert(db, { ... })
-
-const searchResult = await search(db, {
-  term: 'Duomo',
-  where: {
-    location: {           // The property we want to filter by
-      radius: {           // The filter we want to apply (in that case: "radius")
-        coordinates: {    // The central coordinate
-          lat: 45.4648,
-          lon: 9.18998
-        },
-        unit: 'm',        // The unit of measurement. The default is "m" (meters)
-        value: 1000,      // The radius length. In that case, 1km
-        inside: true      // Whether we want to return the documents inside or outside the radius. The default is "true"
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const searchResult = await client.search({
+      term: 'Duomo',
+      where: {
+        location: {           // The property we want to filter by
+          radius: {           // The filter we want to apply (in that case: "radius")
+            coordinates: {    // The central coordinate
+              lat: 45.4648,
+              lon: 9.18998
+            },
+            unit: 'm',        // The unit of measurement. The default is "m" (meters)
+            value: 1000,      // The radius length. In that case, 1km
+          }
+        }
       }
-    }
-  }
-})
-```
+    })
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 The geopoint `{ lat: 45.4648, lon: 9.18998 }` represents the entrance of the **Vittorio Emanuele II Gallery** in Milan, nearby the Duomo.
 
@@ -599,33 +809,49 @@ All these units will be converted into meters automatically. If you feel like we
 
 To filter by bounding polygon, we use the `polygon` property. Let's see how it works:
 
-```javascript
-import { create, insert, search } from '@orama/orama'
 
-const db = await create({ ... })
-
-await insert(db, { ... })
-await insert(db, { ... })
-await insert(db, { ... })
-
-const searchResult = await search(db, {
-  term: 'Duomo',
-  where: {
-    location: {            // The property we want to filter by
-      polygon: {           // The filter we want to apply (in that case: "polygon")
-        coordinates: [     // The polygon coordinate
-          { lat: 45.46472, lon: 9.1886  },
-          { lat: 45.46352, lon: 9.19177 },
-          { lat: 45.46278, lon: 9.19176 },
-          { lat: 45.4628,  lon: 9.18857 },
-          { lat: 45.46472, lon: 9.1886  },
-        ],
-        inside: true      // Whether we want to return the documents inside or outside the polygon. The default is "true"
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const searchResult = await search(db, {
+      term: 'Duomo',
+      where: {
+        location: {            // The property we want to filter by
+          polygon: {           // The filter we want to apply (in that case: "polygon")
+            coordinates: [     // The polygon coordinate
+              { lat: 45.46472, lon: 9.1886  },
+              { lat: 45.46352, lon: 9.19177 },
+              { lat: 45.46278, lon: 9.19176 },
+              { lat: 45.4628,  lon: 9.18857 },
+              { lat: 45.46472, lon: 9.1886  },
+            ]
+          }
+        }
       }
-    }
-  }
-})
-```
+    })
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 If we try to draw the polygon above on our map, we will get the following result:
 

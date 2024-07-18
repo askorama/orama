@@ -383,6 +383,10 @@ export default defineConfig({
               collapsed: true,
               items: [
                 {
+                  label: "Official SDK",
+                  link: "/cloud/performing-search/official-sdk.html",
+                },
+                {
                   label: "Full-text search",
                   link: "/cloud/performing-search/full-text-search.html",
                 },

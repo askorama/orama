@@ -3,6 +3,7 @@ title: Performing hybrid search on Orama Cloud
 description: Learn how to perform hybrid search on Orama Cloud.
 ---
 import { Aside } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 After deploying your index, Orama will distribute it to over 300 global points of presence across more than 100 countries worldwide. This will guarantee the lowest possible latency for any search query, at any scale.
 
@@ -28,19 +29,83 @@ As an alternative, you can provide your own vectors while inserting new document
 
 Once you have at least one index containing vectors, you can perform hybrid search by using the `search` function:
 
-```ts
-import { OramaClient } from "@oramacloud/client";
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```typescript copy
+    import { OramaClient } from "@oramacloud/client";
 
-const client = new OramaClient({
-  endpoint: "",
-  api_key: "",
-});
+    const client = new OramaClient({
+      endpoint: "",
+      api_key: "",
+    });
 
-const vectorSearchResults = await client.search({
-  term: "Super Mario videogame",
-  mode: "hybrid",
-  limit: 5, // How many results to return. Default is 10.
-});
-```
+    const results = await client.search({
+      term: "Super Mario videogame",
+      mode: "hybrid",
+      where: {
+        price: {
+          lt: 19.99,
+        },
+      },
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    import OramaCloud
+
+    struct MyDoc: Encodable & Decodable {
+      let title: String
+      let description: String
+    }
+
+    let clientParams = OramaClientParams(endpoint: "", apiKey: "")
+    let orama = OramaClient(params: clientParams)
+
+    let searchParams = ClientSearchParams.builder(
+        term: "Super Mario videogame",
+        mode: .hybrid
+      )
+      .limit(10) // optional
+      .offset(0) // optional
+      .returning(["title", "description"]) // optional
+      .build()
+
+    let searchResults: SearchResults<MyDoc> = try await orama.search(query: searchParams)
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    use OramaCloud\Client;
+    use OramaCloud\Client\Query;
+    use OramaCloud\Client\QueryParams/WhereOperator;
+    use OramaCloud\Client\QueryParams/SortByOrder;
+
+    $client = new Client([
+      'api_key' => '<Your Orama Cloud API Key>',
+      'endpoint' => '<Your Orama Cloud Endpoint>'
+    ]);
+
+    $query = (new Query('Super Mario videogame', 'hybrid'))
+        ->where('price', WhereOperator::LTE, 9.99)
+        ->where('gender', WhereOperator::EQ, 'unisex')
+        ->sortBy('price' SortByOrder::DESC)
+        ->limit(5)
+        ->offset(1);
+
+    $results = $client->search($query);
+    ```
+  </TabItem>
+</Tabs>
 
 Orama will automatically convert your search term, for instance, `"Super Mario videogame"`, into an embedding using your OpenAI API Key. It will then search through your vectors and ultimately return the full documents in their original format.
