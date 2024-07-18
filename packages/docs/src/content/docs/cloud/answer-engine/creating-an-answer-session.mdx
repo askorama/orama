@@ -2,6 +2,7 @@
 title: Creating an Answer Session
 description: Learn how to create an answer session with the Orama JavaScript SDK.
 ---
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 Once you have set up your index, you will be able to engage in dynamic conversations with it.
 
@@ -13,35 +14,61 @@ Let’s see what it looks like.
 
 Follow the instructions [here](/cloud/integrating-orama-cloud/javascript-sdk) to install the official JavaScript SDK. After you’ve installed it, you will be able to create your first answer session:
 
-```ts
-import { OramaClient } from "@oramacloud/client";
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```typescript copy
+    import { OramaClient } from "@oramacloud/client";
 
-const orama = new OramaClient({
-  endpoint: "",
-  api_key: "",
-});
+    const orama = new OramaClient({
+      endpoint: "",
+      api_key: "",
+    });
 
-const answerSession = orama.createAnswerSession({
-  // optional
-  userContext: "The user is a very skilled programmer but has never used Orama before.",
-  // optional
-  inferenceType: "documentation",
-  // optional
-  initialMessages: [],
-  // optional
-  events: {
-    onMessageChange: (messages) => console.log({ messages }),
-    onMessageLoading: (loading) => console.log({ loading }),
-    onAnswerAborted: (aborted) => console.log({ aborted }),
-    onSourceChange: (sources) => console.log({ sources }),
-    onQueryTranslated: (query) => console.log({ query }),
-  },
-});
+    const answerSession = orama.createAnswerSession({
+      // optional
+      userContext: "The user is a very skilled programmer but has never used Orama before.",
+      // optional
+      inferenceType: "documentation",
+      // optional
+      initialMessages: [],
+      // optional
+      events: {
+        onMessageChange: (messages) => console.log({ messages }),
+        onMessageLoading: (loading) => console.log({ loading }),
+        onAnswerAborted: (aborted) => console.log({ aborted }),
+        onSourceChange: (sources) => console.log({ sources }),
+        onQueryTranslated: (query) => console.log({ query }),
+        onStateChange: (state) => console.log({ state }),
+        onNewInteractionStarted: (interactionId) => console.log({ interactionId }),
+      },
+    });
 
-await answerSession.ask({
-  term: "How do I get started with Orama?",
-});
-```
+    await answerSession.ask({
+      term: "How do I get started with Orama?",
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 All the parameters above are optional, but you may need to use them to create great answer sessions for your users. Let’s see them in detail.
 
@@ -51,23 +78,71 @@ All the parameters above are optional, but you may need to use them to create gr
 
 If we pretend to be an online music store, and we know who the logged in user is, we could provide the following user context:
 
-```js
-const answerSession = orama.createAnswerSession({
-  userContext: 'The user is called John Doe and he loves rock music. He has been a customer for 5 years.'
-})
-```
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```js
+    const answerSession = orama.createAnswerSession({
+      userContext: 'The user is called John Doe and he loves rock music. He has been a customer for 5 years.'
+    })
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 If we prefer, we can also use an object to provide a more structured context:
 
-```js
-const answerSession = orama.createAnswerSession({
-  userContext: {
-    name: 'John Doe',
-    musicTaste: ['Rock', 'Punk', 'Metal'],
-    customerSince: 2019
-  }
-})
-```
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+  ```js
+  const answerSession = orama.createAnswerSession({
+    userContext: {
+      name: 'John Doe',
+      musicTaste: ['Rock', 'Punk', 'Metal'],
+      customerSince: 2019
+    }
+  })
+  ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 ### `inferenceType`
 
@@ -77,12 +152,36 @@ const answerSession = orama.createAnswerSession({
 
 An array of initial messages for your conversational experience with Orama Cloud. By default, this parameter is an empty array, but it can be an array of objects in the following format:
 
-```js
-const initialMessages = [
-  { role: "user", content: "What is Orama?" },
-  { role: "assistant", content: "Orama is a next-generation answer engine" },
-];
-```
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```js
+    const initialMessages = [
+      { role: "user", content: "What is Orama?" },
+      { role: "assistant", content: "Orama is a next-generation answer engine" },
+    ];
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 ### `events`
 
@@ -94,107 +193,409 @@ Answers are a highly dynamic part of Orama. They work in an asynchronous manner 
 
 At the time of writing, Orama supports the following events:
 
-`onMessageChange`. Runs everytime a message changes. This gets triggered with each chunk that gets streamed from the server, allowing you to re-render the messages in your page as they gets updated.
+### `onStateChange`
 
-```js
-const answerSession = orama.createAnswerSession({
-  events: {
-    onMessageChange: (messages) => {
-      console.log(messages);
-      // [
-      //   { role: 'user', content: 'What is Orama?' },
-      //   { role: 'assistant', content: 'Orama is a next-generation answer engine' }
-      // ]
-    },
-  },
-});
+Runs everytime the state of the answer session changes. In this context, the state refers to a list of interactions between the user and Orama Cloud.
 
-await answerSession.ask({
-  term: "What is Orama?",
-});
-```
+Each interaction looks like this:
 
-`onMessageLoading`. Gets triggered everytime an answer request starts or ends.
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```typescript copy
+    import type { AnyDocument, AnyOrama, Nullable, Results, SearchParams } from "@oramacloud/client";
 
-```js
-const answerSession = orama.createAnswerSession({
-  events: {
-    onMessageLoading: (loading) => {
-      if (loading) {
-        console.log("Still loading the messages...");
-      }
-    },
-  },
-});
+    export type Interaction<T = AnyDocument> = {
+      interactionId: string,
+      query: string,
+      response: string,
+      relatedQueries: Nullable<string[]>,
+      sources: Nullable<Results<T>>,
+      translatedQuery: Nullable<SearchParams<AnyOrama>>,
+      aborted: boolean,
+      loading: boolean
+    }
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
-await answerSession.ask({
-  term: "What is Orama?",
-});
-```
+Consequently, the `onStateChange` event will return an array of these interactions:
 
-`onAnswerAborted`. Gets triggered when an answer gets aborted.
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const answerSession = orama.createAnswerSession({
+      events: {
+        onStateChange: (state) => {
+          if (state.every(interaction => !interaction.loading)) {
+            console.log(state)
+          }
+        },
+      },
+    });
 
-```js
-const answerSession = orama.createAnswerSession({
-  events: {
-    onAnswerAborted: (aborted) => {
-      alert("The user has aborted this answer generation!");
-    },
-  },
-});
+    await answerSession.ask({
+      term: "What is Orama?",
+    });
 
-await answerSession.ask({
-  term: "What is Orama?",
-});
+    // [
+    //   {
+    //     interactionId: "clyru4rl8000008l062b26fk1",
+    //     query: "What is Orama?",
+    //     response: "Orama is a next-generation answer engine [...]",
+    //     relatedQueries: ["How Orama works", "Why Orama is the best", "Vector search with orama"],
+    //     sources: [
+    //       {
+    //         count: 15,
+    //         elapsed: { formatted: "78ms", raw: 78000000 },
+    //         hits: [
+    //           { document: { title: "What is Orama", ... } },
+    //           { document: { title: "How Orama works", ... } },
+    //           { document: { title: "Why Orama is the best", ... } }
+    //         ]
+    //       }
+    //     ],
+    //     translatedQuery: { term: "What is Orama?" },
+    //     aborted: false,
+    //     loading: false
+    //   }
+    // ] 
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
-setTimeout(() => {
-  answerSession.abortAnswer();
-}, 1000);
-```
+The `onStateChange` event gets triggered everytime there's a change in the state, which means that it will also get triggered when the server streams a new chunk of the answer back to the client.
 
-`onSourceChange`. Orama Cloud will return the results of the inference process as a standard set of Orama search results. You will have access to those as soon as they gets computed:
+This is particularly useful when creating reactive interfaces that need to update the UI as the answer gets streamed back from the server with frameworks like React, Vue, or Angular.
 
-```js
-const answerSession = orama.createAnswerSession({
-  events: {
-    onSourceChange: (sources) => {
-      console.log(
-        `Got ${sources.count} sources in ${sources.elapsed.formatted}.`
-      );
-      console.log(
-        `Top three sources are: ${sources.hits
-          .map((hit) => hit.document.title)
-          .join(", ")}`
-      );
+You can always access a static version of the state by using the `state` getter:
 
-      // Got 15 sources in 78ms.
-      // Top three sources are: What is Orama, How Orama works, Why Orama is the best
-    },
-  },
-});
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const answerSession = orama.createAnswerSession();
 
-await answerSession.ask({
-  term: "What is Orama?",
-});
-```
+    await answerSession.ask({
+      term: "What is Orama?",
+    });
 
-`onQueryTranslated`. Gets triggered when Orama successfully translates a natural language query into a search query. This is useful when you want to know how Orama interprets the user's input. It adapts to your index schema and returns the most relevant search query.
+    console.log(answerSession.state);
 
-```js
+    // [
+    //   {
+    //     interactionId: "clyru4rl8000008l062b26fk1",
+    //     query: "What is Orama?",
+    //     response: "Orama is a next-generation answer engine [...]",
+    //     relatedQueries: ["How Orama works", "Why Orama is the best", "Vector search with orama"],
+    //     sources: [
+    //       {
+    //         count: 15,
+    //         elapsed: { formatted: "78ms", raw: 78000000 },
+    //         hits: [
+    //           { document: { title: "What is Orama", ... } },
+    //           { document: { title: "How Orama works", ... } },
+    //           { document: { title: "Why Orama is the best", ... } }
+    //         ]
+    //       }
+    //     ],
+    //     translatedQuery: { term: "What is Orama?" },
+    //     aborted: false,
+    //     loading: false
+    //   }
+    // ] 
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
-const answerSession = orama.createAnswerSession({
-  events: {
-    onQueryTranslated: (query) => {
-      console.log(query);
-      // { term: 'Halfpipe skateboard', where: { price: { lt: 100 } } }
-    },
-  },
-});
+### `onMessageChange`
 
-await answerSession.ask({
-  term: "What's the best skateboard for halfpipes under $100?",
-});
-```
+Runs everytime a message changes. This gets triggered with each chunk that gets streamed from the server, allowing you to re-render the messages in your page as they gets updated.
+
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const answerSession = orama.createAnswerSession({
+      events: {
+        onMessageChange: (messages) => {
+          console.log(messages);
+          // [
+          //   { role: 'user', content: 'What is Orama?' },
+          //   { role: 'assistant', content: 'Orama is a next-generation answer engine' }
+          // ]
+        },
+      },
+    });
+
+    await answerSession.ask({
+      term: "What is Orama?",
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
+
+### `onMessageLoading`
+
+Gets triggered everytime an answer request starts or ends.
+
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```js
+    const answerSession = orama.createAnswerSession({
+      events: {
+        onMessageLoading: (loading) => {
+          if (loading) {
+            console.log("Still loading the messages...");
+          }
+        },
+      },
+    });
+
+    await answerSession.ask({
+      term: "What is Orama?",
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
+
+### `onAnswerAborted`
+
+Gets triggered when an answer gets aborted.
+
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```js
+    const answerSession = orama.createAnswerSession({
+      events: {
+        onAnswerAborted: (aborted) => {
+          alert("The user has aborted this answer generation!");
+        },
+      },
+    });
+
+    await answerSession.ask({
+      term: "What is Orama?",
+    });
+
+    setTimeout(() => {
+      answerSession.abortAnswer();
+    }, 1000);
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
+
+### `onSourceChange`
+
+Orama Cloud will return the results of the inference process as a standard set of Orama search results. You will have access to those as soon as they gets computed:
+
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```js
+    const answerSession = orama.createAnswerSession({
+      events: {
+        onSourceChange: (sources) => {
+          console.log(
+            `Got ${sources.count} sources in ${sources.elapsed.formatted}.`
+          );
+          console.log(
+            `Top three sources are: ${sources.hits
+              .map((hit) => hit.document.title)
+              .join(", ")}`
+          );
+
+          // Got 15 sources in 78ms.
+          // Top three sources are: What is Orama, How Orama works, Why Orama is the best
+        },
+      },
+    });
+
+    await answerSession.ask({
+      term: "What is Orama?",
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
+
+### `onQueryTranslated`
+
+Gets triggered when Orama successfully translates a natural language query into a search query. This is useful when you want to know how Orama interprets the user's input. It adapts to your index schema and returns the most relevant search query.
+
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```js
+    const answerSession = orama.createAnswerSession({
+      events: {
+        onQueryTranslated: (query) => {
+          console.log(query);
+          // { term: 'Halfpipe skateboard', where: { price: { lt: 100 } } }
+        },
+      },
+    });
+
+    await answerSession.ask({
+      term: "What's the best skateboard for halfpipes under $100?",
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 ## Asking a Question
 
@@ -209,54 +610,150 @@ They both trigger the exact same events, but the only difference is how they ret
 
 The `.ask` function will return the entire answer once it has been entirely streamed from the server, therefore, you can use this method as follows:
 
-```jsx
-const answer = await answerSession.ask({
-  term: "What is Orama?",
-});
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const answer = await answerSession.ask({
+      term: "What is Orama?",
+    });
 
-console.log(answer);
-// Orama is a next-generation answer engine
-```
+    console.log(answer);
+    // Orama is a next-generation answer engine
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 The `.askStream` method returns an async iterator that yields chunks of the answer as they gets streamed back from the server. Therefore, this is how you would implement it:
 
-```jsx
-const answer = await answerSession.askStream({
-  term: "What is Orama?",
-});
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const answer = await answerSession.askStream({
+      term: "What is Orama?",
+    });
 
-for await (const msg of answer) {
-  console.log(msg);
-}
+    for await (const msg of answer) {
+      console.log(msg);
+    }
 
-// Orama
-//  is a
-// next-gener
-// ation answer
-//  engine
-```
+    // Orama
+    //  is a
+    // next-gener
+    // ation answer
+    //  engine
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 ## Providing User Data for a specific answer
 
 When you ask a question, you can provide additional user data to the answer session. This is useful when you want to provide a more personalized experience to your users. For example, if you know that the user is a beginner in programming, you can provide a more detailed explanation of the concepts you’re talking about:
 
-```js
-const answer = await answerSession.ask({
-  term: "What is Orama?",
-  userData: {
-    userLevel: "beginner"
-  }
-});
-```
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const answer = await answerSession.ask({
+      term: "What is Orama?",
+      userData: {
+        userLevel: "beginner"
+      }
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 Just like the `userContext`, the `userData` can be a string or an object:
 
-```js
-const answer = await answerSession.ask({
-  term: "What is Orama?",
-  userData: "The user is a beginner in programming"
-});
-```
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const answer = await answerSession.ask({
+      term: "What is Orama?",
+      userData: "The user is a beginner in programming"
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 The main difference between `userContext` and `userData` is that the `userData` is specific to a single answer request, while the `userContext` is global to the entire answer session.
 
@@ -267,41 +764,137 @@ Of course, Orama will remember the `userData` in subsequent answer requests, but
 
 In any moment in time (when a user cancels an answer request, for example) you can abort an answer by using the `.abortAnswer` function:
 
-```jsx
-answerSession.abortAnswer();
-```
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    answerSession.abortAnswer();
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 This will trigger the `onAnswerAborted` event, which will simply return a `true` in its callback function:
 
-```jsx
-const answerSession = orama.createAnswerSession({
-  events: {
-    onAnswerAborted: (aborted) => {
-      alert("The user aborted the answer session!");
-    },
-  },
-});
-```
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const answerSession = orama.createAnswerSession({
+      events: {
+        onAnswerAborted: (aborted) => {
+          alert("The user aborted the answer session!");
+        },
+      },
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 ## Getting all the Messages
 
 At any point in time, you can retrieve all the messages by calling the `.getMessages` function:
 
-```js
-const messages = answerSession.getMessages();
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    const messages = answerSession.getMessages();
 
-console.log(messages);
+    console.log(messages);
 
-// [
-//   { role: 'user', content: 'What is Orama?' },
-//   { role: 'assistant', content: 'Orama is a next-generation answer engine' }
-// ]
-```
+    // [
+    //   { role: 'user', content: 'What is Orama?' },
+    //   { role: 'assistant', content: 'Orama is a next-generation answer engine' }
+    // ]
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
 
 ## Clearing the Session
 
 You can clear the answer session by using the `clearSession` method. This will reset the messages to an empty array:
 
-```js
-answerSession.clearSession();
-```
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    answerSession.clearSession();
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
