@@ -50,7 +50,18 @@ Follow the instructions [here](/cloud/integrating-orama-cloud/javascript-sdk) to
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    import OramaCloudClient
+
+    let clientParams = OramaClientParams(endpoint: "", apiKey: "")
+    let orama = OramaClient(params: clientParams)
+
+    let answerParams = AnswerParams<E2EDoc>(
+      userContext: "The user is a very skilled programmer but has never used Orama before.",
+      inferenceType: .documentation,
+      initialMessages: [],
+      oramaClient: oramaClient,
+    )
+    answerSession = AnswerSession(params: answerParams)
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -88,7 +99,18 @@ If we pretend to be an online music store, and we know who the logged in user is
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    import OramaCloudClient
+
+    let clientParams = OramaClientParams(endpoint: "", apiKey: "")
+    let orama = OramaClient(params: clientParams)
+
+    let answerParams = AnswerParams<E2EDoc>(
+      userContext: "The user is a very skilled programmer but has never used Orama before.",
+      inferenceType: .documentation,
+      initialMessages: [],
+      oramaClient: oramaClient,
+    )
+    let answerSession = AnswerSession(params: answerParams)
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -124,7 +146,18 @@ If we prefer, we can also use an object to provide a more structured context:
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    import OramaCloudClient
+
+    let clientParams = OramaClientParams(endpoint: "", apiKey: "")
+    let orama = OramaClient(params: clientParams)
+
+    let answerParams = AnswerParams<E2EDoc>(
+      userContext: "{ name: \"John Doe\", musicTaste: [\"Rock\", \"Punk\", \"Metal\"], customerSince: 2019 }",
+      inferenceType: .documentation,
+      initialMessages: [],
+      oramaClient: orama,
+    )
+    let answerSession = AnswerSession(params: answerParams)
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -163,7 +196,12 @@ An array of initial messages for your conversational experience with Orama Cloud
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    import OramaCloudClient
+
+    let initialMessages = [
+      AnswerParams<Doc>.Message(role: .user, content: "What is Orama?")
+      AnswerParams<Doc>.Message(role: .assistant, content: "Orama is a next-generation answer engine")
+    ]
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -218,7 +256,18 @@ Each interaction looks like this:
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    import OramaCloudClient
+
+    struct Interaction<T: Codable> {
+      var interactionId: String
+      var query: String
+      var response: String
+      var relatedQueries: [String]?
+      var sources: SearchResults<T>?
+      var translatedQuery: ClientSearchParams?
+      var aborted: Bool = false
+      var loading: Bool
+    }
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -283,7 +332,41 @@ Consequently, the `onStateChange` event will return an array of these interactio
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let answerSession = AnswerSession(params: answerParams)
+      .on(event: .stateChange) { state in
+        if state.allSatisfy({ !$0.loading }) {
+          print(state)
+        }
+      }
+
+      try await answerSession.ask(params: AnswerParams.AskParams(
+        query: "What is Orama?",
+        userData: nil,
+        related: nil
+      ))
+
+    // [
+    //   {
+    //     interactionId: "clyru4rl8000008l062b26fk1",
+    //     query: "What is Orama?",
+    //     response: "Orama is a next-generation answer engine [...]",
+    //     relatedQueries: ["How Orama works", "Why Orama is the best", "Vector search with orama"],
+    //     sources: [
+    //       {
+    //         count: 15,
+    //         elapsed: { formatted: "78ms", raw: 78000000 },
+    //         hits: [
+    //           { document: { title: "What is Orama", ... } },
+    //           { document: { title: "How Orama works", ... } },
+    //           { document: { title: "Why Orama is the best", ... } }
+    //         ]
+    //       }
+    //     ],
+    //     translatedQuery: { term: "What is Orama?" },
+    //     aborted: false,
+    //     loading: false
+    //   }
+    // ] 
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -346,7 +429,38 @@ You can always access a static version of the state by using the `state` getter:
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let answerSession = AnswerSession(params: answerParams)
+
+    try await answerSession.ask(params: AnswerParams.AskParams(
+      query: "What is Orama?",
+      userData: nil,
+      related: nil
+    ))
+
+    print(answerSession.getState())
+
+    // [
+    //   {
+    //     interactionId: "clyru4rl8000008l062b26fk1",
+    //     query: "What is Orama?",
+    //     response: "Orama is a next-generation answer engine [...]",
+    //     relatedQueries: ["How Orama works", "Why Orama is the best", "Vector search with orama"],
+    //     sources: [
+    //       {
+    //         count: 15,
+    //         elapsed: { formatted: "78ms", raw: 78000000 },
+    //         hits: [
+    //           { document: { title: "What is Orama", ... } },
+    //           { document: { title: "How Orama works", ... } },
+    //           { document: { title: "Why Orama is the best", ... } }
+    //         ]
+    //       }
+    //     ],
+    //     translatedQuery: { term: "What is Orama?" },
+    //     aborted: false,
+    //     loading: false
+    //   }
+    // ] 
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -392,7 +506,19 @@ Runs everytime a message changes. This gets triggered with each chunk that gets 
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let answerSession = AnswerSession(params: answerParams)
+      .on(event: .messageChange) { print($0) }
+
+      try await answerSession.ask(params: AnswerParams.AskParams(
+        query: "What is Orama?",
+        userData: nil,
+        related: nil
+      ))
+
+    // [
+    //   { role: 'user', content: 'What is Orama?' },
+    //   { role: 'assistant', content: 'Orama is a next-generation answer engine' }
+    // ]
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -436,7 +562,18 @@ Gets triggered everytime an answer request starts or ends.
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let answerSession = AnswerSession(params: answerParams)
+      .on(event: .onMessageLoading) { 
+        if $0 {
+          print("Still loading the messages...")
+        }
+      }
+
+      try await answerSession.ask(params: AnswerParams.AskParams(
+        query: "What is Orama?",
+        userData: nil,
+        related: nil
+      ))
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -534,7 +671,20 @@ Orama Cloud will return the results of the inference process as a standard set o
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let answerSession = AnswerSession(params: answerParams)
+      .on(event: .onSourceChange) {
+        print("Got \($0.count) sources in \($0.elapsed.formatted).")
+        print("Top three sources are: \($0.hits.map { hit in hit.document.title }.joined(separator: ", "))")
+      }
+
+      try await answerSession.ask(params: AnswerParams.AskParams(
+        query: "What is Orama?",
+        userData: nil,
+        related: nil
+      ))
+
+      // Got 15 sources in 78ms.
+      // Top three sources are: What is Orama, How Orama works, Why Orama is the best
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -577,7 +727,16 @@ Gets triggered when Orama successfully translates a natural language query into 
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let answerSession = AnswerSession(params: answerParams)
+      .on(event: .onQueryTranslated) { print($0) }
+
+      try await answerSession.ask(params: AnswerParams.AskParams(
+        query: "What's the best skateboard for halfpipes under $100?",
+        userData: nil,
+        related: nil
+      ))
+
+      // { term: 'Halfpipe skateboard', where: { price: { lt: 100 } } }
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -623,7 +782,11 @@ The `.ask` function will return the entire answer once it has been entirely stre
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let answer = try await answerSession.ask(params: AnswerParams.AskParams(
+      query: "What is Orama?",
+      userData: nil,
+      related: nil
+    ))
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -665,7 +828,15 @@ The `.askStream` method returns an async iterator that yields chunks of the answ
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let answer = try await answerSession.askStream(params: AnswerParams.AskParams(
+      query: "What is Orama?",
+      userData: nil,
+      related: nil
+    ))
+
+    for try await msg in answer {
+      print(msg)
+    }
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -702,7 +873,11 @@ When you ask a question, you can provide additional user data to the answer sess
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let answer = try await answerSession.ask(params: AnswerParams.AskParams(
+      query: "What is Orama?",
+      userData: "{ userLevel: \"beginner\" }",
+      related: nil
+    ))
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -735,7 +910,11 @@ Just like the `userContext`, the `userData` can be a string or an object:
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let answer = try await answerSession.ask(params: AnswerParams.AskParams(
+      query: "What is Orama?",
+      userData: "The user is a beginner in programming",
+      related: nil
+    ))
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -847,7 +1026,14 @@ At any point in time, you can retrieve all the messages by calling the `.getMess
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let messages = answerSession.getMessages()
+
+    print(messages)
+
+    // [
+    //   { role: 'user', content: 'What is Orama?' },
+    //   { role: 'assistant', content: 'Orama is a next-generation answer engine' }
+    // ]
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -879,7 +1065,7 @@ You can clear the answer session by using the `clearSession` method. This will r
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    answerSession.clearSession()
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">

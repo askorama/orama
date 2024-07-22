@@ -63,8 +63,8 @@ For example, if you want your live index to only contains the two following docu
 
 You can use the **snapshot** API to bulk update the live index:
 
-<Tabs>
-  <TabItem label="JavaScript">
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
     ```js
     import { CloudManager } from '@oramacloud/client'
 
@@ -80,7 +80,27 @@ You can use the **snapshot** API to bulk update the live index:
     ])
     ```
   </TabItem>
-  <TabItem label="cURL">
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift
+    import OramaCloudClient
+
+    // This is an example document. It should reflect your index schema.
+    struct OramaDoc: Codable {
+      let id: String
+      let name: String
+      let age: Int
+    }
+
+    let cloudManager = CloudManager(apiKey: "YOUR_API_KEY")
+    let indexManager = cloudManager.index<OramaDoc>("my-index-id")
+
+    await try indexManager.snapshot([
+      OramaDoc(id: "1", name: "John Doe", age: 30),
+      OramaDoc(id: "2", name: "Jane Doe", age: 25)
+    ])
+    ```
+  </TabItem>
+  <TabItem label="cURL" icon="seti:shell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/snapshot \
       -H "authorization: Bearer $PRIVATE_API_KEY" ]
@@ -107,8 +127,8 @@ Let's say you want to add a new document:
 
 you can use the **notify** API to put that operation in queue for the next deployment:
 
-<Tabs>
-  <TabItem label="JavaScript">
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
     ```js
     import { CloudManager } from '@oramacloud/client'
 
@@ -122,7 +142,25 @@ you can use the **notify** API to put that operation in queue for the next deplo
     await myIndex.update([{ id: "3", name: "Rick Doe", age: 75 }])
     ```
   </TabItem>
-  <TabItem label="cURL">
+  <TabItem label="Swift" icon="seti:swift">
+  ```swift
+  import OramaCloudClient
+
+  // This is an example document. It should reflect your index schema.
+  struct OramaDoc: Codable {
+    let id: String
+    let name: String
+    let age: Int
+  }
+
+  let cloudManager = CloudManager(apiKey: "YOUR_API_KEY")
+  let indexManager = cloudManager.index<OramaDoc>("my-index-id")
+
+  await try indexManager.insert([OramaDoc(id: "3", name: "Rick Morty", age: 80)])
+  await try indexManager.update([OramaDoc(id: "3", name: "Rick Doe", age: 75)])
+  ```
+  </TabItem>
+  <TabItem label="cURL" icon="seti:shell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
       -H "authorization: Bearer $PRIVATE_API_KEY" \
@@ -135,8 +173,8 @@ as you can see, you'll need to pass an array of objects to an `upsert` operation
 
 You can always remove an existing document by using the `remove` operation. For example, this is how you can remove the document with id `"2"`:
 
-<Tabs>
-  <TabItem label="JavaScript">
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
     ```js
     import { CloudManager } from '@oramacloud/client'
 
@@ -146,10 +184,27 @@ You can always remove an existing document by using the `remove` operation. For 
 
     const myIndex = oramaCloudManager.index('my-index-id')
 
-    await myIndex.remove(["2"])
+    await myIndex.delete(["2"])
     ```
   </TabItem>
-  <TabItem label="cURL">
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift
+    import OramaCloudClient
+
+    // This is an example document. It should reflect your index schema.
+    struct OramaDoc: Codable {
+      let id: String
+      let name: String
+      let age: Int
+    }
+
+    let cloudManager = CloudManager(apiKey: "YOUR_API_KEY")
+    let indexManager = cloudManager.index<OramaDoc>("my-index-id")
+
+    await try indexManager.delete(["2"])
+    ```
+  </TabItem>
+  <TabItem label="cURL" icon="seti:shell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
       -H "authorization: Bearer $PRIVATE_API_KEY" \
@@ -165,8 +220,8 @@ After you have inserted a snapshot or put a number of insert, remove, or update 
 You can easily do that via the deploy API:
 
 
-<Tabs>
-  <TabItem label="JavaScript">
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
     ```js
     import { CloudManager } from '@oramacloud/client'
 
@@ -179,7 +234,24 @@ You can easily do that via the deploy API:
     await myIndex.deploy()
     ```
   </TabItem>
-  <TabItem label="cURL">
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift
+    import OramaCloudClient
+
+    // This is an example document. It should reflect your index schema.
+    struct OramaDoc: Codable {
+      let id: String
+      let name: String
+      let age: Int
+    }
+
+    let cloudManager = CloudManager(apiKey: "YOUR_API_KEY")
+    let indexManager = cloudManager.index<OramaDoc>("my-index-id")
+
+    await try indexManager.deploy()
+    ```
+  </TabItem>
+  <TabItem label="cURL" icon="seti:shell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/deploy \
       -X POST \
@@ -196,8 +268,8 @@ Sometimes, you may want to re-insert all the documents in the index, and to do t
 
 You can do that by using the `clear` API, or by creating an empty snapshot:
 
-<Tabs>
-  <TabItem label="JavaScript">
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
     ```js
     import { CloudManager } from '@oramacloud/client'
 
@@ -210,7 +282,24 @@ You can do that by using the `clear` API, or by creating an empty snapshot:
     await myIndex.clear()
     ```
   </TabItem>
-  <TabItem label="cURL">
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift
+    import OramaCloudClient
+
+    // This is an example document. It should reflect your index schema.
+    struct OramaDoc: Codable {
+      let id: String
+      let name: String
+      let age: Int
+    }
+
+    let cloudManager = CloudManager(apiKey: "YOUR_API_KEY")
+    let indexManager = cloudManager.index<OramaDoc>("my-index-id")
+
+    await try indexManager.clear()
+    ```
+  </TabItem>
+  <TabItem label="cURL" icon="seti:shell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/snapshot \
       -H "authorization: Bearer $PRIVATE_API_KEY" ]
@@ -225,8 +314,8 @@ This will clear the index on the next deployment, and you can then insert a new 
 
 If you lost track of the operatiosn you ran via the SDK or APIs, you can always check if there are pending operations in the queue by using the `hasPendingOperations` API:
 
-<Tabs>
-  <TabItem label="JavaScript">
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
     ```js
     import { CloudManager } from '@oramacloud/client'
 
@@ -241,7 +330,27 @@ If you lost track of the operatiosn you ran via the SDK or APIs, you can always 
     // true or false
     ```
   </TabItem>
-  <TabItem label="cURL">
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift
+    import OramaCloudClient
+
+    // This is an example document. It should reflect your index schema.
+    struct OramaDoc: Codable {
+      let id: String
+      let name: String
+      let age: Int
+    }
+
+    let cloudManager = CloudManager(apiKey: "YOUR_API_KEY")
+    let indexManager = cloudManager.index<OramaDoc>("my-index-id")
+
+    let hasPendingOperations = await try indexManager.hasPendingOperations()
+
+    print(hasPendingOperations)
+    // true or false
+    ```
+  </TabItem>
+  <TabItem label="cURL" icon="shell">
     ```bash
     # Beware: this API will be renamed to "/has-pending-operations" in the future.
     # We recommend using the SDK instead.

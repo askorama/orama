@@ -48,13 +48,13 @@ The client exposes a simple `search` method that can be used to query the index:
     ```swift copy
     import OramaCloud
 
-    struct MyDoc: Encodable & Decodable {
+    struct MyDoc: Codable {
       let title: String
       let description: String
     }
 
     let clientParams = OramaClientParams(endpoint: "", apiKey: "")
-    let orama = OramaClient(params: clientParams)
+    let client = OramaClient(params: clientParams)
 
     let searchParams = ClientSearchParams.builder(
         term: "What is Orama?",
@@ -65,7 +65,7 @@ The client exposes a simple `search` method that can be used to query the index:
       .returning(["title", "description"]) // optional
       .build()
 
-    let searchResults: SearchResults<MyDoc> = try await orama.search(query: searchParams)
+    let searchResults: SearchResults<MyDoc> = try await client.search(query: searchParams)
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -139,7 +139,17 @@ Considering the following schema:
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let searchQuery = ClientSearchParams
+      .builder(term: "prestige", mode: .fulltext)
+      .sortBy([
+        ClientSearchParams.SortByDirective(
+          property: "year",
+          order: .asc
+        )
+      ])
+      .build()
+
+    let results: SearchResults<MyDoc> = try await client.search(query: searchQuery)
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
@@ -198,7 +208,21 @@ You can sort by `year` and `meta.rating` at the same time:
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    let searchQuery = ClientSearchParams
+      .builder(term: "prestige", mode: .fulltext)
+      .sortBy([
+        ClientSearchParams.SortByDirective(
+          property: "year",
+          order: .asc
+        ),
+        ClientSearchParams.SortByDirective(
+          property: "meta.rating",
+          order: .desc
+        ),
+      ])
+      .build()
+
+    let results: SearchResults<MyDoc> = try await client.search(query: searchQuery)
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
