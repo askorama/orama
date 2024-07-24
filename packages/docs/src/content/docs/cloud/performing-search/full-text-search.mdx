@@ -29,8 +29,8 @@ The client exposes a simple `search` method that can be used to query the index:
     import { OramaClient } from "@oramacloud/client";
 
     const client = new OramaClient({
-      endpoint: "",
-      api_key: "",
+      endpoint: '<Your Orama Cloud Endpoint>',
+      api_key: '<Your Orama Cloud API Key>',
     });
 
     const results = await client.search({
@@ -53,11 +53,11 @@ The client exposes a simple `search` method that can be used to query the index:
       let description: String
     }
 
-    let clientParams = OramaClientParams(endpoint: "", apiKey: "")
+    let clientParams = OramaClientParams(endpoint: "<Your Orama Cloud Endpoint>", apiKey: "<Your Orama Cloud API Key>")
     let client = OramaClient(params: clientParams)
 
     let searchParams = ClientSearchParams.builder(
-        term: "What is Orama?",
+        term: "red shoes",
         mode: .fulltext // optional, default is .fulltext but can also be .vector or .hybrid
       )
       .limit(10) // optional
@@ -82,20 +82,18 @@ The client exposes a simple `search` method that can be used to query the index:
     ```php copy
     use OramaCloud\Client;
     use OramaCloud\Client\Query;
-    use OramaCloud\Client\QueryParams/WhereOperator;
-    use OramaCloud\Client\QueryParams/SortByOrder;
+    use OramaCloud\Client\QueryParams\WhereOperator;
+    use OramaCloud\Client\QueryParams\SortByOrder;
 
     $client = new Client([
-      'api_key' => '<Your Orama Cloud API Key>',
-      'endpoint' => '<Your Orama Cloud Endpoint>'
+      'endpoint' => '<Your Orama Cloud Endpoint>',
+      'api_key' => '<Your Orama Cloud API Key>'
     ]);
 
-    $query = (new Query('red shoes', 'fulltext')) // 'fulltext' is optional, but can also be "vector" or "hybrid"
-        ->where('price', WhereOperator::LTE, 9.99)
-        ->where('gender', WhereOperator::EQ, 'unisex')
-        ->sortBy('price' SortByOrder::DESC)
-        ->limit(5)
-        ->offset(1);
+    $query = (new Query()) 
+      ->term('red shoes')
+      ->mode('fulltext') // 'fulltext' is optional, but can also be "vector" or "hybrid"
+      ->where('price', WhereOperator::GT, 99.99);
 
     $results = $client->search($query);
     ```
@@ -164,7 +162,15 @@ Considering the following schema:
   </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php copy
-    echo "coming soon"
+    use OramaCloud\Client;
+    use OramaCloud\Client\Query;
+    use OramaCloud\Client\QueryParams\SortByOrder;
+
+    $query = (new Query())
+        ->term('prestige')
+        ->sortBy('year' SortByOrder::DESC); // optional, default is "ASC"
+
+    $results = $client->search($query);
     ```
   </TabItem>
 </Tabs>
@@ -237,7 +243,16 @@ You can sort by `year` and `meta.rating` at the same time:
   </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php copy
-    echo "coming soon"
+    use OramaCloud\Client;
+    use OramaCloud\Client\Query;
+    use OramaCloud\Client\QueryParams\SortByOrder;
+
+    $query = (new Query())
+        ->term('prestige')
+        ->sortBy('year' SortByOrder::DESC)
+        ->sortBy('meta.rating' SortByOrder::DESC);
+
+    $results = $client->search($query);
     ```
   </TabItem>
 </Tabs>
@@ -284,7 +299,7 @@ Given the following Orama schema:
   </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php copy
-    echo "coming soon"
+    // coming soon
     ```
   </TabItem>
 </Tabs>
@@ -338,7 +353,7 @@ Orama will be able to generate facets at search-time based on the schema. To do 
   </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php copy
-    echo "coming soon"
+    // coming soon
     ```
   </TabItem>
 </Tabs>
@@ -530,7 +545,15 @@ If we consider the following schema:
   </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php copy
-    echo "coming soon"
+    use OramaCloud\Client;
+    use OramaCloud\Client\Query;
+    use OramaCloud\Client\QueryParams\WhereOperator;
+
+    $query = (new Query())
+      ->term('prestige')
+      ->where('tag', WhereOperator::EQ, 'new');
+
+    $results = $client->search($query);
     ```
   </TabItem>
 </Tabs>
@@ -614,7 +637,17 @@ You can filter the results by the `meta.rating` property as follows:
   </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php copy
-    echo "coming soon"
+    use OramaCloud\Client;
+    use OramaCloud\Client\Query;
+    use OramaCloud\Client\QueryParams\WhereOperator;
+
+    $query = (new Query())
+      ->term('prestige')
+      ->where('year', WhereOperator::GTE, 2000)
+      ->where('meta.rating', WhereOperator::BETWEEN, [5, 10])
+      ->where('meta.length', WhereOperator::LTE, 60);
+
+    $results = $client->search($query);
     ```
   </TabItem>
 </Tabs>
@@ -651,7 +684,15 @@ For boolean properties, you can simply set the property to `true` or `false`:
   </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php copy
-    echo "coming soon"
+    use OramaCloud\Client;
+    use OramaCloud\Client\Query;
+    use OramaCloud\Client\QueryParams\WhereOperator;
+
+    $query = (new Query())
+      ->term('prestige')
+      ->where('meta.favorite', WhereOperator::EQ, true);
+
+    $results = $client->search($query);
     ```
   </TabItem>
 </Tabs>
@@ -798,7 +839,7 @@ To filter by distance, we use the `radius` property. Let's see how it works:
   </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php copy
-    echo "coming soon"
+    // coming soon
     ```
   </TabItem>
 </Tabs>
@@ -872,7 +913,7 @@ To filter by bounding polygon, we use the `polygon` property. Let's see how it w
   </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php copy
-    echo "coming soon"
+    // coming soon
     ```
   </TabItem>
 </Tabs>

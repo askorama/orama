@@ -84,20 +84,18 @@ Once you have at least one index containing vectors, you can perform vector sear
     ```php copy
     use OramaCloud\Client;
     use OramaCloud\Client\Query;
-    use OramaCloud\Client\QueryParams/WhereOperator;
-    use OramaCloud\Client\QueryParams/SortByOrder;
+    use OramaCloud\Client\QueryParams\WhereOperator;
+    use OramaCloud\Client\QueryParams\SortByOrder;
 
     $client = new Client([
       'api_key' => '<Your Orama Cloud API Key>',
       'endpoint' => '<Your Orama Cloud Endpoint>'
     ]);
 
-    $query = (new Query('Super Mario videogame', 'vector'))
-        ->where('price', WhereOperator::LTE, 9.99)
-        ->where('gender', WhereOperator::EQ, 'unisex')
-        ->sortBy('price' SortByOrder::DESC)
-        ->limit(5)
-        ->offset(1);
+    $query = (new Query())
+      ->term('Super Mario videogame')
+      ->mode('vector')
+      ->where('price', WhereOperator::LT, 19.99);
 
     $results = $client->search($query);
     ```
