@@ -46,7 +46,7 @@ The client exposes a simple `search` method that can be used to query the index:
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    import OramaCloud
+    import OramaCloudClient
 
     struct MyDoc: Codable {
       let title: String
@@ -267,42 +267,18 @@ With the Orama Faceted Search API, users can filter their search results by vari
 
 Given the following Orama schema:
 
-<Tabs syncKey="sdk">
-  <TabItem label="JavaScript" icon="seti:javascript">
-    ```json
-    {
-      title: "string",
-      description: "string",
-      categories: {
-        primary: "string",
-        secondary: "string",
-      },
-      rating: "number",
-      isFavorite: "boolean",
-    }
-    ```
-  </TabItem>
-  <TabItem label="Swift" icon="seti:swift">
-    ```swift copy
-    print("coming soon")
-    ```
-  </TabItem>
-  <TabItem label="Kotlin" icon="seti:kotlin">
-    ```kotlin copy
-    print("coming soon")
-    ```
-  </TabItem>
-  <TabItem label="Python" icon="seti:python">
-    ```python copy
-    print("coming soon")
-    ```
-  </TabItem>
-  <TabItem label="PHP" icon="seti:php">
-    ```php copy
-    // coming soon
-    ```
-  </TabItem>
-</Tabs>
+```json title=schema.json
+{
+  "title": "string",
+  "description": "string",
+  "categories": {
+    "primary": "string",
+    "secondary": "string",
+  },
+  "rating": "number",
+  "isFavorite": "boolean",
+}
+```
 
 Orama will be able to generate facets at search-time based on the schema. To do so, we need to specify the `facets` property in the `search` configuration:
 
@@ -311,6 +287,7 @@ Orama will be able to generate facets at search-time based on the schema. To do 
     ```js
     const results = await client.search({
       term: "Movie about cars and racing",
+      mode: "hybrid",
       properties: ["description"],
       facets: {
         "categories.primary": {
@@ -338,7 +315,34 @@ Orama will be able to generate facets at search-time based on the schema. To do 
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-    print("coming soon")
+    import OramaCloudClient
+
+    struct MyDoc: Codable {
+      let title: String
+      let description: String
+    }
+
+    let clientParams = OramaClientParams(endpoint: "<Your Orama Cloud Endpoint>", apiKey: "<Your Orama Cloud API Key>")
+    let client = OramaClient(params: clientParams)
+
+    let searchParams = ClientSearchParams.builder(
+        term: "Movie about cars and racing",
+        mode: .hybrid 
+      )
+      .properties(["description"]) // optional
+      .facets([
+        "category.primary": .string(limit: 3, order: .desc),
+        "category.secondary": .string(limit: 2, order: .desc),
+        "rating": .number(ranges: [
+          ClientSearchParams.Facet.NumberRange(from: 0, to: 3),
+          ClientSearchParams.Facet.NumberRange(from: 3, to: 7),
+          ClientSearchParams.Facet.NumberRange(from: 7, to: 10),
+        ]),
+        "isFavorite": .boolean(isTrue: true, isFalse: true),
+      ])
+      .build()
+
+    let searchResults: SearchResults<MyDoc> = try await client.search(query: searchParams)
     ```
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
