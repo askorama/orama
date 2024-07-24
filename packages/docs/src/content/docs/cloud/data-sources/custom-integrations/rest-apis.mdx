@@ -100,6 +100,17 @@ You can use the **snapshot** API to bulk update the live index:
     ])
     ```
   </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php
+    use OramaCloud\Manager\IndexManager;
+    $indexManager = new IndexManager('my-index-id', PRIVATE_API_KEY);
+
+    $indexManager->insert([
+      ['id' => '1', 'name' => 'John Doe', 'age' => 30],
+      ['id' => '2', 'name' => 'Jane Doe', 'age' => 25],
+    ]);
+    ```
+  </TabItem>
   <TabItem label="cURL" icon="seti:shell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/snapshot \
@@ -160,6 +171,19 @@ you can use the **notify** API to put that operation in queue for the next deplo
   await try indexManager.update([OramaDoc(id: "3", name: "Rick Doe", age: 75)])
   ```
   </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php
+    use OramaCloud\Manager\IndexManager;
+    $indexManager = new IndexManager('my-index-id', PRIVATE_API_KEY);
+
+    $indexManager->insert([
+      ['id' => '3', 'name' => 'Rick Morty', 'age' => 80]
+    ]);
+    $indexManager->update([
+      ['id' => '3', 'name' => 'Rick Doe', 'age' => 75]
+    ]);
+    ```
+  </TabItem>
   <TabItem label="cURL" icon="seti:shell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
@@ -204,6 +228,14 @@ You can always remove an existing document by using the `remove` operation. For 
     await try indexManager.delete(["2"])
     ```
   </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php
+    use OramaCloud\Manager\IndexManager;
+    $indexManager = new IndexManager('my-index-id', PRIVATE_API_KEY);
+
+    $indexManager->delete(["2"]);
+    ```
+  </TabItem>
   <TabItem label="cURL" icon="seti:shell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
@@ -216,8 +248,6 @@ You can always remove an existing document by using the `remove` operation. For 
 ## Deploying the index
 
 After you have inserted a snapshot or put a number of insert, remove, or update operations in the queue, you have to deploy a new version of the index.
-
-You can easily do that via the deploy API:
 
 
 <Tabs syncKey="sdk">
@@ -249,6 +279,14 @@ You can easily do that via the deploy API:
     let indexManager = cloudManager.index<OramaDoc>("my-index-id")
 
     await try indexManager.deploy()
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php
+    use OramaCloud\Manager\IndexManager;
+    $indexManager = new IndexManager('my-index-id', PRIVATE_API_KEY);
+
+    $indexManager->deploy();
     ```
   </TabItem>
   <TabItem label="cURL" icon="seti:shell">
@@ -297,6 +335,11 @@ You can do that by using the `clear` API, or by creating an empty snapshot:
     let indexManager = cloudManager.index<OramaDoc>("my-index-id")
 
     await try indexManager.clear()
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php
+    // coming soon
     ```
   </TabItem>
   <TabItem label="cURL" icon="seti:shell">
@@ -348,6 +391,11 @@ If you lost track of the operatiosn you ran via the SDK or APIs, you can always 
 
     print(hasPendingOperations)
     // true or false
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php
+    // coming soon
     ```
   </TabItem>
   <TabItem label="cURL" icon="shell">
