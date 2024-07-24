@@ -1053,6 +1053,72 @@ At any point in time, you can retrieve all the messages by calling the `.getMess
   </TabItem>
 </Tabs>
 
+## Regenerating the last answer
+
+Sometimes, the user may want to regenerate the last answer. You can do this by calling the `.regenerateLast` method:
+
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript copy
+    // Ask the question
+    await answerSession.ask({ term: "What is Orama?" });
+    
+    // Regenerate the answer
+    // "stream" is true by default, but you can set it to false if you want to get the entire answer at once
+    await answerSession.regenerateLast({ stream: false });
+    
+    // Check the messages
+    const messages = answerSession.getMessages();
+
+    console.log(messages);
+
+    // [
+    //   { role: 'user', content: 'What is Orama?' },
+    //   { role: 'assistant', content: 'Orama is a next-generation answer engine' }
+    // ]
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    // Ask the question
+    let answer = try await answerSession.ask(params: AnswerParams.AskParams(
+      query: "What is Orama?",
+      userData: nil,
+      related: nil
+    ))
+
+    // Regenerate the answer
+    // "stream" is true by default, but you can set it to false if you want to get the entire answer at once
+    let answer = try await answerSession.regenerateLast(params: AnswerParams.RegenerateParams(stream: false))
+
+    // Check the messages
+    let messages = answerSession.getMessages()
+
+    print(messages)
+
+    // [
+    //   { role: 'user', content: 'What is Orama?' },
+    //   { role: 'assistant', content: 'Orama is a next-generation answer engine' }
+    // ]
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    echo "coming soon"
+    ```
+  </TabItem>
+</Tabs>
+
 ## Clearing the Session
 
 You can clear the answer session by using the `clearSession` method. This will reset the messages to an empty array:
