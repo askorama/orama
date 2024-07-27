@@ -20,7 +20,7 @@ export const useOrama = () => {
   const isBrowser = useIsBrowser()
   useEffect(() => {
     async function loadOrama() {
-      if (endpoint) {
+      if (endpoint?.url) {
         setSearchBoxConfig({
           oramaInstance: new OramaClient({
             endpoint: endpoint.url,
