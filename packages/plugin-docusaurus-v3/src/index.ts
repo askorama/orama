@@ -10,6 +10,7 @@ import { JSDOM } from "jsdom"
 import MarkdownIt from "markdown-it"
 import matter from "gray-matter"
 import { createSnapshot, deployIndex, fetchEndpointConfig } from "./utils"
+import { parseMarkdownHeadingId, writeMarkdownHeadingId } from "@docusaurus/utils"
 
 enum DeployType {
   SNAPSHOT_ONLY = "snapshot-only",
@@ -201,12 +202,13 @@ async function generateDocs({
   const { title, permalink, source } = data
   const fileContent = readFileSync(source.replace("@site", siteDir), "utf-8")
   const contentWithoutFrontMatter = matter(fileContent).content
+  const contentWithIds = writeMarkdownHeadingId(contentWithoutFrontMatter)
 
   return parseHTMLContent({
     originalTitle: title,
     version,
     category,
-    html: new MarkdownIt().render(contentWithoutFrontMatter),
+    html: new MarkdownIt().render(contentWithIds),
     path: permalink
   })
 }
@@ -249,8 +251,12 @@ function parseHTMLContent({
     })
   }
   headers.forEach((header) => {
-    const sectionTitle = header.textContent?.trim()
+    const headerText = header.textContent?.trim() ?? ""
     const headerTag = header.tagName.toLowerCase()
+
+    // Use parseMarkdownHeadingId to extract clean title and section ID
+    const { text: sectionTitle, id: sectionId } = parseMarkdownHeadingId(headerText);
+
     let sectionContent = ""
 
     let sibling = header.nextElementSibling
@@ -266,11 +272,15 @@ function parseHTMLContent({
       content: sectionContent,
       version,
       category,
-      path
+      path: headerTag === 'h1' ? path : `${removeTrailingSlash(path)}#${sectionId}`
     })
   })
 
   return sections
+}
+
+function removeTrailingSlash(str: string): string {
+  return str.endsWith('/') ? str.slice(0, -1) : str;
 }
 
 function indexPath(outDir: string, version: string) {

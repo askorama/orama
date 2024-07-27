@@ -23,6 +23,7 @@
   "dependencies": {
     "@docusaurus/plugin-content-docs": "^3.2.0",
     "@docusaurus/theme-common": "^3.2.0",
+    "@docusaurus/utils": "^3.0.1",
     "@orama/highlight": "^0.1.5",
     "@orama/orama": "workspace:*",
     "@orama/plugin-analytics": "workspace:*",
