@@ -123,7 +123,7 @@ t.test('AVL Tree', (t) => {
     insert(tree, 20, ['quuz'])
     insert(tree, 12, ['corge'])
 
-    t.same(greaterThan(tree, 10), ['quuz', 'corge', 'qux'])
+    t.same(greaterThan(tree, 10), ['qux', 'quuz', 'corge'])
   })
 
   t.test('lessThan', (t) => {
@@ -138,6 +138,6 @@ t.test('AVL Tree', (t) => {
     insert(tree, 20, ['quuz'])
     insert(tree, 12, ['corge'])
 
-    t.same(lessThan(tree, 10), ['bar', 'foo', 'quux'])
+    t.same(lessThan(tree, 10), ['foo', 'bar', 'quux'])
   })
 })

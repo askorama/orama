@@ -122,14 +122,14 @@ export function rangeSearch<K, V>(node: RootNode<K, V>, min: K, max: K): V {
 export function greaterThan<K, V>(node: RootNode<K, V>, key: K, inclusive = false): V {
   const result: V[] = []
 
-  if (node === null) return result as V;
+  if (node === null) return result as V
 
   const stack: Array<Nullable<Node<K, V>>> = [node.root]
 
   while (stack.length > 0) {
     const node = stack.pop()
     if (!node) {
-      continue;
+      continue
     }
 
     if (inclusive && node.k >= key) {
@@ -149,14 +149,14 @@ export function greaterThan<K, V>(node: RootNode<K, V>, key: K, inclusive = fals
 export function lessThan<K, V>(node: RootNode<K, V>, key: K, inclusive = false): V {
   const result: V[] = []
 
-  if (node === null) return result as V;
+  if (node === null) return result as V
 
   const stack: Array<Nullable<Node<K, V>>> = [node.root]
 
   while (stack.length > 0) {
     const node = stack.pop()
     if (!node) {
-      continue;
+      continue
     }
 
     if (inclusive && node.k <= key) {
@@ -198,9 +198,12 @@ export function create<K, V>(key: K, value: V): RootNode<K, V> {
   }
 }
 
-export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[]): void {
+let insertCount = 0
+
+export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[], rebalanceThreshold = 500): void {
   function insertNode(node: Nullable<Node<K, V[]>>, key: K, newValue: V[]): Node<K, V[]> {
     if (node === null) {
+      insertCount++
       return {
         k: key,
         v: newValue,
@@ -215,38 +218,49 @@ export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[]):
     } else if (key > node.k) {
       node.r = insertNode(node.r, key, newValue)
     } else {
-      for (const value of newValue) {
-        node.v.push(value)
-      }
+      node.v.push(...newValue)
       return node
     }
 
-    node.h = 1 + Math.max(getHeight(node.l), getHeight(node.r))
-
-    const balanceFactor = getHeight(node.l) - getHeight(node.r)
-
-    if (balanceFactor > 1 && key < node.l!.k) {
-      return rotateRight(node)
-    }
-
-    if (balanceFactor < -1 && key > node.r!.k) {
-      return rotateLeft(node)
-    }
-
-    if (balanceFactor > 1 && key > node.l!.k) {
-      node.l = rotateLeft(node.l!)
-      return rotateRight(node)
-    }
-
-    if (balanceFactor < -1 && key < node.r!.k) {
-      node.r = rotateRight(node.r!)
-      return rotateLeft(node)
+    // Rebalance the tree if the insert count reaches the threshold.
+    // This will improve insertion performance since we won't be rebalancing the tree on every insert.
+    // When inserting docs using `insertMultiple`, the threshold will be set to the number of docs being inserted.
+    // We can force rebalancing the tree by setting the threshold to 1 (default).
+    if (insertCount % rebalanceThreshold === 0) {
+      console.log(`Rebalancing tree after ${insertCount} inserts...`)
+      return rebalanceNode(node, key)
     }
 
     return node
   }
 
   rootNode.root = insertNode(rootNode.root, key, newValue)
+}
+
+function rebalanceNode<K, V>(node: Node<K, V[]>, key: K): Node<K, V[]> {
+  node.h = 1 + Math.max(getHeight(node.l), getHeight(node.r))
+
+  const balanceFactor = getHeight(node.l) - getHeight(node.r)
+
+  if (balanceFactor > 1 && key < node.l!.k) {
+    return rotateRight(node)
+  }
+
+  if (balanceFactor < -1 && key > node.r!.k) {
+    return rotateLeft(node)
+  }
+
+  if (balanceFactor > 1 && key > node.l!.k) {
+    node.l = rotateLeft(node.l!)
+    return rotateRight(node)
+  }
+
+  if (balanceFactor < -1 && key < node.r!.k) {
+    node.r = rotateRight(node.r!)
+    return rotateLeft(node)
+  }
+
+  return node
 }
 
 function getHeight<K, V>(node: Nullable<Node<K, V>>): number {

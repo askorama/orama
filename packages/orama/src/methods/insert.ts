@@ -5,18 +5,23 @@ import { createError } from '../errors.js'
 import { Point } from '../trees/bkd.js'
 import { AnyOrama, PartialSchemaDeep, SortValue, TypedDocument } from '../types.js'
 
+export type InsertOptions = {
+  avlRebalanceThreshold?: number
+}
+
 export async function insert<T extends AnyOrama>(
   orama: T,
   doc: PartialSchemaDeep<TypedDocument<T>>,
   language?: string,
-  skipHooks?: boolean
+  skipHooks?: boolean,
+  options?: InsertOptions
 ): Promise<string> {
   const errorProperty = await orama.validateSchema(doc, orama.schema)
   if (errorProperty) {
     throw createError('SCHEMA_VALIDATION_FAILURE', errorProperty)
   }
 
-  return innerInsert(orama, doc, language, skipHooks)
+  return innerInsert(orama, doc, language, skipHooks, options)
 }
 
 const ENUM_TYPE = new Set(['enum', 'enum[]'])
@@ -26,7 +31,8 @@ async function innerInsert<T extends AnyOrama>(
   orama: T,
   doc: PartialSchemaDeep<TypedDocument<T>>,
   language?: string,
-  skipHooks?: boolean
+  skipHooks?: boolean,
+  options?: InsertOptions
 ): Promise<string> {
   const { index, docs } = orama.data
 
@@ -111,7 +117,8 @@ async function innerInsert<T extends AnyOrama>(
       expectedType,
       language,
       orama.tokenizer,
-      docsCount
+      docsCount,
+      options
     )
     await orama.index.afterInsert?.(
       orama.data.index,
@@ -199,7 +206,8 @@ export async function innerInsertMultiple<T extends AnyOrama>(
 
       for (const doc of batch) {
         try {
-          const id = await insert(orama, doc, language, skipHooks)
+          const options = { avlRebalanceThreshold: batch.length }
+          const id = await insert(orama, doc, language, skipHooks, options)
           ids.push(id)
         } catch (err) {
           reject(err)
