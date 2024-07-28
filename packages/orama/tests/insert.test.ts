@@ -523,6 +523,66 @@ t.test('insertMultiple method', (t) => {
     t.equal(after - before > expectedTime, true)
   })
 
+  t.test('should correctly rebalance AVL tree once the threshold is reached', async (t) => {
+    t.plan(4)
+
+    const db = await create({
+      schema: {
+        id: 'string',
+        name: 'string',
+        number: 'number'
+      } as const
+    })
+
+    function getRandomNumberExcept(n: number): number {
+      const exceptions = [25, 250]
+
+      if (exceptions.includes(n)) {
+        return n
+      }
+
+      let random = Math.floor(Math.random() * 1000)
+
+      while (exceptions.includes(random) || random === n) {
+        random = Math.floor(Math.random() * 1000)
+      }
+
+      return random
+    }
+
+    const docs = Array.from({ length: 1000 }, (_, i) => ({
+      id: i.toString(),
+      name: `name-${i}`,
+      number: getRandomNumberExcept(i)
+    }))
+
+    await insertMultiple(db, docs, 200)
+
+    const results25 = await search(db, {
+      term: 'name-25',
+      where: {
+        number: {
+          eq: 25
+        }
+      }
+    })
+
+    const results250 = await search(db, {
+      term: 'name',
+      where: {
+        number: {
+          eq: 250
+        }
+      }
+    })
+
+    t.equal(results25.count, 1)
+    t.equal(results25.hits[0].document.id, '25')
+
+    t.equal(results250.count, 1)
+    t.equal(results250.hits[0].document.id, '250')
+  })
+
   t.end()
 })
 

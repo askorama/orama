@@ -84,7 +84,7 @@ async function createDb() {
       color: 'string',
       rank: 'number',
       isPromoted: 'boolean'
-    }
+    } as const
   })
 
   const ids = await insertMultiple(db, [

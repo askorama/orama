@@ -198,9 +198,9 @@ export function create<K, V>(key: K, value: V): RootNode<K, V> {
   }
 }
 
-export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[], rebalanceThreshold = 1): void {
-  let insertCount = 0
+let insertCount = 0
 
+export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[], rebalanceThreshold = 500): void {
   function insertNode(node: Nullable<Node<K, V[]>>, key: K, newValue: V[]): Node<K, V[]> {
     if (node === null) {
       insertCount++
@@ -218,9 +218,7 @@ export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[], 
     } else if (key > node.k) {
       node.r = insertNode(node.r, key, newValue)
     } else {
-      for (const value of newValue) {
-        node.v.push(value)
-      }
+      node.v.push(...newValue)
       return node
     }
 
@@ -229,6 +227,7 @@ export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[], 
     // When inserting docs using `insertMultiple`, the threshold will be set to the number of docs being inserted.
     // We can force rebalancing the tree by setting the threshold to 1 (default).
     if (insertCount % rebalanceThreshold === 0) {
+      console.log(`Rebalancing tree after ${insertCount} inserts...`)
       return rebalanceNode(node, key)
     }
 

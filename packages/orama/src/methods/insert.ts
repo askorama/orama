@@ -206,7 +206,8 @@ export async function innerInsertMultiple<T extends AnyOrama>(
 
       for (const doc of batch) {
         try {
-          const id = await insert(orama, doc, language, skipHooks)
+          const options = { avlRebalanceThreshold: batch.length }
+          const id = await insert(orama, doc, language, skipHooks, options)
           ids.push(id)
         } catch (err) {
           reject(err)

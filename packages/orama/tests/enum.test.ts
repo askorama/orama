@@ -17,7 +17,7 @@ t.test('enum', async (t) => {
     const db = await create({
       schema: {
         categoryId: 'enum'
-      }
+      } as const
     })
 
     const c1 = await insert(db, {
@@ -153,7 +153,7 @@ t.test('enum', async (t) => {
     const db = await create({
       schema: {
         categoryId: 'enum'
-      }
+      } as const
     })
     const c1 = await insert(db, { categoryId: 1 })
     const c11 = await insert(db, { categoryId: 1 })
@@ -187,7 +187,7 @@ t.test('enum', async (t) => {
     const db1 = await create({
       schema: {
         categoryId: 'enum'
-      }
+      } as const
     })
     const [c1, c11, c2, c3, c5] = await insertMultiple(db1, [
       { categoryId: 1 },
@@ -202,7 +202,7 @@ t.test('enum', async (t) => {
     const db2 = await create({
       schema: {
         categoryId: 'enum'
-      }
+      } as const
     })
     await load(db2, dump)
 
@@ -239,7 +239,7 @@ t.test('enum', async (t) => {
         title: 'string',
         year: 'number',
         categoryId: 'enum'
-      }
+      } as const
     })
     const [c1] = await insertMultiple(filmDb, [
       { title: 'The Shawshank Redemption', year: 1994, categoryId: 1 },
@@ -303,7 +303,7 @@ t.test('enum[]', async (t) => {
     const db = await create({
       schema: {
         tags: 'enum[]'
-      }
+      } as const
     })
 
     const cGreenBlue = await insert(db, {
@@ -395,7 +395,7 @@ t.test('enum[]', async (t) => {
     const db = await create({
       schema: {
         tags: 'enum[]'
-      }
+      } as const
     })
     const c1 = await insert(db, { tags: ['green', 'blue'] })
     const c11 = await insert(db, { tags: ['blue', 'green'] })
@@ -429,7 +429,7 @@ t.test('enum[]', async (t) => {
     const db1 = await create({
       schema: {
         tags: 'enum[]'
-      }
+      } as const
     })
     const [c1, c11] = await insertMultiple(db1, [
       { tags: ['green'] },
@@ -464,7 +464,7 @@ t.test('enum[]', async (t) => {
       term: '',
       where: {
         tags: { containsAll: [] }
-      }
+      } as const
     })
     t.equal(result2.hits.length, 0)
     t.strictSame(
@@ -481,7 +481,7 @@ t.test('enum[]', async (t) => {
         title: 'string',
         year: 'number',
         tags: 'enum[]'
-      }
+      } as const
     })
     const [, , , c4] = await insertMultiple(filmDb, [
       { title: 'The Shawshank Redemption', year: 1994, tags: ['drama', 'crime'] },
