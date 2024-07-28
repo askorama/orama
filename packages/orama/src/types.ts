@@ -1,3 +1,4 @@
+import type { InsertOptions } from './methods/insert.js'
 import { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from './constants.js'
 import { DocumentsStore } from './components/documents-store.js'
 import { Index } from './components/index.js'
@@ -924,7 +925,8 @@ export interface IIndex<I extends AnyIndexStore> {
     schemaType: SearchableType,
     language: string | undefined,
     tokenizer: Tokenizer,
-    docsCount: number
+    docsCount: number,
+    options?: InsertOptions
   ) => SyncOrAsyncValue
   afterInsert?: IIndexInsertOrRemoveHookFunction
 

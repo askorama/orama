@@ -198,9 +198,12 @@ export function create<K, V>(key: K, value: V): RootNode<K, V> {
   }
 }
 
-export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[]): void {
+export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[], rebalanceThreshold = 1): void {
+  let insertCount = 0;
+
   function insertNode(node: Nullable<Node<K, V[]>>, key: K, newValue: V[]): Node<K, V[]> {
     if (node === null) {
+      insertCount++;
       return {
         k: key,
         v: newValue,
@@ -221,32 +224,44 @@ export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[]):
       return node
     }
 
-    node.h = 1 + Math.max(getHeight(node.l), getHeight(node.r))
-
-    const balanceFactor = getHeight(node.l) - getHeight(node.r)
-
-    if (balanceFactor > 1 && key < node.l!.k) {
-      return rotateRight(node)
+    // Rebalance the tree if the insert count reaches the threshold.
+    // This will improve insertion performance since we won't be rebalancing the tree on every insert.
+    // When inserting docs using `insertMultiple`, the threshold will be set to the number of docs being inserted.
+    // We can force rebalancing the tree by setting the threshold to 1 (default).
+    if (insertCount % rebalanceThreshold === 0) {
+      return rebalanceNode(node, key);
     }
 
-    if (balanceFactor < -1 && key > node.r!.k) {
-      return rotateLeft(node)
-    }
-
-    if (balanceFactor > 1 && key > node.l!.k) {
-      node.l = rotateLeft(node.l!)
-      return rotateRight(node)
-    }
-
-    if (balanceFactor < -1 && key < node.r!.k) {
-      node.r = rotateRight(node.r!)
-      return rotateLeft(node)
-    }
-
-    return node
+    return node;
   }
 
   rootNode.root = insertNode(rootNode.root, key, newValue)
+}
+
+function rebalanceNode<K, V>(node: Node<K, V[]>, key: K): Node<K, V[]> {
+  node.h = 1 + Math.max(getHeight(node.l), getHeight(node.r))
+
+  const balanceFactor = getHeight(node.l) - getHeight(node.r)
+
+  if (balanceFactor > 1 && key < node.l!.k) {
+    return rotateRight(node)
+  }
+
+  if (balanceFactor < -1 && key > node.r!.k) {
+    return rotateLeft(node)
+  }
+
+  if (balanceFactor > 1 && key > node.l!.k) {
+    node.l = rotateLeft(node.l!)
+    return rotateRight(node)
+  }
+
+  if (balanceFactor < -1 && key < node.r!.k) {
+    node.r = rotateRight(node.r!)
+    return rotateLeft(node)
+  }
+
+  return node
 }
 
 function getHeight<K, V>(node: Nullable<Node<K, V>>): number {

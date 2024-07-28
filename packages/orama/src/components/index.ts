@@ -22,6 +22,7 @@ import type {
   VectorType,
   WhereCondition
 } from '../types.js'
+import type { InsertOptions } from '../methods/insert.js'
 import { createError } from '../errors.js'
 import {
   create as avlCreate,
@@ -293,7 +294,8 @@ function insertScalarBuilder(
   id: DocumentID,
   language: string | undefined,
   tokenizer: Tokenizer,
-  docsCount: number
+  docsCount: number,
+  options?: InsertOptions
 ) {
   return async (value: SearchableValue): Promise<void> => {
     const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
@@ -305,7 +307,8 @@ function insertScalarBuilder(
         break
       }
       case 'AVL': {
-        avlInsert(node, value as number, [internalId])
+        const avlRebalanceThreshold = options?.avlRebalanceThreshold ?? 1
+        avlInsert(node, value as number, [internalId], avlRebalanceThreshold)
         break
       }
       case 'Radix': {
@@ -341,13 +344,14 @@ export async function insert(
   schemaType: SearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
-  docsCount: number
+  docsCount: number,
+  options?: InsertOptions
 ): Promise<void> {
   if (isVectorType(schemaType)) {
     return insertVector(index, prop, value as number[] | Float32Array, id)
   }
 
-  const insertScalar = insertScalarBuilder(implementation, index, prop, id, language, tokenizer, docsCount)
+  const insertScalar = insertScalarBuilder(implementation, index, prop, id, language, tokenizer, docsCount, options)
 
   if (!isArrayType(schemaType)) {
     return insertScalar(value)
