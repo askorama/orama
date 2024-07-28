@@ -122,14 +122,14 @@ export function rangeSearch<K, V>(node: RootNode<K, V>, min: K, max: K): V {
 export function greaterThan<K, V>(node: RootNode<K, V>, key: K, inclusive = false): V {
   const result: V[] = []
 
-  if (node === null) return result as V;
+  if (node === null) return result as V
 
   const stack: Array<Nullable<Node<K, V>>> = [node.root]
 
   while (stack.length > 0) {
     const node = stack.pop()
     if (!node) {
-      continue;
+      continue
     }
 
     if (inclusive && node.k >= key) {
@@ -149,14 +149,14 @@ export function greaterThan<K, V>(node: RootNode<K, V>, key: K, inclusive = fals
 export function lessThan<K, V>(node: RootNode<K, V>, key: K, inclusive = false): V {
   const result: V[] = []
 
-  if (node === null) return result as V;
+  if (node === null) return result as V
 
   const stack: Array<Nullable<Node<K, V>>> = [node.root]
 
   while (stack.length > 0) {
     const node = stack.pop()
     if (!node) {
-      continue;
+      continue
     }
 
     if (inclusive && node.k <= key) {
@@ -199,11 +199,11 @@ export function create<K, V>(key: K, value: V): RootNode<K, V> {
 }
 
 export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[], rebalanceThreshold = 1): void {
-  let insertCount = 0;
+  let insertCount = 0
 
   function insertNode(node: Nullable<Node<K, V[]>>, key: K, newValue: V[]): Node<K, V[]> {
     if (node === null) {
-      insertCount++;
+      insertCount++
       return {
         k: key,
         v: newValue,
@@ -229,10 +229,10 @@ export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[], 
     // When inserting docs using `insertMultiple`, the threshold will be set to the number of docs being inserted.
     // We can force rebalancing the tree by setting the threshold to 1 (default).
     if (insertCount % rebalanceThreshold === 0) {
-      return rebalanceNode(node, key);
+      return rebalanceNode(node, key)
     }
 
-    return node;
+    return node
   }
 
   rootNode.root = insertNode(rootNode.root, key, newValue)
