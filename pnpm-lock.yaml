@@ -500,6 +500,9 @@ importers:
       '@docusaurus/types':
         specifier: '>= 3.2.0'
         version: 3.2.0(@swc/core@1.3.27)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@docusaurus/utils':
+        specifier: ^3.0.1
+        version: 3.2.0(@docusaurus/types@3.2.0(@swc/core@1.3.27)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@swc/core@1.3.27)
       '@orama/highlight':
         specifier: ^0.1.5
         version: 0.1.5
@@ -16521,7 +16524,7 @@ snapshots:
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.89.0(@swc/core@1.3.27))
       tslib: 2.6.2
       update-notifier: 5.1.0
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       wait-on: 6.0.1
       webpack: 5.89.0(@swc/core@1.3.27)
       webpack-bundle-analyzer: 4.9.0
@@ -16614,7 +16617,7 @@ snapshots:
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.89.0(@swc/core@1.3.27))
       tslib: 2.6.2
       update-notifier: 5.1.0
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       wait-on: 6.0.1
       webpack: 5.89.0(@swc/core@1.3.27)
       webpack-bundle-analyzer: 4.9.0
@@ -16706,7 +16709,7 @@ snapshots:
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.89.0(@swc/core@1.3.27))
       tslib: 2.6.2
       update-notifier: 6.0.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
       webpack-bundle-analyzer: 4.9.0
       webpack-dev-server: 4.15.1(webpack@5.89.0(@swc/core@1.3.27))
@@ -16798,7 +16801,7 @@ snapshots:
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.89.0(@swc/core@1.3.27))
       tslib: 2.6.2
       update-notifier: 6.0.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
       webpack-bundle-analyzer: 4.9.0
       webpack-dev-server: 4.15.1(webpack@5.89.0(@swc/core@1.3.27))
@@ -16877,7 +16880,7 @@ snapshots:
       tslib: 2.6.2
       unified: 9.2.2
       unist-util-visit: 2.0.3
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
     transitivePeerDependencies:
       - '@docusaurus/types'
@@ -16914,7 +16917,7 @@ snapshots:
       tslib: 2.6.2
       unified: 11.0.4
       unist-util-visit: 5.0.0
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       vfile: 6.0.1
       webpack: 5.89.0(@swc/core@1.3.27)
     transitivePeerDependencies:
@@ -16950,7 +16953,7 @@ snapshots:
       tslib: 2.6.2
       unified: 11.0.4
       unist-util-visit: 5.0.0
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       vfile: 6.0.1
       webpack: 5.89.0(@swc/core@1.3.27)
     transitivePeerDependencies:
@@ -18254,7 +18257,7 @@ snapshots:
       resolve-pathname: 3.0.0
       shelljs: 0.8.5
       tslib: 2.6.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
     optionalDependencies:
       '@docusaurus/types': 2.4.3(@swc/core@1.3.27)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
@@ -18282,7 +18285,7 @@ snapshots:
       resolve-pathname: 3.0.0
       shelljs: 0.8.5
       tslib: 2.6.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
     optionalDependencies:
       '@docusaurus/types': 3.0.1(@swc/core@1.3.27)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -18312,7 +18315,7 @@ snapshots:
       resolve-pathname: 3.0.0
       shelljs: 0.8.5
       tslib: 2.6.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
     optionalDependencies:
       '@docusaurus/types': 3.2.0(@swc/core@1.3.27)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -32017,7 +32020,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  url-loader@4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27)):
+  url-loader@4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27)):
     dependencies:
       loader-utils: 2.0.4
       mime-types: 2.1.35
