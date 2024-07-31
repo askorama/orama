@@ -27,6 +27,7 @@
     "@astrojs/starlight": "^0.24.5",
     "@astrojs/starlight-tailwind": "^2.0.3",
     "@astrojs/tailwind": "^5.1.0",
+    "@jop-software/astro-cookieconsent": "^3.0.0",
     "@orama/crawly": "^0.0.6",
     "@orama/orama": "^2.0.21",
     "@orama/searchbox": "1.0.0-rc48",
@@ -42,6 +43,7 @@
     "react-syntax-highlighter": "^15.5.0",
     "sharp": "^0.33.4",
     "starlight-image-zoom": "^0.5.0",
-    "tailwindcss": "^3.4.4"
+    "tailwindcss": "^3.4.4",
+    "vanilla-cookieconsent": "^3.0.1"
   }
 }
