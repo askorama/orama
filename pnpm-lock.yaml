@@ -108,6 +108,9 @@ importers:
       '@astrojs/tailwind':
         specifier: ^5.1.0
         version: 5.1.0(astro@4.11.3(@types/node@20.11.19)(terser@5.17.7)(typescript@5.5.2))(tailwindcss@3.4.4(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.5.2)))(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.5.2))
+      '@jop-software/astro-cookieconsent':
+        specifier: ^3.0.0
+        version: 3.0.0(vanilla-cookieconsent@3.0.1)
       '@orama/crawly':
         specifier: ^0.0.6
         version: 0.0.6
@@ -156,6 +159,9 @@ importers:
       tailwindcss:
         specifier: ^3.4.4
         version: 3.4.4(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.5.2))
+      vanilla-cookieconsent:
+        specifier: ^3.0.1
+        version: 3.0.1
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.7.3
@@ -3854,6 +3860,11 @@ packages:
 
   '@johnsoncodehk/vscode-html-languageservice@5.2.0-34a5462':
     resolution: {integrity: sha512-etqLfpSJ5zaw76KUNF603be6d6QsiQPmaHr9FKEp4zhLZJzWCCMH6Icak7MtLUFLZLMpL761mZNImi/joBo1ZA==}
+
+  '@jop-software/astro-cookieconsent@3.0.0':
+    resolution: {integrity: sha512-EbjaGgzqKW17Ik8JI7HqBboCPIWsz+6CUh3s6Nw3AXp+TbFpg+GVI6Hqhtw7A+8tmO2N3KGsuaKP7GQbrZyTHw==}
+    peerDependencies:
+      vanilla-cookieconsent: ^3.0.0
 
   '@jridgewell/gen-mapping@0.3.3':
     resolution: {integrity: sha512-HLhSWOLRi875zjjMG/r+Nv0oCW8umGb0BgEhyX3dDX3egwZtB8PqLnjz3yedt8R5StBrzcg4aBpnh8UA9D1BoQ==}
@@ -13151,6 +13162,9 @@ packages:
   value-equal@1.0.1:
     resolution: {integrity: sha512-NOJ6JZCAWr0zlxZt+xqCHNTEKOsrks2HQd4MqhP1qy4z1SkbEP467eNx6TgDKXMvUOb+OENfJCZwM+16n7fRfw==}
 
+  vanilla-cookieconsent@3.0.1:
+    resolution: {integrity: sha512-gqc4x7O9t1I4xWr7x6/jtQWPr4PZK26SmeA0iyTv1WyoECfAGnu5JEOExmMEP+5Fz66AT9OiCBO3GII4wDQHLw==}
+
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
@@ -18955,6 +18969,10 @@ snapshots:
       vscode-languageserver-textdocument: 1.0.11
       vscode-languageserver-types: 3.17.5
       vscode-uri: 3.0.8
+
+  '@jop-software/astro-cookieconsent@3.0.0(vanilla-cookieconsent@3.0.1)':
+    dependencies:
+      vanilla-cookieconsent: 3.0.1
 
   '@jridgewell/gen-mapping@0.3.3':
     dependencies:
@@ -32104,6 +32122,8 @@ snapshots:
       builtins: 5.0.1
 
   value-equal@1.0.1: {}
+
+  vanilla-cookieconsent@3.0.1: {}
 
   vary@1.1.2: {}
 
