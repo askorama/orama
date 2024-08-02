@@ -122,7 +122,7 @@ You can use the **snapshot** API to bulk update the live index:
 
 ## Updating, removing, inserting elements in a live index
 
-While the **snapshot** API is convenient for replacing a live index with a new one, there may be instances where you only want to update one or more documents, or perhaps insert and delete others.
+While the **snapshot** API is convenient for replacing a live index with a new one, there may be instances where you only want to change some documents, inserting, updating, and deleting ones.
 
 This is where the **notify** API becomes really convenient.
 
@@ -193,9 +193,9 @@ you can use the **notify** API to put that operation in queue for the next deplo
   </TabItem>
 </Tabs>
 
-as you can see, you'll need to pass an array of objects to an `upsert` operation (will do that based on the `id` field). If Orama find that document, it will update it, otherwise it will insert a new one.
+As you can see, you'll need to pass an array of objects to an `upsert` operation (which will do that based on the `id` field). If Orama finds that document, it will update it; otherwise, it will insert a new one.
 
-You can always remove an existing document by using the `remove` operation. For example, this is how you can remove the document with id `"2"`:
+You can also remove an existing document using the `remove` operation. For example, this is how you can remove the document with id `"2"`:
 
 <Tabs syncKey="sdk">
   <TabItem label="JavaScript" icon="seti:javascript">
@@ -302,7 +302,7 @@ This will trigger a new deployment and will make the new index available worldwi
 
 ## Clearing the index on next deployment
 
-Sometimes, you may want to re-insert all the documents in the index, and to do that, you will first need to tell Orama to clear the index on the next deployment.
+Sometimes, you may want to re-insert all the documents in the index and to do that, you will first need to tell Orama to clear the index for the next deployment.
 
 You can do that by using the `clear` API, or by creating an empty snapshot:
 
@@ -351,7 +351,7 @@ You can do that by using the `clear` API, or by creating an empty snapshot:
   </TabItem>
 </Tabs>
 
-This will clear the index on the next deployment, and you can then insert a new snapshot or a number of operations to update the index. This ensures that old data is not present in the index anymore.
+This will clear the index, making the next deployment start from empty status. You can then notify some operations to update the index. This ensures that old data is not present in the index anymore.
 
 ## Check if there are pending operations
 
@@ -369,8 +369,7 @@ If you lost track of the operatiosn you ran via the SDK or APIs, you can always 
     const myIndex = oramaCloudManager.index('my-index-id')
 
     const hasPendingOperations = await myIndex.hasPendingOperations()
-    console.log(hasPendingOperations)
-    // true or false
+    console.log(hasPendingOperations) // true or false
     ```
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
@@ -389,8 +388,7 @@ If you lost track of the operatiosn you ran via the SDK or APIs, you can always 
 
     let hasPendingOperations = await try indexManager.hasPendingOperations()
 
-    print(hasPendingOperations)
-    // true or false
+    print(hasPendingOperations) // true or false
     ```
   </TabItem>
   <TabItem label="PHP" icon="seti:php">
