@@ -59,7 +59,7 @@ export default function OramaPluginDocusaurus(
     },
 
     async allContentLoaded({ actions, allContent }) {
-      const isDevelopment = process.env.NODE_ENV === 'development' || !options.cloud?.oramaCloudAPIKey
+      const isDevelopment = process.env.NODE_ENV === 'development' || (options.cloud && !options.cloud?.oramaCloudAPIKey)
       const docsInstances: string[] = []
       const oramaCloudAPIKey = options.cloud?.oramaCloudAPIKey
       const searchDataConfig = [
