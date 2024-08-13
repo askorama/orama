@@ -8,6 +8,14 @@ export const client = new OramaClient({
   endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-bzo330'
 })
 
+setTimeout(() => {
+  try {
+    client.alias(posthog.get_distinct_id());
+  } catch (error) {
+    console.log(`Error setting alias: ${error}`);
+  }
+}, 500);
+
 export function Search(props) {
   const [theme, setTheme] = useState()
   const [currentCategory, setCurrentCategory] = useState(null)
