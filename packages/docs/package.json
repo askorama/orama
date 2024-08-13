@@ -30,6 +30,7 @@
     "@jop-software/astro-cookieconsent": "^3.0.0",
     "@orama/crawly": "^0.0.6",
     "@orama/orama": "^2.0.21",
+    "@orama/react-components": "^0.0.14",
     "@orama/searchbox": "1.0.0-rc48",
     "@oramacloud/client": "^1.3.2",
     "astro": "^4.11.3",
