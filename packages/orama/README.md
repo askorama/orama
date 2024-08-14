@@ -4,8 +4,10 @@ Full-text, vector, and hybrid search with a unique API. <br />
 On your browser, server, mobile app, or at the edge. <br />
 In less than 2kb.
 
-[![Tests](https://github.com/askorama/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/askorama/orama/actions/workflows/turbo.yml)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/%40orama%2Forama?label=Bundle%20Size&link=https%3A%2F%2Fbundlephobia.com%2Fpackage%2F%40orama%2Forama%40latest)
+[![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
+![NPM Downloads](https://img.shields.io/npm/dm/%40orama%2Forama)
+![jsDelivr hits (npm)](https://img.shields.io/jsdelivr/npm/hm/%40orama%2Forama)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/%40orama%2Forama?label=Bundle%20Size&link=https%3A%2F%2Fbundlephobia.com%2Fpackage%2F%40orama%2Forama%40latest)![jsDelivr hits (npm)](https://img.shields.io/jsdelivr/npm/hm/%40orama%2Forama)
 
 # Join Orama's Slack channel
 
