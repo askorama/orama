@@ -80,7 +80,11 @@ export function Search() {
     }
   }, [])
 
-  useCmdK(() => setIsOpen(true))
+  useCmdK(() => {
+    if (!isOpen) {
+      setIsOpen(true)
+    }
+  })
 
   const oramaWhere = currentCategory
     ? {
