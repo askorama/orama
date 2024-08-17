@@ -39,7 +39,8 @@ const errors = {
   MISSING_VECTOR_AND_SECURE_PROXY: `No vector was provided and no secure proxy was configured. Please provide a vector or configure an Orama Secure Proxy to perform hybrid search.`,
   MISSING_TERM: `"term" is a required parameter when performing hybrid search. Please provide a search term.`,
   INVALID_VECTOR_INPUT: `Invalid "vector" property. Expected an object with "value" and "property" properties, but got "%s" instead.`,
-  PLUGIN_CRASHED: `A plugin crashed during initialization. Please check the error message for more information:`
+  PLUGIN_CRASHED: `A plugin crashed during initialization. Please check the error message for more information:`,
+  PLUGIN_SECURE_PROXY_NOT_FOUND: `Could not find '@orama/secure-proxy-plugin' installed in your Orama instance.\nPlease install it before proceeding with creating an answer session.\nRead more at https://docs.orama.com/open-source/plugins/plugin-secure-proxy\n`
 }
 
 export type ErrorCode = keyof typeof errors

@@ -1272,8 +1272,9 @@ export type AnyOrama<TSchema = any> = FunctionComponents<TSchema> &
   ArrayCallbackComponents<any> &
   OramaID & { plugins: OramaPlugin[] }
 
-export type OramaPluginSync = {
+export type OramaPluginSync<T = unknown> = {
   name: string
+  extra?: T
   beforeInsert?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
   afterInsert?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
   beforeRemove?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
