@@ -1,24 +1,43 @@
 import { useEffect, useState } from 'react'
-import { OramaClient } from '@oramacloud/client'
-import { SearchBox, SearchButton } from '@orama/searchbox'
-import '@orama/searchbox/dist/index.css'
+import { OramaSearchBox, OramaSearchButton } from '@orama/react-components'
 
-export const client = new OramaClient({
-  api_key: 'NKiqTJnwnKsQCdxN7RyOBJgeoW5hJ594',
-  endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-bzo330'
-})
+function useCmdK(callback) {
+  const [isCmdKPressed, setIsCmdKPressed] = useState(false)
 
-setTimeout(() => {
-  try {
-    client.alias(posthog.get_distinct_id());
-  } catch (error) {
-    console.log(`Error setting alias: ${error}`);
-  }
-}, 500);
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        event.preventDefault()
+        setIsCmdKPressed(true)
+        if (callback && typeof callback === 'function') {
+          callback()
+        }
+      }
+    };
 
-export function Search(props) {
+    const handleKeyUp = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        setIsCmdKPressed(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [callback])
+
+  return isCmdKPressed
+}
+
+export function Search() {
   const [theme, setTheme] = useState()
   const [currentCategory, setCurrentCategory] = useState(null)
+  // TODO: Remove when fully integrated
+  const [isOpen, setIsOpen] = useState(false)
 
   function getCurrentCategory() {
     const url = new URL(window.location.href).pathname
@@ -61,11 +80,19 @@ export function Search(props) {
     }
   }, [])
 
-  const oramaWhere = currentCategory ? {
-    category: {
-      eq: currentCategory
+  useCmdK(() => {
+    if (!isOpen) {
+      setIsOpen(true)
     }
-  } : {}
+  })
+
+  const oramaWhere = currentCategory
+    ? {
+        category: {
+          eq: currentCategory
+        }
+      }
+    : {}
 
   const facetProperty = ['Cloud', 'Open Source'].includes(currentCategory) ? 'section' : 'category'
 
@@ -73,30 +100,35 @@ export function Search(props) {
 
   return (
     <>
-      <SearchBox
-        {...{
-          oramaInstance: client,
-          backdrop: true,
-          colorScheme: theme,
-          facetProperty,
-          resultsMap: {
-            description: 'content'
-          },
-          searchParams: {
-            where: oramaWhere
-          },
-          setResultTitle: (doc) => doc.title.split('| Orama Docs')[0]
+      <OramaSearchBox
+        id="orama-ui-searchbox"
+        onSearchboxClosed={() => {
+          setIsOpen(false)
         }}
-      />
-      <SearchButton
+        index={{
+          api_key: 'NKiqTJnwnKsQCdxN7RyOBJgeoW5hJ594',
+          endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-bzo330'
+        }}
+        resultsMap={{
+          description: 'content'
+        }}
+        searchParams={{
+          where: oramaWhere
+        }}
+        facetProperty={facetProperty}
         colorScheme={theme}
-        themeConfig={{
-          dark: {
-            '--search-btn-background-color': '#201c27',
-            '--search-btn-background-color-hover': '#201c27'
-          }
-        }}
+        open={isOpen}
       />
+
+      <OramaSearchButton
+        id="orama-ui-searchbox-button"
+        colorScheme={theme}
+        onClick={() => {
+          setIsOpen(true)
+        }}
+      >
+        Search
+      </OramaSearchButton>
     </>
   )
 }
