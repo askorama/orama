@@ -1,6 +1,18 @@
 import { useEffect, useState } from 'react'
 import { OramaSearchBox, OramaSearchButton } from '@orama/react-components'
 
+const ossSuggestions = [
+  'What languages are supported?',
+  'How do I write an Orama plugin?',
+  'How do I perform vector search with OSS Orama?',
+]
+
+const cloudSuggestions = [
+  'What is an Orama index?',
+  'How do I perform vector search with Orama Cloud?',
+  'What is an answer session?',
+]
+
 function useCmdK(callback) {
   const [isCmdKPressed, setIsCmdKPressed] = useState(false)
 
@@ -95,7 +107,8 @@ export function Search() {
     : {}
 
   const facetProperty = ['Cloud', 'Open Source'].includes(currentCategory) ? 'section' : 'category'
-
+  const suggestions = currentCategory === 'Open Source' ? ossSuggestions : cloudSuggestions
+  
   if (!theme) return null
 
   return (
@@ -109,8 +122,11 @@ export function Search() {
           api_key: 'NKiqTJnwnKsQCdxN7RyOBJgeoW5hJ594',
           endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-bzo330'
         }}
+        sourcesMap={{
+          description: 'content',
+        }}
         resultsMap={{
-          description: 'content'
+          description: 'content',
         }}
         searchParams={{
           where: oramaWhere
@@ -118,6 +134,14 @@ export function Search() {
         facetProperty={facetProperty}
         colorScheme={theme}
         open={isOpen}
+        suggestions={suggestions}
+        themeConfig={{
+          colors: {
+            dark: {
+              '--background-color-primary': '#151515'
+            }
+          }
+        }}
       />
 
       <OramaSearchButton
