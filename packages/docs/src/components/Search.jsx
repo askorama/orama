@@ -1,6 +1,38 @@
 import { useEffect, useState } from 'react'
 import { OramaSearchBox, OramaSearchButton } from '@orama/react-components'
 
+function useCmdK(callback) {
+  const [isCmdKPressed, setIsCmdKPressed] = useState(false)
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        event.preventDefault()
+        setIsCmdKPressed(true)
+        if (callback && typeof callback === 'function') {
+          callback()
+        }
+      }
+    };
+
+    const handleKeyUp = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        setIsCmdKPressed(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [callback])
+
+  return isCmdKPressed
+}
+
 export function Search() {
   const [theme, setTheme] = useState()
   const [currentCategory, setCurrentCategory] = useState(null)
@@ -47,6 +79,8 @@ export function Search() {
       observer.disconnect()
     }
   }, [])
+
+  useCmdK(() => setIsOpen(true))
 
   const oramaWhere = currentCategory
     ? {
