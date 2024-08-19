@@ -81,7 +81,6 @@
   "devDependencies": {
     "@orama/stemmers": "workspace:*",
     "@orama/stopwords": "workspace:*",
-    "@orama/plugin-secure-proxy": "workspace:*",
     "@oramacloud/client": "1.3.11",
     "@playwright/test": "^1.29.2",
     "@swc/cli": "^0.1.59",

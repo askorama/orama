@@ -1301,6 +1301,6 @@ export type OramaPluginSync<T = unknown> = {
   afterCreate?: <T extends AnyOrama>(orama: T) => SyncOrAsyncValue
 }
 
-export type OramaPluginAsync = Promise<OramaPluginSync>
+export type OramaPluginAsync<T = unknown> = Promise<OramaPluginSync<T>>
 
-export type OramaPlugin = OramaPluginSync | OramaPluginAsync
+export type OramaPlugin<T = unknown> = OramaPluginSync<T> | OramaPluginAsync<T>

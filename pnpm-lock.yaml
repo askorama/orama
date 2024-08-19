@@ -184,9 +184,6 @@ importers:
 
   packages/orama:
     devDependencies:
-      '@orama/plugin-secure-proxy':
-        specifier: workspace:*
-        version: link:../plugin-secure-proxy
       '@orama/stemmers':
         specifier: workspace:*
         version: link:../stemmers
