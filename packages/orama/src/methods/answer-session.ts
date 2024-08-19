@@ -119,10 +119,6 @@ export class AnswerSession<SourceT = AnyDocument> {
     return this.messages
   }
 
-  // public regenerateLast(params: RegenerateLastParams) {
-
-  // }
-
   public clearSession() {
     this.messages = []
     this.state = []

@@ -4,7 +4,6 @@ import react from "@astrojs/react";
 import starlightImageZoom from "starlight-image-zoom";
 import tailwind from "@astrojs/tailwind";
 import cookieconsent from "@jop-software/astro-cookieconsent";
-import { type } from "node:os";
 
 // https://astro.build/config
 export default defineConfig({
@@ -373,7 +372,7 @@ export default defineConfig({
     }
   }), react(), tailwind({
     applyBaseStyles: false
-  }), 
+  }),
   cookieconsent({
     guiOptions: {
       consentModal: {
