@@ -58,9 +58,9 @@ type AskParams = SearchParams<any> & {
   }
 }
 
-// type RegenerateLastParams = {
-//   stream: boolean
-// }
+type RegenerateLastParams = {
+  stream: boolean
+}
 
 const ORAMA_SECURE_PROXY_PLUGIN_NAME = 'orama-secure-proxy'
 
@@ -69,6 +69,7 @@ export class AnswerSession<SourceT = AnyDocument> {
   private proxy: Nullable<OramaProxy> = null
   private config: IAnswerSessionConfig<SourceT>
   private abortController: Nullable<AbortController> = null
+  private lastInteractionParams: Nullable<AskParams> = null
 
   private conversationID: string
   private messages: Message[] = []
@@ -124,8 +125,31 @@ export class AnswerSession<SourceT = AnyDocument> {
     this.state = []
   }
 
+  public regenerateLast({ stream = true }: RegenerateLastParams) {
+    if (this.state.length === 0 || this.messages.length === 0) {
+      throw new Error('No messages to regenerate')
+    }
+
+    const isLastMessageAssistant = this.messages.at(-1)?.role === 'assistant'
+
+    if (!isLastMessageAssistant) {
+      throw new Error('Last message is not an assistant message')
+    }
+
+    this.messages.pop()
+    this.state.pop()
+
+    if (stream) {
+      return this.askStream(this.lastInteractionParams as AskParams)
+    }
+
+    return this.ask(this.lastInteractionParams as AskParams)
+  }
+
   private async *fetchAnswer(params: AskParams): AsyncGenerator<string> {
     this.abortController = new AbortController()
+    this.lastInteractionParams = params
+  
     const interactionId = this.generateRandomID()
 
     this.messages.push({ role: 'user', content: params.term ?? '' })
