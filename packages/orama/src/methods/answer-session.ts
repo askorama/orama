@@ -1,4 +1,4 @@
-import type { ChatParams, EmbeddingModel, OramaProxy } from "@oramacloud/client"
+import type { OramaProxy, ChatModel } from "@oramacloud/client"
 import type { AnyDocument, AnyOrama, Nullable, OramaPluginSync, SearchParams, Results } from "../types.js"
 import { createError } from "../errors.js"
 import { search } from "./search.js"
@@ -11,10 +11,6 @@ type MessageRole =
   | 'system'
   | 'user'
   | 'assistant'
-
-type RelatedFormat =
-  | 'query'
-  | 'question'
 
 type Message = {
   role: MessageRole
@@ -38,7 +34,6 @@ type AnswerSessionEvents<SourceT = AnyDocument> = {
 }
 
 type IAnswerSessionConfig<SourceT = AnyDocument> = {
-  model: string,
   conversationID?: string
   systemPrompt?: string
   userContext?: GenericContext
@@ -46,17 +41,7 @@ type IAnswerSessionConfig<SourceT = AnyDocument> = {
   events?: AnswerSessionEvents<SourceT>
 }
 
-type AskParams = SearchParams<any> & {
-  userData?: GenericContext
-  rag?: {
-    embeddingsModel: EmbeddingModel
-    llm: ChatParams['model']
-  }
-  related?: {
-    howMany?: number,
-    format?: RelatedFormat
-  }
-}
+type AskParams = SearchParams<AnyDocument>
 
 type RegenerateLastParams = {
   stream: boolean
@@ -70,6 +55,7 @@ export class AnswerSession<SourceT = AnyDocument> {
   private config: IAnswerSessionConfig<SourceT>
   private abortController: Nullable<AbortController> = null
   private lastInteractionParams: Nullable<AskParams> = null
+  private chatModel: Nullable<ChatModel> = null
 
   private conversationID: string
   private messages: Message[] = []
@@ -111,9 +97,7 @@ export class AnswerSession<SourceT = AnyDocument> {
     this.abortController?.abort()
     this.state[this.state.length - 1].aborted = true
 
-    if (this.events?.onStateChange) {
-      this.events.onStateChange(this.state)
-    }
+    this.triggerStateChange()
   }
 
   public getMessages() {
@@ -133,7 +117,7 @@ export class AnswerSession<SourceT = AnyDocument> {
     const isLastMessageAssistant = this.messages.at(-1)?.role === 'assistant'
 
     if (!isLastMessageAssistant) {
-      throw new Error('Last message is not an assistant message')
+      throw createError('ANSWER_SESSION_LAST_MESSAGE_IS_NOT_ASSISTANT')
     }
 
     this.messages.pop()
@@ -147,6 +131,10 @@ export class AnswerSession<SourceT = AnyDocument> {
   }
 
   private async *fetchAnswer(params: AskParams): AsyncGenerator<string> {
+    if (!this.chatModel) {
+      throw createError('PLUGIN_SECURE_PROXY_MISSING_CHAT_MODEL')
+    }
+
     this.abortController = new AbortController()
     this.lastInteractionParams = params
   
@@ -167,58 +155,50 @@ export class AnswerSession<SourceT = AnyDocument> {
     })
 
     const stateIdx = this.state.length - 1
-    this.addEmptyAssistantMessage()
 
-    if (this.events?.onStateChange) {
-      this.events.onStateChange(this.state)
-    }
+    this.addEmptyAssistantMessage()
+    this.triggerStateChange()
 
     try {
       const sources = await search(this.db, params)
 
       this.state[stateIdx].sources = sources
+      this.triggerStateChange()
 
-      for await (const msg of this.proxy!.chatStream({ model: this.config.model, messages: this.messages })) {
+      for await (const msg of this.proxy!.chatStream({ model: this.chatModel, messages: this.messages })) {
         yield msg
 
         this.state[stateIdx].response += msg
         this.messages.findLast(msg => msg.role === 'assistant')!.content += msg
 
-        if (this.events?.onStateChange) {
-          this.events.onStateChange(this.state)
-        }
+        this.triggerStateChange()
       }
 
     } catch (err: any) {
       if (err.name === 'AbortError') {
         this.state[stateIdx].aborted = true
-
-        if (this.events?.onStateChange) {
-          this.events.onStateChange(this.state)
-        }
       } else {
-
         this.state[stateIdx].error = true
-        this.state[stateIdx].errorMessage = err.message
-
-        if (this.events?.onStateChange) {
-          this.events.onStateChange(this.state)
-        }
+        this.state[stateIdx].errorMessage = err.toString()
       }
 
+      this.triggerStateChange()
     }
 
     this.state[stateIdx].loading = false
-
-    if (this.events?.onStateChange) {
-      this.events.onStateChange(this.state)
-    }
+    this.triggerStateChange()
 
     return this.state[stateIdx].response
   }
 
   private generateRandomID(length = 24) {
     return Array.from({ length }, () => Math.floor(Math.random() * 36).toString(36)).join('')
+  }
+
+  private triggerStateChange() {
+    if (this.events.onStateChange) {
+      this.events.onStateChange(this.state)
+    }
   }
 
   private async init(): Promise<void> {
@@ -234,11 +214,19 @@ export class AnswerSession<SourceT = AnyDocument> {
     if (!plugin) {
       throw createError('PLUGIN_SECURE_PROXY_NOT_FOUND')
     }
-    
-    this.proxy = ((plugin as OramaPluginSync).extra as { proxy: OramaProxy }).proxy
+
+    const pluginExtras = plugin.extra as { proxy: OramaProxy, pluginParams: { models: { chat: ChatModel } } }
+
+    this.proxy = pluginExtras.proxy
 
     if (this.config.systemPrompt) {
       this.messages.push({ role: 'system', content: this.config.systemPrompt })
+    }
+
+    if (pluginExtras?.pluginParams?.models?.chat) {
+      this.chatModel = pluginExtras.pluginParams.models.chat
+    } else {
+      throw createError('PLUGIN_SECURE_PROXY_MISSING_CHAT_MODEL')
     }
   }
 

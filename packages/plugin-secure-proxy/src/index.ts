@@ -3,6 +3,7 @@ import { OramaProxy, EmbeddingModel, ChatModel } from '@oramacloud/client'
 
 export type SecureProxyExtra = {
   proxy: OramaProxy
+  pluginParams: SecureProxyPluginOptions
 }
 
 export type LLMModel = ChatModel
@@ -10,13 +11,16 @@ export type LLMModel = ChatModel
 export type SecureProxyPluginOptions = {
   apiKey: string
   defaultProperty: string
-  model: EmbeddingModel
+  models: {
+    embeddings: EmbeddingModel
+    chat?: LLMModel
+  }
 }
 
 export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): Promise<OramaPluginAsync<SecureProxyExtra>> {
   if (!pluginParams.apiKey) throw new Error('Missing "apiKey" parameter for plugin-secure-proxy')
   if (!pluginParams.defaultProperty) throw new Error('Missing "defaultProperty" parameter for plugin-secure-proxy')
-  if (!pluginParams.model) throw new Error('Missing "model" parameter for plugin-secure-proxy')
+  if (!pluginParams.models.embeddings) throw new Error('Missing "model" parameter for plugin-secure-proxy')
 
   const proxy = new OramaProxy({
     api_key: pluginParams.apiKey
@@ -25,7 +29,8 @@ export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions):
   return {
     name: 'orama-secure-proxy',
     extra: {
-      proxy
+      proxy,
+      pluginParams
     },
     async beforeSearch<T extends AnyOrama>(_db: AnyOrama, params: SearchParams<T, TypedDocument<any>>) {
       if (params.mode !== 'vector' && params.mode !== 'hybrid') {
@@ -41,7 +46,7 @@ export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions):
       }
 
       const term = params.term
-      const embeddings = await proxy.generateEmbeddings(term, pluginParams.model)
+      const embeddings = await proxy.generateEmbeddings(term, pluginParams.models.embeddings)
 
       if (!params.vector) {
         params.vector = {
