@@ -12,7 +12,7 @@ export function getCurrentCategory() {
 export function getOramaUserId() {
   if (typeof document === 'undefined' || typeof window === 'undefined') return
   
-  const cookies = document.cookie.split('; ')
+  const cookies = document.cookie.split(';')
   const oid = cookies.find(cookie => cookie.startsWith('oid='))
   
   if (oid) {
