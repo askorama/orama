@@ -57,6 +57,10 @@ async function getAllParsedDocuments() {
 }
 
 async function updateOramaCloud(docs: GeneralPurposeCrawlerResult[]) {
+  if (process.env.ORAMA_CLOUD_INDEX_ID === undefined || process.env.ORAMA_CLOUD_PRIVATE_API_KEY === undefined) {
+    console.warn('ORAMA_CLOUD_INDEX_ID and ORAMA_CLOUD_PRIVATE_API_KEY are not set, skipping Orama Cloud index update.')
+    return
+  }
   const oramaCloudManager = new CloudManager({
     api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
   })

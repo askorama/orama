@@ -1,17 +1,13 @@
 import { useEffect, useState } from 'react'
+import { OramaClient } from '@oramacloud/client';
 import { OramaSearchBox, OramaSearchButton } from '@orama/react-components'
+import { ossSuggestions, cloudSuggestions } from './suggestions';
+import { getCurrentCategory, getOramaUserId, searchSessionTracking, userSessionRefresh } from './utils';
 
-const ossSuggestions = [
-  'What languages are supported?',
-  'How do I write an Orama plugin?',
-  'How do I perform vector search with OSS Orama?',
-]
-
-const cloudSuggestions = [
-  'What is an Orama index?',
-  'How do I perform vector search with Orama Cloud?',
-  'What is an answer session?',
-]
+const client = new OramaClient({
+  api_key: 'NKiqTJnwnKsQCdxN7RyOBJgeoW5hJ594',
+  endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-bzo330'
+})  
 
 function useCmdK(callback) {
   const [isCmdKPressed, setIsCmdKPressed] = useState(false)
@@ -48,17 +44,10 @@ function useCmdK(callback) {
 export function Search() {
   const [theme, setTheme] = useState()
   const [currentCategory, setCurrentCategory] = useState(null)
+  const [userId, setUserId] = useState(getOramaUserId());
+
   // TODO: Remove when fully integrated
   const [isOpen, setIsOpen] = useState(false)
-
-  function getCurrentCategory() {
-    const url = new URL(window.location.href).pathname
-
-    if (url.startsWith('/cloud')) return 'Cloud'
-    if (url.startsWith('/open-source')) return 'Open Source'
-
-    return null
-  }
 
   function initSearchBox() {
     try {
@@ -68,9 +57,15 @@ export function Search() {
     }
   }
 
+  useEffect(() => initSearchBox(), [])
+
+  useEffect(() => searchSessionTracking(client, userId), [userId])
+
   useEffect(() => {
-    initSearchBox()
-  }, [])
+    const intervalId = setInterval(() => userSessionRefresh(client, userId, setUserId), 5000)
+    return () => clearInterval(intervalId)
+  }, [userId])
+    
 
   useEffect(() => {
     function callback(mutationList) {
@@ -115,12 +110,9 @@ export function Search() {
     <>
       <OramaSearchBox
         id="orama-ui-searchbox"
+        clientInstance={client}
         onSearchboxClosed={() => {
           setIsOpen(false)
-        }}
-        index={{
-          api_key: 'NKiqTJnwnKsQCdxN7RyOBJgeoW5hJ594',
-          endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-bzo330'
         }}
         sourcesMap={{
           description: 'content',
