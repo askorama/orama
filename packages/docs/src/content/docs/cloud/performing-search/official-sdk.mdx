@@ -79,7 +79,19 @@ dependencies: [
 
 ### Kotlin
 
-The Kotlin SDK will be available soon. Stay tuned for updates!
+To install the Orama Cloud multiplataform client in your Kotlin project you need to enable `mavenCentral` and include de dependency in your `build.gradle.kts`:
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+
+val oramaClientVersion = "0.0.1"
+
+dependencies {
+    implementation "com.orama:oramacloud-client-kotlin:${oramaClientVersion}"
+}
+```
 
 ### Python
 
