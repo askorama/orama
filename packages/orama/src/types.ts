@@ -161,6 +161,8 @@ export type FacetsParams<T extends AnyOrama> = Partial<Record<LiteralUnion<T['sc
 
 export type FacetDefinition = StringFacetDefinition | NumberFacetDefinition | BooleanFacetDefinition
 
+export type ReturningParams<T extends AnyOrama> = Array<LiteralUnion<T['schema']> | FlattenSchemaProperty<T>>
+
 export type ReduceFunction<T, R> = (values: ScalarSearchableValue[], acc: T, value: R, index: number) => T
 export type Reduce<T, R = AnyDocument> = {
   reducer: ReduceFunction<T, R>
@@ -290,6 +292,23 @@ export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = Typed
    * The properties of the document to search in.
    */
   properties?: '*' | FlattenSchemaProperty<T>[]
+
+  /**
+   * The properties of the document to be returned.
+   * Supports nested objects, allowing root to deepest field extraction while maintaining the original structure.
+   * If provided, only the fields listed in this array will be included in the result.
+   * 
+   * NOTE: This functionality is recommended primarily for server-side use. While it reduces the payload of the response
+   * by including only the specified fields, it can slow down the search.
+   * 
+   * @example
+   * const results = await search(db, {
+   *  term: 'Personal Computer',
+   *  returning: ['title', 'meta.rating'],
+   * })
+   *
+   */
+  returning?: ReturningParams<T>
 
   /**
    * The number of matched documents to return.
@@ -481,6 +500,8 @@ export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = Typed
    * Whether to include the vectors in the result.
    * By default, Orama will not include the vectors, as they can be quite large.
    * If set to "false" (default), vectors will be presented as "null".
+   * 
+   * NOTE: Skipped when "returning" option is provided
    */
   includeVectors?: boolean
 }
@@ -528,6 +549,23 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
   properties?: '*' | FlattenSchemaProperty<T>[]
 
   /**
+   * The properties of the document to be returned.
+   * Supports nested objects, allowing root to deepest field extraction while maintaining the original structure.
+   * If provided, only the fields listed in this array will be included in the result.
+   * 
+   * NOTE: This functionality is recommended primarily for server-side use. While it reduces the payload of the response
+   * by including only the specified fields, it can slow down the search.
+   * 
+   * @example
+   * const results = await search(db, {
+   *  term: 'Personal Computer',
+   *  returning: ['title', 'meta.rating'],
+   * })
+   *
+   */
+  returning?: ReturningParams<T>
+
+  /**
    * The BM25 parameters to use.
    *
    * k: Term frequency saturation parameter.
@@ -567,6 +605,8 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
    * Whether to include the vectors in the result.
    * By default, Orama will not include the vectors, as they can be quite large.
    * If set to "false" (default), vectors will be presented as "null".
+   * 
+   * NOTE: Skipped when "returning" option is provided
    */
   includeVectors?: boolean
 
@@ -676,6 +716,23 @@ export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDo
   }
 
   /**
+   * The properties of the document to be returned.
+   * Supports nested objects, allowing root to deepest field extraction while maintaining the original structure.
+   * If provided, only the fields listed in this array will be included in the result.
+   * 
+   * NOTE: This functionality is recommended primarily for server-side use. While it reduces the payload of the response
+   * by including only the specified fields, it can slow down the search.
+   * 
+   * @example
+   * const results = await search(db, {
+   *  term: 'Personal Computer',
+   *  returning: ['title', 'meta.rating'],
+   * })
+   *
+   */
+  returning?: ReturningParams<T>
+
+  /**
    * The minimum similarity score between the vector and the document.
    * By default, Orama will use 0.8.
    */
@@ -715,6 +772,8 @@ export interface SearchParamsVector<T extends AnyOrama, ResultDocument = TypedDo
    * Whether to include the vectors in the result.
    * By default, Orama will not include the vectors, as they can be quite large.
    * If set to "false" (default), vectors will be presented as "null".
+   * 
+   * NOTE: Skipped when "returning" option is provided
    */
   includeVectors?: boolean
 }

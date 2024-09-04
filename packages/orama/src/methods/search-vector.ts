@@ -1,7 +1,7 @@
 import type { AnyOrama, Results, SearchParamsVector, TypedDocument, Result } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { createSearchContext } from './search.js'
-import { getNanosecondsTime, formatNanoseconds } from '../utils.js'
+import { getNanosecondsTime, formatNanoseconds, filterAndReduceDocuments } from '../utils.js'
 import { getFacets } from '../components/facets.js'
 import { createError } from '../errors.js'
 import { findSimilarVectors } from '../components/cosine-similarity.js'
@@ -28,7 +28,7 @@ export async function searchVector<T extends AnyOrama, ResultDocument = TypedDoc
     throw createError('INVALID_VECTOR_INPUT', Object.keys(vector).join(', '))
   }
 
-  const { limit = 10, offset = 0, includeVectors = false } = params
+  const { limit = 10, offset = 0, includeVectors = false, returning } = params
   const vectorIndex = orama.data.index.vectorIndexes[vector!.property]
   const vectorSize = vectorIndex.size
   const vectors = vectorIndex.vectors
@@ -102,7 +102,7 @@ export async function searchVector<T extends AnyOrama, ResultDocument = TypedDoc
     const doc = orama.data.docs.docs[result[0]]
 
     if (doc) {
-      if (!includeVectors) {
+      if (!includeVectors && typeof returning === 'undefined') {
         doc[vector.property] = null
       }
 
@@ -130,7 +130,7 @@ export async function searchVector<T extends AnyOrama, ResultDocument = TypedDoc
 
   return {
     count: results.length,
-    hits: docs.filter(Boolean),
+    hits: filterAndReduceDocuments(docs, returning),
     elapsed: {
       raw: Number(elapsedTime),
       formatted: await formatNanoseconds(elapsedTime)

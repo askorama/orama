@@ -1,4 +1,4 @@
-import type { AnyDocument, GeosearchDistanceUnit, Results, SearchableValue, TokenScore } from './types.js'
+import type { AnyDocument, AnyOrama, GeosearchDistanceUnit, Result, Results, ReturningParams, SearchableValue, TokenScore, TypedDocument } from './types.js'
 import { createError } from './errors.js'
 
 const baseId = Date.now().toString().slice(5)
@@ -336,4 +336,104 @@ export function removeVectorsFromHits(searchResult: Results<AnyDocument>, vector
       }, result.document)
     }
   }))
+}
+
+/**
+ * Selects and returns only the specified fields from a document.
+ * Supports nested objects, allowing root to deepest field extraction while maintaining the original structure.
+ * 
+ * @example
+ * const doc = { 
+ *    firstname: 'John',
+ *    lastname: 'Doe',
+ *    age: 30,
+ *    address: { street: 'Main St', city: 'New York' }, 
+ *    details: {
+ *      hair: 'Brown',
+ *      sizes: {
+ *        weight: 80,
+ *        height: 180
+ *      },
+ *    }, 
+ * };
+ * 
+ * const fields = ['firstname', 'address', 'details.sizes.height'];
+ * 
+ * console.log(pickDocumentProperties(doc, fields));
+ * { 
+ *    firstname: 'John', 
+ *    address: { street: 'Main St', city: 'New York' },
+ *    details: { sizes: { height: 180 }}
+ * }
+ * 
+ * @param doc The document to process.
+ * @param returning The list of fields to extract, including nested fields (e.g., 'address.street').
+ * @returns The document with only the selected fields, preserving the original nested structure.
+ *          If fields are missing in a document, the resulting document will be empty.
+ */
+export function pickDocumentProperties<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+  doc: ResultDocument,
+  returning: ReturningParams<T>
+): ResultDocument {
+  const result = {} as ResultDocument;
+  // Iterate over each properties to map the returned item
+  for (const field of returning) {
+    // Splits field into its parts (e.g., 'address.street' -> ['address', 'street'])
+    const parts = (field as string).split('.');
+    let source = doc;
+    let target = result;
+    for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        if (source && source[part]) {
+            if (i === parts.length - 1) {
+                // Set the value at the deepest level
+                target[part] = source[part];
+            } else {
+                // Ensure the target object has the correct structure
+                if (!target[part]) target[part] = {};
+                // Move deeper into the object structure
+                source = source[part];
+                target = target[part];
+            }
+        } else {
+            // If any part of the path is undefined, break out of the loop
+            break;
+        }
+    }
+  }
+  return result
+}
+
+/**
+ * Cleans an array of documents by removing falsy items.
+ * An optional array of fields can be provided in order to selects and returns only the 
+ * specified fields from each document, supporting nested objects and maintaining the original structure.
+ * 
+ * @param results The results of a fetch documents to process.
+ * @param returning  An optional list of fields to extract, including nested fields.
+ * @returns Cleaned array of documents
+ */
+export function filterAndReduceDocuments<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+  results: Result<ResultDocument>[],
+  returning?: ReturningParams<T>
+): Result<ResultDocument>[] {
+  if (returning?.length) {
+    return results.reduce((
+      acc: Result<ResultDocument>[], 
+      item: Result<ResultDocument>
+    ) => {
+      // Removes falsy documents
+      if (item) {
+        const result = pickDocumentProperties(item.document, returning);
+        // Remove empty object
+        if (Object.keys(result as any).length) {
+          item.document = result
+          acc.push(item);
+        }
+      }
+      return acc;
+    }, []);
+  }
+  // Removes falsy documents
+  return results.filter(Boolean)
 }

@@ -8,7 +8,7 @@ import type {
   HybridWeights
 } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { getNanosecondsTime, safeArrayPush, formatNanoseconds, removeVectorsFromHits } from '../utils.js'
+import { getNanosecondsTime, safeArrayPush, formatNanoseconds, removeVectorsFromHits, filterAndReduceDocuments } from '../utils.js'
 import { intersectFilteredIDs } from '../components/filters.js'
 import { prioritizeTokenScores } from '../components/algorithms.js'
 import { createError } from '../errors.js'
@@ -31,7 +31,7 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
     await runBeforeSearch(orama.beforeSearch, orama, params, language)
   }
 
-  const { offset = 0, limit = 10, includeVectors = false } = params
+  const { offset = 0, limit = 10, includeVectors = false, returning } = params
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
 
   const [fullTextIDs, vectorIDs] = await Promise.all([
@@ -99,7 +99,8 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
     groups = await getGroups<T, ResultDocument>(orama, uniqueTokenScores, params.groupBy)
   }
 
-  const results = (await fetchDocuments(orama, uniqueTokenScores, offset, limit)).filter(Boolean)
+  const documents = await fetchDocuments(orama, uniqueTokenScores, offset, limit)
+  const results = filterAndReduceDocuments(documents, returning)
 
   if (orama.afterSearch) {
     await runAfterSearch(orama.afterSearch, orama, params, language, results as any)
@@ -118,7 +119,7 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
     ...(groups ? { groups } : {})
   }
 
-  if (!includeVectors) {
+  if (!includeVectors && typeof returning === 'undefined') {
     const vectorProperties = Object.keys(orama.data.index.vectorIndexes)
     removeVectorsFromHits(returningResults, vectorProperties)
   }
