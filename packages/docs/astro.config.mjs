@@ -325,10 +325,10 @@ export default defineConfig({
             },
             {
               label: 'Data Sources',
-              collapsed: false,
+              collapsed: true,
               items: [
                 {
-                  label: 'Introduction to Data Sources',
+                  label: 'Introduction',
                   link: '/cloud/data-sources/introduction-to-data-sources'
                 },
                 {
@@ -383,7 +383,7 @@ export default defineConfig({
             },
             {
               label: 'Performing search',
-              collapsed: false,
+              collapsed: true,
               items: [
                 {
                   label: 'Official SDK',
