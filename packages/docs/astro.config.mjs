@@ -328,7 +328,7 @@ export default defineConfig({
               collapsed: false,
               items: [
                 {
-                  label: 'Introduction to data sources',
+                  label: 'Introduction to Data Sources',
                   link: '/cloud/data-sources/introduction-to-data-sources'
                 },
                 {

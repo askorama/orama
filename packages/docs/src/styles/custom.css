@@ -117,3 +117,13 @@ starlight-theme-select svg.label-icon {
   border-radius: 8px;
   padding: 1rem;
 }
+.hero {
+  grid-template-columns: 1fr;
+  padding-block: 2.5rem;
+}
+@media screen and (min-width: 1024px) {
+  .hero {
+    grid-template-columns: 10fr 2fr;
+    padding-block: clamp(2.5rem, calc(1rem + 10vmin), 10rem);
+  }
+}
