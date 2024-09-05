@@ -1,24 +1,67 @@
 ---
-title: Orama Cloud
+title: Getting Started
 description: Orama Cloud is a fast, high-quality, batteries-included product answer engine.
+editUrl: false
+prev: false
+next: false
 ---
 
-Orama is a fast, high-quality, batteries-included product answer engine.
+import { Aside, LinkCard, CardGrid } from '@astrojs/starlight/components';
 
-With Orama Cloud, you can perform unlimited full-text, vector, and hybrid search queries as well as unlimited generative conversations for a flat rate, which can vary depending on your plan.
+**Orama Cloud** is a fast, high-quality, **batteries-included** product answer engine.
 
-Orama Cloud offers a generous free plan that allows you to perform all the actions described above completely for free.
+With Orama you can perform unlimited full-text, vector, and hybrid search queries as well as unlimited generative conversations for all plans.
 
-## Base Concepts
+**Orama Cloud is free for up to 3 indexes**, **100k documents per index** and **150 index updates per month** (deployments). Check out the <a href="https://orama.com/pricing" target="_blank">pricing plans</a> for more infos.
+
+<br />
+
+<div class="flex flex-col-reverse sm:flex-row justify-between items-start sm:items-end aside">
+  <div>
+    <strong class="text-xl">Do you want to see some examples in the wild?</strong><br />
+    <p>Check out <a href="https://nodejs.org/?utm_source=orama" target="_blank">nodejs.org</a>, 
+    <a href="https://docs.deno.com/?utm_source=orama" target="_blank">docs.deno.com</a> or 
+    <a href="https://tanstack.com/?utm_source=orama" target="_blank">tanstack.com</a>.</p>
+  </div>
+  <div>
+    <img src="/public/orama-doggo.png" alt="It's not the searching... but the finding!" width="140" height="84" />
+  </div>
+</div>
+
+
+## Introduction
 
 When we say that Orama Cloud is batteries-included, we mean that it gives you everything you need to start searching and generating answers (conversations) without any complex configurations.
+Out of the box, Orama Cloud also includes:
 
-At the basis of Orama Cloud, there are three simple elements:
+- **Web Components** to easily integrate a full-featured Searchbox on your website in no time.
+- **Quality check** and quality control tools to fine-tune your users AI interactions experience.
+- **Secure proxy** configuration and advanced security options.
+- and much more...
+
+### Basic Concepts
+
+At the core of Orama Cloud, there are three simple concepts:
 
 - **Index**: A collection of documents that you can search through.
 - **Schema**: A set of rules that define how the documents in the index are structured.
 - **Immutability**: Once you've created an index and populated it with documents, it will remain immutable. To change the content of an index, you have to perform a redeployment.
 
-## Getting Started
+### Create your first index
 
-To get started with Orama Cloud, you will need to create a new account at [https://cloud.orama.com](https://cloud.orama.com) (no credit card needed!) and then follow the instructions in the [working with indexes](/cloud/working-with-indexes/create-a-new-index) guide.
+To get started, you will need to [create a new account](https://cloud.orama.com) (no credit card needed!) and then follow the instructions in the [working with indexes](/cloud/working-with-indexes/create-a-new-index) guide.
+
+<iframe
+  style="height: 420px"
+  width="100%"
+  src="https://www.youtube.com/embed/N_Bjyb7A65o"
+  title="YouTube video player"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowFullScreen>
+</iframe>
+
+
+<CardGrid>
+  <LinkCard href="/cloud/datasources" title="Select a datasource" description="Import your data in Orama Cloud." />
+  <LinkCard href="/cloud/working-with-indexes/create-a-new-index" title="Create an index" description="Create your first index." />
+</CardGrid>

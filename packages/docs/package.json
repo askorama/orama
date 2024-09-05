@@ -24,7 +24,7 @@
   "dependencies": {
     "@astrojs/check": "^0.7.0",
     "@astrojs/react": "^3.6.0",
-    "@astrojs/starlight": "^0.24.5",
+    "@astrojs/starlight": "^0.26.3",
     "@astrojs/starlight-tailwind": "^2.0.3",
     "@astrojs/tailwind": "^5.1.0",
     "@jop-software/astro-cookieconsent": "^3.0.0",

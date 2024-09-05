@@ -142,8 +142,9 @@ export function Search() {
         onClick={() => {
           setIsOpen(true)
         }}
+        style={{width: '100%'}}
       >
-        Search
+        Search {currentCategory === 'Open Source' ? 'Open Source' : ''}
       </OramaSearchButton>
     </>
   )

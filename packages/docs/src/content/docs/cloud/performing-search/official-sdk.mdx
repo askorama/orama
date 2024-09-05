@@ -1,5 +1,5 @@
 ---
-title: Official Orama Cloud SDK
+title: Official SDKs
 description: Interacting with Orama Cloud via the official SDK
 ---
 import { Tabs, TabItem } from '@astrojs/starlight/components';
@@ -8,23 +8,19 @@ Orama Cloud comes with a set of officially supported SDKs that allow you to inte
 
 The SDKs are available in multiple programming languages and provide a set of APIs that allow you to perform various operations on the platform, from performing searches to creating answer sessions and managing your indexes.
 
-## Officially supported programming languages
+## Supported Languages
 
-Orama exposes SDKs for the following programming languages:
+Orama exposes SDKs for the following programming languages.
 
-| Language                                                    | Availability        | Search APIs | Answer APIs | Index APIs |
-|-------------------------------------------------------------|---------------------|-------------|-------------|------------|
-| [JavaScript](https://github.com/askorama/oramacloud-client) | ✅ Available        | ✅           | ✅          | ✅         |
-| [PHP](https://github.com/askorama/oramacloud-client-php)    | ✅ Available        | ✅           | 🚧          | ✅         |
-| Python                                                      | 🚧 Work in progress | 🚧           | 🚧          | 🚧         |
-| [Swift](https://github.com/askorama/oramacloud-client-swift)| ✅ Available        | ✅           | 🚧          | 🚧         |
-| Kotlin                                                      | 🚧 Work in progress | 🚧           | 🚧          | 🚧         |
+| Package                                                              | Search APIs | Answer APIs | Index APIs |
+|----------------------------------------------------------------------|-------------|-------------|------------|
+| [Client JavaScript](https://github.com/askorama/oramacloud-client)   | ✅           | ✅          | ✅         |
+| [Client PHP](https://github.com/askorama/oramacloud-client-php)      | ✅           | 🚧          | ✅         |
+| [Client Swift](https://github.com/askorama/oramacloud-client-swift)  | ✅           | 🚧          | 🚧         |
+| [Client Kotlin](https://github.com/askorama/oramacloud-client-kotlin)| ✅           | ✅          | ✅         |
+| Client Python (Coming soon)                                          | 🚧           | 🚧          | 🚧         |
 
 Want to see a specific language supported? [Let us know](https://github.com/orgs/askorama/discussions/new?category=ideas)!
-
-## Installing the official SDKs
-
-Orama provides installation methods that follow the best practices for each programming language.
 
 ### JavaScript
 
@@ -57,7 +53,7 @@ It also provides TypeScript definitions for type-safe development.
 
 ### Swift
 
-To install the Orama Cloud client in your Swift project, you'll need to install [CocoaPods](https://cocoapods.org) and add the following line to your `Podfile`:
+To install the Orama Cloud client in your Swift project, you'll need to install [CocoaPods](https://cocoapods.org) and add the following line to your `Podfile`.
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
@@ -86,6 +82,8 @@ The Kotlin SDK will be available soon. Stay tuned for updates!
 The Python SDK will be available soon. Stay tuned for updates!
 
 ### PHP
+
+Install the [PHP SDK](https://packagist.org/packages/oramacloud/client) using composer. The minimum version required is PHP 7.3.
 
 ```sh
 composer require oramacloud/client

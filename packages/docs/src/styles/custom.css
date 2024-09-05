@@ -93,3 +93,27 @@ starlight-theme-select svg.label-icon {
   --sl-color-orange-high: #B8541C;
   --sl-color-orange: #F19A69;
 }
+
+.sl-link-button {
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: var(--sl-text-base);
+  padding: 1rem 1.25rem;
+  display: flex;
+}
+.sl-link-button svg {
+  color: var(--sl-color-text) !important;
+}
+.sl-link-button.primary {
+  background-color: var(--sl-color-text-accent);
+  color: var(--sl-color-bg) !important;
+}
+.sl-link-button.primary svg {
+  color: var(--sl-color-bg) !important;
+}
+.aside {
+  background-color: var(--sl-color-bg-sidebar);
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 8px;
+  padding: 1rem;
+}
