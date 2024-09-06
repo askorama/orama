@@ -1,63 +1,3 @@
-summary {
-  display: flex;
-}
-
-.site-title img {
-  height: 24px;
-}
-
-@media (min-width: 50rem) {
-  .grid-home .card-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-  }
-}
-
-.sl-markdown-content starlight-tabs ul li,
-.sl-markdown-content starlight-tabs ul {
-  @apply list-none m-0 p-0;
-}
-
-.sl-markdown-content ul,
-.sl-markdown-content ul li {
-  list-style-type: disc;
-  padding: revert;
-}
-
-.sl-markdown-content ol,
-.sl-markdown-content ol li {
-  list-style-type: decimal;
-  padding: revert;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-size: revert;
-  font-weight: revert;
-}
-
-.grid-home .card-grid .card .title span {
-  line-height: 24px;
-  font-size: 16px;
-  font-weight: 600;
-}
-.grid-home .card-grid .card .body {
-  flex-grow: 1;
-  padding-top: 8px;
-  line-height: 24px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--sl-color-gray-2);
-}
-
-starlight-theme-select svg.label-icon {
-  @apply hidden;
-}
-
 :root {
   --sl-color-bg-nav: #27232e;
   --sl-color-bg: #201c27;
@@ -94,6 +34,37 @@ starlight-theme-select svg.label-icon {
   --sl-color-orange: #F19A69;
 }
 
+summary {
+  display: flex;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: revert;
+  font-weight: revert;
+}
+
+.sl-markdown-content starlight-tabs ul li,
+.sl-markdown-content starlight-tabs ul {
+  @apply list-none m-0 p-0;
+}
+
+.sl-markdown-content ul,
+.sl-markdown-content ul li {
+  list-style-type: disc;
+  padding: revert;
+}
+
+.sl-markdown-content ol,
+.sl-markdown-content ol li {
+  list-style-type: decimal;
+  padding: revert;
+}
+
 .actions a {
   border-radius: 8px;
   font-weight: bold;
@@ -111,6 +82,7 @@ starlight-theme-select svg.label-icon {
 .sl-link-button.primary svg {
   color: var(--sl-color-bg) !important;
 }
+
 ol.sl-steps {
   margin: 0;
   padding: 0;
@@ -124,6 +96,7 @@ ol.sl-steps li::before {
   border-radius: 99rem;
   box-shadow: inset 0 0 0 1px var(--sl-color-text);
 }
+
 ol.sl-steps li img,
 ol.sl-steps li picture,
 ol.sl-steps li video, 
@@ -134,22 +107,49 @@ ol.sl-steps li iframe {
   max-width: 90%;
   position: relative;
 }
+
 .aside {
   background-color: var(--sl-color-bg-sidebar);
   border: 1px solid var(--sl-color-hairline-light);
   border-radius: 8px;
   padding: 1rem;
 }
+
 .hero {
   grid-template-columns: 1fr;
   padding-block: 2.5rem;
 }
+
+.card {
+  border-radius: 12px;
+}
+
+.header {
+  gap: var(--sl-nav-gap);
+  justify-content: space-between;
+  align-items: center;
+  padding-inline-end: var(--sl-nav-gap) !important;
+}
+
+button[aria-controls="starlight__sidebar"] {
+  box-shadow: none;
+}
+
+starlight-theme-select select {
+  padding-left: 24px;
+  font-size: 12px;
+  outline: none;
+}
+
 @media screen and (min-width: 1024px) {
   .hero {
     grid-template-columns: 10fr 2fr;
     padding-block: clamp(2.5rem, calc(1rem + 10vmin), 10rem);
   }
 }
-.card {
-  border-radius: 12px;
+
+@media screen and (min-width: 640px) {
+  .header {
+    padding-inline-end: var(--sl-nav-pad-x) !important;
+  }
 }
