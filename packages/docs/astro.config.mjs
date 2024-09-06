@@ -289,7 +289,7 @@ export default defineConfig({
           items: [
             {
               label: 'Getting Started',
-              collapsed: true,
+              collapsed: false,
               items: [
                 {
                   label: 'Introduction',
@@ -337,19 +337,19 @@ export default defineConfig({
                   items: [
                     {
                       label: 'Introduction',
-                      link: '/cloud/data-sources/native-integrations/introduction.html'
+                      link: '/cloud/data-sources/native-integrations/'
                     },
                     {
                       label: 'Shopify',
-                      link: '/cloud/data-sources/native-integrations/shopify.html'
+                      link: '/cloud/data-sources/native-integrations/shopify'
                     },
                     {
                       label: 'ElasticPath',
-                      link: '/cloud/data-sources/native-integrations/elasticpath.html'
+                      link: '/cloud/data-sources/native-integrations/elasticpath'
                     },
                     {
                       label: 'Docusaurus',
-                      link: '/cloud/data-sources/native-integrations/docusaurus.html'
+                      link: '/cloud/data-sources/native-integrations/docusaurus'
                     }
                   ]
                 },
@@ -359,23 +359,23 @@ export default defineConfig({
                   items: [
                     {
                       label: 'Introduction',
-                      link: '/cloud/data-sources/custom-integrations/introduction.html'
+                      link: '/cloud/data-sources/custom-integrations/'
                     },
                     {
                       label: 'Remote JSON',
-                      link: '/cloud/data-sources/custom-integrations/remote-json.html'
+                      link: '/cloud/data-sources/custom-integrations/remote-json'
                     },
                     {
                       label: 'REST APIs',
-                      link: '/cloud/data-sources/custom-integrations/rest-apis.html'
+                      link: '/cloud/data-sources/custom-integrations/rest-apis'
                     },
                     {
                       label: 'JSON File',
-                      link: '/cloud/data-sources/custom-integrations/json-file.html'
+                      link: '/cloud/data-sources/custom-integrations/json-file'
                     },
                     {
                       label: 'CSV File',
-                      link: '/cloud/data-sources/custom-integrations/csv-file.html'
+                      link: '/cloud/data-sources/custom-integrations/csv-file'
                     }
                   ]
                 }

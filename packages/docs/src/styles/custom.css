@@ -94,7 +94,7 @@ starlight-theme-select svg.label-icon {
   --sl-color-orange: #F19A69;
 }
 
-.sl-link-button {
+.actions a {
   border-radius: 8px;
   font-weight: bold;
   font-size: var(--sl-text-base);
@@ -110,6 +110,29 @@ starlight-theme-select svg.label-icon {
 }
 .sl-link-button.primary svg {
   color: var(--sl-color-bg) !important;
+}
+ol.sl-steps {
+  margin: 0;
+  padding: 0;
+}
+ol.sl-steps li {
+  list-style-type: none;
+}
+ol.sl-steps li::before {
+  color: var(--sl-color-text);
+  background-color: var(--sl-color-bg-nav);
+  border-radius: 99rem;
+  box-shadow: inset 0 0 0 1px var(--sl-color-text);
+}
+ol.sl-steps li img,
+ol.sl-steps li picture,
+ol.sl-steps li video, 
+ol.sl-steps li canvas, 
+ol.sl-steps li svg, 
+ol.sl-steps li iframe {
+  display: block;
+  max-width: 90%;
+  position: relative;
 }
 .aside {
   background-color: var(--sl-color-bg-sidebar);
