@@ -113,6 +113,40 @@ const results = await search(db, {
 });
 ```
 
+## String[] | Number[] | Boolean[] operators
+
+The available operators depend on the type (string, number of boolean) as described in the previous sections.
+A document matches if at least one of the array elements matches the filter condition.
+
+```javascript copy
+const db = await create({
+  schema: {
+    title: "string",
+    tags: "string[]",
+    editions: "number[]",
+    limited: "boolean[]",
+  }
+});
+
+await insertMultiple(db, [
+  {title: "a", tags: ["foo", "bar"], editions: [1990, 2024], limited: [false, false]},
+  {title: "b", tags: ["foo"], editions: [1942, 2024], limited: [false, true]},
+  {title: "c", tags: ["bar"], editions: [2020], limited: [false]},
+])
+
+// Books with tag foo
+await search(db, {where: {tags: "foo"}}); // returns  a, b
+
+// Books tagged either as foo or bar
+await search(db, {where: {tags: ["foo", "bar"]}}); // returns a, b, c
+
+// Books with a 2024 edition
+await search(db, {where: {editions: {eq: 2024}}}); // returns a, b
+
+// Books with a limited edition
+await search(db, {where: {limited: true}}); // returns b
+```
+
 ## Enum operators
 
 The enum properties support the following operators:
