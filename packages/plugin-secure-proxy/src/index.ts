@@ -1,4 +1,4 @@
-import type { AnyOrama, SearchParams, TypedDocument, OramaPluginAsync } from '@orama/orama'
+import type { AnyOrama, SearchParams, TypedDocument, OramaPluginSync } from '@orama/orama'
 import { OramaProxy, EmbeddingModel, ChatModel } from '@oramacloud/client'
 
 export type SecureProxyExtra = {
@@ -17,7 +17,7 @@ export type SecureProxyPluginOptions = {
   }
 }
 
-export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): Promise<OramaPluginAsync<SecureProxyExtra>> {
+export function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): OramaPluginSync<SecureProxyExtra> {
   if (!pluginParams.apiKey) throw new Error('Missing "apiKey" parameter for plugin-secure-proxy')
   if (!pluginParams.defaultProperty) throw new Error('Missing "defaultProperty" parameter for plugin-secure-proxy')
   if (!pluginParams.models.embeddings) throw new Error('Missing "model" parameter for plugin-secure-proxy')
@@ -32,6 +32,7 @@ export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions):
       proxy,
       pluginParams
     },
+    
     async beforeSearch<T extends AnyOrama>(_db: AnyOrama, params: SearchParams<T, TypedDocument<any>>) {
       if (params.mode !== 'vector' && params.mode !== 'hybrid') {
         return
