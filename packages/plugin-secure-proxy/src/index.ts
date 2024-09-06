@@ -35,7 +35,7 @@ function getPropertiesValues(schema: object, properties: string[]) {
   return properties
     .map(prop => getPropertyValue(schema, prop))
     .filter(value => value !== undefined)
-    .join('.')
+    .join('. ')
 }
 
 export function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): OramaPluginSync<SecureProxyExtra> {
@@ -54,7 +54,7 @@ export function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): Orama
       pluginParams
     },
 
-    async beforeInsert<T extends TypedDocument<any>>(db: AnyOrama, params: PartialSchemaDeep<T>) {
+    async beforeInsert<T extends TypedDocument<any>>(_db: AnyOrama, _id: string, params: PartialSchemaDeep<T>) {
       if (!pluginParams.embeddings?.onInsert?.generate) {
         return
       }
