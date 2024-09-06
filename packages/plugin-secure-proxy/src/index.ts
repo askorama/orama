@@ -8,20 +8,6 @@ export type SecureProxyExtra = {
 
 export type LLMModel = ChatModel
 
-// export type SecureProxyPluginOptions = {
-//   apiKey: string
-//   defaultProperty: string
-//   models: {
-//     embeddings: EmbeddingModel
-//     chat?: LLMModel
-//   }
-//   embeddingsConfig?: {
-//     generate: boolean
-//     properties: string[]
-//     verbose?: boolean
-//   }
-// }
-
 export type SecureProxyPluginOptions = {
   apiKey: string
   embeddings: {
