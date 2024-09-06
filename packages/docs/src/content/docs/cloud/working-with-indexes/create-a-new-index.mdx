@@ -4,6 +4,7 @@ description: Learn how to create a new index on Orama Cloud.
 editUrl: false
 ---
 import { Steps } from '@astrojs/starlight/components';
+import { ShowcaseProfile } from 'starlight-showcases';
 
 Creating a new index is extremely simple. When creating your first index, you have the option to:
 - import a static file (either [JSON](/cloud/data-sources/custom-integrations/json-file) or [CSV](/cloud/data-sources/custom-integrations/csv-file))
@@ -15,10 +16,43 @@ Creating a new index is extremely simple. When creating your first index, you ha
   <img src="https://placehold.co/800x400" alt="Orama Cloud - Data Sources" class="rounded-xl" />
 </div>
 
+## Select a Data Source
+
+Where do you want to import your data from?
+
+<ShowcaseProfile
+  entries={[
+    {
+      href: 'https://github.com/HiDeoo/starlight-typedoc',
+      name: 'E-commerce',
+      picture: 'https://placehold.co/400x400',
+      description: 'Integrate Orama Cloud with your Shopify or Elasticpath store.',
+    },
+    {
+      href: 'https://github.com/HiDeoo/starlight-typedoc',
+      name: 'CMS Platform',
+      picture: 'https://placehold.co/400x400',
+      description: 'Install a native plugin for your app, like Strapi or Docusaurus.',
+    },
+    {
+      href: 'https://github.com/HiDeoo/starlight-links-validator',
+      name: 'Static File',
+      picture: 'https://placehold.co/400x400',
+      description: 'Upload a JSON or CSV file from your computer.',
+    },
+    {
+      href: 'https://github.com/HiDeoo/starlight-typedoc',
+      name: 'Custom Integration',
+      picture: 'https://placehold.co/400x400',
+      description: 'Connect your Orama Cloud Index using Remote JSON or REST APIs.',
+    },
+  ]}
+/>
+
 <br />
 ---
 
-## Guide
+## Tutorial
 
 For this guide, we will use a JSON file. You can follow along using [this dataset](/cloud/guides/example-datasets/games.json).
 

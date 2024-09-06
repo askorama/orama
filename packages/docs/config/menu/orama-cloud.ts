@@ -102,7 +102,19 @@ const oramaCloudMenu = [
         items: [
           {
             label: 'Design System',
-            link: '#'
+            link: '/cloud/ui-components/design-system'
+          },
+          {
+            label: 'Chat Box',
+            link: '/cloud/ui-components/chat-box'
+          },
+          {
+            label: 'Search Box',
+            link: '/cloud/ui-components/search-box'
+          },
+          {
+            label: 'Search Button',
+            link: '/cloud/ui-components/search-button'
           }
         ]
       },

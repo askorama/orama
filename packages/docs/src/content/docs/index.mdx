@@ -7,7 +7,32 @@ editUrl: false
 next: false
 head:
   - tag: style
-    content: ":root { --sl-content-width: 1024px !important; --sl-content-pad-x: 3rem !important; }"
+    content: "
+      :root {
+        --sl-content-width: 1024px !important;
+        --sl-content-pad-x: 3rem !important;
+      }
+      .main-frame {
+        overflow: hidden;
+        position: relative;
+      }
+      .main-frame:before {
+        position: absolute;
+        z-index: 0;
+        content: '';
+        top: 60px;
+        right: -25px;
+        width: 500px;
+        height: 500px;
+        max-width: 70vw;
+        background-color: var(--sl-color-blur-bg);
+        border-radius: 800px;
+        filter: blur(67px);
+        will-change: transform;
+        transform: perspective(1200px);
+        opacity: 0.3;
+      }
+    "
 hero:
   title: Next-Gen Product Answer Engine.
   tagline: "Make your content discoverable with <b>Orama</b>. Unlimited full-text, vector search, hybrid search ...and beyond: inform, present, convert and retain your users with a next-generation search experience."
@@ -26,7 +51,7 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 <div>
   <div class="my-0">
-    <CardGrid stagger>
+    <CardGrid>
       <Card title="Native Plugins" icon="puzzle">
         Import your data and integrate using our native plugins for [Docusaurus](/cloud/data-sources/native-integrations/docusaurus), [Shopify](/cloud/data-sources/native-integrations/shopify), [Strapi](/cloud/data-sources/native-integrations/strapi) and many more.
       </Card>
@@ -35,7 +60,7 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
       </Card>
     </CardGrid>
   </div>
-  <div class="my-40">
+  <div class="mt-40">
     <div class="sm:max-w-[600px] mx-0 pt-6">
       <div class="my-10 sm:mr-20">
         <h4 style="margin: 20px 0">What is Orama Cloud?</h4>

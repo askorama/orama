@@ -9,6 +9,8 @@
 
   --sl-color-text-accent: #D1BDFB;
 
+  --sl-color-blur-bg: #8860d8;
+
   --sl-color-hairline-light: #514D56;
 
   --sl-color-orange-low: #422F25;
@@ -22,6 +24,8 @@
   --sl-color-bg-sidebar: #fff;
 
   --sl-color-text-accent: #7241D6;
+
+  --sl-color-blur-bg: #9368f1;
 
   --sl-color-hairline-light: #CCD5E0;
 
@@ -150,6 +154,6 @@ starlight-theme-select select {
 
 @media screen and (min-width: 640px) {
   .header {
-    padding-inline-end: var(--sl-nav-pad-x) !important;
+    padding-inline-end: 0.5rem !important;
   }
 }

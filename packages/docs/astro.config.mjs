@@ -25,7 +25,6 @@ export default defineConfig({
         github: 'https://github.com/askorama/orama',
         slack: 'https://orama.to/slack',
         twitter: 'https://x.com/askorama',
-        youtube: 'https://www.youtube.com/@askorama'
       },
       customCss: ['./src/tailwind.css', './src/styles/custom.css'],
       logo: {
