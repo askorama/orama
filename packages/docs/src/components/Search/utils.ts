@@ -13,7 +13,7 @@ export function getOramaUserId() {
   if (typeof document === 'undefined' || typeof window === 'undefined') return
   
   const cookies = document.cookie.split(';')
-  const oid = cookies.find(cookie => cookie.startsWith('oid='))
+  const oid = cookies.find(cookie => cookie.trim().startsWith('oid='))
   
   if (oid) {
     return oid.split('=')[1]
@@ -25,7 +25,7 @@ export function getOramaUserId() {
 export function userSessionRefresh(client: OramaClient, userId: string, updateCallback: (userId: string) => void) {
   const currentUserId = getOramaUserId();
   if (currentUserId !== userId) {
-    console.log('User ID changed:', currentUserId);
+    console.warn('User ID changed:', currentUserId);
     client.reset();
     updateCallback(currentUserId);
   }
