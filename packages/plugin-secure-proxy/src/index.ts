@@ -1,24 +1,38 @@
-import type { AnyOrama, SearchParams, TypedDocument, OramaPluginAsync } from '@orama/orama'
-import { OramaProxy, EmbeddingModel } from '@oramacloud/client'
+import type { AnyOrama, SearchParams, TypedDocument, OramaPluginSync } from '@orama/orama'
+import { OramaProxy, EmbeddingModel, ChatModel } from '@oramacloud/client'
+
+export type SecureProxyExtra = {
+  proxy: OramaProxy
+  pluginParams: SecureProxyPluginOptions
+}
+
+export type LLMModel = ChatModel
 
 export type SecureProxyPluginOptions = {
   apiKey: string
   defaultProperty: string
-  model: EmbeddingModel
+  models: {
+    embeddings: EmbeddingModel
+    chat?: LLMModel
+  }
 }
 
-export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): Promise<OramaPluginAsync> {
+export function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): OramaPluginSync<SecureProxyExtra> {
   if (!pluginParams.apiKey) throw new Error('Missing "apiKey" parameter for plugin-secure-proxy')
   if (!pluginParams.defaultProperty) throw new Error('Missing "defaultProperty" parameter for plugin-secure-proxy')
-  if (!pluginParams.model) throw new Error('Missing "model" parameter for plugin-secure-proxy')
+  if (!pluginParams.models.embeddings) throw new Error('Missing "model" parameter for plugin-secure-proxy')
 
   const proxy = new OramaProxy({
     api_key: pluginParams.apiKey
   })
 
   return {
-    name: 'secure-proxy',
-
+    name: 'orama-secure-proxy',
+    extra: {
+      proxy,
+      pluginParams
+    },
+    
     async beforeSearch<T extends AnyOrama>(_db: AnyOrama, params: SearchParams<T, TypedDocument<any>>) {
       if (params.mode !== 'vector' && params.mode !== 'hybrid') {
         return
@@ -33,7 +47,7 @@ export async function pluginSecureProxy(pluginParams: SecureProxyPluginOptions):
       }
 
       const term = params.term
-      const embeddings = await proxy.generateEmbeddings(term, pluginParams.model)
+      const embeddings = await proxy.generateEmbeddings(term, pluginParams.models.embeddings)
 
       if (!params.vector) {
         params.vector = {
