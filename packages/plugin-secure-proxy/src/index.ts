@@ -1,4 +1,4 @@
-import type { AnyOrama, SearchParams, TypedDocument, OramaPluginSync } from '@orama/orama'
+import type { AnyOrama, SearchParams, TypedDocument, OramaPluginSync, PartialSchemaDeep } from '@orama/orama'
 import { OramaProxy, EmbeddingModel, ChatModel } from '@oramacloud/client'
 
 export type SecureProxyExtra = {
@@ -15,6 +15,25 @@ export type SecureProxyPluginOptions = {
     embeddings: EmbeddingModel
     chat?: LLMModel
   }
+  embeddingsConfig?: {
+    generate: boolean
+    properties: string[]
+    verbose?: boolean
+  }
+}
+
+function getPropertyValue (obj: object, path: string) {
+  return path.split('.').reduce((current, key) => 
+    current && current[key] !== undefined ? current[key] : undefined, obj
+  );
+}
+
+
+function getPropertiesValues(schema: object, properties: string[]) {
+  return properties
+    .map(prop => getPropertyValue(schema, prop))
+    .filter(value => value !== undefined)
+    .join(' ');
 }
 
 export function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): OramaPluginSync<SecureProxyExtra> {
@@ -31,6 +50,27 @@ export function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): Orama
     extra: {
       proxy,
       pluginParams
+    },
+
+    async beforeInsert<T extends TypedDocument<any>>(db: AnyOrama, params: PartialSchemaDeep<T>) {
+      if (!pluginParams.embeddingsConfig?.generate) {
+        return
+      }
+
+      if (!pluginParams.embeddingsConfig.properties) {
+        throw new Error('Missing "embeddingsConfig.properties" parameter for plugin-secure-proxy')
+      }
+
+      const properties = pluginParams.embeddingsConfig.properties
+      const values = getPropertiesValues(params, properties)
+
+      if (pluginParams.embeddingsConfig?.verbose) {
+        console.log(`Generating embeddings for properties: ${properties.join(', ')}: ${values}`)
+      }
+
+      const embeddings = await proxy.generateEmbeddings(values, pluginParams.models.embeddings)
+
+      params[pluginParams.defaultProperty] = embeddings
     },
     
     async beforeSearch<T extends AnyOrama>(_db: AnyOrama, params: SearchParams<T, TypedDocument<any>>) {
