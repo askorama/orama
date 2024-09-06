@@ -33,7 +33,7 @@ function getPropertiesValues(schema: object, properties: string[]) {
   return properties
     .map(prop => getPropertyValue(schema, prop))
     .filter(value => value !== undefined)
-    .join(' ');
+    .join('.');
 }
 
 export function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): OramaPluginSync<SecureProxyExtra> {
@@ -65,7 +65,7 @@ export function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): Orama
       const values = getPropertiesValues(params, properties)
 
       if (pluginParams.embeddingsConfig?.verbose) {
-        console.log(`Generating embeddings for properties: ${properties.join(', ')}: ${values}`)
+        console.log(`Generating embeddings for properties ${properties.join(', ')}: ${values}`)
       }
 
       const embeddings = await proxy.generateEmbeddings(values, pluginParams.models.embeddings)
