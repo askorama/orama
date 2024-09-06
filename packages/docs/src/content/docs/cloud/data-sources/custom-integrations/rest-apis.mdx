@@ -100,6 +100,30 @@ You can use the **snapshot** API to bulk update the live index:
     ])
     ```
   </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```swift
+    import com.orama.client.CloudManager
+    import kotlinx.coroutines.runBlocking
+    import kotlinx.serialization.Serializable
+
+    @Serializable
+    data class OramaDoc (
+      let id: String
+      let name: String
+      let age: Int
+    )
+
+    val cloudManager = CloudManager(apiKey = "YOUR_API_KEY")
+    val indexManager = cloudManager.index<Product>(indexId)
+
+    runBlocking {
+      val snapshot = index.snapshot(listOf(
+        OramaDoc(id = "1", name = "John Doe", age = 30),
+        OramaDoc(id = "2", name = "Jane Doe", age = 25)
+      ), OramaDoc.serializer())
+    }
+    ```
+  </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php
     use OramaCloud\Manager\IndexManager;
@@ -171,6 +195,33 @@ you can use the **notify** API to put that operation in queue for the next deplo
   await try indexManager.update([OramaDoc(id: "3", name: "Rick Doe", age: 75)])
   ```
   </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```swift
+    import com.orama.client.CloudManager
+    import kotlinx.coroutines.runBlocking
+    import kotlinx.serialization.Serializable
+
+    @Serializable
+    data class OramaDoc (
+      let id: String
+      let name: String
+      let age: Int
+    )
+
+    val cloudManager = CloudManager(apiKey = "YOUR_API_KEY")
+    val indexManager = cloudManager.index<OramaDoc>(indexId)
+
+    runBlocking {
+      index.insert(listOf(
+          OramaDoc(id = "3", name = "Rick Morty", age = 80)
+      ), OramaDoc.serializer())
+
+      index.update(listOf(
+          OramaDoc(id = "3", name = "Rick Doe", age = 75)
+      ), OramaDoc.serializer())
+    }
+    ```
+  </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php
     use OramaCloud\Manager\IndexManager;
@@ -228,6 +279,27 @@ You can also remove an existing document using the `remove` operation. For examp
     await try indexManager.delete(["2"])
     ```
   </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```swift
+    import com.orama.client.CloudManager
+    import kotlinx.coroutines.runBlocking
+    import kotlinx.serialization.Serializable
+
+    @Serializable
+    data class OramaDoc (
+      let id: String
+      let name: String
+      let age: Int
+    )
+
+    val cloudManager = CloudManager(apiKey = "YOUR_API_KEY")
+    val indexManager = cloudManager.index<OramaDoc>(indexId)
+
+    runBlocking {
+      index.delete(listOf("2"), OramaDoc.serializer())
+    }
+    ```
+  </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php
     use OramaCloud\Manager\IndexManager;
@@ -279,6 +351,27 @@ After you have inserted a snapshot or put a number of insert, remove, or update 
     let indexManager = cloudManager.index<OramaDoc>("my-index-id")
 
     await try indexManager.deploy()
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```swift
+    import com.orama.client.CloudManager
+    import kotlinx.coroutines.runBlocking
+    import kotlinx.serialization.Serializable
+
+    @Serializable
+    data class OramaDoc (
+      let id: String
+      let name: String
+      let age: Int
+    )
+
+    val cloudManager = CloudManager(apiKey = "YOUR_API_KEY")
+    val indexManager = cloudManager.index<OramaDoc>(indexId)
+
+    runBlocking {
+      index.deploy()
+    }
     ```
   </TabItem>
   <TabItem label="PHP" icon="seti:php">
@@ -337,6 +430,27 @@ You can do that by using the `clear` API, or by creating an empty snapshot:
     await try indexManager.clear()
     ```
   </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```swift
+    import com.orama.client.CloudManager
+    import kotlinx.coroutines.runBlocking
+    import kotlinx.serialization.Serializable
+
+    @Serializable
+    data class OramaDoc (
+      let id: String
+      let name: String
+      let age: Int
+    )
+
+    val cloudManager = CloudManager(apiKey = "YOUR_API_KEY")
+    val indexManager = cloudManager.index<OramaDoc>(indexId)
+
+    runBlocking {
+      index.clear()
+    }
+    ```
+  </TabItem>
   <TabItem label="PHP" icon="seti:php">
     ```php
     // coming soon
@@ -389,6 +503,28 @@ If you lost track of the operatiosn you ran via the SDK or APIs, you can always 
     let hasPendingOperations = await try indexManager.hasPendingOperations()
 
     print(hasPendingOperations) // true or false
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```swift
+    import com.orama.client.CloudManager
+    import kotlinx.coroutines.runBlocking
+    import kotlinx.serialization.Serializable
+
+    @Serializable
+    data class OramaDoc (
+      let id: String
+      let name: String
+      let age: Int
+    )
+
+    val cloudManager = CloudManager(apiKey = "YOUR_API_KEY")
+    val indexManager = cloudManager.index<OramaDoc>(indexId)
+
+    runBlocking {
+      val hasPendingOperations = index.hasPendingOperations()
+      println(hasPendingOperations) // true or false
+    }
     ```
   </TabItem>
   <TabItem label="PHP" icon="seti:php">
