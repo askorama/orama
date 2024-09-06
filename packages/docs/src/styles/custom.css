@@ -150,3 +150,6 @@ ol.sl-steps li iframe {
     padding-block: clamp(2.5rem, calc(1rem + 10vmin), 10rem);
   }
 }
+.card {
+  border-radius: 12px;
+}

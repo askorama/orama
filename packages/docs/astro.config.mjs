@@ -1,7 +1,6 @@
 import { defineConfig } from 'astro/config'
 import starlight from '@astrojs/starlight'
 import react from '@astrojs/react'
-import starlightImageZoom from 'starlight-image-zoom'
 import tailwind from '@astrojs/tailwind'
 import cookieconsent from '@jop-software/astro-cookieconsent'
 
@@ -16,8 +15,8 @@ export default defineConfig({
   integrations: [
     starlight({
       pagefind: false,
-      plugins: [starlightImageZoom()],
-      title: 'Orama',
+      plugins: [],
+      title: 'Orama Docs',
       description: 'Your product answer engine.',
       favicon: '/favicon.png',
       head: [
@@ -88,6 +87,7 @@ export default defineConfig({
         Sidebar: './src/components/Sidebar.astro',
         Header: './src/components/Header.astro',
         Search: './src/components/Search.astro',
+        Hero: "./src/components/Hero.astro",
         Head: './src/components/Head.astro'
       },
       sidebar: [
@@ -104,23 +104,23 @@ export default defineConfig({
                 },
                 {
                   label: 'Create',
-                  link: '/open-source/usage/create.html'
+                  link: '/open-source/usage/create'
                 },
                 {
                   label: 'Insert',
-                  link: '/open-source/usage/insert.html'
+                  link: '/open-source/usage/insert'
                 },
                 {
                   label: 'Remove',
-                  link: '/open-source/usage/remove.html'
+                  link: '/open-source/usage/remove'
                 },
                 {
                   label: 'Update',
-                  link: '/open-source/usage/update.html'
+                  link: '/open-source/usage/update'
                 },
                 {
                   label: 'Utilities',
-                  link: '/open-source/usage/utilities.html'
+                  link: '/open-source/usage/utilities'
                 },
                 {
                   label: 'Search',
@@ -128,55 +128,55 @@ export default defineConfig({
                   items: [
                     {
                       label: 'Searching with Orama',
-                      link: '/open-source/usage/search/introduction.html'
+                      link: '/open-source/usage/search/introduction'
                     },
                     {
                       label: 'Vector Search',
-                      link: '/open-source/usage/search/vector-search.html'
+                      link: '/open-source/usage/search/vector-search'
                     },
                     {
                       label: 'Hybrid Search',
-                      link: '/open-source/usage/search/hybrid-search.html'
+                      link: '/open-source/usage/search/hybrid-search'
                     },
                     {
                       label: 'Fields Boosting',
-                      link: '/open-source/usage/search/fields-boosting.html'
+                      link: '/open-source/usage/search/fields-boosting'
                     },
                     {
                       label: 'Custom Search Priority',
-                      link: '/open-source/usage/search/custom-search-priority.html'
+                      link: '/open-source/usage/search/custom-search-priority'
                     },
                     {
                       label: 'Facets',
-                      link: '/open-source/usage/search/facets.html'
+                      link: '/open-source/usage/search/facets'
                     },
                     {
                       label: 'Filters',
-                      link: '/open-source/usage/search/filters.html'
+                      link: '/open-source/usage/search/filters'
                     },
                     {
                       label: 'GeoSearch',
-                      link: '/open-source/usage/search/geosearch.html'
+                      link: '/open-source/usage/search/geosearch'
                     },
                     {
                       label: 'Sorting',
-                      link: '/open-source/usage/search/sorting.html'
+                      link: '/open-source/usage/search/sorting'
                     },
                     {
                       label: 'Grouping',
-                      link: '/open-source/usage/search/grouping.html'
+                      link: '/open-source/usage/search/grouping'
                     },
                     {
                       label: 'Threshold',
-                      link: '/open-source/usage/search/threshold.html'
+                      link: '/open-source/usage/search/threshold'
                     },
                     {
                       label: 'Preflight',
-                      link: '/open-source/usage/search/preflight.html'
+                      link: '/open-source/usage/search/preflight'
                     },
                     {
                       label: 'BM25',
-                      link: '/open-source/usage/search/bm25-algorithm.html'
+                      link: '/open-source/usage/search/bm25-algorithm'
                     }
                   ]
                 },
@@ -190,17 +190,17 @@ export default defineConfig({
                     },
                     {
                       label: 'Using Chinese with Orama',
-                      link: '/open-source/supported-languages/using-chinese-with-orama.html'
+                      link: '/open-source/supported-languages/using-chinese-with-orama'
                     },
                     {
                       label: 'Using Japanese with Orama',
-                      link: '/open-source/supported-languages/using-japanese-with-orama.html'
+                      link: '/open-source/supported-languages/using-japanese-with-orama'
                     }
                   ]
                 },
                 {
                   label: 'TypeScript',
-                  link: '/open-source/usage/typescript.html'
+                  link: '/open-source/usage/typescript'
                 }
               ]
             },
@@ -210,11 +210,11 @@ export default defineConfig({
               items: [
                 {
                   label: 'Components',
-                  link: '/open-source/internals/components.html'
+                  link: '/open-source/internals/components'
                 },
                 {
                   label: 'Utilities',
-                  link: '/open-source/internals/utilities.html'
+                  link: '/open-source/internals/utilities'
                 }
               ]
             },
@@ -224,47 +224,47 @@ export default defineConfig({
               items: [
                 {
                   label: 'Introduction',
-                  link: '/open-source/plugins/introduction.html'
+                  link: '/open-source/plugins/introduction'
                 },
                 {
                   label: 'Writing your own plugins',
-                  link: '/open-source/plugins/writing-your-own-plugins.html'
+                  link: '/open-source/plugins/writing-your-own-plugins'
                 },
                 {
                   label: 'Plugin Vitepress',
-                  link: '/open-source/plugins/plugin-vitepress.html'
+                  link: '/open-source/plugins/plugin-vitepress'
                 },
                 {
                   label: 'Plugin Docusaurus',
-                  link: '/open-source/plugins/plugin-docusaurus.html'
+                  link: '/open-source/plugins/plugin-docusaurus'
                 },
                 {
                   label: 'Plugin Secure Proxy',
-                  link: '/open-source/plugins/plugin-secure-proxy.html'
+                  link: '/open-source/plugins/plugin-secure-proxy'
                 },
                 {
                   label: 'Plugin Analytics',
-                  link: '/open-source/plugins/plugin-analytics.html'
+                  link: '/open-source/plugins/plugin-analytics'
                 },
                 {
                   label: 'Plugin Astro',
-                  link: '/open-source/plugins/plugin-astro.html'
+                  link: '/open-source/plugins/plugin-astro'
                 },
                 {
                   label: 'Plugin Data Persistence',
-                  link: '/open-source/plugins/plugin-data-persistence.html'
+                  link: '/open-source/plugins/plugin-data-persistence'
                 },
                 {
                   label: 'Plugin Match Highlight',
-                  link: '/open-source/plugins/plugin-match-highlight.html'
+                  link: '/open-source/plugins/plugin-match-highlight'
                 },
                 {
                   label: 'Plugin Parsedoc',
-                  link: '/open-source/plugins/plugin-parsedoc.html'
+                  link: '/open-source/plugins/plugin-parsedoc'
                 },
                 {
                   label: 'Plugin Nextra',
-                  link: '/open-source/plugins/plugin-nextra.html'
+                  link: '/open-source/plugins/plugin-nextra'
                 }
               ]
             },
@@ -274,11 +274,11 @@ export default defineConfig({
               items: [
                 {
                   label: 'Stemming',
-                  link: '/open-source/text-analysis/stemming.html'
+                  link: '/open-source/text-analysis/stemming'
                 },
                 {
                   label: 'Stopwords',
-                  link: '/open-source/text-analysis/stopwords.html'
+                  link: '/open-source/text-analysis/stopwords'
                 }
               ]
             }
@@ -306,100 +306,42 @@ export default defineConfig({
               ]
             },
             {
-              label: 'Working with indexes',
+              label: 'Importing Data',
               collapsed: false,
-              items: [
-                {
-                  label: 'Create a new index',
-                  link: '/cloud/working-with-indexes/create-a-new-index.html'
-                },
-                {
-                  label: 'Edit an index',
-                  link: '/cloud/working-with-indexes/edit-an-index.html'
-                },
-                {
-                  label: 'Delete an index',
-                  link: '/cloud/working-with-indexes/delete-an-index.html'
-                }
-              ]
-            },
-            {
-              label: 'Data Sources',
-              collapsed: true,
               items: [
                 {
                   label: 'Introduction',
                   link: '/cloud/data-sources/introduction-to-data-sources'
                 },
                 {
-                  label: 'Native Plugins',
-                  collapsed: true,
-                  items: [
-                    {
-                      label: 'Introduction',
-                      link: '/cloud/data-sources/native-integrations/'
-                    },
-                    {
-                      label: 'Shopify',
-                      link: '/cloud/data-sources/native-integrations/shopify'
-                    },
-                    {
-                      label: 'ElasticPath',
-                      link: '/cloud/data-sources/native-integrations/elasticpath'
-                    },
-                    {
-                      label: 'Docusaurus',
-                      link: '/cloud/data-sources/native-integrations/docusaurus'
-                    }
-                  ]
+                  label: 'Create a new index',
+                  link: '/cloud/working-with-indexes/create-a-new-index'
                 },
                 {
-                  label: 'Custom Integrations',
-                  collapsed: true,
-                  items: [
-                    {
-                      label: 'Introduction',
-                      link: '/cloud/data-sources/custom-integrations/'
-                    },
-                    {
-                      label: 'Remote JSON',
-                      link: '/cloud/data-sources/custom-integrations/remote-json'
-                    },
-                    {
-                      label: 'REST APIs',
-                      link: '/cloud/data-sources/custom-integrations/rest-apis'
-                    },
-                    {
-                      label: 'JSON File',
-                      link: '/cloud/data-sources/custom-integrations/json-file'
-                    },
-                    {
-                      label: 'CSV File',
-                      link: '/cloud/data-sources/custom-integrations/csv-file'
-                    }
-                  ]
+                  label: 'Edit an index',
+                  link: '/cloud/working-with-indexes/edit-an-index'
+                },
+                {
+                  label: 'Delete an index',
+                  link: '/cloud/working-with-indexes/delete-an-index'
                 }
               ]
             },
             {
-              label: 'Performing search',
+              label: 'Search Engine',
               collapsed: true,
               items: [
                 {
-                  label: 'Official SDK',
-                  link: '/cloud/performing-search/official-sdk.html'
-                },
-                {
                   label: 'Full-text search',
-                  link: '/cloud/performing-search/full-text-search.html'
+                  link: '/cloud/performing-search/full-text-search'
                 },
                 {
                   label: 'Vector search',
-                  link: '/cloud/performing-search/vector-search.html'
+                  link: '/cloud/performing-search/vector-search'
                 },
                 {
                   label: 'Hybrid search',
-                  link: '/cloud/performing-search/hybrid-search.html'
+                  link: '/cloud/performing-search/hybrid-search'
                 }
               ]
             },
@@ -409,11 +351,11 @@ export default defineConfig({
               items: [
                 {
                   label: 'Introduction',
-                  link: '/cloud/answer-engine/introduction.html'
+                  link: '/cloud/answer-engine/introduction'
                 },
                 {
                   label: 'Creating an Answer Session',
-                  link: '/cloud/answer-engine/creating-an-answer-session.html'
+                  link: '/cloud/answer-engine/creating-an-answer-session'
                 }
               ]
             },
@@ -423,15 +365,15 @@ export default defineConfig({
               items: [
                 {
                   label: 'Introduction',
-                  link: '/cloud/audience-management/introduction.html'
+                  link: '/cloud/audience-management/introduction'
                 },
                 {
                   label: 'User Segmentation',
-                  link: '/cloud/audience-management/user-segmentation.html'
+                  link: '/cloud/audience-management/user-segmentation'
                 },
                 {
                   label: 'Triggers',
-                  link: '/cloud/audience-management/triggers.html'
+                  link: '/cloud/audience-management/triggers'
                 }
               ]
             },
@@ -450,17 +392,21 @@ export default defineConfig({
               collapsed: false,
               items: [
                 {
+                  label: 'Introduction',
+                  link: '/cloud/integrating-orama-cloud/official-sdk'
+                },
+                {
                   label: 'JavaScript SDK',
-                  link: '/cloud/integrating-orama-cloud/javascript-sdk.html'
+                  link: '/cloud/integrating-orama-cloud/javascript-sdk'
                 },
                 {
                   label: 'React SDK',
-                  link: '/cloud/integrating-orama-cloud/react-sdk.html'
+                  link: '/cloud/integrating-orama-cloud/react-sdk'
                 },
                 {
                   label: 'Vue SDK',
-                  link: '/cloud/integrating-orama-cloud/vue-sdk.html'
-                }
+                  link: '/cloud/integrating-orama-cloud/vue-sdk'
+                },
               ]
             },
             {
@@ -468,12 +414,12 @@ export default defineConfig({
               collapsed: true,
               items: [
                 {
-                  label: 'Automatic embeddings generation',
-                  link: '/cloud/orama-ai/automatic-embeddings-generation.html'
+                  label: 'Embeddings Generation',
+                  link: '/cloud/orama-ai/automatic-embeddings-generation'
                 },
                 {
-                  label: 'Orama Secure Proxy',
-                  link: '/cloud/orama-ai/orama-secure-proxy.html'
+                  label: 'Secure Proxy',
+                  link: '/cloud/orama-ai/orama-secure-proxy'
                 }
               ]
             },
@@ -483,11 +429,11 @@ export default defineConfig({
               items: [
                 {
                   label: 'What is Orama Cloud?',
-                  link: '/cloud/understanding-orama/orama-cloud.html'
+                  link: '/cloud/understanding-orama/orama-cloud'
                 },
                 {
                   label: 'What is an index?',
-                  link: '/cloud/understanding-orama/indexes.html'
+                  link: '/cloud/understanding-orama/indexes'
                 }
               ]
             },

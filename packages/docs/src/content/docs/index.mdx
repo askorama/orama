@@ -7,10 +7,10 @@ editUrl: false
 next: false
 head:
   - tag: style
-    content: ":root { --sl-content-width: 100% !important; --sl-content-margin-inline: 40px; }"
+    content: ":root { --sl-content-width: 1024px !important; --sl-content-pad-x: 3rem !important; }"
 hero:
   title: Next-Gen Product Answer Engine.
-  tagline: "Make your content discoverable with <b>Orama</b>. Unlimited full-text, vector search and hybrid search, and beyond: inform, present, convert and retain your users with a next-generation search experience."
+  tagline: "Make your content discoverable with <b>Orama</b>. Unlimited full-text, vector search, hybrid search ...and beyond: inform, present, convert and retain your users with a next-generation search experience."
   actions:
     - variant: primary
       text: Start now
@@ -22,11 +22,10 @@ hero:
       icon: github
 ---
 
-
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 <div>
-  <div>
+  <div class="my-0">
     <CardGrid stagger>
       <Card title="Native Plugins" icon="puzzle">
         Import your data and integrate using our native plugins for [Docusaurus](/cloud/data-sources/native-integrations/docusaurus), [Shopify](/cloud/data-sources/native-integrations/shopify), [Strapi](/cloud/data-sources/native-integrations/strapi) and many more.
@@ -35,10 +34,12 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
         Create an index with using custom [HTTP integrations](/cloud/data-sources/custom-integrations/) and Orama Cloud SDKs.
       </Card>
     </CardGrid>
+  </div>
+  <div class="my-40">
     <div class="sm:max-w-[600px] mx-0 pt-6">
       <div class="my-10 sm:mr-20">
-        <h4 style="margin: 20px 0">What are you looking for?</h4>
-        <p>These are some frequently asked questions about Orama Cloud. Build your fast, unlimited hybrid search and answer engine and help your users discover what they are looking for.</p>
+        <h4 style="margin: 20px 0">What is Orama?</h4>
+        <p>Check out the frequently asked questions about Orama Cloud below. Build your fast, unlimited hybrid search and answer engine and help your users discover what they are looking for.</p>
       </div>
       <details open="true">
         <summary>What is an index?</summary>
@@ -46,11 +47,11 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
       </details>
       <details open="true">
         <summary>How can I add data to my index?</summary>
-        You can create indexes through many different datasources. You can upload a static file, install one of the supported native plugins, or build your own custom integration via REST APIs.
+        You can create indexes through many different [datasources](/cloud/data-sources/introduction-to-data-sources). You can upload a [static file](/cloud/data-sources/custom-integrations/json-file), install one of the supported [native plugins](/cloud/data-sources/native-integrations/), or build your own custom integration via [REST APIs](/cloud/data-sources/custom-integrations/rest-apis).
       </details>
       <details>
         <summary>Does it integrate with Docusaurus?</summary>
-        Yes! Simply install Orama's Docusaurus plugin and add unlimited search and answers to your documentation website in no time.
+        Yes! Simply install Orama's [Docusaurus plugin](/cloud/data-sources/native-integrations/docusaurus) and add unlimited search and answers to your documentation website in no time.
       </details>
       <details>
         <summary>Does it integrate with Shopify?</summary>
@@ -62,16 +63,20 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
       </details>
       <details>
         <summary>How do I ensure high quality AI-generated results?</summary>
-        In the background, Orama Cloud asyncronously runs an extensive set of quality checks on each interaction. You can easily add contextual data and fine-tuned prompts to every answer session, giving your users the best answers for their needs.
+        In the background, Orama Cloud asyncronously runs an extensive set of quality checks on each interaction. You can easily add contextual data and fine-tuned prompts to every [answer session](/cloud/answer-engine/creating-an-answer-session), giving your users the best answers for their needs.
       </details>
       <details>
         <summary>What is a deployment?</summary>
-        Orama Cloud indexes are immutable. To change the content of an index, you have to perform a deployment.
+        Orama Cloud indexes are [immutable](/cloud#basic-concepts). To change the content of an index, you have to perform a re-deployment.
       </details>
       <details>
         <summary>How much does Orama cost?</summary>
         Orama is <b>Free</b> for up to 3 indexes. Unlimited queries, [unlimited embeddings](/cloud/orama-ai/automatic-embeddings-generation#pricing) and answer generations are included. Not enough? You can pick a different plan depending on your needs, [starting at $49 / month](https://orama.com/pricing).
       </details>
+      <details>
+        <summary>What is the difference between Orama Open Source and Orama Cloud?</summary>
+        TODO: to be completed
+      </details>
     </div>
-</div>
+  </div>
 </div>
