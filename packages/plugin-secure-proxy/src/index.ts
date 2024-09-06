@@ -27,7 +27,7 @@ export type SecureProxyPluginOptions = {
 function getPropertyValue (obj: object, path: string) {
   return path.split('.').reduce((current, key) => 
     current && current[key] !== undefined ? current[key] : undefined, obj
-  );
+  )
 }
 
 
@@ -35,7 +35,7 @@ function getPropertiesValues(schema: object, properties: string[]) {
   return properties
     .map(prop => getPropertyValue(schema, prop))
     .filter(value => value !== undefined)
-    .join('.');
+    .join('.')
 }
 
 export function pluginSecureProxy(pluginParams: SecureProxyPluginOptions): OramaPluginSync<SecureProxyExtra> {

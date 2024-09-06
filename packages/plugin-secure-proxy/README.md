@@ -22,11 +22,18 @@ const db = await create({
   },
   plugins: [
     pluginSecureProxy({
-      apiKey: '<API-KEY>',
-      defaultProperty: 'embeddings',
-      models: {
-        embeddings: 'orama/gte-small',
-        chat: 'openai/gpt-4o' // chat model is optional
+      apiKey: 'xyz',
+      embeddings: {
+        defaultProperty: 'embeddings',
+        model: 'orama/gte-small',
+        onInsert: {
+          generate: true, // Generate the embeddings at insert-time
+          properties: ['title', 'description'], // Properties to generate embeddings from
+          verbose: false
+        },
+      },
+      chat: {
+        model: 'openai/gpt-4o'
       }
     })
   ]
