@@ -18,7 +18,7 @@ export default defineConfig({
       pagefind: false,
       plugins: [],
       title: 'Orama Docs',
-      description: 'Your product answer engine.',
+      description: 'Your product answer engine. Unlimited full-text search, embeddings generations and more. Help your users find the right answers, faster.',
       favicon: '/favicon.png',
       head: head,
       social: {
@@ -37,7 +37,8 @@ export default defineConfig({
         Header: './src/components/Header.astro',
         Search: './src/components/Search.astro',
         Hero: "./src/components/Hero.astro",
-        Head: './src/components/Head.astro'
+        Head: './src/components/Head.astro',
+        TableOfContents: './src/components/TableOfContents.astro',
       },
       sidebar: [
         ...oramaCloudMenu,

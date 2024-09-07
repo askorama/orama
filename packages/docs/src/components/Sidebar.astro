@@ -11,10 +11,16 @@ const sidebar = (
       : k.label === "cloud"
   )[0] as any
 ).entries;
+
+const showMiniBanner = Astro.props.slug.startsWith("open-source");
+
 ---
 
 <SidebarSublist sublist={sidebar} />
-<div class="md:sl-hidden">
+
+{/* TODO: add mini-banner for Orama Cloud (only on open-source) */}
+
+<div class="md:hidden">
   <MobileMenuFooter {...Astro.props} />
 </div>
 

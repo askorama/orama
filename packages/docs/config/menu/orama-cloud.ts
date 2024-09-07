@@ -43,9 +43,27 @@ const oramaCloudMenu = [
         ]
       },
       {
+        label: 'Orama AI',
+        collapsed: true,
+        items: [
+          {
+            label: 'Embeddings generation',
+            link: '/cloud/orama-ai/automatic-embeddings-generation'
+          },
+          {
+            label: 'Secure proxy',
+            link: '/cloud/orama-ai/orama-secure-proxy'
+          }
+        ]
+      },
+      {
         label: 'Search engine',
         collapsed: true,
         items: [
+          {
+            label: 'Performing search',
+            link: '/cloud/performing-search/'
+          },
           {
             label: 'Full-text search',
             link: '/cloud/performing-search/full-text-search'
@@ -66,7 +84,7 @@ const oramaCloudMenu = [
         items: [
           {
             label: 'Introduction',
-            link: '/cloud/answer-engine/introduction'
+            link: '/cloud/answer-engine/'
           },
           {
             label: 'Creating an answer session',
@@ -141,20 +159,6 @@ const oramaCloudMenu = [
         ]
       },
       {
-        label: 'Orama AI',
-        collapsed: true,
-        items: [
-          {
-            label: 'Embeddings generation',
-            link: '/cloud/orama-ai/automatic-embeddings-generation'
-          },
-          {
-            label: 'Secure proxy',
-            link: '/cloud/orama-ai/orama-secure-proxy'
-          }
-        ]
-      },
-      {
         label: 'Understanding Orama',
         collapsed: true,
         items: [
@@ -163,8 +167,8 @@ const oramaCloudMenu = [
             link: '/cloud/understanding-orama/orama-cloud'
           },
           {
-            label: 'What is an index?',
-            link: '/cloud/understanding-orama/indexes'
+            label: 'Pricing and limits',
+            link: '/cloud/understanding-orama/pricing-limits'
           }
         ]
       },

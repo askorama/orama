@@ -3,6 +3,7 @@ title: Data Sources
 description: Learn about the concept of data sources in Orama Cloud.
 editUrl: false
 ---
+import { ShowcaseText } from 'starlight-showcases';
 
 One important concept to understand when working with **Orama Cloud**, is the concept of **data source**. A data source, as the name suggests, refers to the original source from which data is derived. This could be a database, a web service, a JSON file, or any other platform that generates and stores data.
 
@@ -22,6 +23,24 @@ Connecting to a native plugin data source is straight-forward. For instance, con
 
 You can easily upload any [JSON](/cloud/data-sources/custom-integrations/json-file) or [CSV](/cloud/data-sources/custom-integrations/csv-file) files and index their data in just a few clicks. This feature is particularly useful when you want to test an Orama Cloud indexes with a database dump or a spreadsheet export.
 
+<ShowcaseText
+  entries={[
+    {
+      href: '/cloud/data-sources/custom-integrations/json-file',
+      title: 'JSON File',
+      description: 'Import a JSON file from your computer.',
+    },
+    {
+      href: '/cloud/data-sources/custom-integrations/csv-file',
+      title: 'CSV File',
+      description: 'Import a CSV file from your computer.',
+    },
+  ]}
+/>
+
+<hr />
+
+
 ### Native Plugins
 
 Orama Cloud offers a rich variety of Native Plugins that helps you integrate with your app with ease. When available, we suggest using native integrations over custom integrations, as they are highly optimized and provide a better developer experience, performance, and maintainability.
@@ -30,15 +49,61 @@ Integrating is very straightforward. Install our plugin on your current applicat
 
 Find out more [Native Plugins](/cloud/data-sources/native-integrations/).
 
+<br />
+
+<ShowcaseText
+  entries={[
+    {
+      href: '/cloud/data-sources/native-integrations/shopify',
+      title: 'Shopify',
+      description: 'Connect your Shopify store to Orama Cloud.',
+    },
+    {
+      href: '/cloud/data-sources/native-integrations/elasticpath',
+      title: 'Elasticpath',
+      description: 'Connect your Elasticpath store to Orama Cloud.',
+    },
+    {
+      href: '/cloud/data-sources/native-integrations/strapi',
+      title: 'Strapi',
+      description: 'Integrate Orama Cloud with your Strapi CMS.',
+    },
+    {
+      href: '/cloud/data-sources/native-integrations/docusaurus',
+      title: 'Docusaurus',
+      description: 'Install a plugin in your Docusaurus app to index your contents.',
+    }
+  ]}
+/>
+
+<hr />
+
 ### Custom Integrations
 
 If you need to regularly update the Orama Cloud index for production-grade workflows, or on a demand basis, we highly recommend considering feeding your index via [REST APIs](/cloud/data-sources/custom-integrations/rest-apis).
 
-This is the data source that powers big, traffic-intense websites such as [Node JS](https://nodejs.org), [JSR](https://jsr.io), [Tan Stack](https://tanstack.com), or [Solid JS](https://docs.solidjs.com).
+This is the data source that powers big, traffic-intense websites like [Node](https://nodejs.org), [JSR](https://jsr.io), [Tan Stack](https://tanstack.com), or [SolidJS](https://docs.solidjs.com).
 
-By utilizing this data source, you can decide when to redeploy the index or only update a segment of it. Typically, you might set up a cron job to periodically update the index based on your needs. However, with our REST APIs, you also have the option to trigger updates on demand.
+By utilizing this data source, you can decide when to redeploy the index or only update a segment of it. Typically, you might set up a cron job to periodically update the index based on your needs. You also trigger deployments on demand.
 
-Find out more [Custom Integrations](/cloud/data-sources/custom-integrations/).
+<br />
+
+<ShowcaseText
+  entries={[
+    {
+      href: '/cloud/data-sources/custom-integrations/rest-apis',
+      title: 'REST APIs',
+      description: 'Import data using REST APIs. Recommended for custom use cases.',
+    },
+    {
+      href: '/cloud/data-sources/custom-integrations/remote-json',
+      title: 'Remote JSON',
+      description: 'Import data in Orama Cloud providing a JSON endpoint url.',
+    },
+  ]}
+/>
+
+<hr />
 
 ### Need Help?
 
