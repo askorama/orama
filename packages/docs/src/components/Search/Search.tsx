@@ -113,8 +113,8 @@ export function Search() {
           description: 'content',
         }}
         searchParams={{
-          where: {
-          }
+          // @ts-ignore
+          where: oramaWhere
         }}
         facetProperty={facetProperty}
         colorScheme={theme === 'light' ? 'light' : 'dark'}
