@@ -43,20 +43,6 @@ const oramaCloudMenu = [
         ]
       },
       {
-        label: 'Orama AI',
-        collapsed: true,
-        items: [
-          {
-            label: 'Embeddings generation',
-            link: '/cloud/orama-ai/automatic-embeddings-generation'
-          },
-          {
-            label: 'Secure proxy',
-            link: '/cloud/orama-ai/orama-secure-proxy'
-          }
-        ]
-      },
-      {
         label: 'Search engine',
         collapsed: true,
         items: [
@@ -111,6 +97,20 @@ const oramaCloudMenu = [
           {
             label: 'Triggers',
             link: '/cloud/audience-management/triggers'
+          }
+        ]
+      },
+      {
+        label: 'Orama AI',
+        collapsed: true,
+        items: [
+          {
+            label: 'Embeddings generation',
+            link: '/cloud/orama-ai/automatic-embeddings-generation'
+          },
+          {
+            label: 'Secure proxy',
+            link: '/cloud/orama-ai/orama-secure-proxy'
           }
         ]
       },

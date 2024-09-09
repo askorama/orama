@@ -3,34 +3,35 @@ title: Data Sources
 description: Learn about the concept of data sources in Orama Cloud.
 editUrl: false
 ---
-import { ShowcaseText } from 'starlight-showcases';
+import { ShowcaseImage } from 'starlight-showcases';
+import { Aside } from '@astrojs/starlight/components';
 
-One important concept to understand when working with **Orama Cloud**, is the concept of **data source**. A data source, as the name suggests, refers to the original source from which data is derived. This could be a database, a web service, a JSON file, or any other platform that generates and stores data.
+One important concept to understand when working with **Orama Cloud**, is the concept of **data source**. A data source, as the name suggests, refers to the original source from which data is derived. This could be a database, a web service, a JSON file, or any other platform that handles and stores your data.
 
-Orama Cloud offers built-in integrations with [Shopify](/cloud/data-sources/native-integrations/shopify), [Docusaurus](/cloud/data-sources/native-integrations/docusaurus), and [Elasticpath](/cloud/data-sources/native-integrations/elasticpath), and continues to expand its native integrations to additional platforms.
-
-If you're interested in integrating **Orama Cloud** into a project, but your data source isn't included in the list of [native integrations](/cloud/data-sources/native-integrations/), don't fret! You can always utilize the [REST APIs](/cloud/data-sources/custom-integrations/rest-apis) and [Remote JSON](/cloud/data-sources/custom-integrations/remote-json) to supply Orama with your own data.
+Connecting your data source to Orama Cloud is the first step in creating an index. An index is a collection of documents that you can search through. 
 
 <div class="text-center py-4">
   <img src="https://placehold.co/800x500" alt="Orama Cloud - Data Sources" class="rounded-xl" />
 </div>
 
-## Choosing the right Data Source
+## Choosing a data source
 
-Connecting to a native plugin data source is straight-forward. For instance, connecting to [Shopify](/cloud/data-sources/native-integrations/shopify) only involves a few steps (you can find the full documentation [here](/cloud/data-sources/native-integrations/shopify)). Likewise, connecting to a custom data source is also quite simple.
+When choosing a data source for your Orama Cloud index, consider the following: if you're looking to test the platform, you can easily upload a [JSON](/cloud/data-sources/custom-integrations/json-file) or [CSV](/cloud/data-sources/custom-integrations/csv-file) file and index its data in just a few clicks. If you're looking to integrate Orama Cloud with your app, [CMS](#native-integrations), or [E-commerce](#native-integrations) platform, we recommend using a native integration if available. If your platform is not listed, you can always build a [custom integration](#custom-integrations) using REST APIs.
 
-### Static Files
+### Static files
 
 You can easily upload any [JSON](/cloud/data-sources/custom-integrations/json-file) or [CSV](/cloud/data-sources/custom-integrations/csv-file) files and index their data in just a few clicks. This feature is particularly useful when you want to test an Orama Cloud indexes with a database dump or a spreadsheet export.
 
-<ShowcaseText
+<ShowcaseImage
   entries={[
     {
+      thumbnail: import('../../../../assets/og-bg.png'),
       href: '/cloud/data-sources/custom-integrations/json-file',
       title: 'JSON File',
       description: 'Import a JSON file from your computer.',
     },
     {
+      thumbnail: import('../../../../assets/og-bg.png'),
       href: '/cloud/data-sources/custom-integrations/csv-file',
       title: 'CSV File',
       description: 'Import a CSV file from your computer.',
@@ -41,38 +42,40 @@ You can easily upload any [JSON](/cloud/data-sources/custom-integrations/json-fi
 <hr />
 
 
-### Native Plugins
+### Native integrations
 
-Orama Cloud offers a rich variety of Native Plugins that helps you integrate with your app with ease. When available, we suggest using native integrations over custom integrations, as they are highly optimized and provide a better developer experience, performance, and maintainability.
+Orama Cloud offers a rich variety of Native integrations and plugins that helps you integrate with your app with ease. When available, we suggest using native integrations over custom integrations, as they are highly optimized and provide a better developer experience, performance, and maintainability.
 
-Integrating is very straightforward. Install our plugin on your current application, CMS or E-commerce platform, such as [Shopify](/cloud/data-sources/native-integrations/shopify), [Docusaurus](/cloud/data-sources/native-integrations/docusaurus) or [Strapi](/cloud/data-sources/native-integrations/docusaurus).
-
-Find out more [Native Plugins](/cloud/data-sources/native-integrations/).
+Integrating is very straight-forward. Install the plugin for your application, CMS or E-commerce platform. If your platform is not listed, you can always build a custom integration using REST APIs.
 
 <br />
 
-<ShowcaseText
+<ShowcaseImage
   entries={[
     {
+      thumbnail: import('../../../../assets/og-bg.png'),
       href: '/cloud/data-sources/native-integrations/shopify',
       title: 'Shopify',
       description: 'Connect your Shopify store to Orama Cloud.',
     },
     {
-      href: '/cloud/data-sources/native-integrations/elasticpath',
-      title: 'Elasticpath',
-      description: 'Connect your Elasticpath store to Orama Cloud.',
-    },
-    {
+      thumbnail: import('../../../../assets/og-bg.png'),
       href: '/cloud/data-sources/native-integrations/strapi',
       title: 'Strapi',
       description: 'Integrate Orama Cloud with your Strapi CMS.',
     },
     {
+      thumbnail: import('../../../../assets/og-bg.png'),
       href: '/cloud/data-sources/native-integrations/docusaurus',
       title: 'Docusaurus',
-      description: 'Install a plugin in your Docusaurus app to index your contents.',
-    }
+      description: 'Install a plugin to index your documentation contents.',
+    },
+    {
+      thumbnail: import('../../../../assets/og-bg.png'),
+      href: '/cloud/data-sources/native-integrations/elasticpath',
+      title: 'Elasticpath',
+      description: 'Connect your Elasticpath store to Orama Cloud.',
+    },
   ]}
 />
 
@@ -88,17 +91,45 @@ By utilizing this data source, you can decide when to redeploy the index or only
 
 <br />
 
-<ShowcaseText
+<ShowcaseImage
   entries={[
     {
+      thumbnail: import('../../../../assets/og-bg.png'),
       href: '/cloud/data-sources/custom-integrations/rest-apis',
       title: 'REST APIs',
-      description: 'Import data using REST APIs. Recommended for custom use cases.',
+      description: 'Import data using REST APIs. Recommended for custom use case.',
     },
     {
+      thumbnail: import('../../../../assets/og-bg.png'),
       href: '/cloud/data-sources/custom-integrations/remote-json',
       title: 'Remote JSON',
-      description: 'Import data in Orama Cloud providing a JSON endpoint url.',
+      description: 'Integrate Orama Cloud by providing a JSON endpoint URL to fetch your data.',
+    },
+  ]}
+/>
+
+<hr />
+
+### Other data sources
+
+If you are looking for an alternative data source to integrate with Orama Cloud, you can use our [Web Crawler](/cloud/data-sources/web-crawler) to index the contents of your website. This is particularly useful when you want to index a website that does not provide an API.
+
+
+<br />
+
+<ShowcaseImage
+  entries={[
+    {
+      thumbnail: import('../../../../assets/og-bg.png'),
+      href: '/cloud/data-sources/web-crawler',
+      title: 'Web Crawler',
+      description: 'Index the contents of your website with a general purpse web crawler.',
+    },
+    {
+      thumbnail: import('../../../../assets/og-bg.png'),
+      href: '/cloud/data-sources/custom-integrations/rest-apis',
+      title: 'Building your own',
+      description: 'Integrate Orama Cloud with your custom data source.',
     },
   ]}
 />
