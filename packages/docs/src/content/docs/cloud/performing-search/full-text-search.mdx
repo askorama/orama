@@ -70,7 +70,32 @@ The client exposes a simple `search` method that can be used to query the index:
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    import com.orama.client.OramaClient
+    import com.orama.model.search.*
+    import kotlinx.serialization.Serializable
+    
+    // Keep in mind that search is a suspended function, 
+    // so you need to call it from a coroutine ;)
+
+    @Serializable
+    data class MyDoc (
+        val title: String,
+        val category: String,
+        val path: String,
+        val content: String,
+        val section: String
+    )
+
+    val searchParams = SearchParams.builder(
+            term = "red shoes",
+            mode = Mode.FULLTEXT
+        )
+        .where(listOf(
+            Condition("price", ConditionType.GreaterThan(99.99))
+        ))
+        .build()
+
+    val results = client.search(searchParams, MyDoc.serializer())
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -90,7 +115,7 @@ The client exposes a simple `search` method that can be used to query the index:
       'api_key' => '<Your Orama Cloud API Key>'
     ]);
 
-    $query = (new Query()) 
+    $query = (new Query())
       ->term('red shoes')
       ->mode('fulltext') // 'fulltext' is optional, but can also be "vector" or "hybrid"
       ->where('price', WhereOperator::GT, 99.99);
@@ -152,7 +177,15 @@ Considering the following schema:
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val searchParams = SearchParams.builder(
+            term = "prestige"
+        )
+      .sortBy([
+        sortByDirective("year", SortByOrder.ASC)
+      ])
+      .build()
+
+    val results = client.search(searchParams, MyDoc.serializer())
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -177,7 +210,7 @@ Considering the following schema:
 
 With Orama Cloud, you can set up to three sorting properties. This means that you can sort by up to three properties at the same time.
 
-So, considering the following schema: 
+So, considering the following schema:
 
 ```json copy
 {
@@ -233,7 +266,16 @@ You can sort by `year` and `meta.rating` at the same time:
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val searchParams = SearchParams.builder(
+            term = "prestige"
+        )
+      .sortBy([
+        sortByDirective("year", Order.ASC),
+        sortByDirective("meta.rating", Order.DESC)
+      ])
+      .build()
+
+    val results = client.search(searchParams, MyDoc.serializer())
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -327,7 +369,7 @@ Orama will be able to generate facets at search-time based on the schema. To do 
 
     let searchParams = ClientSearchParams.builder(
         term: "Movie about cars and racing",
-        mode: .hybrid 
+        mode: .hybrid
       )
       .properties(["description"]) // optional
       .facets([
@@ -347,7 +389,28 @@ Orama will be able to generate facets at search-time based on the schema. To do 
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val searchParams = SearchParams.builder(
+            term = "Movie about cars and racing",
+            mode = Mode.HYBRID,
+        )
+        .properties(listOf("description"))
+        .facets(
+            mapOf(
+                "category.primary" to Facet.StringFacet(limit = 3, order = Order.DESC),
+                "category.secondary" to Facet.StringFacet(limit = 2, order = Order.DESC),
+                "rating" to Facet.NumberFacet(
+                    ranges = listOf(
+                        Facet.NumberRange(from = 0, to = 3),
+                        Facet.NumberRange(from = 3, to = 7),
+                        Facet.NumberRange(from = 7, to = 10)
+                    )
+                ),
+                "isFavorite" to Facet.BooleanFacet(isTrue = true, isFalse = true)
+            )
+        )
+        .build()
+
+    val results = client.search(searchParams, MyDoc.serializer())
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -539,7 +602,15 @@ If we consider the following schema:
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val searchParams = SearchParams.builder(
+          term = "prestige",
+        )
+        .where(listOf(
+            Condition("tag", ConditionType.Equals("new"))
+        ))
+        .build()
+
+    val results = client.search(searchParams, MyDoc.serializer())
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -631,7 +702,19 @@ You can filter the results by the `meta.rating` property as follows:
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val searchParams = SearchParams.builder(
+        term = "prestige",
+    )
+    .where(listOf(
+        Condition("year", ConditionType.GreaterThanOrEqual(2000.00)),
+        Condition("meta.rating", ConditionType.Between(
+            listOf(5.00, 10.00)
+        )),
+        Condition("meta.length", ConditionType.LessThanOrEqual(60.00))
+    ))
+    .build()
+            
+    val results = client.search(searchParams, MyDoc.serializer())
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">

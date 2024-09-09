@@ -76,7 +76,34 @@ Once you have at least one index containing vectors, you can perform hybrid sear
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    import com.orama.client.OramaClient
+    import com.orama.model.search.*
+    import kotlinx.serialization.Serializable
+
+    @Serializable
+    data class MyDoc (
+        val title: String,
+        val category: String,
+        val path: String,
+        val content: String,
+        val section: String
+    )
+
+    val client = OramaClient(
+        endpoint = "",
+        apiKey = ""
+    )
+
+    val searchParams = SearchParams.builder(
+          term = "Super Mario videogame",
+          mode = Mode.HYBRID
+      )
+      .where(listOf(
+          Condition("price", ConditionType.LessThan(19.99))
+      ))
+      .build()
+
+    val results = client.search(searchParams, MyDoc.serializer())
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">

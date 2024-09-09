@@ -18,7 +18,7 @@ Orama exposes SDKs for the following programming languages:
 | [PHP](https://github.com/askorama/oramacloud-client-php)    | ✅ Available        | ✅           | 🚧          | ✅         |
 | Python                                                      | 🚧 Work in progress | 🚧           | 🚧          | 🚧         |
 | [Swift](https://github.com/askorama/oramacloud-client-swift)| ✅ Available        | ✅           | 🚧          | 🚧         |
-| Kotlin                                                      | 🚧 Work in progress | 🚧           | 🚧          | 🚧         |
+| Kotlin                                                      | ✅                  | ✅           | ✅          | ✅         |
 
 Want to see a specific language supported? [Let us know](https://github.com/orgs/askorama/discussions/new?category=ideas)!
 
@@ -79,7 +79,19 @@ dependencies: [
 
 ### Kotlin
 
-The Kotlin SDK will be available soon. Stay tuned for updates!
+To install the Orama Cloud multiplataform client in your Kotlin project you need to enable `mavenCentral` and include de dependency in your `build.gradle.kts`:
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+
+val oramaClientVersion = "0.0.2"
+
+dependencies {
+    implementation "com.orama:oramacloud-client-kotlin:${oramaClientVersion}"
+}
+```
 
 ### Python
 
