@@ -42,22 +42,12 @@ function useCmdK(callback) {
 }
 
 export function Search() {
-  const [theme, setTheme] = useState()
+  const [theme, setTheme] = useState(document.documentElement.dataset.theme || 'dark')
   const [currentCategory, setCurrentCategory] = useState(null)
   const [userId, setUserId] = useState(getOramaUserId());
 
   // TODO: Remove when fully integrated
   const [isOpen, setIsOpen] = useState(false)
-
-  function initSearchBox() {
-    try {
-      setTheme(document.documentElement.dataset.theme)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  useEffect(() => initSearchBox(), [])
 
   useEffect(() => searchSessionTracking(client, userId), [userId])
 
@@ -93,6 +83,7 @@ export function Search() {
     }
   })
 
+  
   const oramaWhere = currentCategory
     ? {
         category: {
@@ -100,6 +91,7 @@ export function Search() {
         }
       }
     : {}
+  
 
   const facetProperty = ['Cloud', 'Open Source'].includes(currentCategory) ? 'section' : 'category'
   const suggestions = currentCategory === 'Open Source' ? ossSuggestions : cloudSuggestions
@@ -109,7 +101,7 @@ export function Search() {
   return (
     <>
       <OramaSearchBox
-        id="orama-ui-searchbox"
+        // @ts-ignore
         clientInstance={client}
         onSearchboxClosed={() => {
           setIsOpen(false)
@@ -117,14 +109,15 @@ export function Search() {
         sourcesMap={{
           description: 'content',
         }}
-        resultsMap={{
+        resultMap={{
           description: 'content',
         }}
         searchParams={{
-          where: oramaWhere
+          where: {
+          }
         }}
         facetProperty={facetProperty}
-        colorScheme={theme}
+        colorScheme={theme === 'light' ? 'light' : 'dark'}
         open={isOpen}
         suggestions={suggestions}
         themeConfig={{
@@ -137,8 +130,7 @@ export function Search() {
       />
 
       <OramaSearchButton
-        id="orama-ui-searchbox-button"
-        colorScheme={theme}
+        colorScheme={theme === 'light' ? 'light' : 'dark'}
         onClick={() => {
           setIsOpen(true)
         }}
