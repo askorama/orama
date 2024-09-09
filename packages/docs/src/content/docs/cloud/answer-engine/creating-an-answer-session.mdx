@@ -1008,7 +1008,11 @@ The `.askStream` method returns an async iterator that yields chunks of the answ
     ```kotlin copy
     val answer = answerSession.askStream(AskParams(
       query = "What is Orama?"
-    ))
+    ), this)
+
+    answer.incoming {
+      println(it)
+    }
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
