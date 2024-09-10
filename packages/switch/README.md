@@ -15,7 +15,7 @@ You can use the same APIs to access either Orama Cloud or Orama OSS.
 For instance, this is how you would interact with Orama Cloud:
 
 ```js
-import { switch } from '@orama/switch'
+import { Switch } from '@orama/switch'
 import { OramaClient } from '@oramacloud/client'
 
 const client = new OramaClient({
@@ -23,7 +23,7 @@ const client = new OramaClient({
   api_key: '<Your Orama Cloud API Key>',
 })
 
-const orama = switch(client)
+const orama = new Switch(client)
 
 const results = await orama.search({
   term: 'noise cancelling headphones',
@@ -38,7 +38,7 @@ const results = await orama.search({
 And this is Orama OSS:
 
 ```js
-import { switch } from '@orama/switch'
+import { Switch } from '@orama/switch'
 import { create } from '@orama/orama'
 
 const db = await create({
@@ -48,7 +48,7 @@ const db = await create({
   }
 })
 
-const orama = switch(db)
+const orama = new Switch(client)
 
 const results = await orama.search({
   term: 'noise cancelling headphones',
