@@ -1,5 +1,8 @@
 import t from 'tap'
 import { boundedLevenshtein, levenshtein, syncBoundedLevenshtein } from '../src/components/levenshtein.js'
+import { create } from '../src/methods/create.js'
+import { insertMultiple } from '../src/methods/insert.js'
+import { search } from '../src/methods/search.js'
 
 t.test('syncBoundedLevenshtein', (t) => {
   // Test exact match
@@ -189,4 +192,40 @@ t.test('syncBoundedLevenshtein substrings are ok even if with tolerance pppppp',
   t.match(await boundedLevenshtein('Chris', 'Christopher', 1), { isBounded: true, distance: 0 })
 
   t.end()
+})
+
+// Test cases for https://github.com/askorama/orama/issues/744
+t.test('Issue #744', async (t) => {
+  const index = await create({
+    schema: {
+      libelle: 'string',
+    } as const
+  })
+
+  await insertMultiple(index, [
+    {libelle: 'ABRICOT MOELLEUX'},
+    {libelle: 'MOELLEUX CHOC BIO'},
+    {libelle: 'CREPE MOELLEUSE'},
+    {libelle: 'OS MOELLE'},
+  ])
+
+  const s1 = await search(index, {
+    term: 'moelleux',
+  })
+
+  const s2 = await search(index, {
+    term: 'moelleux',
+    tolerance: 1,
+    threshold: 0,
+  })
+
+  const s3 = await search(index, {
+    term: 'moelleux',
+    tolerance: 2,
+    threshold: 0,
+  })
+
+  t.equal(s1.count, 2)
+  t.equal(s2.count, 1)
+  t.equal(s3.count, 4)
 })
