@@ -55,7 +55,7 @@ t.test('search method', (t) => {
 
       const result = await search(db, {
         term: 'coffee',
-        threshold: 1,
+        threshold: 1
       })
 
       const matchedIds = result.hits.map((d) => d.id)

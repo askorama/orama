@@ -11,7 +11,7 @@ export class Switch<T = OramaSwitchClient> {
   clientType: ClientType
   isCloud: boolean = false
   isOSS: boolean = false
-  
+
   constructor(client: OramaSwitchClient) {
     this.client = client
 
@@ -26,7 +26,9 @@ export class Switch<T = OramaSwitchClient> {
     }
   }
 
-  async search<R = unknown>(params: T extends OramaClient ? ClientSearchParams : SearchParams<AnyOrama>): Promise<Nullable<Results<R>>> {
+  async search<R = unknown>(
+    params: T extends OramaClient ? ClientSearchParams : SearchParams<AnyOrama>
+  ): Promise<Nullable<Results<R>>> {
     if (this.isCloud) {
       return (this.client as OramaClient).search(params as T extends OramaClient ? ClientSearchParams : never)
     } else {

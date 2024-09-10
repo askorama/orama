@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
-import { OramaClient } from '@oramacloud/client';
+import { OramaClient } from '@oramacloud/client'
 import { OramaSearchBox, OramaSearchButton } from '@orama/react-components'
-import { ossSuggestions, cloudSuggestions } from './suggestions';
-import { getCurrentCategory, getOramaUserId, searchSessionTracking, userSessionRefresh } from './utils';
+import { ossSuggestions, cloudSuggestions } from './suggestions'
+import { getCurrentCategory, getOramaUserId, searchSessionTracking, userSessionRefresh } from './utils'
 
 const client = new OramaClient({
   api_key: 'NKiqTJnwnKsQCdxN7RyOBJgeoW5hJ594',
   endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-bzo330'
-})  
+})
 
 function useCmdK(callback) {
   const [isCmdKPressed, setIsCmdKPressed] = useState(false)
@@ -21,13 +21,13 @@ function useCmdK(callback) {
           callback()
         }
       }
-    };
+    }
 
     const handleKeyUp = (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-        setIsCmdKPressed(false);
+        setIsCmdKPressed(false)
       }
-    };
+    }
 
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
@@ -44,7 +44,7 @@ function useCmdK(callback) {
 export function Search() {
   const [theme, setTheme] = useState()
   const [currentCategory, setCurrentCategory] = useState(null)
-  const [userId, setUserId] = useState(getOramaUserId());
+  const [userId, setUserId] = useState(getOramaUserId())
 
   // TODO: Remove when fully integrated
   const [isOpen, setIsOpen] = useState(false)
@@ -65,7 +65,6 @@ export function Search() {
     const intervalId = setInterval(() => userSessionRefresh(client, userId, setUserId), 5000)
     return () => clearInterval(intervalId)
   }, [userId])
-    
 
   useEffect(() => {
     function callback(mutationList) {
@@ -103,7 +102,7 @@ export function Search() {
 
   const facetProperty = ['Cloud', 'Open Source'].includes(currentCategory) ? 'section' : 'category'
   const suggestions = currentCategory === 'Open Source' ? ossSuggestions : cloudSuggestions
-  
+
   if (!theme) return null
 
   return (
@@ -115,10 +114,10 @@ export function Search() {
           setIsOpen(false)
         }}
         sourcesMap={{
-          description: 'content',
+          description: 'content'
         }}
         resultsMap={{
-          description: 'content',
+          description: 'content'
         }}
         searchParams={{
           where: oramaWhere
