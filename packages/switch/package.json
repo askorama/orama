@@ -1,0 +1,19 @@
+{
+  "name": "@orama/switch",
+  "version": "2.0.24",
+  "description": "Orama Switch allows you to run queries on Orama Cloud and OSS with a single interface",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "orama",
+    "orama cloud"
+  ],
+  "author": {
+    "name": "Michele Riva",
+    "email": "michele@orama.com",
+    "url": "https://github.com/micheleriva"
+  },
+  "license": "Apache-2.0"
+}
