@@ -134,7 +134,7 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
   const timeStart = await getNanosecondsTime()
   params.relevance = Object.assign(defaultBM25Params, params.relevance ?? {})
 
-  const { term = '', properties, threshold = 1 } = params
+  const { term = '', properties, threshold = 0 } = params
 
   const { index, docs } = orama.data
   const tokens = await orama.tokenizer.tokenize(term, language)
