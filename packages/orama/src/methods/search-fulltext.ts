@@ -15,7 +15,7 @@ import type {
   TokenScore,
   TypedDocument
 } from '../types.js'
-import { getNanosecondsTime, removeVectorsFromHits, safeArrayPush, sortTokenScorePredicate } from '../utils.js'
+import { filterAndReduceDocuments, getNanosecondsTime, removeVectorsFromHits, safeArrayPush, sortTokenScorePredicate } from '../utils.js'
 import { createSearchContext, defaultBM25Params, fetchDocuments, fetchDocumentsWithDistinct } from './search.js'
 
 export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
@@ -34,7 +34,7 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
   const vectorProperties = Object.keys(orama.data.index.vectorIndexes)
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
-  const { limit = 10, offset = 0, term, properties, threshold = 1, distinctOn, includeVectors = false } = params
+  const { limit = 10, offset = 0, term, properties, returning, threshold = 1, distinctOn, includeVectors = false } = params
   const isPreflight = params.preflight === true
 
   const { index, docs } = orama.data
@@ -182,10 +182,10 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
   }
 
   if (typeof results !== 'undefined') {
-    searchResult.hits = results.filter(Boolean)
+    searchResult.hits = filterAndReduceDocuments(results, returning)
 
     // Vectors can be very large, so we remove them from the result if not needed
-    if (!includeVectors) {
+    if (!includeVectors && typeof returning === 'undefined') {
       removeVectorsFromHits(searchResult, vectorProperties)
     }
   }
