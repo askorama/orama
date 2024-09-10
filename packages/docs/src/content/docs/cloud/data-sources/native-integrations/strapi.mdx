@@ -5,3 +5,40 @@ editUrl: false
 ---
 
 Strapi plugin integration is coming soon. Please [contact us](mailto:info@orama.com) or [join our Slack channel](https://orama.to/slack) if you want to be notified when it's ready.
+
+
+## Install plugin
+
+### Using the Marketplace
+
+### Using a package manager
+
+## Configuration
+
+## Creating an Index
+
+- Explain Collections (mapping Indexes VS Strapi Content Types)
+
+### Add a collection
+
+<img src="/cloud/guides/strapi/strapi-plugin.jpg" alt="Strapi plugin" />
+
+### Define the schema
+
+In the collection configuration modal, you can select the attributes of your Strapi `Content Type` that you want to include in your search documents (the records that will be indexed in Orama Cloud).
+
+<img src="/cloud/guides/strapi/define-schema.jpg" alt="Strapi plugin - Attributes mapping" />
+
+This is where you also define the `Searchable properties` of your index. These are the attributes that will be searchable in your index. The searchable properties are also used in the automatic [embeddings generation](/cloud/orama-ai/automatic-embeddings-generation) to perform vector and hybrid searches.
+
+### Update settings
+
+- Deployment strategy
+
+#### Live updates
+
+<img src="/cloud/guides/strapi/live-updates.jpg" alt="Strapi plugin - Live updates" />
+
+#### Scheduled updates
+
+<img src="/cloud/guides/strapi/scheduled-updates.jpg" alt="Strapi plugin - Scheduled updates" />
