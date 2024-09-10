@@ -1,5 +1,79 @@
 import t from 'tap'
-import { boundedLevenshtein, levenshtein } from '../src/components/levenshtein.js'
+import { boundedLevenshtein, levenshtein, syncBoundedLevenshtein } from '../src/components/levenshtein.js'
+
+t.test('syncBoundedLevenshtein', (t) => {
+  // Test exact match
+  t.same(
+    syncBoundedLevenshtein('hello', 'hello', 3),
+    { distance: 0, isBounded: true },
+    'Exact match should return distance 0 and isBounded true'
+  )
+
+  // Test within tolerance
+  t.same(
+    syncBoundedLevenshtein('hello', 'helo', 2),
+    { distance: 1, isBounded: true },
+    'Strings within tolerance should return correct distance and isBounded true'
+  )
+
+  // Test at tolerance limit
+  t.same(
+    syncBoundedLevenshtein('hello', 'hllo', 1),
+    { distance: 1, isBounded: true },
+    'Strings at tolerance limit should return correct distance and isBounded true'
+  )
+
+  // Test beyond tolerance
+  t.same(
+    syncBoundedLevenshtein('hello', 'hi', 1),
+    { distance: -1, isBounded: false },
+    'Strings beyond tolerance should return distance -1 and isBounded false'
+  )
+
+  // Test empty string
+  t.same(
+    syncBoundedLevenshtein('', 'hello', 5),
+    { distance: 5, isBounded: true },
+    'Empty string should return correct distance and isBounded true if within tolerance'
+  )
+
+  // Test prefix
+  t.same(
+    syncBoundedLevenshtein('hel', 'hello', 5),
+    { distance: 0, isBounded: true },
+    'Prefix should return distance 0 and isBounded true'
+  )
+
+  // Test suffix
+  t.same(
+    syncBoundedLevenshtein('llo', 'hello', 5),
+    { distance: 2, isBounded: true },
+    'Suffix should return correct distance and isBounded true if within tolerance'
+  )
+
+  // Test case sensitivity
+  t.same(
+    syncBoundedLevenshtein('Hello', 'hello', 1),
+    { distance: 0, isBounded: true },
+    'Case difference should not be counted in the distance'
+  )
+
+  // Test with tolerance 0
+  t.same(
+    syncBoundedLevenshtein('hello', 'helo', 0),
+    { distance: -1, isBounded: false },
+    'Any difference should return distance -1 and isBounded false when tolerance is 0'
+  )
+
+  // Test with very large tolerance
+  t.same(
+    syncBoundedLevenshtein('short', 'very long string', 100),
+    { distance: 14, isBounded: true },
+    'Large tolerance should allow for big differences'
+  )
+
+  t.end()
+})
 
 t.test('levenshtein', (t) => {
   t.plan(3)
@@ -41,10 +115,10 @@ t.test('boundedLevenshtein', (t) => {
   t.test('should be the max input length when either strings are empty', async (t) => {
     t.plan(3)
 
-    t.match(await boundedLevenshtein('', 'some', 0), { distance: 0, isBounded: true })
+    t.match(await boundedLevenshtein('', 'some', 0), { distance: -1, isBounded: false })
 
-    t.match(await boundedLevenshtein('', 'some', 4), { distance: 0, isBounded: true })
-    t.match(await boundedLevenshtein('body', '', 4), { distance: 0, isBounded: true })
+    t.match(await boundedLevenshtein('', 'some', 4), { distance: 4, isBounded: true })
+    t.match(await boundedLevenshtein('body', '', 4), { distance: 4, isBounded: true })
   })
 
   t.test('should tell whether the Levenshtein distance is upperbounded by a given tolerance', async (t) => {
