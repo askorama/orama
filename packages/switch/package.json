@@ -13,16 +13,11 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsup"
   },
-  "keywords": [
-    "orama",
-    "orama cloud"
-  ],
+  "keywords": ["orama", "orama cloud"],
   "type": "module",
   "author": {
     "name": "Michele Riva",

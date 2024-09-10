@@ -30,7 +30,7 @@ t.test('boosting', (t) => {
 
     const { hits: hits1 } = await search(db, {
       term: 'computer for browsing and movies',
-      threshold: 1,
+      threshold: 1
     })
 
     const { hits: hits2 } = await search(db, {

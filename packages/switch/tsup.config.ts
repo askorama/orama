@@ -8,5 +8,5 @@ export default defineConfig({
   bundle: true,
   dts: true,
   minify: false,
-  format: ['cjs', 'esm', 'iife'],
+  format: ['cjs', 'esm', 'iife']
 })
