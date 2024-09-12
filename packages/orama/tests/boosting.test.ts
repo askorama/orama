@@ -12,7 +12,7 @@ t.test('boosting', (t) => {
         id: 'string',
         title: 'string',
         description: 'string'
-      }
+      } as const
     })
 
     await insert(db, {
@@ -29,11 +29,13 @@ t.test('boosting', (t) => {
     })
 
     const { hits: hits1 } = await search(db, {
-      term: 'computer for browsing and movies'
+      term: 'computer for browsing and movies',
+      threshold: 1
     })
 
     const { hits: hits2 } = await search(db, {
       term: 'computer for browsing and movies',
+      threshold: 1,
       boost: {
         title: 2.5
       }

@@ -430,7 +430,7 @@ export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = Typed
   /**
    * Threshold to use for refining the search results.
    * The threshold is a number between 0 and 1 that represents the minimum score of the documents to return.
-   * By default, the threshold is 1.
+   * By default, the threshold is 0.
    *
    * Full documentation: https://docs.oramasearch.com/open-source/usage/search/threshold
    *

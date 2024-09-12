@@ -66,7 +66,29 @@ Follow the instructions [here](/cloud/integrating-orama-cloud/javascript-sdk) to
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    import com.orama.client.OramaClient
+
+    @Serializable
+    data class MyDoc (
+        val title: String,
+        val category: String,
+        val path: String,
+        val content: String,
+        val section: String
+    )
+
+    val client = OramaClient(
+      apiKey = "",
+      endpoint = ""
+    )
+
+    val answerParams = AnswerParams(
+      oramaClient = client,
+      serializer = MyDoc.serializer(),
+      userContext = "The user is a very skilled programmer but has never used Orama before."
+    )
+
+    val answerSession = AnswerSession(answerParams)
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -115,7 +137,17 @@ If we pretend to be an online music store, and we know who the logged in user is
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    import com.orama.client.OramaClient
+
+    val client = OramaClient(apiKey = "", endpoint = "" )
+
+    val answerParams = AnswerParams(
+      oramaClient = client,
+      serializer = MyDoc.serializer(),
+      userContext = "The user is a very skilled programmer but has never used Orama before."
+    )
+
+    val answerSession = AnswerSession(answerParams)
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -162,7 +194,17 @@ If we prefer, we can also use an object to provide a more structured context:
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    import com.orama.client.OramaClient
+
+    val client = OramaClient(apiKey = "", endpoint = "" )
+
+    val answerParams = AnswerParams(
+      oramaClient = client,
+      serializer = MyDoc.serializer(),
+      userContext = "{ name: \"John Doe\", musicTaste: [\"Rock\", \"Punk\", \"Metal\"], customerSince: 2019 }"
+    )
+
+    val answerSession = AnswerSession(answerParams)
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -206,7 +248,12 @@ An array of initial messages for your conversational experience with Orama Cloud
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    import com.orama.client.OramaClient
+
+    var initialMessages = listOf(
+      Message(role = Role.USER, content = "What is Orama?"),
+      Message(role = Role.ASSISTANT, content = "Orama is a next-generation answer engine."),
+    )
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -272,7 +319,18 @@ Each interaction looks like this:
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    import com.orama.client.OramaClient
+
+    data class Interaction<T> (
+      val interactionId: String,
+      val query: String,
+      val response: String,
+      val relatedQueries: List<String>?,
+      val sources: List<Hit<T>>,
+      val translatedQuery: Map<String, JsonElement>,
+      val aborted: Boolean = false,
+      val loading: Boolean
+    )
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -371,7 +429,34 @@ Consequently, the `onStateChange` event will return an array of these interactio
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val answerSession = AnswerSession(answerParams, events = object: AnswerEventListener<MyDoc> {
+      override fun onStateChange(state: MutableList<Interaction<MyDoc>>) {
+        println(state)
+      }
+    })
+
+    // [
+    //   {
+    //     interactionId: "clyru4rl8000008l062b26fk1",
+    //     query: "What is Orama?",
+    //     response: "Orama is a next-generation answer engine [...]",
+    //     relatedQueries: ["How Orama works", "Why Orama is the best", "Vector search with orama"],
+    //     sources: [
+    //       {
+    //         count: 15,
+    //         elapsed: { formatted: "78ms", raw: 78000000 },
+    //         hits: [
+    //           { document: { title: "What is Orama", ... } },
+    //           { document: { title: "How Orama works", ... } },
+    //           { document: { title: "Why Orama is the best", ... } }
+    //         ]
+    //       }
+    //     ],
+    //     translatedQuery: { term: "What is Orama?" },
+    //     aborted: false,
+    //     loading: false
+    //   }
+    // ]
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -465,7 +550,36 @@ You can always access a static version of the state by using the `state` getter:
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val answerSession = AnswerSession(answerParams)
+
+    val answer = answerSession.ask(AskParams(
+      query = "Query is Orama?"
+    ))
+
+    println(answerSession.getState())
+
+    // [
+    //   {
+    //     interactionId: "clyru4rl8000008l062b26fk1",
+    //     query: "What is Orama?",
+    //     response: "Orama is a next-generation answer engine [...]",
+    //     relatedQueries: ["How Orama works", "Why Orama is the best", "Vector search with orama"],
+    //     sources: [
+    //       {
+    //         count: 15,
+    //         elapsed: { formatted: "78ms", raw: 78000000 },
+    //         hits: [
+    //           { document: { title: "What is Orama", ... } },
+    //           { document: { title: "How Orama works", ... } },
+    //           { document: { title: "Why Orama is the best", ... } }
+    //         ]
+    //       }
+    //     ],
+    //     translatedQuery: { term: "What is Orama?" },
+    //     aborted: false,
+    //     loading: false
+    //   }
+    // ] 
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -523,7 +637,15 @@ Runs everytime a message changes. This gets triggered with each chunk that gets 
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val answerSession = AnswerSession(answerParams, events = object: AnswerEventListener<MyDoc> {
+      override fun onMessageChange(data: String) {
+          println(data)
+      }
+    })
+
+    val answer = answerSession.ask(AskParams(
+      query = "Query is Orama?"
+    ))
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -578,7 +700,17 @@ Gets triggered everytime an answer request starts or ends.
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val answerSession = AnswerSession(answerParams, events = object: AnswerEventListener<MyDoc> {
+      override fun onMessageLoading(loading: Boolean) {
+        if (loading) {
+          println("Still loading the messages...")
+        }
+      }
+    })
+
+    val answer = answerSession.ask(AskParams(
+      query = "Query is Orama?"
+    ))
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -624,7 +756,22 @@ Gets triggered when an answer gets aborted.
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val abortHandler = AbortHandler()
+
+    val answerSession = AnswerSession(answerParams, events = object: AnswerEventListener<MyDoc> {
+      override fun onAnswerAborted(aborted: Boolean) {
+        if (aborted) {
+          println("The user has aborted this answer generation!")
+        }
+      }
+    }, abortHandler = abortHandler)
+
+    val answer = answerSession.ask(AskParams(
+      query = "Query is Orama?"
+    ))
+
+    delay(2000)
+    abortHandler.abort()
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -689,7 +836,15 @@ Orama Cloud will return the results of the inference process as a standard set o
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val answerSession = AnswerSession(answerParams, events = object: AnswerEventListener<MyDoc> {
+      override fun onSourceChanged(sources: List<Hit<MyDoc>>) {
+        println("Got ${sources.size}")
+      }
+    })
+
+    val answer = answerSession.ask(AskParams(
+        query = "Query is Orama?"
+    ))
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -741,7 +896,15 @@ Gets triggered when Orama successfully translates a natural language query into 
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val answerSession = AnswerSession(answerParams, events = object: AnswerEventListener<MyDoc> {
+      override fun onQueryTranslated(query: Map<String, JsonElement>) {
+        println(query)
+      }
+    })
+
+    val answer = answerSession.ask(AskParams(
+      query = "What's the best skateboard for halfpipes under $100?"
+    ))
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -791,7 +954,9 @@ The `.ask` function will return the entire answer once it has been entirely stre
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val answer = answerSession.ask(AskParams(
+      query = "What is Orama?"
+    ))
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -841,7 +1006,13 @@ The `.askStream` method returns an async iterator that yields chunks of the answ
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val answer = answerSession.askStream(AskParams(
+      query = "What is Orama?"
+    ), this)
+
+    answer.incoming {
+      println(it)
+    }
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -882,7 +1053,10 @@ When you ask a question, you can provide additional user data to the answer sess
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val answer = answerSession.ask(AskParams(
+      query = "What is Orama?",
+      userData = "{ userLevel: \"beginner\" }"
+    ))
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -919,7 +1093,10 @@ Just like the `userContext`, the `userData` can be a string or an object:
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val answer = answerSession.ask(AskParams(
+      query = "What is Orama?",
+      userData = "The user is a beginner in programming"
+    ))
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -955,7 +1132,16 @@ In any moment in time (when a user cancels an answer request, for example) you c
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val myAbortHandler = AbortHandler()
+
+    val answerSession = AnswerSession(answerParams, abortHandler = myAbortHandler)
+
+    val answer = answerSession.ask(AskParams(
+      query = "Query is Orama?"
+    ))
+
+    delay(2000)
+    myAbortHandler.abort()
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -991,7 +1177,13 @@ This will trigger the `onAnswerAborted` event, which will simply return a `true`
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val answerSession = AnswerSession(answerParams, events = object: AnswerEventListener<MyDoc> {
+      override fun onAnswerAborted(aborted: Boolean) {
+        if (aborted) {
+          println("The user has aborted this answer generation!")
+        }
+      }
+    }, abortHandler = abortHandler)
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -1037,7 +1229,6 @@ If the format is `"query"`, Orama will return an array of related queries in a q
   </TabItem>
   <TabItem label="Swift" icon="seti:swift">
     ```swift copy
-        ```swift copy
       let answer = try await answerSession.ask(params: AnswerParams.AskParams(
         query: "What is Orama?",
         userData: "The user is a beginner in programming",
@@ -1093,7 +1284,12 @@ At any point in time, you can retrieve all the messages by calling the `.getMess
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    val messages = answerSession.getMessages()
+
+    // [
+    //   { role: 'user', content: 'What is Orama?' },
+    //   { role: 'assistant', content: 'Orama is a next-generation answer engine' }
+    // ]
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -1159,7 +1355,18 @@ Sometimes, the user may want to regenerate the last answer. You can do this by c
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    var answer = answerSession.ask(AskParams(
+      query = "What is Orama?"
+    ))
+
+    answer = answerSession.regenerateLast()
+
+    val messages = answerSession.getMessages()
+
+    // [
+    //   { role: 'user', content: 'What is Orama?' },
+    //   { role: 'assistant', content: 'Orama is a next-generation answer engine' }
+    // ]
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">
@@ -1191,7 +1398,7 @@ You can clear the answer session by using the `clearSession` method. This will r
   </TabItem>
   <TabItem label="Kotlin" icon="seti:kotlin">
     ```kotlin copy
-    print("coming soon")
+    answerSession.clearSession()
     ```
   </TabItem>
   <TabItem label="Python" icon="seti:python">

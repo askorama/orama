@@ -34,7 +34,7 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
   const vectorProperties = Object.keys(orama.data.index.vectorIndexes)
 
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
-  const { limit = 10, offset = 0, term, properties, threshold = 1, distinctOn, includeVectors = false } = params
+  const { limit = 10, offset = 0, term, properties, threshold = 0, distinctOn, includeVectors = false } = params
   const isPreflight = params.preflight === true
 
   const { index, docs } = orama.data

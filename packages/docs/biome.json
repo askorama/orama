@@ -29,7 +29,7 @@
     "formatter": {
       "jsxQuoteStyle": "double",
       "quoteProperties": "asNeeded",
-      "trailingCommas": "none",
+      "trailingComma": "none",
       "semicolons": "asNeeded",
       "arrowParentheses": "always",
       "bracketSpacing": true,

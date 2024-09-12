@@ -20,14 +20,12 @@ function unslugify(slug: string) {
   return slug
     .toLowerCase()
     .split(/[-_.\s]/)
-    .map((w) => `${w.charAt(0).toUpperCase()}${w.substring(1)}`).join(' ');
+    .map((w) => `${w.charAt(0).toUpperCase()}${w.substring(1)}`)
+    .join(' ')
 }
 
 async function getAllRenderedDocs() {
-  const [cloud, oss] = await Promise.all([
-    globby(docsCloud),
-    globby(docsOSS)
-  ])
+  const [cloud, oss] = await Promise.all([globby(docsCloud), globby(docsOSS)])
 
   return {
     cloud,
@@ -36,23 +34,31 @@ async function getAllRenderedDocs() {
 }
 
 function parseDoc(path: string) {
-  const content = readFileSync(path, 'utf-8') 
+  const content = readFileSync(path, 'utf-8')
   const isCloud = path.replace(baseURL, '').startsWith('/cloud')
-  const fullPath = `http://localhost:3000${path.replace(baseURL, '').replace(/^\/(open-source|cloud)/, '').replace('.html', '').replace(/\/index$/, '')}`
+  const fullPath = `http://localhost:3000${path
+    .replace(baseURL, '')
+    .replace(/^\/(open-source|cloud)/, '')
+    .replace('.html', '')
+    .replace(/\/index$/, '')}`
 
   return generalPurposeCrawler(fullPath, content, {
-    parseCodeBlocks: true,
+    parseCodeBlocks: true
   }).map((doc) => ({
     ...doc,
-    path: `/${isCloud ? 'cloud' : 'open-source'}${doc.path}`,
+    path: `/${isCloud ? 'cloud' : 'open-source'}${doc.path}`
   }))
 }
 
 async function getAllParsedDocuments() {
   const { cloud, oss } = await getAllRenderedDocs()
-  const cloudDocs = (await Promise.all(cloud.map(parseDoc))).flat().map((doc) => ({ ...doc, category: 'Cloud', section: unslugify(doc.section) }))
-  const ossDocs = (await Promise.all(oss.map(parseDoc))).flat().map((doc) => ({ ...doc, category: 'Open Source', section: unslugify(doc.section) }))
-  
+  const cloudDocs = (await Promise.all(cloud.map(parseDoc)))
+    .flat()
+    .map((doc) => ({ ...doc, category: 'Cloud', section: unslugify(doc.section) }))
+  const ossDocs = (await Promise.all(oss.map(parseDoc)))
+    .flat()
+    .map((doc) => ({ ...doc, category: 'Open Source', section: unslugify(doc.section) }))
+
   return [...cloudDocs, ...ossDocs]
 }
 
@@ -62,7 +68,7 @@ async function updateOramaCloud(docs: GeneralPurposeCrawlerResult[]) {
     return
   }
   const oramaCloudManager = new CloudManager({
-    api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
+    api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY
   })
 
   const docsIndex = oramaCloudManager.index(process.env.ORAMA_CLOUD_INDEX_ID)
