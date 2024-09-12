@@ -526,10 +526,10 @@ importers:
         version: link:../plugin-parsedoc
       '@orama/searchbox':
         specifier: ^1.0.0-rc44
-        version: 1.0.0-rc47(@orama/highlight@0.1.5)(@orama/orama@packages+orama)(@oramacloud/client@1.2.2(encoding@0.1.13)(typescript@5.6.2))(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1(react@18.2.0))(@r2wc/react-to-web-component@2.0.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(encoding@0.1.13)(react-dom@18.2.0(react@18.2.0))(react-markdown@9.0.1(@types/react@18.3.3)(react@18.2.0))(react@18.2.0)(typescript@5.6.2)
+        version: 1.0.0-rc47(@orama/highlight@0.1.5)(@orama/orama@packages+orama)(@oramacloud/client@1.3.14(encoding@0.1.13)(typescript@5.6.2))(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1(react@18.2.0))(@r2wc/react-to-web-component@2.0.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(encoding@0.1.13)(react-dom@18.2.0(react@18.2.0))(react-markdown@9.0.1(@types/react@18.3.3)(react@18.2.0))(react@18.2.0)(typescript@5.6.2)
       '@oramacloud/client':
         specifier: ^1.0.14
-        version: 1.2.2(encoding@0.1.13)(typescript@5.6.2)
+        version: 1.3.14(encoding@0.1.13)(typescript@5.6.2)
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
@@ -4302,9 +4302,6 @@ packages:
 
   '@orama/wc-components@0.0.17':
     resolution: {integrity: sha512-vvYOX6kjSH+xmiDOEuiyzTCfXPoFtqT4t3dltOmO69CBeXtEUL8YKhaghASF38kfVFClYyPAhNqIxJ2dLkFGCg==}
-
-  '@oramacloud/client@1.2.2':
-    resolution: {integrity: sha512-f3LJpaNiYIFVt/jcN8Zujv8b3Oy+l2NZ3sSUahx+H/m586eU66VODf/at3/8Z+sjKN1JeTcaRik1pcLF9OvCqQ==}
 
   '@oramacloud/client@1.3.10':
     resolution: {integrity: sha512-8CJTZgFlOHMAVrixN22PdT9i4Go7qw4a75UWWDEexsZQas5Vbeyria3ZtnOXb9aeH5M2uYssz0255ctY8tHIaw==}
@@ -16588,7 +16585,7 @@ snapshots:
       '@types/node': 20.11.19
       chalk: 4.1.2
       cosmiconfig: 8.2.0
-      cosmiconfig-typescript-loader: 4.3.0(@types/node@20.11.19)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@5.0.3))(typescript@5.5.2)
+      cosmiconfig-typescript-loader: 4.3.0(@types/node@20.11.19)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.5.2))(typescript@5.5.2)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -16608,7 +16605,7 @@ snapshots:
       '@types/node': 20.5.1
       chalk: 4.1.2
       cosmiconfig: 8.2.0
-      cosmiconfig-typescript-loader: 4.3.0(@types/node@20.5.1)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.9.0)(typescript@5.0.3))(typescript@5.5.2)
+      cosmiconfig-typescript-loader: 4.3.0(@types/node@20.5.1)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.5.1)(typescript@5.5.2))(typescript@5.5.2)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -16809,7 +16806,7 @@ snapshots:
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.89.0(@swc/core@1.3.27))
       tslib: 2.6.2
       update-notifier: 5.1.0
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       wait-on: 6.0.1
       webpack: 5.89.0(@swc/core@1.3.27)
       webpack-bundle-analyzer: 4.9.0
@@ -16902,7 +16899,7 @@ snapshots:
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.89.0(@swc/core@1.3.27))
       tslib: 2.6.2
       update-notifier: 5.1.0
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       wait-on: 6.0.1
       webpack: 5.89.0(@swc/core@1.3.27)
       webpack-bundle-analyzer: 4.9.0
@@ -16994,7 +16991,7 @@ snapshots:
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.89.0(@swc/core@1.3.27))
       tslib: 2.6.2
       update-notifier: 6.0.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
       webpack-bundle-analyzer: 4.9.0
       webpack-dev-server: 4.15.1(webpack@5.89.0(@swc/core@1.3.27))
@@ -17086,7 +17083,7 @@ snapshots:
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.89.0(@swc/core@1.3.27))
       tslib: 2.6.2
       update-notifier: 6.0.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
       webpack-bundle-analyzer: 4.9.0
       webpack-dev-server: 4.15.1(webpack@5.89.0(@swc/core@1.3.27))
@@ -17165,7 +17162,7 @@ snapshots:
       tslib: 2.6.2
       unified: 9.2.2
       unist-util-visit: 2.0.3
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
     transitivePeerDependencies:
       - '@docusaurus/types'
@@ -17202,7 +17199,7 @@ snapshots:
       tslib: 2.6.2
       unified: 11.0.4
       unist-util-visit: 5.0.0
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       vfile: 6.0.1
       webpack: 5.89.0(@swc/core@1.3.27)
     transitivePeerDependencies:
@@ -17238,7 +17235,7 @@ snapshots:
       tslib: 2.6.2
       unified: 11.0.4
       unist-util-visit: 5.0.0
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       vfile: 6.0.1
       webpack: 5.89.0(@swc/core@1.3.27)
     transitivePeerDependencies:
@@ -18542,7 +18539,7 @@ snapshots:
       resolve-pathname: 3.0.0
       shelljs: 0.8.5
       tslib: 2.6.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
     optionalDependencies:
       '@docusaurus/types': 2.4.3(@swc/core@1.3.27)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
@@ -18570,7 +18567,7 @@ snapshots:
       resolve-pathname: 3.0.0
       shelljs: 0.8.5
       tslib: 2.6.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
     optionalDependencies:
       '@docusaurus/types': 3.0.1(@swc/core@1.3.27)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -18600,7 +18597,7 @@ snapshots:
       resolve-pathname: 3.0.0
       shelljs: 0.8.5
       tslib: 2.6.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
     optionalDependencies:
       '@docusaurus/types': 3.2.0(@swc/core@1.3.27)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -19647,13 +19644,13 @@ snapshots:
     transitivePeerDependencies:
       - postcss
 
-  '@orama/searchbox@1.0.0-rc47(@orama/highlight@0.1.5)(@orama/orama@packages+orama)(@oramacloud/client@1.2.2(encoding@0.1.13)(typescript@5.6.2))(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1(react@18.2.0))(@r2wc/react-to-web-component@2.0.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(encoding@0.1.13)(react-dom@18.2.0(react@18.2.0))(react-markdown@9.0.1(@types/react@18.3.3)(react@18.2.0))(react@18.2.0)(typescript@5.6.2)':
+  '@orama/searchbox@1.0.0-rc47(@orama/highlight@0.1.5)(@orama/orama@packages+orama)(@oramacloud/client@1.3.14(encoding@0.1.13)(typescript@5.6.2))(@preact/signals-core@1.6.0)(@preact/signals-react@2.0.1(react@18.2.0))(@r2wc/react-to-web-component@2.0.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(encoding@0.1.13)(react-dom@18.2.0(react@18.2.0))(react-markdown@9.0.1(@types/react@18.3.3)(react@18.2.0))(react@18.2.0)(typescript@5.6.2)':
     dependencies:
       '@orama/highlight': 0.1.5
       '@orama/orama': link:packages/orama
       '@orama/plugin-analytics': 2.0.20
       '@orama/plugin-secure-proxy': 2.0.20(encoding@0.1.13)(typescript@5.6.2)
-      '@oramacloud/client': 1.2.2(encoding@0.1.13)(typescript@5.6.2)
+      '@oramacloud/client': 1.3.14(encoding@0.1.13)(typescript@5.6.2)
       '@phosphor-icons/react': 2.1.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@preact/signals-core': 1.6.0
       '@preact/signals-react': 2.0.1(react@18.2.0)
@@ -19684,18 +19681,6 @@ snapshots:
       marked-highlight: 2.1.4(marked@13.0.3)
       shiki: 1.12.1
       sse.js: 2.5.0
-    transitivePeerDependencies:
-      - encoding
-      - typescript
-
-  '@oramacloud/client@1.2.2(encoding@0.1.13)(typescript@5.5.2)':
-    dependencies:
-      '@orama/orama': 2.0.21
-      '@paralleldrive/cuid2': 2.2.2
-      lodash: 4.17.21
-      openai: 4.52.0(encoding@0.1.13)
-      react: 18.3.1
-      vue: 3.4.29(typescript@5.6.2)
     transitivePeerDependencies:
       - encoding
       - typescript
@@ -19736,7 +19721,31 @@ snapshots:
       - encoding
       - typescript
 
-  '@oramacloud/client@1.3.14(encoding@0.1.13)(typescript@5.2.2)':
+  '@oramacloud/client@1.3.14(encoding@0.1.13)(typescript@5.5.2)':
+    dependencies:
+      '@orama/orama': 2.0.23
+      '@paralleldrive/cuid2': 2.2.2
+      lodash: 4.17.21
+      openai: 4.52.0(encoding@0.1.13)
+      react: 18.3.1
+      vue: 3.4.29(typescript@5.5.2)
+    transitivePeerDependencies:
+      - encoding
+      - typescript
+
+  '@oramacloud/client@1.3.14(encoding@0.1.13)(typescript@5.6.2)':
+    dependencies:
+      '@orama/orama': 2.0.23
+      '@paralleldrive/cuid2': 2.2.2
+      lodash: 4.17.21
+      openai: 4.52.0(encoding@0.1.13)
+      react: 18.3.1
+      vue: 3.4.29(typescript@5.6.2)
+    transitivePeerDependencies:
+      - encoding
+      - typescript
+
+  '@oramacloud/client@1.3.15(encoding@0.1.13)(typescript@5.2.2)':
     dependencies:
       '@orama/orama': 2.0.23
       '@paralleldrive/cuid2': 2.2.2
@@ -23285,14 +23294,14 @@ snapshots:
 
   core-util-is@1.0.3: {}
 
-  cosmiconfig-typescript-loader@4.3.0(@types/node@20.11.19)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@5.0.3))(typescript@5.5.2):
+  cosmiconfig-typescript-loader@4.3.0(@types/node@20.11.19)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.5.2))(typescript@5.5.2):
     dependencies:
       '@types/node': 20.11.19
       cosmiconfig: 8.2.0
       ts-node: 10.9.1(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.5.2)
       typescript: 5.5.2
 
-  cosmiconfig-typescript-loader@4.3.0(@types/node@20.5.1)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.9.0)(typescript@5.0.3))(typescript@5.5.2):
+  cosmiconfig-typescript-loader@4.3.0(@types/node@20.5.1)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.5.1)(typescript@5.5.2))(typescript@5.5.2):
     dependencies:
       '@types/node': 20.5.1
       cosmiconfig: 8.2.0
@@ -32474,7 +32483,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  url-loader@4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27)):
+  url-loader@4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27)):
     dependencies:
       loader-utils: 2.0.4
       mime-types: 2.1.35
