@@ -40,10 +40,6 @@ const oramaCloudMenu = [
             label: 'Custom integrations',
             link: '/cloud/data-sources/custom-integrations'
           },
-          {
-            label: 'Other sources',
-            link: '/cloud/data-sources/other-sources'
-          },
           /*{
             label: 'Create a new index',
             link: '/cloud/working-with-indexes/create-a-new-index'
@@ -175,7 +171,7 @@ const oramaCloudMenu = [
         ]
       },
       {
-        label: 'Understanding Orama',
+        label: 'More information',
         collapsed: true,
         items: [
           {
