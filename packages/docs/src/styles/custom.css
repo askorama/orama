@@ -90,11 +90,17 @@ h6 {
 }
 
 .actions a {
-  border-radius: 8px;
+  border-radius: 6px;
   font-weight: bold;
   font-size: var(--sl-text-base);
   padding: 1rem 1.25rem;
   display: flex;
+  border-width: 1px;
+  border-color: transparent;
+  border-style: solid;
+}
+.actions a:hover {
+  border-color: var(--sl-color-text-accent);
 }
 .sl-link-button svg {
   color: var(--sl-color-text) !important;
