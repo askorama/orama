@@ -4,6 +4,7 @@ description: Learn how to connect Orama Cloud to a Remote JSON data source
 editUrl: false
 ---
 import { Steps } from "@astrojs/starlight/components";
+import IntegratingIntoYourApp from '../../../../../components/IntegratingIntoYourApp.astro'
 
 Another way to integrate with Orama Cloud and get your data indexed is feeding the data using a Remote JSON data source. 
 
@@ -142,8 +143,4 @@ Make sure that the JSON response is valid and that the JSONPath is correct. If y
 
 ## Integrating into your app
 
-Now that you have your index deployed, you can start using it in your app.
-
-Orama Cloud provides Official SDKs for JavaScript, Swift, Kotlin, PHP and Python. You can use it to query your data (and much more).
-
-To learn more about the SDKs, check out the [documentation](/cloud/integrating-orama-cloud/official-sdk).
+<IntegratingIntoYourApp />

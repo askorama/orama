@@ -4,6 +4,7 @@ description: Learn how to connect Orama Cloud to Shopify.
 editUrl: false
 ---
 import { Steps } from "@astrojs/starlight/components";
+import IntegratingIntoYourApp from '../../../../../components/IntegratingIntoYourApp.astro'
 
 Orama Cloud integrates natively with Shopify via the **official Orama data source**. \
 This guide will walk you through the steps to connect your Shopify store to Orama Cloud.
@@ -125,8 +126,4 @@ Now that you have your [Shopify access token](#shopify-access-token), you can cr
 
 ## Integrating into your app
 
-Now that you have your index deployed, you can start using it in your app.
-
-Orama Cloud provides an official SDK for JavaScript that runs on every JavaScript runtime. You can use it to query your data.
-
-To learn more about the SDK, check out the [documentation](/cloud/integrating-orama-cloud/javascript-sdk). If you are looking for a ready to use component, check out our Searchbox component.
+<IntegratingIntoYourApp />

@@ -7,37 +7,37 @@ next: true
 ---
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-<a href="https://components.orama.com/?path=/story/components-searchbox--search-box" target="_blank">Search Box</a> component is a full-featured searchbox with autocomplete and suggestions.
+<a href="https://components.orama.com/?path=/story/components-searchbox--search-box" target="_blank">Search Box</a> component is a full-featured search experience with autocomplete and suggestions.
+Out of the box, the Search Box component offers the following features:
+
+- 🧘 **Easy setup**: install and configure as you need.
+- 🎨 **Theming**: colors, typography and styling can be customized to match your website.
+- 🫡 **Autocomplete**: as you type, the search box will suggest the most relevant results.
+- ✨ **AI summary**: the search box includes the [Chat Box](/cloud/ui-components/chat-box) component, that can provide a conversational search tool featuring our Answer Engine capabilities.
+
+<br />
 
 <video width="800" height="600" controls autoPlay loop>
     <source src="https://website-assets.oramasearch.com/docs/search-box-component.mp4" type="video/mp4" />
     Your browser does not support the video tag.
 </video>
 
-Out of the box, the Search Box component offers the following features:
-
-- 🎨 **Theming**: the search box can be customized to match your website's theme.
-- 🫡 **Autocomplete**: as you type, the search box will suggest the most relevant results.
-- 💡 **Suggestions**: the search box will suggest the most relevant queries based on your input.
-- 🏷️ **Facets**: the search box can include facets to filter the search results.
-- ✨ **AI summary**: the search box includes the `Chat Box` component, that can provide a conversational search tool featuring our Answer Engine capabilities.
-
-and much more...
+Do you want to see some examples in the wild? Check out the Search Box component on this website, on the top left corner.
 
 ## Installation
 
-To install the `Orama UI Components` library, you can follow the instructions [here](/cloud/ui-components/design-system#installation).
+To install the <a href="https://components.orama.com/" target="_blank">Orama UI Components</a> library, you can follow the instructions [here](/cloud/ui-components/design-system#installation).
 
 ## Usage
 
-The `Search Box` supports a vast number of options and configurations. You can find the full list of options and examples in the [Storybook](https://components.orama.com/?path=/story/components-searchbox--search-box).
+The `Search Box` supports a vast number of options and configurations. You can find the full list of options and examples in the <a href="https://components.orama.com/?path=/story/components-searchbox--search-box" target="_blank">Storybook</a>.
 
 | Option | Description | Default |
 |:------ | ----------- | ------- |
-| **open** | Whether the search box is open or not. | `false` |
+| **index** | The index configuration. An object with the `endpoint` and `api_key` properties. These are the Endpoint URL and Public API Key of your index. | **Required** when `clientInstance` is not specified. |
+| **clientInstance** | The [OramaClient](/cloud/performing-search/#quick-start) instance to use for the search and answer engine. | **Required** when `index` is not specified. |
+| **open** | Whether the search box is open or not. You can use a [Search Button](/cloud/ui-components/search-button) to toggle it. | `false` |
 | **placeholder** | The placeholder text for the search box | `Search...` |
-| **index** | The index configuration. An object with the `endpoint` and `api_key` properties. | **Required** when `clientInstance` is not specified. |
-| **clientInstance** | The `OramaClient` instance to use for the search and answer engine. | **Required** when `index` is not specified. |
 | **sourceBaseUrl** | The base URL for the search results. | Empty |
 | **sourcesMap** | An object to mapping your document properties with the `ChatBox` source results. | `{}` |
 | **resultMap** | An object to mapping your document properties with the `SearchBox` results. | `{}` |

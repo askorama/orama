@@ -6,6 +6,7 @@ editUrl: false
 import { ShowcaseText } from 'starlight-showcases';
 import { Aside, Code, Steps } from '@astrojs/starlight/components';
 import Install from '../../../../../components/Install.astro'
+import IntegratingIntoYourApp from '../../../../../components/IntegratingIntoYourApp.astro'
 
 We provide a plugin for Strapi that allows you to connect your Strapi application to Orama Cloud and index your content in a few simple steps.
 
@@ -132,31 +133,4 @@ This option is useful when you want to keep your index up-to-date with your Stra
 
 ## Integrating into your app
 
-Now that you have your index deployed, you can start using it in your application's frontend.
-
-Check out our [JavaScript SDK](/cloud/integrating-orama-cloud/javascript-sdk) to learn how to integrate Orama Cloud into your client-side application to perform search queries and more.
-
-<ShowcaseText
-  entries={[
-    {
-      title: "UI Components",
-      description: "Add a fully featured and highly customizable Search Box component in your application.",
-      href: "/cloud/ui-components/design-system",
-    },
-    {
-      title: "JavaScript SDK",
-      description: "Learn how to use your Orama Cloud index in a JavaScript application.",
-      href: "/cloud/integrating-orama-cloud/javascript-sdk",
-    },
-    {
-      title: "React Example",
-      description: "Learn how to use your Orama Cloud index in a React application.",
-      href: "/cloud/integrating-orama-cloud/react-sdk",
-    },
-    {
-      title: "Vue Example",
-      description: "Learn how to use your Orama Cloud index in a Vue application.",
-      href: "/cloud/integrating-orama-cloud/vue-sdk",
-    },
-  ]}
-/>
+<IntegratingIntoYourApp />

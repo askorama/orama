@@ -5,16 +5,19 @@ editUrl: false
 ---
 import { ShowcaseText } from 'starlight-showcases';
 import { Tabs, TabItem, Code, Aside, Steps, LinkCard } from "@astrojs/starlight/components";
+import IntegratingIntoYourApp from '../../../../../components/IntegratingIntoYourApp.astro'
 
-REST APIs provide an effective means of interacting with your Orama index.
+REST APIs provide an effective means of interacting with your Orama Cloud index.
 
-They allow you to update, insert, and remove data from your index seamlessly. The system then queues these changes until you request a redeploy.
+The REST APIs allow you to update, insert, and remove data from your index seamlessly. The system then queues these changes until you request a new deployment.
 
-This guide will show you how to utilize the Orama REST APIs for deploying and managing an index on Orama Cloud.
+This guide will show you how to use the REST APIs data source, to deploy and manage your indexes on Orama Cloud.
 
 ## Creating an index
 
-Firstly, create a new index using "REST API" as a data source. You"ll find it under "custom integrations". Insert a name and optionally add a description for your index, then click on "Create".
+Firstly, create a new index using "**REST API**" as a data source. You'll find it under "**custom integrations**". 
+
+Insert a name and optionally add a description for your index, then click on "**Create index**".
 
 After creating it, you will need to define the searchable properties schema. 
 
@@ -32,7 +35,7 @@ For this guide, we will use a very simple schema, which consists of two simple p
 <Steps>
   <ol>
     <li>
-      <p class="pl-10">Define the schema of the searchable properties of your document.</p>
+      <p class="pl-10"><a href="/cloud/working-with-indexes/searchable-schema">Define the schema</a> of the searchable properties of your document.</p>
       <p class="pl-10">Automatic [embeddings generation](/cloud/orama-ai/automatic-embeddings-generation) are included in your index, to perform vector and hybrid search on it. By default, all the **string** properties are included in the embeddings generation.</p>
       <img
         src="/cloud/guides/webhook/schema.png"
@@ -50,7 +53,7 @@ For this guide, we will use a very simple schema, which consists of two simple p
       />
     </li>
     <li>
-      <p class="pl-10">From here, you can use the Official SDKs to manage your index data.</p> 
+      <p class="pl-10">From here, you can use the <a href="/cloud/integrating-orama-cloud/official-sdk">Official SDKs</a> to manage your index data.</p> 
     </li>
   </ol>
 </Steps>
@@ -598,31 +601,4 @@ If you lost track of the operatiosn you ran via the SDK or APIs, you can always 
 
 ## Integrating into your app
 
-Now that you have your index deployed, you can start using it in your app.
-
-Check out our [JavaScript SDK](/cloud/integrating-orama-cloud/javascript-sdk) to learn how to integrate Orama Cloud into your client-side application to perform search queries and more.
-
-<ShowcaseText
-  entries={[
-    {
-      title: "UI Components",
-      description: "Add a fully featured and highly customizable Search Box component in your application.",
-      href: "/cloud/ui-components/design-system",
-    },
-    {
-      title: "JavaScript SDK",
-      description: "Learn how to use your Orama Cloud index in a JavaScript application.",
-      href: "/cloud/integrating-orama-cloud/javascript-sdk",
-    },
-    {
-      title: "React Example",
-      description: "Learn how to use your Orama Cloud index in a React application.",
-      href: "/cloud/integrating-orama-cloud/react-sdk",
-    },
-    {
-      title: "Vue Example",
-      description: "Learn how to use your Orama Cloud index in a Vue application.",
-      href: "/cloud/integrating-orama-cloud/vue-sdk",
-    },
-  ]}
-/>
+<IntegratingIntoYourApp />

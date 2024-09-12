@@ -5,6 +5,7 @@ editUrl: false
 ---
 import { ShowcaseImage } from 'starlight-showcases';
 import { Aside, Steps } from '@astrojs/starlight/components';
+import IntegratingIntoYourApp from '../../../../../components/IntegratingIntoYourApp.astro'
 
 If you are looking for an alternative data source to integrate with Orama Cloud, you can use our <a href="https://cloud.orama.com/indexes/create/from-website" target="_blank">Web Crawler</a> to index the contents of your website. This is particularly useful when you want to index a public website that does not provide an API.
 
@@ -83,10 +84,6 @@ Large websites with many pages can take a long time to index. In some cases, the
 
 If you are still having trouble, please reach out to our [Slack](https://orama.to/slack) for support.
 
-### Integrating into your app
+## Integrating into your app
 
-Now that you have your index deployed, you can start using it in your app.
-
-Orama Cloud provides Official SDKs for JavaScript, Swift, Kotlin, PHP and Python. You can use it to query your data (and much more).
-
-To learn more about the SDKs, check out the [documentation](/cloud/integrating-orama-cloud/official-sdk).
+<IntegratingIntoYourApp />
