@@ -4,7 +4,6 @@ import { OramaSearchBox, OramaSearchButton } from '@orama/react-components'
 import { ossSuggestions, cloudSuggestions } from './suggestions';
 import { getCurrentCategory, getOramaUserId, searchSessionTracking, userSessionRefresh } from './utils';
 
-/** Production index */  
 const client = new OramaClient({
   api_key: 'NKiqTJnwnKsQCdxN7RyOBJgeoW5hJ594',
   endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-bzo330'
