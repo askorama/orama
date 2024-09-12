@@ -86,6 +86,14 @@ Now that you have created an index, you can start managing it using the REST API
 - [Clearing the index on next deployment](#clearing-the-index-data)
 - [Check for pending operations](#check-for-pending-operations)
 
+You can integrate with the REST APIs using the Official SDKs or by making direct HTTP requests.
+
+<Aside type="tip" title='Installing the Orama SDK'>
+You can find the guide on installing the SDK [here](/cloud/integrating-orama-cloud/official-sdk).
+</Aside>
+
+The official SDKs supported languages are JavaScript, Swift, Kotlin, PHP, and Python. In the following examples, we will also include a cURL example.
+
 ### Inserting a snapshot
 
 A snapshot is a complete override of a given index. It means you bulk upload a number of documents, which entirely substitute the live index all at once.

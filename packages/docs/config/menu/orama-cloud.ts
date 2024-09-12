@@ -159,7 +159,7 @@ const oramaCloudMenu = [
         ]
       },
       {
-        label: 'More information',
+        label: 'Guides and tutorials',
         collapsed: true,
         items: [
           {
@@ -170,12 +170,10 @@ const oramaCloudMenu = [
             label: 'Pricing and limits',
             link: '/cloud/understanding-orama/pricing-limits'
           },
-        ]
-      },
-      {
-        label: 'Guides and tutorials',
-        collapsed: true,
-        items: [
+          {
+            label: 'Defining a schema',
+            link: '/cloud/working-with-indexes/searchable-schema'
+          },
           {
             label: 'Creating an index',
             link: '/cloud/working-with-indexes/create-a-new-index'

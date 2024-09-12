@@ -112,3 +112,123 @@ Install the [PHP SDK](https://packagist.org/packages/oramacloud/client) using co
 ```sh
 composer require oramacloud/client
 ```
+
+## Usage
+
+Once you have your SDK for your preferred language installed, you can start performing full-text, vector, and hybrid search queries on Orama Cloud.
+
+The client exposes a simple `search` method that can be used to query the index. 
+
+<Tabs syncKey="sdk">
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```typescript copy
+    import { OramaClient } from "@oramacloud/client";
+
+    const client = new OramaClient({
+      endpoint: '<Your Orama Cloud Endpoint>',
+      api_key: '<Your Orama Cloud API Key>',
+    });
+
+    const results = await client.search({
+      term: "red shoes",
+      mode: "fulltext", // optional, default is "fulltext" but can also be "vector" or "hybrid"
+      where: {
+        price: {
+          gt: 99.99,
+        },
+      },
+    });
+    ```
+  </TabItem>
+  <TabItem label="Swift" icon="seti:swift">
+    ```swift copy
+    import OramaCloudClient
+
+    struct MyDoc: Codable {
+      let title: String
+      let description: String
+    }
+
+    let clientParams = OramaClientParams(endpoint: "<Your Orama Cloud Endpoint>", apiKey: "<Your Orama Cloud API Key>")
+    let client = OramaClient(params: clientParams)
+
+    let searchParams = ClientSearchParams.builder(
+        term: "red shoes",
+        mode: .fulltext // optional, default is .fulltext but can also be .vector or .hybrid
+      )
+      .limit(10) // optional
+      .offset(0) // optional
+      .returning(["title", "description"]) // optional
+      .build()
+
+    let searchResults: SearchResults<MyDoc> = try await client.search(query: searchParams)
+    ```
+  </TabItem>
+  <TabItem label="Kotlin" icon="seti:kotlin">
+    ```kotlin copy
+    import com.orama.client.OramaClient
+    import com.orama.model.search.*
+    import kotlinx.serialization.Serializable
+    
+    // Keep in mind that search is a suspended function, 
+    // so you need to call it from a coroutine ;)
+
+    @Serializable
+    data class MyDoc (
+        val title: String,
+        val category: String,
+        val path: String,
+        val content: String,
+        val section: String
+    )
+
+    val searchParams = SearchParams.builder(
+            term = "red shoes",
+            mode = Mode.FULLTEXT
+        )
+        .where(listOf(
+            Condition("price", ConditionType.GreaterThan(99.99))
+        ))
+        .build()
+
+    val results = client.search(searchParams, MyDoc.serializer())
+    ```
+  </TabItem>
+  <TabItem label="Python" icon="seti:python">
+    ```python copy
+    print("coming soon")
+    ```
+  </TabItem>
+  <TabItem label="PHP" icon="seti:php">
+    ```php copy
+    use OramaCloud\Client;
+    use OramaCloud\Client\Query;
+    use OramaCloud\Client\QueryParams\WhereOperator;
+    use OramaCloud\Client\QueryParams\SortByOrder;
+
+    $client = new Client([
+      'endpoint' => '<Your Orama Cloud Endpoint>',
+      'api_key' => '<Your Orama Cloud API Key>'
+    ]);
+
+    $query = (new Query())
+      ->term('red shoes')
+      ->mode('fulltext') // 'fulltext' is optional, but can also be "vector" or "hybrid"
+      ->where('price', WhereOperator::GT, 99.99);
+
+    $results = $client->search($query);
+    ```
+  </TabItem>
+</Tabs>
+
+---
+
+## Next Steps
+
+The SDKs provide a wide range of functionalities that allow you to interact with Orama Cloud programmatically. Here are some guides to help you get started:
+
+- [Performing a full-text search](/cloud/performing-search/full-text-search)
+- [Performing a vector search](/cloud/performing-search/vector-search)
+- [Performing a hybrid search](/cloud/performing-search/hybrid-search)
+- [Creating an answer session](/cloud/answer-engine/creating-an-answer-session)
+- [Managing your indexes](/cloud/data-sources/custom-integrations/rest-apis#managing-your-index)
