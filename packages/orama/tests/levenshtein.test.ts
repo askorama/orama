@@ -198,31 +198,31 @@ t.test('syncBoundedLevenshtein substrings are ok even if with tolerance pppppp',
 t.test('Issue #744', async (t) => {
   const index = await create({
     schema: {
-      libelle: 'string',
+      libelle: 'string'
     } as const
   })
 
   await insertMultiple(index, [
-    {libelle: 'ABRICOT MOELLEUX'},
-    {libelle: 'MOELLEUX CHOC BIO'},
-    {libelle: 'CREPE MOELLEUSE'},
-    {libelle: 'OS MOELLE'},
+    { libelle: 'ABRICOT MOELLEUX' },
+    { libelle: 'MOELLEUX CHOC BIO' },
+    { libelle: 'CREPE MOELLEUSE' },
+    { libelle: 'OS MOELLE' }
   ])
 
   const s1 = await search(index, {
-    term: 'moelleux',
+    term: 'moelleux'
   })
 
   const s2 = await search(index, {
     term: 'moelleux',
     tolerance: 1,
-    threshold: 0,
+    threshold: 0
   })
 
   const s3 = await search(index, {
     term: 'moelleux',
     tolerance: 2,
-    threshold: 0,
+    threshold: 0
   })
 
   t.equal(s1.count, 2)
