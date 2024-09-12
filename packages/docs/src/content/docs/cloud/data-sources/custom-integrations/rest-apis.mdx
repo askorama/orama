@@ -183,7 +183,7 @@ Let"s say you want to add a new document:
 ```json
 {
   "id": "3",
-  "name": "Rick Morty",
+  "name": "Rick Sanchez",
   "age": 80
 }
 ```
@@ -201,7 +201,7 @@ you can use the **notify** API to put that operation in queue for the next deplo
 
     const myIndex = oramaCloudManager.index("my-index-id")
 
-    await myIndex.insert([{ id: "3", name: "Rick Morty", age: 80 }])
+    await myIndex.insert([{ id: "3", name: "Rick Sanchez", age: 80 }])
     await myIndex.update([{ id: "3", name: "Rick Doe", age: 75 }])
     ```
   </TabItem>
@@ -219,7 +219,7 @@ you can use the **notify** API to put that operation in queue for the next deplo
   let cloudManager = CloudManager(apiKey: "YOUR_API_KEY")
   let indexManager = cloudManager.index<OramaDoc>("my-index-id")
 
-  await try indexManager.insert([OramaDoc(id: "3", name: "Rick Morty", age: 80)])
+  await try indexManager.insert([OramaDoc(id: "3", name: "Rick Sanchez", age: 80)])
   await try indexManager.update([OramaDoc(id: "3", name: "Rick Doe", age: 75)])
   ```
   </TabItem>
@@ -241,7 +241,7 @@ you can use the **notify** API to put that operation in queue for the next deplo
 
     runBlocking {
       index.insert(listOf(
-          OramaDoc(id = "3", name = "Rick Morty", age = 80)
+          OramaDoc(id = "3", name = "Rick Sanchez", age = 80)
       ), OramaDoc.serializer())
 
       index.update(listOf(
@@ -256,7 +256,7 @@ you can use the **notify** API to put that operation in queue for the next deplo
     $indexManager = new IndexManager("my-index-id", PRIVATE_API_KEY);
 
     $indexManager->insert([
-      ["id" => "3", "name" => "Rick Morty", "age" => 80]
+      ["id" => "3", "name" => "Rick Sanchez", "age" => 80]
     ]);
     $indexManager->update([
       ["id" => "3", "name" => "Rick Doe", "age" => 75]
@@ -267,7 +267,7 @@ you can use the **notify** API to put that operation in queue for the next deplo
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
       -H "authorization: Bearer $PRIVATE_API_KEY" \
-      -d "{ "upsert": [{ "id": "3", "name": "Rick Morty", "age": 80 }] }"
+      -d "{ "upsert": [{ "id": "3", "name": "Rick Sanchez", "age": 80 }] }"
     ```
   </TabItem>
 </Tabs>

@@ -21,8 +21,8 @@ Follow the instructions [here](/cloud/integrating-orama-cloud/javascript-sdk) to
     import { OramaClient } from "@oramacloud/client";
 
     const orama = new OramaClient({
-      endpoint: "",
-      api_key: "",
+      endpoint: "YOUR_ENDPOINT_URL",
+      api_key: "YOUR_PUBLIC_API_KEY",
     });
 
     const answerSession = orama.createAnswerSession({
@@ -53,7 +53,7 @@ Follow the instructions [here](/cloud/integrating-orama-cloud/javascript-sdk) to
     ```swift copy
     import OramaCloudClient
 
-    let clientParams = OramaClientParams(endpoint: "", apiKey: "")
+    let clientParams = OramaClientParams(endpoint: "YOUR_ENDPOINT_URL", apiKey: "YOUR_PUBLIC_API_KEY")
     let orama = OramaClient(params: clientParams)
 
     let answerParams = AnswerParams<E2EDoc>(
@@ -79,8 +79,8 @@ Follow the instructions [here](/cloud/integrating-orama-cloud/javascript-sdk) to
     )
 
     val client = OramaClient(
-      apiKey = "",
-      endpoint = ""
+      apiKey = "YOUR_PUBLIC_API_KEY",
+      endpoint = "YOUR_ENDPOINT_URL"
     )
 
     val answerParams = AnswerParams(

@@ -3,6 +3,7 @@ title: Embeddings Generation
 description: Learn how to automatically generate embeddings from your data at deployment.
 editUrl: false
 ---
+import { ShowcaseText } from 'starlight-showcases';
 import { Aside } from '@astrojs/starlight/components';
 
 With Orama Cloud, you can automatically generate embeddings from your data at deployment.
@@ -67,37 +68,34 @@ After adding your API key, you won't be able to view it again for security reaso
 
 ### Creating the Embeddings
 
-You can now create a new index by going to [https://cloud.orama.com/indexes/new](https://cloud.orama.com/indexes/new). For this guide, we will use a simple JSON file as a data source.
+You can now create a new index by going to [Orama Cloud dashboard](https://cloud.orama.com/indexes), if you don't have one yet. Depending on your use case, you will need to select the right Data Source to import your data (check out our guide on [Data Sources](/cloud/data-sources/introduction-to-data-sources) to learn more about the available options).
 
-You can download the same JSON file here: [download example dataset](/cloud/guides/example-datasets/games.json).
-
-Once you have your dataset ready, you can create a new Index:
+When creating an index, the embedding generation is automatically enabled. You can select the Large Language Model (LLM) you would like to use for the embeddings generation. 
 
 <img
-  src='/cloud/guides/automatic-embeddings-generation/new-index.png'
-  alt='Creating a new index on Orama Cloud'
+  src='/cloud/guides/automatic-embeddings-generation/orama-native-embeddings.png'
+  alt='Automatic embeddings generation via Orama Native Embeddings'
 />
 
-After uploading the file, you can enable the **Automatic Embeddings Generation** feature. This feature will scan the `"string"` properties in your schema and automatically select them to generate embeddings. You can always select or deselect different properties as needed.
-
-<img
-  src='/cloud/guides/automatic-embeddings-generation/enable-orama-ai.png'
-  alt='Enablin Orama AI on Orama Cloud'
-/>
-
-Once you have deployed your index containing embeddings, you can locate it in the indexes list where the "Embeddings" column is marked with the icon of the chosen model, such as OpenAI.
-
-Congratulations! You've just deployed your first automatically-generated embeddings on Orama Cloud!
-
-## Querying the Embeddings
+## Querying the embeddings
 
 Now that you have your embeddings distributed on Orama Cloud, you can use the [official JavaScript client](/cloud/integrating-orama-cloud/javascript-sdk) to perform vector search on them.
 
 Read more about performing vector search on Orama Cloud [here](/cloud/performing-search/vector-search).
 
+<ShowcaseText
+  entries={[
+    {
+      href: 'https://cloud.orama.com',
+      title: 'Performing vector search',
+      description: 'Learn more how to perform vector search on Orama Cloud.',
+    },
+  ]}
+/>
+
 ## Pricing
 
-The automatic embeddings generation feature is included in all Orama Cloud plans with no limits. 
+The automatic embeddings generation feature is included in all Orama Cloud plans with **no limits**. 
 
 When using an **Orama AI** model, the embeddings generation is included in the flat rate.
 

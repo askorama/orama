@@ -40,18 +40,6 @@ const oramaCloudMenu = [
             label: 'Custom integrations',
             link: '/cloud/data-sources/custom-integrations'
           },
-          /*{
-            label: 'Create a new index',
-            link: '/cloud/working-with-indexes/create-a-new-index'
-          },
-          {
-            label: 'Update an index',
-            link: '/cloud/working-with-indexes/edit-an-index'
-          },
-          {
-            label: 'Delete an index',
-            link: '/cloud/working-with-indexes/delete-an-index'
-          }*/
         ]
       },
       {
@@ -135,17 +123,17 @@ const oramaCloudMenu = [
             link: '/cloud/ui-components/design-system'
           },
           {
-            label: 'Chat Box',
-            link: '/cloud/ui-components/chat-box'
+            label: 'Search Button',
+            link: '/cloud/ui-components/search-button'
           },
           {
             label: 'Search Box',
             link: '/cloud/ui-components/search-box'
           },
           {
-            label: 'Search Button',
-            link: '/cloud/ui-components/search-button'
-          }
+            label: 'Chat Box',
+            link: '/cloud/ui-components/chat-box'
+          },
         ]
       },
       {
@@ -181,6 +169,24 @@ const oramaCloudMenu = [
           {
             label: 'Pricing and limits',
             link: '/cloud/understanding-orama/pricing-limits'
+          },
+        ]
+      },
+      {
+        label: 'Guides and tutorials',
+        collapsed: true,
+        items: [
+          {
+            label: 'Creating an index',
+            link: '/cloud/working-with-indexes/create-a-new-index'
+          },
+          {
+            label: 'Updating an index',
+            link: '/cloud/working-with-indexes/edit-an-index'
+          },
+          {
+            label: 'Deleting an index',
+            link: '/cloud/working-with-indexes/delete-an-index'
           }
         ]
       },
@@ -189,7 +195,7 @@ const oramaCloudMenu = [
         collapsed: true,
         items: [
           {
-            label: 'Documentation',
+            label: 'Open Source Documentation',
             link: '/open-source'
           },
           {

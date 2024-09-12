@@ -32,8 +32,8 @@ From there, you can connect to the Orama Cloud API and start making requests:
 import { OramaClient } from "@oramacloud/client";
 
 const client = new OramaClient({
-  endpoint: "",
-  api_key: "",
+  endpoint: "YOUR_ENDPOINT_URL",
+  api_key: "YOUR_PUBLIC_API_KEY",
 });
 ```
 
@@ -48,14 +48,14 @@ Remember, the API key and endpoint are public, so you can safely include them in
 
 ## Performing a full-text search query
 
-The Orama Cloud SDK wraps the [open source search method](/open-source/usage/search/introduction), maintaining backward compatibility with the Open Source API.
+The Orama Cloud SDK wraps the [open source search method](/open-source/usage/search/introduction), maintaining backward compatibility with the [Open Source API](/open-source/usage/search/introduction).
 
 ```typescript copy
 import { OramaClient } from "@oramacloud/client";
 
 const client = new OramaClient({
-  endpoint: "",
-  api_key: "",
+  endpoint: "YOUR_ENDPOINT_URL",
+  api_key: "YOUR_PUBLIC_API_KEY",
 });
 
 const results = await client.search({

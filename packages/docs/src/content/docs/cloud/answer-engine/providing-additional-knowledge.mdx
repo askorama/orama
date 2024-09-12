@@ -5,7 +5,9 @@ editUrl: false
 ---
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-When you ask a question, you can provide additional user data to the answer session. This is useful when you want to provide a more personalized experience to your users. For example, if you know that the user is a beginner in programming, you can provide a more detailed explanation of the concepts you’re talking about:
+When you ask a question, you can provide additional user data to the answer session. This is useful when you want to provide a more personalized experience to your users. 
+
+For example, if you know that the user is a beginner in programming, you can provide a more detailed explanation of the concepts you’re talking about:
 
 <Tabs syncKey="sdk">
   <TabItem label="JavaScript" icon="seti:javascript">
@@ -80,6 +82,9 @@ Just like the `userContext`, the `userData` can be a string or an object:
     ```
   </TabItem>
 </Tabs>
+
+
+### What's the difference between userContext and userData?
 
 The main difference between `userContext` and `userData` is that the `userData` is specific to a single answer request, while the `userContext` is global to the entire answer session.
 

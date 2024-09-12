@@ -1,13 +1,13 @@
 ---
-title: Official SDKs
+title: Orama Cloud SDKs
 description: Interacting with Orama Cloud via the official SDK
 editUrl: false
 ---
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Orama Cloud comes with a set of officially supported SDKs that allow you to interact with the platform programmatically.
+Orama Cloud comes with a set of officially supported Software Development Kits that allow you to interact and connect with the platform programmatically.
 
-The SDKs are available in multiple programming languages and provide a set of APIs that allow you to perform various operations on the platform, from performing searches to creating answer sessions and managing your indexes.
+The SDKs are available in multiple programming languages and provide a set of APIs that allow you to perform various operations on the platform, from performing searches and creating answer sessions, to managing your index data and trigger new deployments.
 
 ## Supported Languages
 
@@ -83,7 +83,19 @@ dependencies: [
 
 ### Kotlin SDK
 
-The Kotlin SDK will be available soon. Stay tuned for updates!
+To install the Orama Cloud multi-plataform client in your Kotlin project you need to enable `mavenCentral` and include the dependency in your `build.gradle.kts`:
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+
+val oramaClientVersion = "0.0.3"
+
+dependencies {
+    implementation "com.orama:oramacloud-client-kotlin:${oramaClientVersion}"
+}
+```
 
 ---
 
