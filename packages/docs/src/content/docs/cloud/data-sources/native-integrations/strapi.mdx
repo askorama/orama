@@ -3,42 +3,160 @@ title: Connect to Strapi
 description: Learn how to connect Orama Cloud to your Strapi app.
 editUrl: false
 ---
+import { ShowcaseText } from 'starlight-showcases';
+import { Aside, Code, Steps } from '@astrojs/starlight/components';
+import Install from '../../../../../components/Install.astro'
 
-Strapi plugin integration is coming soon. Please [contact us](mailto:info@orama.com) or [join our Slack channel](https://orama.to/slack) if you want to be notified when it's ready.
-
+We provide a plugin for Strapi that allows you to connect your Strapi application to Orama Cloud and index your content in a few simple steps.
 
 ## Install plugin
 
-### Using the Marketplace
+To get started, you need to install the Orama Cloud plugin in your Strapi application.
 
-### Using a package manager
+#### Using the marketplace
 
-## Configuration
+Coming soon.
 
-## Creating an Index
+#### Using a package manager
 
-- Explain Collections (mapping Indexes VS Strapi Content Types)
+You can install the plugin using any major Node.js package manager.
+
+<Install pkg="@oramacloud/plugin-strapi" />
+
+### Configuration
+
+To use the plugin, you need to add the following configuration to your `config/plugins.js` file.
+
+<Code lang="js" title="config/plugins.js" code={`
+module.exports = ({ env }) => ({
+  "orama-cloud": {
+    config: {
+      privateApiKey: env('ORAMACLOUD_PRIVATE_API_KEY'),
+    },
+  },
+});
+`} />
+
+You can get the `privateApiKey` from your Orama Cloud dashboard. It is required to authenticate your Strapi application with Orama Cloud.
+
+<Aside type="caution">
+  Keep your private API key in a **secure** place. Do not share it with anyone and **do not expose it** in your client-side code or public repository.
+</Aside>
+
+## Creating an index
+
+<Steps>
+  <ol>
+    <li>
+      <p class="pl-10">Go to your [dashboard](https://cloud.orama.com/indexes) and click on "Native Integrations".</p>
+      <p class="pl-10">Then, click on the **Strapi** logo to create a new index.</p>
+    </li>
+    <li>
+      <p class="pl-10">Add a name to your index. It can be anything.</p>
+      <p class="pl-10">Click **Create index** to continue.</p>
+    </li>
+    <li>
+      <p class="pl-10">In the following screen, you will be presented with the variables you need to set up the plugin.</p>
+      <p class="pl-10">Follow the instructions on the dashboard to get your `PRIVATE_API_KEY`.</p>
+    </li>
+  </ol>
+</Steps>
+
+## Managing your indexes
+
+The Orama Cloud plugin for Strapi allows you to manage **one or more indexes** directly from your Strapi admin panel.
+
+Directly from the Strapi plugin's admin panel, you can:
+
+- [Add a collection](#add-a-collection) to map your Strapi `Content Type` to an Orama Cloud index.
+- [Define the schema](#define-the-schema) of your index.
+- Define the [update strategy](#update-settings) for your index.
 
 ### Add a collection
 
-<img src="/cloud/guides/strapi/strapi-plugin.jpg" alt="Strapi plugin" />
+<img 
+  src="/cloud/guides/strapi/strapi-plugin.jpg"
+  alt="Strapi plugin"
+  class="p-5"
+/>
 
-### Define the schema
+| Option           | Description |
+|------------------|-------------|
+| **Index ID**     | **(required)** The index ID you want to connect to. You can find the Index ID in the dashboard. |
+| **Content Type** | **(required)** The Strapi Content Type you want to map to your Orama Index. |
+| **Include relations** | Include Content Type relations as nested objects in your index documents. |
+| **Attributes mapping** | **(required)** Define the attributes to be included in your index documents. |
+| **Searchable properties** | In the attributes mapping section, you can toggle the attributes that should be used in search queries. |
 
-In the collection configuration modal, you can select the attributes of your Strapi `Content Type` that you want to include in your search documents (the records that will be indexed in Orama Cloud).
+### Defining the schema
 
-<img src="/cloud/guides/strapi/define-schema.jpg" alt="Strapi plugin - Attributes mapping" />
+In the collection configuration modal, under the **Attributes mapping** section, you can select the attributes of your Strapi `Content Type` that you want to include in your search documents (the records that will be indexed in Orama Cloud).
+
+<img 
+  src="/cloud/guides/strapi/define-schema.jpg" 
+  alt="Strapi plugin - Attributes mapping" 
+  class="p-5"
+/>
 
 This is where you also define the `Searchable properties` of your index. These are the attributes that will be searchable in your index. The searchable properties are also used in the automatic [embeddings generation](/cloud/orama-ai/automatic-embeddings-generation) to perform vector and hybrid searches.
 
 ### Update settings
 
-- Deployment strategy
+To define how your index should be updated, you can either enable **Live updates** or **Scheduled updates**. Depending on your use case, you can choose to update your index in real-time or at specific intervals.
 
 #### Live updates
 
-<img src="/cloud/guides/strapi/live-updates.jpg" alt="Strapi plugin - Live updates" />
+Live updates will automatically update your index whenever a new record is created, updated, or deleted in your Strapi application. This will automatically trigger a reindexing process and a new deployment in Orama Cloud.
+
+<img
+  src="/cloud/guides/strapi/live-updates.jpg"
+  alt="Strapi plugin - Live updates"
+  class="p-5"
+/>
+
+This option is useful when you want to keep your index up-to-date with your Strapi application in real-time. However, it may increase the number of deployments in Orama Cloud. 
+
+To keep the number of deployments low, you can use the **Scheduled updates** option.
 
 #### Scheduled updates
 
-<img src="/cloud/guides/strapi/scheduled-updates.jpg" alt="Strapi plugin - Scheduled updates" />
+Scheduled updates allow you to define a specific interval for updating your index. You can choose to update your index every 30 minutes, every hour, daily, weekly or monthly.
+
+<img
+  src="/cloud/guides/strapi/scheduled-updates.jpg"
+  alt="Strapi plugin - Scheduled updates"
+  class="p-5"
+/>
+
+This option is useful when you want to keep your index up-to-date with your Strapi application but don't need real-time updates. Scheduled updates can help you reduce the number of deployments in Orama Cloud.
+
+## Integrating into your app
+
+Now that you have your index deployed, you can start using it in your application's frontend.
+
+Check out our [JavaScript SDK](/cloud/integrating-orama-cloud/javascript-sdk) to learn how to integrate Orama Cloud into your client-side application to perform search queries and more.
+
+<ShowcaseText
+  entries={[
+    {
+      title: "UI Components",
+      description: "Add a fully featured and highly customizable Search Box component in your application.",
+      href: "/cloud/ui-components/design-system",
+    },
+    {
+      title: "JavaScript SDK",
+      description: "Learn how to use your Orama Cloud index in a JavaScript application.",
+      href: "/cloud/integrating-orama-cloud/javascript-sdk",
+    },
+    {
+      title: "React Example",
+      description: "Learn how to use your Orama Cloud index in a React application.",
+      href: "/cloud/integrating-orama-cloud/react-sdk",
+    },
+    {
+      title: "Vue Example",
+      description: "Learn how to use your Orama Cloud index in a Vue application.",
+      href: "/cloud/integrating-orama-cloud/vue-sdk",
+    },
+  ]}
+/>
