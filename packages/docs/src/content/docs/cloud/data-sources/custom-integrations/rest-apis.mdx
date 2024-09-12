@@ -3,7 +3,8 @@ title: Connect using REST APIs
 description: Learn how to feed data into Orama Cloud using REST APIs
 editUrl: false
 ---
-import { Tabs, TabItem, Code, Aside, Steps } from "@astrojs/starlight/components";
+import { ShowcaseText } from 'starlight-showcases';
+import { Tabs, TabItem, Code, Aside, Steps, LinkCard } from "@astrojs/starlight/components";
 
 REST APIs provide an effective means of interacting with your Orama index.
 
@@ -56,23 +57,40 @@ For this guide, we will use a very simple schema, which consists of two simple p
 
 ### Generate a Private API Key
 
-To use the REST APIs, you will need to generate a private API key. You can do this in the [developer tools section](https://cloud.orama.com/developer-tools) of the dashboard.
+To use the REST APIs, you will need to generate a private API key. You can do this in the [developer tools section](https://cloud.orama.com/developer-tools) of the dashboard. 
+
+<LinkCard
+  href="https://cloud.orama.com/developer-tools"
+  title="Developer Tools"
+  description="Access the Orama Cloud dashboard section to manage your Private API Keys."
+  target="_blank"
+/>
+
+Simply add a new private key by clicking on `Generate API Key` and providing a name and an optional description for it. A single private API key can be used to manage multiple indexes.
+
+<Aside type="caution">
+  Keep your private API key in a **secure** place. Do not share it with anyone and **do not expose it** in your client-side code or public repository.
+</Aside>
+
+<Aside>
+  This **Private API Key** is NOT the same as the public API key you use to query the index. <br />The private API key is used to manage your index, while the public API key is used to query it.
+</Aside>
 
 ## Managing your index
 
 Now that you have created an index, you can start managing it using the REST APIs. <br />Here is a list of the available methods.
 
-- Inserting a snapshot
-- Inserting, updating and removing documents
-- Deploying the index
-- Clearing the index on next deployment
-- Check for pending operations
+- [Inserting a snapshot](#inserting-a-snapshot)
+- [Inserting, updating and removing documents](#insert-update-and-remove)
+- [Deploying the index](#deploying-the-index)
+- [Clearing the index on next deployment](#clearing-the-index-data)
+- [Check for pending operations](#check-for-pending-operations)
 
 ### Inserting a snapshot
 
 A snapshot is a complete override of a given index. It means you bulk upload a number of documents, which entirely substitute the live index all at once.
 
-For example, if you want your live index to only contains the two following documents:
+For example, if you want your live index to only contain the two following documents:
 
 ```json
 [
@@ -103,8 +121,8 @@ You can use the **snapshot** API to bulk update the live index:
     const myIndex = oramaCloudManager.index("my-index-id")
 
     await myIndex.snapshot([
-      { id: 1, name: "John Doe", age: 30 },
-      { id: 2, name: "Jane Doe", age: 25 },
+      { id: "1", name: "John Doe", age: 30 },
+      { id: "2", name: "Jane Doe", age: 25 },
     ])
     ```
   </TabItem>
@@ -163,7 +181,7 @@ You can use the **snapshot** API to bulk update the live index:
     ]);
     ```
   </TabItem>
-  <TabItem label="cURL" icon="seti:shell">
+  <TabItem label="cURL" icon="seti:powershell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/snapshot \
       -H "authorization: Bearer $PRIVATE_API_KEY" ]
@@ -263,7 +281,7 @@ you can use the **notify** API to put that operation in queue for the next deplo
     ]);
     ```
   </TabItem>
-  <TabItem label="cURL" icon="seti:shell">
+  <TabItem label="cURL" icon="seti:powershell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
       -H "authorization: Bearer $PRIVATE_API_KEY" \
@@ -336,7 +354,7 @@ You can also remove an existing document using the `remove` operation. For examp
     $indexManager->delete(["2"]);
     ```
   </TabItem>
-  <TabItem label="cURL" icon="seti:shell">
+  <TabItem label="cURL" icon="seti:powershell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
       -H "authorization: Bearer $PRIVATE_API_KEY" \
@@ -410,7 +428,7 @@ After you have inserted a snapshot or put a number of insert, remove, or update 
     $indexManager->deploy();
     ```
   </TabItem>
-  <TabItem label="cURL" icon="seti:shell">
+  <TabItem label="cURL" icon="seti:powershell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/deploy \
       -X POST \
@@ -484,7 +502,7 @@ You can do that by using the `clear` API, or by creating an empty snapshot:
     // coming soon
     ```
   </TabItem>
-  <TabItem label="cURL" icon="seti:shell">
+  <TabItem label="cURL" icon="seti:powershell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/snapshot \
       -H "authorization: Bearer $PRIVATE_API_KEY" ]
@@ -569,3 +587,34 @@ If you lost track of the operatiosn you ran via the SDK or APIs, you can always 
     ```
   </TabItem>
 </Tabs>
+
+## Integrating into your app
+
+Now that you have your index deployed, you can start using it in your app.
+
+Check out our [JavaScript SDK](/cloud/integrating-orama-cloud/javascript-sdk) to learn how to integrate Orama Cloud into your client-side application to perform search queries and more.
+
+<ShowcaseText
+  entries={[
+    {
+      title: "Components",
+      description: "Add a fully featured and highly customizable Search Box component in your application.",
+      href: "/cloud/ui-components/design-system",
+    },
+    {
+      title: "JavaScript SDK",
+      description: "Learn how to use your Orama Cloud index in a JavaScript application.",
+      href: "/cloud/integrating-orama-cloud/javascript-sdk",
+    },
+    {
+      title: "React Example",
+      description: "Learn how to use your Orama Cloud index in a React application.",
+      href: "/cloud/integrating-orama-cloud/react-sdk",
+    },
+    {
+      title: "Vue Example",
+      description: "Learn how to use your Orama Cloud index in a Vue application.",
+      href: "/cloud/integrating-orama-cloud/vue-sdk",
+    },
+  ]}
+/>

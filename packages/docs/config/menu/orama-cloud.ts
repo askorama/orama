@@ -69,7 +69,7 @@ const oramaCloudMenu = [
         collapsed: true,
         items: [
           {
-            label: 'Introduction',
+            label: 'Introduction to Answer Engine',
             link: '/cloud/answer-engine/'
           },
           {
