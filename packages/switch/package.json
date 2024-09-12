@@ -15,7 +15,8 @@
   },
   "files": ["dist"],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "test": "tsx --test tests/search.test.ts"
   },
   "keywords": ["orama", "orama cloud"],
   "type": "module",
@@ -30,6 +31,7 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
-    "tsup": "^7.2.0"
+    "tsup": "^7.2.0",
+    "tsx": "^4.19.0"
   }
 }
