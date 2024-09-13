@@ -4,15 +4,15 @@ import { OramaSearchBox, OramaSearchButton } from '@orama/react-components'
 import { ossSuggestions, cloudSuggestions } from './suggestions';
 import { getCurrentCategory, getOramaUserId, searchSessionTracking, userSessionRefresh } from './utils';
 
-const isDev = import.meta.env.DEV;
+const useDevIndex = import.meta.env.PUBLIC_ORAMA_CLOUD_PREVIEW_INDEX;
 
 const client = new OramaClient({
-  ...(isDev ? {
-    /** Staging and preview index */
+  ...(useDevIndex ? {
+    // Staging and preview index
     api_key: 'dfshiLS0swg2SANbDkXrEtXzCg1WPpo8',
     endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-dev-kf3qcz'
   } : {
-    /** Production index */
+    // Production index
     api_key: 'NKiqTJnwnKsQCdxN7RyOBJgeoW5hJ594',
     endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-bzo330'
   }),
