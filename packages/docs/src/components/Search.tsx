@@ -1,21 +1,14 @@
 import { useEffect, useState } from 'react'
-import { OramaClient } from '@oramacloud/client';
+import { OramaClient } from '@oramacloud/client'
 import { OramaSearchBox, OramaSearchButton } from '@orama/react-components'
-import { ossSuggestions, cloudSuggestions } from './suggestions';
-import { getCurrentCategory, getOramaUserId, searchSessionTracking, userSessionRefresh } from './utils';
+import { getCurrentCategory, getOramaUserId, searchSessionTracking, userSessionRefresh } from '../utils/search'
 
-const useDevIndex = import.meta.env.PUBLIC_ORAMA_CLOUD_PREVIEW_INDEX;
+const endpointUrl = import.meta.env.PUBLIC_ORAMA_CLOUD_ENDPOINT
+const publicApiKey = import.meta.env.PUBLIC_ORAMA_CLOUD_API_KEY
 
 const client = new OramaClient({
-  ...(useDevIndex ? {
-    // Staging and preview index
-    api_key: 'dfshiLS0swg2SANbDkXrEtXzCg1WPpo8',
-    endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-dev-kf3qcz'
-  } : {
-    // Production index
-    api_key: 'NKiqTJnwnKsQCdxN7RyOBJgeoW5hJ594',
-    endpoint: 'https://cloud.orama.run/v1/indexes/orama-docs-bzo330'
-  }),
+  api_key: publicApiKey,
+  endpoint: endpointUrl
 })
 
 function useCmdK(callback) {
@@ -30,13 +23,13 @@ function useCmdK(callback) {
           callback()
         }
       }
-    };
+    }
 
     const handleKeyUp = (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-        setIsCmdKPressed(false);
+        setIsCmdKPressed(false)
       }
-    };
+    }
 
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
@@ -53,18 +46,15 @@ function useCmdK(callback) {
 export function Search() {
   const [theme, setTheme] = useState(document.documentElement.dataset.theme || 'dark')
   const [currentCategory, setCurrentCategory] = useState(null)
-  const [userId, setUserId] = useState(getOramaUserId());
+  const [userId, setUserId] = useState(getOramaUserId())
 
   // TODO: Remove when fully integrated
   const [isOpen, setIsOpen] = useState(false)
-
-  useEffect(() => searchSessionTracking(client, userId), [userId])
 
   useEffect(() => {
     const intervalId = setInterval(() => userSessionRefresh(client, userId, setUserId), 5000)
     return () => clearInterval(intervalId)
   }, [userId])
-    
 
   useEffect(() => {
     function callback(mutationList) {
@@ -92,7 +82,20 @@ export function Search() {
     }
   })
 
-  
+  useEffect(() => searchSessionTracking(client, userId), [userId])
+
+  const ossSuggestions = [
+    'What languages are supported?',
+    'How do I write an Orama plugin?',
+    'How do I perform vector search with OSS Orama?'
+  ]
+
+  const cloudSuggestions = [
+    'What is an Orama index?',
+    'How do I perform vector search with Orama Cloud?',
+    'What is an answer session?'
+  ]
+
   const oramaWhere = currentCategory
     ? {
         category: {
@@ -100,11 +103,10 @@ export function Search() {
         }
       }
     : {}
-  
 
   const facetProperty = ['Cloud', 'Open Source'].includes(currentCategory) ? 'section' : 'category'
   const suggestions = currentCategory === 'Open Source' ? ossSuggestions : cloudSuggestions
-  
+
   if (!theme) return null
 
   return (
@@ -116,10 +118,10 @@ export function Search() {
           setIsOpen(false)
         }}
         sourcesMap={{
-          description: 'content',
+          description: 'content'
         }}
         resultMap={{
-          description: 'content',
+          description: 'content'
         }}
         searchParams={{
           // @ts-ignore
@@ -143,9 +145,9 @@ export function Search() {
         onClick={() => {
           setIsOpen(true)
         }}
-        style={{width: '100%'}}
+        style={{ width: '100%' }}
       >
-        Search {currentCategory === 'Open Source' ? 'Open Source' : ''}
+        Search {currentCategory === 'Open Source' && 'Open Source'}
       </OramaSearchButton>
     </>
   )

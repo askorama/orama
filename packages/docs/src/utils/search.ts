@@ -22,7 +22,7 @@ export function getOramaUserId() {
   return undefined
 }
 
-export function userSessionRefresh(client: OramaClient, userId: string, updateCallback: (userId: string) => void) {
+export function userSessionRefresh(client: OramaClient, userId: string | undefined, updateCallback: (userId: string | undefined) => void) {
   const currentUserId = getOramaUserId();
   if (currentUserId !== userId) {
     console.warn('User ID changed:', currentUserId);
