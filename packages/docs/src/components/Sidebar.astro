@@ -2,7 +2,7 @@
 import type { Props } from "@astrojs/starlight/props";
 
 import MobileMenuFooter from "@astrojs/starlight/components/MobileMenuFooter.astro";
-import SidebarSublist from "@astrojs/starlight/components/SidebarSublist.astro";
+import SidebarSublist from "./SidebarSublist.astro";
 
 const sidebar = (
   Astro.props.sidebar.filter((k) =>
@@ -12,13 +12,9 @@ const sidebar = (
   )[0] as any
 ).entries;
 
-const showMiniBanner = Astro.props.slug.startsWith("open-source");
-
 ---
 
 <SidebarSublist sublist={sidebar} />
-
-{/* TODO: add mini-banner for Orama Cloud (only on open-source) */}
 
 <div class="md:hidden">
   <MobileMenuFooter {...Astro.props} />

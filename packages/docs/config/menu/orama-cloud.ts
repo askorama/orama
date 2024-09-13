@@ -163,29 +163,83 @@ const oramaCloudMenu = [
         collapsed: true,
         items: [
           {
-            label: 'What is Orama Cloud?',
-            link: '/cloud/understanding-orama/orama-cloud'
+            label: "Data sources",
+            collapsed: false,
+            items: [
+              {
+                label: 'Import a JSON file',
+                link: '/cloud/data-sources/static-files/json-file'
+              },
+              {
+                label: 'Import a CSV file',
+                link: '/cloud/data-sources/static-files/csv-file'
+              },
+              {
+                label: 'Connect to Shopify',
+                link: '/cloud/data-sources/native-integrations/shopify'
+              },
+              {
+                label: 'Connect to Elastic Path',
+                link: '/cloud/data-sources/native-integrations/elasticpath'
+              },
+              {
+                label: 'Connect to Strapi',
+                link: '/cloud/data-sources/native-integrations/strapi'
+              },
+              {
+                label: 'Connect to Docusaurus',
+                link: '/cloud/data-sources/native-integrations/docusaurus'
+              },
+              {
+                label: 'Connect via REST APIs',
+                link: '/cloud/data-sources/custom-integrations/rest-apis'
+              },
+              {
+                label: 'Connect via Remote JSON',
+                link: '/cloud/data-sources/custom-integrations/remote-json'
+              },
+              {
+                label: 'Scrape your website',
+                link: '/cloud/data-sources/other-sources/web-crawler'
+              }
+            ]
           },
           {
-            label: 'Pricing and limits',
-            link: '/cloud/understanding-orama/pricing-limits'
+            label: "Working with indexes",
+            collapsed: false,
+            items: [
+              {
+                label: 'Defining a schema',
+                link: '/cloud/working-with-indexes/searchable-schema'
+              },
+              {
+                label: 'Creating an index',
+                link: '/cloud/working-with-indexes/create-a-new-index'
+              },
+              {
+                label: 'Updating an index',
+                link: '/cloud/working-with-indexes/edit-an-index'
+              },
+              {
+                label: 'Deleting an index',
+                link: '/cloud/working-with-indexes/delete-an-index'
+              }
+            ]
           },
           {
-            label: 'Defining a schema',
-            link: '/cloud/working-with-indexes/searchable-schema'
+            label: "Learn more",
+            collapsed: false,
+            items: [
+              {
+                label: 'What is Orama Cloud?',
+                link: '/cloud/understanding-orama/orama-cloud'
+              },
+              {
+                label: 'Pricing and limits',
+                link: '/cloud/understanding-orama/pricing-limits'
+              },
+            ]
           },
-          {
-            label: 'Creating an index',
-            link: '/cloud/working-with-indexes/create-a-new-index'
-          },
-          {
-            label: 'Updating an index',
-            link: '/cloud/working-with-indexes/edit-an-index'
-          },
-          {
-            label: 'Deleting an index',
-            link: '/cloud/working-with-indexes/delete-an-index'
-          }
         ]
       },
       {

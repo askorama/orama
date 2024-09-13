@@ -4,60 +4,68 @@ description: Learn how to import a JSON file to Orama Cloud.
 editUrl: false
 ---
 import IntegratingIntoYourApp from '../../../../../components/IntegratingIntoYourApp.astro'
+import { LinkCard, Steps } from '@astrojs/starlight/components';
 
-With Orama Cloud, you can upload a JSON file as a data source.
+With Orama Cloud, you can upload a JSON file as a data source. This feature is particularly useful when you want to integrate Orama Cloud with a database dump and you don't want to use a plugin or a custom integration.
 
-You can follow along with this guide by downloading the following example JSON file: [example dataset](/cloud/guides/json-file/dog_breeds.json)
+When you need to update your index with new data, you can simply upload a new JSON file with the updated data. If you think you will need to update your index frequently, you might want to consider using a [custom integration](/cloud/data-sources/custom-integrations), like the [Rest APIs](/cloud/data-sources/custom-integrations/rest-apis) or [Remote JSON](/cloud/data-sources/custom-integrations/remote-json) data sources.
+
+### Prerequisites
+
+In this guide, we will show you how to import a JSON file to Orama Cloud and how to integrate it into your app.
+You can follow along with this guide by downloading the following example JSON file. 
+
+<LinkCard
+  title="Download example dataset"
+  href="/cloud/guides/example-datasets/dog_breeds.json"
+  target="_blank"
+  download="dog_breeds.json"
+ />
 
 ## Creating the index
 
-As always, you can create a new Orama Cloud index by going to [https://cloud.orama.com/indexes](https://cloud.orama.com/indexes).
-
-In this page click on the `Add new index` button and choose: `Import Data from files`.
-
-<img
-  src='/cloud/guides/json-file/1.png'
-  alt='Orama cloud indexes page'
-/>
-
-Once you clicked on `Import Data from files` you will be presented with the following page:
-
-<img
-  src='/cloud/guides/json-file/orama-cloud-index-creation.png'
-  alt='Create a new JSON File index with Orama Cloud'
-/>
-
-Of course, you can choose any name and description you want for your index. In this example, we will use the name `My JSON File Index`.
-
-After selecting "JSON File" as a data source, we can click on the "Create Index" button, and we'll see the following screen:
-
-<img
-  src='/cloud/guides/json-file/orama-cloud-index-feed.webp'
-  alt='Feeding a JSON File index with Orama Cloud'
-/>
-
-At this point, we can upload our JSON file by dragging and dropping it into the dedicated area, or by clicking on the "Choose a file" area and selecting the file from our computer.
-
-As soon as we do that, we will see the preview of the JSON file, which will help us write the Orama Schema for our index.
-
-<img
-  src='/cloud/guides/json-file/orama-cloud-index-json-preview.webp'
-  alt='JSON preview of a JSON File index with Orama Cloud'
-/>
-
-We can also use the "autodetect" feature, which will automatically generate a schema for us. This is an experimental feature, so please always double check the generated schema.
-
-<img
-  src='/cloud/guides/json-file/orama-cloud-index-json-autodetect.webp'
-  alt='Auto detecting the schema of a JSON File index with Orama Cloud'
-/>
-
-Once we are happy with the schema, we can click on the "Save and deploy" button, and our index will be deployed.
-
-<img
-  src='/cloud/guides/json-file/orama-cloud-index-json-deploy.webp'
-  alt='Deploying a JSON File index with Orama Cloud'
-/>
+<Steps>
+  <ol>
+    <li>
+      <p class="pl-10">As always, you can create a new index by visiting your <a href="https://cloud.orama.com/indexes" target="_blank">dashboard</a>.</p>
+      <p class="pl-10">In this page click on the `Add new index` button and choose: `Import Data from files`.</p>
+    </li>
+    <li>
+      <p class="pl-10">Of course, you can choose any name and description you want for your index.</p>
+      <p class="pl-10">After selecting "**JSON File**" as a data source, we can click on the "**Create Index**" button.</p>
+      <img
+        src="/cloud/guides/working-with-indexes/uploading-a-file.png"
+        alt="Choosing the JSON data source on Orama Cloud"
+        class="mx-10"
+      />
+    </li>
+    <li>
+      <p class="pl-10">At this point, we can upload our JSON file by dragging and dropping it into the dedicated area, or by clicking on the "Choose a file" area and selecting the file from our computer.</p>
+      <p class="pl-10">As soon as we do that, we will see the preview of the JSON file, which will help us write the [Searchable Properties](/cloud/working-with-indexes/searchable-schema) schema for our index.</p>
+      <img
+        src="/cloud/guides/working-with-indexes/writing-the-schema.png"
+        alt="Writing the searchable properties schema"
+        class="mx-10"
+      />
+      <p class="pl-10">We can also use the "**autodetect**" feature, which will automatically generate a schema for us. This is an experimental feature, so please always double check the generated schema.</p>
+    </li>
+    <li>
+      <p class="pl-10">By default, the **automatic embeddings generation** will be enabled with all the searchable properties of type `string`.</p>
+      <p class="pl-10">You can change the properties by clicking on them and selecting only the ones you want to be searchable when performing a vector search or answer generation.</p>
+    </li>
+    <li>
+      <p class="pl-10">Click on "**Save and deploy**" to release your index.</p>
+      <img
+        src="/cloud/guides/working-with-indexes/deploy.png"
+        alt="Deploying Orama"
+        class="mx-10"
+      />
+    </li>
+    <li>
+      <p class="pl-10">Done 🎉 - You just deployed your JSON file on the edge. You can now start integrating it into your app.</p>
+    </li>
+  </ol>
+</Steps>
 
 ## Integrating into your app
 

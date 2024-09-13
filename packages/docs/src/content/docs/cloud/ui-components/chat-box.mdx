@@ -11,7 +11,7 @@ next: true
 
 The Chat Box component is included in the Search Box component with no additional configuration needed, but it can also be used as a **standalone component**.
 
-You can check out a live demo on our main website [orama.com](https://www.orama.com/).
+You can check out a live demo on our main website <a href="https://www.orama.com/" target="_blank">orama.com</a>.
 
 <br />
 
@@ -30,8 +30,8 @@ The `Chat Box` supports the following options.
 
 | Option | Description | Default |
 |:------ | ----------- | ------- |
-| **index** | The index configuration. An object with the `endpoint` and `api_key` properties. | **Required** when `clientInstance` is not specified. |
-| **clientInstance** | The `OramaClient` instance to use for the search and answer engine. | **Required** when `index` is not specified. |
+| **index** | The index configuration. An object with the `endpoint` and `api_key` properties. These are the Endpoint URL and Public API Key of your index. | **Required** when `clientInstance` is not specified. |
+| **clientInstance** | The [OramaClient](/cloud/performing-search/#quick-start) instance to use for the search and answer engine. | **Required** when `index` is not specified. |
 | **sourceBaseUrl** | The base URL for the search results. | Empty |
 | **sourcesMap** | An object to mapping your document properties with the `ChatBox` source results. | `{}` |
 | **suggestions** | An array of suggestions to display in the initial state. | `[]` |
