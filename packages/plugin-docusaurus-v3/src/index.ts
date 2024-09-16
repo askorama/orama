@@ -152,6 +152,12 @@ export default function OramaPluginDocusaurus(
       }, [])
 
       if (isDevelopment) {
+        await deployData({
+          oramaDocs,
+          generatedFilesDir: ctx.generatedFilesDir,
+          version: 'current'
+        })
+
         actions.setGlobalData({
           searchData: Object.fromEntries([['current', readFileSync(indexPath(ctx.generatedFilesDir, 'current'))]]),
           docsInstances,
@@ -297,13 +303,12 @@ async function deployData({
   oramaDocs: any[]
   generatedFilesDir: string
   version: string
-  deployConfig:
-    | {
-        indexId: string
-        oramaCloudAPIKey: string | undefined
-        type: DeployType | false
-      }
-    | undefined
+  deployConfig?:
+    {
+      indexId: string
+      oramaCloudAPIKey: string | undefined
+      type: DeployType | false
+    }
 }) {
   const { ORAMA_CLOUD_BASE_URL } = process.env
   const baseUrl = ORAMA_CLOUD_BASE_URL || 'https://cloud.orama.com'
