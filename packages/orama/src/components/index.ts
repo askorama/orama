@@ -165,7 +165,7 @@ export async function removeDocumentScoreParameters(
   if (docsCount > 1) {
     index.avgFieldLength[prop] = (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][internalId]!) / (docsCount - 1);
   } else {
-    index.avgFieldLength[prop] = undefined;
+    index.avgFieldLength[prop] = undefined as unknown as number;
   }
   index.fieldLengths[prop][internalId] = undefined
   index.frequencies[prop][internalId] = undefined
