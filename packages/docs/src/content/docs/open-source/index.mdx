@@ -1,11 +1,20 @@
 ---
-title: Getting Started with Orama
+title: Welcome to Orama!
 description: Learn how to get started with Orama.
 ---
 import Install from '../../../components/Install.astro'
-import {Code} from '@astrojs/starlight/components'
+import { Code } from '@astrojs/starlight/components'
+import { ShowcaseCTA } from 'starlight-showcases'
 
-Orama is a fast, batteries-included, full-text and vector search engine entirely written in TypeScript, with zero dependencies. <br /><br />
+<ShowcaseCTA title="Are you looking for Orama Cloud?">
+  This is the documentation for Orama's **Open Source** products. Please consider starring our repo on [GitHub](https://github.com/askorama/orama) and supporting our project. If you're looking for **Orama Cloud**, [click here](/cloud).
+</ShowcaseCTA>
+
+<br />
+
+Orama is an <a href="https://github.com/AskOrama/orama" target="_blank">open source</a>, high performance full-text and vector search engine entirely written in TypeScript, with zero dependencies. 
+
+<br />
 
 <iframe
   style="height: 420px"
@@ -15,47 +24,17 @@ Orama is a fast, batteries-included, full-text and vector search engine entirely
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
   allowFullScreen>
 </iframe>
-<br />
 
-Get started with just a few lines of code:
-
-```js
-import { create, insert, search } from "@orama/orama";
-
-const db = await create({
-  schema: {
-    title: "string",
-    director: "string",
-    isFavorite: "boolean",
-    year: "number",
-  },
-});
-
-await insert(db, {
-  title: "The Prestige",
-  director: "Christopher Nolan",
-  isFavorite: true,
-  year: 2006,
-});
-
-const searchResults = await search(db, {
-  term: "prestige",
-  where: {
-    isFavorite: true,
-    year: {
-      between: [2000, 2008],
-    },
-  },
-});
-```
+<br /><br />
+---
 
 ## Requirements
 
-A JavaScript runtime is the **only** requirement. Orama has been designed to work on any runtime and has no dependencies.
+A JavaScript runtime is the **only** requirement. Orama has been designed to work on any JS runtime and has no dependencies.
 
 ## Installation
 
-You can install Orama using npm, yarn, pnpm:
+You can install Orama using **npm**, **yarn** or **pnpm**.
 
 <Install pkg="@orama/orama" />
 
@@ -130,4 +109,4 @@ import type { Language } from "@orama/orama";
 
 ![Orama Community Rewards](/misc/community-rewards.webp)
 
-Are you using Orama in production? Have you written an article or made a YouTube video on Orama? [Contact us](mailto:info@oramasearch.com) to get some Orama swag in return!
+Are you using Orama in production? Have you written an article or made a YouTube video on Orama? [Contact us](mailto:info@orama.com) to get some Orama swag in return!

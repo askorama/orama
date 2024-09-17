@@ -1,12 +1,13 @@
 ---
 title: Creating an Answer Session
 description: Learn how to create an answer session with the Orama JavaScript SDK.
+editUrl: false
 ---
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 Once you have set up your index, you will be able to engage in dynamic conversations with it.
 
-The Orama SDK exposes a very convenient function for performing highly dynamic generative AI experiences with your data through the `answerSession` API.
+The Orama Cloud SDK exposes a very convenient function for performing highly dynamic generative AI experiences with your data through the `answerSession` API.
 
 Let’s see what it looks like.
 
@@ -20,8 +21,8 @@ Follow the instructions [here](/cloud/integrating-orama-cloud/javascript-sdk) to
     import { OramaClient } from "@oramacloud/client";
 
     const orama = new OramaClient({
-      endpoint: "",
-      api_key: "",
+      endpoint: "YOUR_ENDPOINT_URL",
+      api_key: "YOUR_PUBLIC_API_KEY",
     });
 
     const answerSession = orama.createAnswerSession({
@@ -52,7 +53,7 @@ Follow the instructions [here](/cloud/integrating-orama-cloud/javascript-sdk) to
     ```swift copy
     import OramaCloudClient
 
-    let clientParams = OramaClientParams(endpoint: "", apiKey: "")
+    let clientParams = OramaClientParams(endpoint: "YOUR_ENDPOINT_URL", apiKey: "YOUR_PUBLIC_API_KEY")
     let orama = OramaClient(params: clientParams)
 
     let answerParams = AnswerParams<E2EDoc>(
@@ -78,8 +79,8 @@ Follow the instructions [here](/cloud/integrating-orama-cloud/javascript-sdk) to
     )
 
     val client = OramaClient(
-      apiKey = "",
-      endpoint = ""
+      apiKey = "YOUR_PUBLIC_API_KEY",
+      endpoint = "YOUR_ENDPOINT_URL"
     )
 
     val answerParams = AnswerParams(
@@ -272,7 +273,7 @@ An array of initial messages for your conversational experience with Orama Cloud
 
 The events to subscribe to. You will get notified whenever a new event gets triggered. More on this in the next section.
 
-## Answer Session Events
+## Session Events
 
 Answers are a highly dynamic part of Orama. They work in an asynchronous manner and requires you to subscribe to events to catch any new change in the answer flow and react to it.
 
@@ -1027,95 +1028,7 @@ The `.askStream` method returns an async iterator that yields chunks of the answ
   </TabItem>
 </Tabs>
 
-## Providing User Data for a specific answer
-
-When you ask a question, you can provide additional user data to the answer session. This is useful when you want to provide a more personalized experience to your users. For example, if you know that the user is a beginner in programming, you can provide a more detailed explanation of the concepts you’re talking about:
-
-<Tabs syncKey="sdk">
-  <TabItem label="JavaScript" icon="seti:javascript">
-    ```javascript copy
-    const answer = await answerSession.ask({
-      term: "What is Orama?",
-      userData: {
-        userLevel: "beginner"
-      }
-    });
-    ```
-  </TabItem>
-  <TabItem label="Swift" icon="seti:swift">
-    ```swift copy
-    let answer = try await answerSession.ask(params: AnswerParams.AskParams(
-      query: "What is Orama?",
-      userData: "{ userLevel: \"beginner\" }",
-      related: nil
-    ))
-    ```
-  </TabItem>
-  <TabItem label="Kotlin" icon="seti:kotlin">
-    ```kotlin copy
-    val answer = answerSession.ask(AskParams(
-      query = "What is Orama?",
-      userData = "{ userLevel: \"beginner\" }"
-    ))
-    ```
-  </TabItem>
-  <TabItem label="Python" icon="seti:python">
-    ```python copy
-    print("coming soon")
-    ```
-  </TabItem>
-  <TabItem label="PHP" icon="seti:php">
-    ```php copy
-    // coming soon
-    ```
-  </TabItem>
-</Tabs>
-
-Just like the `userContext`, the `userData` can be a string or an object:
-
-<Tabs syncKey="sdk">
-  <TabItem label="JavaScript" icon="seti:javascript">
-    ```javascript copy
-    const answer = await answerSession.ask({
-      term: "What is Orama?",
-      userData: "The user is a beginner in programming"
-    });
-    ```
-  </TabItem>
-  <TabItem label="Swift" icon="seti:swift">
-    ```swift copy
-    let answer = try await answerSession.ask(params: AnswerParams.AskParams(
-      query: "What is Orama?",
-      userData: "The user is a beginner in programming",
-      related: nil
-    ))
-    ```
-  </TabItem>
-  <TabItem label="Kotlin" icon="seti:kotlin">
-    ```kotlin copy
-    val answer = answerSession.ask(AskParams(
-      query = "What is Orama?",
-      userData = "The user is a beginner in programming"
-    ))
-    ```
-  </TabItem>
-  <TabItem label="Python" icon="seti:python">
-    ```python copy
-    print("coming soon")
-    ```
-  </TabItem>
-  <TabItem label="PHP" icon="seti:php">
-    ```php copy
-    // coming soon
-    ```
-  </TabItem>
-</Tabs>
-
-The main difference between `userContext` and `userData` is that the `userData` is specific to a single answer request, while the `userContext` is global to the entire answer session.
-
-Of course, Orama will remember the `userData` in subsequent answer requests, but will tend to forget it after a while. So, if that data is important to you, you should either provide it in every answer request, or use the `userContext` instead.
-
-## Aborting Answers Generation
+## Aborting Sessions
 
 In any moment in time (when a user cancels an answer request, for example) you can abort an answer by using the `.abortAnswer` function:
 
