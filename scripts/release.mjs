@@ -17,7 +17,8 @@ const packages = [
   'plugin-secure-proxy',
   'stemmers',
   'stopwords',
-  'tokenizers'
+  'tokenizers',
+  'switch'
 ]
 
 function step(message) {

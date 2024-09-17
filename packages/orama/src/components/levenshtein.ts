@@ -8,128 +8,58 @@ export type BoundedMetric = {
  * https://github.com/Yomguithereal/talisman/blob/86ae55cbd040ff021d05e282e0e6c71f2dde21f8/src/metrics/levenshtein.js#L218-L340
  */
 function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
-  // the strings are the same
-  if (a === b) {
-    return 0
+  // Handle base cases
+  if (tolerance < 0) return -1
+  if (a === b) return 0
+
+  const m = a.length
+  const n = b.length
+
+  // Special case for empty strings
+  if (m === 0) return n <= tolerance ? n : -1
+  if (n === 0) return m <= tolerance ? m : -1
+
+  a = a.toLowerCase()
+  b = b.toLowerCase()
+
+  // Special case for prefixes
+  if (b.startsWith(a) || a.startsWith(b)) return 0
+
+  // If the length difference is greater than the tolerance, return early
+  if (Math.abs(m - n) > tolerance) return -1
+
+  // Initialize the matrix
+  const matrix: number[][] = []
+  for (let i = 0; i <= m; i++) {
+    matrix[i] = [i]
+    for (let j = 1; j <= n; j++) {
+      matrix[i][j] = i === 0 ? j : 0
+    }
   }
 
-  // a should be the shortest string
-  const swap = a
-  if (a.length > b.length) {
-    a = b
-    b = swap
-  }
-
-  let lenA = a.length
-  let lenB = b.length
-
-  // ignore common prefix
-  let startIdx = 0
-  while (startIdx < lenA && a.charCodeAt(startIdx) === b.charCodeAt(startIdx)) {
-    startIdx++
-  }
-
-  // if string A is subfix of B, we consider the distance 0
-  // because we search for prefix!
-  // fix https://github.com/askorama/orama/issues/544
-  if (startIdx === lenA) {
-    return 0
-  }
-
-  // ignore common suffix
-  // note: `~-` decreases by a unit in a bitwise fashion
-  while (lenA > 0 && a.charCodeAt(~-lenA) === b.charCodeAt(~-lenB)) {
-    lenA--
-    lenB--
-  }
-
-  // early return when the smallest string is empty
-  if (!lenA) {
-    return lenB > tolerance ? -1 : lenB
-  }
-
-  lenA -= startIdx
-  lenB -= startIdx
-
-  // If both strings are smaller than the tolerance, we accept any distance
-  // Probably the result distance is wrong, but we don't care:
-  // It is always less then the tolerance!
-  if (lenA <= tolerance && lenB <= tolerance) {
-    return lenA > lenB ? lenA : lenB
-  }
-
-  const delta = lenB - lenA
-
-  if (tolerance > lenB) {
-    tolerance = lenB
-  } else if (delta > tolerance) {
-    return -1
-  }
-
-  let i = 0
-  const row: number[] = []
-  const characterCodeCache: number[] = []
-
-  while (i < tolerance) {
-    characterCodeCache[i] = b.charCodeAt(startIdx + i)
-    row[i] = ++i
-  }
-
-  while (i < lenB) {
-    characterCodeCache[i] = b.charCodeAt(startIdx + i)
-    row[i++] = tolerance + 1
-  }
-
-  const offset = tolerance - delta
-  const haveMax = tolerance < lenB
-
-  let jStart = 0
-  let jEnd = tolerance
-
-  let current = 0
-  let left = 0
-  let above = 0
-  let charA = 0
-  let j = 0
-
-  // Starting the nested loops
-  for (i = 0; i < lenA; i++) {
-    left = i
-    current = i + 1
-
-    charA = a.charCodeAt(startIdx + i)
-    jStart += i > offset ? 1 : 0
-    jEnd += jEnd < lenB ? 1 : 0
-
-    for (j = jStart; j < jEnd; j++) {
-      above = current
-
-      current = left
-      left = row[j]
-
-      if (charA !== characterCodeCache[j]) {
-        // insert current
-        if (left < current) {
-          current = left
-        }
-
-        // delete current
-        if (above < current) {
-          current = above
-        }
-
-        current++
+  // Fill the matrix
+  for (let i = 1; i <= m; i++) {
+    let rowMin = Infinity
+    for (let j = 1; j <= n; j++) {
+      if (a[i - 1] === b[j - 1]) {
+        matrix[i][j] = matrix[i - 1][j - 1]
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1, // deletion
+          matrix[i][j - 1] + 1, // insertion
+          matrix[i - 1][j - 1] + 1 // substitution
+        )
       }
-
-      row[j] = current
+      rowMin = Math.min(rowMin, matrix[i][j])
     }
 
-    if (haveMax && row[i + delta] > tolerance) {
+    // Early termination if all values in this row exceed tolerance
+    if (rowMin > tolerance) {
       return -1
     }
   }
 
-  return current <= tolerance ? current : -1
+  return matrix[m][n] <= tolerance ? matrix[m][n] : -1
 }
 
 /**

@@ -13,7 +13,7 @@ t.test('facets', (t) => {
           tag: 'string',
           isFavorite: 'boolean'
         }
-      }
+      } as const
     })
 
     await insert(db, {
@@ -73,6 +73,7 @@ t.test('facets', (t) => {
 
     const results = await search(db, {
       term: 'work time',
+      threshold: 1,
       facets: {
         'meta.isFavorite': {
           true: true,
@@ -99,7 +100,7 @@ t.test('facets', (t) => {
         name: 'string',
         price: 'number',
         category: 'string'
-      }
+      } as const
     })
 
     await insert(db, {
@@ -140,6 +141,7 @@ t.test('facets', (t) => {
 
     const results = await search(db, {
       term: 'groceries',
+      threshold: 1,
       properties: ['category'],
       facets: {
         price: {
@@ -165,7 +167,7 @@ t.test('facets', (t) => {
       schema: {
         category: 'enum',
         colors: 'enum[]'
-      }
+      } as const
     })
 
     await insertMultiple(db, [
@@ -235,10 +237,10 @@ t.test('facets', (t) => {
       schema: {
         author: 'string',
         quote: 'string'
-      }
+      } as const
     })
 
-    const quotes = []
+    const quotes: any[] = []
 
     for (let i = 0; i < orderedAuthors.length; i++) {
       quotes.push({ author: orderedAuthors[i], quote: 'Be the change you wish to see in the world' })
@@ -254,6 +256,7 @@ t.test('facets', (t) => {
 
     const results = await search(db, {
       term: 'person',
+      threshold: 1,
       facets: {
         author: {}
       }
@@ -268,6 +271,7 @@ t.test('facets', (t) => {
 
     const results = await search(db, {
       term: 'person',
+      threshold: 1,
       facets: {
         author: {
           limit: orderedAuthors.length + 1
@@ -284,6 +288,7 @@ t.test('facets', (t) => {
 
     const results = await search(db, {
       term: 'person',
+      threshold: 1,
       facets: {
         author: {
           limit: orderedAuthors.length - 1

@@ -48,6 +48,9 @@
     },
     "@orama/tokenizers#build": {
       "dependsOn": ["@orama/orama#build"]
+    },
+    "@orama/switch#build": {
+      "dependsOn": ["@orama/orama#build"]
     }
   }
 }

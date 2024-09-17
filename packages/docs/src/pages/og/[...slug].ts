@@ -14,14 +14,14 @@ export const { getStaticPaths, GET } = OGImageRoute({
       description: page.data.description,
       logo: {
         path: './src/assets/logo.png',
-        size: [120],
+        size: [120]
       },
       bgImage: {
         path: './src/assets/og-bg.png'
       },
       format: 'PNG',
       padding: 60,
-      quality: 100,
+      quality: 100
     }
   }
 })

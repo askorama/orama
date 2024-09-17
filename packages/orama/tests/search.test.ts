@@ -54,7 +54,8 @@ t.test('search method', (t) => {
       const docIdsShouldMatch = allDocs.filter((d) => /coffee/.test(d.document.name as string)).map((d) => d.id)
 
       const result = await search(db, {
-        term: 'coffee'
+        term: 'coffee',
+        threshold: 1
       })
 
       const matchedIds = result.hits.map((d) => d.id)
@@ -107,8 +108,8 @@ t.test('search method', (t) => {
       t.equal(result6.count, 4)
 
       // Long string search (Tests for https://github.com/askorama/orama/issues/159 )
-      const result7 = await search(db, { term: 'They are the best' })
-      const result8 = await search(db, { term: 'Foxes are nice animals' })
+      const result7 = await search(db, { term: 'They are the best', threshold: 1 })
+      const result8 = await search(db, { term: 'Foxes are nice animals', threshold: 1 })
 
       t.equal(result7.count, 2)
       t.equal(result8.count, 2)
@@ -661,6 +662,7 @@ t.test('search method', (t) => {
 
     const result = await search(db, {
       term: '',
+      threshold: 1,
       properties: ['animal']
     })
 

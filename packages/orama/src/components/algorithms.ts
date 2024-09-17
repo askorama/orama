@@ -5,7 +5,7 @@ import { InternalDocumentID } from './internal-document-id-store.js'
 export function prioritizeTokenScores(
   arrays: TokenScore[][],
   boost: number,
-  threshold = 1,
+  threshold = 0,
   keywordsCount: number
 ): TokenScore[] {
   if (boost === 0) {

@@ -21,7 +21,8 @@
 			"*.png",
 			"*.svg",
 			"*.xml",
-			"*.ico"
+			"*.ico",
+			"./packages/tokenizers"
 		],
 		"maxSize": 10000000000
 	},
