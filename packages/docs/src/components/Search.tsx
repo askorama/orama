@@ -116,6 +116,7 @@ export function Search() {
         clientInstance={client}
         onSearchboxClosed={() => {
           setIsOpen(false)
+          document.body.removeAttribute('data-search-open')
         }}
         sourcesMap={{
           description: 'content'
@@ -131,19 +132,13 @@ export function Search() {
         colorScheme={theme === 'light' ? 'light' : 'dark'}
         open={isOpen}
         suggestions={suggestions}
-        themeConfig={{
-          colors: {
-            dark: {
-              '--background-color-primary': '#151515'
-            }
-          }
-        }}
       />
 
       <OramaSearchButton
         colorScheme={theme === 'light' ? 'light' : 'dark'}
         onClick={() => {
           setIsOpen(true)
+          document.body.setAttribute('data-search-open', '')
         }}
         style={{ width: '100%' }}
       >
