@@ -14,7 +14,7 @@ import { Search } from './Search'
       <SiteTitle {...Astro.props} />
     </div>
     <div class="flex min-w-[150px] sm:max-w-[320px] w-full">
-      <Search client:only />
+      <Search client:only="react" />
 	</div>
   </div>
   <div class="hidden sm:flex right-group">

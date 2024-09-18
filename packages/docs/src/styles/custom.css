@@ -158,7 +158,6 @@ ol.sl-steps li iframe {
   gap: var(--sl-nav-gap);
   justify-content: space-between;
   align-items: center;
-  padding-inline-end: var(--sl-nav-gap) !important;
 }
 
 button[aria-controls="starlight__sidebar"] {
@@ -181,5 +180,11 @@ starlight-theme-select select {
 @media screen and (min-width: 640px) {
   .header {
     padding-inline-end: 0.5rem !important;
+  }
+}
+
+@media screen and (max-width: 639px) {
+  body[data-search-open] nav.sidebar {
+    display: none;
   }
 }
