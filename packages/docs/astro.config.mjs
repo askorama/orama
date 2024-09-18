@@ -13,6 +13,16 @@ export default defineConfig({
       noExternal: ['nanoid']
     }
   },
+  redirects: {
+    '/cloud/answer-engine/introduction': '/cloud/answer-engine/',
+    '/cloud/data-sources/custom-integrations/csv-file': '/cloud/data-sources/static-files/csv-file',
+    '/cloud/data-sources/custom-integrations/json-file': '/cloud/data-sources/static-files/json-file',
+    '/cloud/data-sources/custom-integrations/introduction': '/cloud/data-sources/custom-integrations/',
+    '/cloud/data-sources/native-integrations/introduction': '/cloud/data-sources/native-integrations/',
+    '/cloud/performing-search/official-sdk': '/cloud/integrating-orama-cloud/official-sdk',
+    '/cloud/understanding-orama/indexes': '/cloud/understanding-orama/orama-cloud',
+    '/cloud/understanding-orama/introduction': '/cloud/understanding-orama/orama-cloud',
+  },
   integrations: [
     starlight({
       pagefind: false,
