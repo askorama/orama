@@ -22,6 +22,7 @@ export default defineConfig({
     '/cloud/performing-search/official-sdk': '/cloud/integrating-orama-cloud/official-sdk',
     '/cloud/understanding-orama/indexes': '/cloud/understanding-orama/orama-cloud',
     '/cloud/understanding-orama/introduction': '/cloud/understanding-orama/orama-cloud',
+    '/cloud/understanding-orama/indexes': '/cloud'
   },
   integrations: [
     starlight({
