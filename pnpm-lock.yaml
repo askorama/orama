@@ -112,11 +112,11 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0(vanilla-cookieconsent@3.0.1)
       '@orama/react-components':
-        specifier: ^0.0.17
-        version: 0.0.17(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(zod@3.23.8)
+        specifier: ^0.0.25
+        version: 0.0.25(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(zod@3.23.8)
       '@oramacloud/client':
-        specifier: ^1.3.14
-        version: 1.3.15(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)
+        specifier: ^1.3.16
+        version: 1.3.16(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)
       astro:
         specifier: ^4.11.3
         version: 4.15.6(@types/node@22.5.5)(rollup@4.21.3)(terser@5.33.0)(typescript@5.6.2)
@@ -738,7 +738,7 @@ importers:
         version: link:../plugin-data-persistence
       '@orama/searchbox':
         specifier: 1.0.0-beta.13
-        version: 1.0.0-beta.13(@orama/highlight@0.1.6)(@orama/orama@packages+orama)(@oramacloud/client@1.3.15(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8))(@preact/signals-core@1.8.0)(@preact/signals@1.3.0(preact@10.24.0))(postcss@8.4.47)(preact-custom-element@4.3.0(preact@10.24.0))(preact@10.24.0)
+        version: 1.0.0-beta.13(@orama/highlight@0.1.6)(@orama/orama@packages+orama)(@oramacloud/client@1.3.16(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8))(@preact/signals-core@1.8.0)(@preact/signals@1.3.0(preact@10.24.0))(postcss@8.4.47)(preact-custom-element@4.3.0(preact@10.24.0))(preact@10.24.0)
       '@vitejs/plugin-vue':
         specifier: ^4.5.1
         version: 4.6.2(vite@4.5.5(@types/node@22.5.5)(terser@5.33.0))(vue@3.5.6(typescript@5.6.2))
@@ -3660,8 +3660,8 @@ packages:
   '@orama/plugin-secure-proxy@2.1.1':
     resolution: {integrity: sha512-gXXHGpa2cLtwK9ijVI7V//Qj++g1ky1vUfKYkzmMwgn8BxaNMteA3LMpJHY5qfaXGJQ1ojLDCbM7dhbZ30abRw==}
 
-  '@orama/react-components@0.0.17':
-    resolution: {integrity: sha512-u71DnqvbvoZtTn2SWEvH3T4dpMo4ReeKl20kdt/TSE1D83Bs83p5jIvgRLJ0l0k4fF6EdoEDAXWC727xc4NmFQ==}
+  '@orama/react-components@0.0.25':
+    resolution: {integrity: sha512-AVDVRKagrEUJ859JYW/iTfKfvDu+ftQDWQ1fZBEDYxYo8M86WCYhRmi+0wY8dpg27dSmMmYjN1tM+8IXK0lJSA==}
     peerDependencies:
       react: ^17.0.0 || ^18.3.1
       react-dom: ^17.0.0 || ^18.3.1
@@ -3690,14 +3690,14 @@ packages:
       react-dom: ^18.3.1
       react-markdown: ^9.0.1
 
-  '@orama/wc-components@0.0.17':
-    resolution: {integrity: sha512-vvYOX6kjSH+xmiDOEuiyzTCfXPoFtqT4t3dltOmO69CBeXtEUL8YKhaghASF38kfVFClYyPAhNqIxJ2dLkFGCg==}
-
-  '@oramacloud/client@1.3.10':
-    resolution: {integrity: sha512-8CJTZgFlOHMAVrixN22PdT9i4Go7qw4a75UWWDEexsZQas5Vbeyria3ZtnOXb9aeH5M2uYssz0255ctY8tHIaw==}
+  '@orama/wc-components@0.0.25':
+    resolution: {integrity: sha512-3EJIuE47k86hNbPXExd3bNzeMwdkdDA3AfwNTPSRVq3zdGlcKoUR/kmLvsGtHIt73oIPO+Lcyl9n0PK8F12nbg==}
 
   '@oramacloud/client@1.3.15':
     resolution: {integrity: sha512-QBgQrK0WA9pPzeVh/E6p44erwL0IJaHB3TrbEAsrduqbj38xY06jjpYsn//2fJt34jEnIBjOwPkjZ3OJEJlR4A==}
+
+  '@oramacloud/client@1.3.16':
+    resolution: {integrity: sha512-WOc7hcg40x5OZb1rPiH/qSLeDb1hzCy4jVIV1wSfwni/ZQ4cHRyDKuMda5iyjF3A+ZgQfH1P5Oqi03cZSZw98g==}
 
   '@oslojs/encoding@0.4.1':
     resolution: {integrity: sha512-hkjo6MuIK/kQR5CrGNdAPZhS01ZCXuWDRJ187zh6qqF2+yMHZpD9fAYpX8q2bOO6Ryhl3XpCT6kUX76N8hhm4Q==}
@@ -17377,15 +17377,15 @@ snapshots:
 
   '@orama/plugin-secure-proxy@2.1.1(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)':
     dependencies:
-      '@oramacloud/client': 1.3.15(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)
+      '@oramacloud/client': 1.3.16(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)
     transitivePeerDependencies:
       - encoding
       - typescript
       - zod
 
-  '@orama/react-components@0.0.17(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(zod@3.23.8)':
+  '@orama/react-components@0.0.25(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(zod@3.23.8)':
     dependencies:
-      '@orama/wc-components': 0.0.17(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)
+      '@orama/wc-components': 0.0.25(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     transitivePeerDependencies:
@@ -17393,12 +17393,12 @@ snapshots:
       - typescript
       - zod
 
-  '@orama/searchbox@1.0.0-beta.13(@orama/highlight@0.1.6)(@orama/orama@packages+orama)(@oramacloud/client@1.3.15(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8))(@preact/signals-core@1.8.0)(@preact/signals@1.3.0(preact@10.24.0))(postcss@8.4.47)(preact-custom-element@4.3.0(preact@10.24.0))(preact@10.24.0)':
+  '@orama/searchbox@1.0.0-beta.13(@orama/highlight@0.1.6)(@orama/orama@packages+orama)(@oramacloud/client@1.3.16(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8))(@preact/signals-core@1.8.0)(@preact/signals@1.3.0(preact@10.24.0))(postcss@8.4.47)(preact-custom-element@4.3.0(preact@10.24.0))(preact@10.24.0)':
     dependencies:
       '@orama/highlight': 0.1.6
       '@orama/orama': link:packages/orama
       '@orama/plugin-analytics': 2.1.1
-      '@oramacloud/client': 1.3.15(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)
+      '@oramacloud/client': 1.3.16(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)
       '@preact/signals': 1.3.0(preact@10.24.0)
       '@preact/signals-core': 1.8.0
       object-to-css-variables: 0.2.1
@@ -17435,10 +17435,10 @@ snapshots:
       - typescript
       - zod
 
-  '@orama/wc-components@0.0.17(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)':
+  '@orama/wc-components@0.0.25(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)':
     dependencies:
       '@orama/orama': 2.1.1
-      '@oramacloud/client': 1.3.10(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)
+      '@oramacloud/client': 1.3.15(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)
       '@phosphor-icons/webcomponents': 2.1.5
       '@stencil/core': 4.21.0
       '@stencil/store': 2.0.16(@stencil/core@4.21.0)
@@ -17454,7 +17454,7 @@ snapshots:
       - typescript
       - zod
 
-  '@oramacloud/client@1.3.10(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)':
+  '@oramacloud/client@1.3.15(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)':
     dependencies:
       '@orama/orama': 2.1.1
       '@paralleldrive/cuid2': 2.2.2
@@ -17467,7 +17467,7 @@ snapshots:
       - typescript
       - zod
 
-  '@oramacloud/client@1.3.15(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)':
+  '@oramacloud/client@1.3.16(encoding@0.1.13)(typescript@5.6.2)(zod@3.23.8)':
     dependencies:
       '@orama/orama': 2.1.1
       '@paralleldrive/cuid2': 2.2.2
@@ -18451,7 +18451,7 @@ snapshots:
 
   '@types/node-fetch@2.6.11':
     dependencies:
-      '@types/node': 18.19.50
+      '@types/node': 20.16.5
       form-data: 4.0.0
 
   '@types/node-forge@1.3.11':
@@ -23316,7 +23316,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 18.19.50
+      '@types/node': 20.16.5
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
