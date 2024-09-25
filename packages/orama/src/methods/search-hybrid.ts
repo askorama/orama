@@ -39,12 +39,10 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
     getVectorSearchIDs(orama, params)
   ])
 
-  const { index, docs } = orama.data
+  const index = orama.data.index
   const hybridWeights = params.hybridWeights
   let uniqueTokenScores = mergeAndRankResults(fullTextIDs, vectorIDs, params.term ?? '', hybridWeights)
 
-  // @todo avoid tokenize twice
-  const tokens = await orama.tokenizer.tokenize(params.term ?? '', language)
   let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
   if (!propertiesToSearch) {
     const propertiesToSearchWithTypes = await orama.index.getSearchablePropertiesWithTypes(index)
@@ -67,24 +65,11 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
     propertiesToSearch = propertiesToSearch.filter((prop: string) => (params.properties as string[]).includes(prop))
   }
 
-  // @todo avoid create context twice
-  const context = await createSearchContext(
-    orama.tokenizer,
-    orama.index,
-    orama.documentsStore,
-    language,
-    params,
-    propertiesToSearch,
-    tokens,
-    await orama.documentsStore.count(docs),
-    timeStart
-  )
-
   const hasFilters = Object.keys(params.where ?? {}).length > 0
   let whereFiltersIDs: InternalDocumentID[] = []
 
   if (hasFilters) {
-    whereFiltersIDs = await orama.index.searchByWhereClause(context, index, params.where!)
+    whereFiltersIDs = await orama.index.searchByWhereClause(index, orama.tokenizer, params.where!, language)
     uniqueTokenScores = intersectFilteredIDs(whereFiltersIDs, uniqueTokenScores)
   }
 
@@ -134,7 +119,7 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
   const timeStart = await getNanosecondsTime()
   params.relevance = Object.assign(defaultBM25Params, params.relevance ?? {})
 
-  const { term = '', properties, threshold = 0 } = params
+  const { term = '', properties, boost } = params
 
   const { index, docs } = orama.data
   const tokens = await orama.tokenizer.tokenize(term, language)
@@ -191,20 +176,38 @@ async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDo
           const term = tokens[j]
 
           // Lookup
-          const scoreList = await orama.index.search(context, index, prop, term)
+          const scoreList = await orama.index.search(
+            index,
+            term,
+            orama.tokenizer,
+            language,
+            propertiesToSearch,
+            false,
+            0,
+            boost || {}
+          )
 
           safeArrayPush(context.indexMap[prop][term], scoreList)
         }
       } else {
         const indexMapContent = []
         context.indexMap[prop][''] = indexMapContent
-        const scoreList = await orama.index.search(context, index, prop, '')
+        const scoreList = await orama.index.search(
+          index,
+          '',
+          orama.tokenizer,
+          language,
+          propertiesToSearch,
+          false,
+          0,
+          boost || {}
+        )
         safeArrayPush(indexMapContent, scoreList)
       }
 
       const docIds = context.indexMap[prop]
       const vals = Object.values(docIds)
-      context.docsIntersection[prop] = prioritizeTokenScores(vals, params?.boost?.[prop] ?? 1, threshold, tokensLength)
+      context.docsIntersection[prop] = prioritizeTokenScores(vals, params?.boost?.[prop] ?? 1)
       const uniqueDocs = context.docsIntersection[prop]
 
       const uniqueDocsLength = uniqueDocs.length

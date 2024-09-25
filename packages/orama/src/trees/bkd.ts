@@ -14,8 +14,11 @@ export interface Node {
   parent?: Node
 }
 
-export interface RootNode {
+export const BKDType = 'BKD' as const
+export interface BKDTree {
+  type: typeof BKDType
   root: Nullable<Node>
+  isArray: boolean
 }
 
 export interface GeoSearchResult {
@@ -33,11 +36,15 @@ interface SearchTask {
 const K = 2 // 2D points
 const EARTH_RADIUS = 6371e3 // Earth radius in meters
 
-export function create(): RootNode {
-  return { root: null }
+export function create(isArray): BKDTree {
+  return {
+    type: BKDType,
+    root: null,
+    isArray
+  }
 }
 
-export function insert(tree: RootNode, point: Point, docIDs: InternalDocumentID[]): void {
+export function insert(tree: BKDTree, point: Point, docIDs: InternalDocumentID[]): void {
   const newNode: Node = { point, docIDs }
 
   if (tree.root == null) {
@@ -95,7 +102,7 @@ export function insert(tree: RootNode, point: Point, docIDs: InternalDocumentID[
   }
 }
 
-export function contains(tree: RootNode, point: Point): boolean {
+export function contains(tree: BKDTree, point: Point): boolean {
   let node: Nullable<Node> | undefined = tree.root
   let depth = 0
 
@@ -129,7 +136,7 @@ export function contains(tree: RootNode, point: Point): boolean {
 }
 
 // @todo: this is very inefficient. Fix this later.
-export function removeDocByID(tree: RootNode, point: Point, docID: InternalDocumentID): void {
+export function removeDocByID(tree: BKDTree, point: Point, docID: InternalDocumentID): void {
   let node: Nullable<Node> | undefined = tree.root
   let depth = 0
   let parentNode: Nullable<Node> = null
@@ -187,7 +194,7 @@ export function removeDocByID(tree: RootNode, point: Point, docID: InternalDocum
   }
 }
 
-export function getDocIDsByCoordinates(tree: RootNode, point: Point): Nullable<InternalDocumentID[]> {
+export function getDocIDsByCoordinates(tree: BKDTree, point: Point): Nullable<InternalDocumentID[]> {
   let node: Nullable<Node> = tree.root
   let depth = 0
 

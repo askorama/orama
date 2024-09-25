@@ -2,12 +2,7 @@ import { createError } from '../errors.js'
 import { TokenScore, BM25Params } from '../types.js'
 import { InternalDocumentID } from './internal-document-id-store.js'
 
-export function prioritizeTokenScores(
-  arrays: TokenScore[][],
-  boost: number,
-  threshold = 0,
-  keywordsCount: number
-): TokenScore[] {
+export function prioritizeTokenScores(arrays: TokenScore[][], boost: number): TokenScore[] {
   if (boost === 0) {
     throw createError('INVALID_BOOST_VALUE')
   }
@@ -40,71 +35,7 @@ export function prioritizeTokenScores(
 
   const results = tokenScores.sort((a, b) => b[1] - a[1])
 
-  // If threshold is 1, it means we will return all the results with at least one search term,
-  // prioritizig the ones that contains more search terms (fuzzy match)
-  if (threshold === 1) {
-    return results
-  }
-
-  // Prepare keywords count tracking for threshold handling
-  const allResults = results.length
-  const tokenScoreWithKeywordsCount: [InternalDocumentID, number, number][] = []
-
-  for (const tokenScoreEntry of tokenScoresMap.entries()) {
-    tokenScoreWithKeywordsCount.push([tokenScoreEntry[0], tokenScoreEntry[1][0], tokenScoreEntry[1][1]])
-  }
-
-  // Find the index of the last result with all keywords.
-  // Order the documents by the number of keywords they contain, and then by the score.
-  const keywordsPerToken = tokenScoreWithKeywordsCount.sort((a, b) => {
-    // Compare by the third element, higher numbers first
-    if (a[2] > b[2]) return -1
-    if (a[2] < b[2]) return 1
-
-    // If the third elements are equal, compare by the second element, higher numbers first
-    if (a[1] > b[1]) return -1
-    if (a[1] < b[1]) return 1
-
-    // If both the second and third elements are equal, consider the elements equal
-    return 0
-  })
-
-  let lastTokenWithAllKeywords: number | undefined = undefined
-  for (let i = 0; i < allResults; i++) {
-    if (keywordsPerToken[i][2] === keywordsCount) {
-      lastTokenWithAllKeywords = i
-    } else {
-      break
-    }
-  }
-
-  // If no results had all the keywords, either bail out earlier or normalize
-  if (typeof lastTokenWithAllKeywords === 'undefined') {
-    if (threshold === 0) {
-      return []
-    }
-
-    lastTokenWithAllKeywords = 0
-  }
-
-  const keywordsPerTokenLength = keywordsPerToken.length
-  const resultsWithIdAndScore: [number, number][] = new Array(keywordsPerTokenLength)
-  for (let i = 0; i < keywordsPerTokenLength; i++) {
-    resultsWithIdAndScore[i] = [keywordsPerToken[i][0], keywordsPerToken[i][1]]
-  }
-
-  // If threshold is 0, it means we will only return all the results that contains ALL the search terms (exact match)
-  if (threshold === 0) {
-    return resultsWithIdAndScore.slice(0, lastTokenWithAllKeywords + 1)
-  }
-
-  // If the threshold is between 0 and 1, we will return all the results that contains at least the threshold of search terms
-  // For example, if threshold is 0.5, we will return all the results that contains at least 50% of the search terms
-  // (fuzzy match with a minimum threshold)
-  const thresholdLength =
-    lastTokenWithAllKeywords + Math.ceil((threshold * 100 * (allResults - lastTokenWithAllKeywords)) / 100)
-
-  return resultsWithIdAndScore.slice(0, allResults + thresholdLength)
+  return results
 }
 
 export function BM25(

@@ -108,11 +108,13 @@ async function innerInsert<T extends AnyOrama>(
       orama.tokenizer,
       docsCount
     )
+    const internalId = orama.internalDocumentIDStore.idToInternalId.get(id)
     await orama.index.insert(
       orama.index,
       orama.data.index,
       prop,
       id,
+      internalId!,
       value,
       expectedType,
       language,

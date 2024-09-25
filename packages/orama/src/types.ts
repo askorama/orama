@@ -921,6 +921,7 @@ export interface IIndex<I extends AnyIndexStore> {
     index: T,
     prop: string,
     id: DocumentID,
+    internalDocumentId: InternalDocumentID,
     value: SearchableValue,
     schemaType: SearchableType,
     language: string | undefined,
@@ -962,16 +963,22 @@ export interface IIndex<I extends AnyIndexStore> {
     ids: DocumentID[]
   ): SyncOrAsyncValue<TokenScore[]>
 
-  search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-    context: SearchContext<T, ResultDocument>,
+  search<T extends AnyOrama>(
     index: I,
-    prop: string,
-    term: string
+    term: string,
+    tokenizer: Tokenizer,
+    language: string | undefined,
+    propertiesToSearch: string[],
+    exact: boolean,
+    tolerance: number,
+    boost: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>
   ): SyncOrAsyncValue<TokenScore[]>
-  searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-    context: SearchContext<T, ResultDocument>,
+
+  searchByWhereClause<T extends AnyOrama>(
     index: I,
-    filters: Partial<WhereCondition<T['schema']>>
+    tokenizer: Tokenizer,
+    filters: Partial<WhereCondition<T['schema']>>,
+    language: string | undefined
   ): SyncOrAsyncValue<InternalDocumentID[]>
 
   getSearchableProperties(index: I): SyncOrAsyncValue<string[]>

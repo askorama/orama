@@ -2,7 +2,6 @@ import type {
   AnyIndexStore,
   AnyOrama,
   ArraySearchableType,
-  BM25Params,
   ComparisonOperator,
   EnumArrComparisonOperator,
   EnumComparisonOperator,
@@ -13,11 +12,8 @@ import type {
   ScalarSearchableType,
   SearchableType,
   SearchableValue,
-  SearchContext,
-  SearchParamsFullText,
   Tokenizer,
   TokenScore,
-  TypedDocument,
   VectorIndex,
   VectorType,
   WhereCondition
@@ -30,9 +26,10 @@ import {
   greaterThan as avlGreaterThan,
   insert as avlInsert,
   lessThan as avlLessThan,
-  RootNode as AVLRootNode,
   rangeSearch as avlRangeSearch,
-  removeDocument as avlRemoveDocument
+  removeDocument as avlRemoveDocument,
+  AVLTree,
+  AVLType
 } from '../trees/avl.js'
 import {
   create as flatCreate,
@@ -40,27 +37,34 @@ import {
   filterArr as flatFilterArr,
   insert as flatInsert,
   removeDocument as flatRemoveDocument,
-  FlatTree
+  FlatTree,
+  FlatType,
+  load as loadFlatNode,
+  save as saveFlatNode
 } from '../trees/flat.js'
 import {
+  save as saveRadixTree,
+  load as loadRadixTree,
   create as radixCreate,
   find as radixFind,
   insert as radixInsert,
-  Node as RadixNode,
-  removeDocumentByWord as radixRemoveDocument
+  removeDocumentByWord as radixRemoveDocument,
+  RadixTree,
+  RadixType
 } from '../trees/radix.js'
 import {
   create as bkdCreate,
   insert as bkdInsert,
   removeDocByID as bkdRemoveDocByID,
-  RootNode as BKDNode,
   Point as BKDGeoPoint,
   searchByRadius,
-  searchByPolygon
+  searchByPolygon,
+  BKDTree,
+  BKDType
 } from '../trees/bkd.js'
+import { create as boolCreate, removeDocument as boolRemoveDocument, BoolType } from '../trees/bool.js'
 
-import { convertDistanceToMeters, intersect, safeArrayPush, getOwnProperty } from '../utils.js'
-import { BM25 } from './algorithms.js'
+import { convertDistanceToMeters, intersect, safeArrayPush } from '../utils.js'
 import { getMagnitude } from './cosine-similarity.js'
 import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
 import {
@@ -80,25 +84,12 @@ export type FrequencyMap = {
   }
 }
 
-export type BooleanIndex = {
-  true: InternalDocumentID[]
-  false: InternalDocumentID[]
-}
-
-export type TreeType = 'AVL' | 'Radix' | 'Bool' | 'Flat' | 'BKD'
-
-export type TTree<T = TreeType, N = unknown> = {
-  type: T
-  node: N
-  isArray: boolean
-}
-
 export type Tree =
-  | TTree<'Radix', RadixNode>
-  | TTree<'AVL', AVLRootNode<number, InternalDocumentID[]>>
-  | TTree<'Bool', BooleanIndex>
-  | TTree<'Flat', FlatTree>
-  | TTree<'BKD', BKDNode>
+  | ReturnType<typeof radixCreate>
+  | ReturnType<typeof avlCreate<number, InternalDocumentID[]>>
+  | ReturnType<typeof flatCreate>
+  | ReturnType<typeof bkdCreate>
+  | ReturnType<typeof boolCreate>
 
 export interface Index extends AnyIndexStore {
   sharedInternalDocumentStore: InternalDocumentIDStore
@@ -106,75 +97,9 @@ export interface Index extends AnyIndexStore {
   vectorIndexes: Record<string, VectorIndex>
   searchableProperties: string[]
   searchablePropertiesWithTypes: Record<string, SearchableType>
-  frequencies: FrequencyMap
-  tokenOccurrences: Record<string, Record<string, number>>
-  avgFieldLength: Record<string, number>
-  fieldLengths: Record<string, Record<InternalDocumentID, number | undefined>>
 }
 
-export async function insertDocumentScoreParameters(
-  index: Index,
-  prop: string,
-  id: DocumentID,
-  tokens: string[],
-  docsCount: number
-): Promise<void> {
-  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
-
-  index.avgFieldLength[prop] = ((index.avgFieldLength[prop] ?? 0) * (docsCount - 1) + tokens.length) / docsCount
-  index.fieldLengths[prop][internalId] = tokens.length
-  index.frequencies[prop][internalId] = {}
-}
-
-export async function insertTokenScoreParameters(
-  index: Index,
-  prop: string,
-  id: DocumentID,
-  tokens: string[],
-  token: string
-): Promise<void> {
-  let tokenFrequency = 0
-
-  for (const t of tokens) {
-    if (t === token) {
-      tokenFrequency++
-    }
-  }
-
-  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
-  const tf = tokenFrequency / tokens.length
-
-  index.frequencies[prop][internalId]![token] = tf
-
-  if (!(token in index.tokenOccurrences[prop])) {
-    index.tokenOccurrences[prop][token] = 0
-  }
-
-  // increase a token counter that may not yet exist
-  index.tokenOccurrences[prop][token] = (index.tokenOccurrences[prop][token] ?? 0) + 1
-}
-
-export async function removeDocumentScoreParameters(
-  index: Index,
-  prop: string,
-  id: DocumentID,
-  docsCount: number
-): Promise<void> {
-  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
-
-  if (docsCount > 1) {
-    index.avgFieldLength[prop] = (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][internalId]!) / (docsCount - 1);
-  } else {
-    index.avgFieldLength[prop] = undefined as unknown as number;
-  }
-  index.fieldLengths[prop][internalId] = undefined
-  index.frequencies[prop][internalId] = undefined
-}
-
-export async function removeTokenScoreParameters(index: Index, prop: string, token: string): Promise<void> {
-  index.tokenOccurrences[prop][token]--
-}
-
+/*
 export async function calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   context: SearchContext<T, ResultDocument, SearchParamsFullText<T, ResultDocument>>,
   index: Index,
@@ -214,6 +139,7 @@ export async function calculateResultScores<T extends AnyOrama, ResultDocument =
   }
   return scoreList
 }
+*/
 
 export async function create<T extends AnyOrama, TSchema extends T['schema']>(
   orama: T,
@@ -228,11 +154,7 @@ export async function create<T extends AnyOrama, TSchema extends T['schema']>(
       indexes: {},
       vectorIndexes: {},
       searchableProperties: [],
-      searchablePropertiesWithTypes: {},
-      frequencies: {},
-      tokenOccurrences: {},
-      avgFieldLength: {},
-      fieldLengths: {}
+      searchablePropertiesWithTypes: {}
     }
   }
 
@@ -257,26 +179,22 @@ export async function create<T extends AnyOrama, TSchema extends T['schema']>(
       switch (type) {
         case 'boolean':
         case 'boolean[]':
-          index.indexes[path] = { type: 'Bool', node: { true: [], false: [] }, isArray }
+          index.indexes[path] = boolCreate(isArray)
           break
         case 'number':
         case 'number[]':
-          index.indexes[path] = { type: 'AVL', node: avlCreate<number, InternalDocumentID[]>(0, []), isArray }
+          index.indexes[path] = avlCreate<number, InternalDocumentID[]>(0, [], isArray)
           break
         case 'string':
         case 'string[]':
-          index.indexes[path] = { type: 'Radix', node: radixCreate(), isArray }
-          index.avgFieldLength[path] = 0
-          index.frequencies[path] = {}
-          index.tokenOccurrences[path] = {}
-          index.fieldLengths[path] = {}
+          index.indexes[path] = radixCreate(false, '', '', isArray)
           break
         case 'enum':
         case 'enum[]':
-          index.indexes[path] = { type: 'Flat', node: flatCreate(), isArray }
+          index.indexes[path] = flatCreate(isArray)
           break
         case 'geopoint':
-          index.indexes[path] = { type: 'BKD', node: bkdCreate(), isArray }
+          index.indexes[path] = bkdCreate(isArray)
           break
         default:
           throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type, path)
@@ -295,43 +213,46 @@ function insertScalarBuilder(
   index: Index,
   prop: string,
   id: DocumentID,
+  internalDocumentId: InternalDocumentID,
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number,
   options?: InsertOptions
 ) {
   return async (value: SearchableValue): Promise<void> => {
-    const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
-
-    const { type, node } = index.indexes[prop]
-    switch (type) {
-      case 'Bool': {
-        node[value ? 'true' : 'false'].push(internalId)
+    const treeForProperty = index.indexes[prop]
+    switch (treeForProperty.type) {
+      // enum & bool & enum[] & bool[]
+      case FlatType: {
+        flatInsert(index.indexes[prop] as FlatTree, value as ScalarSearchableType, internalDocumentId)
         break
       }
-      case 'AVL': {
+      // number & number[]
+      case AVLType: {
         const avlRebalanceThreshold = options?.avlRebalanceThreshold ?? 1
-        avlInsert(node, value as number, [internalId], avlRebalanceThreshold)
+        avlInsert(
+          index.indexes[prop] as AVLTree<number, InternalDocumentID[]>,
+          value as number,
+          [internalDocumentId],
+          avlRebalanceThreshold
+        )
         break
       }
-      case 'Radix': {
-        const tokens = await tokenizer.tokenize(value as string, language, prop)
-        await implementation.insertDocumentScoreParameters(index, prop, internalId, tokens, docsCount)
-
-        for (const token of tokens) {
-          await implementation.insertTokenScoreParameters(index, prop, internalId, tokens, token)
-
-          radixInsert(node, token, internalId)
-        }
-
+      // Geopoint
+      case BKDType: {
+        bkdInsert(index.indexes[prop] as BKDTree, value as unknown as BKDGeoPoint, [internalDocumentId])
         break
       }
-      case 'Flat': {
-        flatInsert(node, value as ScalarSearchableType, internalId)
-        break
-      }
-      case 'BKD': {
-        bkdInsert(node, value as unknown as BKDGeoPoint, [internalId])
+      // string & string[]
+      case RadixType: {
+        await radixInsert(
+          index.indexes[prop] as RadixTree,
+          value as string,
+          internalDocumentId,
+          tokenizer,
+          language,
+          prop
+        )
         break
       }
     }
@@ -343,6 +264,7 @@ export async function insert(
   index: Index,
   prop: string,
   id: DocumentID,
+  internalDocumentId: InternalDocumentID,
   value: SearchableValue,
   schemaType: SearchableType,
   language: string | undefined,
@@ -354,7 +276,17 @@ export async function insert(
     return insertVector(index, prop, value as number[] | Float32Array, id)
   }
 
-  const insertScalar = insertScalarBuilder(implementation, index, prop, id, language, tokenizer, docsCount, options)
+  const insertScalar = insertScalarBuilder(
+    implementation,
+    index,
+    prop,
+    id,
+    internalDocumentId,
+    language,
+    tokenizer,
+    docsCount,
+    options
+  )
 
   if (!isArrayType(schemaType)) {
     return insertScalar(value)
@@ -396,37 +328,34 @@ async function removeScalar(
     return true
   }
 
-  const { type, node } = index.indexes[prop]
+  const { type } = index.indexes[prop]
   switch (type) {
-    case 'AVL': {
-      avlRemoveDocument(node, internalId, value as number)
+    case AVLType: {
+      avlRemoveDocument(index.indexes[prop], internalId, value as number)
       return true
     }
-    case 'Bool': {
-      const booleanKey = value ? 'true' : 'false'
-      const position = node[booleanKey].indexOf(internalId)
-
-      node[value ? 'true' : 'false'].splice(position, 1)
-      return true
-    }
-    case 'Radix': {
+    case RadixType: {
       const tokens = await tokenizer.tokenize(value as string, language, prop)
 
       await implementation.removeDocumentScoreParameters(index, prop, id, docsCount)
 
       for (const token of tokens) {
         await implementation.removeTokenScoreParameters(index, prop, token)
-        radixRemoveDocument(node, token, internalId)
+        radixRemoveDocument(index.indexes[prop], token, internalId)
       }
 
       return true
     }
-    case 'Flat': {
-      flatRemoveDocument(node, internalId, value as ScalarSearchableType)
+    case FlatType: {
+      flatRemoveDocument(index.indexes[prop], internalId, value as ScalarSearchableType)
       return true
     }
-    case 'BKD': {
-      bkdRemoveDocByID(node, value as unknown as BKDGeoPoint, internalId)
+    case BoolType: {
+      boolRemoveDocument(index.indexes[prop], internalId, value as ScalarSearchableType)
+      return true
+    }
+    case BKDType: {
+      bkdRemoveDocByID(index.indexes[prop], value as unknown as BKDGeoPoint, internalId)
       return false
     }
   }
@@ -468,42 +397,129 @@ export async function remove(
   return true
 }
 
-export async function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-  context: SearchContext<T, ResultDocument, SearchParamsFullText<T, ResultDocument>>,
-  index: Index,
+const BIT_MASK_20 = 0b11111111111111111111
+
+export function bitmask_20(n: number) {
+  return n & BIT_MASK_20
+}
+export function count(n: number) {
+  return n >> 20
+}
+function numberOfOnes(n: number) {
+  let i = 0
+  do {
+    if (n & 1) {
+      ++i
+    }
+  } while ((n >>= 1))
+  return i
+}
+
+function searchInProperty(
+  tree: RadixTree,
   prop: string,
-  term: string
-): Promise<TokenScore[]> {
-  if (!(prop in index.tokenOccurrences)) {
-    return []
-  }
+  tokens: string[],
+  exact: boolean,
+  tolerance: number,
+  resultsMap: Map<number, number>,
+  boostPerProperty: number
+) {
+  let foundWords = {} as Record<string, number[]>
 
-  const { node, type } = index.indexes[prop]
-  if (type !== 'Radix') {
-    throw createError('WRONG_SEARCH_PROPERTY_TYPE', prop)
-  }
+  for (const word of tokens) {
+    const searchResult = radixFind(tree, { term: word, exact, tolerance })
 
-  const { exact, tolerance } = context.params
-  const searchResult = radixFind(node, { term, exact, tolerance })
-  const ids = new Set<InternalDocumentID>()
-
-  for (const key in searchResult) {
-    //skip keys inherited from prototype
-    const ownProperty = getOwnProperty(searchResult, key)
-    if (!ownProperty) continue
-
-    for (const id of searchResult[key]) {
-      ids.add(id)
+    foundWords = {
+      ...foundWords,
+      ...searchResult
     }
   }
 
-  return context.index.calculateResultScores(context, index, prop, term, Array.from(ids))
+  const foundKeys = Object.getOwnPropertyNames(foundWords)
+
+  const foundKeysLength = foundKeys.length
+  const resultMap = new Map<number, [number, number[]]>()
+  for (let i = 0; i < foundKeysLength; i++) {
+    const key = foundKeys[i]
+    const matchedDocs = foundWords[key]
+    const matchedDocsLength = matchedDocs.length
+    const isExactMatch = tokens.includes(key)
+
+    for (let j = 0; j < matchedDocsLength; j++) {
+      const docId = matchedDocs[j]
+
+      const numberOfQuantums = tree.tokensLength.get(docId)!
+      const tokenQuantumDescriptor = tree.tokenQuantums[docId][key]
+
+      const occurrence = count(tokenQuantumDescriptor)
+      const bitMask = bitmask_20(tokenQuantumDescriptor)
+
+      const score = ((occurrence * occurrence) / numberOfQuantums + (isExactMatch ? 1 : 0)) * boostPerProperty
+
+      if (!resultMap.has(docId)) {
+        resultMap.set(docId, [score, [bitMask]])
+        continue
+      }
+
+      const current = resultMap.get(docId)!
+      let totalScore = current[0] + score
+      const othersMatches = current[1]
+      const othersLength = othersMatches.length
+      for (let k = 0; k < othersLength; k++) {
+        const other = othersMatches[k]
+        if (other & bitMask) {
+          totalScore += numberOfOnes(other & bitMask) * 2
+        }
+      }
+      othersMatches.push(tokenQuantumDescriptor)
+      current[0] = totalScore
+    }
+  }
+
+  for (const [id, [score]] of resultMap.entries()) {
+    if (resultsMap.has(id)) {
+      resultsMap.set(id, resultsMap.get(id)! + score)
+    } else {
+      resultsMap.set(id, score)
+    }
+  }
 }
 
-export async function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-  context: SearchContext<T, ResultDocument>,
+export async function search(
   index: Index,
-  filters: Partial<WhereCondition<T['schema']>>
+  term: string,
+  tokenizer: Tokenizer,
+  language: string | undefined,
+  propertiesToSearch: string[],
+  exact: boolean,
+  tolerance: number,
+  boost: Record<string, number>
+): Promise<TokenScore[]> {
+  const words = await tokenizer.tokenize(term, language)
+
+  const resultsMap = new Map<number, number>()
+  for (const prop of propertiesToSearch) {
+    if (!(prop in index.indexes)) {
+      continue
+    }
+
+    const tree = index.indexes[prop] as RadixTree
+    const { type } = tree
+    if (type !== RadixType) {
+      throw createError('WRONG_SEARCH_PROPERTY_TYPE', prop)
+    }
+    const boostPerProperty = boost[prop] || 1
+    searchInProperty(tree, prop, words, exact, tolerance, resultsMap, boostPerProperty)
+  }
+
+  return Array.from(resultsMap)
+}
+
+export async function searchByWhereClause<T extends AnyOrama>(
+  index: Index,
+  tokenizer: Tokenizer,
+  filters: Partial<WhereCondition<T['schema']>>,
+  language: string | undefined
 ): Promise<number[]> {
   const filterKeys = Object.keys(filters)
 
@@ -522,16 +538,17 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
       throw createError('UNKNOWN_FILTER_PROPERTY', param)
     }
 
-    const { node, type, isArray } = index.indexes[param]
+    const { type, isArray } = index.indexes[param]
 
-    if (type === 'Bool') {
-      const idx = node
-      const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
+    if (type === BoolType) {
+      const node = index.indexes[param]
+      // operation is `true` or `false`
+      const filteredIDs = node[operation.toString()]
       safeArrayPush(filtersMap[param], filteredIDs)
       continue
     }
 
-    if (type === 'BKD') {
+    if (type === BKDType) {
       let reqOperation: 'radius' | 'polygon'
 
       if ('radius' in (operation as GeosearchOperation)) {
@@ -552,7 +569,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
         } = operation[reqOperation] as GeosearchRadiusOperator['radius']
         const distanceInMeters = convertDistanceToMeters(value, unit)
         const ids = searchByRadius(
-          node.root,
+          index.indexes[param].root,
           coordinates as BKDGeoPoint,
           distanceInMeters,
           inside,
@@ -570,7 +587,13 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
           inside = true,
           highPrecision = false
         } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
-        const ids = searchByPolygon(node.root, coordinates as BKDGeoPoint[], inside, undefined, highPrecision)
+        const ids = searchByPolygon(
+          index.indexes[param].root,
+          coordinates as BKDGeoPoint[],
+          inside,
+          undefined,
+          highPrecision
+        )
         // @todo: convert this into a for loop
         safeArrayPush(
           filtersMap[param],
@@ -581,11 +604,11 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
       continue
     }
 
-    if (type === 'Radix' && (typeof operation === 'string' || Array.isArray(operation))) {
+    if (type === RadixType && (typeof operation === 'string' || Array.isArray(operation))) {
       for (const raw of [operation].flat()) {
-        const term = await context.tokenizer.tokenize(raw, context.language, param)
+        const term = await tokenizer.tokenize(raw, language, param)
         for (const t of term) {
-          const filteredIDsResults = radixFind(node, { term: t, exact: true })
+          const filteredIDsResults = radixFind(index.indexes[param], { term: t, exact: true })
           safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())
         }
       }
@@ -599,45 +622,45 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
       throw createError('INVALID_FILTER_OPERATION', operationKeys.length)
     }
 
-    if (type === 'Flat') {
+    if (type === FlatType) {
       const flatOperation = isArray ? flatFilterArr : flatFilter
       safeArrayPush(
         filtersMap[param],
-        flatOperation(node, operation as EnumComparisonOperator & EnumArrComparisonOperator)
+        flatOperation(index.indexes[param], operation as EnumComparisonOperator & EnumArrComparisonOperator)
       )
 
       continue
     }
 
-    if (type === 'AVL') {
+    if (type === AVLType) {
       const operationOpt = operationKeys[0] as keyof ComparisonOperator
       const operationValue = (operation as ComparisonOperator)[operationOpt]
       let filteredIDs: InternalDocumentID[] = []
 
       switch (operationOpt) {
         case 'gt': {
-          filteredIDs = avlGreaterThan(node, operationValue, false)
+          filteredIDs = avlGreaterThan(index.indexes[param], operationValue, false)
           break
         }
         case 'gte': {
-          filteredIDs = avlGreaterThan(node, operationValue, true)
+          filteredIDs = avlGreaterThan(index.indexes[param], operationValue, true)
           break
         }
         case 'lt': {
-          filteredIDs = avlLessThan(node, operationValue, false)
+          filteredIDs = avlLessThan(index.indexes[param], operationValue, false)
           break
         }
         case 'lte': {
-          filteredIDs = avlLessThan(node, operationValue, true)
+          filteredIDs = avlLessThan(index.indexes[param], operationValue, true)
           break
         }
         case 'eq': {
-          filteredIDs = avlFind(node, operationValue) ?? []
+          filteredIDs = avlFind(index.indexes[param], operationValue) ?? []
           break
         }
         case 'between': {
           const [min, max] = operationValue as number[]
-          filteredIDs = avlRangeSearch(node, min, max)
+          filteredIDs = avlRangeSearch(index.indexes[param], min, max)
           break
         }
       }
@@ -658,61 +681,26 @@ export async function getSearchablePropertiesWithTypes(index: Index): Promise<Re
   return index.searchablePropertiesWithTypes
 }
 
-function loadRadixNode(node: RadixNode): RadixNode {
-  const convertedNode = radixCreate(node.e, node.s, node.k)
-
-  convertedNode.d = node.d
-  convertedNode.w = node.w
-
-  for (const childrenKey of Object.keys(node.c)) {
-    convertedNode.c[childrenKey] = loadRadixNode(node.c[childrenKey])
-  }
-
-  return convertedNode
-}
-
-function loadFlatNode(node: unknown): FlatTree {
-  return {
-    numberToDocumentId: new Map(node as [ScalarSearchableType, InternalDocumentID[]][])
-  }
-}
-
-function saveFlatNode(node: FlatTree): unknown {
-  return Array.from(node.numberToDocumentId.entries())
-}
-
 export async function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Promise<Index> {
   const {
     indexes: rawIndexes,
     vectorIndexes: rawVectorIndexes,
     searchableProperties,
-    searchablePropertiesWithTypes,
-    frequencies,
-    tokenOccurrences,
-    avgFieldLength,
-    fieldLengths
+    searchablePropertiesWithTypes
   } = raw as Index
 
   const indexes: Index['indexes'] = {}
   const vectorIndexes: Index['vectorIndexes'] = {}
 
   for (const prop of Object.keys(rawIndexes)) {
-    const { node, type, isArray } = rawIndexes[prop]
+    const { type } = rawIndexes[prop]
 
     switch (type) {
-      case 'Radix':
-        indexes[prop] = {
-          type: 'Radix',
-          node: loadRadixNode(node),
-          isArray
-        }
+      case RadixType:
+        indexes[prop] = loadRadixTree(rawIndexes[prop])
         break
-      case 'Flat':
-        indexes[prop] = {
-          type: 'Flat',
-          node: loadFlatNode(node),
-          isArray
-        }
+      case FlatType:
+        indexes[prop] = loadFlatNode(rawIndexes[prop])
         break
       default:
         indexes[prop] = rawIndexes[prop]
@@ -737,25 +725,12 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
     indexes,
     vectorIndexes,
     searchableProperties,
-    searchablePropertiesWithTypes,
-    frequencies,
-    tokenOccurrences,
-    avgFieldLength,
-    fieldLengths
+    searchablePropertiesWithTypes
   }
 }
 
 export async function save<R = unknown>(index: Index): Promise<R> {
-  const {
-    indexes,
-    vectorIndexes,
-    searchableProperties,
-    searchablePropertiesWithTypes,
-    frequencies,
-    tokenOccurrences,
-    avgFieldLength,
-    fieldLengths
-  } = index
+  const { indexes, vectorIndexes, searchableProperties, searchablePropertiesWithTypes } = index
 
   const vectorIndexesAsArrays: Index['vectorIndexes'] = {}
 
@@ -775,15 +750,17 @@ export async function save<R = unknown>(index: Index): Promise<R> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const savedIndexes: any = {}
   for (const name of Object.keys(indexes)) {
-    const { type, node, isArray } = indexes[name]
-    if (type !== 'Flat') {
-      savedIndexes[name] = indexes[name]
-      continue
-    }
-    savedIndexes[name] = {
-      type: 'Flat',
-      node: saveFlatNode(node),
-      isArray
+    const { type } = indexes[name]
+    switch (type) {
+      case RadixType:
+        savedIndexes[name] = saveRadixTree(indexes[name])
+        break
+      case FlatType:
+        savedIndexes[name] = saveFlatNode(indexes[name])
+        break
+      default:
+        savedIndexes[name] = indexes[name]
+        break
     }
   }
 
@@ -791,11 +768,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
     indexes: savedIndexes,
     vectorIndexes: vectorIndexesAsArrays,
     searchableProperties,
-    searchablePropertiesWithTypes,
-    frequencies,
-    tokenOccurrences,
-    avgFieldLength,
-    fieldLengths
+    searchablePropertiesWithTypes
   } as R
 }
 
@@ -804,11 +777,11 @@ export async function createIndex(): Promise<IIndex<Index>> {
     create,
     insert,
     remove,
-    insertDocumentScoreParameters,
-    insertTokenScoreParameters,
-    removeDocumentScoreParameters,
-    removeTokenScoreParameters,
-    calculateResultScores,
+    insertDocumentScoreParameters: () => {},
+    insertTokenScoreParameters: () => {},
+    removeDocumentScoreParameters: () => {},
+    removeTokenScoreParameters: () => {},
+    calculateResultScores: () => [],
     search,
     searchByWhereClause,
     getSearchableProperties,

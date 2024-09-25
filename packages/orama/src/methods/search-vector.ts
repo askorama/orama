@@ -1,6 +1,5 @@
 import type { AnyOrama, Results, SearchParamsVector, TypedDocument, Result } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { createSearchContext } from './search.js'
 import { getNanosecondsTime, formatNanoseconds } from '../utils.js'
 import { getFacets } from '../components/facets.js'
 import { createError } from '../errors.js'
@@ -34,7 +33,7 @@ export async function searchVector<T extends AnyOrama, ResultDocument = TypedDoc
   const vectors = vectorIndex.vectors
   const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
   const hasFilters = Object.keys(params.where ?? {}).length > 0
-  const { index, docs: oramaDocs } = orama.data
+  const index = orama.data.index
 
   if (vector?.value.length !== vectorSize) {
     // eslint-disable-next-line
@@ -62,24 +61,10 @@ export async function searchVector<T extends AnyOrama, ResultDocument = TypedDoc
     orama.caches['propertiesToSearch'] = propertiesToSearch
   }
 
-  const tokens = []
-
-  const context = await createSearchContext(
-    orama.tokenizer,
-    orama.index,
-    orama.documentsStore,
-    language,
-    params,
-    propertiesToSearch,
-    tokens,
-    await orama.documentsStore.count(oramaDocs),
-    timeStart
-  )
-
   let whereFiltersIDs: InternalDocumentID[] = []
 
   if (hasFilters) {
-    whereFiltersIDs = await orama.index.searchByWhereClause(context, index, params.where!)
+    whereFiltersIDs = await orama.index.searchByWhereClause(index, orama.tokenizer, params.where!, language)
     results = intersectFilteredIDs(whereFiltersIDs, results)
   }
 

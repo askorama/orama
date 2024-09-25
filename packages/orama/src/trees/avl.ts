@@ -14,8 +14,12 @@ export interface Node<K, V> {
   h: number
 }
 
-export interface RootNode<K, V> {
+export const AVLType = 'AVL' as const
+
+export interface AVLTree<K, V> {
+  type: typeof AVLType
   root: Node<K, V>
+  isArray: boolean
 }
 
 function rotateLeft<K, V>(node: Node<K, V>): Node<K, V> {
@@ -36,11 +40,11 @@ function rotateRight<K, V>(node: Node<K, V>): Node<K, V> {
   return left
 }
 
-export function contains<K, V>(node: RootNode<K, V>, key: K): boolean {
+export function contains<K, V>(node: AVLTree<K, V>, key: K): boolean {
   return !!find(node, key)
 }
 
-export function getSize<K, V>(root: Nullable<RootNode<K, V>>): number {
+export function getSize<K, V>(root: Nullable<AVLTree<K, V>>): number {
   let size = 0
   const queue: Array<Node<K, V>> = []
 
@@ -64,7 +68,7 @@ export function getSize<K, V>(root: Nullable<RootNode<K, V>>): number {
   return size
 }
 
-export function isBalanced<K, V>(root: Nullable<RootNode<K, V>>): boolean {
+export function isBalanced<K, V>(root: Nullable<AVLTree<K, V>>): boolean {
   if (root === null) return true
 
   const stack: Array<Node<K, V>> = [root.root]
@@ -93,7 +97,7 @@ export function isBalanced<K, V>(root: Nullable<RootNode<K, V>>): boolean {
   return true
 }
 
-export function rangeSearch<K, V>(node: RootNode<K, V>, min: K, max: K): V {
+export function rangeSearch<K, V>(node: AVLTree<K, V>, min: K, max: K): V {
   const result: V[] = []
 
   function traverse(node: Node<K, V>) {
@@ -119,7 +123,7 @@ export function rangeSearch<K, V>(node: RootNode<K, V>, min: K, max: K): V {
   return result as V
 }
 
-export function greaterThan<K, V>(node: RootNode<K, V>, key: K, inclusive = false): V {
+export function greaterThan<K, V>(node: AVLTree<K, V>, key: K, inclusive = false): V {
   const result: V[] = []
 
   if (node === null) return result as V
@@ -146,7 +150,7 @@ export function greaterThan<K, V>(node: RootNode<K, V>, key: K, inclusive = fals
   return result as V
 }
 
-export function lessThan<K, V>(node: RootNode<K, V>, key: K, inclusive = false): V {
+export function lessThan<K, V>(node: AVLTree<K, V>, key: K, inclusive = false): V {
   const result: V[] = []
 
   if (node === null) return result as V
@@ -186,21 +190,23 @@ function getNodeByKey<K, V>(node: Nullable<Node<K, V>>, key: K): Nullable<Node<K
   return null
 }
 
-export function create<K, V>(key: K, value: V): RootNode<K, V> {
+export function create<K, V>(key: K, value: V, isArray: boolean): AVLTree<K, V> {
   return {
+    type: AVLType,
     root: {
       k: key,
       v: value,
       l: null,
       r: null,
       h: 0
-    }
+    },
+    isArray
   }
 }
 
 let insertCount = 0
 
-export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[], rebalanceThreshold = 500): void {
+export function insert<K, V>(rootNode: AVLTree<K, V[]>, key: K, newValue: V[], rebalanceThreshold = 500): void {
   function insertNode(node: Nullable<Node<K, V[]>>, key: K, newValue: V[]): Node<K, V[]> {
     if (node === null) {
       insertCount++
@@ -266,7 +272,7 @@ function getHeight<K, V>(node: Nullable<Node<K, V>>): number {
   return node !== null ? node.h : -1
 }
 
-export function find<K, V>(root: RootNode<K, V>, key: K): Nullable<V> {
+export function find<K, V>(root: AVLTree<K, V>, key: K): Nullable<V> {
   const node = getNodeByKey(root.root, key)
   if (node === null) {
     return null
@@ -274,7 +280,7 @@ export function find<K, V>(root: RootNode<K, V>, key: K): Nullable<V> {
   return node.v
 }
 
-export function remove<K, V>(rootNode: Nullable<RootNode<K, V>>, key: K): void {
+export function remove<K, V>(rootNode: Nullable<AVLTree<K, V>>, key: K): void {
   if (rootNode === null || rootNode.root === null) {
     return
   }
@@ -340,7 +346,7 @@ export function remove<K, V>(rootNode: Nullable<RootNode<K, V>>, key: K): void {
   deleteNode()
 }
 
-export function removeDocument<K, V>(root: RootNode<K, V[]>, id: V, key: K): void {
+export function removeDocument<K, V>(root: AVLTree<K, V[]>, id: V, key: K): void {
   const node = getNodeByKey(root.root, key)!
 
   if (!node) {

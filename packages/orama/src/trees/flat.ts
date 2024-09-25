@@ -1,15 +1,27 @@
 import type { Point } from './bkd.js'
 import { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { EnumArrComparisonOperator, EnumComparisonOperator, Nullable, ScalarSearchableValue } from '../types.js'
+import {
+  EnumArrComparisonOperator,
+  EnumComparisonOperator,
+  Nullable,
+  ScalarSearchableType,
+  ScalarSearchableValue
+} from '../types.js'
 import { intersect, safeArrayPush } from '../utils.js'
 
+export const FlatType = 'Flat' as const
+
 export interface FlatTree {
+  type: typeof FlatType
   numberToDocumentId: Map<ScalarSearchableValue, InternalDocumentID[]>
+  isArray
 }
 
-export function create(): FlatTree {
+export function create(isArray: boolean): FlatTree {
   return {
-    numberToDocumentId: new Map()
+    type: FlatType,
+    numberToDocumentId: new Map(),
+    isArray
   }
 }
 
@@ -112,4 +124,28 @@ export function filterArr(root: FlatTree, operation: EnumArrComparisonOperator):
   }
 
   throw new Error('Invalid operation')
+}
+
+interface FlatDump {
+  type: typeof FlatType
+  numberToDocumentId: [ScalarSearchableValue, InternalDocumentID[]][]
+  isArray: boolean
+}
+
+export function load(dumpRaw: unknown): FlatTree {
+  const dump = dumpRaw as FlatDump
+  return {
+    type: FlatType,
+    isArray: dump.isArray,
+    numberToDocumentId: new Map(dump.numberToDocumentId as [ScalarSearchableType, InternalDocumentID[]][])
+  }
+}
+
+export function save(node: FlatTree): unknown {
+  const dump: FlatDump = {
+    type: FlatType,
+    isArray: node.isArray,
+    numberToDocumentId: Array.from(node.numberToDocumentId)
+  }
+  return dump as unknown
 }

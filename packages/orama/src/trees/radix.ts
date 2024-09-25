@@ -1,6 +1,7 @@
 import { syncBoundedLevenshtein } from '../components/levenshtein.js'
 import { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getOwnProperty } from '../utils.js'
+import { Tokenizer } from '../types.js'
 
 export class Node {
   constructor(key: string, subWord: string, end: boolean) {
@@ -121,11 +122,32 @@ function getCommonPrefix(a: string, b: string) {
   return commonPrefix
 }
 
-export function create(end = false, subWord = '', key = ''): Node {
+export const RadixType = 'Radix' as const
+export interface RadixTree {
+  type: typeof RadixType
+  node: Node
+  isArray: boolean
+  tokensLength: Map<number, number>
+  tokenQuantums: Record<number, Record<string, number>>
+}
+
+function createNode(end: boolean, subWord: string, key: string): Node {
   return new Node(key, subWord, end)
 }
 
-export function insert(root: Node, word: string, docId: InternalDocumentID) {
+export function create(end: boolean, subWord: string, key: string, isArray: boolean): RadixTree {
+  return {
+    type: RadixType,
+    node: new Node(key, subWord, end),
+    isArray,
+    tokensLength: new Map(),
+    tokenQuantums: {}
+  }
+}
+
+async function insertInner(tree: RadixTree, word: string, docId: InternalDocumentID) {
+  let root = tree.node
+
   const wordLength = word.length
   for (let i = 0; i < wordLength; i++) {
     const currentCharacter = word[i]
@@ -149,7 +171,7 @@ export function insert(root: Node, word: string, docId: InternalDocumentID) {
       const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength]
       // the wordAtIndex is completely contained in the child node subword
       if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
-        const newNode = create(true, wordAtIndex, currentCharacter) // Create a new node with end set to true
+        const newNode = createNode(true, wordAtIndex, currentCharacter) // Create a new node with end set to true
         newNode.c[edgeLabelAtCommonPrefix] = rootChildCurrentChar
 
         const newNodeChild = newNode.c[edgeLabelAtCommonPrefix]
@@ -166,7 +188,7 @@ export function insert(root: Node, word: string, docId: InternalDocumentID) {
 
       // the wordAtIndex is partially contained in the child node subword
       if (commonPrefixLength < edgeLabelLength && commonPrefixLength < wordAtIndex.length) {
-        const inbetweenNode = create(false, commonPrefix, currentCharacter)
+        const inbetweenNode = createNode(false, commonPrefix, currentCharacter)
         inbetweenNode.c[edgeLabelAtCommonPrefix] = rootChildCurrentChar
         root.c[currentCharacter] = inbetweenNode
 
@@ -175,7 +197,7 @@ export function insert(root: Node, word: string, docId: InternalDocumentID) {
         inbetweenNodeChild.k = edgeLabelAtCommonPrefix
 
         const wordAtCommonPrefix = wordAtIndex[commonPrefixLength]
-        const newNode = create(true, word.substring(i + commonPrefixLength), wordAtCommonPrefix)
+        const newNode = createNode(true, word.substring(i + commonPrefixLength), wordAtCommonPrefix)
         addDocument(newNode, docId)
 
         inbetweenNode.c[wordAtCommonPrefix] = newNode
@@ -192,7 +214,7 @@ export function insert(root: Node, word: string, docId: InternalDocumentID) {
       root = rootChildCurrentChar
     } else {
       // if the node for the current character doesn't exist create new node
-      const newNode = create(true, wordAtIndex, currentCharacter)
+      const newNode = createNode(true, wordAtIndex, currentCharacter)
       addDocument(newNode, docId)
 
       root.c[currentCharacter] = newNode
@@ -200,6 +222,72 @@ export function insert(root: Node, word: string, docId: InternalDocumentID) {
       return
     }
   }
+}
+
+export async function insert(
+  tree: RadixTree,
+  value: string,
+  docId: InternalDocumentID,
+  tokenizer: Tokenizer,
+  language: string | undefined,
+  prop: string
+) {
+  const quantums = value.split(/\.|\?|!/)
+
+  tree.tokenQuantums[docId] = {}
+
+  let quantumIndex = 0
+  let tokenNumber = 0
+  for (const quantum of quantums) {
+    const tokens = await tokenizer.tokenize(quantum, language, prop)
+
+    for (const token of tokens) {
+      tokenNumber++
+
+      if (!tree.tokenQuantums[docId][token]) {
+        tree.tokenQuantums[docId][token] = 0
+      }
+
+      const tokenBitIndex = Math.min(quantumIndex, 20)
+
+      tree.tokenQuantums[docId][token] = calculateTokenQuantum(tree.tokenQuantums[docId][token], tokenBitIndex)
+      if (tree.tokenQuantums[docId][token] < 0) {
+        // console.log("Overflow", docId, token, data.tokenStats.description[docId][token], tokenBitIndex)
+        throw new Error('Overflow')
+      }
+
+      insertInner(tree, token, docId)
+    }
+
+    // Don't increment the quantum index if the sentence is too short
+    if (tokens.length > 1) {
+      quantumIndex++
+    }
+  }
+
+  tree.tokensLength.set(docId, tokenNumber)
+}
+
+export function calculateTokenQuantum(prevValue: number, bit: number) {
+  if (prevValue < 0) {
+    throw new Error('Overflow')
+  }
+  if (bit < 0 || bit > 20) {
+    throw new Error('Invalid bit')
+  }
+
+  const currentCount = count(prevValue)
+  const currentSentenceMask = bitmask_20(prevValue)
+  const newSentenceMask = currentSentenceMask | (1 << bit)
+  return ((currentCount + 1) << 20) | newSentenceMask
+}
+
+export function count(n: number) {
+  return n >> 20
+}
+const BIT_MASK_20 = 0b11111111111111111111
+export function bitmask_20(n: number) {
+  return n & BIT_MASK_20
 }
 
 function _findLevenshtein(
@@ -263,7 +351,9 @@ function _findLevenshtein(
   }
 }
 
-export function find(root: Node, { term, exact, tolerance }: FindParams): FindResult {
+export function find(tree: RadixTree, { term, exact, tolerance }: FindParams): FindResult {
+  let root = tree.node
+
   // Find the closest node to the term
 
   // Use `if` condition because tolerance `0` is supposed to match only prefix.
@@ -361,10 +451,11 @@ export function removeWord(root: Node, term: string): boolean {
   return false
 }
 
-export function removeDocumentByWord(root: Node, term: string, docID: InternalDocumentID, exact = true): boolean {
+export function removeDocumentByWord(tree: RadixTree, term: string, docID: InternalDocumentID, exact = true): boolean {
   if (!term) {
     return true
   }
+  let root = tree.node
 
   const termLength = term.length
   for (let i = 0; i < termLength; i++) {
@@ -384,4 +475,34 @@ export function removeDocumentByWord(root: Node, term: string, docID: InternalDo
     }
   }
   return true
+}
+
+interface RadixDump {
+  type: typeof RadixType
+  isArray: boolean
+  node: Node
+  tokenQuantums: Record<number, Record<string, number>>
+  tokensLength: [number, number][]
+}
+
+export function load(dumpRaw: unknown): RadixTree {
+  const dump = dumpRaw as RadixDump
+  return {
+    type: RadixType,
+    isArray: dump.isArray,
+    node: dump.node,
+    tokenQuantums: dump.tokenQuantums,
+    tokensLength: new Map(dump.tokensLength)
+  }
+}
+
+export function save(node: RadixTree): unknown {
+  const dump: RadixDump = {
+    type: RadixType,
+    isArray: node.isArray,
+    node: node.node,
+    tokenQuantums: node.tokenQuantums,
+    tokensLength: Array.from(node.tokensLength)
+  }
+  return dump as unknown
 }
