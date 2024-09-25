@@ -61,21 +61,6 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
     propertiesToSearch = propertiesToSearch.filter((prop: string) => (properties as string[]).includes(prop))
   }
 
-  /*
-  // Create the search context and the results
-  const context = await createSearchContext(
-    orama.tokenizer,
-    orama.index,
-    orama.documentsStore,
-    language,
-    params,
-    propertiesToSearch,
-    tokens,
-    await orama.documentsStore.count(docs),
-    timeStart
-  )
-    */
-
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
   const hasFilters = Object.keys(params.where ?? {}).length > 0
   let whereFiltersIDs: InternalDocumentID[] = []
@@ -85,10 +70,14 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
   }
 
   let uniqueDocsIDs: TokenScore[]
-  if (term) {
+  // We need to perform the search if:
+  // - we have a search term
+  // - or we have properties to search
+  //   in this case, we need to return all the documents that contains at least one of the given properties
+  if (term || properties) {
     uniqueDocsIDs = await orama.index.search(
       index,
-      term,
+      term || '',
       orama.tokenizer,
       language,
       propertiesToSearch,
@@ -99,8 +88,7 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
   } else {
     // Tokenizer returns empty array and the search term is empty as well.
     // We return all the documents.
-    // TODO
-    uniqueDocsIDs = [] // Object.keys(await orama.documentsStore.getAll(orama.data.docs)).map((k) => [k, 0])
+    uniqueDocsIDs = Object.keys(await orama.documentsStore.getAll(orama.data.docs)).map((k) => [+k, 0] as TokenScore)
   }
 
   // Get unique doc IDs from uniqueDocsIDs map

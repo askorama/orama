@@ -62,7 +62,14 @@ import {
   BKDTree,
   BKDType
 } from '../trees/bkd.js'
-import { create as boolCreate, removeDocument as boolRemoveDocument, BoolType } from '../trees/bool.js'
+import {
+  create as boolCreate,
+  removeDocument as boolRemoveDocument,
+  insert as boolInsert,
+  where as boolWhere,
+  BoolType,
+  BoolTree
+} from '../trees/bool.js'
 
 import { convertDistanceToMeters, intersect, safeArrayPush } from '../utils.js'
 import { getMagnitude } from './cosine-similarity.js'
@@ -255,6 +262,13 @@ function insertScalarBuilder(
         )
         break
       }
+      case BoolType: {
+        await boolInsert(
+          index.indexes[prop] as BoolTree,
+          internalDocumentId,
+          value as boolean
+        )
+      }
     }
   }
 }
@@ -319,7 +333,6 @@ async function removeScalar(
   schemaType: ScalarSearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
-  docsCount: number
 ): Promise<boolean> {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
@@ -337,10 +350,7 @@ async function removeScalar(
     case RadixType: {
       const tokens = await tokenizer.tokenize(value as string, language, prop)
 
-      await implementation.removeDocumentScoreParameters(index, prop, id, docsCount)
-
       for (const token of tokens) {
-        await implementation.removeTokenScoreParameters(index, prop, token)
         radixRemoveDocument(index.indexes[prop], token, internalId)
       }
 
@@ -370,7 +380,6 @@ export async function remove(
   schemaType: SearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
-  docsCount: number
 ): Promise<boolean> {
   if (!isArrayType(schemaType)) {
     return removeScalar(
@@ -382,7 +391,6 @@ export async function remove(
       schemaType as ScalarSearchableType,
       language,
       tokenizer,
-      docsCount
     )
   }
 
@@ -391,7 +399,7 @@ export async function remove(
   const elements = value as Array<string | number | boolean>
   const elementsLength = elements.length
   for (let i = 0; i < elementsLength; i++) {
-    await removeScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer, docsCount)
+    await removeScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer)
   }
 
   return true
@@ -417,7 +425,6 @@ function numberOfOnes(n: number) {
 
 function searchInProperty(
   tree: RadixTree,
-  prop: string,
   tokens: string[],
   exact: boolean,
   tolerance: number,
@@ -495,7 +502,7 @@ export async function search(
   tolerance: number,
   boost: Record<string, number>
 ): Promise<TokenScore[]> {
-  const words = await tokenizer.tokenize(term, language)
+  const tokens = await tokenizer.tokenize(term, language)
 
   const resultsMap = new Map<number, number>()
   for (const prop of propertiesToSearch) {
@@ -508,8 +515,17 @@ export async function search(
     if (type !== RadixType) {
       throw createError('WRONG_SEARCH_PROPERTY_TYPE', prop)
     }
-    const boostPerProperty = boost[prop] || 1
-    searchInProperty(tree, prop, words, exact, tolerance, resultsMap, boostPerProperty)
+    const boostPerProperty = boost[prop] ?? 1
+    if (boostPerProperty <= 0) {
+      throw createError('INVALID_BOOST_VALUE', boostPerProperty)
+    }
+
+    // if the tokenizer returns an empty array, we returns all the documents
+    if (tokens.length === 0 && !term) {
+      tokens.push('')
+    }
+
+    searchInProperty(tree, tokens, exact, tolerance, resultsMap, boostPerProperty)
   }
 
   return Array.from(resultsMap)
@@ -541,10 +557,7 @@ export async function searchByWhereClause<T extends AnyOrama>(
     const { type, isArray } = index.indexes[param]
 
     if (type === BoolType) {
-      const node = index.indexes[param]
-      // operation is `true` or `false`
-      const filteredIDs = node[operation.toString()]
-      safeArrayPush(filtersMap[param], filteredIDs)
+      safeArrayPush(filtersMap[param], boolWhere(index.indexes[param], operation as boolean))
       continue
     }
 
@@ -777,11 +790,6 @@ export async function createIndex(): Promise<IIndex<Index>> {
     create,
     insert,
     remove,
-    insertDocumentScoreParameters: () => {},
-    insertTokenScoreParameters: () => {},
-    removeDocumentScoreParameters: () => {},
-    removeTokenScoreParameters: () => {},
-    calculateResultScores: () => [],
     search,
     searchByWhereClause,
     getSearchableProperties,

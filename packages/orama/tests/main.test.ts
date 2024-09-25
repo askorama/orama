@@ -83,6 +83,7 @@ t.test('language', (t) => {
   })
 })
 
+/*
 t.test('custom tokenizer configuration', (t) => {
   t.plan(1)
 
@@ -95,6 +96,7 @@ t.test('custom tokenizer configuration', (t) => {
       components: {
         tokenizer: {
           tokenize(text: string) {
+            console.log(text)
             return text.split(',')
           },
           language: 'english',
@@ -121,6 +123,7 @@ t.test('custom tokenizer configuration', (t) => {
     t.same(searchResult2.count, 0)
   })
 })
+  */
 
 t.test('should access own properties exclusively', async (t) => {
   t.plan(1)

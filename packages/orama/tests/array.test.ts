@@ -18,7 +18,7 @@ t.test('create should support array of string', async (t) => {
     { name: ['Lily', 'Lily', 'Lily', 'Lily', 'Evans', 'Potter'] }
   ])
 
-  await checkSearchTerm(t, db, 'Albus', [albusId])
+  await checkSearchTerm(t, db, 'Albus', [albusId])  
   await checkSearchTerm(t, db, 'Harry', [harryId])
   await checkSearchTerm(t, db, 'James', [harryId, jamesId])
   await checkSearchTerm(t, db, 'Potter', [harryId, jamesId, lilyId])
@@ -26,6 +26,7 @@ t.test('create should support array of string', async (t) => {
   await checkSearchTerm(t, db, 'foo', [])
 
   await checkSearchWhere(t, db, 'name', 'Albus', [albusId])
+
   await checkSearchWhere(t, db, 'name', 'Harry', [harryId])
   await checkSearchWhere(t, db, 'name', 'James', [harryId, jamesId])
   await checkSearchWhere(t, db, 'name', 'Potter', [harryId, jamesId, lilyId])
@@ -253,7 +254,7 @@ async function checkSearchWhere(t, db, key, where, expectedIds) {
   t.strictSame(new Set(result.hits.map((h) => h.id).sort()), new Set(expectedIds))
 }
 
-async function checkSearchFacets(t: Tap.Test, db, key, facet, expectedFacet) {
+async function checkSearchFacets(t: any, db, key, facet, expectedFacet) {
   const result = await search(db, {
     facets: {
       [key]: facet

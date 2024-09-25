@@ -4,7 +4,85 @@
     "hits": [
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.6666666666666665,
+        "document": {
+          "date": "1870/07/19",
+          "description": " Franco-Prussian War: France declares war on Prussia.",
+          "granularity": "year",
+          "categories": {
+            "first": "July/September",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 1.5714285714285714,
+        "document": {
+          "date": "1846/05/13",
+          "description": " Mexican-American War: The United States declares war on Mexico.",
+          "granularity": "year",
+          "categories": {
+            "first": "April/June",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 1.5714285714285714,
+        "document": {
+          "date": "1854/03/27",
+          "description": " Crimean War: The United Kingdom declares war on Russia.",
+          "granularity": "year",
+          "categories": {
+            "first": "January/March",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 1.5714285714285714,
+        "document": {
+          "date": "1856/11/01",
+          "description": " Anglo-Persian War: War is declared between Great Britain and Persia.",
+          "granularity": "year",
+          "categories": {
+            "first": "October/December",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 1.5714285714285714,
+        "document": {
+          "date": "1977/07/13",
+          "description": " Somalia declares war on Ethiopia, starting the Ethiopian-Somali War.",
+          "granularity": "year",
+          "categories": {
+            "first": "July",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 1.5294117647058822,
+        "document": {
+          "date": "1756/05/15",
+          "description": " Seven Years' War: The Seven Years' War formally begins when Great Britain declares war on France.ref name=quotCassell's Chronologyquot/",
+          "granularity": "year",
+          "categories": {
+            "first": "January/June",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 1.5,
         "document": {
           "date": "-89",
           "description": "Social War:",
@@ -17,7 +95,7 @@
       },
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.5,
         "document": {
           "date": "-57",
           "description": "Gallic Wars:",
@@ -30,7 +108,7 @@
       },
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.5,
         "document": {
           "date": "-55",
           "description": "Gallic War",
@@ -43,7 +121,7 @@
       },
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.5,
         "document": {
           "date": "-54",
           "description": "Gallic Wars",
@@ -53,10 +131,15 @@
             "second": "Roman Republic"
           }
         }
-      },
+      }
+    ]
+  },
+  "should perform paginate search-page-2": {
+    "count": 2357,
+    "hits": [
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.5,
         "document": {
           "date": "-53",
           "description": "Parthian war:",
@@ -69,7 +152,7 @@
       },
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.5,
         "document": {
           "date": "-53",
           "description": "Gallic War:",
@@ -82,7 +165,7 @@
       },
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.5,
         "document": {
           "date": "-48",
           "description": "Civil War:",
@@ -95,7 +178,7 @@
       },
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.5,
         "document": {
           "date": "-47",
           "description": "Civil War:",
@@ -108,7 +191,7 @@
       },
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.5,
         "document": {
           "date": "-46",
           "description": "Civil War:",
@@ -121,7 +204,20 @@
       },
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.5,
+        "document": {
+          "date": "1739/10/23",
+          "description": " War of Jenkins' Ear: Great Britain declares war on Spain.",
+          "granularity": "year",
+          "categories": {
+            "first": "July/December",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 1.5,
         "document": {
           "date": "1809/03/13",
           "description": "Peninsular War",
@@ -131,15 +227,23 @@
             "second": ""
           }
         }
-      }
-    ]
-  },
-  "should perform paginate search-page-2": {
-    "count": 2357,
-    "hits": [
+      },
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.5,
+        "document": {
+          "date": "1814/12/24",
+          "description": " War of 1812: The Treaty of Ghent is signed, officially ending the war.",
+          "granularity": "year",
+          "categories": {
+            "first": "October/December",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 1.5,
         "document": {
           "date": "1867/12/02",
           "description": "Paraguayan War.",
@@ -152,7 +256,38 @@
       },
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.5,
+        "document": {
+          "date": "1879/07/04",
+          "description": " Anglo-Zulu War: The Anglo-Zulu War effectively ends at the Battle of Ulundi.",
+          "granularity": "year",
+          "categories": {
+            "first": "July/September",
+            "second": ""
+          }
+        }
+      }
+    ]
+  },
+  "should perform paginate search-page-3": {
+    "count": 2357,
+    "hits": [
+      {
+        "id": "",
+        "score": 1.5,
+        "document": {
+          "date": "1912/10/08",
+          "description": "The First Balkan War begins: Montenegro declares war against Turkey.",
+          "granularity": "year",
+          "categories": {
+            "first": "October",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 1.5,
         "document": {
           "date": "1914/12/24",
           "description": " World War I:",
@@ -165,7 +300,7 @@
       },
       {
         "id": "",
-        "score": 4.744426329679039,
+        "score": 1.5,
         "document": {
           "date": "1950/02/14",
           "description": " Cold War:",
@@ -178,145 +313,62 @@
       },
       {
         "id": "",
-        "score": 4.087300377720357,
+        "score": 1.5,
         "document": {
-          "date": "-113",
-          "description": "War between the Celtiberians and the Romans.",
+          "date": "1953/08/05",
+          "description": "Operation Big Switch: Prisoners of war are repatriated after the Korean War.",
           "granularity": "year",
           "categories": {
-            "first": "By place",
-            "second": "Roman Republic"
+            "first": "August",
+            "second": ""
           }
         }
       },
       {
         "id": "",
-        "score": 4.087300377720357,
+        "score": 1.5,
         "document": {
-          "date": "-86",
-          "description": "First Mithridatic War",
+          "date": "1973/02/11",
+          "description": "Vietnam War: The first American prisoners of war are released from Vietnam.",
           "granularity": "year",
           "categories": {
-            "first": "By place",
-            "second": "Roman Republic"
+            "first": "February",
+            "second": ""
           }
         }
       },
       {
         "id": "",
-        "score": 4.087300377720357,
+        "score": 1.4736842105263157,
         "document": {
-          "date": "630",
-          "description": "The Byzantine-Arab Wars begin.",
+          "date": "1998/08/02",
+          "description": " Second Congo War begins. 3,900,000 people are killed before it ends in 2003, making it the bloodiest war, to date, since World War II.",
           "granularity": "year",
           "categories": {
-            "first": "By place",
-            "second": "Byzantine Empire"
+            "first": "August",
+            "second": ""
           }
         }
       },
       {
         "id": "",
-        "score": 4.087300377720357,
+        "score": 1.4444444444444444,
         "document": {
-          "date": "632/01/27",
-          "description": "Ridda Wars begins",
+          "date": "1264",
+          "description": "Before May ampampndash The Second Barons' War, a civil war in England, begins.",
           "granularity": "year",
           "categories": {
-            "first": "By place",
-            "second": "Asia"
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "941",
-          "description": "The Rus'-Byzantine War is fought.",
-          "granularity": "year",
-          "categories": {
-            "first": "By place",
-            "second": "Asia"
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "988",
-          "description": "Rus'–Byzantine War",
-          "granularity": "year",
-          "categories": {
-            "first": "By place",
+            "first": "By area",
             "second": "Europe"
           }
         }
       },
       {
         "id": "",
-        "score": 4.087300377720357,
+        "score": 1.4444444444444444,
         "document": {
-          "date": "1043/10/31",
-          "description": "Rus'-Byzantine War (1043).",
-          "granularity": "year",
-          "categories": {
-            "first": "",
-            "second": ""
-          }
-        }
-      }
-    ]
-  },
-  "should perform paginate search-page-3": {
-    "count": 2357,
-    "hits": [
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1447/07/15",
-          "description": "The Albanian-Venetian War of 1447-1448.",
-          "granularity": "year",
-          "categories": {
-            "first": "Date unknown",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1470/10/30",
-          "description": "Start of the Anglo-Hanseatic War.",
-          "granularity": "year",
-          "categories": {
-            "first": "Date unknown",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1522/12/20",
-          "description": "The Habsburg-Valois Wars begin.",
-          "granularity": "year",
-          "categories": {
-            "first": "Date unknown",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1558/01/22",
-          "description": " Beginning of the Livonian War.",
+          "date": "1793/02/01",
+          "description": " French Revolutionary Wars: France declares war on Great Britain and the Netherlands.",
           "granularity": "year",
           "categories": {
             "first": "January/June",
@@ -326,78 +378,26 @@
       },
       {
         "id": "",
-        "score": 4.087300377720357,
+        "score": 1.4444444444444444,
         "document": {
-          "date": "1728/10/20",
-          "description": "The Meerkat–Mongoose war.",
+          "date": "1810/11/17",
+          "description": " Anglo-Swedish War (1810–1812): Sweden declares war on the United Kingdom.",
           "granularity": "year",
           "categories": {
-            "first": "In fiction",
+            "first": "October/December",
             "second": ""
           }
         }
       },
       {
         "id": "",
-        "score": 4.087300377720357,
+        "score": 1.4444444444444444,
         "document": {
-          "date": "1830/12/20",
-          "description": "The Java War ends.",
-          "granularity": "year",
-          "categories": {
-            "first": "Date unknown",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1857/04/04",
-          "description": " End of the Anglo-Persian War.",
-          "granularity": "year",
-          "categories": {
-            "first": "April/June",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1861/04/27",
-          "description": " American Civil War:",
-          "granularity": "year",
-          "categories": {
-            "first": "April/June",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1879/01/11",
-          "description": " The Anglo-Zulu War begins.",
+          "date": "1856/02/18",
+          "description": "March ampampndash Nepalese-Tibetan War: The signing of the Treaty of Thapathali concludes the war.",
           "granularity": "year",
           "categories": {
             "first": "January/March",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 4.087300377720357,
-        "document": {
-          "date": "1919/02/14",
-          "description": " The Polish-Soviet War begins.",
-          "granularity": "year",
-          "categories": {
-            "first": "February",
             "second": ""
           }
         }

@@ -110,7 +110,7 @@ function findAllWords(node: Node, output: FindResult, term: string, exact?: bool
   return output
 }
 
-function getCommonPrefix(a: string, b: string) {
+export function getCommonPrefix(a: string, b: string) {
   let commonPrefix = ''
   const len = Math.min(a.length, b.length)
   for (let i = 0; i < len; i++) {
@@ -131,7 +131,7 @@ export interface RadixTree {
   tokenQuantums: Record<number, Record<string, number>>
 }
 
-function createNode(end: boolean, subWord: string, key: string): Node {
+function createNode(end = false, subWord = '', key = ''): Node {
   return new Node(key, subWord, end)
 }
 
@@ -402,55 +402,6 @@ export function find(tree: RadixTree, { term, exact, tolerance }: FindParams): F
   }
 }
 
-export function contains(root: Node, term: string): boolean {
-  const termLength = term.length
-  for (let i = 0; i < termLength; i++) {
-    const character = term[i]
-
-    if (character in root.c) {
-      const rootChildrenChar = root.c[character]
-      const edgeLabel = rootChildrenChar.s
-      const termSubstring = term.substring(i)
-      const commonPrefix = getCommonPrefix(edgeLabel, termSubstring)
-      const commonPrefixLength = commonPrefix.length
-
-      if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
-        return false
-      }
-      i += rootChildrenChar.s.length - 1
-      root = rootChildrenChar
-    } else {
-      return false
-    }
-  }
-  return true
-}
-
-export function removeWord(root: Node, term: string): boolean {
-  if (!term) {
-    return false
-  }
-
-  const termLength = term.length
-  for (let i = 0; i < termLength; i++) {
-    const character = term[i]
-    const parent = root
-    if (character in root.c) {
-      i += root.c[character].s.length - 1
-      root = root.c[character]
-
-      if (Object.keys(root.c).length === 0) {
-        delete parent.c[root.k]
-        return true
-      }
-    } else {
-      return false
-    }
-  }
-
-  return false
-}
-
 export function removeDocumentByWord(tree: RadixTree, term: string, docID: InternalDocumentID, exact = true): boolean {
   if (!term) {
     return true
@@ -474,6 +425,11 @@ export function removeDocumentByWord(tree: RadixTree, term: string, docID: Inter
       return false
     }
   }
+
+  // Cleanup stats
+  tree.tokensLength.delete(docID)
+  delete tree.tokenQuantums[docID]
+
   return true
 }
 

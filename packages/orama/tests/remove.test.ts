@@ -11,6 +11,8 @@ import {
   removeMultiple,
   search
 } from '../src/index.js'
+import { RadixTree } from '../src/trees/radix.js'
+
 
 t.test('remove method', (t) => {
   t.test('removes the given document', async (t) => {
@@ -249,12 +251,13 @@ t.test('removeMultiple method', (t) => {
 })
 
 t.test('should remove a document and update index field length', async (t) => {
-  t.plan(2)
+  t.plan(4)
 
   const [db] = await createSimpleDB()
 
-  const fieldLengths = { ...(db.data.index as Index).fieldLengths }
-  const avgFieldLength = { ...(db.data.index as Index).avgFieldLength }
+  const name = (db.data.index as Index).indexes['name'] as RadixTree
+  const fieldQuantums = { ...name.tokenQuantums }
+  const fieldTokensLength = new Map(name.tokensLength)
 
   const id4 = await insert(db, {
     name: 'other machine',
@@ -264,10 +267,13 @@ t.test('should remove a document and update index field length', async (t) => {
       sales: 100
     }
   })
+  t.notSame(name.tokenQuantums, fieldQuantums)
+  t.notSame(name.tokensLength, fieldTokensLength)
+
   await remove(db, id4)
 
-  t.same((db.data.index as Index).fieldLengths, fieldLengths)
-  t.same((db.data.index as Index).avgFieldLength, avgFieldLength)
+  t.same(name.tokenQuantums, fieldQuantums)
+  t.same(name.tokensLength, fieldTokensLength)
 })
 
 // Test cases for issue https://github.com/askorama/orama/issues/486

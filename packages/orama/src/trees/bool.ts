@@ -19,6 +19,16 @@ export function create(isArray: boolean): BoolTree {
   }
 }
 
+export function insert(root: BoolTree, internalId: InternalDocumentID, value: boolean) {
+  const booleanKey = value ? 'true' : 'false'
+  root[booleanKey].push(internalId)
+}
+
+export function where(root: BoolTree, value: boolean) {
+  const booleanKey = value ? 'true' : 'false'
+  return root[booleanKey]
+}
+
 export function removeDocument(root: BoolTree, internalId: InternalDocumentID, value: ScalarSearchableValue): void {
   const booleanKey = value ? 'true' : 'false'
   const position = root[booleanKey].indexOf(internalId)

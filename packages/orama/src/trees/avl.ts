@@ -206,7 +206,7 @@ export function create<K, V>(key: K, value: V, isArray: boolean): AVLTree<K, V> 
 
 let insertCount = 0
 
-export function insert<K, V>(rootNode: AVLTree<K, V[]>, key: K, newValue: V[], rebalanceThreshold = 500): void {
+export function insert<K, V>(rootNode: AVLTree<K, V[]>, key: K, newValue: V, rebalanceThreshold = 500): void {
   function insertNode(node: Nullable<Node<K, V[]>>, key: K, newValue: V[]): Node<K, V[]> {
     if (node === null) {
       insertCount++
@@ -239,7 +239,7 @@ export function insert<K, V>(rootNode: AVLTree<K, V[]>, key: K, newValue: V[], r
     return node
   }
 
-  rootNode.root = insertNode(rootNode.root, key, newValue)
+  rootNode.root = insertNode(rootNode.root, key, [newValue])
 }
 
 function rebalanceNode<K, V>(node: Node<K, V[]>, key: K): Node<K, V[]> {

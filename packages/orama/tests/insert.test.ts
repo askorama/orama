@@ -4,6 +4,7 @@ import { Index } from '../src/components/index.js'
 import { getInternalDocumentId } from '../src/components/internal-document-id-store.js'
 import { AnyDocument, count, create, insert, insertMultiple, search } from '../src/index.js'
 import dataset from './datasets/events.json' assert { type: 'json' }
+import { BKDTree } from '../src/trees/bkd.js'
 
 t.test('insert method', (t) => {
   t.test('should correctly insert and retrieve data', async (t) => {
@@ -59,7 +60,7 @@ t.test('insert method', (t) => {
     t.equal(searchResult.count, 1)
     t.equal(searchResult.hits[0].document.author, 'Frank Zappa')
   })
-
+  
   t.test("should use the 'id' field found in the document as index id", async (t) => {
     t.plan(2)
 
@@ -346,8 +347,9 @@ t.test('insert method', (t) => {
       })
     )
 
-    t.equal((db.data.index.indexes.location.node as any).root.point.lat, 45.5771622)
-    t.equal((db.data.index.indexes.location.node as any).root.point.lon, 9.261266)
+    const index = db.data.index.indexes.location as BKDTree
+    t.equal(index.root?.point.lat, 45.5771622)
+    t.equal(index.root?.point.lon, 9.261266)
   })
 
   t.end()
@@ -498,8 +500,6 @@ t.test('insertMultiple method', (t) => {
   })
 
   t.test('should support `timeout` parameter', async (t) => {
-    t.plan(2)
-
     const db = await create({
       schema: {
         description: 'string'
@@ -512,14 +512,14 @@ t.test('insertMultiple method', (t) => {
     const batchSize = 10
 
     const before = Date.now()
-    await insertMultiple(db, docs, batchSize, undefined, false, 200)
+    await insertMultiple(db, docs, batchSize, undefined, false, 20)
     const after = Date.now()
 
     t.equal(await count(db), 4000)
     const batchNumber = Math.ceil(docs.length / batchSize)
     // the "sleep" is yeilded between batches,
     // so it is not fired for the last batch
-    const expectedTime = (batchNumber - 1) * 200
+    const expectedTime = (batchNumber - 1) * 20
     t.equal(after - before > expectedTime, true)
   })
 

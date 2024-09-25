@@ -18,7 +18,7 @@ t.test('AVL Tree', (t) => {
   t.test('create', (t) => {
     t.plan(3)
 
-    const tree = create(1, 'foo')
+    const tree = create(1, 'foo', false)
     t.equal(getSize(tree), 1)
     t.equal(find(tree, 1), 'foo')
     t.equal(find(tree, 4), null)
@@ -27,7 +27,7 @@ t.test('AVL Tree', (t) => {
   t.test('insert', (t) => {
     t.plan(1)
 
-    const tree = create(1, 'foo')
+    const tree = create(1, ['foo'], false)
 
     insert(tree, 2, 'bar')
     insert(tree, 10, 'baz')
@@ -42,7 +42,7 @@ t.test('AVL Tree', (t) => {
   t.test('isBalanced', (t) => {
     t.plan(1)
 
-    const tree = create(1, { foo: 'bar' })
+    const tree = create(1, [{ foo: 'bar' }], false)
 
     insert(tree, 2, { foo: 'baz' })
     insert(tree, 10, { foo: 'qux' })
@@ -64,7 +64,7 @@ t.test('AVL Tree', (t) => {
   t.test('find', (t) => {
     t.plan(2)
 
-    const tree = create(1, [1, 2, 3])
+    const tree = create(1, [1, 2, 3], false)
 
     insert(tree, 2, [4, 5, 6])
     insert(tree, 10, [7, 8, 9])
@@ -80,7 +80,7 @@ t.test('AVL Tree', (t) => {
   t.test('remove', (t) => {
     t.plan(3)
 
-    const tree = create(1, 'foo')
+    const tree = create(1, 'foo', false)
 
     insert(tree, 2, 'bar')
     insert(tree, 10, 'baz')
@@ -99,7 +99,7 @@ t.test('AVL Tree', (t) => {
   t.test('rangeSearch', (t) => {
     t.plan(1)
 
-    const tree = create(1, ['foo'])
+    const tree = create(1, ['foo'], false)
 
     insert(tree, 2, ['bar'])
     insert(tree, 10, ['baz'])
@@ -114,7 +114,7 @@ t.test('AVL Tree', (t) => {
   t.test('greaterThan', (t) => {
     t.plan(1)
 
-    const tree = create(1, ['foo'])
+    const tree = create(1, ['foo'], false)
 
     insert(tree, 2, ['bar'])
     insert(tree, 10, ['baz'])
@@ -129,7 +129,7 @@ t.test('AVL Tree', (t) => {
   t.test('lessThan', (t) => {
     t.plan(1)
 
-    const tree = create(1, ['foo'])
+    const tree = create(1, ['foo'], false)
 
     insert(tree, 2, ['bar'])
     insert(tree, 10, ['baz'])

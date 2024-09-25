@@ -941,27 +941,8 @@ export interface IIndex<I extends AnyIndexStore> {
     schemaType: SearchableType,
     language: string | undefined,
     tokenizer: Tokenizer,
-    docsCount: number
   ) => SyncOrAsyncValue<boolean>
   afterRemove?: IIndexInsertOrRemoveHookFunction
-
-  insertDocumentScoreParameters(
-    index: I,
-    prop: string,
-    id: DocumentID,
-    tokens: string[],
-    docsCount: number
-  ): SyncOrAsyncValue
-  insertTokenScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], token: string): SyncOrAsyncValue
-  removeDocumentScoreParameters(index: I, prop: string, id: DocumentID, docsCount: number): SyncOrAsyncValue
-  removeTokenScoreParameters(index: I, prop: string, token: string): SyncOrAsyncValue
-  calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-    context: SearchContext<T, ResultDocument>,
-    index: I,
-    prop: string,
-    term: string,
-    ids: DocumentID[]
-  ): SyncOrAsyncValue<TokenScore[]>
 
   search<T extends AnyOrama>(
     index: I,

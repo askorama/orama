@@ -64,7 +64,6 @@ export async function remove<T extends AnyOrama>(
         schemaType,
         language,
         orama.tokenizer,
-        docsCount
       ))
     ) {
       result = false
