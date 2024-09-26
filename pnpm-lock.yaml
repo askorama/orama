@@ -570,6 +570,9 @@ importers:
 
   packages/plugin-embeddings:
     dependencies:
+      '@orama/orama':
+        specifier: workspace:*
+        version: link:../orama
       '@tensorflow-models/universal-sentence-encoder':
         specifier: ^1.3.3
         version: 1.3.3(@tensorflow/tfjs-converter@4.21.0(@tensorflow/tfjs-core@4.21.0(encoding@0.1.13)))(@tensorflow/tfjs-core@4.21.0(encoding@0.1.13))
@@ -583,9 +586,6 @@ importers:
         specifier: ^4.21.0
         version: 4.21.0(encoding@0.1.13)(seedrandom@3.0.5)
     devDependencies:
-      '@orama/orama':
-        specifier: workspace:*
-        version: link:../orama
       '@types/node':
         specifier: ^20.9.0
         version: 20.11.19
@@ -16769,7 +16769,7 @@ snapshots:
       '@types/node': 20.11.19
       chalk: 4.1.2
       cosmiconfig: 8.2.0
-      cosmiconfig-typescript-loader: 4.3.0(@types/node@20.11.19)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@5.0.3))(typescript@5.6.2)
+      cosmiconfig-typescript-loader: 4.3.0(@types/node@20.11.19)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.6.2))(typescript@5.6.2)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -16789,7 +16789,7 @@ snapshots:
       '@types/node': 20.5.1
       chalk: 4.1.2
       cosmiconfig: 8.2.0
-      cosmiconfig-typescript-loader: 4.3.0(@types/node@20.5.1)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.9.0)(typescript@5.0.3))(typescript@5.6.2)
+      cosmiconfig-typescript-loader: 4.3.0(@types/node@20.5.1)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.5.1)(typescript@5.6.2))(typescript@5.6.2)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -16990,7 +16990,7 @@ snapshots:
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.89.0(@swc/core@1.3.27))
       tslib: 2.6.2
       update-notifier: 5.1.0
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       wait-on: 6.0.1
       webpack: 5.89.0(@swc/core@1.3.27)
       webpack-bundle-analyzer: 4.9.0
@@ -17083,7 +17083,7 @@ snapshots:
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.89.0(@swc/core@1.3.27))
       tslib: 2.6.2
       update-notifier: 5.1.0
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       wait-on: 6.0.1
       webpack: 5.89.0(@swc/core@1.3.27)
       webpack-bundle-analyzer: 4.9.0
@@ -17175,7 +17175,7 @@ snapshots:
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.89.0(@swc/core@1.3.27))
       tslib: 2.6.2
       update-notifier: 6.0.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
       webpack-bundle-analyzer: 4.9.0
       webpack-dev-server: 4.15.1(webpack@5.89.0(@swc/core@1.3.27))
@@ -17267,7 +17267,7 @@ snapshots:
       terser-webpack-plugin: 5.3.9(@swc/core@1.3.27)(webpack@5.89.0(@swc/core@1.3.27))
       tslib: 2.6.2
       update-notifier: 6.0.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
       webpack-bundle-analyzer: 4.9.0
       webpack-dev-server: 4.15.1(webpack@5.89.0(@swc/core@1.3.27))
@@ -17346,7 +17346,7 @@ snapshots:
       tslib: 2.6.2
       unified: 9.2.2
       unist-util-visit: 2.0.3
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
     transitivePeerDependencies:
       - '@docusaurus/types'
@@ -17383,7 +17383,7 @@ snapshots:
       tslib: 2.6.2
       unified: 11.0.4
       unist-util-visit: 5.0.0
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       vfile: 6.0.1
       webpack: 5.89.0(@swc/core@1.3.27)
     transitivePeerDependencies:
@@ -17419,7 +17419,7 @@ snapshots:
       tslib: 2.6.2
       unified: 11.0.4
       unist-util-visit: 5.0.0
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       vfile: 6.0.1
       webpack: 5.89.0(@swc/core@1.3.27)
     transitivePeerDependencies:
@@ -18723,7 +18723,7 @@ snapshots:
       resolve-pathname: 3.0.0
       shelljs: 0.8.5
       tslib: 2.6.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
     optionalDependencies:
       '@docusaurus/types': 2.4.3(@swc/core@1.3.27)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
@@ -18751,7 +18751,7 @@ snapshots:
       resolve-pathname: 3.0.0
       shelljs: 0.8.5
       tslib: 2.6.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
     optionalDependencies:
       '@docusaurus/types': 3.0.1(@swc/core@1.3.27)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -18781,7 +18781,7 @@ snapshots:
       resolve-pathname: 3.0.0
       shelljs: 0.8.5
       tslib: 2.6.2
-      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
+      url-loader: 4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27))
       webpack: 5.89.0(@swc/core@1.3.27)
     optionalDependencies:
       '@docusaurus/types': 3.2.0(@swc/core@1.3.27)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -23609,14 +23609,14 @@ snapshots:
 
   core-util-is@1.0.3: {}
 
-  cosmiconfig-typescript-loader@4.3.0(@types/node@20.11.19)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@18.11.18)(typescript@5.0.3))(typescript@5.6.2):
+  cosmiconfig-typescript-loader@4.3.0(@types/node@20.11.19)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.6.2))(typescript@5.6.2):
     dependencies:
       '@types/node': 20.11.19
       cosmiconfig: 8.2.0
       ts-node: 10.9.1(@swc/core@1.3.27)(@types/node@20.11.19)(typescript@5.6.2)
       typescript: 5.6.2
 
-  cosmiconfig-typescript-loader@4.3.0(@types/node@20.5.1)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.9.0)(typescript@5.0.3))(typescript@5.6.2):
+  cosmiconfig-typescript-loader@4.3.0(@types/node@20.5.1)(cosmiconfig@8.2.0)(ts-node@10.9.1(@swc/core@1.3.27)(@types/node@20.5.1)(typescript@5.6.2))(typescript@5.6.2):
     dependencies:
       '@types/node': 20.5.1
       cosmiconfig: 8.2.0
@@ -32921,7 +32921,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  url-loader@4.1.1(file-loader@6.2.0(webpack@5.75.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27)):
+  url-loader@4.1.1(file-loader@6.2.0(webpack@5.89.0(@swc/core@1.3.27)))(webpack@5.89.0(@swc/core@1.3.27)):
     dependencies:
       loader-utils: 2.0.4
       mime-types: 2.1.35

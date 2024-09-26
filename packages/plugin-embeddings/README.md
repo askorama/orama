@@ -16,6 +16,7 @@ npm i @orama/plugin-embeddings
 - `@tensorflow/tfjs-node`
 - `@tensorflow/tfjs-backend-webgl`
 - `@tensorflow/tfjs-backend-cpu`
+- `@tensorflow/tfjs-node-gpu`
 - `@tensorflow/tfjs-backend-wasm`
 
 For example, if you're running Orama on the browser, we highly recommend using `@tensorflow/tfjs-backend-webgl`:

@@ -41,12 +41,12 @@
     "access": "public"
   },
   "devDependencies": {
-    "@orama/orama": "workspace:*",
     "@types/node": "^20.9.0",
     "tsup": "^7.2.0",
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@orama/orama": "workspace:*",
     "@tensorflow-models/universal-sentence-encoder": "^1.3.3",
     "@tensorflow/tfjs": "^4.21.0",
     "@tensorflow/tfjs-backend-cpu": "^4.21.0",

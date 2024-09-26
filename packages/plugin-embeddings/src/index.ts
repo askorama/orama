@@ -1,5 +1,5 @@
 import type { AnyOrama, SearchParams, TypedDocument, OramaPluginAsync, PartialSchemaDeep } from '@orama/orama'
-import use from '@tensorflow-models/universal-sentence-encoder'
+import { load as loadModel } from '@tensorflow-models/universal-sentence-encoder'
 
 export type PluginEmbeddingsParams = {
   embeddings: {
@@ -28,7 +28,7 @@ function getPropertiesValues(schema: object, properties: string[]) {
 export const embeddingsType = 'vector[512]'
 
 export async function pluginEmbeddings(pluginParams: PluginEmbeddingsParams): OramaPluginAsync {
-  const model = await use.load()
+  const model = await loadModel()
 
   return {
     name: 'orama-plugin-embeddings',
