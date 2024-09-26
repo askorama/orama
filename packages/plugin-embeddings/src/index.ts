@@ -27,7 +27,7 @@ function getPropertiesValues(schema: object, properties: string[]) {
 
 export const embeddingsType = 'vector[512]'
 
-export async function pluginEmbeddings(pluginParams: PluginEmbeddingsParams): OramaPluginAsync {
+export async function pluginEmbeddings(pluginParams: PluginEmbeddingsParams): Promise<OramaPluginAsync> {
   const model = await loadModel()
 
   return {
@@ -51,7 +51,7 @@ export async function pluginEmbeddings(pluginParams: PluginEmbeddingsParams): Or
 
       const embeddings = await model.embed(values)
 
-      params[pluginParams.embeddings.defaultProperty] = await embeddings.data()
+      params[pluginParams.embeddings.defaultProperty] = (await embeddings.data()) as unknown as number[]
     },
 
     async beforeSearch<T extends AnyOrama>(_db: AnyOrama, params: SearchParams<T, TypedDocument<any>>) {
@@ -67,7 +67,7 @@ export async function pluginEmbeddings(pluginParams: PluginEmbeddingsParams): Or
         throw new Error('Neither "term" nor "vector" parameters were provided')
       }
 
-      const embeddings = await model.embed(params.term)
+      const embeddings = await model.embed(params.term) as unknown as number[]
 
       if (!params.vector) {
         params.vector = {
