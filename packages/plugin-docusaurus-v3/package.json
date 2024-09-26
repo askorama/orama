@@ -21,14 +21,11 @@
     "watch": "tsc --watch"
   },
   "dependencies": {
-    "@docusaurus/plugin-content-docs": "^3.2.0",
-    "@docusaurus/theme-common": "^3.2.0",
-    "@docusaurus/utils": "^3.0.1",
     "@orama/highlight": "^0.1.5",
     "@orama/orama": "workspace:*",
     "@orama/plugin-analytics": "workspace:*",
     "@orama/plugin-parsedoc": "workspace:*",
-    "@orama/searchbox": "^1.0.0-rc44",
+    "@orama/searchbox": "^1.0.0-rc53",
     "@oramacloud/client": "^1.0.14",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
@@ -36,9 +33,7 @@
     "markdown-it": "^13.0.2",
     "pako": "^2.1.0",
     "tslib": "^2.6.2",
-    "vfile-message": "^3.1.4",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "vfile-message": "^3.1.4"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.6",
@@ -49,6 +44,7 @@
     "@docusaurus/plugin-content-docs": ">= 3.2.0",
     "@docusaurus/theme-common": ">= 3.2.0",
     "@docusaurus/types": ">= 3.2.0",
+    "@docusaurus/utils": ">= 3.2.0",
     "react": ">= 18.0.0",
     "react-dom": ">= 18.0.0"
   },

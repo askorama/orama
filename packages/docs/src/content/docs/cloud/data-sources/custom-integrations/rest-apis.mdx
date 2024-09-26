@@ -1,50 +1,107 @@
 ---
-title: REST APIs
+title: Connect using REST APIs
 description: Learn how to feed data into Orama Cloud using REST APIs
+editUrl: false
 ---
-import { Tabs, TabItem, Code } from "@astrojs/starlight/components";
+import { ShowcaseText } from 'starlight-showcases';
+import { Tabs, TabItem, Code, Aside, Steps, LinkCard } from "@astrojs/starlight/components";
+import IntegratingIntoYourApp from '../../../../../components/IntegratingIntoYourApp.astro'
 
-REST APIs provide an effective means of interacting with your Orama index.
+REST APIs provide an effective means of interacting with your Orama Cloud index.
 
-They allow you to update, insert, and remove data from your index seamlessly. The system then queues these changes until you request a redeploy.
+The REST APIs allow you to update, insert, and remove data from your index seamlessly. The system then queues these changes until you request a new deployment.
 
-This guide will show you how to utilize the Orama REST APIs for deploying and managing an index on Orama Cloud.
+This guide will show you how to use the REST APIs data source, to deploy and manage your indexes on Orama Cloud.
 
-## Creating an index and feeding it via REST APIs
+## Creating an index
 
-Firstly, create a new index using "REST API" as a data source. You can find it under "custom data sources."
+Firstly, create a new index using "**REST API**" as a data source. You'll find it under "**custom integrations**". 
 
-After creating it, you will need to construct the searchable properties schema. Remember, only include the properties you plan to use for searching or filtering.
+Insert a name and optionally add a description for your index, then click on "**Create index**".
 
-If you have questions about optimizing your Orama schema and its impact on search performance, refer to [this blog post](https://askorama.com/blog/optimizing-orama-schema-optimization) on schema optimization.
+After creating it, you will need to define the searchable properties schema. 
 
-For this guide, we will use a very simple schema, which consists of two simple properties: `"name"` (of type `string`) and `"age"` (of type `number`).
+### Define the schema
 
-We will also enable [automatic embeddings generation](/cloud/orama-ai/automatic-embeddings-generation), so that we can perform vector and hybrid search on this index:
+For this guide, we will use a very simple schema, which consists of two simple properties: `"name"` (of type string) and `"age"` (of type number).
 
-<img
-  src='/cloud/guides/webhook/schema.png'
-  alt='REST APIs index schema'
+<Aside>
+  Remember, only include the properties you plan to use for searching or filtering.<br />
+  If you have questions about optimizing your Orama schema and its impact on search performance, refer to [this blog post](https://orama.com/blog/optimizing-orama-schema-optimization) on schema optimization.
+</Aside>
+
+<br />
+
+<Steps>
+  <ol>
+    <li>
+      <p class="pl-10"><a href="/cloud/working-with-indexes/searchable-schema">Define the schema</a> of the searchable properties of your document.</p>
+      <p class="pl-10">Automatic [embeddings generation](/cloud/orama-ai/automatic-embeddings-generation) are included in your index, to perform vector and hybrid search on it. By default, all the **string** properties are included in the embeddings generation.</p>
+      <img
+        src="/cloud/guides/webhook/schema.png"
+        alt="REST APIs index schema"
+        class="mx-10"
+      />
+      <p class="pl-10">After we complete this step, we can save the configuration by clicking on "**Save**".</p>
+    </li>
+    <li>
+      <p class="pl-10">This will bring us to the following screen, where we can find some instructions on how to deploy and update an index via REST APIs.</p> 
+      <img
+        src="/cloud/guides/webhook/instruction.png"
+        alt="REST APIs instructions"
+        class="mx-10"
+      />
+    </li>
+    <li>
+      <p class="pl-10">From here, you can use the <a href="/cloud/integrating-orama-cloud/official-sdk">Official SDKs</a> to manage your index data.</p> 
+    </li>
+  </ol>
+</Steps>
+
+### Generate a Private API Key
+
+To use the REST APIs, you will need to generate a private API key. You can do this in the [developer tools section](https://cloud.orama.com/developer-tools) of the dashboard. 
+
+<LinkCard
+  href="https://cloud.orama.com/developer-tools"
+  title="Developer Tools"
+  description="Access the Orama Cloud dashboard section to manage your Private API Keys."
+  target="_blank"
 />
 
-After we complete this step, we can save the configuration by clicking on "Save".
+Simply add a new private key by clicking on `Generate API Key` and providing a name and an optional description for it. A single private API key can be used to manage multiple indexes.
 
-This will bring us to the following screen, where we can find some instructions on how to deploy and update an index via REST APIs:
+<Aside type="caution">
+  Keep your private API key in a **secure** place. Do not share it with anyone and **do not expose it** in your client-side code or public repository.
+</Aside>
 
-<img
-  src='/cloud/guides/webhook/instruction.png'
-  alt='REST APIs instructions'
-/>
+<Aside>
+  This **Private API Key** is NOT the same as the public API key you use to query the index. <br />The private API key is used to manage your index, while the public API key is used to query it.
+</Aside>
 
-From here, we can choose two different ways of updating an index.
+## Managing your index
 
-To run the following APIs, get an Orama API Key in the [developers tools section](https://cloud.orama.com/developer-tools) of the dashboard.
+Now that you have created an index, you can start managing it using the REST APIs. <br />Here is a list of the available methods.
 
-## Inserting a snapshot
+- [Inserting a snapshot](#inserting-a-snapshot)
+- [Inserting, updating and removing documents](#insert-update-and-remove)
+- [Deploying the index](#deploying-the-index)
+- [Clearing the index on next deployment](#clearing-the-index-data)
+- [Check for pending operations](#check-for-pending-operations)
+
+You can integrate with the REST APIs using the Official SDKs or by making direct HTTP requests.
+
+<Aside type="tip" title='Installing the Orama SDK'>
+You can find the guide on installing the SDK [here](/cloud/integrating-orama-cloud/official-sdk).
+</Aside>
+
+The official SDKs supported languages are JavaScript, Swift, Kotlin, PHP, and Python. In the following examples, we will also include a cURL example.
+
+### Inserting a snapshot
 
 A snapshot is a complete override of a given index. It means you bulk upload a number of documents, which entirely substitute the live index all at once.
 
-For example, if you want your live index to only contains the two following documents:
+For example, if you want your live index to only contain the two following documents:
 
 ```json
 [
@@ -66,17 +123,17 @@ You can use the **snapshot** API to bulk update the live index:
 <Tabs syncKey="sdk">
   <TabItem label="JavaScript" icon="seti:javascript">
     ```js
-    import { CloudManager } from '@oramacloud/client'
+    import { CloudManager } from "@oramacloud/client"
 
     const oramaCloudManager = new CloudManager({
       api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
     })
 
-    const myIndex = oramaCloudManager.index('my-index-id')
+    const myIndex = oramaCloudManager.index("my-index-id")
 
     await myIndex.snapshot([
-      { id: 1, name: "John Doe", age: 30 },
-      { id: 2, name: "Jane Doe", age: 25 },
+      { id: "1", name: "John Doe", age: 30 },
+      { id: "2", name: "Jane Doe", age: 25 },
     ])
     ```
   </TabItem>
@@ -127,35 +184,35 @@ You can use the **snapshot** API to bulk update the live index:
   <TabItem label="PHP" icon="seti:php">
     ```php
     use OramaCloud\Manager\IndexManager;
-    $indexManager = new IndexManager('my-index-id', PRIVATE_API_KEY);
+    $indexManager = new IndexManager("my-index-id", PRIVATE_API_KEY);
 
     $indexManager->insert([
-      ['id' => '1', 'name' => 'John Doe', 'age' => 30],
-      ['id' => '2', 'name' => 'Jane Doe', 'age' => 25],
+      ["id" => "1", "name" => "John Doe", "age" => 30],
+      ["id" => "2", "name" => "Jane Doe", "age" => 25],
     ]);
     ```
   </TabItem>
-  <TabItem label="cURL" icon="seti:shell">
+  <TabItem label="cURL" icon="seti:powershell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/snapshot \
       -H "authorization: Bearer $PRIVATE_API_KEY" ]
-      -d '[ { "id": "1", "name": "John Doe", "age": 30 }, { "id": "2", "name": "Jane Doe", "age": 25 } ]'
+      -d "[ { "id": "1", "name": "John Doe", "age": 30 }, { "id": "2", "name": "Jane Doe", "age": 25 } ]"
     ```
   </TabItem>
 </Tabs>
 
-## Updating, removing, inserting elements in a live index
+### Insert, update and remove
 
 While the **snapshot** API is convenient for replacing a live index with a new one, there may be instances where you only want to change some documents, inserting, updating, and deleting ones.
 
 This is where the **notify** API becomes really convenient.
 
-Let's say you want to add a new document:
+Let"s say you want to add a new document:
 
 ```json
 {
   "id": "3",
-  "name": "Rick Morty",
+  "name": "Rick Sanchez",
   "age": 80
 }
 ```
@@ -165,15 +222,15 @@ you can use the **notify** API to put that operation in queue for the next deplo
 <Tabs syncKey="sdk">
   <TabItem label="JavaScript" icon="seti:javascript">
     ```js
-    import { CloudManager } from '@oramacloud/client'
+    import { CloudManager } from "@oramacloud/client"
 
     const oramaCloudManager = new CloudManager({
       api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
     })
 
-    const myIndex = oramaCloudManager.index('my-index-id')
+    const myIndex = oramaCloudManager.index("my-index-id")
 
-    await myIndex.insert([{ id: "3", name: "Rick Morty", age: 80 }])
+    await myIndex.insert([{ id: "3", name: "Rick Sanchez", age: 80 }])
     await myIndex.update([{ id: "3", name: "Rick Doe", age: 75 }])
     ```
   </TabItem>
@@ -191,7 +248,7 @@ you can use the **notify** API to put that operation in queue for the next deplo
   let cloudManager = CloudManager(apiKey: "YOUR_API_KEY")
   let indexManager = cloudManager.index<OramaDoc>("my-index-id")
 
-  await try indexManager.insert([OramaDoc(id: "3", name: "Rick Morty", age: 80)])
+  await try indexManager.insert([OramaDoc(id: "3", name: "Rick Sanchez", age: 80)])
   await try indexManager.update([OramaDoc(id: "3", name: "Rick Doe", age: 75)])
   ```
   </TabItem>
@@ -213,7 +270,7 @@ you can use the **notify** API to put that operation in queue for the next deplo
 
     runBlocking {
       index.insert(listOf(
-          OramaDoc(id = "3", name = "Rick Morty", age = 80)
+          OramaDoc(id = "3", name = "Rick Sanchez", age = 80)
       ), OramaDoc.serializer())
 
       index.update(listOf(
@@ -225,39 +282,39 @@ you can use the **notify** API to put that operation in queue for the next deplo
   <TabItem label="PHP" icon="seti:php">
     ```php
     use OramaCloud\Manager\IndexManager;
-    $indexManager = new IndexManager('my-index-id', PRIVATE_API_KEY);
+    $indexManager = new IndexManager("my-index-id", PRIVATE_API_KEY);
 
     $indexManager->insert([
-      ['id' => '3', 'name' => 'Rick Morty', 'age' => 80]
+      ["id" => "3", "name" => "Rick Sanchez", "age" => 80]
     ]);
     $indexManager->update([
-      ['id' => '3', 'name' => 'Rick Doe', 'age' => 75]
+      ["id" => "3", "name" => "Rick Doe", "age" => 75]
     ]);
     ```
   </TabItem>
-  <TabItem label="cURL" icon="seti:shell">
+  <TabItem label="cURL" icon="seti:powershell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
       -H "authorization: Bearer $PRIVATE_API_KEY" \
-      -d '{ "upsert": [{ "id": "3", "name": "Rick Morty", "age": 80 }] }'
+      -d "{ "upsert": [{ "id": "3", "name": "Rick Sanchez", "age": 80 }] }"
     ```
   </TabItem>
 </Tabs>
 
-As you can see, you'll need to pass an array of objects to an `upsert` operation (which will do that based on the `id` field). If Orama finds that document, it will update it; otherwise, it will insert a new one.
+As you can see, you"ll need to pass an array of objects to an `upsert` operation (which will do that based on the `id` field). If Orama finds that document, it will update it; otherwise, it will insert a new one.
 
 You can also remove an existing document using the `remove` operation. For example, this is how you can remove the document with id `"2"`:
 
 <Tabs syncKey="sdk">
   <TabItem label="JavaScript" icon="seti:javascript">
     ```js
-    import { CloudManager } from '@oramacloud/client'
+    import { CloudManager } from "@oramacloud/client"
 
     const oramaCloudManager = new CloudManager({
       api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
     })
 
-    const myIndex = oramaCloudManager.index('my-index-id')
+    const myIndex = oramaCloudManager.index("my-index-id")
 
     await myIndex.delete(["2"])
     ```
@@ -303,21 +360,21 @@ You can also remove an existing document using the `remove` operation. For examp
   <TabItem label="PHP" icon="seti:php">
     ```php
     use OramaCloud\Manager\IndexManager;
-    $indexManager = new IndexManager('my-index-id', PRIVATE_API_KEY);
+    $indexManager = new IndexManager("my-index-id", PRIVATE_API_KEY);
 
     $indexManager->delete(["2"]);
     ```
   </TabItem>
-  <TabItem label="cURL" icon="seti:shell">
+  <TabItem label="cURL" icon="seti:powershell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/notify \
       -H "authorization: Bearer $PRIVATE_API_KEY" \
-      -d '{ "remove": ["2"] }'
+      -d "{ "remove": ["2"] }"
     ```
   </TabItem>
 </Tabs>
 
-## Deploying the index
+### Deploying the index
 
 After you have inserted a snapshot or put a number of insert, remove, or update operations in the queue, you have to deploy a new version of the index.
 
@@ -325,13 +382,13 @@ After you have inserted a snapshot or put a number of insert, remove, or update 
 <Tabs syncKey="sdk">
   <TabItem label="JavaScript" icon="seti:javascript">
     ```js
-    import { CloudManager } from '@oramacloud/client'
+    import { CloudManager } from "@oramacloud/client"
 
     const oramaCloudManager = new CloudManager({
       api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
     })
 
-    const myIndex = oramaCloudManager.index('my-index-id')
+    const myIndex = oramaCloudManager.index("my-index-id")
 
     await myIndex.deploy()
     ```
@@ -377,12 +434,12 @@ After you have inserted a snapshot or put a number of insert, remove, or update 
   <TabItem label="PHP" icon="seti:php">
     ```php
     use OramaCloud\Manager\IndexManager;
-    $indexManager = new IndexManager('my-index-id', PRIVATE_API_KEY);
+    $indexManager = new IndexManager("my-index-id", PRIVATE_API_KEY);
 
     $indexManager->deploy();
     ```
   </TabItem>
-  <TabItem label="cURL" icon="seti:shell">
+  <TabItem label="cURL" icon="seti:powershell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/deploy \
       -X POST \
@@ -393,7 +450,7 @@ After you have inserted a snapshot or put a number of insert, remove, or update 
 
 This will trigger a new deployment and will make the new index available worldwide in just a few minutes.
 
-## Clearing the index on next deployment
+### Clearing the index data
 
 Sometimes, you may want to re-insert all the documents in the index and to do that, you will first need to tell Orama to clear the index for the next deployment.
 
@@ -402,13 +459,13 @@ You can do that by using the `clear` API, or by creating an empty snapshot:
 <Tabs syncKey="sdk">
   <TabItem label="JavaScript" icon="seti:javascript">
     ```js
-    import { CloudManager } from '@oramacloud/client'
+    import { CloudManager } from "@oramacloud/client"
 
     const oramaCloudManager = new CloudManager({
       api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
     })
 
-    const myIndex = oramaCloudManager.index('my-index-id')
+    const myIndex = oramaCloudManager.index("my-index-id")
 
     await myIndex.clear()
     ```
@@ -456,31 +513,31 @@ You can do that by using the `clear` API, or by creating an empty snapshot:
     // coming soon
     ```
   </TabItem>
-  <TabItem label="cURL" icon="seti:shell">
+  <TabItem label="cURL" icon="seti:powershell">
     ```bash
     curl https://api.oramasearch.com/api/v1/webhooks/$INDEX_ID/snapshot \
       -H "authorization: Bearer $PRIVATE_API_KEY" ]
-      -d '[]'
+      -d "[]"
     ```
   </TabItem>
 </Tabs>
 
 This will clear the index, making the next deployment start from empty status. You can then notify some operations to update the index. This ensures that old data is not present in the index anymore.
 
-## Check if there are pending operations
+### Check for pending operations
 
 If you lost track of the operatiosn you ran via the SDK or APIs, you can always check if there are pending operations in the queue by using the `hasPendingOperations` API:
 
 <Tabs syncKey="sdk">
   <TabItem label="JavaScript" icon="seti:javascript">
     ```js
-    import { CloudManager } from '@oramacloud/client'
+    import { CloudManager } from "@oramacloud/client"
 
     const oramaCloudManager = new CloudManager({
       api_key: process.env.ORAMA_CLOUD_PRIVATE_API_KEY,
     })
 
-    const myIndex = oramaCloudManager.index('my-index-id')
+    const myIndex = oramaCloudManager.index("my-index-id")
 
     const hasPendingOperations = await myIndex.hasPendingOperations()
     console.log(hasPendingOperations) // true or false
@@ -541,3 +598,7 @@ If you lost track of the operatiosn you ran via the SDK or APIs, you can always 
     ```
   </TabItem>
 </Tabs>
+
+## Integrating into your app
+
+<IntegratingIntoYourApp />

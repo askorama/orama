@@ -45,11 +45,10 @@ async function compile(lang, jsExtension, tsExtension, moduleType) {
 
   const compiled = await transform(content, {
     module: { type: moduleType },
-    env: { targets: 'node >= 16' },
     jsc: { target: 'es2022' }
   })
 
-  const minified = await minify(compiled.code, { sourceMap: true })
+  const minified = await minify(compiled.code, { sourceMap: true, module: moduleType !== "commonjs" })
 
   await writeFile(resolve(destinationDir, `${lang}.${jsExtension}`), minified.code, 'utf-8')
   await writeFile(resolve(destinationDir, `${lang}.${jsExtension}.map`), minified.map, 'utf-8')

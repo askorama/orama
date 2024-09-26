@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "target": "ESNext",
-    "module": "ESNext",
+    "module": "NodeNext",
     "outDir": "dist",
     "lib": ["ESNext", "DOM"],
     "esModuleInterop": true,

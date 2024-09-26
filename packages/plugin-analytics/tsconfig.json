@@ -2,10 +2,10 @@
   "compilerOptions": {
     "allowJs": true,
     "target": "ESNext",
-    "module": "ESNext",
+    "module": "NodeNext",
     "outDir": "dist",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "moduleResolution": "Node",
+    "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "declaration": true,
     "forceConsistentCasingInFileNames": true,

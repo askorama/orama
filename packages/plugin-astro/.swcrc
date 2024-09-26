@@ -1,9 +1,6 @@
 [
   {
     "test": ".*\\.ts$",
-    "env": {
-      "targets": "node >= 16"
-    },
     "jsc": {
       "target": "es2022",
       "parser": {
