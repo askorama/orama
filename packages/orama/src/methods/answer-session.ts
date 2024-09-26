@@ -3,21 +3,21 @@ import type { AnyDocument, AnyOrama, Nullable, OramaPluginSync, SearchParams, Re
 import { createError } from "../errors.js"
 import { search } from "./search.js"
 
-type GenericContext =
+export type GenericContext =
   | string
   | object
 
-type MessageRole =
+export type MessageRole =
   | 'system'
   | 'user'
   | 'assistant'
 
-type Message = {
+export type Message = {
   role: MessageRole
   content: string
 }
 
-type Interaction<SourceT = AnyDocument> = {
+export type Interaction<SourceT = AnyDocument> = {
   interactionId: string
   query: string
   response: string
@@ -29,11 +29,11 @@ type Interaction<SourceT = AnyDocument> = {
   errorMessage: Nullable<string>
 }
 
-type AnswerSessionEvents<SourceT = AnyDocument> = {
+export type AnswerSessionEvents<SourceT = AnyDocument> = {
   onStateChange?: (state: Interaction<SourceT>[]) => void
 }
 
-type IAnswerSessionConfig<SourceT = AnyDocument> = {
+export type IAnswerSessionConfig<SourceT = AnyDocument> = {
   conversationID?: string
   systemPrompt?: string
   userContext?: GenericContext
@@ -41,9 +41,9 @@ type IAnswerSessionConfig<SourceT = AnyDocument> = {
   events?: AnswerSessionEvents<SourceT>
 }
 
-type AskParams = SearchParams<AnyDocument>
+export type AskParams = SearchParams<AnyDocument>
 
-type RegenerateLastParams = {
+export type RegenerateLastParams = {
   stream: boolean
 }
 
@@ -60,8 +60,8 @@ export class AnswerSession<SourceT = AnyDocument> {
   private conversationID: string
   private messages: Message[] = []
   private events: AnswerSessionEvents<SourceT>
-  private state: Interaction<SourceT>[] = []
   private initPromise?: Promise<true | null>
+  public state: Interaction<SourceT>[] = []
 
   constructor(db: AnyOrama, config: IAnswerSessionConfig<SourceT>) {    
     this.db = db
@@ -215,7 +215,7 @@ export class AnswerSession<SourceT = AnyDocument> {
       throw createError('PLUGIN_SECURE_PROXY_NOT_FOUND')
     }
 
-    const pluginExtras = plugin.extra as { proxy: OramaProxy, pluginParams: { models: { chat: ChatModel } } }
+    const pluginExtras = plugin.extra as { proxy: OramaProxy, pluginParams: { chat: { model: ChatModel } } }
 
     this.proxy = pluginExtras.proxy
 
@@ -223,8 +223,8 @@ export class AnswerSession<SourceT = AnyDocument> {
       this.messages.push({ role: 'system', content: this.config.systemPrompt })
     }
 
-    if (pluginExtras?.pluginParams?.models?.chat) {
-      this.chatModel = pluginExtras.pluginParams.models.chat
+    if (pluginExtras?.pluginParams?.chat?.model) {
+      this.chatModel = pluginExtras.pluginParams.chat.model
     } else {
       throw createError('PLUGIN_SECURE_PROXY_MISSING_CHAT_MODEL')
     }
