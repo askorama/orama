@@ -11,6 +11,7 @@ import {
   save,
   search
 } from '@orama/orama'
+// @ts-ignore
 import { boundedLevenshtein } from '@orama/orama/internals'
 
 export interface Position {
