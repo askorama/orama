@@ -2,9 +2,15 @@ import type { AnyOrama, Results, SearchParams, Nullable } from '@orama/orama'
 import { search } from '@orama/orama'
 import { OramaClient, ClientSearchParams } from '@oramacloud/client'
 
-type OramaSwitchClient = AnyOrama | OramaClient
+export type OramaSwitchClient = AnyOrama | OramaClient
 
-type ClientType = 'oss' | 'cloud'
+export type ClientType = 'oss' | 'cloud'
+
+export type SearchConfig = {
+  abortController?: AbortController
+  fresh?: boolean
+  debounce?: number
+}
 
 export class Switch<T = OramaSwitchClient> {
   client: OramaSwitchClient
@@ -27,10 +33,11 @@ export class Switch<T = OramaSwitchClient> {
   }
 
   async search<R = unknown>(
-    params: T extends OramaClient ? ClientSearchParams : SearchParams<AnyOrama>
+    params: T extends OramaClient ? ClientSearchParams : SearchParams<AnyOrama>,
+    config?: SearchConfig
   ): Promise<Nullable<Results<R>>> {
     if (this.isCloud) {
-      return (this.client as OramaClient).search(params as T extends OramaClient ? ClientSearchParams : never)
+      return (this.client as OramaClient).search(params as T extends OramaClient ? ClientSearchParams : never, config)
     } else {
       return search(this.client as AnyOrama, params as SearchParams<AnyOrama>) as Promise<Nullable<Results<R>>>
     }
