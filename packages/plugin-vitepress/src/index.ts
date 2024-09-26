@@ -171,8 +171,8 @@ export function OramaPlugin(pluginOptions: OramaPluginOptions = {}): Plugin {
 }
 
 const pluginSiteConfig: Partial<SiteConfig> = {
-  buildEnd(ctx) {},
-  transformHead(ctx) {
+  buildEnd() {},
+  transformHead() {
     return []
   }
 }
