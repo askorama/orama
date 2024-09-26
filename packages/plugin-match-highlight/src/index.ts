@@ -10,7 +10,6 @@ import {
   load,
   save,
   search
-// @ts-ignore
 } from '@orama/orama'
 // @ts-ignore
 import { boundedLevenshtein } from '@orama/orama/internals'
