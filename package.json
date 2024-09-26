@@ -1,8 +1,7 @@
 {
   "name": "orama-monorepo",
-  "version": "3.0.0",
+  "version": "3.0.0-rc-1",
   "description": "Next generation full-text and vector search engine, written in TypeScript",
-  "packageManager": "pnpm@9.5.0",
   "workspaces": [
     "packages/*",
     "sandboxes/*"
@@ -40,7 +39,7 @@
     "tape": "^5.6.1",
     "tcompare": "^6.0.0",
     "tsx": "^3.12.1",
-    "turbo": "^2.0.14",
+    "turbo": "^1.8.5",
     "typescript": "^5.0.0"
   },
   "author": {
