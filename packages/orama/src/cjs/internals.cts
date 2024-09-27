@@ -6,7 +6,6 @@ import type {
   uniqueId as esmUniqueId,
   safeArrayPush as esmSafeArrayPush,
   convertDistanceToMeters as esmConvertDistanceToMeters,
-  BM25 as esmBM25
 } from '../internals.js'
 
 let _esmBoundedLevenshtein: typeof esmBoundedLevenshtein
@@ -16,7 +15,6 @@ let _esmGetNanosecondsTime: typeof esmGetNanosecondsTime
 let _esmUniqueId: typeof esmUniqueId
 let _esmSafeArrayPush: typeof esmSafeArrayPush
 let _esmConvertDistanceToMeters: typeof esmConvertDistanceToMeters
-let _esmBM25: typeof esmBM25
 
 export async function boundedLevenshtein(
   ...args: Parameters<typeof esmBoundedLevenshtein>
@@ -85,13 +83,4 @@ export async function convertDistanceToMeters(...args: Parameters<typeof esmConv
   }
 
   return _esmConvertDistanceToMeters(...args)
-}
-
-export async function BM25(...args: Parameters<typeof esmBM25>): Promise<number> {
-  if (!_esmBM25) {
-    const imported = await import('../internals.js')
-    _esmBM25 = imported.BM25
-  }
-
-  return _esmBM25(...args)
 }

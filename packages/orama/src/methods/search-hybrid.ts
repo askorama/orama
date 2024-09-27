@@ -8,17 +8,16 @@ import type {
   HybridWeights
 } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { getNanosecondsTime, safeArrayPush, formatNanoseconds, removeVectorsFromHits } from '../utils.js'
+import { getNanosecondsTime, formatNanoseconds, removeVectorsFromHits } from '../utils.js'
 import { intersectFilteredIDs } from '../components/filters.js'
-import { prioritizeTokenScores } from '../components/algorithms.js'
 import { createError } from '../errors.js'
-import { createSearchContext, defaultBM25Params } from './search.js'
 import { getFacets } from '../components/facets.js'
 import { getGroups } from '../components/groups.js'
 import { findSimilarVectors } from '../components/cosine-similarity.js'
 import { getInternalDocumentId } from '../components/internal-document-id-store.js'
 import { fetchDocuments } from './search.js'
 import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
+import { innerFullTextSearch } from './search-fulltext.js'
 
 export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
@@ -114,123 +113,14 @@ export async function hybridSearch<T extends AnyOrama, ResultDocument = TypedDoc
 async function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
   params: SearchParamsHybrid<T, ResultDocument>,
-  language?: string
+  language?: string,
 ): Promise<TokenScore[]> {
-  const timeStart = await getNanosecondsTime()
-  params.relevance = Object.assign(defaultBM25Params, params.relevance ?? {})
-
-  const { term = '', properties, boost } = params
-
-  const { index, docs } = orama.data
-  const tokens = await orama.tokenizer.tokenize(term, language)
-
-  // Get searchable string properties
-  let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
-  if (!propertiesToSearch) {
-    const propertiesToSearchWithTypes = await orama.index.getSearchablePropertiesWithTypes(index)
-
-    propertiesToSearch = await orama.index.getSearchableProperties(index)
-    propertiesToSearch = propertiesToSearch.filter((prop: string) =>
-      propertiesToSearchWithTypes[prop].startsWith('string')
-    )
-
-    orama.caches['propertiesToSearch'] = propertiesToSearch
-  }
-
-  if (properties && properties !== '*') {
-    const propertiesToSearchSet = new Set(propertiesToSearch)
-    const propertiesSet = new Set(properties as string[])
-
-    for (const prop of properties) {
-      if (!propertiesToSearchSet.has(prop as string)) {
-        throw createError('UNKNOWN_INDEX', prop as string, propertiesToSearch.join(', '))
-      }
-    }
-
-    propertiesToSearch = propertiesToSearch.filter((prop: string) => propertiesSet.has(prop))
-  }
-
-  // Create the search context and the results
-  const context = await createSearchContext(
-    orama.tokenizer,
-    orama.index,
-    orama.documentsStore,
-    language,
+  const uniqueIDs = await innerFullTextSearch<T>(
+    orama,
     params,
-    propertiesToSearch,
-    tokens,
-    await orama.documentsStore.count(docs),
-    timeStart
+    language,
   )
-
-  const tokensLength = tokens.length
-
-  if (tokensLength || (properties && properties.length > 0)) {
-    // Now it's time to loop over all the indices and get the documents IDs for every single term
-    const indexesLength = propertiesToSearch.length
-    for (let i = 0; i < indexesLength; i++) {
-      const prop = propertiesToSearch[i]
-
-      if (tokensLength !== 0) {
-        for (let j = 0; j < tokensLength; j++) {
-          const term = tokens[j]
-
-          // Lookup
-          const scoreList = await orama.index.search(
-            index,
-            term,
-            orama.tokenizer,
-            language,
-            propertiesToSearch,
-            false,
-            0,
-            boost || {}
-          )
-
-          safeArrayPush(context.indexMap[prop][term], scoreList)
-        }
-      } else {
-        const indexMapContent = []
-        context.indexMap[prop][''] = indexMapContent
-        const scoreList = await orama.index.search(
-          index,
-          '',
-          orama.tokenizer,
-          language,
-          propertiesToSearch,
-          false,
-          0,
-          boost || {}
-        )
-        safeArrayPush(indexMapContent, scoreList)
-      }
-
-      const docIds = context.indexMap[prop]
-      const vals = Object.values(docIds)
-      context.docsIntersection[prop] = prioritizeTokenScores(vals, params?.boost?.[prop] ?? 1)
-      const uniqueDocs = context.docsIntersection[prop]
-
-      const uniqueDocsLength = uniqueDocs.length
-      for (let i = 0; i < uniqueDocsLength; i++) {
-        const [id, score] = uniqueDocs[i]
-        const prevScore = context.uniqueDocsIDs[id]
-        context.uniqueDocsIDs[id] = prevScore ? prevScore + score + 0.5 : score
-      }
-    }
-  } else if (tokens.length === 0 && term) {
-    // This case is hard to handle correctly.
-    // For the time being, if tokenizer returns empty array but the term is not empty,
-    // we returns an empty result set
-    context.uniqueDocsIDs = {}
-  } else {
-    context.uniqueDocsIDs = Object.fromEntries(
-      Object.keys(await orama.documentsStore.getAll(orama.data.docs)).map((k) => [k, 0])
-    )
-  }
-
-  const uniqueIDs = Object.entries(context.uniqueDocsIDs)
-    .map(([id, score]) => [+id, score] as TokenScore)
-    .sort((a, b) => b[1] - a[1])
+  uniqueIDs.sort((a, b) => b[1] - a[1])
 
   return minMaxScoreNormalization(uniqueIDs)
 }

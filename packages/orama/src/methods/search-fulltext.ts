@@ -15,29 +15,16 @@ import type {
   TypedDocument
 } from '../types.js'
 import { getNanosecondsTime, removeVectorsFromHits, sortTokenScorePredicate } from '../utils.js'
-import { defaultBM25Params, fetchDocuments, fetchDocumentsWithDistinct } from './search.js'
+import { fetchDocuments, fetchDocumentsWithDistinct } from './search.js'
 
-export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+export async function innerFullTextSearch<T extends AnyOrama>(
   orama: T,
-  params: SearchParamsFullText<T, ResultDocument>,
-  language?: string
-): Promise<Results<ResultDocument>> {
-  const timeStart = await getNanosecondsTime()
-
-  if (orama.beforeSearch) {
-    await runBeforeSearch(orama.beforeSearch, orama, params, language)
-  }
-
-  params.relevance = Object.assign(defaultBM25Params, params.relevance ?? {})
-
-  const vectorProperties = Object.keys(orama.data.index.vectorIndexes)
-
-  const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
-  const { limit = 10, offset = 0, term, properties, distinctOn, includeVectors = false } = params
-  const isPreflight = params.preflight === true
+  params: Pick<SearchParamsFullText<T>, 'term' | 'properties' | 'where' | 'exact' | 'tolerance' | 'boost'>,
+  language: string | undefined
+) {
+  const { term, properties } = params
 
   const index = orama.data.index
-
   // Get searchable string properties
   let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
   if (!propertiesToSearch) {
@@ -99,6 +86,31 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
     uniqueDocsIDs = intersectFilteredIDs(whereFiltersIDs, uniqueDocsIDs)
   }
 
+  return uniqueDocsIDs
+}
+
+export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+  orama: T,
+  params: SearchParamsFullText<T, ResultDocument>,
+  language?: string
+): Promise<Results<ResultDocument>> {
+  const timeStart = await getNanosecondsTime()
+
+  if (orama.beforeSearch) {
+    await runBeforeSearch(orama.beforeSearch, orama, params, language)
+  }
+
+  let uniqueDocsIDs = await innerFullTextSearch<T>(
+    orama,
+    params,
+    language,
+  )
+
+  const vectorProperties = Object.keys(orama.data.index.vectorIndexes)
+
+  const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
+  const isPreflight = params.preflight === true
+
   if (params.sortBy) {
     if (typeof params.sortBy === 'function') {
       const ids = uniqueDocsIDs.map(([id]) => id)
@@ -120,6 +132,8 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
   } else {
     uniqueDocsIDs = uniqueDocsIDs.sort(sortTokenScorePredicate)
   }
+
+  const { offset = 0, limit = 10, includeVectors = false, distinctOn } = params
 
   let results
   if (!isPreflight) {

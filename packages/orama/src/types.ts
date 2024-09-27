@@ -132,12 +132,6 @@ export type VectorIndex = {
   }
 }
 
-export type BM25Params = {
-  k?: number
-  b?: number
-  d?: number
-}
-
 export type GenericSorting = 'asc' | 'desc' | 'ASC' | 'DESC'
 
 export type FacetSorting = GenericSorting
@@ -318,24 +312,6 @@ export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = Typed
   tolerance?: number
 
   /**
-   * The BM25 parameters to use.
-   *
-   * k: Term frequency saturation parameter.
-   * The higher the value, the more important the term frequency becomes.
-   * The default value is 1.2. It should be set to a value between 1.2 and 2.0.
-   *
-   * b: Document length saturation impact. The higher the value, the more
-   * important the document length becomes. The default value is 0.75.
-   *
-   * d: Frequency normalization lower bound. Default value is 0.5.
-   *
-   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/BM25-algorithm
-   *
-   * @see https://en.wikipedia.org/wiki/Okapi_BM25
-   */
-  relevance?: BM25Params
-
-  /**
    * The boost to apply to the properties.
    *
    * The boost is a number that is multiplied to the score of the property.
@@ -428,31 +404,6 @@ export interface SearchParamsFullText<T extends AnyOrama, ResultDocument = Typed
   where?: Partial<WhereCondition<T['schema']>>
 
   /**
-   * Threshold to use for refining the search results.
-   * The threshold is a number between 0 and 1 that represents the minimum score of the documents to return.
-   * By default, the threshold is 0.
-   *
-   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/threshold
-   *
-   * @example
-   *
-   * const result = await search(db, {
-   *  term: 'Red Headphones'
-   *  threshold: 0
-   * });
-   *
-   * // The result will contain all the documents that contain both 'Red' and 'Headphones' in their properties.
-   *
-   * const result2 = await search(db, {
-   *  term: 'Red Headphones'
-   *  threshold: 1
-   * });
-   *
-   * // The result will contain all the documents that contain either 'Red' and 'Headphones' in their properties.
-   */
-  threshold?: number
-
-  /**
    * Preflight query.
    * Will return just the facets (if needed) and the number of matched documents for the given query.
    *
@@ -528,24 +479,6 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
   properties?: '*' | FlattenSchemaProperty<T>[]
 
   /**
-   * The BM25 parameters to use.
-   *
-   * k: Term frequency saturation parameter.
-   * The higher the value, the more important the term frequency becomes.
-   * The default value is 1.2. It should be set to a value between 1.2 and 2.0.
-   *
-   * b: Document length saturation impact. The higher the value, the more
-   * important the document length becomes. The default value is 0.75.
-   *
-   * d: Frequency normalization lower bound. Default value is 0.5.
-   *
-   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/BM25-algorithm
-   *
-   * @see https://en.wikipedia.org/wiki/Okapi_BM25
-   */
-  relevance?: BM25Params
-
-  /**
    * The number of matched documents to return.
    * By default, Orama will return 10 of each (10 for full-text search, and 10 for vector search).
    */
@@ -558,7 +491,7 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
   offset?: number
 
   /**
-   * Similarity threshold for the vector search.
+   * A threshold for the vector search.
    * By default, Orama will use 0.8.
    */
   similarity?: number
@@ -581,15 +514,6 @@ export interface SearchParamsHybrid<T extends AnyOrama, ResultDocument = TypedDo
    * Full documentation: https://docs.oramasearch.com/open-source/usage/search/filters
    */
   where?: Partial<WhereCondition<T['schema']>>
-
-  /**
-   * Threshold to use for refining the search results.
-   * The threshold is a number between 0 and 1 that represents the minimum score of the documents to return.
-   * By default, the threshold is 1. Only applies to the full-text search.
-   *
-   * Full documentation: https://docs.oramasearch.com/open-source/usage/search/threshold
-   */
-  threshold?: number
 
   /**
    * The boost to apply to the properties.
@@ -757,23 +681,6 @@ export type TokenScore = [id: InternalDocumentID, score: number]
 export type TokenMap = Record<string, TokenScore[]>
 
 export type IndexMap = Record<string, TokenMap>
-
-export type SearchContext<
-  T extends AnyOrama,
-  ResultDocument = TypedDocument<T>,
-  P = SearchParams<T, ResultDocument>
-> = {
-  timeStart: bigint
-  tokenizer: Tokenizer
-  index: T['index']
-  documentsStore: T['documentsStore']
-  language: string | undefined
-  params: P
-  docsCount: number
-  uniqueDocsIDs: Record<number, number>
-  indexMap: IndexMap
-  docsIntersection: TokenMap
-}
 
 export type ElapsedTime = {
   raw: number
