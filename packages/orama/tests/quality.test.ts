@@ -1,6 +1,6 @@
 import t from 'tap'
 import { AnyOrama, create, insertMultiple, search } from '../src/index.js'
-import { bitmask_20, calculateTokenQuantum, count } from '../src/trees/radix.js'
+import { bitmask_20, calculateTokenQuantum, count, numberOfOnes } from '../src/trees/radix.js'
 
 async function createNew(docs: { description: string }[]) {
   const db = await create({
@@ -155,6 +155,18 @@ t.test('calculateTokenQuantum', async t => {
   t.equal(count(n), 4)
 })
 
+t.test('numberOfOnes', async t => {
+  t.equal(0, numberOfOnes(0))
+  t.equal(1, numberOfOnes(1))
+  t.equal(1, numberOfOnes(2))
+  t.equal(2, numberOfOnes(3))
+  t.equal(1, numberOfOnes(4))
+  t.equal(2, numberOfOnes(5))
+  t.equal(2, numberOfOnes(6))
+  t.equal(3, numberOfOnes(7))
+  t.equal(1, numberOfOnes(8))
+})
+
 t.test('matching criteria', async t => {
   const docs = [
       { id: '0', description: 'Find your way!' },
@@ -263,6 +275,107 @@ t.test('test', async t => {
   // - contains shoes
   t.equal(results[2].id, '0')
 })
+
+t.test('test #2', async t => {
+  const texts = [
+    // 0
+    "The sun was setting behind the mountains, casting a golden hue over the landscape. Birds chirped as they flew across the sky, their silhouettes blending with the clouds. The air was cool and crisp, filled with the scent of pine trees.",
+    "She opened the old book, its pages yellowed with time. The words inside told a story of adventure, of brave heroes and distant lands. As she read, the room around her seemed to fade away.",
+    "The city buzzed with energy as people hurried along the streets. Tall buildings towered over them, casting long shadows. A street vendor called out, selling fresh fruit to passersby, while car horns blared in the distance.",
+    "On a quiet night, the stars twinkled brightly in the clear sky. A gentle breeze rustled the leaves, and the sound of crickets filled the air. It was a peaceful moment, one that seemed to stretch on forever.",
+    "The ocean waves crashed against the shore, their rhythm steady and unchanging. Seagulls circled overhead, calling out to one another. A lone figure stood at the water's edge, watching the horizon with a sense of calm.",
+    // 5
+    "In the heart of the forest, the trees stood tall and proud. Sunlight filtered through the leaves, casting dappled shadows on the ground. A deer cautiously stepped out into a clearing, its ears twitching as it listened for danger.",
+    "The train pulled into the station with a loud screech. Passengers hurried to board, their footsteps echoing on the platform. Inside the train, the seats were worn but comfortable, and the soft hum of the engine filled the air.",
+    "The storm raged outside, lightning flashing across the sky. Rain pounded against the windows, and the wind howled through the trees. Inside, the fire crackled in the fireplace, offering warmth and light against the storm’s fury.",
+    "The classroom was filled with the sound of pencils scratching on paper. Students sat at their desks, focused on their assignments. The teacher moved quietly between the rows, offering guidance and encouragement.",
+    // 9
+    "At the edge of the desert, the sand dunes stretched as far as the eye could see. The heat was intense, and the sun beat down relentlessly. In the distance, a caravan made its way slowly across the barren landscape."
+  ]
+  const docs = texts.map((text, i) => ({ id: i.toString(), description: text }))
+  const s = await createNew(docs)
+
+  await t.test('"sun"', async t => {
+    const results = await searchNew(s, {
+      term: 'sun'
+    })
+
+    // only 3 documents contain the word "sun"
+    t.equal(results.length, 3)
+    // This contains the word "sun".
+    t.equal(results[0].id, '9')
+    // Also this, but the text is more length, so it has less score.
+    t.equal(results[1].id, '0')
+    // This contains the word "Sunlight", so it match as prefix and not as a word.
+    t.equal(results[2].id, '5')
+  })
+
+  await t.test("stormy night", async t => {
+    const results = await searchNew(s, {
+      term: 'storm night'
+    })
+
+    t.equal(results.length, 2)
+    // This mention the storm twice
+    t.equal(results[0].id, '7')
+    // this mention night only once
+    t.equal(results[1].id, '3')
+    // For this reason, the first document has more score
+    t.ok(results[0].score > results[1].score)
+  })
+
+  await t.test('trees casting sun', async t => {
+    const results = await searchNew(s, {
+      term: 'trees casting sun'
+    })
+
+    t.equal(results.length, 5)
+
+    // This contains the word "sun" and "trees" and "casting"
+    // Also, "sun" & "casting" are in the same sentence.
+    t.equal(results[0].id, '0')
+
+    // This contains "trees" and "sun" ("Sunlight") also "casting" but not in the same sentence.
+    // This score is high because "Sunlight" (so "sun") and "casting" are in the same sentence.
+    t.equal(results[1].id, '5')
+
+    // This contains only "trees"
+    t.equal(results[2].id, '7')
+
+    // This contains only "sun".
+    // This score is less (compared to the previous one) because the sentences are longer.
+    t.equal(results[3].id, '9')
+
+    // This contains only "casting"
+    // Again, the score is less because the sentences are longer.
+    t.equal(results[4].id, '2')
+  })
+
+  await t.test('the sound of pencils scratching on paper', async t => {
+    const results = await searchNew(s, {
+      term: 'the sound of pencils scratching on paper'
+    })
+
+    t.equal(results.length, 9)
+
+    // This contains a lot of word in the same sentence.
+    t.equal(results[0].id, '8')
+    // This contains 2 words in the same sentence.
+    t.equal(results[1].id, '3')
+
+    // The remaining documents contain only "of" word.
+    t.equal(results[2].id, '6')
+    t.equal(results[3].id, '1')
+    t.equal(results[4].id, '4')
+    t.equal(results[5].id, '9')
+    t.equal(results[6].id, '5')
+    t.equal(results[7].id, '0')
+
+    // This contains "of" in term of "offering", so it has less score.
+    t.equal(results[8].id, '7')
+  })
+})
+
 
 
 

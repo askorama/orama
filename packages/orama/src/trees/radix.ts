@@ -289,7 +289,7 @@ const BIT_MASK_20 = 0b11111111111111111111
 export function bitmask_20(n: number) {
   return n & BIT_MASK_20
 }
-function numberOfOnes(n: number) {
+export function numberOfOnes(n: number) {
   let i = 0
   do {
     if (n & 1) {
