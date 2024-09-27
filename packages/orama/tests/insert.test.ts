@@ -6,10 +6,8 @@ import { AnyDocument, count, create, insert, insertMultiple, search } from '../s
 import dataset from './datasets/events.json' assert { type: 'json' }
 import { BKDTree } from '../src/trees/bkd.js'
 
-t.test('insert method', (t) => {
-  t.test('should correctly insert and retrieve data', async (t) => {
-    t.plan(4)
-
+t.test('insert method', async (t) => {
+  await t.test('should correctly insert and retrieve data', async (t) => {
     const db = await create({
       schema: {
         example: 'string'
@@ -27,9 +25,7 @@ t.test('insert method', (t) => {
     t.equal(ex1Search.hits[0].document.example, 'The quick, brown, fox')
   })
 
-  t.test('should be able to insert documens with non-searchable fields', async (t) => {
-    t.plan(2)
-
+  await t.test('should be able to insert documens with non-searchable fields', async (t) => {
     const db = await create({
       schema: {
         quote: 'string',
@@ -61,9 +57,7 @@ t.test('insert method', (t) => {
     t.equal(searchResult.hits[0].document.author, 'Frank Zappa')
   })
   
-  t.test("should use the 'id' field found in the document as index id", async (t) => {
-    t.plan(2)
-
+  await t.test("should use the 'id' field found in the document as index id", async (t) => {
     const db = await create({
       schema: {
         id: 'string',
@@ -85,9 +79,7 @@ t.test('insert method', (t) => {
     t.equal(i2, 'doe-02')
   })
 
-  t.test("should use the custom 'id' function passed in the configuration object", async (t) => {
-    t.plan(2)
-
+  await t.test("should use the custom 'id' function passed in the configuration object", async (t) => {
     const db = await create({
       schema: {
         id: 'string',
@@ -114,9 +106,7 @@ t.test('insert method', (t) => {
     t.equal(i2, 'doe-foo-bar-baz')
   })
 
-  t.test("should throw an error if the 'id' field is not a string", async (t) => {
-    t.plan(1)
-
+  await t.test("should throw an error if the 'id' field is not a string", async (t) => {
     const db = await create({
       schema: {
         name: 'string'
@@ -135,9 +125,7 @@ t.test('insert method', (t) => {
     )
   })
 
-  t.test("should throw an error if the 'id' field is already taken", async (t) => {
-    t.plan(1)
-
+  await t.test("should throw an error if the 'id' field is already taken", async (t) => {
     const db = await create({
       schema: {
         id: 'string',
@@ -160,9 +148,7 @@ t.test('insert method', (t) => {
     )
   })
 
-  t.test('should use the ID field as index id even if not specified in the schema', async (t) => {
-    t.plan(1)
-
+  await t.test('should use the ID field as index id even if not specified in the schema', async (t) => {
     const db = await create({
       schema: {
         name: 'string'
@@ -177,9 +163,7 @@ t.test('insert method', (t) => {
     t.equal(i1, 'john-01')
   })
 
-  t.test('should allow doc with missing schema keys to be inserted without indexing those keys', async (t) => {
-    t.plan(6)
-
+  await t.test('should allow doc with missing schema keys to be inserted without indexing those keys', async (t) => {
     const db = await create({
       schema: {
         quote: 'string',
@@ -205,10 +189,9 @@ t.test('insert method', (t) => {
     t.notOk('foo' in (db.data.index as unknown as Index).indexes)
   })
 
-  t.test(
+  await t.test(
     'should allow doc with missing schema keys to be inserted without indexing those keys - nested schema version',
     async (t) => {
-      t.plan(6)
       const db = await create({
         schema: {
           quote: 'string',
@@ -263,8 +246,8 @@ t.test('insert method', (t) => {
     }
   )
 
-  t.test('should validate', (t) => {
-    t.test('the properties are not mandatory', async (t) => {
+  await t.test('should validate', async (t) => {
+    await t.test('the properties are not mandatory', async (t) => {
       const db = await create({
         schema: {
           id: 'string',
@@ -279,11 +262,9 @@ t.test('insert method', (t) => {
       await t.resolves(insert(db, { id: 'foo' }))
       await t.resolves(insert(db, { name: 'bar' }))
       await t.resolves(insert(db, { inner: {} }))
-
-      t.end()
     })
 
-    t.test('invalid document', async (t) => {
+    await t.test('invalid document', async (t) => {
       const db = await create({
         schema: {
           string: 'string',
@@ -320,16 +301,10 @@ t.test('insert method', (t) => {
       for (const doc of invalidDocuments) {
         await t.rejects(insert(db, doc))
       }
-
-      t.end()
     })
-
-    t.end()
   })
 
-  t.test('should insert Geopoints', async (t) => {
-    t.plan(3)
-
+  await t.test('should insert Geopoints', async (t) => {
     const db = await create({
       schema: {
         name: 'string',
@@ -351,16 +326,10 @@ t.test('insert method', (t) => {
     t.equal(index.root?.point.lat, 45.5771622)
     t.equal(index.root?.point.lon, 9.261266)
   })
-
-  t.end()
 })
 
-t.test('insert short prefixes, as in #327 and #328', (t) => {
-  t.plan(2)
-
-  t.test('example 1', async (t) => {
-    t.plan(8)
-
+t.test('insert short prefixes, as in #327 and #328', async (t) => {
+  await t.test('example 1', async (t) => {
     const db = await create({
       schema: {
         id: 'string',
@@ -403,9 +372,7 @@ t.test('insert short prefixes, as in #327 and #328', (t) => {
     t.same(prefixResults.hits[1].document.abbrv, 'RDGE')
   })
 
-  t.test('example 2', async (t) => {
-    t.plan(5)
-
+  await t.test('example 2', async (t) => {
     const db = await create({
       schema: {
         id: 'string',
@@ -433,8 +400,8 @@ t.test('insert short prefixes, as in #327 and #328', (t) => {
   })
 })
 
-t.test('insertMultiple method', (t) => {
-  t.test("should use the custom 'id' function passed in the configuration object", async (t) => {
+t.test('insertMultiple method', async (t) => {
+  await t.test("should use the custom 'id' function passed in the configuration object", async (t) => {
     const db = await create({
       schema: {
         id: 'string',
@@ -453,11 +420,9 @@ t.test('insertMultiple method', (t) => {
     ])
 
     t.strictSame(ids, ['john-01', 'doe-02'])
-
-    t.end()
   })
 
-  t.test("should use the 'id' field as index id if found in the document", async (t) => {
+  await t.test("should use the 'id' field as index id if found in the document", async (t) => {
     const db = await create({
       schema: {
         name: 'string'
@@ -467,12 +432,9 @@ t.test('insertMultiple method', (t) => {
     const ids = await insertMultiple(db, [{ name: 'John' }, { id: '02', name: 'Doe' }])
 
     t.ok(ids.includes('02'))
-
-    t.end()
   })
 
-  t.test('should support batch insert of documents', async (t) => {
-    t.plan(2)
+  await t.test('should support batch insert of documents', async (t) => {
 
     const db = await create({
       schema: {
@@ -499,7 +461,7 @@ t.test('insertMultiple method', (t) => {
     await t.rejects(() => insertMultiple(db, wrongSchemaDocs as unknown as DataEvent[]))
   })
 
-  t.test('should support `timeout` parameter', async (t) => {
+  await t.test('should support `timeout` parameter', async (t) => {
     const db = await create({
       schema: {
         description: 'string'
@@ -523,9 +485,7 @@ t.test('insertMultiple method', (t) => {
     t.equal(after - before > expectedTime, true)
   })
 
-  t.test('should correctly rebalance AVL tree once the threshold is reached', async (t) => {
-    t.plan(4)
-
+  await t.test('should correctly rebalance AVL tree once the threshold is reached', async (t) => {
     const db = await create({
       schema: {
         id: 'string',
@@ -582,8 +542,6 @@ t.test('insertMultiple method', (t) => {
     t.equal(results250.count, 1)
     t.equal(results250.hits[0].document.id, '250')
   })
-
-  t.end()
 })
 
 interface BaseDataEvent extends AnyDocument {
