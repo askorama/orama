@@ -13,7 +13,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "moduleResolution": "Bundler"
+    "moduleResolution": "nodenext"
   },
   "include": ["src/*.ts", "src/**/*.ts"]
 }

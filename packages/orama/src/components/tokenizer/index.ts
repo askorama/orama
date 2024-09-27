@@ -140,7 +140,7 @@ export async function createTokenizer(config: DefaultTokenizerConfig = {}): Prom
     stemmerSkipProperties: new Set(config.stemmerSkipProperties ? [config.stemmerSkipProperties].flat() : []),
     tokenizeSkipProperties: new Set(config.tokenizeSkipProperties ? [config.tokenizeSkipProperties].flat() : []),
     stopWords,
-    allowDuplicates: 'allowDuplicates' in config ? Boolean(config.allowDuplicates) : true,
+    allowDuplicates: Boolean(config.allowDuplicates),
     normalizeToken,
     normalizationCache: new Map()
   }

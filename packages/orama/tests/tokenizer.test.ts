@@ -9,7 +9,7 @@ import { stemmer as germanStemmer, language as germanLanguage } from '@orama/ste
 import { stemmer as italianStemmer, language as italianLanguage } from '@orama/stemmers/italian'
 import { stemmer as norwegianStemmer, language as norwegianLanguage } from '@orama/stemmers/norwegian'
 import { stemmer as portugueseStemmer, language as portugueseLanguage } from '@orama/stemmers/portuguese'
-import { stemmer as russianStemmer } from '@orama/stemmers/russian'
+import { stemmer as russianStemmer, language as russianLanguage } from '@orama/stemmers/russian'
 import { stemmer as spanishStemmer, language as spanishLanguage } from '@orama/stemmers/spanish'
 import { stemmer as swedishStemmer, language as swedishLanguage } from '@orama/stemmers/swedish'
 import { stemmer as ukrainianStemmer, language as ukrainianLanguage } from '@orama/stemmers/ukrainian'
@@ -33,10 +33,7 @@ import { stopwords as tamilStopwords } from '@orama/stopwords/tamil'
 import { createTokenizer } from '../src/components/tokenizer/index.js'
 
 t.test('Tokenizer', async (t) => {
-  t.plan(21)
-
   t.test('should tokenize and stem correctly in english', async (t) => {
-    t.plan(2)
 
     const tokenizer = await createTokenizer({ language: 'english', stopWords: false, stemming: true })
 
@@ -209,7 +206,7 @@ t.test('Tokenizer', async (t) => {
     t.plan(2)
 
     const tokenizer = await createTokenizer({
-      language: 'russian',
+      language: russianLanguage,
       stemmer: russianStemmer,
       stopWords: russianStopwords
     })
