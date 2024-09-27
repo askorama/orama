@@ -3,7 +3,7 @@ import { DocumentsStore } from '../src/components/documents-store.js'
 import { Index } from '../src/components/index.js'
 import { getInternalDocumentId } from '../src/components/internal-document-id-store.js'
 import { Result, create, insert, load, save, search } from '../src/index.js'
-import { getCommonPrefix, Node as RadixNode, RadixTree } from '../src/trees/radix.js'
+import { getCommonPrefix, RadixTree } from '../src/trees/radix.js'
 import type { AnyDocument } from '../src/types.js'
 
 function extractOriginalDoc(result: Result<AnyDocument>[]): AnyDocument[] {
