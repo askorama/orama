@@ -476,7 +476,7 @@ export function calculateScore(tree: RadixTree, tokens: string[], foundWords: Fi
   const foundKeys = Object.getOwnPropertyNames(foundWords)
 
   const foundKeysLength = foundKeys.length
-  const resultMap = new Map<number, [number, number[]]>()
+  const resultMap = new Map<number, [number, number]>()
   for (let i = 0; i < foundKeysLength; i++) {
     const key = foundKeys[i]
     const matchedDocs = foundWords[key]
@@ -495,22 +495,20 @@ export function calculateScore(tree: RadixTree, tokens: string[], foundWords: Fi
       const score = ((occurrence * occurrence) / numberOfQuantums + (isExactMatch ? 1 : 0)) * boost
 
       if (!resultMap.has(docId)) {
-        resultMap.set(docId, [score, [bitMask]])
+        resultMap.set(docId, [score, 0])
         continue
       }
 
       const current = resultMap.get(docId)!
       let totalScore = current[0] + score
-      const othersMatches = current[1]
-      const othersLength = othersMatches.length
-      for (let k = 0; k < othersLength; k++) {
-        const other = othersMatches[k]
-        if (other & bitMask) {
-          totalScore += numberOfOnes(other & bitMask) * 2
-        }
-      }
-      othersMatches.push(tokenQuantumDescriptor)
+      const cumulativeBitMask = current[1]
+
+      const overlappingBits = cumulativeBitMask & bitMask
+      const numberOfOverlappingBits = numberOfOnes(overlappingBits)
+      totalScore += numberOfOverlappingBits * 2 + score
+
       current[0] = totalScore
+      current[1] = cumulativeBitMask | bitMask
     }
   }
 
