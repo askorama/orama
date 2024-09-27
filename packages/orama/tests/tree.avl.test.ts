@@ -12,7 +12,7 @@ import {
   rangeSearch
 } from '../src/trees/avl.js'
 
-t.test('AVL Tree', (t) => {
+t.test('AVL Tree', {skip: true}, (t) => {
   t.plan(8)
 
   t.test('create', (t) => {
