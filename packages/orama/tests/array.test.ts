@@ -82,6 +82,7 @@ t.test('create should support array of number', async (t) => {
   ])
 
   await checkSearchWhere(t, db, 'num', { eq: 5 }, [first, third, fourth])
+
   await checkSearchWhere(t, db, 'num', { eq: 35 }, [third])
   await checkSearchWhere(t, db, 'num', { gt: 6 }, [second, third])
   await checkSearchWhere(t, db, 'num', { gte: 7 }, [second, third])

@@ -12,7 +12,7 @@ import {
   rangeSearch
 } from '../src/trees/avl.js'
 
-t.test('AVL Tree', {skip: true}, (t) => {
+t.test('AVL Tree', (t) => {
   t.plan(8)
 
   t.test('create', (t) => {
@@ -66,12 +66,24 @@ t.test('AVL Tree', {skip: true}, (t) => {
 
     const tree = create(1, [1, 2, 3], false)
 
-    insert(tree, 2, [4, 5, 6])
-    insert(tree, 10, [7, 8, 9])
-    insert(tree, 25, [10, 11, 12])
-    insert(tree, 5, [13, 14, 15])
-    insert(tree, 20, [16, 17, 18])
-    insert(tree, 12, [19, 20, 21])
+    insert(tree, 2, 4)
+    insert(tree, 2, 5)
+    insert(tree, 2, 6)
+    insert(tree, 10, 7)
+    insert(tree, 10, 8)
+    insert(tree, 10, 9)
+    insert(tree, 25, 10)
+    insert(tree, 25, 11)
+    insert(tree, 25, 12)
+    insert(tree, 5, 13)
+    insert(tree, 5, 14)
+    insert(tree, 5, 15)
+    insert(tree, 20, 16)
+    insert(tree, 20, 17)
+    insert(tree, 20, 18)
+    insert(tree, 12, 19)
+    insert(tree, 12, 20)
+    insert(tree, 12, 21)
 
     t.same(contains(tree, 20), true)
     t.same(find(tree, 20), [16, 17, 18])
@@ -80,7 +92,7 @@ t.test('AVL Tree', {skip: true}, (t) => {
   t.test('remove', (t) => {
     t.plan(3)
 
-    const tree = create(1, 'foo', false)
+    const tree = create(1, ['foo'], false)
 
     insert(tree, 2, 'bar')
     insert(tree, 10, 'baz')
@@ -101,12 +113,12 @@ t.test('AVL Tree', {skip: true}, (t) => {
 
     const tree = create(1, ['foo'], false)
 
-    insert(tree, 2, ['bar'])
-    insert(tree, 10, ['baz'])
-    insert(tree, 25, ['qux'])
-    insert(tree, 5, ['quux'])
-    insert(tree, 20, ['quuz'])
-    insert(tree, 12, ['corge'])
+    insert(tree, 2, 'bar')
+    insert(tree, 10, 'baz')
+    insert(tree, 25, 'qux')
+    insert(tree, 5, 'quux')
+    insert(tree, 20, 'quuz')
+    insert(tree, 12, 'corge')
 
     t.same(rangeSearch(tree, 5, 20), ['quux', 'baz', 'corge', 'quuz'])
   })
@@ -116,12 +128,12 @@ t.test('AVL Tree', {skip: true}, (t) => {
 
     const tree = create(1, ['foo'], false)
 
-    insert(tree, 2, ['bar'])
-    insert(tree, 10, ['baz'])
-    insert(tree, 25, ['qux'])
-    insert(tree, 5, ['quux'])
-    insert(tree, 20, ['quuz'])
-    insert(tree, 12, ['corge'])
+    insert(tree, 2, 'bar')
+    insert(tree, 10, 'baz')
+    insert(tree, 25, 'qux')
+    insert(tree, 5, 'quux')
+    insert(tree, 20, 'quuz')
+    insert(tree, 12, 'corge')
 
     t.same(greaterThan(tree, 10), ['qux', 'quuz', 'corge'])
   })
@@ -131,12 +143,12 @@ t.test('AVL Tree', {skip: true}, (t) => {
 
     const tree = create(1, ['foo'], false)
 
-    insert(tree, 2, ['bar'])
-    insert(tree, 10, ['baz'])
-    insert(tree, 25, ['qux'])
-    insert(tree, 5, ['quux'])
-    insert(tree, 20, ['quuz'])
-    insert(tree, 12, ['corge'])
+    insert(tree, 2, 'bar')
+    insert(tree, 10, 'baz')
+    insert(tree, 25, 'qux')
+    insert(tree, 5, 'quux')
+    insert(tree, 20, 'quuz')
+    insert(tree, 12, 'corge')
 
     t.same(lessThan(tree, 10), ['foo', 'bar', 'quux'])
   })

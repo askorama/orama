@@ -39,13 +39,13 @@ t.test('radix tree', (t) => {
     })
   })
 
-  t.test('should correctly find a complete sentence', async (t) => {
+  t.test('should correctly find all the words', async (t) => {
     const tree = await buildTree()
 
     for (const phrase of phrases) {
       const tokens = await tokenizer.tokenize(phrase.doc)
+
       for (const term of tokens) {
-        const term = phrase.doc.split(' ')[0]
         const result = radixFind(tree, { term })
         t.ok(result[term].includes(phrase.id))
       }
@@ -63,76 +63,6 @@ t.test('radix tree', (t) => {
     t.strictSame(prefixResult, {
       'the': [1, 2],
       "there": [4],
-    })
-  })
-
-  // TODO: this test tests a non feature: `radixContains` is not used at all
-  t.test('should correctly index phrases into a prefix tree',{ skip: true }, async (t) => {
-    const tree = await buildTree()
-
-    for (const phrase of phrases) {
-      t.ok(radixContains(tree, phrase.doc))
-    }
-
-    t.notOk(radixContains(tree, 'thought it was saturday'))
-  })
-
-
-  // TODO: this test tests a non feature: `radixRemoveWord` and `radixContains` are not used at all
-  t.test('should correctly delete a word from the tree', { skip: true }, async (t) => {
-    const tree = await buildTree()
-
-    const removedIndex = 0
-    const removal = radixRemoveWord(tree, phrases[removedIndex].doc)
-    t.ok(removal)
-
-    const invalidRemoval = radixRemoveWord(tree, 'xyz')
-    t.notOk(invalidRemoval)
-
-    for (let i = 0; i < phrases.length; i++) {
-      if (i === removedIndex) {
-        t.notOk(radixContains(root, phrases[removedIndex].doc))
-      } else {
-        const result = radixFind(root, { term: phrases[i].doc })
-        t.strictSame(result, {
-          [phrases[i].doc]: [phrases[i].id]
-        })
-      }
-    }
-  })
-
-  // TODO: this is an unnecessary test: `exact` is always `true`
-  t.test('should correctly delete a id from the tree with exact=true', { skip: true }, async (t) => {
-    const tree = await buildTree()
-
-    radixRemoveDocumentByWord(tree, phrases[0].doc, phrases[0].id, true)
-
-    const resultFullSearch = radixFind(tree, { term: phrases[0].doc })
-
-    t.strictSame(resultFullSearch, {
-      [phrases[0].doc]: []
-    })
-
-    const resultHalfSearch = radixFind(tree, { term: 'the' })
-    t.has(resultHalfSearch, {
-      [phrases[0].doc]: []
-    })
-  })
-
-  // again
-  t.test('should correctly delete a id from the tree', { skip: true }, async (t) => {
-    const tree = await buildTree()
-
-    radixRemoveDocumentByWord(tree, phrases[0].doc, phrases[0].id, false)
-
-    const resultFullSearch = radixFind(tree, { term: phrases[0].doc })
-    t.strictSame(resultFullSearch, {
-      [phrases[0].doc]: []
-    })
-
-    const resultHalfSearch = radixFind(tree, { term: phrases[0].doc.slice(0, 5) })
-    t.strictSame(resultHalfSearch, {
-      [phrases[0].doc]: []
     })
   })
 
@@ -169,15 +99,6 @@ t.test('radix tree', (t) => {
 
 
 t.test('test from trie for compatibility', async (t) => {
-  // radixContains is not used at all
-  t.test('should correctly index phrases into a prefix tree', { skip: true }, async (t) => {
-    const tree = await buildTree()
-
-    for (const phrase of phrases) {
-      t.ok(radixContains(tree, phrase.doc))
-    }
-  })
-
   t.test('should correctly find an element by prefix', async (t) => {
     const tree = await buildTree()
 

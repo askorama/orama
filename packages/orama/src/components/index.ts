@@ -240,7 +240,7 @@ function insertScalarBuilder(
         avlInsert(
           index.indexes[prop] as AVLTree<number, InternalDocumentID[]>,
           value as number,
-          [internalDocumentId],
+          internalDocumentId,
           avlRebalanceThreshold
         )
         break
