@@ -289,6 +289,15 @@ const BIT_MASK_20 = 0b11111111111111111111
 export function bitmask_20(n: number) {
   return n & BIT_MASK_20
 }
+function numberOfOnes(n: number) {
+  let i = 0
+  do {
+    if (n & 1) {
+      ++i
+    }
+  } while ((n >>= 1))
+  return i
+}
 
 function _findLevenshtein(
   node: Node,
@@ -461,4 +470,55 @@ export function save(node: RadixTree): unknown {
     tokensLength: Array.from(node.tokensLength)
   }
   return dump as unknown
+}
+
+export function calculateScore(tree: RadixTree, tokens: string[], foundWords: FindResult, resultsMap: Map<number, number>, boost: number) {
+  const foundKeys = Object.getOwnPropertyNames(foundWords)
+
+  const foundKeysLength = foundKeys.length
+  const resultMap = new Map<number, [number, number[]]>()
+  for (let i = 0; i < foundKeysLength; i++) {
+    const key = foundKeys[i]
+    const matchedDocs = foundWords[key]
+    const matchedDocsLength = matchedDocs.length
+    const isExactMatch = tokens.includes(key)
+
+    for (let j = 0; j < matchedDocsLength; j++) {
+      const docId = matchedDocs[j]
+
+      const numberOfQuantums = tree.tokensLength.get(docId)!
+      const tokenQuantumDescriptor = tree.tokenQuantums[docId][key]
+
+      const occurrence = count(tokenQuantumDescriptor)
+      const bitMask = bitmask_20(tokenQuantumDescriptor)
+
+      const score = ((occurrence * occurrence) / numberOfQuantums + (isExactMatch ? 1 : 0)) * boost
+
+      if (!resultMap.has(docId)) {
+        resultMap.set(docId, [score, [bitMask]])
+        continue
+      }
+
+      const current = resultMap.get(docId)!
+      let totalScore = current[0] + score
+      const othersMatches = current[1]
+      const othersLength = othersMatches.length
+      for (let k = 0; k < othersLength; k++) {
+        const other = othersMatches[k]
+        if (other & bitMask) {
+          totalScore += numberOfOnes(other & bitMask) * 2
+        }
+      }
+      othersMatches.push(tokenQuantumDescriptor)
+      current[0] = totalScore
+    }
+  }
+
+  for (const [id, [score]] of resultMap.entries()) {
+    if (resultsMap.has(id)) {
+      resultsMap.set(id, resultsMap.get(id)! + score)
+    } else {
+      resultsMap.set(id, score)
+    }
+  }
 }

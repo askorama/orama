@@ -50,7 +50,8 @@ import {
   insert as radixInsert,
   removeDocumentByWord as radixRemoveDocument,
   RadixTree,
-  RadixType
+  RadixType,
+  calculateScore
 } from '../trees/radix.js'
 import {
   create as bkdCreate,
@@ -105,48 +106,6 @@ export interface Index extends AnyIndexStore {
   searchableProperties: string[]
   searchablePropertiesWithTypes: Record<string, SearchableType>
 }
-
-/*
-export async function calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-  context: SearchContext<T, ResultDocument, SearchParamsFullText<T, ResultDocument>>,
-  index: Index,
-  prop: string,
-  term: string,
-  ids: DocumentID[]
-): Promise<TokenScore[]> {
-  const documentIDs = Array.from(ids)
-
-  // Exact fields for TF-IDF
-  const avgFieldLength = index.avgFieldLength[prop]
-  const fieldLengths = index.fieldLengths[prop]
-  const oramaOccurrences = index.tokenOccurrences[prop]
-  const oramaFrequencies = index.frequencies[prop]
-
-  // oramaOccurrences[term] can be undefined, 0, string, or { [k: string]: number }
-  const termOccurrences = typeof oramaOccurrences[term] === 'number' ? oramaOccurrences[term] ?? 0 : 0
-
-  const scoreList: TokenScore[] = []
-
-  // Calculate TF-IDF value for each term, in each document, for each index.
-  const documentIDsLength = documentIDs.length
-  for (let k = 0; k < documentIDsLength; k++) {
-    const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, documentIDs[k])
-    const tf = oramaFrequencies?.[internalId]?.[term] ?? 0
-
-    const bm25 = BM25(
-      tf,
-      termOccurrences,
-      context.docsCount,
-      fieldLengths[internalId]!,
-      avgFieldLength,
-      context.params.relevance! as Required<BM25Params>
-    )
-
-    scoreList.push([internalId, bm25])
-  }
-  return scoreList
-}
-*/
 
 export async function create<T extends AnyOrama, TSchema extends T['schema']>(
   orama: T,
@@ -405,24 +364,6 @@ export async function remove(
   return true
 }
 
-const BIT_MASK_20 = 0b11111111111111111111
-
-export function bitmask_20(n: number) {
-  return n & BIT_MASK_20
-}
-export function count(n: number) {
-  return n >> 20
-}
-function numberOfOnes(n: number) {
-  let i = 0
-  do {
-    if (n & 1) {
-      ++i
-    }
-  } while ((n >>= 1))
-  return i
-}
-
 function searchInProperty(
   tree: RadixTree,
   tokens: string[],
@@ -442,54 +383,13 @@ function searchInProperty(
     }
   }
 
-  const foundKeys = Object.getOwnPropertyNames(foundWords)
-
-  const foundKeysLength = foundKeys.length
-  const resultMap = new Map<number, [number, number[]]>()
-  for (let i = 0; i < foundKeysLength; i++) {
-    const key = foundKeys[i]
-    const matchedDocs = foundWords[key]
-    const matchedDocsLength = matchedDocs.length
-    const isExactMatch = tokens.includes(key)
-
-    for (let j = 0; j < matchedDocsLength; j++) {
-      const docId = matchedDocs[j]
-
-      const numberOfQuantums = tree.tokensLength.get(docId)!
-      const tokenQuantumDescriptor = tree.tokenQuantums[docId][key]
-
-      const occurrence = count(tokenQuantumDescriptor)
-      const bitMask = bitmask_20(tokenQuantumDescriptor)
-
-      const score = ((occurrence * occurrence) / numberOfQuantums + (isExactMatch ? 1 : 0)) * boostPerProperty
-
-      if (!resultMap.has(docId)) {
-        resultMap.set(docId, [score, [bitMask]])
-        continue
-      }
-
-      const current = resultMap.get(docId)!
-      let totalScore = current[0] + score
-      const othersMatches = current[1]
-      const othersLength = othersMatches.length
-      for (let k = 0; k < othersLength; k++) {
-        const other = othersMatches[k]
-        if (other & bitMask) {
-          totalScore += numberOfOnes(other & bitMask) * 2
-        }
-      }
-      othersMatches.push(tokenQuantumDescriptor)
-      current[0] = totalScore
-    }
-  }
-
-  for (const [id, [score]] of resultMap.entries()) {
-    if (resultsMap.has(id)) {
-      resultsMap.set(id, resultsMap.get(id)! + score)
-    } else {
-      resultsMap.set(id, score)
-    }
-  }
+  calculateScore(
+    tree,
+    tokens,
+    foundWords,
+    resultsMap,
+    boostPerProperty
+  )
 }
 
 export async function search(
