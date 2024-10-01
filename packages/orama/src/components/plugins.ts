@@ -23,10 +23,7 @@ export const AVAILABLE_PLUGIN_HOOKS = [
   'afterCreate'
 ] as const
 
-export function getAllPluginsByHook<T extends AnyOrama>(
-  orama: T,
-  hook: AvailablePluginHooks
-): OramaPlugin[] {
+export function getAllPluginsByHook<T extends AnyOrama>(orama: T, hook: AvailablePluginHooks): OramaPlugin[] {
   const pluginsToRun: OramaPlugin[] = []
   const pluginsLength = orama.plugins?.length
 

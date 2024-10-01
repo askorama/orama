@@ -182,7 +182,7 @@ export function fetchDocuments<T extends AnyOrama, ResultDocument extends TypedD
   uniqueDocsArray: [InternalDocumentID, number][],
   offset: number,
   limit: number
-): Result<ResultDocument>[]{
+): Result<ResultDocument>[] {
   const docs = orama.data.docs
 
   const results: Result<ResultDocument>[] = Array.from({

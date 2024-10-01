@@ -13,10 +13,7 @@ export interface DocumentsStore extends AnyDocumentStore {
   count: number
 }
 
-export function create<T extends AnyOrama>(
-  _: T,
-  sharedInternalDocumentStore: InternalDocumentIDStore
-): DocumentsStore {
+export function create<T extends AnyOrama>(_: T, sharedInternalDocumentStore: InternalDocumentIDStore): DocumentsStore {
   return {
     sharedInternalDocumentStore,
     docs: {},
@@ -84,10 +81,7 @@ export function count(store: DocumentsStore): number {
   return store.count
 }
 
-export function load<R = unknown>(
-  sharedInternalDocumentStore: InternalDocumentIDStore,
-  raw: R
-): DocumentsStore {
+export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): DocumentsStore {
   const rawDocument = raw as DocumentsStore
 
   return {

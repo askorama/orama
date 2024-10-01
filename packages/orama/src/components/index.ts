@@ -154,18 +154,14 @@ export function insertTokenScoreParameters(
   index.tokenOccurrences[prop][token] = (index.tokenOccurrences[prop][token] ?? 0) + 1
 }
 
-export function removeDocumentScoreParameters(
-  index: Index,
-  prop: string,
-  id: DocumentID,
-  docsCount: number
-): void {
+export function removeDocumentScoreParameters(index: Index, prop: string, id: DocumentID, docsCount: number): void {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
   if (docsCount > 1) {
-    index.avgFieldLength[prop] = (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][internalId]!) / (docsCount - 1);
+    index.avgFieldLength[prop] =
+      (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][internalId]!) / (docsCount - 1)
   } else {
-    index.avgFieldLength[prop] = undefined as unknown as number;
+    index.avgFieldLength[prop] = undefined as unknown as number
   }
   index.fieldLengths[prop][internalId] = undefined
   index.frequencies[prop][internalId] = undefined

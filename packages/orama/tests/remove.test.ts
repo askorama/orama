@@ -354,19 +354,22 @@ async function createSimpleDB() {
   return [db, id1, id2, id3, id4] as const
 }
 
-t.test('test case for #766: Zero division when computing scores after removing all documents from an index.', async (t) => {
-  const db = await create({
-    schema: {
-      name: 'string'
-    } as const
-  })
+t.test(
+  'test case for #766: Zero division when computing scores after removing all documents from an index.',
+  async (t) => {
+    const db = await create({
+      schema: {
+        name: 'string'
+      } as const
+    })
 
-  const id = await insert(db, { name: 'test' })
+    const id = await insert(db, { name: 'test' })
 
-  const success = await remove(db, id)
+    const success = await remove(db, id)
 
-  await insert(db, { name: 'foo' })
-  await insert(db, { name: 'bar' })
+    await insert(db, { name: 'foo' })
+    await insert(db, { name: 'bar' })
 
-  t.ok(success)
-})
+    t.ok(success)
+  }
+)

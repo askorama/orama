@@ -7,6 +7,6 @@ export function getByID<T extends AnyOrama, ResultDocument extends TypedDocument
   return db.documentsStore.get(db.data.docs, id) as Promise<ResultDocument | undefined>
 }
 
-export function count<T extends AnyOrama>(db: T): Promise<number> {
-  return db.documentsStore.count(db.data.docs) as Promise<number>
+export function count<T extends AnyOrama>(db: T): number {
+  return db.documentsStore.count(db.data.docs)
 }

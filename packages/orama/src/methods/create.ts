@@ -81,8 +81,7 @@ export function create<
   components,
   id,
   plugins
-}: CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter>): Orama<OramaSchema, TIndex, TDocumentStore, TSorter
-> {
+}: CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter>): Orama<OramaSchema, TIndex, TDocumentStore, TSorter> {
   if (!components) {
     components = {}
   }

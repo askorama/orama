@@ -229,10 +229,7 @@ export function intersect<T>(arrays: Array<readonly T[]>): T[] {
   })
 }
 
-export function getDocumentProperties(
-  doc: AnyDocument,
-  paths: string[]
-): Record<string, SearchableValue> {
+export function getDocumentProperties(doc: AnyDocument, paths: string[]): Record<string, SearchableValue> {
   const properties: Record<string, SearchableValue> = {}
 
   const pathsLength = paths.length
@@ -335,4 +332,12 @@ export function removeVectorsFromHits(searchResult: Results<AnyDocument>, vector
       }, result.document)
     }
   }))
+}
+
+export function isPromise(obj: any): obj is Promise<unknown> {
+  return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function'
+}
+
+export function isAsyncFunction(func: any): boolean {
+  return func?.constructor?.name === 'AsyncFunction' ?? false
 }

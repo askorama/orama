@@ -64,9 +64,7 @@ export function getFacets<T extends AnyOrama>(
     const doc = allDocs[i]
 
     for (const facet of facetKeys) {
-      const facetValue = facet.includes('.')
-        ? getNested<string>(doc!, facet)!
-        : (doc![facet] as SearchableValue)
+      const facetValue = facet.includes('.') ? getNested<string>(doc!, facet)! : (doc![facet] as SearchableValue)
 
       const propertyType = properties[facet]
       const facetValues = facets[facet].values

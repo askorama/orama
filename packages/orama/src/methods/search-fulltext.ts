@@ -96,7 +96,12 @@ export function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocumen
         }
 
         const vals = Object.values(docIds)
-        context.docsIntersection[prop] = prioritizeTokenScores(vals, params?.boost?.[prop] ?? 1, threshold, tokensLength)
+        context.docsIntersection[prop] = prioritizeTokenScores(
+          vals,
+          params?.boost?.[prop] ?? 1,
+          threshold,
+          tokensLength
+        )
         const uniqueDocs = context.docsIntersection[prop]
 
         const uniqueDocsLength = uniqueDocs.length
@@ -176,9 +181,7 @@ export function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocumen
       searchResult.groups = getGroups<T, ResultDocument>(orama, uniqueDocsArray, params.groupBy)
     }
 
-    searchResult.elapsed = orama.formatElapsedTime(
-      getNanosecondsTime() - context.timeStart
-    ) as ElapsedTime
+    searchResult.elapsed = orama.formatElapsedTime(getNanosecondsTime() - context.timeStart) as ElapsedTime
 
     return searchResult
   }

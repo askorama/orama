@@ -1004,7 +1004,7 @@ export interface IDocumentsStore<D extends AnyDocumentStore = AnyDocumentStore> 
   get(store: D, id: DocumentID): Optional<AnyDocument>
   getMultiple(store: D, ids: DocumentID[]): Optional<AnyDocument>[]
   getAll(store: D): SyncOrAsyncValue<Record<InternalDocumentID, AnyDocument>>
-  store(store: D, id: DocumentID, doc: AnyDocument): SyncOrAsyncValue<boolean>
+  store(store: D, id: DocumentID, doc: AnyDocument): boolean
   remove(store: D, id: DocumentID): SyncOrAsyncValue<boolean>
   count(store: D): number
 
@@ -1035,17 +1035,13 @@ export interface ISorter<So extends AnySorterStore> {
     value: SortValue,
     schemaType: SortType,
     language: string | undefined
-  ) => SyncOrAsyncValue
+  ) => void
   remove: <T extends So>(sorter: T, prop: string, id: DocumentID) => void
 
   load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): So
   save<R = unknown>(sorter: So): R
 
-  sortBy<T extends AnyOrama>(
-    sorter: So,
-    docIds: [DocumentID, number][],
-    by: SorterParams<T>
-  ): [DocumentID, number][]
+  sortBy<T extends AnyOrama>(sorter: So, docIds: [DocumentID, number][], by: SorterParams<T>): [DocumentID, number][]
 
   getSortableProperties(sorter: So): string[]
   getSortablePropertiesWithTypes(sorter: So): Record<string, SortType>
@@ -1077,10 +1073,10 @@ export interface ObjectComponents<I, D, So> {
 }
 
 export interface FunctionComponents<S> {
-  validateSchema(doc: AnyDocument, schema: S): SyncOrAsyncValue<string | undefined>
-  getDocumentIndexId(doc: AnyDocument): SyncOrAsyncValue<string>
-  getDocumentProperties(doc: AnyDocument, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>
-  formatElapsedTime(number: bigint): SyncOrAsyncValue<number | string | object | ElapsedTime>
+  validateSchema(doc: AnyDocument, schema: S): string | undefined
+  getDocumentIndexId(doc: AnyDocument): string
+  getDocumentProperties(doc: AnyDocument, paths: string[]): Record<string, string | number | boolean>
+  formatElapsedTime(number: bigint): number | string | object | ElapsedTime
 }
 
 export interface SingleOrArrayCallbackComponents<T extends AnyOrama> {

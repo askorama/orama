@@ -134,7 +134,6 @@ export function hybridSearch<T extends AnyOrama, ResultDocument = TypedDocument<
   return performSearchLogic()
 }
 
-
 function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
   params: SearchParamsHybrid<T, ResultDocument>,

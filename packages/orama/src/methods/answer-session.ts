@@ -1,16 +1,11 @@
-import type { OramaProxy, ChatModel } from "@oramacloud/client"
-import type { AnyDocument, AnyOrama, Nullable, OramaPluginSync, SearchParams, Results } from "../types.js"
-import { createError } from "../errors.js"
-import { search } from "./search.js"
+import type { OramaProxy, ChatModel } from '@oramacloud/client'
+import type { AnyDocument, AnyOrama, Nullable, OramaPluginSync, SearchParams, Results } from '../types.js'
+import { createError } from '../errors.js'
+import { search } from './search.js'
 
-export type GenericContext =
-  | string
-  | object
+export type GenericContext = string | object
 
-export type MessageRole =
-  | 'system'
-  | 'user'
-  | 'assistant'
+export type MessageRole = 'system' | 'user' | 'assistant'
 
 export type Message = {
   role: MessageRole
@@ -23,8 +18,8 @@ export type Interaction<SourceT = AnyDocument> = {
   response: string
   aborted: boolean
   loading: boolean
-  sources: Nullable<Results<SourceT>>,
-  translatedQuery: Nullable<SearchParams<AnyOrama>>,
+  sources: Nullable<Results<SourceT>>
+  translatedQuery: Nullable<SearchParams<AnyOrama>>
   error: boolean
   errorMessage: Nullable<string>
 }
@@ -63,7 +58,7 @@ export class AnswerSession<SourceT = AnyDocument> {
   private initPromise?: Promise<true | null>
   public state: Interaction<SourceT>[] = []
 
-  constructor(db: AnyOrama, config: IAnswerSessionConfig<SourceT>) {    
+  constructor(db: AnyOrama, config: IAnswerSessionConfig<SourceT>) {
     this.db = db
     this.config = config
 
@@ -73,7 +68,6 @@ export class AnswerSession<SourceT = AnyDocument> {
     this.events = config.events || {}
     this.conversationID = config.conversationID || this.generateRandomID()
   }
-
 
   public async ask(query: AskParams): Promise<string> {
     await this.initPromise
@@ -137,11 +131,11 @@ export class AnswerSession<SourceT = AnyDocument> {
 
     this.abortController = new AbortController()
     this.lastInteractionParams = params
-  
+
     const interactionId = this.generateRandomID()
 
     this.messages.push({ role: 'user', content: params.term ?? '' })
-  
+
     this.state.push({
       interactionId,
       aborted: false,
@@ -169,11 +163,10 @@ export class AnswerSession<SourceT = AnyDocument> {
         yield msg
 
         this.state[stateIdx].response += msg
-        this.messages.findLast(msg => msg.role === 'assistant')!.content += msg
+        this.messages.findLast((msg) => msg.role === 'assistant')!.content += msg
 
         this.triggerStateChange()
       }
-
     } catch (err: any) {
       if (err.name === 'AbortError') {
         this.state[stateIdx].aborted = true
@@ -204,9 +197,9 @@ export class AnswerSession<SourceT = AnyDocument> {
   private async init(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this
-    
+
     async function getPlugin() {
-      return await self.db.plugins.find(plugin => (plugin as OramaPluginSync).name === ORAMA_SECURE_PROXY_PLUGIN_NAME)
+      return await self.db.plugins.find((plugin) => (plugin as OramaPluginSync).name === ORAMA_SECURE_PROXY_PLUGIN_NAME)
     }
 
     const plugin = await getPlugin()
@@ -215,7 +208,7 @@ export class AnswerSession<SourceT = AnyDocument> {
       throw createError('PLUGIN_SECURE_PROXY_NOT_FOUND')
     }
 
-    const pluginExtras = plugin.extra as { proxy: OramaProxy, pluginParams: { chat: { model: ChatModel } } }
+    const pluginExtras = plugin.extra as { proxy: OramaProxy; pluginParams: { chat: { model: ChatModel } } }
 
     this.proxy = pluginExtras.proxy
 

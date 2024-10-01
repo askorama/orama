@@ -157,4 +157,3 @@ export function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<
   // Sync path
   return performSearchLogic()
 }
-
