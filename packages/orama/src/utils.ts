@@ -339,5 +339,5 @@ export function isPromise(obj: any): obj is Promise<unknown> {
 }
 
 export function isAsyncFunction(func: any): boolean {
-  return func?.constructor?.name === 'AsyncFunction' ?? false
+  return func?.constructor?.name === 'AsyncFunction'
 }

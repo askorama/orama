@@ -25,11 +25,11 @@ import {
 
 t.test('index', (t) => {
   t.test('should allow custom component', async (t) => {
-    const index = await defaultIndex.createIndex()
-    const db = await create({
+    const index = defaultIndex.createIndex()
+    const db = create({
       schema: {
         number: 'number'
-      },
+      } as const,
       components: {
         index: {
           ...index,
@@ -39,7 +39,7 @@ t.test('index', (t) => {
         }
       }
     })
-    const id = await insert(db, { number: 1 })
+    const id = insert(db, { number: 1 }) as string
     await search(db, { sortBy: { property: 'number' } })
     await remove(db, id)
     const raw = await save(db)
@@ -83,15 +83,15 @@ t.test('documentStore', (t) => {
         return store.store(s, id, doc)
       }
     }
-    const db = await create({
+    const db = create({
       schema: {
         number: 'number'
-      },
+      } as const,
       components: {
         documentsStore: customDocumentStore
       }
     })
-    const id = await insert(db, { number: 1 })
+    const id = insert(db, { number: 1 }) as string
     await search(db, { sortBy: { property: 'number' } })
     await remove(db, id)
     const raw = await save(db)
@@ -101,7 +101,7 @@ t.test('documentStore', (t) => {
   })
 
   t.test('should allow custom component - partially', async (t) => {
-    const store = await defaultDocumentsStore.createDocumentsStore()
+    const store = defaultDocumentsStore.createDocumentsStore()
     const customDocumentStore: IDocumentsStore<DocumentsStore> = {
       ...store,
       remove(s, id) {
@@ -111,7 +111,7 @@ t.test('documentStore', (t) => {
     const db = await create({
       schema: {
         number: 'number'
-      },
+      } as const,
       components: {
         documentsStore: customDocumentStore
       }
@@ -132,11 +132,11 @@ t.test('sorter', (t) => {
   t.test('should allow custom component', async (t) => {
     const s = await defaultSorter.createSorter()
     const customSorter: ISorter<Sorter> = {
-      async sortBy(sort, docIds, by) {
+      sortBy(sort, docIds, by) {
         order.push('sortBy')
         return s.sortBy(sort, docIds, by)
       },
-      async create(orama, internalDocumentIdStore, schema, config) {
+      create(orama, internalDocumentIdStore, schema, config) {
         order.push('create')
         return s.create(orama, internalDocumentIdStore, schema, config)
       },
@@ -148,11 +148,11 @@ t.test('sorter', (t) => {
         order.push('remove')
         return s.remove(sort, prop, id)
       },
-      async load(internalDocumentIdStore, raw) {
+      load(internalDocumentIdStore, raw) {
         order.push('load')
         return s.load(internalDocumentIdStore, raw)
       },
-      async save(sort) {
+      save(sort) {
         order.push('save')
         return s.save(sort)
       },
@@ -167,7 +167,7 @@ t.test('sorter', (t) => {
     const db = await create({
       schema: {
         number: 'number'
-      },
+      } as const,
       components: {
         sorter: customSorter
       }
@@ -184,7 +184,7 @@ t.test('sorter', (t) => {
   })
 
   t.test('should allow custom component - partially', async (t) => {
-    const s = await defaultSorter.createSorter()
+    const s = defaultSorter.createSorter()
     const customSorter: ISorter<Sorter> = {
       ...s,
       async remove(sort, prop, id) {
@@ -196,7 +196,7 @@ t.test('sorter', (t) => {
     const db = await create({
       schema: {
         number: 'number'
-      },
+      } as const,
       components: {
         sorter: customSorter
       }
@@ -220,12 +220,12 @@ t.test('sorter', (t) => {
       constructor(private sorter: ISorter<Sorter>) {
         this.sorter = sorter
       }
-      async sortBy(sort, docIds, by) {
+      sortBy(sort, docIds, by) {
         return this.sorter.sortBy(sort.storage, docIds, by)
       }
-      async create(orama, internalDocumentIdStore, schema, config) {
+      create(orama, internalDocumentIdStore, schema, config) {
         return {
-          storage: await this.sorter.create(orama, internalDocumentIdStore, schema, config)
+          storage: this.sorter.create(orama, internalDocumentIdStore, schema, config)
         }
       }
       async insert(sort, prop, id, value, schemaType, language) {
@@ -234,12 +234,12 @@ t.test('sorter', (t) => {
       async remove(sort, prop, id) {
         return this.sorter.remove(sort.storage, prop, id)
       }
-      async load(internalDocumentIdStore, raw) {
+      load(internalDocumentIdStore, raw) {
         return {
-          storage: await this.sorter.load(internalDocumentIdStore, raw)
+          storage: this.sorter.load(internalDocumentIdStore, raw)
         }
       }
-      async save<R = unknown>(sort) {
+      save<R = unknown>(sort) {
         return this.sorter.save(sort.storage) as R
       }
       getSortableProperties(sort) {
@@ -252,10 +252,10 @@ t.test('sorter', (t) => {
 
     const sorter: ISorter<SorterStorage> = new MyCustomSorter(await defaultSorter.createSorter())
 
-    const db = await create({
+    const db = create({
       schema: {
         number: 'number'
-      },
+      } as const,
       components: {
         sorter: sorter
       }
@@ -277,11 +277,11 @@ t.test('sorter', (t) => {
       constructor(private doc: IDocumentsStore<DocumentsStore>) {
         this.doc = doc
       }
-      async create<T extends AnyOrama<any>>(
+      create<T extends AnyOrama<any>>(
         orama: T,
         sharedInternalDocumentStore: InternalDocumentIDStore
-      ): Promise<DocStorage> {
-        const originalDoc = await this.doc.create(orama, sharedInternalDocumentStore)
+      ): DocStorage {
+        const originalDoc = this.doc.create(orama, sharedInternalDocumentStore)
         return {
           storage: originalDoc,
           docs: originalDoc.docs
@@ -290,19 +290,19 @@ t.test('sorter', (t) => {
       get(store: DocStorage, id: DocumentID) {
         return this.doc.get(store.storage, id)
       }
-      getMultiple(store: DocStorage, ids: DocumentID[]): SyncOrAsyncValue<any[]> {
+      getMultiple(store: DocStorage, ids: DocumentID[]): any[] {
         return this.doc.getMultiple(store.storage, ids)
       }
       getAll(store: DocStorage): SyncOrAsyncValue<Record<number, any>> {
         return this.doc.getAll(store.storage)
       }
-      store(store: DocStorage, id: DocumentID, doc: AnyDocument): SyncOrAsyncValue<boolean> {
+      store(store: DocStorage, id: DocumentID, doc: AnyDocument): boolean {
         return this.doc.store(store.storage, id, doc)
       }
       remove(store: DocStorage, id: DocumentID): SyncOrAsyncValue<boolean> {
         return this.doc.remove(store.storage, id)
       }
-      count(store: DocStorage): SyncOrAsyncValue<number> {
+      count(store: DocStorage): number {
         return this.doc.count(store.storage)
       }
       async load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Promise<DocStorage> {
@@ -323,7 +323,7 @@ t.test('sorter', (t) => {
     const db = await create({
       schema: {
         number: 'number'
-      },
+      } as const,
       components: {
         documentsStore: documentsStore
       }

@@ -7,23 +7,23 @@ t.test('update method', (t) => {
   t.test('should remove a document the old document and insert the new one', async (t) => {
     t.plan(3)
 
-    const db = await create({
+    const db = create({
       schema: {
         quote: 'string',
         author: 'string',
         meta: {
           tags: 'string'
         }
-      }
+      } as const
     })
 
-    const oldDocId = await insert(db, {
+    const oldDocId = insert(db, {
       quote: "Life is what happens when you're busy making other plans",
       author: 'John Lennon',
       meta: {
         tags: 'music, life, music'
       }
-    })
+    }) as string
 
     const newDocId = await update(db, oldDocId, {
       quote: 'What I cannot create, I do not understand',
@@ -45,11 +45,11 @@ t.test('update method', (t) => {
 
 t.test('updateMultiple', async (t) => {
   t.test('should update the documents', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         quote: 'string',
         author: 'string'
-      }
+      } as const
     })
 
     const oldDocId1 = await insert(db, {
@@ -85,10 +85,10 @@ t.test('updateMultiple', async (t) => {
   })
 
   t.test('should skip the update if a document is not valid', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         quote: 'string'
-      }
+      } as const
     })
 
     const oldDocId = await insert(db, {
@@ -98,8 +98,8 @@ t.test('updateMultiple', async (t) => {
 
     await t.rejects(updateMultiple(db, [oldDocId], [{ quote: 55 }] as any))
 
-    t.ok(await getByID(db, oldDocId))
-    t.equal(await count(db), 1)
+    t.ok(getByID(db, oldDocId))
+    t.equal(count(db), 1)
 
     t.end()
   })

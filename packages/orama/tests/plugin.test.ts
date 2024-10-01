@@ -61,7 +61,7 @@ t.test('getAllPluginsByHook', async (t) => {
   })
 })
 
-t.only('plugin', async (t) => {
+t.test('plugin', async (t) => {
   const data: string[] = []
 
   function loggerPlugin(): OramaPlugin {
@@ -112,8 +112,8 @@ t.only('plugin', async (t) => {
     }
   }
 
-  t.only('should run all the hooks of a plugin', async (t) => {
-    const db = await create({
+  t.test('should run all the hooks of a plugin', async (t) => {
+    const db = create({
       id: 'orama-1',
       schema: {
         id: 'string',
@@ -167,6 +167,10 @@ t.only('plugin', async (t) => {
     t.equal(data[22], '[Logger] beforeInsertMultiple: [{"id":"4","name":"Foo Bar"},{"id":"5","name":"Bar Baz"}]')
     t.equal(data[29], '[Logger] beforeRemoveMultiple: 4,5')
     t.equal(data[40], '[Logger] afterUpdateMultiple')
+
+    t.equal(data.length, 41)
+
+    console.log(data)
 
     t.end()
   })

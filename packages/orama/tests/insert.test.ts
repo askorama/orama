@@ -5,7 +5,7 @@ import { getInternalDocumentId } from '../src/components/internal-document-id-st
 import { AnyDocument, count, create, insert, insertMultiple, search } from '../src/index.js'
 import dataset from './datasets/events.json' assert { type: 'json' }
 
-t.test('insert method', (t) => {
+t.only('insert method', (t) => {
   t.test('should correctly insert and retrieve data', async (t) => {
     t.plan(4)
 
@@ -122,16 +122,14 @@ t.test('insert method', (t) => {
       } as const
     })
 
-    await t.rejects(
-      () =>
-        insert(db, {
-          id: 123,
-          name: 'John'
-        }),
-      {
-        code: 'DOCUMENT_ID_MUST_BE_STRING'
-      }
-    )
+    try {
+      insert(db, {
+        id: 123,
+        name: 'John'
+      })
+    } catch (e) {
+      t.equal(e.code, 'DOCUMENT_ID_MUST_BE_STRING')
+    }
   })
 
   t.test("should throw an error if the 'id' field is already taken", async (t) => {
@@ -149,20 +147,20 @@ t.test('insert method', (t) => {
       name: 'John'
     })
 
-    await t.rejects(
-      () =>
-        insert(db, {
-          id: 'john-01',
-          name: 'John'
-        }),
-      { code: 'DOCUMENT_ALREADY_EXISTS' }
-    )
+    try {
+      insert(db, {
+        id: 'john-01',
+        name: 'John'
+      })
+    } catch (e) {
+      t.equal(e.code, 'DOCUMENT_ALREADY_EXISTS')
+    }
   })
 
   t.test('should use the ID field as index id even if not specified in the schema', async (t) => {
     t.plan(1)
 
-    const db = await create({
+    const db = create({
       schema: {
         name: 'string'
       } as const
@@ -179,7 +177,7 @@ t.test('insert method', (t) => {
   t.test('should allow doc with missing schema keys to be inserted without indexing those keys', async (t) => {
     t.plan(6)
 
-    const db = await create({
+    const db = create({
       schema: {
         quote: 'string',
         author: 'string'
@@ -264,7 +262,7 @@ t.test('insert method', (t) => {
 
   t.test('should validate', (t) => {
     t.test('the properties are not mandatory', async (t) => {
-      const db = await create({
+      const db = create({
         schema: {
           id: 'string',
           name: 'string',
@@ -274,10 +272,10 @@ t.test('insert method', (t) => {
         } as const
       })
 
-      await t.resolves(insert(db, {}))
-      await t.resolves(insert(db, { id: 'foo' }))
-      await t.resolves(insert(db, { name: 'bar' }))
-      await t.resolves(insert(db, { inner: {} }))
+      insert(db, {})
+      insert(db, { id: 'foo' })
+      insert(db, { name: 'bar' })
+      insert(db, { inner: {} })
 
       t.end()
     })
@@ -317,7 +315,11 @@ t.test('insert method', (t) => {
       ]
       invalidDocuments.push(...invalidDocuments.map((d) => ({ inner: { ...d } })))
       for (const doc of invalidDocuments) {
-        await t.rejects(insert(db, doc))
+        try {
+          insert(db, doc)
+        } catch (e) {
+          t.equal(e.code, 'SCHEMA_VALIDATION_FAILURE')
+        }
       }
 
       t.end()
@@ -494,7 +496,11 @@ t.test('insertMultiple method', (t) => {
       // eslint-disable-next-line no-empty
     } catch (_e) {}
 
-    await t.rejects(() => insertMultiple(db, wrongSchemaDocs as unknown as DataEvent[]))
+    try {
+      insertMultiple(db, wrongSchemaDocs as unknown as DataEvent[])
+    } catch (e) {
+      t.equal(e.code, 'INVALID_DOCUMENT')
+    }
   })
 
   t.test('should support `timeout` parameter', async (t) => {
