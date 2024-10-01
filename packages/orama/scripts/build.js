@@ -108,7 +108,7 @@ async function main() {
   // cjs inherits the version from esm
   await replaceVersion()
 
-  await cjs()
+  // await cjs()
 }
 
 await main()

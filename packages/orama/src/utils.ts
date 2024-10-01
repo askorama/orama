@@ -1,4 +1,4 @@
-import type { AnyDocument, GeosearchDistanceUnit, Results, SearchableValue, TokenScore } from './types.js'
+import type { AnyDocument, GeosearchDistanceUnit, Optional, Results, SearchableValue, TokenScore } from './types.js'
 import { createError } from './errors.js'
 
 const baseId = Date.now().toString().slice(5)
@@ -73,7 +73,7 @@ export function sprintf(template: string, ...args: Array<string | number>): stri
   )
 }
 
-export async function formatBytes(bytes: number, decimals = 2): Promise<string> {
+export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) {
     return '0 Bytes'
   }
@@ -96,7 +96,7 @@ export function getNanosecondTimeViaPerformance() {
   return BigInt(Math.floor(performance.now() * 1e6))
 }
 
-export async function formatNanoseconds(value: number | bigint): Promise<string> {
+export function formatNanoseconds(value: number | bigint): string {
   if (typeof value === 'number') {
     value = BigInt(value)
   }
@@ -112,8 +112,7 @@ export async function formatNanoseconds(value: number | bigint): Promise<string>
   return `${value / second}s`
 }
 
-// TODO: none of these operations is async. Should we change the signature of this function?
-export async function getNanosecondsTime(): Promise<bigint> {
+export function getNanosecondsTime(): bigint {
   if (isInsideWebWorker()) {
     return getNanosecondTimeViaPerformance()
   }
@@ -134,7 +133,7 @@ export async function getNanosecondsTime(): Promise<bigint> {
   return BigInt(0)
 }
 
-export async function uniqueId(): Promise<string> {
+export function uniqueId(): string {
   return `${baseId}-${lastId++}`
 }
 
@@ -230,10 +229,10 @@ export function intersect<T>(arrays: Array<readonly T[]>): T[] {
   })
 }
 
-export async function getDocumentProperties(
+export function getDocumentProperties(
   doc: AnyDocument,
   paths: string[]
-): Promise<Record<string, SearchableValue>> {
+): Record<string, SearchableValue> {
   const properties: Record<string, SearchableValue> = {}
 
   const pathsLength = paths.length
@@ -276,8 +275,8 @@ export async function getDocumentProperties(
   return properties
 }
 
-export async function getNested<T = SearchableValue>(obj: object, path: string): Promise<T | undefined> {
-  const props = await getDocumentProperties(obj as AnyDocument, [path])
+export function getNested<T = SearchableValue>(obj: object, path: string): Optional<T> {
+  const props = getDocumentProperties(obj as AnyDocument, [path])
 
   return props[path] as T | undefined
 }

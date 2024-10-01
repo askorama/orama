@@ -23,10 +23,10 @@ export const AVAILABLE_PLUGIN_HOOKS = [
   'afterCreate'
 ] as const
 
-export async function getAllPluginsByHook<T extends AnyOrama>(
+export function getAllPluginsByHook<T extends AnyOrama>(
   orama: T,
   hook: AvailablePluginHooks
-): Promise<OramaPlugin[]> {
+): OramaPlugin[] {
   const pluginsToRun: OramaPlugin[] = []
   const pluginsLength = orama.plugins?.length
 
@@ -36,7 +36,7 @@ export async function getAllPluginsByHook<T extends AnyOrama>(
 
   for (let i = 0; i < pluginsLength; i++) {
     try {
-      const plugin = await orama.plugins[i]
+      const plugin = orama.plugins[i]
       if (typeof plugin[hook] === 'function') {
         pluginsToRun.push(plugin[hook] as OramaPlugin)
       }

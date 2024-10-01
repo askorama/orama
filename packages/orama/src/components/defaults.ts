@@ -1,3 +1,4 @@
+import type { Optional } from '../types.js'
 import { createError } from '../errors.js'
 import { Point } from '../trees/bkd.js'
 import {
@@ -14,14 +15,14 @@ import { formatNanoseconds, uniqueId } from '../utils.js'
 
 export { getDocumentProperties } from '../utils.js'
 
-export async function formatElapsedTime(n: bigint): Promise<ElapsedTime> {
+export function formatElapsedTime(n: bigint): ElapsedTime {
   return {
     raw: Number(n),
-    formatted: await formatNanoseconds(n)
+    formatted: formatNanoseconds(n)
   }
 }
 
-export async function getDocumentIndexId(doc: AnyDocument): Promise<string> {
+export function getDocumentIndexId(doc: AnyDocument): string {
   if (doc.id) {
     if (typeof doc.id !== 'string') {
       throw createError('DOCUMENT_ID_MUST_BE_STRING', typeof doc.id)
@@ -30,13 +31,13 @@ export async function getDocumentIndexId(doc: AnyDocument): Promise<string> {
     return doc.id
   }
 
-  return await uniqueId()
+  return uniqueId()
 }
 
-export async function validateSchema<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+export function validateSchema<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
   doc: ResultDocument,
   schema: T['schema']
-): Promise<string | undefined> {
+): Optional<string> {
   for (const [prop, type] of Object.entries(schema)) {
     const value = doc[prop]
 
@@ -96,7 +97,7 @@ export async function validateSchema<T extends AnyOrama, ResultDocument extends 
       }
 
       // using as ResultDocument is not exactly right but trying to be type-safe here is not useful
-      const subProp = await validateSchema(value as ResultDocument, type)
+      const subProp = validateSchema(value as ResultDocument, type)
       if (subProp) {
         return prop + '.' + subProp
       }

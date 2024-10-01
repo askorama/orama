@@ -69,7 +69,7 @@ function validateComponents<
   }
 }
 
-export async function create<
+export function create<
   OramaSchema,
   TIndex = IIndex<Index>,
   TDocumentStore = IDocumentsStore<DocumentsStore>,
@@ -81,15 +81,14 @@ export async function create<
   components,
   id,
   plugins
-}: CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter>): Promise<
-  Orama<OramaSchema, TIndex, TDocumentStore, TSorter>
+}: CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter>): Orama<OramaSchema, TIndex, TDocumentStore, TSorter
 > {
   if (!components) {
     components = {}
   }
 
   if (!id) {
-    id = await uniqueId()
+    id = uniqueId()
   }
 
   let tokenizer = components.tokenizer
@@ -99,10 +98,10 @@ export async function create<
 
   if (!tokenizer) {
     // Use the default tokenizer
-    tokenizer = await createTokenizer({ language: language ?? 'english' })
+    tokenizer = createTokenizer({ language: language ?? 'english' })
   } else if (!(tokenizer as Tokenizer).tokenize) {
     // If there is no tokenizer function, we assume this is a TokenizerConfig
-    tokenizer = await createTokenizer(tokenizer)
+    tokenizer = createTokenizer(tokenizer)
   } else {
     const customTokenizer = tokenizer as Tokenizer
     tokenizer = customTokenizer
@@ -115,9 +114,9 @@ export async function create<
 
   const internalDocumentStore = createInternalDocumentIDStore()
 
-  index ||= (await createIndex()) as TIndex
-  sorter ||= (await createSorter()) as TSorter
-  documentsStore ||= (await createDocumentsStore()) as TDocumentStore
+  index ||= createIndex() as TIndex
+  sorter ||= createSorter() as TSorter
+  documentsStore ||= createDocumentsStore() as TDocumentStore
 
   // Validate all other components
   validateComponents(components)
@@ -159,18 +158,18 @@ export async function create<
   } as unknown as Orama<OramaSchema, TIndex, TDocumentStore, TSorter>
 
   orama.data = {
-    index: await orama.index.create(orama, internalDocumentStore, schema),
-    docs: await orama.documentsStore.create(orama, internalDocumentStore),
-    sorting: await orama.sorter.create(orama, internalDocumentStore, schema, sort)
+    index: orama.index.create(orama, internalDocumentStore, schema),
+    docs: orama.documentsStore.create(orama, internalDocumentStore),
+    sorting: orama.sorter.create(orama, internalDocumentStore, schema, sort)
   }
 
   for (const hook of AVAILABLE_PLUGIN_HOOKS) {
-    orama[hook] = (orama[hook] ?? []).concat(await getAllPluginsByHook(orama, hook))
+    orama[hook] = (orama[hook] ?? []).concat(getAllPluginsByHook(orama, hook))
   }
 
   const afterCreate = orama['afterCreate']
   if (afterCreate) {
-    await runAfterCreate(afterCreate, orama)
+    runAfterCreate(afterCreate, orama)
   }
 
   return orama
