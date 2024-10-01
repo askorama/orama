@@ -11,131 +11,150 @@ import { getInternalDocumentId, getDocumentIdFromInternalId } from '../component
 import { Language } from '../index.js'
 import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
 
-export async function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+export function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
   params: SearchParamsVector<T, ResultDocument>,
   language: Language = 'english'
-): Promise<Results<ResultDocument>> {
-  const timeStart = await getNanosecondsTime()
+): Results<ResultDocument> | Promise<Results<ResultDocument>> {
+  const timeStart = getNanosecondsTime()
 
-  if (orama.beforeSearch) {
-    await runBeforeSearch(orama.beforeSearch, orama, params, language)
-  }
+  const asyncNeeded = orama.beforeSearch?.length || orama.afterSearch?.length
 
-  const { vector } = params
+  function performSearchLogic(): Results<ResultDocument> {
+    const { vector } = params
 
-  if (vector && (!('value' in vector) || !('property' in vector))) {
-    throw createError('INVALID_VECTOR_INPUT', Object.keys(vector).join(', '))
-  }
+    if (vector && (!('value' in vector) || !('property' in vector))) {
+      throw createError('INVALID_VECTOR_INPUT', Object.keys(vector).join(', '))
+    }
 
-  const { limit = 10, offset = 0, includeVectors = false } = params
-  const vectorIndex = orama.data.index.vectorIndexes[vector!.property]
-  const vectorSize = vectorIndex.size
-  const vectors = vectorIndex.vectors
-  const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
-  const hasFilters = Object.keys(params.where ?? {}).length > 0
-  const { index, docs: oramaDocs } = orama.data
+    const { limit = 10, offset = 0, includeVectors = false } = params
+    const vectorIndex = orama.data.index.vectorIndexes[vector!.property]
+    const vectorSize = vectorIndex.size
+    const vectors = vectorIndex.vectors
+    const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
+    const hasFilters = Object.keys(params.where ?? {}).length > 0
+    const { index, docs: oramaDocs } = orama.data
 
-  if (vector?.value.length !== vectorSize) {
-    // eslint-disable-next-line
-    throw createError('INVALID_INPUT_VECTOR', vector?.property!, vectorSize, vector?.value.length!)
-  }
+    if (vector?.value.length !== vectorSize) {
+      if (vector?.property === undefined || vector?.value.length === undefined) {
+        throw createError('INVALID_INPUT_VECTOR', 'undefined', vectorSize, 'undefined')
+      }
+      throw createError('INVALID_INPUT_VECTOR', vector.property, vectorSize, vector.value.length)
+    }
 
-  if (!(vector instanceof Float32Array)) {
-    vector.value = new Float32Array(vector.value)
-  }
+    if (!(vector instanceof Float32Array)) {
+      vector.value = new Float32Array(vector.value)
+    }
 
-  let results = findSimilarVectors(vector.value as Float32Array, vectors, vectorSize, params.similarity).map(
-    ([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score]
-  ) as [number, number][]
+    let results = findSimilarVectors(vector.value as Float32Array, vectors, vectorSize, params.similarity).map(
+      ([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score]
+    ) as [number, number][]
 
-  let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
+    let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
 
-  if (!propertiesToSearch) {
-    const propertiesToSearchWithTypes = await orama.index.getSearchablePropertiesWithTypes(index)
+    if (!propertiesToSearch) {
+      const propertiesToSearchWithTypes = orama.index.getSearchablePropertiesWithTypes(index)
 
-    propertiesToSearch = await orama.index.getSearchableProperties(index)
-    propertiesToSearch = propertiesToSearch.filter((prop: string) =>
-      propertiesToSearchWithTypes[prop].startsWith('string')
+      propertiesToSearch = orama.index.getSearchableProperties(index)
+      propertiesToSearch = propertiesToSearch.filter((prop: string) =>
+        propertiesToSearchWithTypes[prop].startsWith('string')
+      )
+
+      orama.caches['propertiesToSearch'] = propertiesToSearch
+    }
+
+    const tokens = []
+
+    const context = createSearchContext(
+      orama.tokenizer,
+      orama.index,
+      orama.documentsStore,
+      language,
+      params,
+      propertiesToSearch,
+      tokens,
+      orama.documentsStore.count(oramaDocs),
+      timeStart
     )
 
-    orama.caches['propertiesToSearch'] = propertiesToSearch
-  }
+    let whereFiltersIDs: InternalDocumentID[] = []
 
-  const tokens = []
-
-  const context = await createSearchContext(
-    orama.tokenizer,
-    orama.index,
-    orama.documentsStore,
-    language,
-    params,
-    propertiesToSearch,
-    tokens,
-    await orama.documentsStore.count(oramaDocs),
-    timeStart
-  )
-
-  let whereFiltersIDs: InternalDocumentID[] = []
-
-  if (hasFilters) {
-    whereFiltersIDs = await orama.index.searchByWhereClause(context, index, params.where!)
-    results = intersectFilteredIDs(whereFiltersIDs, results)
-  }
-
-  let facetsResults: any = []
-
-  if (shouldCalculateFacets) {
-    // Populate facets if needed
-    const facets = await getFacets(orama, results, params.facets!)
-    facetsResults = facets
-  }
-
-  const docs: Result<ResultDocument>[] = Array.from({ length: limit })
-
-  for (let i = 0; i < limit; i++) {
-    const result = results[i + offset]
-    if (!result) {
-      break
+    if (hasFilters) {
+      whereFiltersIDs = orama.index.searchByWhereClause(context, index, params.where!)
+      results = intersectFilteredIDs(whereFiltersIDs, results)
     }
 
-    const doc = orama.data.docs.docs[result[0]]
+    let facetsResults: any = []
 
-    if (doc) {
-      if (!includeVectors) {
-        doc[vector.property] = null
+    if (shouldCalculateFacets) {
+      const facets = getFacets(orama, results, params.facets!)
+      facetsResults = facets
+    }
+
+    const docs: Result<ResultDocument>[] = Array.from({ length: limit })
+
+    for (let i = 0; i < limit; i++) {
+      const result = results[i + offset]
+      if (!result) {
+        break
       }
 
-      const newDoc: Result<ResultDocument> = {
-        id: getDocumentIdFromInternalId(orama.internalDocumentIDStore, result[0]),
-        score: result[1],
-        document: doc
+      const doc = orama.data.docs.docs[result[0]]
+
+      if (doc) {
+        if (!includeVectors) {
+          doc[vector.property] = null
+        }
+
+        const newDoc: Result<ResultDocument> = {
+          id: getDocumentIdFromInternalId(orama.internalDocumentIDStore, result[0]),
+          score: result[1],
+          document: doc
+        }
+        docs[i] = newDoc
       }
-      docs[i] = newDoc
+    }
+
+    let groups: any = []
+
+    if (params.groupBy) {
+      groups = getGroups<T, ResultDocument>(orama, results, params.groupBy)
+    }
+
+    const timeEnd = getNanosecondsTime()
+    const elapsedTime = timeEnd - timeStart
+
+    return {
+      count: results.length,
+      hits: docs.filter(Boolean),
+      elapsed: {
+        raw: Number(elapsedTime),
+        formatted: formatNanoseconds(elapsedTime)
+      },
+      ...(facetsResults ? { facets: facetsResults } : {}),
+      ...(groups ? { groups } : {})
     }
   }
 
-  let groups: any = []
+  async function executeSearchAsync(): Promise<Results<ResultDocument>> {
+    if (orama.beforeSearch) {
+      await runBeforeSearch(orama.beforeSearch, orama, params, language)
+    }
 
-  if (params.groupBy) {
-    groups = await getGroups<T, ResultDocument>(orama, results, params.groupBy)
+    const results = performSearchLogic()
+
+    if (orama.afterSearch) {
+      await runAfterSearch(orama.afterSearch, orama, params, language, results as any)
+    }
+
+    return results
   }
 
-  if (orama.afterSearch) {
-    await runAfterSearch(orama.afterSearch, orama, params, language, results as any)
+  if (asyncNeeded) {
+    return executeSearchAsync()
   }
 
-  const timeEnd = await getNanosecondsTime()
-  const elapsedTime = timeEnd - timeStart
-
-  return {
-    count: results.length,
-    hits: docs.filter(Boolean),
-    elapsed: {
-      raw: Number(elapsedTime),
-      formatted: await formatNanoseconds(elapsedTime)
-    },
-    ...(facetsResults ? { facets: facetsResults } : {}),
-    ...(groups ? { groups } : {})
-  }
+  // Sync path
+  return performSearchLogic()
 }
+

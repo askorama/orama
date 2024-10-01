@@ -27,7 +27,7 @@ export function hybridSearch<T extends AnyOrama, ResultDocument = TypedDocument<
 ): Results<ResultDocument> | Promise<Results<ResultDocument>> {
   const timeStart = getNanosecondsTime()
 
-  const asyncNeeded = orama.beforeSearch || orama.afterSearch
+  const asyncNeeded = orama.beforeSearch?.length || orama.afterSearch?.length
 
   function performSearchLogic(): Results<ResultDocument> {
     const { offset = 0, limit = 10, includeVectors = false } = params

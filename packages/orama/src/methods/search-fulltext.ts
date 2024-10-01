@@ -25,7 +25,7 @@ export function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocumen
 ): Results<ResultDocument> | Promise<Results<ResultDocument>> {
   const timeStart = getNanosecondsTime()
 
-  const asyncNeeded = orama.beforeSearch || orama.afterSearch
+  const asyncNeeded = orama.beforeSearch?.length || orama.afterSearch?.length
 
   function performSearchLogic(): Results<ResultDocument> {
     params.relevance = Object.assign(defaultBM25Params, params.relevance ?? {})
