@@ -1,12 +1,12 @@
-// @ts-nocheck
+//@ts-nocheck
 import { useEffect, useState } from 'react'
 import useBaseUrl from '@docusaurus/useBaseUrl'
 import useIsBrowser from '@docusaurus/useIsBrowser'
 import { useColorMode } from '@docusaurus/theme-common'
 import { usePluginData } from '@docusaurus/useGlobalData'
 import { ungzip } from 'pako'
-import { presets } from '@orama/searchbox'
 import { OramaClient } from '@oramacloud/client'
+import { presets } from '@orama/searchbox'
 import { create, insertMultiple } from '@orama/orama'
 import { pluginAnalytics } from '@orama/plugin-analytics'
 import '@orama/searchbox/dist/index.css'
@@ -18,11 +18,12 @@ export const useOrama = () => {
 
   const baseURL = useBaseUrl('orama-search-index-current.json.gz')
   const isBrowser = useIsBrowser()
+
   useEffect(() => {
     async function loadOrama() {
       if (endpoint?.url) {
         setSearchBoxConfig({
-          oramaInstance: new OramaClient({
+          clientInstance: new OramaClient({
             endpoint: endpoint.url,
             api_key: endpoint.key
           })
@@ -79,5 +80,5 @@ export const useOrama = () => {
     })
   }, [isBrowser])
 
-  return { searchBoxConfig, colorMode }
+  return { searchBoxConfig, colorMode, clientMode: endpoint?.url ? 'cloud' : 'oss' }
 }
