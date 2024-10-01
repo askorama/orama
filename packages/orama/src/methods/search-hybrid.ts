@@ -60,7 +60,6 @@ export function hybridSearch<T extends AnyOrama, ResultDocument = TypedDocument<
       propertiesToSearch = propertiesToSearch.filter((prop: string) => (params.properties as string[]).includes(prop))
     }
 
-    // Context creation
     const context = createSearchContext(
       orama.tokenizer,
       orama.index,
@@ -149,7 +148,6 @@ function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDocument
   const { index, docs } = orama.data
   const tokens = orama.tokenizer.tokenize(term, language)
 
-  // Get searchable string properties
   let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
   if (!propertiesToSearch) {
     const propertiesToSearchWithTypes = orama.index.getSearchablePropertiesWithTypes(index)
@@ -175,7 +173,6 @@ function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDocument
     propertiesToSearch = propertiesToSearch.filter((prop: string) => propertiesSet.has(prop))
   }
 
-  // Create the search context and the results
   const context = createSearchContext(
     orama.tokenizer,
     orama.index,
@@ -191,7 +188,6 @@ function getFullTextSearchIDs<T extends AnyOrama, ResultDocument = TypedDocument
   const tokensLength = tokens.length
 
   if (tokensLength || (properties && properties.length > 0)) {
-    // Now it's time to loop over all the indices and get the documents IDs for every single term
     const indexesLength = propertiesToSearch.length
     for (let i = 0; i < indexesLength; i++) {
       const prop = propertiesToSearch[i]
