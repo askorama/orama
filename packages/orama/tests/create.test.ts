@@ -24,10 +24,12 @@ t.test('create method', (t) => {
   })
 
   t.test('should throw if custom tokenizer and language are specified together', async (t) => {
-    t.throws(() => create({
-      schema: {},
-      language: 'en'
-    }))
+    t.throws(() =>
+      create({
+        schema: {},
+        language: 'en'
+      })
+    )
 
     t.end()
   })

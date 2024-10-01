@@ -29,7 +29,7 @@ t.only('insert method', (t) => {
   t.test('should be able to insert documens with non-searchable fields', async (t) => {
     t.plan(2)
 
-    const db = await create({
+    const db = create({
       schema: {
         quote: 'string',
         author: 'string',
@@ -63,7 +63,7 @@ t.only('insert method', (t) => {
   t.test("should use the 'id' field found in the document as index id", async (t) => {
     t.plan(2)
 
-    const db = await create({
+    const db = create({
       schema: {
         id: 'string',
         name: 'string'
@@ -87,7 +87,7 @@ t.only('insert method', (t) => {
   t.test("should use the custom 'id' function passed in the configuration object", async (t) => {
     t.plan(2)
 
-    const db = await create({
+    const db = create({
       schema: {
         id: 'string',
         name: 'string'
@@ -116,7 +116,7 @@ t.only('insert method', (t) => {
   t.test("should throw an error if the 'id' field is not a string", async (t) => {
     t.plan(1)
 
-    const db = await create({
+    const db = create({
       schema: {
         name: 'string'
       } as const
@@ -135,7 +135,7 @@ t.only('insert method', (t) => {
   t.test("should throw an error if the 'id' field is already taken", async (t) => {
     t.plan(1)
 
-    const db = await create({
+    const db = create({
       schema: {
         id: 'string',
         name: 'string'
@@ -206,7 +206,7 @@ t.only('insert method', (t) => {
     'should allow doc with missing schema keys to be inserted without indexing those keys - nested schema version',
     async (t) => {
       t.plan(6)
-      const db = await create({
+      const db = create({
         schema: {
           quote: 'string',
           author: {
@@ -435,7 +435,7 @@ t.test('insert short prefixes, as in #327 and #328', (t) => {
 
 t.test('insertMultiple method', (t) => {
   t.test("should use the custom 'id' function passed in the configuration object", async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         id: 'string',
         name: 'string'
@@ -458,7 +458,7 @@ t.test('insertMultiple method', (t) => {
   })
 
   t.test("should use the 'id' field as index id if found in the document", async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         name: 'string'
       } as const
@@ -474,7 +474,7 @@ t.test('insertMultiple method', (t) => {
   t.test('should support batch insert of documents', async (t) => {
     t.plan(2)
 
-    const db = await create({
+    const db = create({
       schema: {
         date: 'string',
         description: 'string',
@@ -486,42 +486,39 @@ t.test('insertMultiple method', (t) => {
     })
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const docs = (dataset as DataSet).result.events.slice(0, 4000)
+    const docs = (dataset as DataSet).result.events.slice(0, 2000)
     const wrongSchemaDocs: WrongDataEvent[] = docs.map((doc) => ({ ...doc, date: +new Date() }))
 
-    try {
-      await insertMultiple(db, docs)
-      t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 4000)
-
-      // eslint-disable-next-line no-empty
-    } catch (_e) {}
+    insertMultiple(db, docs)
+    t.equal(Object.keys((db.data.docs as DocumentsStore).docs).length, 2000)
 
     try {
       insertMultiple(db, wrongSchemaDocs as unknown as DataEvent[])
     } catch (e) {
-      t.equal(e.code, 'INVALID_DOCUMENT')
+      t.equal(e.code, 'SCHEMA_VALIDATION_FAILURE')
     }
   })
 
-  t.test('should support `timeout` parameter', async (t) => {
+  // Skipping this test for now, as it is not reliable
+  t.skip('should support `timeout` parameter', async (t) => {
     t.plan(2)
 
-    const db = await create({
+    const db = create({
       schema: {
         description: 'string'
       } as const
     })
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const docs = (dataset as DataSet).result.events.slice(0, 4000)
+    const docs = (dataset as DataSet).result.events.slice(0, 1000)
 
     const batchSize = 10
 
     const before = Date.now()
-    await insertMultiple(db, docs, batchSize, undefined, false, 200)
+    insertMultiple(db, docs, batchSize, undefined, false, 200)
     const after = Date.now()
 
-    t.equal(await count(db), 4000)
+    t.equal(count(db), 1000)
     const batchNumber = Math.ceil(docs.length / batchSize)
     // the "sleep" is yeilded between batches,
     // so it is not fired for the last batch

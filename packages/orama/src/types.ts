@@ -941,7 +941,7 @@ export interface IIndex<I extends AnyIndexStore> {
     tokenizer: Tokenizer,
     docsCount: number,
     options?: InsertOptions
-  ) => SyncOrAsyncValue
+  ) => void
   afterInsert?: IIndexInsertOrRemoveHookFunction
 
   beforeRemove?: IIndexInsertOrRemoveHookFunction
@@ -958,14 +958,8 @@ export interface IIndex<I extends AnyIndexStore> {
   ) => SyncOrAsyncValue<boolean>
   afterRemove?: IIndexInsertOrRemoveHookFunction
 
-  insertDocumentScoreParameters(
-    index: I,
-    prop: string,
-    id: DocumentID,
-    tokens: string[],
-    docsCount: number
-  ): SyncOrAsyncValue
-  insertTokenScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], token: string): SyncOrAsyncValue
+  insertDocumentScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], docsCount: number): void
+  insertTokenScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], token: string): void
   removeDocumentScoreParameters(index: I, prop: string, id: DocumentID, docsCount: number): SyncOrAsyncValue
   removeTokenScoreParameters(index: I, prop: string, token: string): void
   calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(

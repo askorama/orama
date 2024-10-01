@@ -40,7 +40,7 @@ export async function updateMultiple<T extends AnyOrama>(
   // Validate all documents before the insertion
   const docsLength = docs.length
   for (let i = 0; i < docsLength; i++) {
-    const errorProperty = await orama.validateSchema(docs[i], orama.schema)
+    const errorProperty = orama.validateSchema(docs[i], orama.schema)
     if (errorProperty) {
       throw createError('SCHEMA_VALIDATION_FAILURE', errorProperty)
     }

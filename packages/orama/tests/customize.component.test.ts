@@ -277,10 +277,7 @@ t.test('sorter', (t) => {
       constructor(private doc: IDocumentsStore<DocumentsStore>) {
         this.doc = doc
       }
-      create<T extends AnyOrama<any>>(
-        orama: T,
-        sharedInternalDocumentStore: InternalDocumentIDStore
-      ): DocStorage {
+      create<T extends AnyOrama<any>>(orama: T, sharedInternalDocumentStore: InternalDocumentIDStore): DocStorage {
         const originalDoc = this.doc.create(orama, sharedInternalDocumentStore)
         return {
           storage: originalDoc,

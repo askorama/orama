@@ -285,42 +285,44 @@ export function insertMultiple<T extends AnyOrama>(
 async function innerInsertMultipleAsync<T extends AnyOrama>(
   orama: T,
   docs: PartialSchemaDeep<TypedDocument<T>>[],
-  batchSize?: number,
+  batchSize: number = 1000,
   language?: string,
   skipHooks?: boolean,
-  timeout?: number
+  timeout: number = 0
 ): Promise<string[]> {
-  if (!batchSize) {
-    batchSize = 1000
-  }
-
-  timeout ??= 0
-
   const ids: string[] = []
-  await new Promise<void>((resolve, reject) => {
-    let i = 0
-    async function _insertMultiple() {
-      const batch = docs.slice(i * batchSize!, ++i * batchSize!)
 
-      if (!batch.length) {
-        return resolve()
-      }
+  const processNextBatch = async (startIndex: number): Promise<number> => {
+    const endIndex = Math.min(startIndex + batchSize, docs.length)
+    const batch = docs.slice(startIndex, endIndex)
 
-      for (const doc of batch) {
-        try {
-          const options = { avlRebalanceThreshold: batch.length }
-          const id = await insert(orama, doc, language, skipHooks, options)
-          ids.push(id)
-        } catch (err) {
-          reject(err)
-        }
-      }
-
-      setTimeout(_insertMultiple, timeout)
+    for (const doc of batch) {
+      const options = { avlRebalanceThreshold: batch.length }
+      const id = await insert(orama, doc, language, skipHooks, options)
+      ids.push(id)
     }
 
-    setTimeout(_insertMultiple, timeout)
-  })
+    return endIndex
+  }
+
+  const processAllBatches = async (): Promise<void> => {
+    let currentIndex = 0
+
+    while (currentIndex < docs.length) {
+      const startTime = Date.now()
+
+      currentIndex = await processNextBatch(currentIndex)
+
+      if (timeout > 0) {
+        const elapsedTime = Date.now() - startTime
+        if (elapsedTime < timeout) {
+          await new Promise((resolve) => setTimeout(resolve, timeout - elapsedTime))
+        }
+      }
+    }
+  }
+
+  await processAllBatches()
 
   if (!skipHooks) {
     await runMultipleHook(orama.afterInsertMultiple, orama, docs as TypedDocument<T>[])
@@ -332,24 +334,17 @@ async function innerInsertMultipleAsync<T extends AnyOrama>(
 function innerInsertMultipleSync<T extends AnyOrama>(
   orama: T,
   docs: PartialSchemaDeep<TypedDocument<T>>[],
-  batchSize?: number,
+  batchSize: number = 1000,
   language?: string,
   skipHooks?: boolean,
-  timeout?: number
+  timeout: number = 0
 ): string[] {
-  if (!batchSize) {
-    batchSize = 1000
-  }
-
-  timeout ??= 0
-
   const ids: string[] = []
   let i = 0
 
-  function _insertMultipleSync() {
-    const batch = docs.slice(i * batchSize!, ++i * batchSize!)
-
-    if (!batch.length) return
+  function processNextBatch(): boolean {
+    const batch = docs.slice(i * batchSize, (i + 1) * batchSize)
+    if (batch.length === 0) return false
 
     for (const doc of batch) {
       const options = { avlRebalanceThreshold: batch.length }
@@ -357,10 +352,33 @@ function innerInsertMultipleSync<T extends AnyOrama>(
       ids.push(id)
     }
 
-    setTimeout(_insertMultipleSync, timeout)
+    i++
+    return true
   }
 
-  _insertMultipleSync()
+  function processAllBatches() {
+    const startTime = Date.now()
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const hasMoreBatches = processNextBatch()
+      if (!hasMoreBatches) break
+
+      if (timeout > 0) {
+        const elapsedTime = Date.now() - startTime
+        if (elapsedTime >= timeout) {
+          // Synchronously wait for the remaining time
+          const remainingTime = timeout - (elapsedTime % timeout)
+          const endTime = Date.now() + remainingTime
+          while (Date.now() < endTime) {
+            // Do nothing, just wait
+          }
+        }
+      }
+    }
+  }
+
+  processAllBatches()
 
   if (!skipHooks) {
     runMultipleHook(orama.afterInsertMultiple, orama, docs as TypedDocument<T>[])

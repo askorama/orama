@@ -296,7 +296,7 @@ function insertScalarBuilder(
   docsCount: number,
   options?: InsertOptions
 ) {
-  return async (value: SearchableValue): Promise<void> => {
+  return (value: SearchableValue) => {
     const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
     const { type, node } = index.indexes[prop]
@@ -311,11 +311,11 @@ function insertScalarBuilder(
         break
       }
       case 'Radix': {
-        const tokens = await tokenizer.tokenize(value as string, language, prop)
-        await implementation.insertDocumentScoreParameters(index, prop, internalId, tokens, docsCount)
+        const tokens = tokenizer.tokenize(value as string, language, prop)
+        implementation.insertDocumentScoreParameters(index, prop, internalId, tokens, docsCount)
 
         for (const token of tokens) {
-          await implementation.insertTokenScoreParameters(index, prop, internalId, tokens, token)
+          implementation.insertTokenScoreParameters(index, prop, internalId, tokens, token)
 
           radixInsert(node, token, internalId)
         }
@@ -334,7 +334,7 @@ function insertScalarBuilder(
   }
 }
 
-export async function insert(
+export function insert(
   implementation: IIndex<Index>,
   index: Index,
   prop: string,
@@ -345,7 +345,7 @@ export async function insert(
   tokenizer: Tokenizer,
   docsCount: number,
   options?: InsertOptions
-): Promise<void> {
+): void {
   if (isVectorType(schemaType)) {
     return insertVector(index, prop, value as number[] | Float32Array, id)
   }
@@ -359,7 +359,7 @@ export async function insert(
   const elements = value as Array<string | number | boolean>
   const elementsLength = elements.length
   for (let i = 0; i < elementsLength; i++) {
-    await insertScalar(elements[i])
+    insertScalar(elements[i])
   }
 }
 
