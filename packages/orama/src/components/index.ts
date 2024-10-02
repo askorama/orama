@@ -22,6 +22,7 @@ import type {
   VectorType,
   WhereCondition
 } from '../types.js'
+import type { RadixNode } from '../trees/radix.js'
 import type { InsertOptions } from '../methods/insert.js'
 import { createError } from '../errors.js'
 import {
@@ -42,13 +43,7 @@ import {
   removeDocument as flatRemoveDocument,
   FlatTree
 } from '../trees/flat.js'
-import {
-  create as radixCreate,
-  find as radixFind,
-  insert as radixInsert,
-  Node as RadixNode,
-  removeDocumentByWord as radixRemoveDocument
-} from '../trees/radix.js'
+import { RadixTree } from '../trees/radix.js'
 import {
   create as bkdCreate,
   insert as bkdInsert,
@@ -261,7 +256,7 @@ export function create<T extends AnyOrama, TSchema extends T['schema']>(
           break
         case 'string':
         case 'string[]':
-          index.indexes[path] = { type: 'Radix', node: radixCreate(), isArray }
+          index.indexes[path] = { type: 'Radix', node: new RadixTree(), isArray }
           index.avgFieldLength[path] = 0
           index.frequencies[path] = {}
           index.tokenOccurrences[path] = {}
