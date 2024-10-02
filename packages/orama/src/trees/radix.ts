@@ -37,12 +37,7 @@ export class RadixNode {
     return this.d.delete(docID)
   }
 
-  public findAllWords(
-    output: FindResult,
-    term: string,
-    exact?: boolean,
-    tolerance?: number
-  ): FindResult {
+  public findAllWords(output: FindResult, term: string, exact?: boolean, tolerance?: number): FindResult {
     if (this.e) {
       const { w, d: docIDs } = this
 
@@ -54,10 +49,7 @@ export class RadixNode {
         if (tolerance) {
           const difference = Math.abs(term.length - w.length)
 
-          if (
-            difference <= tolerance &&
-            syncBoundedLevenshtein(term, w, tolerance).isBounded
-          ) {
+          if (difference <= tolerance && syncBoundedLevenshtein(term, w, tolerance).isBounded) {
             output[w] = []
           }
         } else {
@@ -103,10 +95,7 @@ export class RadixNode {
         }
 
         const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength]
-        if (
-          commonPrefixLength < edgeLabelLength &&
-          commonPrefixLength === wordAtIndex.length
-        ) {
+        if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
           const newNode = new RadixNode(currentCharacter, wordAtIndex, true)
           newNode.c.set(edgeLabelAtCommonPrefix, childNode)
 
@@ -122,10 +111,7 @@ export class RadixNode {
           return
         }
 
-        if (
-          commonPrefixLength < edgeLabelLength &&
-          commonPrefixLength < wordAtIndex.length
-        ) {
+        if (commonPrefixLength < edgeLabelLength && commonPrefixLength < wordAtIndex.length) {
           const inbetweenNode = new RadixNode(currentCharacter, commonPrefix, false)
           inbetweenNode.c.set(edgeLabel[commonPrefixLength], childNode)
           node.c.set(currentCharacter, inbetweenNode)
@@ -135,11 +121,7 @@ export class RadixNode {
           inbetweenNodeChild.k = edgeLabel[commonPrefixLength]
 
           const wordAtCommonPrefix = wordAtIndex[commonPrefixLength]
-          const newNode = new RadixNode(
-            wordAtCommonPrefix,
-            word.substring(i + commonPrefixLength),
-            true
-          )
+          const newNode = new RadixNode(wordAtCommonPrefix, word.substring(i + commonPrefixLength), true)
           newNode.addDocument(docId)
 
           inbetweenNode.c.set(wordAtCommonPrefix, newNode)
@@ -201,9 +183,7 @@ export class RadixNode {
     }
 
     if (this.c.has(term[index])) {
-      this.c
-        .get(term[index])!
-        ._findLevenshtein(term, index + 1, tolerance, originalTolerance, output)
+      this.c.get(term[index])!._findLevenshtein(term, index + 1, tolerance, originalTolerance, output)
     }
 
     this._findLevenshtein(term, index + 1, tolerance - 1, originalTolerance, output)
@@ -214,13 +194,7 @@ export class RadixNode {
 
     for (const [character, childNode] of this.c) {
       if (character !== term[index]) {
-        childNode._findLevenshtein(
-          term,
-          index + 1,
-          tolerance - 1,
-          originalTolerance,
-          output
-        )
+        childNode._findLevenshtein(term, index + 1, tolerance - 1, originalTolerance, output)
       }
     }
   }
@@ -243,10 +217,7 @@ export class RadixNode {
 
           const commonPrefix = RadixNode.getCommonPrefix(edgeLabel, termSubstring)
           const commonPrefixLength = commonPrefix.length
-          if (
-            commonPrefixLength !== edgeLabel.length &&
-            commonPrefixLength !== termSubstring.length
-          ) {
+          if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
             if (tolerance) break
             return {}
           }
@@ -277,10 +248,7 @@ export class RadixNode {
         const commonPrefix = RadixNode.getCommonPrefix(edgeLabel, termSubstring)
         const commonPrefixLength = commonPrefix.length
 
-        if (
-          commonPrefixLength !== edgeLabel.length &&
-          commonPrefixLength !== termSubstring.length
-        ) {
+        if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
           return false
         }
         i += childNode.s.length - 1
@@ -326,11 +294,7 @@ export class RadixNode {
     return true
   }
 
-  public removeDocumentByWord(
-    term: string,
-    docID: InternalDocumentID,
-    exact = true
-  ): boolean {
+  public removeDocumentByWord(term: string, docID: InternalDocumentID, exact = true): boolean {
     if (!term) {
       return true
     }
@@ -371,9 +335,7 @@ export class RadixNode {
     const node = new RadixNode(json.k, json.s, json.e)
     node.w = json.w
     node.d = new Set(json.d)
-    node.c = new Map(
-      json.c.map(([key, nodeJson]: [string, any]) => [key, RadixNode.fromJSON(nodeJson)])
-    )
+    node.c = new Map(json.c.map(([key, nodeJson]: [string, any]) => [key, RadixNode.fromJSON(nodeJson)]))
     return node
   }
 
@@ -402,9 +364,7 @@ export class RadixTree extends RadixNode {
     tree.e = json.e
     tree.k = json.k
     tree.d = new Set(json.d)
-    tree.c = new Map(
-      json.c.map(([key, nodeJson]: [string, any]) => [key, RadixNode.fromJSON(nodeJson)])
-    )
+    tree.c = new Map(json.c.map(([key, nodeJson]: [string, any]) => [key, RadixNode.fromJSON(nodeJson)]))
     return tree
   }
 

@@ -22,7 +22,7 @@ import type {
   VectorType,
   WhereCondition
 } from '../types.js'
-import type { RadixNode } from '../trees/radix.js'
+import { RadixNode } from '../trees/radix.js'
 import type { InsertOptions } from '../methods/insert.js'
 import { createError } from '../errors.js'
 import {
@@ -312,7 +312,7 @@ function insertScalarBuilder(
         for (const token of tokens) {
           implementation.insertTokenScoreParameters(index, prop, internalId, tokens, token)
 
-          radixInsert(node, token, internalId)
+          node.insert(token, internalId)
         }
 
         break
@@ -407,7 +407,7 @@ function removeScalar(
 
       for (const token of tokens) {
         implementation.removeTokenScoreParameters(index, prop, token)
-        radixRemoveDocument(node, token, internalId)
+        node.removeDocumentByWord(token, internalId)
       }
 
       return true
@@ -475,7 +475,7 @@ export function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   }
 
   const { exact, tolerance } = context.params
-  const searchResult = radixFind(node, { term, exact, tolerance })
+  const searchResult = node.find({ term, exact, tolerance })
   const ids = new Set<InternalDocumentID>()
 
   for (const key in searchResult) {
@@ -576,7 +576,7 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
       for (const raw of [operation].flat()) {
         const term = context.tokenizer.tokenize(raw, context.language, param)
         for (const t of term) {
-          const filteredIDsResults = radixFind(node, { term: t, exact: true })
+          const filteredIDsResults = node.find({ term: t, exact: true })
           safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())
         }
       }
@@ -650,7 +650,7 @@ export function getSearchablePropertiesWithTypes(index: Index): Record<string, S
 }
 
 function loadRadixNode(node: RadixNode): RadixNode {
-  const convertedNode = radixCreate(node.e, node.s, node.k)
+  const convertedNode = new RadixNode(node.k, node.s, node.e)
 
   convertedNode.d = node.d
   convertedNode.w = node.w
