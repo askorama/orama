@@ -4,31 +4,86 @@
   "type": "module",
   "description": "Next generation full-text and vector search engine, written in TypeScript",
   "sideEffects": false,
-  "main": "./dist/cjs/index.cjs",
+  "main": "./dist/commonjs/index.js",
   "exports": {
+    "./package.json": "./package.json",
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/cjs/index.cjs"
+      "deno": {
+        "types": "./dist/deno/index.d.ts",
+        "default": "./dist/deno/index.js"
+      },
+      "browser": {
+        "types": "./dist/browser/index.d.ts",
+        "default": "./dist/browser/index.js"
+      },
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/commonjs/index.d.ts",
+        "default": "./dist/commonjs/index.js"
+      }
     },
     "./internals": {
-      "types": "./dist/internals.d.ts",
-      "import": "./dist/internals.js",
-      "require": "./dist/cjs/internals.cjs"
+      "deno": {
+        "types": "./dist/deno/internals.d.ts",
+        "default": "./dist/deno/internals.js"
+      },
+      "browser": {
+        "types": "./dist/browser/internals.d.ts",
+        "default": "./dist/browser/internals.js"
+      },
+      "import": {
+        "types": "./dist/esm/internals.d.ts",
+        "default": "./dist/esm/internals.js"
+      },
+      "require": {
+        "types": "./dist/commonjs/internals.d.ts",
+        "default": "./dist/commonjs/internals.js"
+      }
     },
     "./components": {
-      "types": "./dist/components.d.ts",
-      "import": "./dist/components.js",
-      "require": "./dist/cjs/components.cjs"
+      "deno": {
+        "types": "./dist/deno/components.d.ts",
+        "default": "./dist/deno/components.js"
+      },
+      "browser": {
+        "types": "./dist/browser/components.d.ts",
+        "default": "./dist/browser/components.js"
+      },
+      "import": {
+        "types": "./dist/esm/components.d.ts",
+        "default": "./dist/esm/components.js"
+      },
+      "require": {
+        "types": "./dist/commonjs/components.d.ts",
+        "default": "./dist/commonjs/components.js"
+      }
     },
     "./trees": {
-      "types": "./dist/trees.d.ts",
-      "import": "./dist/trees.js",
-      "require": "./dist/cjs/trees.cjs"
+      "deno": {
+        "types": "./dist/deno/trees.d.ts",
+        "default": "./dist/deno/trees.js"
+      },
+      "browser": {
+        "types": "./dist/browser/trees.d.ts",
+        "default": "./dist/browser/trees.js"
+      },
+      "import": {
+        "types": "./dist/esm/trees.d.ts",
+        "default": "./dist/esm/trees.js"
+      },
+      "require": {
+        "types": "./dist/commonjs/trees.d.ts",
+        "default": "./dist/commonjs/trees.js"
+      }
     }
   },
-  "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "types": "./dist/commonjs/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/askorama/orama"
@@ -40,7 +95,7 @@
     "predev": "rm -rf dist && mkdir dist",
     "dev": "swc -s -w --extensions .ts,.cts -d dist src",
     "prebuild": "npm run lint",
-    "build": "node scripts/build.js",
+    "build": "tshy",
     "lint": "eslint src tests --ext .js,.ts,.cts",
     "test": "c8 -c tests/config/c8-local.json tap tests/*.test.ts",
     "test:ci": "c8 -c tests/config/c8-ci.json tap --no-color tests/*.test.ts",
@@ -97,6 +152,7 @@
     "tape": "^5.6.1",
     "tcompare": "^6.0.0",
     "tsd": "^0.29.0",
+    "tshy": "^3.0.2",
     "tsx": "^3.12.1",
     "typescript": "^5.0.0"
   },
@@ -105,5 +161,19 @@
   },
   "tap": {
     "extends": "tests/config/tap.yml"
-  }
+  },
+  "tshy": {
+    "exports": {
+      "./package.json": "./package.json",
+      ".": "./src/index.ts",
+      "./internals": "./src/internals.ts",
+      "./components": "./src/components.ts",
+      "./trees": "./src/trees.ts"
+    },
+    "esmDialects": [
+      "deno",
+      "browser"
+    ]
+  },
+  "module": "./dist/esm/index.js"
 }

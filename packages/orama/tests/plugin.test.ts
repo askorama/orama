@@ -85,25 +85,25 @@ t.only('plugin', async (t) => {
       afterInsertMultiple: async (orama, docs) => {
         data.push(`[Logger] afterInsertMultiple: ${JSON.stringify(docs)}`)
       },
-      beforeRemove: async (orama, id) => {
+      beforeRemove: async () => {
         data.push(`[Logger] beforeRemove`)
       },
-      afterRemove: async (orama, id) => {
+      afterRemove: async () => {
         data.push(`[Logger] afterRemove`)
       },
-      beforeUpdate(orama, id) {
+      beforeUpdate() {
         data.push(`[Logger] beforeUpdate`)
       },
       afterUpdate() {
         data.push(`[Logger] afterUpdate`)
       },
-      beforeRemoveMultiple(orama, ids) {
+      beforeRemoveMultiple() {
         data.push(`[Logger] beforeRemoveMultiple`)
       },
-      afterRemoveMultiple(orama, ids) {
+      afterRemoveMultiple() {
         data.push(`[Logger] afterRemoveMultiple`)
       },
-      beforeUpdateMultiple(orama, ids) {
+      beforeUpdateMultiple() {
         data.push(`[Logger] beforeUpdateMultiple`)
       },
       afterUpdateMultiple() {
