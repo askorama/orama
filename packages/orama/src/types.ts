@@ -985,7 +985,7 @@ export interface IIndex<I extends AnyIndexStore> {
   getSearchableProperties(index: I): string[]
   getSearchablePropertiesWithTypes(index: I): Record<string, SearchableType>
 
-  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): SyncOrAsyncValue<I>
+  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): I
   save<R = unknown>(index: I): SyncOrAsyncValue<R>
 }
 
@@ -1002,7 +1002,7 @@ export interface IDocumentsStore<D extends AnyDocumentStore = AnyDocumentStore> 
   remove(store: D, id: DocumentID): SyncOrAsyncValue<boolean>
   count(store: D): number
 
-  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): SyncOrAsyncValue<D>
+  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): D
   save<R = unknown>(store: D): SyncOrAsyncValue<R>
 }
 
