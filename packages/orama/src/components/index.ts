@@ -25,16 +25,7 @@ import type {
 import { RadixNode } from '../trees/radix.js'
 import type { InsertOptions } from '../methods/insert.js'
 import { createError } from '../errors.js'
-import {
-  create as avlCreate,
-  find as avlFind,
-  greaterThan as avlGreaterThan,
-  insert as avlInsert,
-  lessThan as avlLessThan,
-  RootNode as AVLRootNode,
-  rangeSearch as avlRangeSearch,
-  removeDocument as avlRemoveDocument
-} from '../trees/avl.js'
+import { AVLTree } from '../trees/avl.js'
 import {
   create as flatCreate,
   filter as flatFilter,
@@ -90,7 +81,7 @@ export type TTree<T = TreeType, N = unknown> = {
 
 export type Tree =
   | TTree<'Radix', RadixNode>
-  | TTree<'AVL', AVLRootNode<number, InternalDocumentID[]>>
+  | TTree<'AVL', AVLTree<number, InternalDocumentID[]>>
   | TTree<'Bool', BooleanIndex>
   | TTree<'Flat', FlatTree>
   | TTree<'BKD', BKDNode>
@@ -252,7 +243,7 @@ export function create<T extends AnyOrama, TSchema extends T['schema']>(
           break
         case 'number':
         case 'number[]':
-          index.indexes[path] = { type: 'AVL', node: avlCreate<number, InternalDocumentID[]>(0, []), isArray }
+          index.indexes[path] = { type: 'AVL', node: new AVLTree<number, InternalDocumentID[]>(0, []), isArray }
           break
         case 'string':
         case 'string[]':
@@ -302,7 +293,7 @@ function insertScalarBuilder(
       }
       case 'AVL': {
         const avlRebalanceThreshold = options?.avlRebalanceThreshold ?? 1
-        avlInsert(node, value as number, [internalId], avlRebalanceThreshold)
+        node.insert(value as number, [internalId], avlRebalanceThreshold)
         break
       }
       case 'Radix': {
@@ -390,7 +381,7 @@ function removeScalar(
   const { type, node } = index.indexes[prop]
   switch (type) {
     case 'AVL': {
-      avlRemoveDocument(node, internalId, value as number)
+      node.removeDocument(internalId, value as number[])
       return true
     }
     case 'Bool': {
@@ -607,28 +598,28 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
 
       switch (operationOpt) {
         case 'gt': {
-          filteredIDs = avlGreaterThan(node, operationValue, false)
+          filteredIDs = node.greaterThan(operationValue as number, false)
           break
         }
         case 'gte': {
-          filteredIDs = avlGreaterThan(node, operationValue, true)
+          filteredIDs = node.greaterThan(operationValue as number, true)
           break
         }
         case 'lt': {
-          filteredIDs = avlLessThan(node, operationValue, false)
+          filteredIDs = node.lessThan(operationValue as number, false)
           break
         }
         case 'lte': {
-          filteredIDs = avlLessThan(node, operationValue, true)
+          filteredIDs = node.lessThan(operationValue as number, true)
           break
         }
         case 'eq': {
-          filteredIDs = avlFind(node, operationValue) ?? []
+          filteredIDs = node.find(operationValue as number) ?? []
           break
         }
         case 'between': {
           const [min, max] = operationValue as number[]
-          filteredIDs = avlRangeSearch(node, min, max)
+          filteredIDs = node.rangeSearch(min, max)
           break
         }
       }

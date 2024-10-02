@@ -106,17 +106,8 @@ export class AVLTree<K, V> {
   }
 
   public find(key: K): Nullable<V> {
-    let node = this.root
-    while (node) {
-      if (key < node.k) {
-        node = node.l
-      } else if (key > node.k) {
-        node = node.r
-      } else {
-        return node.v
-      }
-    }
-    return null
+    const node = this.findNodeByKey(key)
+    return node ? node.v : null
   }
 
   public contains(key: K): boolean {
@@ -147,6 +138,34 @@ export class AVLTree<K, V> {
 
   public remove(key: K): void {
     this.root = this.removeNode(this.root, key)
+  }
+
+  public removeDocument(key: K, id: V) {
+    const node = this.findNodeByKey(key)
+
+    if (!node) {
+      return
+    }
+
+    if ((node.v as unknown as Set<V>).size === 1) {
+      this.removeNode(node, key)
+    }
+   
+    (node.v as unknown as Set<V>) = new Set([...(node.v as unknown as Set<V>).values()].filter((v) => v !== id))
+  }
+
+  private findNodeByKey(key: K): Nullable<AVLNode<K, V>> {
+    let node = this.root
+    while (node) {
+      if (key < node.k) {
+        node = node.l
+      } else if (key > node.k) {
+        node = node.r
+      } else {
+        return node
+      }
+    }
+    return null
   }
 
   private removeNode(node: Nullable<AVLNode<K, V>>, key: K): Nullable<AVLNode<K, V>> {
@@ -218,7 +237,7 @@ export class AVLTree<K, V> {
     return result
   }
 
-  public lessThan(key: K, inclusive = false): V[] {
+  public lessThan(key: K, inclusive = false): V {
     const result: V[] = []
     const traverse = (node: Nullable<AVLNode<K, V>>) => {
       if (!node) return
@@ -235,6 +254,6 @@ export class AVLTree<K, V> {
       }
     }
     traverse(this.root)
-    return result
+    return result.flat()
   }
 }
