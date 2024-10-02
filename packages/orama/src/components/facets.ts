@@ -1,4 +1,3 @@
-import { createError } from '../errors.js'
 import type {
   AnyOrama,
   FacetResult,
@@ -9,6 +8,7 @@ import type {
   StringFacetDefinition,
   TokenScore
 } from '../types.js'
+import { createError } from '../errors.js'
 import { getNested } from '../utils.js'
 
 type FacetValue = string | boolean | number
@@ -25,17 +25,17 @@ function sortingPredicateBuilder(order: FacetSorting = 'desc') {
   return order.toLowerCase() === 'asc' ? sortAsc : sortDesc
 }
 
-export async function getFacets<T extends AnyOrama>(
+export function getFacets<T extends AnyOrama>(
   orama: T,
   results: TokenScore[],
   facetsConfig: FacetsParams<T>
-): Promise<FacetResult> {
+): FacetResult {
   const facets: FacetResult = {}
   const allIDs = results.map(([id]) => id)
-  const allDocs = await orama.documentsStore.getMultiple(orama.data.docs, allIDs)
+  const allDocs = orama.documentsStore.getMultiple(orama.data.docs, allIDs)
   const facetKeys = Object.keys(facetsConfig!)
 
-  const properties = await orama.index.getSearchablePropertiesWithTypes(orama.data.index)
+  const properties = orama.index.getSearchablePropertiesWithTypes(orama.data.index)
 
   for (const facet of facetKeys) {
     let values
@@ -64,9 +64,7 @@ export async function getFacets<T extends AnyOrama>(
     const doc = allDocs[i]
 
     for (const facet of facetKeys) {
-      const facetValue = facet.includes('.')
-        ? (await getNested<string>(doc!, facet))!
-        : (doc![facet] as SearchableValue)
+      const facetValue = facet.includes('.') ? getNested<string>(doc!, facet)! : (doc![facet] as SearchableValue)
 
       const propertyType = properties[facet]
       const facetValues = facets[facet].values

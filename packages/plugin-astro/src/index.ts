@@ -72,7 +72,7 @@ async function prepareOramaDb(
     })
     .filter(({ generatedFilePath }) => !!generatedFilePath)
 
-  const oramaDB = await createOramaDB({
+  const oramaDB = createOramaDB({
     schema: defaultSchema,
     ...(dbConfig.language ? { language: dbConfig.language } : undefined)
   })
@@ -84,7 +84,7 @@ async function prepareOramaDb(
     const h1 = h1Converter(htmlContent) ?? ''
     const content = contentConverter(htmlContent)
 
-    await insertIntoOramaDB(
+    insertIntoOramaDB(
       oramaDB,
       {
         path: `/${pathname}`,

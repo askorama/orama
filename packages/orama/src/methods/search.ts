@@ -29,7 +29,7 @@ export const defaultBM25Params: BM25Params = {
   d: 0.5
 }
 
-export async function createSearchContext<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+export function createSearchContext<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   tokenizer: Tokenizer,
   index: T['index'],
   documentsStore: T['documentsStore'],
@@ -39,7 +39,7 @@ export async function createSearchContext<T extends AnyOrama, ResultDocument = T
   tokens: string[],
   docsCount: number,
   timeStart: bigint
-): Promise<SearchContext<T, ResultDocument>> {
+): SearchContext<T, ResultDocument> {
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
   // const hasFilters = Object.keys(params.where ?? {}).length > 0;
   // let whereFiltersIDs: string[] = [];
@@ -97,11 +97,11 @@ export async function createSearchContext<T extends AnyOrama, ResultDocument = T
   }
 }
 
-export async function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+export function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
   params: SearchParams<T, ResultDocument>,
   language?: string
-): Promise<Results<ResultDocument>> {
+): Results<ResultDocument> | Promise<Results<ResultDocument>> {
   const mode = params.mode ?? MODE_FULLTEXT_SEARCH
 
   if (mode === MODE_FULLTEXT_SEARCH) {
@@ -119,13 +119,13 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
   throw createError('INVALID_SEARCH_MODE', mode)
 }
 
-export async function fetchDocumentsWithDistinct<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+export function fetchDocumentsWithDistinct<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
   orama: T,
   uniqueDocsArray: [InternalDocumentID, number][],
   offset: number,
   limit: number,
   distinctOn: LiteralUnion<T['schema']>
-): Promise<Result<ResultDocument>[]> {
+): Result<ResultDocument>[] {
   const docs = orama.data.docs
 
   // Keep track which values we already seen
@@ -152,8 +152,8 @@ export async function fetchDocumentsWithDistinct<T extends AnyOrama, ResultDocum
       continue
     }
 
-    const doc = await orama.documentsStore.get(docs, id)
-    const value = await getNested(doc as object, distinctOn)
+    const doc = orama.documentsStore.get(docs, id)
+    const value = getNested(doc as object, distinctOn)
     if (typeof value === 'undefined' || values.has(value)) {
       continue
     }
@@ -177,12 +177,12 @@ export async function fetchDocumentsWithDistinct<T extends AnyOrama, ResultDocum
   return results
 }
 
-export async function fetchDocuments<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+export function fetchDocuments<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
   orama: T,
   uniqueDocsArray: [InternalDocumentID, number][],
   offset: number,
   limit: number
-): Promise<Result<ResultDocument>[]> {
+): Result<ResultDocument>[] {
   const docs = orama.data.docs
 
   const results: Result<ResultDocument>[] = Array.from({
@@ -207,7 +207,7 @@ export async function fetchDocuments<T extends AnyOrama, ResultDocument extends 
     if (!resultIDs.has(id)) {
       // We retrieve the full document only AFTER making sure that we really want it.
       // We never retrieve the full document preventively.
-      const fullDoc = await orama.documentsStore.get(docs, id)
+      const fullDoc = orama.documentsStore.get(docs, id)
       results[i] = { id: getDocumentIdFromInternalId(orama.internalDocumentIDStore, id), score, document: fullDoc! }
       resultIDs.add(id)
     }

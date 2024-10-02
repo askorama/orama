@@ -55,7 +55,7 @@ t.test('filters', (t) => {
   t.test('should throw on unknown field', async (t) => {
     const db = await createSimpleDB()
 
-    await t.rejects(
+    t.throws(() =>
       search(db, {
         term: 'coffee',
         where: {
@@ -69,7 +69,7 @@ t.test('filters', (t) => {
       }
     )
 
-    await t.rejects(
+    t.throws(() =>
       search(db, {
         term: 'coffee',
         where: {
@@ -83,7 +83,7 @@ t.test('filters', (t) => {
       }
     )
 
-    await t.rejects(
+    t.throws(() =>
       search(db, {
         term: 'coffee',
         where: {
@@ -261,7 +261,7 @@ t.test('should throw when using multiple operators', async (t) => {
 
   const db = await createSimpleDB()
 
-  await t.rejects(
+  t.throws(
     () =>
       search(db, {
         term: 'coffee',
@@ -279,7 +279,7 @@ t.test('should throw when using multiple operators', async (t) => {
 t.test('boolean filters', async (t) => {
   t.plan(7)
 
-  const db = await create({
+  const db = create({
     schema: {
       id: 'string',
       isAvailable: 'boolean',

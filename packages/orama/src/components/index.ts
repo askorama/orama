@@ -112,13 +112,13 @@ export interface Index extends AnyIndexStore {
   fieldLengths: Record<string, Record<InternalDocumentID, number | undefined>>
 }
 
-export async function insertDocumentScoreParameters(
+export function insertDocumentScoreParameters(
   index: Index,
   prop: string,
   id: DocumentID,
   tokens: string[],
   docsCount: number
-): Promise<void> {
+): void {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
   index.avgFieldLength[prop] = ((index.avgFieldLength[prop] ?? 0) * (docsCount - 1) + tokens.length) / docsCount
@@ -126,13 +126,13 @@ export async function insertDocumentScoreParameters(
   index.frequencies[prop][internalId] = {}
 }
 
-export async function insertTokenScoreParameters(
+export function insertTokenScoreParameters(
   index: Index,
   prop: string,
   id: DocumentID,
   tokens: string[],
   token: string
-): Promise<void> {
+): void {
   let tokenFrequency = 0
 
   for (const t of tokens) {
@@ -154,34 +154,30 @@ export async function insertTokenScoreParameters(
   index.tokenOccurrences[prop][token] = (index.tokenOccurrences[prop][token] ?? 0) + 1
 }
 
-export async function removeDocumentScoreParameters(
-  index: Index,
-  prop: string,
-  id: DocumentID,
-  docsCount: number
-): Promise<void> {
+export function removeDocumentScoreParameters(index: Index, prop: string, id: DocumentID, docsCount: number): void {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
   if (docsCount > 1) {
-    index.avgFieldLength[prop] = (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][internalId]!) / (docsCount - 1);
+    index.avgFieldLength[prop] =
+      (index.avgFieldLength[prop] * docsCount - index.fieldLengths[prop][internalId]!) / (docsCount - 1)
   } else {
-    index.avgFieldLength[prop] = undefined as unknown as number;
+    index.avgFieldLength[prop] = undefined as unknown as number
   }
   index.fieldLengths[prop][internalId] = undefined
   index.frequencies[prop][internalId] = undefined
 }
 
-export async function removeTokenScoreParameters(index: Index, prop: string, token: string): Promise<void> {
+export function removeTokenScoreParameters(index: Index, prop: string, token: string): void {
   index.tokenOccurrences[prop][token]--
 }
 
-export async function calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+export function calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   context: SearchContext<T, ResultDocument, SearchParamsFullText<T, ResultDocument>>,
   index: Index,
   prop: string,
   term: string,
   ids: DocumentID[]
-): Promise<TokenScore[]> {
+): TokenScore[] {
   const documentIDs = Array.from(ids)
 
   // Exact fields for TF-IDF
@@ -215,13 +211,13 @@ export async function calculateResultScores<T extends AnyOrama, ResultDocument =
   return scoreList
 }
 
-export async function create<T extends AnyOrama, TSchema extends T['schema']>(
+export function create<T extends AnyOrama, TSchema extends T['schema']>(
   orama: T,
   sharedInternalDocumentStore: T['internalDocumentIDStore'],
   schema: TSchema,
   index?: Index,
   prefix = ''
-): Promise<Index> {
+): Index {
   if (!index) {
     index = {
       sharedInternalDocumentStore,
@@ -300,7 +296,7 @@ function insertScalarBuilder(
   docsCount: number,
   options?: InsertOptions
 ) {
-  return async (value: SearchableValue): Promise<void> => {
+  return (value: SearchableValue) => {
     const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
     const { type, node } = index.indexes[prop]
@@ -315,11 +311,11 @@ function insertScalarBuilder(
         break
       }
       case 'Radix': {
-        const tokens = await tokenizer.tokenize(value as string, language, prop)
-        await implementation.insertDocumentScoreParameters(index, prop, internalId, tokens, docsCount)
+        const tokens = tokenizer.tokenize(value as string, language, prop)
+        implementation.insertDocumentScoreParameters(index, prop, internalId, tokens, docsCount)
 
         for (const token of tokens) {
-          await implementation.insertTokenScoreParameters(index, prop, internalId, tokens, token)
+          implementation.insertTokenScoreParameters(index, prop, internalId, tokens, token)
 
           radixInsert(node, token, internalId)
         }
@@ -338,7 +334,7 @@ function insertScalarBuilder(
   }
 }
 
-export async function insert(
+export function insert(
   implementation: IIndex<Index>,
   index: Index,
   prop: string,
@@ -349,7 +345,7 @@ export async function insert(
   tokenizer: Tokenizer,
   docsCount: number,
   options?: InsertOptions
-): Promise<void> {
+): void {
   if (isVectorType(schemaType)) {
     return insertVector(index, prop, value as number[] | Float32Array, id)
   }
@@ -363,7 +359,7 @@ export async function insert(
   const elements = value as Array<string | number | boolean>
   const elementsLength = elements.length
   for (let i = 0; i < elementsLength; i++) {
-    await insertScalar(elements[i])
+    insertScalar(elements[i])
   }
 }
 
@@ -378,7 +374,7 @@ function insertVector(index: Index, prop: string, value: number[] | VectorType, 
   index.vectorIndexes[prop].vectors[id] = [magnitude, value]
 }
 
-async function removeScalar(
+function removeScalar(
   implementation: IIndex<Index>,
   index: Index,
   prop: string,
@@ -388,7 +384,7 @@ async function removeScalar(
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number
-): Promise<boolean> {
+): boolean {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
   if (isVectorType(schemaType)) {
@@ -410,12 +406,12 @@ async function removeScalar(
       return true
     }
     case 'Radix': {
-      const tokens = await tokenizer.tokenize(value as string, language, prop)
+      const tokens = tokenizer.tokenize(value as string, language, prop)
 
-      await implementation.removeDocumentScoreParameters(index, prop, id, docsCount)
+      implementation.removeDocumentScoreParameters(index, prop, id, docsCount)
 
       for (const token of tokens) {
-        await implementation.removeTokenScoreParameters(index, prop, token)
+        implementation.removeTokenScoreParameters(index, prop, token)
         radixRemoveDocument(node, token, internalId)
       }
 
@@ -432,7 +428,7 @@ async function removeScalar(
   }
 }
 
-export async function remove(
+export function remove(
   implementation: IIndex<Index>,
   index: Index,
   prop: string,
@@ -442,7 +438,7 @@ export async function remove(
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number
-): Promise<boolean> {
+): boolean {
   if (!isArrayType(schemaType)) {
     return removeScalar(
       implementation,
@@ -462,18 +458,18 @@ export async function remove(
   const elements = value as Array<string | number | boolean>
   const elementsLength = elements.length
   for (let i = 0; i < elementsLength; i++) {
-    await removeScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer, docsCount)
+    removeScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer, docsCount)
   }
 
   return true
 }
 
-export async function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+export function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   context: SearchContext<T, ResultDocument, SearchParamsFullText<T, ResultDocument>>,
   index: Index,
   prop: string,
   term: string
-): Promise<TokenScore[]> {
+): TokenScore[] {
   if (!(prop in index.tokenOccurrences)) {
     return []
   }
@@ -500,11 +496,11 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
   return context.index.calculateResultScores(context, index, prop, term, Array.from(ids))
 }
 
-export async function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   context: SearchContext<T, ResultDocument>,
   index: Index,
   filters: Partial<WhereCondition<T['schema']>>
-): Promise<number[]> {
+): number[] {
   const filterKeys = Object.keys(filters)
 
   const filtersMap: Record<string, InternalDocumentID[]> = filterKeys.reduce(
@@ -583,7 +579,7 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
 
     if (type === 'Radix' && (typeof operation === 'string' || Array.isArray(operation))) {
       for (const raw of [operation].flat()) {
-        const term = await context.tokenizer.tokenize(raw, context.language, param)
+        const term = context.tokenizer.tokenize(raw, context.language, param)
         for (const t of term) {
           const filteredIDsResults = radixFind(node, { term: t, exact: true })
           safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())
@@ -650,11 +646,11 @@ export async function searchByWhereClause<T extends AnyOrama, ResultDocument = T
   return intersect(Object.values(filtersMap))
 }
 
-export async function getSearchableProperties(index: Index): Promise<string[]> {
+export function getSearchableProperties(index: Index): string[] {
   return index.searchableProperties
 }
 
-export async function getSearchablePropertiesWithTypes(index: Index): Promise<Record<string, SearchableType>> {
+export function getSearchablePropertiesWithTypes(index: Index): Record<string, SearchableType> {
   return index.searchablePropertiesWithTypes
 }
 
@@ -681,7 +677,7 @@ function saveFlatNode(node: FlatTree): unknown {
   return Array.from(node.numberToDocumentId.entries())
 }
 
-export async function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Promise<Index> {
+export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Index {
   const {
     indexes: rawIndexes,
     vectorIndexes: rawVectorIndexes,
@@ -745,7 +741,7 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
   }
 }
 
-export async function save<R = unknown>(index: Index): Promise<R> {
+export function save<R = unknown>(index: Index): R {
   const {
     indexes,
     vectorIndexes,
@@ -799,7 +795,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
   } as R
 }
 
-export async function createIndex(): Promise<IIndex<Index>> {
+export function createIndex(): IIndex<Index> {
   return {
     create,
     insert,

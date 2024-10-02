@@ -25,6 +25,8 @@ export type { DefaultTokenizer } from './components/tokenizer/index.js'
 
 export type Nullable<T> = T | null
 
+export type Optional<T> = T | undefined
+
 export type SingleOrArray<T> = T | T[]
 
 export type SyncOrAsyncValue<T = void> = T | PromiseLike<T>
@@ -925,7 +927,7 @@ export interface IIndex<I extends AnyIndexStore> {
     orama: T,
     sharedInternalDocumentStore: T['internalDocumentIDStore'],
     schema: T['schema']
-  ): SyncOrAsyncValue<I>
+  ): I
 
   beforeInsert?: IIndexInsertOrRemoveHookFunction
   insert: <T extends I>(
@@ -939,7 +941,7 @@ export interface IIndex<I extends AnyIndexStore> {
     tokenizer: Tokenizer,
     docsCount: number,
     options?: InsertOptions
-  ) => SyncOrAsyncValue
+  ) => void
   afterInsert?: IIndexInsertOrRemoveHookFunction
 
   beforeRemove?: IIndexInsertOrRemoveHookFunction
@@ -956,40 +958,34 @@ export interface IIndex<I extends AnyIndexStore> {
   ) => SyncOrAsyncValue<boolean>
   afterRemove?: IIndexInsertOrRemoveHookFunction
 
-  insertDocumentScoreParameters(
-    index: I,
-    prop: string,
-    id: DocumentID,
-    tokens: string[],
-    docsCount: number
-  ): SyncOrAsyncValue
-  insertTokenScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], token: string): SyncOrAsyncValue
+  insertDocumentScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], docsCount: number): void
+  insertTokenScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], token: string): void
   removeDocumentScoreParameters(index: I, prop: string, id: DocumentID, docsCount: number): SyncOrAsyncValue
-  removeTokenScoreParameters(index: I, prop: string, token: string): SyncOrAsyncValue
+  removeTokenScoreParameters(index: I, prop: string, token: string): void
   calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
     context: SearchContext<T, ResultDocument>,
     index: I,
     prop: string,
     term: string,
     ids: DocumentID[]
-  ): SyncOrAsyncValue<TokenScore[]>
+  ): TokenScore[]
 
   search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
     context: SearchContext<T, ResultDocument>,
     index: I,
     prop: string,
     term: string
-  ): SyncOrAsyncValue<TokenScore[]>
+  ): TokenScore[]
   searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
     context: SearchContext<T, ResultDocument>,
     index: I,
     filters: Partial<WhereCondition<T['schema']>>
-  ): SyncOrAsyncValue<InternalDocumentID[]>
+  ): InternalDocumentID[]
 
-  getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
-  getSearchablePropertiesWithTypes(index: I): SyncOrAsyncValue<Record<string, SearchableType>>
+  getSearchableProperties(index: I): string[]
+  getSearchablePropertiesWithTypes(index: I): Record<string, SearchableType>
 
-  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): SyncOrAsyncValue<I>
+  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): I
   save<R = unknown>(index: I): SyncOrAsyncValue<R>
 }
 
@@ -998,15 +994,15 @@ export interface AnyDocumentStore {
 }
 
 export interface IDocumentsStore<D extends AnyDocumentStore = AnyDocumentStore> {
-  create<T extends AnyOrama>(orama: T, sharedInternalDocumentStore: InternalDocumentIDStore): SyncOrAsyncValue<D>
-  get(store: D, id: DocumentID): SyncOrAsyncValue<AnyDocument | undefined>
-  getMultiple(store: D, ids: DocumentID[]): SyncOrAsyncValue<(AnyDocument | undefined)[]>
+  create<T extends AnyOrama>(orama: T, sharedInternalDocumentStore: InternalDocumentIDStore): D
+  get(store: D, id: DocumentID): Optional<AnyDocument>
+  getMultiple(store: D, ids: DocumentID[]): Optional<AnyDocument>[]
   getAll(store: D): SyncOrAsyncValue<Record<InternalDocumentID, AnyDocument>>
-  store(store: D, id: DocumentID, doc: AnyDocument): SyncOrAsyncValue<boolean>
+  store(store: D, id: DocumentID, doc: AnyDocument): boolean
   remove(store: D, id: DocumentID): SyncOrAsyncValue<boolean>
-  count(store: D): SyncOrAsyncValue<number>
+  count(store: D): number
 
-  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): SyncOrAsyncValue<D>
+  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): D
   save<R = unknown>(store: D): SyncOrAsyncValue<R>
 }
 
@@ -1025,7 +1021,7 @@ export interface ISorter<So extends AnySorterStore> {
     sharedInternalDocumentStore: InternalDocumentIDStore,
     schema: T['schema'],
     sorterConfig?: SorterConfig
-  ): SyncOrAsyncValue<So>
+  ): So
   insert: <T extends So>(
     sorter: T,
     prop: string,
@@ -1033,20 +1029,16 @@ export interface ISorter<So extends AnySorterStore> {
     value: SortValue,
     schemaType: SortType,
     language: string | undefined
-  ) => SyncOrAsyncValue
-  remove: <T extends So>(sorter: T, prop: string, id: DocumentID) => SyncOrAsyncValue
+  ) => void
+  remove: <T extends So>(sorter: T, prop: string, id: DocumentID) => void
 
-  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): SyncOrAsyncValue<So>
-  save<R = unknown>(sorter: So): SyncOrAsyncValue<R>
+  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): So
+  save<R = unknown>(sorter: So): R
 
-  sortBy<T extends AnyOrama>(
-    sorter: So,
-    docIds: [DocumentID, number][],
-    by: SorterParams<T>
-  ): Promise<[DocumentID, number][]>
+  sortBy<T extends AnyOrama>(sorter: So, docIds: [DocumentID, number][], by: SorterParams<T>): [DocumentID, number][]
 
-  getSortableProperties(sorter: So): SyncOrAsyncValue<string[]>
-  getSortablePropertiesWithTypes(sorter: So): SyncOrAsyncValue<Record<string, SortType>>
+  getSortableProperties(sorter: So): string[]
+  getSortablePropertiesWithTypes(sorter: So): Record<string, SortType>
 }
 
 export type Stemmer = (word: string) => string
@@ -1057,14 +1049,14 @@ export type DefaultTokenizerConfig = {
   stemmer?: Stemmer
   stemmerSkipProperties?: string | string[]
   tokenizeSkipProperties?: string | string[]
-  stopWords?: boolean | string[] | ((stopWords: string[]) => string[] | Promise<string[]>)
+  stopWords?: boolean | string[] | ((stopWords: string[]) => string[])
   allowDuplicates?: boolean
 }
 
 export interface Tokenizer {
   language: string
   normalizationCache: Map<string, string>
-  tokenize: (raw: string, language?: string, prop?: string) => SyncOrAsyncValue<string[]>
+  tokenize: (raw: string, language?: string, prop?: string) => string[]
 }
 
 export interface ObjectComponents<I, D, So> {
@@ -1075,10 +1067,10 @@ export interface ObjectComponents<I, D, So> {
 }
 
 export interface FunctionComponents<S> {
-  validateSchema(doc: AnyDocument, schema: S): SyncOrAsyncValue<string | undefined>
-  getDocumentIndexId(doc: AnyDocument): SyncOrAsyncValue<string>
-  getDocumentProperties(doc: AnyDocument, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>
-  formatElapsedTime(number: bigint): SyncOrAsyncValue<number | string | object | ElapsedTime>
+  validateSchema(doc: AnyDocument, schema: S): string | undefined
+  getDocumentIndexId(doc: AnyDocument): string
+  getDocumentProperties(doc: AnyDocument, paths: string[]): Record<string, string | number | boolean>
+  formatElapsedTime(number: bigint): number | string | object | ElapsedTime
 }
 
 export interface SingleOrArrayCallbackComponents<T extends AnyOrama> {
