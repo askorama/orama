@@ -411,7 +411,7 @@ t.test('search with sortBy', (t) => {
         number: 'number'
       } as const
     })
-    await t.rejects(search(db, { sortBy: { property: 'foobar' } as any }))
+    t.throws(() => search(db, { sortBy: { property: 'foobar' } as any }))
 
     t.end()
   })
@@ -425,13 +425,13 @@ t.test('search with sortBy', (t) => {
         unsortableProperties: ['number']
       }
     })
-    await t.rejects(search(db, { sortBy: { property: 'number' } }))
+    t.throws(() => search(db, { sortBy: { property: 'number' } }))
 
     t.end()
   })
 
   t.test('should allow custom function', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         string: 'string'
       } as const
@@ -463,7 +463,7 @@ t.test('search with sortBy', (t) => {
 })
 
 t.test('serialize work fine', async (t) => {
-  const db = await create({
+  const db = create({
     schema: {
       title: 'string',
       year: 'number',
@@ -485,9 +485,9 @@ t.test('serialize work fine', async (t) => {
       favorite: true
     }
   })
-  const raw = await save(db)
+  const raw = save(db)
 
-  const db2 = await create({
+  const db2 = create({
     schema: {
       title: 'string',
       year: 'number',
@@ -499,7 +499,8 @@ t.test('serialize work fine', async (t) => {
       }
     }
   })
-  await t.resolves(load(db2, raw))
+  
+  load(db2, raw)
 
   const r = await search(db2, { sortBy: { property: 'title' } })
 
@@ -521,7 +522,7 @@ t.test('disabled', async (t) => {
     }
   })
   const id = await insert(db, { number: 1 })
-  await t.rejects(search(db, { sortBy: { property: 'number' } }), {
+  await t.throws(() => search(db, { sortBy: { property: 'number' } }), {
     code: 'SORT_DISABLED'
   })
   await remove(db, id)
@@ -538,14 +539,14 @@ t.test('disabled', async (t) => {
     }
   })
 
-  await load(db2, raw)
+  load(db2, raw)
 
   const id2 = await insert(db2, { number: 1 })
-  await t.rejects(search(db2, { sortBy: { property: 'number' } }), {
+  t.throws(() => search(db2, { sortBy: { property: 'number' } }), {
     code: 'SORT_DISABLED'
   })
   await remove(db2, id2)
-  const raw2 = await save(db2)
+  const raw2 = save(db2)
 
   t.equal((raw2.sorting as { enabled: boolean }).enabled, false)
 
