@@ -67,7 +67,7 @@ instance and set an indexing schema:
 ```js
 import { create, insert, remove, search, searchVector } from '@orama/orama'
 
-const db = await create({
+const db = create({
   schema: {
     name: 'string',
     description: 'string',
@@ -101,7 +101,7 @@ Orama will only index properties specified in the schema but will allow you to s
 Once the db instance is created, you can start adding some documents:
 
 ```js
-await insert(db, {
+insert(db, {
   name: 'Wireless Headphones',
   description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
   price: 99.99,
@@ -111,7 +111,7 @@ await insert(db, {
   },
 })
 
-await insert(db, {
+insert(db, {
   name: 'Smart LED Bulb',
   description: 'Control the lighting in your home with this energy-efficient smart LED bulb, compatible with most smart home systems.',
   price: 24.99,
@@ -121,7 +121,7 @@ await insert(db, {
   },
 })
 
-await insert(db, {
+insert(db, {
   name: 'Portable Charger',
   description: 'Never run out of power on-the-go with this compact and fast-charging portable charger for your devices.',
   price: 29.99,
@@ -135,7 +135,7 @@ await insert(db, {
 After the data has been inserted, you can finally start to query the database.
 
 ```js
-const searchResult = await search(db, {
+const searchResult = search(db, {
   term: 'headphones',
 })
 ```
@@ -170,7 +170,7 @@ word `"headphones"`, looking up in every `string` property specified in the sche
 You can also restrict the lookup to a specific property:
 
 ```js
-const searchResult = await search(db, {
+const searchResult = search(db, {
   term: 'immersive sound quality',
   properties: ['description'],
 })
@@ -205,7 +205,7 @@ Result:
 You can use non-string data to [filter](https://docs.askorama.ai/open-source/usage/search/filters), [group](https://docs.askorama.ai/open-source/usage/search/grouping), and create [facets](https://docs.askorama.ai/open-source/usage/search/facets):
 
 ```js
-const searchResult = await search(db, {
+const searchResult = search(db, {
   term: 'immersive sound quality',
   where: {
     price: {
@@ -227,7 +227,7 @@ To perform vector or hybrid search, you can use the same `search` method used fo
 You'll just have to specify which property you want to perform vector search on, and a vector to be used to perform vector similarity:
 
 ```js
-const searchResult = await searchVector(db, {
+const searchResult = search(db, {
   mode: 'vector', // or 'hybrid'
   vector: {
     value: [...], // OpenAI embedding or similar vector to be used as an input
@@ -242,13 +242,13 @@ If you're using the [Orama Secure AI Proxy](https://askorama.ai/blog/announcing-
 import { create } from '@orama/orama'
 import { pluginSecureProxy } from '@orama/plugin-secure-proxy'
 
-const secureProxy = secureProxyPlugin({
+const secureProxy = await secureProxyPlugin({
   apiKey: '<YOUR-PUBLIC-API-KEY>',
   defaultProperty: 'embedding', // the default property to perform vector and hybrid search on
   model: 'openai/text-embedding-ada-002' // the model to use to generate embeddings
 })
 
-const db = await create({
+const db = create({
   schema: {
     name: 'string',
     description: 'string',
@@ -261,7 +261,7 @@ const db = await create({
   plugins: [secureProxy]
 })
 
-const resultsHybrid = await search(db, {
+const resultsHybrid = search(db, {
   mode: 'vector', // or 'hybrid'
   term: 'Videogame for little kids with a passion about ice cream',
   where: {
@@ -282,18 +282,18 @@ Orama supports Geosearch as a search filter. It will search through all the prop
 ```js
 import { create, insert } from '@orama/orama'
 
-const db = await create({
+const db = create({
   schema: {
     name: 'string',
     location: 'geopoint'
   }
 })
 
-await insert(db, { name: 'Duomo di Milano', location: { lat: 45.46409, lon: 9.19192 } })
-await insert(db, { name: 'Piazza Duomo',    location: { lat: 45.46416, lon: 9.18945 } })
-await insert(db, { name: 'Piazzetta Reale', location: { lat: 45.46339, lon: 9.19092 } })
+insert(db, { name: 'Duomo di Milano', location: { lat: 45.46409, lon: 9.19192 } })
+insert(db, { name: 'Piazza Duomo',    location: { lat: 45.46416, lon: 9.18945 } })
+insert(db, { name: 'Piazzetta Reale', location: { lat: 45.46339, lon: 9.19092 } })
 
-const searchResult = await search(db, {
+const searchResult = search(db, {
   term: 'Duomo',
   where: {
     location: {           // The property we want to filter by
