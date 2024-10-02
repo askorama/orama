@@ -22,8 +22,9 @@ import type {
   VectorType,
   WhereCondition
 } from '../types.js'
-import { RadixNode } from '../trees/radix.js'
 import type { InsertOptions } from '../methods/insert.js'
+import type { Point as BKDGeoPoint } from '../trees/bkd.js'
+import { RadixNode } from '../trees/radix.js'
 import { createError } from '../errors.js'
 import { AVLTree } from '../trees/avl.js'
 import {
@@ -35,15 +36,7 @@ import {
   FlatTree
 } from '../trees/flat.js'
 import { RadixTree } from '../trees/radix.js'
-import {
-  create as bkdCreate,
-  insert as bkdInsert,
-  removeDocByID as bkdRemoveDocByID,
-  RootNode as BKDNode,
-  Point as BKDGeoPoint,
-  searchByRadius,
-  searchByPolygon
-} from '../trees/bkd.js'
+import { BKDTree } from '../trees/bkd.js'
 
 import { convertDistanceToMeters, intersect, safeArrayPush, getOwnProperty } from '../utils.js'
 import { BM25 } from './algorithms.js'
@@ -84,7 +77,7 @@ export type Tree =
   | TTree<'AVL', AVLTree<number, InternalDocumentID[]>>
   | TTree<'Bool', BooleanIndex>
   | TTree<'Flat', FlatTree>
-  | TTree<'BKD', BKDNode>
+  | TTree<'BKD', BKDTree>
 
 export interface Index extends AnyIndexStore {
   sharedInternalDocumentStore: InternalDocumentIDStore
@@ -258,7 +251,7 @@ export function create<T extends AnyOrama, TSchema extends T['schema']>(
           index.indexes[path] = { type: 'Flat', node: flatCreate(), isArray }
           break
         case 'geopoint':
-          index.indexes[path] = { type: 'BKD', node: bkdCreate(), isArray }
+          index.indexes[path] = { type: 'BKD', node: new BKDTree(), isArray }
           break
         default:
           throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type, path)
@@ -313,7 +306,7 @@ function insertScalarBuilder(
         break
       }
       case 'BKD': {
-        bkdInsert(node, value as unknown as BKDGeoPoint, [internalId])
+        node.insert(value as unknown as BKDGeoPoint, [internalId])
         break
       }
     }
@@ -408,7 +401,7 @@ function removeScalar(
       return true
     }
     case 'BKD': {
-      bkdRemoveDocByID(node, value as unknown as BKDGeoPoint, internalId)
+      node.removeDocByID(value as unknown as BKDGeoPoint, internalId)
       return false
     }
   }
@@ -533,14 +526,7 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
           highPrecision = false
         } = operation[reqOperation] as GeosearchRadiusOperator['radius']
         const distanceInMeters = convertDistanceToMeters(value, unit)
-        const ids = searchByRadius(
-          node.root,
-          coordinates as BKDGeoPoint,
-          distanceInMeters,
-          inside,
-          undefined,
-          highPrecision
-        )
+        const ids = node.searchByRadius(coordinates as BKDGeoPoint, distanceInMeters, inside, undefined, highPrecision)
         // @todo: convert this into a for loop
         safeArrayPush(
           filtersMap[param],
@@ -552,7 +538,7 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
           inside = true,
           highPrecision = false
         } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
-        const ids = searchByPolygon(node.root, coordinates as BKDGeoPoint[], inside, undefined, highPrecision)
+        const ids = node.searchByPolygon(coordinates as BKDGeoPoint[], inside, undefined, highPrecision)
         // @todo: convert this into a for loop
         safeArrayPush(
           filtersMap[param],
@@ -619,7 +605,7 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
         }
         case 'between': {
           const [min, max] = operationValue as number[]
-          filteredIDs = node.rangeSearch(min, max)  as unknown as number[]
+          filteredIDs = node.rangeSearch(min, max) as unknown as number[]
           break
         }
       }

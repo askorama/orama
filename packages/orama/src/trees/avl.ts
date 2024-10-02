@@ -49,7 +49,7 @@ export class AVLNode<K, V> {
       v: this.v,
       l: this.l ? this.l.toJSON() : null,
       r: this.r ? this.r.toJSON() : null,
-      h: this.h,
+      h: this.h
     }
   }
 
@@ -89,7 +89,7 @@ export class AVLTree<K, V> {
   public toJSON(): object {
     return {
       root: this.root ? this.root.toJSON() : null,
-      insertCount: this.insertCount,
+      insertCount: this.insertCount
     }
   }
 
@@ -112,9 +112,9 @@ export class AVLTree<K, V> {
     } else {
       if (Array.isArray(node.v)) {
         if (Array.isArray(value)) {
-          (node.v as any[]).push(...value as V[])
+          ;(node.v as any[]).push(...(value as V[]))
         } else {
-          (node.v as any[]).push(value)
+          ;(node.v as any[]).push(value)
         }
       } else {
         node.v = value
@@ -206,8 +206,8 @@ export class AVLTree<K, V> {
     if ((node.v as unknown as Set<V>).size === 1) {
       this.removeNode(node, key)
     }
-   
-    (node.v as unknown as Set<V>) = new Set([...(node.v as unknown as Set<V>).values()].filter((v) => v !== id))
+
+    ;(node.v as unknown as Set<V>) = new Set([...(node.v as unknown as Set<V>).values()].filter((v) => v !== id))
   }
 
   private findNodeByKey(key: K): Nullable<AVLNode<K, V>> {

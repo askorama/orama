@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "turbo build",
-    "format": "biome format --write ./packages",
+    "format": "biome format --write ./packages/orama",
     "format:hook": "biome format --write --no-errors-on-unmatched ./packages",
     "lint": "turbo lint",
     "test": "turbo test",
