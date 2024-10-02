@@ -12,12 +12,13 @@ export function update<T extends AnyOrama>(
   language?: string,
   skipHooks?: boolean
 ): Promise<string> | string {
-  const asyncNeeded = isAsyncFunction(orama.afterInsert) ||
-                      isAsyncFunction(orama.beforeInsert) ||
-                      isAsyncFunction(orama.afterRemove) ||
-                      isAsyncFunction(orama.beforeRemove) ||
-                      isAsyncFunction(orama.beforeUpdate) ||
-                      isAsyncFunction(orama.afterUpdate)
+  const asyncNeeded =
+    isAsyncFunction(orama.afterInsert) ||
+    isAsyncFunction(orama.beforeInsert) ||
+    isAsyncFunction(orama.afterRemove) ||
+    isAsyncFunction(orama.beforeRemove) ||
+    isAsyncFunction(orama.beforeUpdate) ||
+    isAsyncFunction(orama.afterUpdate)
 
   if (asyncNeeded) {
     return updateAsync(orama, id, doc, language, skipHooks)
@@ -76,18 +77,19 @@ export function updateMultiple<T extends AnyOrama>(
   language?: string,
   skipHooks?: boolean
 ): Promise<string[]> | string[] {
-  const asyncNeeded = isAsyncFunction(orama.afterInsert) ||
-                      isAsyncFunction(orama.beforeInsert) ||
-                      isAsyncFunction(orama.afterRemove) ||
-                      isAsyncFunction(orama.beforeRemove) ||
-                      isAsyncFunction(orama.beforeUpdate) ||
-                      isAsyncFunction(orama.afterUpdate) ||
-                      isAsyncFunction(orama.beforeUpdateMultiple) ||
-                      isAsyncFunction(orama.afterUpdateMultiple)
-                      isAsyncFunction(orama.beforeRemoveMultiple) ||
-                      isAsyncFunction(orama.afterRemoveMultiple) ||
-                      isAsyncFunction(orama.beforeInsertMultiple) ||
-                      isAsyncFunction(orama.afterInsertMultiple)
+  const asyncNeeded =
+    isAsyncFunction(orama.afterInsert) ||
+    isAsyncFunction(orama.beforeInsert) ||
+    isAsyncFunction(orama.afterRemove) ||
+    isAsyncFunction(orama.beforeRemove) ||
+    isAsyncFunction(orama.beforeUpdate) ||
+    isAsyncFunction(orama.afterUpdate) ||
+    isAsyncFunction(orama.beforeUpdateMultiple) ||
+    isAsyncFunction(orama.afterUpdateMultiple)
+  isAsyncFunction(orama.beforeRemoveMultiple) ||
+    isAsyncFunction(orama.afterRemoveMultiple) ||
+    isAsyncFunction(orama.beforeInsertMultiple) ||
+    isAsyncFunction(orama.afterInsertMultiple)
 
   if (asyncNeeded) {
     return updateMultipleAsync(orama, ids, docs, batchSize, language, skipHooks)

@@ -16,7 +16,7 @@ t.test('remove method', (t) => {
   t.test('removes the given document', async (t) => {
     const [db, id1, id2, id3, id4] = createSimpleDB()
 
-    const doc1 = (getByID(db, id1))!
+    const doc1 = getByID(db, id1)!
     t.ok(getByID(db, id1))
 
     const r = await remove(db, id1)
@@ -122,7 +122,7 @@ t.test('remove method', (t) => {
   t.test('should preserve identical docs after deletion', (t) => {
     t.test('- delete old document', async (t) => {
       const [db, id1] = createSimpleDB()
-      const doc = (getByID(db, id1))!
+      const doc = getByID(db, id1)!
       const id5 = insert(db, { ...doc, id: undefined })
 
       remove(db, id1)
@@ -147,7 +147,7 @@ t.test('remove method', (t) => {
 
     t.test('- delete new document', async (t) => {
       const [db, id1] = createSimpleDB()
-      const doc = (getByID(db, id1))!
+      const doc = getByID(db, id1)!
       const id5 = await insert(db, { ...doc, id: undefined })
 
       remove(db, id5)

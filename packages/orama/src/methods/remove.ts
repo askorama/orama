@@ -14,9 +14,10 @@ export function remove<T extends AnyOrama>(
   language?: string,
   skipHooks?: boolean
 ): Promise<boolean> | boolean {
-  const asyncNeeded = isAsyncFunction(orama.index.beforeRemove) ||
-                      isAsyncFunction(orama.index.remove) ||
-                      isAsyncFunction(orama.index.afterRemove)
+  const asyncNeeded =
+    isAsyncFunction(orama.index.beforeRemove) ||
+    isAsyncFunction(orama.index.remove) ||
+    isAsyncFunction(orama.index.afterRemove)
 
   if (asyncNeeded) {
     return removeAsync(orama, id, language, skipHooks)
@@ -120,12 +121,7 @@ async function removeAsync<T extends AnyOrama>(
   return result
 }
 
-function removeSync<T extends AnyOrama>(
-  orama: T,
-  id: DocumentID,
-  language?: string,
-  skipHooks?: boolean
-): boolean {
+function removeSync<T extends AnyOrama>(orama: T, id: DocumentID, language?: string, skipHooks?: boolean): boolean {
   let result = true
   const { index, docs } = orama.data
 
@@ -156,16 +152,7 @@ function removeSync<T extends AnyOrama>(
 
     const schemaType = indexablePropertiesWithTypes[prop]
 
-    orama.index.beforeRemove?.(
-      orama.data.index,
-      prop,
-      docId,
-      value,
-      schemaType,
-      language,
-      orama.tokenizer,
-      docsCount
-    )
+    orama.index.beforeRemove?.(orama.data.index, prop, docId, value, schemaType, language, orama.tokenizer, docsCount)
 
     if (
       !orama.index.remove(
@@ -183,16 +170,7 @@ function removeSync<T extends AnyOrama>(
       result = false
     }
 
-    orama.index.afterRemove?.(
-      orama.data.index,
-      prop,
-      docId,
-      value,
-      schemaType,
-      language,
-      orama.tokenizer,
-      docsCount
-    )
+    orama.index.afterRemove?.(orama.data.index, prop, docId, value, schemaType, language, orama.tokenizer, docsCount)
   }
 
   const sortableProperties = orama.sorter.getSortableProperties(orama.data.sorting)
@@ -222,12 +200,12 @@ export function removeMultiple<T extends AnyOrama>(
   language?: string,
   skipHooks?: boolean
 ): Promise<number> | number {
-  const asyncNeeded = isAsyncFunction(orama.index.beforeRemove) ||
-                      isAsyncFunction(orama.index.remove) ||
-                      isAsyncFunction(orama.index.afterRemove) ||
-                      isAsyncFunction(orama.beforeRemoveMultiple) ||
-                      isAsyncFunction(orama.afterRemoveMultiple)
-
+  const asyncNeeded =
+    isAsyncFunction(orama.index.beforeRemove) ||
+    isAsyncFunction(orama.index.remove) ||
+    isAsyncFunction(orama.index.afterRemove) ||
+    isAsyncFunction(orama.beforeRemoveMultiple) ||
+    isAsyncFunction(orama.afterRemoveMultiple)
 
   if (asyncNeeded) {
     return removeMultipleAsync(orama, ids, batchSize, language, skipHooks)
@@ -333,8 +311,7 @@ function removeMultipleSync<T extends AnyOrama>(
     }
 
     setTimeout(_removeMultipleSync, 0)
-}
-
+  }
 
   _removeMultipleSync()
 
