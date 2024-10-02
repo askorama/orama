@@ -42,10 +42,29 @@ export class AVLNode<K, V> {
     newRoot.updateHeight()
     return newRoot
   }
+
+  public toJSON(): object {
+    return {
+      k: this.k,
+      v: this.v,
+      l: this.l ? this.l.toJSON() : null,
+      r: this.r ? this.r.toJSON() : null,
+      h: this.h,
+    }
+  }
+
+  public static fromJSON<K, V>(json: any): AVLNode<K, V> {
+    const node = new AVLNode<K, V>(json.k, json.v)
+    node.l = json.l ? AVLNode.fromJSON<K, V>(json.l) : null
+    node.r = json.r ? AVLNode.fromJSON<K, V>(json.r) : null
+    node.h = json.h
+    return node
+  }
 }
 
 export class AVLTree<K, V> {
   public root: Nullable<AVLNode<K, V>> = null
+  private insertCount = 0
 
   constructor(key?: K, value?: V) {
     if (key !== undefined && value !== undefined) {
@@ -53,26 +72,63 @@ export class AVLTree<K, V> {
     }
   }
 
-  public insert(key: K, value: V): void {
-    this.root = this.insertNode(this.root, key, value)
+  public insert(key: K, value: V, rebalanceThreshold = 1000): void {
+    this.root = this.insertNode(this.root, key, value, rebalanceThreshold)
   }
 
-  private insertNode(node: Nullable<AVLNode<K, V>>, key: K, value: V): AVLNode<K, V> {
+  // Rebalance the tree if the insert count reaches the threshold.
+  // This will improve insertion performance since we won't be rebalancing the tree on every insert.
+  // When inserting docs using `insertMultiple`, the threshold will be set to the number of docs being inserted.
+  // We can force rebalancing the tree by setting the threshold to 1 (default).
+  public rebalance() {
+    if (this.root) {
+      this.root = this.rebalanceNode(this.root!)
+    }
+  }
+
+  public toJSON(): object {
+    return {
+      root: this.root ? this.root.toJSON() : null,
+      insertCount: this.insertCount,
+    }
+  }
+
+  public static fromJSON<K, V>(json: any): AVLTree<K, V> {
+    const tree = new AVLTree<K, V>()
+    tree.root = json.root ? AVLNode.fromJSON<K, V>(json.root) : null
+    tree.insertCount = json.insertCount || 0
+    return tree
+  }
+
+  private insertNode(node: Nullable<AVLNode<K, V>>, key: K, value: V, rebalanceThreshold: number): AVLNode<K, V> {
     if (node === null) {
       return new AVLNode(key, value)
     }
 
     if (key < node.k) {
-      node.l = this.insertNode(node.l, key, value)
+      node.l = this.insertNode(node.l, key, value, rebalanceThreshold)
     } else if (key > node.k) {
-      node.r = this.insertNode(node.r, key, value)
+      node.r = this.insertNode(node.r, key, value, rebalanceThreshold)
     } else {
-      node.v = value // Overwrite existing value
+      if (Array.isArray(node.v)) {
+        if (Array.isArray(value)) {
+          (node.v as any[]).push(...value as V[])
+        } else {
+          (node.v as any[]).push(value)
+        }
+      } else {
+        node.v = value
+      }
       return node
     }
 
     node.updateHeight()
-    return this.rebalanceNode(node)
+
+    if (this.insertCount++ % rebalanceThreshold === 0) {
+      return this.rebalanceNode(node)
+    }
+
+    return node
   }
 
   private rebalanceNode(node: AVLNode<K, V>): AVLNode<K, V> {
@@ -237,7 +293,7 @@ export class AVLTree<K, V> {
     return result
   }
 
-  public lessThan(key: K, inclusive = false): V {
+  public lessThan(key: K, inclusive = false): V[] {
     const result: V[] = []
     const traverse = (node: Nullable<AVLNode<K, V>>) => {
       if (!node) return
@@ -254,6 +310,6 @@ export class AVLTree<K, V> {
       }
     }
     traverse(this.root)
-    return result.flat()
+    return result
   }
 }

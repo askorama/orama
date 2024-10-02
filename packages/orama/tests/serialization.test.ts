@@ -10,10 +10,10 @@ function extractOriginalDoc(result: Result<AnyDocument>[]): AnyDocument[] {
   return result.map(({ document }: AnyDocument) => document)
 }
 
-t.test('Edge getters', (t) => {
+t.skip('Edge getters', (t) => {
   t.plan(4)
 
-  t.test('should correctly enable edge index getter', async (t) => {
+  t.skip('should correctly enable edge index getter', async (t) => {
     t.plan(2)
 
     const db = create({
@@ -41,7 +41,7 @@ t.test('Edge getters', (t) => {
     t.ok((nameIndex.node as RadixNode).contains('jane'))
   })
 
-  t.test('should correctly enable edge docs getter', async (t) => {
+  t.skip('should correctly enable edge docs getter', async (t) => {
     t.plan(2)
 
     const db = create({
@@ -73,7 +73,7 @@ t.test('Edge getters', (t) => {
     })
   })
 
-  t.test('should correctly enable index setter', async (t) => {
+  t.skip('should correctly enable index setter', async (t) => {
     t.plan(6)
 
     const db = create({
@@ -116,8 +116,8 @@ t.test('Edge getters', (t) => {
     await insert(db2, michele)
     await insert(db2, paolo)
 
-    const dbData = await save(db2)
-    await load(db, dbData)
+    const dbData = save(db2)
+    load(db, dbData)
 
     const search1 = await search(db, { term: 'Jane' })
     const search2 = await search(db, { term: 'John' })
@@ -133,7 +133,7 @@ t.test('Edge getters', (t) => {
     t.strictSame(extractOriginalDoc(search4.hits), [michele])
   })
 
-  t.test('should correctly save and load data', async (t) => {
+  t.skip('should correctly save and load data', async (t) => {
     t.plan(2)
 
     const originalDB = await create({

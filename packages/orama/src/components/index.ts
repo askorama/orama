@@ -598,19 +598,19 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
 
       switch (operationOpt) {
         case 'gt': {
-          filteredIDs = node.greaterThan(operationValue as number, false)
+          filteredIDs = node.greaterThan(operationValue as number, false) as unknown as number[]
           break
         }
         case 'gte': {
-          filteredIDs = node.greaterThan(operationValue as number, true)
+          filteredIDs = node.greaterThan(operationValue as number, true) as unknown as number[]
           break
         }
         case 'lt': {
-          filteredIDs = node.lessThan(operationValue as number, false)
+          filteredIDs = node.lessThan(operationValue as number, false) as unknown as number[]
           break
         }
         case 'lte': {
-          filteredIDs = node.lessThan(operationValue as number, true)
+          filteredIDs = node.lessThan(operationValue as number, true) as unknown as number[]
           break
         }
         case 'eq': {
@@ -619,7 +619,7 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
         }
         case 'between': {
           const [min, max] = operationValue as number[]
-          filteredIDs = node.rangeSearch(min, max)
+          filteredIDs = node.rangeSearch(min, max)  as unknown as number[]
           break
         }
       }
