@@ -1,10 +1,10 @@
 import t from 'tap'
 import { create, insert, getByID, update, updateMultiple, count } from '../src/index.js'
 
-t.only('update method', (t) => {
+t.test('update method', (t) => {
   t.plan(1)
 
-  t.only('should remove a document the old document and insert the new one', async (t) => {
+  t.test('should remove a document the old document and insert the new one', async (t) => {
     t.plan(3)
 
     const db = create({
@@ -43,8 +43,8 @@ t.only('update method', (t) => {
   })
 })
 
-t.only('updateMultiple', async (t) => {
-  t.only('should update the documents', async (t) => {
+t.test('updateMultiple', async (t) => {
+  t.test('should update the documents', async (t) => {
     const db = create({
       schema: {
         quote: 'string',
@@ -84,7 +84,7 @@ t.only('updateMultiple', async (t) => {
     t.end()
   })
 
-  t.only('should skip the update if a document is not valid', async (t) => {
+  t.test('should skip the update if a document is not valid', async (t) => {
     const db = create({
       schema: {
         quote: 'string'
