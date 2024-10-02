@@ -27,14 +27,7 @@ import type { Point as BKDGeoPoint } from '../trees/bkd.js'
 import { RadixNode } from '../trees/radix.js'
 import { createError } from '../errors.js'
 import { AVLTree } from '../trees/avl.js'
-import {
-  create as flatCreate,
-  filter as flatFilter,
-  filterArr as flatFilterArr,
-  insert as flatInsert,
-  removeDocument as flatRemoveDocument,
-  FlatTree
-} from '../trees/flat.js'
+import { FlatTree } from '../trees/flat.js'
 import { RadixTree } from '../trees/radix.js'
 import { BKDTree } from '../trees/bkd.js'
 
@@ -248,7 +241,7 @@ export function create<T extends AnyOrama, TSchema extends T['schema']>(
           break
         case 'enum':
         case 'enum[]':
-          index.indexes[path] = { type: 'Flat', node: flatCreate(), isArray }
+          index.indexes[path] = { type: 'Flat', node: new FlatTree(), isArray }
           break
         case 'geopoint':
           index.indexes[path] = { type: 'BKD', node: new BKDTree(), isArray }
@@ -302,7 +295,7 @@ function insertScalarBuilder(
         break
       }
       case 'Flat': {
-        flatInsert(node, value as ScalarSearchableType, internalId)
+        node.insert(value as ScalarSearchableType, internalId)
         break
       }
       case 'BKD': {
@@ -397,7 +390,7 @@ function removeScalar(
       return true
     }
     case 'Flat': {
-      flatRemoveDocument(node, internalId, value as ScalarSearchableType)
+      node.removeDocument(internalId, value as ScalarSearchableType)
       return true
     }
     case 'BKD': {
@@ -568,12 +561,11 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
     }
 
     if (type === 'Flat') {
-      const flatOperation = isArray ? flatFilterArr : flatFilter
-      safeArrayPush(
-        filtersMap[param],
-        flatOperation(node, operation as EnumComparisonOperator & EnumArrComparisonOperator)
-      )
+      const results = isArray
+        ? node.filterArr(operation as EnumArrComparisonOperator)
+        : node.filter(operation as EnumComparisonOperator)
 
+      safeArrayPush(filtersMap[param], results)
       continue
     }
 
@@ -640,9 +632,7 @@ function loadRadixNode(node: RadixNode): RadixNode {
 }
 
 function loadFlatNode(node: unknown): FlatTree {
-  return {
-    numberToDocumentId: new Map(node as [ScalarSearchableType, InternalDocumentID[]][])
-  }
+  return FlatTree.fromJSON({ numberToDocumentId: node })
 }
 
 function saveFlatNode(node: FlatTree): unknown {

@@ -1,115 +1,132 @@
-import type { Point } from './bkd.js'
 import { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { EnumArrComparisonOperator, EnumComparisonOperator, Nullable, ScalarSearchableValue } from '../types.js'
-import { intersect, safeArrayPush } from '../utils.js'
 
-export interface FlatTree {
-  numberToDocumentId: Map<ScalarSearchableValue, InternalDocumentID[]>
-}
+export class FlatTree {
+  numberToDocumentId: Map<ScalarSearchableValue, Set<InternalDocumentID>>
 
-export function create(): FlatTree {
-  return {
-    numberToDocumentId: new Map()
-  }
-}
-
-export function insert(root: FlatTree, key: ScalarSearchableValue, value: InternalDocumentID): FlatTree {
-  if (root.numberToDocumentId.has(key)) {
-    root.numberToDocumentId.get(key)!.push(value)
-    return root
-  }
-  root.numberToDocumentId.set(key, [value])
-  return root
-}
-
-export function find(root: FlatTree, key: ScalarSearchableValue): Nullable<InternalDocumentID[]> {
-  return root.numberToDocumentId.get(key) ?? null
-}
-
-export function remove(root: Nullable<FlatTree>, key: ScalarSearchableValue): Nullable<FlatTree> {
-  if (root != null) {
-    root.numberToDocumentId.delete(key)
-  }
-  return root
-}
-export function removeDocument(root: FlatTree, id: InternalDocumentID, key: ScalarSearchableValue): void {
-  root?.numberToDocumentId.set(key, root?.numberToDocumentId.get(key)?.filter((v) => v !== id) ?? [])
-  if (root?.numberToDocumentId.get(key)?.length === 0) {
-    root?.numberToDocumentId.delete(key)
-  }
-}
-
-export function contains(node: FlatTree, key: ScalarSearchableValue): boolean {
-  return !(find(node, key) == null)
-}
-
-export function getSize(root: Nullable<FlatTree>): number {
-  let size = 0
-  for (const [, value] of root?.numberToDocumentId ?? []) {
-    size += value.length
-  }
-  return size
-}
-export function filter(root: FlatTree, operation: EnumComparisonOperator): InternalDocumentID[] {
-  const operationKeys = Object.keys(operation)
-
-  if (operationKeys.length !== 1) {
-    throw new Error('Invalid operation')
+  constructor() {
+    this.numberToDocumentId = new Map()
   }
 
-  const operationType = operationKeys[0] as keyof EnumComparisonOperator
-  switch (operationType) {
-    case 'eq': {
-      const value = operation[operationType]!
-      return root.numberToDocumentId.get(value) ?? []
+  static fromJSON(json: any): FlatTree {
+    const tree = new FlatTree()
+    for (const [key, ids] of json.numberToDocumentId) {
+      tree.numberToDocumentId.set(key, new Set(ids))
     }
-    case 'in': {
-      const value = operation[operationType]!
-      const result: InternalDocumentID[] = []
-      for (const v of value) {
-        const ids = root.numberToDocumentId.get(v)
-        if (ids != null) {
-          safeArrayPush(result, ids)
-        }
+    return tree
+  }
+
+  toJSON(): any {
+    return {
+      numberToDocumentId: Array.from(this.numberToDocumentId.entries()).map(([key, idSet]) => [key, Array.from(idSet)])
+    }
+  }
+
+  insert(key: ScalarSearchableValue, value: InternalDocumentID): void {
+    if (this.numberToDocumentId.has(key)) {
+      this.numberToDocumentId.get(key)!.add(value)
+    } else {
+      this.numberToDocumentId.set(key, new Set([value]))
+    }
+  }
+
+  find(key: ScalarSearchableValue): Nullable<InternalDocumentID[]> {
+    const idSet = this.numberToDocumentId.get(key)
+    return idSet ? Array.from(idSet) : null
+  }
+
+  remove(key: ScalarSearchableValue): void {
+    this.numberToDocumentId.delete(key)
+  }
+
+  removeDocument(id: InternalDocumentID, key: ScalarSearchableValue): void {
+    const idSet = this.numberToDocumentId.get(key)
+    if (idSet) {
+      idSet.delete(id)
+      if (idSet.size === 0) {
+        this.numberToDocumentId.delete(key)
       }
-      return result
     }
-    case 'nin': {
-      const value = operation[operationType]!
-      const result: InternalDocumentID[] = []
+  }
 
-      const keys = root.numberToDocumentId.keys()
-      for (const key of keys) {
-        if (value.includes(key as Exclude<ScalarSearchableValue, Point>)) {
-          continue
-        }
-        const ids = root.numberToDocumentId.get(key)
-        if (ids != null) {
-          safeArrayPush(result, ids)
-        }
+  contains(key: ScalarSearchableValue): boolean {
+    return this.numberToDocumentId.has(key)
+  }
+
+  getSize(): number {
+    let size = 0
+    for (const idSet of this.numberToDocumentId.values()) {
+      size += idSet.size
+    }
+    return size
+  }
+
+  filter(operation: EnumComparisonOperator): InternalDocumentID[] {
+    const operationKeys = Object.keys(operation)
+
+    if (operationKeys.length !== 1) {
+      throw new Error('Invalid operation')
+    }
+
+    const operationType = operationKeys[0] as keyof EnumComparisonOperator
+
+    switch (operationType) {
+      case 'eq': {
+        const value = operation[operationType]!
+        const idSet = this.numberToDocumentId.get(value)
+        return idSet ? Array.from(idSet) : []
       }
-      return result
+      case 'in': {
+        const values = operation[operationType]!
+        const resultSet: Set<InternalDocumentID> = new Set()
+        for (const value of values) {
+          const idSet = this.numberToDocumentId.get(value)
+          if (idSet) {
+            for (const id of idSet) {
+              resultSet.add(id)
+            }
+          }
+        }
+        return Array.from(resultSet)
+      }
+      case 'nin': {
+        const excludeValues = new Set<ScalarSearchableValue>(operation[operationType]!)
+        const resultSet: Set<InternalDocumentID> = new Set()
+        for (const [key, idSet] of this.numberToDocumentId.entries()) {
+          if (!excludeValues.has(key)) {
+            for (const id of idSet) {
+              resultSet.add(id)
+            }
+          }
+        }
+        return Array.from(resultSet)
+      }
+      default:
+        throw new Error('Invalid operation')
     }
   }
 
-  throw new Error('Invalid operation')
-}
+  filterArr(operation: EnumArrComparisonOperator): InternalDocumentID[] {
+    const operationKeys = Object.keys(operation)
 
-export function filterArr(root: FlatTree, operation: EnumArrComparisonOperator): InternalDocumentID[] {
-  const operationKeys = Object.keys(operation)
+    if (operationKeys.length !== 1) {
+      throw new Error('Invalid operation')
+    }
 
-  if (operationKeys.length !== 1) {
-    throw new Error('Invalid operation')
-  }
+    const operationType = operationKeys[0] as keyof EnumArrComparisonOperator
 
-  const operationType = operationKeys[0] as keyof EnumArrComparisonOperator
-  switch (operationType) {
-    case 'containsAll': {
-      const values = operation[operationType]!
-      const ids = values.map((value) => root.numberToDocumentId.get(value) ?? [])
-      return intersect(ids)
+    switch (operationType) {
+      case 'containsAll': {
+        const values = operation[operationType]!
+        const idSets = values.map((value) => this.numberToDocumentId.get(value) ?? new Set())
+        if (idSets.length === 0) return []
+        const intersection = idSets.reduce((prev, curr) => {
+          return new Set([...prev].filter((id) => curr.has(id)))
+        })
+        return Array.from(intersection) as InternalDocumentID[]
+      }
+      default:
+        throw new Error('Invalid operation')
     }
   }
-
-  throw new Error('Invalid operation')
 }

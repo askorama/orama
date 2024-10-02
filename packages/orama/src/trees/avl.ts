@@ -206,7 +206,6 @@ export class AVLTree<K, V> {
     if ((node.v as unknown as Set<V>).size === 1) {
       this.removeNode(node, key)
     }
-
     ;(node.v as unknown as Set<V>) = new Set([...(node.v as unknown as Set<V>).values()].filter((v) => v !== id))
   }
 
