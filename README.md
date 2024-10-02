@@ -339,6 +339,8 @@ Read the complete documentation at [https://docs.askorama.ai](https://docs.askor
 
 # Official Orama Plugins
 
+[Family of Orama Plugins](https://npm-compare.com/@orama/plugin-analytics,@orama/plugin-astro,@orama/plugin-data-persistence,@orama/plugin-docusaurus,@orama/plugin-docusaurus-v3,@orama/plugin-nextra,@orama/plugin-vitepress):
+
 - [Plugin Vitepress](https://docs.askorama.ai/open-source/plugins/plugin-vitepress)
 - [Plugin Docusaurus](https://docs.askorama.ai/open-source/plugins/plugin-docusaurus)
 - [Plugin Analytics](https://docs.askorama.ai/open-source/plugins/plugin-analytics)
