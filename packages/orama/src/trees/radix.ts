@@ -512,7 +512,9 @@ export function calculateScore(tree: RadixTree, tokens: string[], foundWords: Fi
     }
   }
 
-  for (const [id, [score]] of resultMap.entries()) {
+  for (const res of resultMap) {
+    const id = res[0]
+    const score = res[1][0]
     if (resultsMap.has(id)) {
       resultsMap.set(id, resultsMap.get(id)! + score)
     } else {
