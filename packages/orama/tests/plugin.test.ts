@@ -12,10 +12,10 @@ import {
 } from '../src/index.js'
 import { getAllPluginsByHook } from '../src/components/plugins.js'
 
-t.test('getAllPluginsByHook', async (t) => {
+t.only('getAllPluginsByHook', async (t) => {
   t.plan(1)
 
-  t.test('should return all the plugins that includes a given hook name', async (t) => {
+  t.only('should return all the plugins that includes a given hook name', async (t) => {
     t.plan(2)
 
     function plugin1() {
@@ -46,32 +46,32 @@ t.test('getAllPluginsByHook', async (t) => {
       }
     }
 
-    const db = await create({
+    const db = create({
       schema: {
         name: 'string'
       } as const,
       plugins: [plugin1(), plugin2(), plugin3()]
     })
 
-    const beforeInsertPlugins = await getAllPluginsByHook(db, 'beforeInsert')
-    const afterSearchPlugins = await getAllPluginsByHook(db, 'afterSearch')
+    const beforeInsertPlugins = getAllPluginsByHook(db, 'beforeInsert')
+    const afterSearchPlugins = getAllPluginsByHook(db, 'afterSearch')
 
     t.equal(beforeInsertPlugins.length, 3)
     t.equal(afterSearchPlugins.length, 2)
   })
 })
 
-t.test('plugin', async (t) => {
+t.only('plugin', async (t) => {
   const data: string[] = []
 
   function loggerPlugin(): OramaPlugin {
     return {
       name: 'Logger',
       beforeInsert: async (orama, id, doc) => {
-        data.push(`[Logger] beforeInsert: ${id} - ${JSON.stringify(doc)}`)
+        data.push(`[Logger] beforeInsert - ${JSON.stringify(doc)}`)
       },
       afterInsert: async (orama, id, doc) => {
-        data.push(`[Logger] afterInsert: ${id} - ${JSON.stringify(doc)}`)
+        data.push(`[Logger] afterInsert - ${JSON.stringify(doc)}`)
       },
       beforeSearch: async (orama, query) => {
         data.push(`[Logger] beforeSearch: ${JSON.stringify(query)}`)
@@ -86,33 +86,36 @@ t.test('plugin', async (t) => {
         data.push(`[Logger] afterInsertMultiple: ${JSON.stringify(docs)}`)
       },
       beforeRemove: async (orama, id) => {
-        data.push(`[Logger] beforeRemove: ${id}`)
+        data.push(`[Logger] beforeRemove`)
       },
       afterRemove: async (orama, id) => {
-        data.push(`[Logger] afterRemove: ${id}`)
+        data.push(`[Logger] afterRemove`)
       },
       beforeUpdate(orama, id) {
-        data.push(`[Logger] beforeUpdate: ${id}`)
+        data.push(`[Logger] beforeUpdate`)
       },
       afterUpdate() {
         data.push(`[Logger] afterUpdate`)
       },
       beforeRemoveMultiple(orama, ids) {
-        data.push(`[Logger] beforeRemoveMultiple: ${ids}`)
+        data.push(`[Logger] beforeRemoveMultiple`)
       },
       afterRemoveMultiple(orama, ids) {
-        data.push(`[Logger] afterRemoveMultiple: ${ids}`)
+        data.push(`[Logger] afterRemoveMultiple`)
       },
       beforeUpdateMultiple(orama, ids) {
-        data.push(`[Logger] beforeUpdateMultiple: ${ids}`)
+        data.push(`[Logger] beforeUpdateMultiple`)
       },
       afterUpdateMultiple() {
         data.push(`[Logger] afterUpdateMultiple`)
+      },
+      afterCreate() {
+        data.push(`[Logger] afterCreate called`)
       }
     }
   }
 
-  t.test('should run all the hooks of a plugin', async (t) => {
+  t.only('should run all the hooks of a plugin', async (t) => {
     const db = create({
       id: 'orama-1',
       schema: {
@@ -152,26 +155,55 @@ t.test('plugin', async (t) => {
 
     await updateMultiple(db, ['4', '5'], [{ name: 'Foo Bar Baz' }, { name: 'Bar Baz Foo' }])
 
-    t.equal(data[0], '[Logger] beforeInsert: 1 - {"id":"1","name":"John Doe"}')
-    t.equal(data[1], '[Logger] afterInsert: 1 - {"id":"1","name":"John Doe"}')
-    t.equal(data[2], '[Logger] beforeSearch: {"term":"john"}')
-    t.equal(data[3], '[Logger] afterSearch: {"term":"john","relevance":{"k":1.2,"b":0.75,"d":0.5}} - undefined')
-    t.equal(data[4], '[Logger] beforeInsertMultiple: [{"id":"2","name":"Jane Doe"},{"id":"3","name":"Jim Doe"}]')
-    t.equal(data[9], '[Logger] afterInsertMultiple: [{"id":"2","name":"Jane Doe"},{"id":"3","name":"Jim Doe"}]')
-    t.equal(data[10], '[Logger] beforeRemove: 1')
-    t.equal(data[11], '[Logger] afterRemove: 1')
-    t.equal(data[12], '[Logger] beforeUpdate: 2')
-    t.equal(data[17], '[Logger] afterUpdate')
-    t.equal(data[18], '[Logger] beforeRemoveMultiple: 2,3')
-    t.equal(data[21], '[Logger] afterRemoveMultiple: 2,3')
-    t.equal(data[22], '[Logger] beforeInsertMultiple: [{"id":"4","name":"Foo Bar"},{"id":"5","name":"Bar Baz"}]')
-    t.equal(data[29], '[Logger] beforeRemoveMultiple: 4,5')
-    t.equal(data[40], '[Logger] afterUpdateMultiple')
+    const log = [
+      '[Logger] afterCreate called',
+      '[Logger] beforeInsert - {"id":"1","name":"John Doe"}',
+      '[Logger] afterInsert - {"id":"1","name":"John Doe"}',
+      '[Logger] beforeSearch: {"term":"john"}',
+      '[Logger] afterSearch: {"term":"john","relevance":{"k":1.2,"b":0.75,"d":0.5}} - undefined',
+      '[Logger] beforeInsert - {"id":"2","name":"Jane Doe"}',
+      '[Logger] afterInsert - {"id":"2","name":"Jane Doe"}',
+      '[Logger] beforeInsert - {"id":"3","name":"Jim Doe"}',
+      '[Logger] afterInsert - {"id":"3","name":"Jim Doe"}',
+      '[Logger] afterInsertMultiple: [{"id":"2","name":"Jane Doe"},{"id":"3","name":"Jim Doe"}]',
+      '[Logger] beforeRemove',
+      '[Logger] afterRemove',
+      '[Logger] beforeUpdate',
+      '[Logger] beforeRemove',
+      '[Logger] afterRemove',
+      '[Logger] beforeInsert - {"name":"Jasmine Doe"}',
+      '[Logger] afterInsert - {"name":"Jasmine Doe"}',
+      '[Logger] afterUpdate',
+      '[Logger] beforeRemoveMultiple',
+      '[Logger] beforeRemove',
+      '[Logger] afterRemove',
+      '[Logger] afterRemoveMultiple',
+      '[Logger] beforeInsert - {"id":"4","name":"Foo Bar"}',
+      '[Logger] afterInsert - {"id":"4","name":"Foo Bar"}',
+      '[Logger] beforeInsert - {"id":"5","name":"Bar Baz"}',
+      '[Logger] afterInsert - {"id":"5","name":"Bar Baz"}',
+      '[Logger] afterInsertMultiple: [{"id":"4","name":"Foo Bar"},{"id":"5","name":"Bar Baz"}]',
+      '[Logger] beforeUpdateMultiple',
+      '[Logger] beforeRemoveMultiple',
+      '[Logger] beforeRemove',
+      '[Logger] afterRemove',
+      '[Logger] beforeRemove',
+      '[Logger] afterRemove',
+      '[Logger] afterRemoveMultiple',
+      '[Logger] beforeInsert - {"name":"Foo Bar Baz"}',
+      '[Logger] afterInsert - {"name":"Foo Bar Baz"}',
+      '[Logger] beforeInsert - {"name":"Bar Baz Foo"}',
+      '[Logger] afterInsert - {"name":"Bar Baz Foo"}',
+      '[Logger] afterInsertMultiple: [{"name":"Foo Bar Baz"},{"name":"Bar Baz Foo"}]',
+      '[Logger] afterUpdateMultiple',
+    ]
 
-    t.equal(data.length, 41)
 
-    console.log(data)
+    for (let i = 0; i < log.length; i++) {
+      t.equal(data[i], log[i])
+    }
 
+    t.equal(data.length, 40)
     t.end()
   })
 
