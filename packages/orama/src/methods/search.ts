@@ -97,11 +97,11 @@ export function createSearchContext<T extends AnyOrama, ResultDocument = TypedDo
   }
 }
 
-export async function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+export function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
   params: SearchParams<T, ResultDocument>,
   language?: string
-): Promise<Results<ResultDocument>> {
+): Results<ResultDocument> | Promise<Results<ResultDocument>> {
   const mode = params.mode ?? MODE_FULLTEXT_SEARCH
 
   if (mode === MODE_FULLTEXT_SEARCH) {
