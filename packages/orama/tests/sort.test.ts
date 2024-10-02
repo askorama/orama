@@ -499,7 +499,7 @@ t.test('serialize work fine', async (t) => {
       }
     }
   })
-  
+
   load(db2, raw)
 
   const r = await search(db2, { sortBy: { property: 'title' } })

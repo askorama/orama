@@ -347,13 +347,14 @@ t.test('enum[]', async (t) => {
     })
 
     t.test("eq operator shouldn't allowed", async (t) => {
-      t.throws(() =>
-        search(db, {
-          term: '',
-          where: {
-            tags: { eq: 'green' } as EnumArrComparisonOperator
-          }
-        }),
+      t.throws(
+        () =>
+          search(db, {
+            term: '',
+            where: {
+              tags: { eq: 'green' } as EnumArrComparisonOperator
+            }
+          }),
         'aa'
       )
 
@@ -361,13 +362,14 @@ t.test('enum[]', async (t) => {
     })
 
     t.test("in operator shouldn't allowed", async (t) => {
-      t.throws(() =>
-        search(db, {
-          term: '',
-          where: {
-            tags: { in: ['green'] } as EnumArrComparisonOperator
-          }
-        }),
+      t.throws(
+        () =>
+          search(db, {
+            term: '',
+            where: {
+              tags: { in: ['green'] } as EnumArrComparisonOperator
+            }
+          }),
         'aa'
       )
 
@@ -375,13 +377,14 @@ t.test('enum[]', async (t) => {
     })
 
     t.test("in operator shouldn't allowed", async (t) => {
-      t.throws(() =>
-        search(db, {
-          term: '',
-          where: {
-            tags: { nin: ['green'] } as EnumArrComparisonOperator
-          }
-        }),
+      t.throws(
+        () =>
+          search(db, {
+            term: '',
+            where: {
+              tags: { nin: ['green'] } as EnumArrComparisonOperator
+            }
+          }),
         'aa'
       )
 
