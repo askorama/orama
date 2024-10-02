@@ -14,7 +14,7 @@ import {
 
 t.test('enum', async (t) => {
   t.test('filter', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         categoryId: 'enum'
       } as const
@@ -29,7 +29,7 @@ t.test('enum', async (t) => {
       { categoryId: 3 },
       { categoryId: '5' }
     ])
-    const documentCount = await count(db)
+    const documentCount = count(db)
     const allIds = [c1, c11, c2, c3, c5]
 
     const tests: { value: ScalarSearchableValue; expected: string[] }[] = [
@@ -347,7 +347,7 @@ t.test('enum[]', async (t) => {
     })
 
     t.test("eq operator shouldn't allowed", async (t) => {
-      await t.rejects(
+      t.throws(() =>
         search(db, {
           term: '',
           where: {
@@ -361,7 +361,7 @@ t.test('enum[]', async (t) => {
     })
 
     t.test("in operator shouldn't allowed", async (t) => {
-      await t.rejects(
+      t.throws(() =>
         search(db, {
           term: '',
           where: {
@@ -375,7 +375,7 @@ t.test('enum[]', async (t) => {
     })
 
     t.test("in operator shouldn't allowed", async (t) => {
-      await t.rejects(
+      t.throws(() =>
         search(db, {
           term: '',
           where: {
@@ -392,7 +392,7 @@ t.test('enum[]', async (t) => {
   })
 
   t.test(`remove document works fine`, async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         tags: 'enum[]'
       } as const
@@ -439,14 +439,14 @@ t.test('enum[]', async (t) => {
       { tags: ['black'] }
     ])
 
-    const dump = await save(db1)
+    const dump = save(db1)
 
-    const db2 = await create({
+    const db2 = create({
       schema: {
         tags: 'enum[]'
       }
     })
-    await load(db2, dump)
+    load(db2, dump)
 
     const result1 = await search(db2, {
       term: '',
@@ -476,7 +476,7 @@ t.test('enum[]', async (t) => {
   })
 
   t.test(`complex example`, async (t) => {
-    const filmDb = await create({
+    const filmDb = create({
       schema: {
         title: 'string',
         year: 'number',
