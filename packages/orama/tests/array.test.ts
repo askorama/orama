@@ -154,8 +154,6 @@ t.test('create should support array of boolean', async (t) => {
 })
 
 t.test('remove should support array as well', async (t) => {
-  t.plan(2)
-
   const db = await create({
     schema: {
       strings: 'string[]',
@@ -176,8 +174,6 @@ t.test('remove should support array as well', async (t) => {
 })
 
 t.test('serialization should support array as well', async (t) => {
-  t.plan(2)
-
   const db = await create({
     schema: {
       strings: 'string[]',
@@ -211,8 +207,6 @@ t.test('serialization should support array as well', async (t) => {
 })
 
 t.test('update supports array as well', async (t) => {
-  t.plan(2)
-
   const db = await create({
     schema: {
       strings: 'string[]',

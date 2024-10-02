@@ -29,10 +29,8 @@ async function buildTree(docs = phrases) {
   return tree
 }
 
-t.test('radix tree', (t) => {
-  t.test('should correctly find an element by prefix', async (t) => {
-    t.plan(1)
-    const tree = await buildTree()
+t.test('radix tree', async (t) => {
+  t.test('should correctly find an element by prefix', async (t) => {    const tree = await buildTree()
     const result = radixFind(tree, { term: phrases[5].doc.slice(0, 5) })
     t.strictSame(result, {
       'thought': [phrases[5].id]

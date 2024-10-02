@@ -107,13 +107,13 @@ export interface Index extends AnyIndexStore {
   searchablePropertiesWithTypes: Record<string, SearchableType>
 }
 
-export async function create<T extends AnyOrama, TSchema extends T['schema']>(
+export function create<T extends AnyOrama, TSchema extends T['schema']>(
   orama: T,
   sharedInternalDocumentStore: T['internalDocumentIDStore'],
   schema: TSchema,
   index?: Index,
   prefix = ''
-): Promise<Index> {
+): Index {
   if (!index) {
     index = {
       sharedInternalDocumentStore,
@@ -185,7 +185,7 @@ function insertScalarBuilder(
   docsCount: number,
   options?: InsertOptions
 ) {
-  return async (value: SearchableValue): Promise<void> => {
+  return (value: SearchableValue) => {
     const treeForProperty = index.indexes[prop]
     switch (treeForProperty.type) {
       // enum & bool & enum[] & bool[]
@@ -211,7 +211,7 @@ function insertScalarBuilder(
       }
       // string & string[]
       case RadixType: {
-        await radixInsert(
+        radixInsert(
           index.indexes[prop] as RadixTree,
           value as string,
           internalDocumentId,
@@ -222,7 +222,7 @@ function insertScalarBuilder(
         break
       }
       case BoolType: {
-        await boolInsert(
+        boolInsert(
           index.indexes[prop] as BoolTree,
           internalDocumentId,
           value as boolean
@@ -232,7 +232,7 @@ function insertScalarBuilder(
   }
 }
 
-export async function insert(
+export function insert(
   implementation: IIndex<Index>,
   index: Index,
   prop: string,
@@ -244,7 +244,7 @@ export async function insert(
   tokenizer: Tokenizer,
   docsCount: number,
   options?: InsertOptions
-): Promise<void> {
+): void {
   if (isVectorType(schemaType)) {
     return insertVector(index, prop, value as number[] | Float32Array, id)
   }
@@ -268,7 +268,7 @@ export async function insert(
   const elements = value as Array<string | number | boolean>
   const elementsLength = elements.length
   for (let i = 0; i < elementsLength; i++) {
-    await insertScalar(elements[i])
+    insertScalar(elements[i])
   }
 }
 
@@ -283,7 +283,7 @@ function insertVector(index: Index, prop: string, value: number[] | VectorType, 
   index.vectorIndexes[prop].vectors[id] = [magnitude, value]
 }
 
-async function removeScalar(
+function removeScalar(
   implementation: IIndex<Index>,
   index: Index,
   prop: string,
@@ -292,7 +292,7 @@ async function removeScalar(
   schemaType: ScalarSearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
-): Promise<boolean> {
+): boolean {
   const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
 
   if (isVectorType(schemaType)) {
@@ -307,7 +307,7 @@ async function removeScalar(
       return true
     }
     case RadixType: {
-      const tokens = await tokenizer.tokenize(value as string, language, prop)
+      const tokens = tokenizer.tokenize(value as string, language, prop)
 
       for (const token of tokens) {
         radixRemoveDocument(index.indexes[prop], token, internalId)
@@ -330,7 +330,7 @@ async function removeScalar(
   }
 }
 
-export async function remove(
+export function remove(
   implementation: IIndex<Index>,
   index: Index,
   prop: string,
@@ -339,7 +339,7 @@ export async function remove(
   schemaType: SearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
-): Promise<boolean> {
+): boolean {
   if (!isArrayType(schemaType)) {
     return removeScalar(
       implementation,
@@ -358,7 +358,7 @@ export async function remove(
   const elements = value as Array<string | number | boolean>
   const elementsLength = elements.length
   for (let i = 0; i < elementsLength; i++) {
-    await removeScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer)
+    removeScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer)
   }
 
   return true
@@ -373,7 +373,6 @@ function searchInProperty(
   boostPerProperty: number
 ) {
   let foundWords = {} as Record<string, number[]>
-
   for (const word of tokens) {
     const searchResult = radixFind(tree, { term: word, exact, tolerance })
 
@@ -392,7 +391,7 @@ function searchInProperty(
   )
 }
 
-export async function search(
+export function search(
   index: Index,
   term: string,
   tokenizer: Tokenizer,
@@ -401,8 +400,8 @@ export async function search(
   exact: boolean,
   tolerance: number,
   boost: Record<string, number>
-): Promise<TokenScore[]> {
-  const tokens = await tokenizer.tokenize(term, language)
+): TokenScore[] {
+  const tokens = tokenizer.tokenize(term, language)
 
   const resultsMap = new Map<number, number>()
   for (const prop of propertiesToSearch) {
@@ -431,12 +430,12 @@ export async function search(
   return Array.from(resultsMap)
 }
 
-export async function searchByWhereClause<T extends AnyOrama>(
+export function searchByWhereClause<T extends AnyOrama>(
   index: Index,
   tokenizer: Tokenizer,
   filters: Partial<WhereCondition<T['schema']>>,
   language: string | undefined
-): Promise<number[]> {
+): number[] {
   const filterKeys = Object.keys(filters)
 
   const filtersMap: Record<string, InternalDocumentID[]> = filterKeys.reduce(
@@ -519,7 +518,7 @@ export async function searchByWhereClause<T extends AnyOrama>(
 
     if (type === RadixType && (typeof operation === 'string' || Array.isArray(operation))) {
       for (const raw of [operation].flat()) {
-        const term = await tokenizer.tokenize(raw, language, param)
+        const term = tokenizer.tokenize(raw, language, param)
         for (const t of term) {
           const filteredIDsResults = radixFind(index.indexes[param], { term: t, exact: true })
           safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())
@@ -586,15 +585,15 @@ export async function searchByWhereClause<T extends AnyOrama>(
   return intersect(Object.values(filtersMap))
 }
 
-export async function getSearchableProperties(index: Index): Promise<string[]> {
+export function getSearchableProperties(index: Index): string[] {
   return index.searchableProperties
 }
 
-export async function getSearchablePropertiesWithTypes(index: Index): Promise<Record<string, SearchableType>> {
+export function getSearchablePropertiesWithTypes(index: Index): Record<string, SearchableType> {
   return index.searchablePropertiesWithTypes
 }
 
-export async function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Promise<Index> {
+export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Index {
   const {
     indexes: rawIndexes,
     vectorIndexes: rawVectorIndexes,
@@ -642,7 +641,7 @@ export async function load<R = unknown>(sharedInternalDocumentStore: InternalDoc
   }
 }
 
-export async function save<R = unknown>(index: Index): Promise<R> {
+export function save<R = unknown>(index: Index): R {
   const { indexes, vectorIndexes, searchableProperties, searchablePropertiesWithTypes } = index
 
   const vectorIndexesAsArrays: Index['vectorIndexes'] = {}
@@ -685,7 +684,7 @@ export async function save<R = unknown>(index: Index): Promise<R> {
   } as R
 }
 
-export async function createIndex(): Promise<IIndex<Index>> {
+export function createIndex(): IIndex<Index> {
   return {
     create,
     insert,

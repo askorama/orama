@@ -1,6 +1,6 @@
 {
   "name": "@orama/switch",
-  "version": "2.1.1",
+  "version": "3.0.0-rc-2",
   "description": "Orama Switch allows you to run queries on Orama Cloud and OSS with a single interface",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,7 +16,7 @@
   "files": ["dist"],
   "scripts": {
     "build": "tsup",
-    "test": "tsx --test tests/search.test.ts"
+    "test": "tsx --test tests/answer-session.test.ts && tsx --test tests/search.test.ts"
   },
   "keywords": ["orama", "orama cloud"],
   "type": "module",
@@ -31,6 +31,7 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
+    "@orama/plugin-secure-proxy": "workspace:*",
     "tsup": "^7.2.0",
     "tsx": "^4.19.0"
   }

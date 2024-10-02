@@ -11,21 +11,15 @@ import {
   rangeSearch
 } from '../src/trees/zip.js'
 
-t.test('ZIP Tree', (t) => {
-  t.plan(7)
-
-  t.test('create', (t) => {
-    t.plan(3)
-
+t.test('ZIP Tree', async (t) => {
+  t.test('create', async (t) => {
     const tree = create(1, 'foo')
     t.equal(getSize(tree), 1)
     t.equal(find(tree, 1), 'foo')
     t.equal(find(tree, 4), null)
   })
 
-  t.test('insert', (t) => {
-    t.plan(1)
-
+  t.test('insert', async (t) => {
     const tree = create(1, 'foo')
 
     insert(tree, 2, 'bar')
@@ -38,9 +32,7 @@ t.test('ZIP Tree', (t) => {
     t.equal(getSize(tree), 7)
   })
 
-  t.test('find', (t) => {
-    t.plan(2)
-
+  t.test('find', async (t) => {
     const tree = create(1, [1, 2, 3])
 
     insert(tree, 2, [4, 5, 6])
@@ -54,9 +46,7 @@ t.test('ZIP Tree', (t) => {
     t.same(find(tree, 20), [16, 17, 18])
   })
 
-  t.test('remove', (t) => {
-    t.plan(2)
-
+  t.test('remove', async (t) => {
     const tree = create(1, 'foo')
 
     insert(tree, 2, 'bar')
@@ -72,9 +62,7 @@ t.test('ZIP Tree', (t) => {
     t.equal(contains(tree, 20), false)
   })
 
-  t.test('rangeSearch', (t) => {
-    t.plan(1)
-
+  t.test('rangeSearch', async (t) => {
     const tree = create(1, 'foo')
 
     insert(tree, 2, 'bar')
@@ -87,9 +75,7 @@ t.test('ZIP Tree', (t) => {
     t.same(rangeSearch(tree, 5, 20), ['quux', 'baz', 'corge', 'quuz'])
   })
 
-  t.test('greaterThan', (t) => {
-    t.plan(1)
-
+  t.test('greaterThan', async (t) => {
     const tree = create(1, 'foo')
 
     insert(tree, 2, 'bar')
@@ -102,9 +88,7 @@ t.test('ZIP Tree', (t) => {
     t.same(greaterThan(tree, 10), ['corge', 'quuz', 'qux'])
   })
 
-  t.test('lessThan', (t) => {
-    t.plan(1)
-
+  t.test('lessThan', async (t) => {
     const tree = create(1, 'foo')
 
     insert(tree, 2, 'bar')

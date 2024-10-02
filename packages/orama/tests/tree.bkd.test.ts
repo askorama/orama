@@ -28,12 +28,8 @@ const coordinates = [
   }
 ]
 
-t.test('create', (t) => {
-  t.plan(1)
-
-  t.test('should create a new, empty tree', (t) => {
-    t.plan(1)
-
+t.test('create', async (t) => {
+  t.test('should create a new, empty tree', async (t) => {
     t.same(create(false), {
       type: BKDType,
       isArray: false,
@@ -42,12 +38,8 @@ t.test('create', (t) => {
   })
 })
 
-t.test('insert', (t) => {
-  t.plan(2)
-
-  t.test('should insert a new node into an empty tree', (t) => {
-    t.plan(1)
-
+t.test('insert', async (t) => {
+  t.test('should insert a new node into an empty tree', async (t) => {
     const tree = create(false)
     const coordinatePoints = coordinates.map(({ lat, lon }) => ({ lat, lon }))
 
@@ -82,9 +74,7 @@ t.test('insert', (t) => {
     })
   })
 
-  t.test('should merge docIDs if the point already exists', (t) => {
-    t.plan(1)
-
+  t.test('should merge docIDs if the point already exists', async (t) => {
     const tree = create(false)
 
     insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [1])
@@ -95,12 +85,8 @@ t.test('insert', (t) => {
   })
 })
 
-t.test('searchByRadius', (t) => {
-  t.plan(1)
-
-  t.test('should return all points within a given radius', (t) => {
-    t.plan(3)
-
+t.test('searchByRadius', async (t) => {
+  t.test('should return all points within a given radius', async (t) => {
     const tree = create(false)
     const coordinatePoints = coordinates.map(({ lat, lon }) => ({ lat, lon }))
 
@@ -136,12 +122,8 @@ t.test('searchByRadius', (t) => {
   })
 })
 
-t.test('searchInsidePolygon', (t) => {
-  t.plan(1)
-
-  t.test('should return all points inside a given polygon', (t) => {
-    t.plan(2)
-
+t.test('searchInsidePolygon', async (t) => {
+  t.test('should return all points inside a given polygon', async (t) => {
     const tree = create(false)
     const coordinatePoints = coordinates.map(({ lat, lon }) => ({ lat, lon }))
 
@@ -189,12 +171,8 @@ t.test('searchInsidePolygon', (t) => {
   })
 })
 
-t.test('contains', (t) => {
-  t.plan(1)
-
-  t.test('should return true if the tree contains the given point', (t) => {
-    t.plan(2)
-
+t.test('contains', async (t) => {
+  t.test('should return true if the tree contains the given point', async (t) => {
     const tree = create(false)
     const coordinatePoints = coordinates.map(({ lat, lon }) => ({ lat, lon }))
 
@@ -207,12 +185,8 @@ t.test('contains', (t) => {
   })
 })
 
-t.test('removeDocByID', (t) => {
-  t.plan(2)
-
-  t.test('should remove a document from the tree by its ID', (t) => {
-    t.plan(1)
-
+t.test('removeDocByID', async (t) => {
+  t.test('should remove a document from the tree by its ID', async (t) => {
     const tree = create(false)
 
     insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [1])
@@ -225,9 +199,7 @@ t.test('removeDocByID', (t) => {
     t.same(getDocIDsByCoordinates(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }), [1, 3])
   })
 
-  t.test("If the node doesn't have any more docIDs, it should remove the node", (t) => {
-    t.plan(1)
-
+  t.test("If the node doesn't have any more docIDs, it should remove the node", async (t) => {
     const tree = create(false)
 
     insert(tree, { lat: 37.8207190397588, lon: -122.47838916631231 }, [1])

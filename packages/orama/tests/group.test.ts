@@ -2,9 +2,9 @@ import t from 'tap'
 import { GroupResult, create, insertMultiple, search } from '../src/index.js'
 
 t.test('search with groupBy', async (t) => {
-  const [db] = await createDb()
+  const [db] = createDb()
 
-  t.test('should group by a single property', (t) => {
+  t.test('should group by a single property', async (t) => {
     t.test('', async (t) => {
       const results = await search(db, {
         term: 't-shirt',
@@ -17,7 +17,7 @@ t.test('search with groupBy', async (t) => {
         }
       })
 
-      compareGroupResults(t, results.groups!, [
+      compareGroupResults(t as unknown as Tap.Test, results.groups!, [
         { values: ['A'], result: ['0', '1', '2'] },
         { values: ['B'], result: ['3', '4', '5', '6'] }
       ])
@@ -37,7 +37,7 @@ t.test('search with groupBy', async (t) => {
         }
       })
 
-      compareGroupResults(t, results.groups!, [
+      compareGroupResults(t as unknown as Tap.Test, results.groups!, [
         { values: ['A'], result: ['2', '1', '0'] },
         { values: ['B'], result: ['6', '5', '4', '3'] }
       ])
@@ -54,7 +54,7 @@ t.test('search with groupBy', async (t) => {
         }
       })
 
-      compareGroupResults(t, results.groups!, [
+      compareGroupResults(t as unknown as Tap.Test, results.groups!, [
         { values: ['A'], result: ['0', '1'] },
         { values: ['B'], result: ['3', '4'] }
       ])
@@ -75,7 +75,7 @@ t.test('search with groupBy', async (t) => {
         }
       })
 
-      compareGroupResults(t, results.groups!, [
+      compareGroupResults(t as unknown as Tap.Test, results.groups!, [
         { values: ['A'], result: ['2', '1'] },
         { values: ['B'], result: ['6', '5'] }
       ])
@@ -83,10 +83,9 @@ t.test('search with groupBy', async (t) => {
       t.end()
     })
 
-    t.end()
   })
 
-  t.test('should group by a 2 properties', (t) => {
+  t.test('should group by a 2 properties', async (t) => {
     t.test('', async (t) => {
       const results = await search(db, {
         groupBy: {
@@ -98,7 +97,7 @@ t.test('search with groupBy', async (t) => {
         }
       })
 
-      compareGroupResults(t, results.groups!, [
+      compareGroupResults(t as unknown as Tap.Test, results.groups!, [
         { values: ['A', 3], result: ['0', '7'] },
         { values: ['A', 4], result: ['2', '8'] },
         { values: ['A', 5], result: ['1'] },
@@ -122,7 +121,7 @@ t.test('search with groupBy', async (t) => {
         }
       })
 
-      compareGroupResults(t, results.groups!, [
+      compareGroupResults(t as unknown as Tap.Test, results.groups!, [
         { values: ['A', 3], result: ['7', '0'] },
         { values: ['A', 4], result: ['8', '2'] },
         { values: ['A', 5], result: ['1'] },
@@ -132,8 +131,6 @@ t.test('search with groupBy', async (t) => {
 
       t.end()
     })
-
-    t.end()
   })
 
   t.test('should group by a 3 properties', async (t) => {
@@ -148,7 +145,7 @@ t.test('search with groupBy', async (t) => {
         }
       })
 
-      compareGroupResults(t, results.groups!, [
+      compareGroupResults(t as unknown as Tap.Test, results.groups!, [
         { values: ['A', 3, true], result: ['0', '7'] },
         { values: ['B', 4, true], result: ['4'] },
         { values: ['B', 5, true], result: ['6'] },
@@ -171,7 +168,7 @@ t.test('search with groupBy', async (t) => {
         }
       })
 
-      compareGroupResults(t, results.groups!, [
+      compareGroupResults(t as unknown as Tap.Test, results.groups!, [
         { values: ['A', 3, true], result: ['7', '0'] },
         { values: ['B', 4, true], result: ['4'] },
         { values: ['B', 5, true], result: ['6'] },
@@ -183,8 +180,6 @@ t.test('search with groupBy', async (t) => {
 
       t.end()
     })
-
-    t.end()
   })
 
   t.test('with custom aggregator', async (t) => {
@@ -247,18 +242,16 @@ t.test('search with groupBy', async (t) => {
         }
       ])
     )
-
-    t.end()
   })
 
   t.test('only scalar values are supported', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         tags: 'string[]'
-      }
+      } as const
     })
 
-    await t.rejects(
+    t.throws( () =>
       search(db, {
         groupBy: {
           properties: ['unknown-property']
@@ -269,7 +262,7 @@ t.test('search with groupBy', async (t) => {
       }
     )
 
-    await t.rejects(
+    t.throws(() =>
       search(db, {
         groupBy: {
           properties: ['tags']
@@ -279,15 +272,11 @@ t.test('search with groupBy', async (t) => {
         message: 'Invalid groupBy property "tags". Allowed types: "string, number, boolean", but given "string[]"'
       }
     )
-
-    t.end()
   })
-
-  t.end()
 })
 
 t.test('real test', async (t) => {
-  const [db] = await createDb()
+  const [db] = createDb()
   const results = await search(db, {
     term: 't-shirt',
     groupBy: {
@@ -300,12 +289,10 @@ t.test('real test', async (t) => {
     }
   })
 
-  compareGroupResults(t, results.groups!, [
+  compareGroupResults(t as unknown as Tap.Test, results.groups!, [
     { values: ['A'], result: ['1'] },
     { values: ['B'], result: ['6'] }
   ])
-
-  t.end()
 })
 
 function compareGroupResults(t: Tap.Test, groups: GroupResult<any>, expected) {
@@ -321,8 +308,8 @@ function compareGroupResults(t: Tap.Test, groups: GroupResult<any>, expected) {
   )
 }
 
-async function createDb() {
-  const db = await create({
+function createDb() {
+  const db = create({
     schema: {
       id: 'string',
       type: 'string',
@@ -333,7 +320,7 @@ async function createDb() {
     } as const
   })
 
-  const ids = await insertMultiple(db, [
+  const ids = insertMultiple(db, [
     { id: '0', type: 't-shirt', design: 'A', color: 'blue', rank: 3, isPromoted: true },
     { id: '1', type: 't-shirt', design: 'A', color: 'green', rank: 5, isPromoted: false },
     { id: '2', type: 't-shirt', design: 'A', color: 'red', rank: 4, isPromoted: false },

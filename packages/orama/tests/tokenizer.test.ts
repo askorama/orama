@@ -48,8 +48,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in english and allow duplicates', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: 'english',
       allowDuplicates: true,
@@ -68,8 +66,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in english skipping appropriate properties (single)', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: 'english',
       stemming: true,
@@ -87,8 +83,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in english skipping appropriate properties (multiple)', async (t) => {
-    t.plan(3)
-
     const tokenizer = await createTokenizer({
       language: 'english',
       stemming: true,
@@ -108,8 +102,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in english skipping appropriate properties (invalid)', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: 'english',
       stemming: true,
@@ -128,8 +120,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in french', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: frenchLanguage,
       stemmer: frenchStemmer,
@@ -147,8 +137,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in italian', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: italianLanguage,
       stemmer: italianStemmer,
@@ -166,8 +154,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in norwegian', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: norwegianLanguage,
       stemmer: norwegianStemmer,
@@ -184,8 +170,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in portuguese', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: portugueseLanguage,
       stemmer: portugueseStemmer,
@@ -203,8 +187,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in russian', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: russianLanguage,
       stemmer: russianStemmer,
@@ -222,8 +204,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in swedish', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: swedishLanguage,
       stemmer: swedishStemmer,
@@ -240,8 +220,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in spanish', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: spanishLanguage,
       stemmer: spanishStemmer,
@@ -259,8 +237,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in dutch', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: dutchLanguage,
       stemmer: dutchStemmer,
@@ -277,8 +253,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in german', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: germanLanguage,
       stemmer: germanStemmer,
@@ -296,8 +270,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in finnish', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: finnishLanguage,
       stemmer: finnishStemmer,
@@ -315,8 +287,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in danish', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: danishLanguage,
       stemmer: danishStemmer,
@@ -334,8 +304,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in tamil', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: tamilLanguage,
       stemmer: tamilStemmer,
@@ -353,8 +321,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in ukrainian', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: ukrainianLanguage,
       stemmer: ukrainianStemmer,
@@ -372,8 +338,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should tokenize and stem correctly in bulgarian', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({ language: bulgarianLanguage, stemmer: bulgarianStemmer, stopWords: [] })
 
     const I1 = 'Кокошката е малка крава която не може да се събере с теста'
@@ -387,8 +351,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('disable stemming', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({ language: 'english', stemming: false, stopWords: englishStopwords })
 
     const I1 = 'the quick brown fox jumps over the lazy dog'
@@ -402,8 +364,6 @@ t.test('Tokenizer', async (t) => {
   })
 
   t.test('should validate options', async (t) => {
-    t.plan(3)
-
     await t.rejects(() => createTokenizer({ language: 'weird-language' }), { code: 'LANGUAGE_NOT_SUPPORTED' })
 
     await t.rejects(() => createTokenizer({ language: 'italian', stemming: true }), { code: 'MISSING_STEMMER' })
@@ -416,11 +376,7 @@ t.test('Tokenizer', async (t) => {
 })
 
 t.test('Custom stop-words rules', async (t) => {
-  t.plan(5)
-
   t.test('custom array of stop-words', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: 'english',
       stopWords: ['quick', 'brown', 'fox', 'dog'],
@@ -439,8 +395,6 @@ t.test('Custom stop-words rules', async (t) => {
   })
 
   t.test('custom stop-words function', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: 'english',
       stopWords(): string[] {
@@ -460,8 +414,6 @@ t.test('Custom stop-words rules', async (t) => {
   })
 
   t.test('disable stop-words', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({ language: 'english', stopWords: false, stemming: true })
 
     const I1 = 'the quick brown fox jumps over the lazy dog'
@@ -475,8 +427,6 @@ t.test('Custom stop-words rules', async (t) => {
   })
 
   t.test('custom stemming function', async (t) => {
-    t.plan(2)
-
     const tokenizer = await createTokenizer({
       language: 'english',
       stemmer: (word) => `${word}-ish`,
@@ -494,8 +444,6 @@ t.test('Custom stop-words rules', async (t) => {
   })
 
   await t.test('should validate options', async (t) => {
-    t.plan(3)
-
     // @ts-expect-error testing validation
     await t.rejects(() => createTokenizer({ language: 'english', stopWords: 'FOO' }), {
       code: 'CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY'

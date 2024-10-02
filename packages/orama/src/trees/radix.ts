@@ -145,7 +145,7 @@ export function create(end: boolean, subWord: string, key: string, isArray: bool
   }
 }
 
-async function insertInner(tree: RadixTree, word: string, docId: InternalDocumentID) {
+function insertInner(tree: RadixTree, word: string, docId: InternalDocumentID) {
   let root = tree.node
 
   const wordLength = word.length
@@ -224,7 +224,7 @@ async function insertInner(tree: RadixTree, word: string, docId: InternalDocumen
   }
 }
 
-export async function insert(
+export function insert(
   tree: RadixTree,
   value: string,
   docId: InternalDocumentID,
@@ -239,7 +239,7 @@ export async function insert(
   let quantumIndex = 0
   let tokenNumber = 0
   for (const quantum of quantums) {
-    const tokens = await tokenizer.tokenize(quantum, language, prop)
+    const tokens = tokenizer.tokenize(quantum, language, prop)
 
     for (const token of tokens) {
       tokenNumber++
@@ -252,7 +252,6 @@ export async function insert(
 
       tree.tokenQuantums[docId][token] = calculateTokenQuantum(tree.tokenQuantums[docId][token], tokenBitIndex)
       if (tree.tokenQuantums[docId][token] < 0) {
-        // console.log("Overflow", docId, token, data.tokenStats.description[docId][token], tokenBitIndex)
         throw new Error('Overflow')
       }
 

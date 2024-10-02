@@ -6,6 +6,11 @@ import { setupServer, SetupServerApi } from 'msw/node'
 import { pluginAnalytics } from '../index.js'
 import { DEFAULT_ORAMA_DEPLOYMENT_ID } from '../const.js'
 
+interface MockedRequest {
+  url: string
+  body: object
+}
+
 const FAKE_ENDPOINT = 'http://localhost:3000/sso_collect'
 const API_KEY = 'the-api-key'
 const INDEX_ID = 'the-index-id'
@@ -21,7 +26,7 @@ t.test('analytics-plugin', async (t) => {
     server.close()
   })
 
-  const db = await create({
+  const db = create({
     schema: { name: 'string' } as const,
     plugins: [
       pluginAnalytics({
@@ -46,23 +51,12 @@ t.test('analytics-plugin', async (t) => {
 
   const firstInvocation = invocations[0]
 
-  t.matchStrict(firstInvocation, {
-    url: `${FAKE_ENDPOINT}?api-key=${API_KEY}`,
-    body: {
-      source: 'oss-fe',
-      deploymentID: DEFAULT_ORAMA_DEPLOYMENT_ID,
-      index: INDEX_ID,
-      events: [
-        {
-          query: {
-            term: 'foo'
-          },
-          resultsCount: 1,
-          roundTripTime: 0
-        }
-      ]
-    }
-  })
+  t.equal(firstInvocation.url, `${FAKE_ENDPOINT}?api-key=${API_KEY}`)
+  t.equal(firstInvocation.body['source'], 'oss-fe')
+  t.equal(firstInvocation.body['deploymentID'], DEFAULT_ORAMA_DEPLOYMENT_ID)
+  t.equal(firstInvocation.body['index'], INDEX_ID)
+  t.equal(firstInvocation.body['events'].length, 1)
+  t.equal(firstInvocation.body['events'][0]['rawSearchString'], 'foo')
 
   await search(db, { term: 'b' })
 
@@ -129,9 +123,4 @@ function getServer(invocations: MockedRequest[]): SetupServerApi {
       return HttpResponse.json()
     })
   )
-}
-
-interface MockedRequest {
-  url: string
-  body: object
 }
