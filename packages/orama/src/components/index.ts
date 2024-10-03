@@ -618,27 +618,6 @@ export function getSearchablePropertiesWithTypes(index: Index): Record<string, S
   return index.searchablePropertiesWithTypes
 }
 
-function loadRadixNode(node: RadixNode): RadixNode {
-  const convertedNode = new RadixNode(node.k, node.s, node.e)
-
-  convertedNode.d = node.d
-  convertedNode.w = node.w
-
-  for (const childrenKey of Object.keys(node.c)) {
-    convertedNode.c[childrenKey] = loadRadixNode(node.c[childrenKey])
-  }
-
-  return convertedNode
-}
-
-function loadFlatNode(node: unknown): FlatTree {
-  return FlatTree.fromJSON({ numberToDocumentId: node })
-}
-
-function saveFlatNode(node: FlatTree): unknown {
-  return Array.from(node.numberToDocumentId.entries())
-}
-
 export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Index {
   const {
     indexes: rawIndexes,
@@ -661,14 +640,14 @@ export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentI
       case 'Radix':
         indexes[prop] = {
           type: 'Radix',
-          node: loadRadixNode(node),
+          node: RadixNode.fromJSON(node),
           isArray
         }
         break
       case 'Flat':
         indexes[prop] = {
           type: 'Flat',
-          node: loadFlatNode(node),
+          node: FlatTree.fromJSON({ numberToDocumentId: node }),
           isArray
         }
         break
@@ -712,7 +691,7 @@ export function save<R = unknown>(index: Index): R {
     frequencies,
     tokenOccurrences,
     avgFieldLength,
-    fieldLengths
+    fieldLengths,
   } = index
 
   const vectorIndexesAsArrays: Index['vectorIndexes'] = {}
@@ -736,11 +715,12 @@ export function save<R = unknown>(index: Index): R {
     const { type, node, isArray } = indexes[name]
     if (type !== 'Flat') {
       savedIndexes[name] = indexes[name]
+      savedIndexes[name].node = savedIndexes[name].node.toJSON()
       continue
     }
     savedIndexes[name] = {
       type: 'Flat',
-      node: saveFlatNode(node),
+      node: node.toJSON(),
       isArray
     }
   }

@@ -10,10 +10,10 @@ function extractOriginalDoc(result: Result<AnyDocument>[]): AnyDocument[] {
   return result.map(({ document }: AnyDocument) => document)
 }
 
-t.skip('Edge getters', (t) => {
+t.only('Edge getters', (t) => {
   t.plan(4)
 
-  t.skip('should correctly enable edge index getter', async (t) => {
+  t.only('should correctly enable edge index getter', async (t) => {
     t.plan(2)
 
     const db = create({
@@ -41,7 +41,7 @@ t.skip('Edge getters', (t) => {
     t.ok((nameIndex.node as RadixNode).contains('jane'))
   })
 
-  t.skip('should correctly enable edge docs getter', async (t) => {
+  t.only('should correctly enable edge docs getter', async (t) => {
     t.plan(2)
 
     const db = create({
@@ -73,7 +73,7 @@ t.skip('Edge getters', (t) => {
     })
   })
 
-  t.skip('should correctly enable index setter', async (t) => {
+  t.only('should correctly enable index setter', async (t) => {
     t.plan(6)
 
     const db = create({
@@ -133,7 +133,7 @@ t.skip('Edge getters', (t) => {
     t.strictSame(extractOriginalDoc(search4.hits), [michele])
   })
 
-  t.skip('should correctly save and load data', async (t) => {
+  t.only('should correctly save and load data', async (t) => {
     t.plan(2)
 
     const originalDB = await create({
