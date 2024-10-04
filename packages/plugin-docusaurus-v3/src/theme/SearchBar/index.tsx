@@ -4,7 +4,7 @@ import { useLocation } from '@docusaurus/router'
 import { useActiveVersion, useVersions } from '@docusaurus/plugin-content-docs/client'
 import { useDocsPreferredVersion } from '@docusaurus/theme-common'
 import { usePluginData } from '@docusaurus/useGlobalData'
-import { SearchBox, SearchButton } from '@orama/searchbox'
+import { OramaSearchBox, OramaSearchButton } from '@orama/react-components'
 import { useOrama } from './useOrama'
 
 interface PluginData {
@@ -17,13 +17,13 @@ interface PluginData {
 }
 
 export function OramaSearchNoDocs() {
-  const { searchBoxConfig, colorMode } = useOrama()
+  const { searchBoxConfig, colorMode, clientMode } = useOrama()
 
   return (
     <div>
-      <SearchButton colorScheme={colorMode} className="DocSearch-Button" />
+      <OramaSearchButton colorScheme={colorMode} className="DocSearch-Button" />
       {searchBoxConfig && (
-        <SearchBox
+        <OramaSearchBox
           {...searchBoxConfig}
           colorScheme={colorMode}
           searchParams={{
@@ -43,7 +43,8 @@ export function OramaSearchWithDocs({ pluginId }: { pluginId: string }) {
   const activeVersion = useActiveVersion(pluginId)
   const { preferredVersion } = useDocsPreferredVersion(pluginId)
   const currentVersion = activeVersion || preferredVersion || versions[0]
-  const { searchBoxConfig, colorMode } = useOrama()
+  const { searchBoxConfig, colorMode, clientMode } = useOrama()
+
   const searchParams = {
     ...(currentVersion && {
       where: {
@@ -54,9 +55,9 @@ export function OramaSearchWithDocs({ pluginId }: { pluginId: string }) {
 
   return (
     <div>
-      <SearchButton colorScheme={colorMode} className="DocSearch-Button" />
+      <OramaSearchButton colorScheme={colorMode} className="DocSearch-Button" />
       {searchBoxConfig && (
-        <SearchBox {...searchBoxConfig} colorScheme={colorMode} searchParams={searchParams} facetProperty="category" />
+        <OramaSearchBox {...searchBoxConfig} colorScheme={colorMode} searchParams={searchParams} facetProperty="category" />
       )}
     </div>
   )
@@ -66,8 +67,10 @@ export default function OramaSearchWrapper() {
   const { pathname } = useLocation()
   const { docsInstances }: PluginData = usePluginData('@orama/plugin-docusaurus-v3') as PluginData
   const pluginId = docsInstances.filter((id: string) => pathname.includes(id))[0] || docsInstances[0]
+
   if (!pluginId) {
     return <OramaSearchNoDocs />
   }
+
   return <OramaSearchWithDocs pluginId={pluginId} />
 }

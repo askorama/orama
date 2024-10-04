@@ -23,10 +23,10 @@
   "dependencies": {
     "@orama/highlight": "^0.1.5",
     "@orama/orama": "workspace:*",
+    "@orama/react-components": "^0.0.25",
     "@orama/plugin-analytics": "workspace:*",
     "@orama/plugin-parsedoc": "workspace:*",
-    "@orama/searchbox": "^1.0.0-rc53",
-    "@oramacloud/client": "^1.0.14",
+    "@orama/switch": "workspace:*",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
     "jsdom": "^23.2.0",

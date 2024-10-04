@@ -82,3 +82,12 @@ export async function deployIndex(baseUrl: string, APIKey: string, indexId: stri
     'End: Deploy index (success)'
   )
 }
+
+export const DOCS_PRESET_SCHEMA = {
+  title: 'string',
+  content: 'string',
+  path: 'string',
+  section: 'string',
+  category: 'enum',
+  version: 'enum'
+}

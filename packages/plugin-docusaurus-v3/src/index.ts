@@ -4,12 +4,11 @@ import { cp } from 'node:fs/promises'
 import { gzip } from 'pako'
 import { resolve } from 'node:path'
 // @ts-ignore
-import { presets } from '@orama/searchbox'
 import { create, insertMultiple, save } from '@orama/orama'
 import { JSDOM } from 'jsdom'
 import MarkdownIt from 'markdown-it'
 import matter from 'gray-matter'
-import { createSnapshot, deployIndex, fetchEndpointConfig } from './utils'
+import { createSnapshot, deployIndex, DOCS_PRESET_SCHEMA, fetchEndpointConfig } from "./utils"
 import { parseMarkdownHeadingId, writeMarkdownHeadingId } from '@docusaurus/utils'
 
 enum DeployType {
@@ -328,7 +327,7 @@ async function deployData({
     }
   } else {
     const db = await create({
-      schema: { ...presets.docs.schema, version: 'enum' }
+      schema: { ...DOCS_PRESET_SCHEMA, version: 'enum' }
     })
 
     await insertMultiple(db, oramaDocs as any)

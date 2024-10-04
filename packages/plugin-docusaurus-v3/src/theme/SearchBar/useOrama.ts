@@ -1,15 +1,15 @@
-// @ts-nocheck
+//@ts-nocheck
 import { useEffect, useState } from 'react'
+import { Switch } from '@orama/switch'
 import useBaseUrl from '@docusaurus/useBaseUrl'
 import useIsBrowser from '@docusaurus/useIsBrowser'
 import { useColorMode } from '@docusaurus/theme-common'
 import { usePluginData } from '@docusaurus/useGlobalData'
 import { ungzip } from 'pako'
-import { presets } from '@orama/searchbox'
 import { OramaClient } from '@oramacloud/client'
 import { create, insertMultiple } from '@orama/orama'
 import { pluginAnalytics } from '@orama/plugin-analytics'
-import '@orama/searchbox/dist/index.css'
+import {DOCS_PRESET_SCHEMA} from '../../utils'
 
 export const useOrama = () => {
   const [searchBoxConfig, setSearchBoxConfig] = useState(null)
@@ -18,14 +18,15 @@ export const useOrama = () => {
 
   const baseURL = useBaseUrl('orama-search-index-current.json.gz')
   const isBrowser = useIsBrowser()
+
   useEffect(() => {
     async function loadOrama() {
+      let oramaInstance = null
+
       if (endpoint?.url) {
-        setSearchBoxConfig({
-          oramaInstance: new OramaClient({
-            endpoint: endpoint.url,
-            api_key: endpoint.key
-          })
+        oramaInstance = new OramaClient({
+          endpoint: endpoint.url,
+          api_key: endpoint.key
         })
       } else {
         let buffer
@@ -48,7 +49,7 @@ export const useOrama = () => {
         const parsedDeflated = JSON.parse(deflated)
 
         const db = await create({
-          schema: { ...presets.docs.schema, version: 'enum' },
+          schema: { ...DOCS_PRESET_SCHEMA, version: 'enum' },
           plugins: [
             ...(analytics
               ? [
@@ -64,10 +65,13 @@ export const useOrama = () => {
 
         await insertMultiple(db, Object.values(parsedDeflated.docs.docs))
 
-        setSearchBoxConfig({
-          oramaInstance: db
-        })
+        oramaInstance = new Switch(db)
       }
+
+      setSearchBoxConfig({
+        clientInstance: oramaInstance,
+        disableChat: !endpoint?.url
+      })
     }
 
     if (!isBrowser) {
@@ -79,5 +83,5 @@ export const useOrama = () => {
     })
   }, [isBrowser])
 
-  return { searchBoxConfig, colorMode }
+  return { searchBoxConfig, colorMode, clientMode: endpoint?.url ? 'cloud' : 'oss' }
 }
