@@ -1,6 +1,6 @@
 export class BoolNode<V = unknown> {
-  'true':  Set<V>
-  'false': Set<V>
+  true: Set<V>
+  false: Set<V>
 
   constructor() {
     this.true = new Set()

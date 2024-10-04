@@ -643,7 +643,7 @@ export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentI
           node: FlatTree.fromJSON(node),
           isArray
         }
-      break
+        break
       case 'AVL':
         indexes[prop] = {
           type: 'AVL',
@@ -705,7 +705,7 @@ export function save<R = unknown>(index: Index): R {
     frequencies,
     tokenOccurrences,
     avgFieldLength,
-    fieldLengths,
+    fieldLengths
   } = index
 
   const vectorIndexesAsArrays: Index['vectorIndexes'] = {}
