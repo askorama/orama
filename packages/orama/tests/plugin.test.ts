@@ -195,9 +195,8 @@ t.only('plugin', async (t) => {
       '[Logger] beforeInsert - {"name":"Bar Baz Foo"}',
       '[Logger] afterInsert - {"name":"Bar Baz Foo"}',
       '[Logger] afterInsertMultiple: [{"name":"Foo Bar Baz"},{"name":"Bar Baz Foo"}]',
-      '[Logger] afterUpdateMultiple',
+      '[Logger] afterUpdateMultiple'
     ]
-
 
     for (let i = 0; i < log.length; i++) {
       t.equal(data[i], log[i])

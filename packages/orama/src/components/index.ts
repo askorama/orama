@@ -23,41 +23,14 @@ import type {
   WhereCondition
 } from '../types.js'
 import type { InsertOptions } from '../methods/insert.js'
+import type { Point as BKDGeoPoint } from '../trees/bkd.js'
+import { RadixNode } from '../trees/radix.js'
 import { createError } from '../errors.js'
-import {
-  create as avlCreate,
-  find as avlFind,
-  greaterThan as avlGreaterThan,
-  insert as avlInsert,
-  lessThan as avlLessThan,
-  RootNode as AVLRootNode,
-  rangeSearch as avlRangeSearch,
-  removeDocument as avlRemoveDocument
-} from '../trees/avl.js'
-import {
-  create as flatCreate,
-  filter as flatFilter,
-  filterArr as flatFilterArr,
-  insert as flatInsert,
-  removeDocument as flatRemoveDocument,
-  FlatTree
-} from '../trees/flat.js'
-import {
-  create as radixCreate,
-  find as radixFind,
-  insert as radixInsert,
-  Node as RadixNode,
-  removeDocumentByWord as radixRemoveDocument
-} from '../trees/radix.js'
-import {
-  create as bkdCreate,
-  insert as bkdInsert,
-  removeDocByID as bkdRemoveDocByID,
-  RootNode as BKDNode,
-  Point as BKDGeoPoint,
-  searchByRadius,
-  searchByPolygon
-} from '../trees/bkd.js'
+import { AVLTree } from '../trees/avl.js'
+import { FlatTree } from '../trees/flat.js'
+import { RadixTree } from '../trees/radix.js'
+import { BKDTree } from '../trees/bkd.js'
+import { BoolNode } from '../trees/bool.js'
 
 import { convertDistanceToMeters, intersect, safeArrayPush, getOwnProperty } from '../utils.js'
 import { BM25 } from './algorithms.js'
@@ -80,11 +53,6 @@ export type FrequencyMap = {
   }
 }
 
-export type BooleanIndex = {
-  true: InternalDocumentID[]
-  false: InternalDocumentID[]
-}
-
 export type TreeType = 'AVL' | 'Radix' | 'Bool' | 'Flat' | 'BKD'
 
 export type TTree<T = TreeType, N = unknown> = {
@@ -95,10 +63,10 @@ export type TTree<T = TreeType, N = unknown> = {
 
 export type Tree =
   | TTree<'Radix', RadixNode>
-  | TTree<'AVL', AVLRootNode<number, InternalDocumentID[]>>
-  | TTree<'Bool', BooleanIndex>
+  | TTree<'AVL', AVLTree<number, InternalDocumentID[]>>
+  | TTree<'Bool', BoolNode>
   | TTree<'Flat', FlatTree>
-  | TTree<'BKD', BKDNode>
+  | TTree<'BKD', BKDTree>
 
 export interface Index extends AnyIndexStore {
   sharedInternalDocumentStore: InternalDocumentIDStore
@@ -253,15 +221,15 @@ export function create<T extends AnyOrama, TSchema extends T['schema']>(
       switch (type) {
         case 'boolean':
         case 'boolean[]':
-          index.indexes[path] = { type: 'Bool', node: { true: [], false: [] }, isArray }
+          index.indexes[path] = { type: 'Bool', node: new BoolNode(), isArray }
           break
         case 'number':
         case 'number[]':
-          index.indexes[path] = { type: 'AVL', node: avlCreate<number, InternalDocumentID[]>(0, []), isArray }
+          index.indexes[path] = { type: 'AVL', node: new AVLTree<number, InternalDocumentID[]>(0, []), isArray }
           break
         case 'string':
         case 'string[]':
-          index.indexes[path] = { type: 'Radix', node: radixCreate(), isArray }
+          index.indexes[path] = { type: 'Radix', node: new RadixTree(), isArray }
           index.avgFieldLength[path] = 0
           index.frequencies[path] = {}
           index.tokenOccurrences[path] = {}
@@ -269,10 +237,10 @@ export function create<T extends AnyOrama, TSchema extends T['schema']>(
           break
         case 'enum':
         case 'enum[]':
-          index.indexes[path] = { type: 'Flat', node: flatCreate(), isArray }
+          index.indexes[path] = { type: 'Flat', node: new FlatTree(), isArray }
           break
         case 'geopoint':
-          index.indexes[path] = { type: 'BKD', node: bkdCreate(), isArray }
+          index.indexes[path] = { type: 'BKD', node: new BKDTree(), isArray }
           break
         default:
           throw createError('INVALID_SCHEMA_TYPE', Array.isArray(type) ? 'array' : type, path)
@@ -302,12 +270,12 @@ function insertScalarBuilder(
     const { type, node } = index.indexes[prop]
     switch (type) {
       case 'Bool': {
-        node[value ? 'true' : 'false'].push(internalId)
+        node[value ? 'true' : 'false'].add(internalId)
         break
       }
       case 'AVL': {
         const avlRebalanceThreshold = options?.avlRebalanceThreshold ?? 1
-        avlInsert(node, value as number, [internalId], avlRebalanceThreshold)
+        node.insert(value as number, [internalId], avlRebalanceThreshold)
         break
       }
       case 'Radix': {
@@ -317,17 +285,17 @@ function insertScalarBuilder(
         for (const token of tokens) {
           implementation.insertTokenScoreParameters(index, prop, internalId, tokens, token)
 
-          radixInsert(node, token, internalId)
+          node.insert(token, internalId)
         }
 
         break
       }
       case 'Flat': {
-        flatInsert(node, value as ScalarSearchableType, internalId)
+        node.insert(value as ScalarSearchableType, internalId)
         break
       }
       case 'BKD': {
-        bkdInsert(node, value as unknown as BKDGeoPoint, [internalId])
+        node.insert(value as unknown as BKDGeoPoint, [internalId])
         break
       }
     }
@@ -395,14 +363,11 @@ function removeScalar(
   const { type, node } = index.indexes[prop]
   switch (type) {
     case 'AVL': {
-      avlRemoveDocument(node, internalId, value as number)
+      node.removeDocument(internalId, value as number[])
       return true
     }
     case 'Bool': {
-      const booleanKey = value ? 'true' : 'false'
-      const position = node[booleanKey].indexOf(internalId)
-
-      node[value ? 'true' : 'false'].splice(position, 1)
+      node[value ? 'true' : 'false'].delete(internalId)
       return true
     }
     case 'Radix': {
@@ -412,17 +377,17 @@ function removeScalar(
 
       for (const token of tokens) {
         implementation.removeTokenScoreParameters(index, prop, token)
-        radixRemoveDocument(node, token, internalId)
+        node.removeDocumentByWord(token, internalId)
       }
 
       return true
     }
     case 'Flat': {
-      flatRemoveDocument(node, internalId, value as ScalarSearchableType)
+      node.removeDocument(internalId, value as ScalarSearchableType)
       return true
     }
     case 'BKD': {
-      bkdRemoveDocByID(node, value as unknown as BKDGeoPoint, internalId)
+      node.removeDocByID(value as unknown as BKDGeoPoint, internalId)
       return false
     }
   }
@@ -480,7 +445,7 @@ export function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   }
 
   const { exact, tolerance } = context.params
-  const searchResult = radixFind(node, { term, exact, tolerance })
+  const searchResult = node.find({ term, exact, tolerance })
   const ids = new Set<InternalDocumentID>()
 
   for (const key in searchResult) {
@@ -522,7 +487,7 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
 
     if (type === 'Bool') {
       const idx = node
-      const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
+      const filteredIDs = Array.from(operation ? idx.true : idx.false)
       safeArrayPush(filtersMap[param], filteredIDs)
       continue
     }
@@ -547,14 +512,7 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
           highPrecision = false
         } = operation[reqOperation] as GeosearchRadiusOperator['radius']
         const distanceInMeters = convertDistanceToMeters(value, unit)
-        const ids = searchByRadius(
-          node.root,
-          coordinates as BKDGeoPoint,
-          distanceInMeters,
-          inside,
-          undefined,
-          highPrecision
-        )
+        const ids = node.searchByRadius(coordinates as BKDGeoPoint, distanceInMeters, inside, undefined, highPrecision)
         // @todo: convert this into a for loop
         safeArrayPush(
           filtersMap[param],
@@ -566,7 +524,7 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
           inside = true,
           highPrecision = false
         } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
-        const ids = searchByPolygon(node.root, coordinates as BKDGeoPoint[], inside, undefined, highPrecision)
+        const ids = node.searchByPolygon(coordinates as BKDGeoPoint[], inside, undefined, highPrecision)
         // @todo: convert this into a for loop
         safeArrayPush(
           filtersMap[param],
@@ -581,7 +539,7 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
       for (const raw of [operation].flat()) {
         const term = context.tokenizer.tokenize(raw, context.language, param)
         for (const t of term) {
-          const filteredIDsResults = radixFind(node, { term: t, exact: true })
+          const filteredIDsResults = node.find({ term: t, exact: true })
           safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())
         }
       }
@@ -596,12 +554,11 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
     }
 
     if (type === 'Flat') {
-      const flatOperation = isArray ? flatFilterArr : flatFilter
-      safeArrayPush(
-        filtersMap[param],
-        flatOperation(node, operation as EnumComparisonOperator & EnumArrComparisonOperator)
-      )
+      const results = isArray
+        ? node.filterArr(operation as EnumArrComparisonOperator)
+        : node.filter(operation as EnumComparisonOperator)
 
+      safeArrayPush(filtersMap[param], results)
       continue
     }
 
@@ -612,28 +569,28 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
 
       switch (operationOpt) {
         case 'gt': {
-          filteredIDs = avlGreaterThan(node, operationValue, false)
+          filteredIDs = node.greaterThan(operationValue as number, false) as unknown as number[]
           break
         }
         case 'gte': {
-          filteredIDs = avlGreaterThan(node, operationValue, true)
+          filteredIDs = node.greaterThan(operationValue as number, true) as unknown as number[]
           break
         }
         case 'lt': {
-          filteredIDs = avlLessThan(node, operationValue, false)
+          filteredIDs = node.lessThan(operationValue as number, false) as unknown as number[]
           break
         }
         case 'lte': {
-          filteredIDs = avlLessThan(node, operationValue, true)
+          filteredIDs = node.lessThan(operationValue as number, true) as unknown as number[]
           break
         }
         case 'eq': {
-          filteredIDs = avlFind(node, operationValue) ?? []
+          filteredIDs = node.find(operationValue as number) ?? []
           break
         }
         case 'between': {
           const [min, max] = operationValue as number[]
-          filteredIDs = avlRangeSearch(node, min, max)
+          filteredIDs = node.rangeSearch(min, max) as unknown as number[]
           break
         }
       }
@@ -652,29 +609,6 @@ export function getSearchableProperties(index: Index): string[] {
 
 export function getSearchablePropertiesWithTypes(index: Index): Record<string, SearchableType> {
   return index.searchablePropertiesWithTypes
-}
-
-function loadRadixNode(node: RadixNode): RadixNode {
-  const convertedNode = radixCreate(node.e, node.s, node.k)
-
-  convertedNode.d = node.d
-  convertedNode.w = node.w
-
-  for (const childrenKey of Object.keys(node.c)) {
-    convertedNode.c[childrenKey] = loadRadixNode(node.c[childrenKey])
-  }
-
-  return convertedNode
-}
-
-function loadFlatNode(node: unknown): FlatTree {
-  return {
-    numberToDocumentId: new Map(node as [ScalarSearchableType, InternalDocumentID[]][])
-  }
-}
-
-function saveFlatNode(node: FlatTree): unknown {
-  return Array.from(node.numberToDocumentId.entries())
 }
 
 export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): Index {
@@ -699,14 +633,35 @@ export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentI
       case 'Radix':
         indexes[prop] = {
           type: 'Radix',
-          node: loadRadixNode(node),
+          node: RadixTree.fromJSON(node),
           isArray
         }
         break
       case 'Flat':
         indexes[prop] = {
           type: 'Flat',
-          node: loadFlatNode(node),
+          node: FlatTree.fromJSON(node),
+          isArray
+        }
+        break
+      case 'AVL':
+        indexes[prop] = {
+          type: 'AVL',
+          node: AVLTree.fromJSON(node),
+          isArray
+        }
+        break
+      case 'BKD':
+        indexes[prop] = {
+          type: 'BKD',
+          node: BKDTree.fromJSON(node),
+          isArray
+        }
+        break
+      case 'Bool':
+        indexes[prop] = {
+          type: 'Bool',
+          node: BoolNode.fromJSON(node),
           isArray
         }
         break
@@ -772,14 +727,15 @@ export function save<R = unknown>(index: Index): R {
   const savedIndexes: any = {}
   for (const name of Object.keys(indexes)) {
     const { type, node, isArray } = indexes[name]
-    if (type !== 'Flat') {
+    if (type === 'Flat' || type === 'Radix' || type === 'AVL' || type === 'BKD' || type === 'Bool') {
+      savedIndexes[name] = {
+        type,
+        node: node.toJSON(),
+        isArray
+      }
+    } else {
       savedIndexes[name] = indexes[name]
-      continue
-    }
-    savedIndexes[name] = {
-      type: 'Flat',
-      node: saveFlatNode(node),
-      isArray
+      savedIndexes[name].node = savedIndexes[name].node.toJSON()
     }
   }
 

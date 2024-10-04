@@ -1,356 +1,314 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { Nullable } from '../types.js'
-import { safeArrayPush } from '../utils.js'
 
-export interface Node<K, V> {
-  // Node key
-  k: K
-  // Node value
-  v: V
-  // Left child node
-  l: Nullable<Node<K, V>>
-  // Right child node
-  r: Nullable<Node<K, V>>
-  // Tree height from this node
-  h: number
-}
+export class AVLNode<K, V> {
+  public k: K
+  public v: V
+  public l: Nullable<AVLNode<K, V>> = null
+  public r: Nullable<AVLNode<K, V>> = null
+  public h: number = 1
 
-export interface RootNode<K, V> {
-  root: Node<K, V>
-}
-
-function rotateLeft<K, V>(node: Node<K, V>): Node<K, V> {
-  const right = node.r as Node<K, V>
-  node.r = right.l
-  right.l = node
-  node.h = Math.max(getHeight(node.l), getHeight(node.r)) + 1
-  right.h = Math.max(getHeight(right.l), getHeight(right.r)) + 1
-  return right
-}
-
-function rotateRight<K, V>(node: Node<K, V>): Node<K, V> {
-  const left = node.l as Node<K, V>
-  node.l = left.r
-  left.r = node
-  node.h = Math.max(getHeight(node.l), getHeight(node.r)) + 1
-  left.h = Math.max(getHeight(left.l), getHeight(left.r)) + 1
-  return left
-}
-
-export function contains<K, V>(node: RootNode<K, V>, key: K): boolean {
-  return !!find(node, key)
-}
-
-export function getSize<K, V>(root: Nullable<RootNode<K, V>>): number {
-  let size = 0
-  const queue: Array<Node<K, V>> = []
-
-  if (root !== null) {
-    queue.push(root.root)
+  constructor(key: K, value: V) {
+    this.k = key
+    this.v = value
   }
 
-  while (queue.length > 0) {
-    const node = queue.shift() as Node<K, V>
-    size++
+  public updateHeight(): void {
+    this.h = Math.max(AVLNode.getHeight(this.l), AVLNode.getHeight(this.r)) + 1
+  }
 
-    if (node.l !== null) {
-      queue.push(node.l)
-    }
+  public static getHeight<K, V>(node: Nullable<AVLNode<K, V>>): number {
+    return node ? node.h : 0
+  }
 
-    if (node.r !== null) {
-      queue.push(node.r)
+  public getBalanceFactor(): number {
+    return AVLNode.getHeight(this.l) - AVLNode.getHeight(this.r)
+  }
+
+  public rotateLeft(): AVLNode<K, V> {
+    const newRoot = this.r as AVLNode<K, V>
+    this.r = newRoot.l
+    newRoot.l = this
+    this.updateHeight()
+    newRoot.updateHeight()
+    return newRoot
+  }
+
+  public rotateRight(): AVLNode<K, V> {
+    const newRoot = this.l as AVLNode<K, V>
+    this.l = newRoot.r
+    newRoot.r = this
+    this.updateHeight()
+    newRoot.updateHeight()
+    return newRoot
+  }
+
+  public toJSON(): object {
+    return {
+      k: this.k,
+      v: this.v,
+      l: this.l ? this.l.toJSON() : null,
+      r: this.r ? this.r.toJSON() : null,
+      h: this.h
     }
   }
 
-  return size
+  public static fromJSON<K, V>(json: any): AVLNode<K, V> {
+    const node = new AVLNode<K, V>(json.k, json.v)
+    node.l = json.l ? AVLNode.fromJSON<K, V>(json.l) : null
+    node.r = json.r ? AVLNode.fromJSON<K, V>(json.r) : null
+    node.h = json.h
+    return node
+  }
 }
 
-export function isBalanced<K, V>(root: Nullable<RootNode<K, V>>): boolean {
-  if (root === null) return true
+export class AVLTree<K, V> {
+  public root: Nullable<AVLNode<K, V>> = null
+  private insertCount = 0
 
-  const stack: Array<Node<K, V>> = [root.root]
-
-  while (stack.length > 0) {
-    const node = stack.pop()
-
-    if (node != null) {
-      const leftHeight = getHeight(node.l)
-      const rightHeight = getHeight(node.r)
-      const heightDiff = leftHeight - rightHeight
-
-      if (Math.abs(heightDiff) > 1) {
-        return false
-      }
-
-      if (node.l !== null) {
-        stack.push(node.l)
-      }
-      if (node.r !== null) {
-        stack.push(node.r)
-      }
+  constructor(key?: K, value?: V) {
+    if (key !== undefined && value !== undefined) {
+      this.root = new AVLNode(key, value)
     }
   }
 
-  return true
-}
+  public insert(key: K, value: V, rebalanceThreshold = 1000): void {
+    this.root = this.insertNode(this.root, key, value, rebalanceThreshold)
+  }
 
-export function rangeSearch<K, V>(node: RootNode<K, V>, min: K, max: K): V {
-  const result: V[] = []
+  // Rebalance the tree if the insert count reaches the threshold.
+  // This will improve insertion performance since we won't be rebalancing the tree on every insert.
+  // When inserting docs using `insertMultiple`, the threshold will be set to the number of docs being inserted.
+  // We can force rebalancing the tree by setting the threshold to 1 (default).
+  public rebalance() {
+    if (this.root) {
+      this.root = this.rebalanceNode(this.root!)
+    }
+  }
 
-  function traverse(node: Node<K, V>) {
+  public toJSON(): object {
+    return {
+      root: this.root ? this.root.toJSON() : null,
+      insertCount: this.insertCount
+    }
+  }
+
+  public static fromJSON<K, V>(json: any): AVLTree<K, V> {
+    const tree = new AVLTree<K, V>()
+    tree.root = json.root ? AVLNode.fromJSON<K, V>(json.root) : null
+    tree.insertCount = json.insertCount || 0
+    return tree
+  }
+
+  private insertNode(node: Nullable<AVLNode<K, V>>, key: K, value: V, rebalanceThreshold: number): AVLNode<K, V> {
     if (node === null) {
-      return
-    }
-
-    if (min < node.k) {
-      traverse(node.l as Node<K, V>)
-    }
-
-    if (node.k >= min && node.k <= max) {
-      safeArrayPush(result, node.v as V[])
-    }
-
-    if (max > node.k) {
-      traverse(node.r as Node<K, V>)
-    }
-  }
-
-  traverse(node.root)
-
-  return result as V
-}
-
-export function greaterThan<K, V>(node: RootNode<K, V>, key: K, inclusive = false): V {
-  const result: V[] = []
-
-  if (node === null) return result as V
-
-  const stack: Array<Nullable<Node<K, V>>> = [node.root]
-
-  while (stack.length > 0) {
-    const node = stack.pop()
-    if (!node) {
-      continue
-    }
-
-    if (inclusive && node.k >= key) {
-      safeArrayPush(result, node.v as V[])
-    }
-    if (!inclusive && node.k > key) {
-      safeArrayPush(result, node.v as V[])
-    }
-
-    stack.push(node.r)
-    stack.push(node.l)
-  }
-
-  return result as V
-}
-
-export function lessThan<K, V>(node: RootNode<K, V>, key: K, inclusive = false): V {
-  const result: V[] = []
-
-  if (node === null) return result as V
-
-  const stack: Array<Nullable<Node<K, V>>> = [node.root]
-
-  while (stack.length > 0) {
-    const node = stack.pop()
-    if (!node) {
-      continue
-    }
-
-    if (inclusive && node.k <= key) {
-      safeArrayPush(result, node.v as V[])
-    }
-    if (!inclusive && node.k < key) {
-      safeArrayPush(result, node.v as V[])
-    }
-
-    stack.push(node.r)
-    stack.push(node.l)
-  }
-
-  return result as V
-}
-
-function getNodeByKey<K, V>(node: Nullable<Node<K, V>>, key: K): Nullable<Node<K, V>> {
-  while (node !== null) {
-    if (key < node.k) {
-      node = node.l
-    } else if (key > node.k) {
-      node = node.r
-    } else {
-      return node
-    }
-  }
-  return null
-}
-
-export function create<K, V>(key: K, value: V): RootNode<K, V> {
-  return {
-    root: {
-      k: key,
-      v: value,
-      l: null,
-      r: null,
-      h: 0
-    }
-  }
-}
-
-let insertCount = 0
-
-export function insert<K, V>(rootNode: RootNode<K, V[]>, key: K, newValue: V[], rebalanceThreshold = 500): void {
-  function insertNode(node: Nullable<Node<K, V[]>>, key: K, newValue: V[]): Node<K, V[]> {
-    if (node === null) {
-      insertCount++
-      return {
-        k: key,
-        v: newValue,
-        l: null,
-        r: null,
-        h: 0
-      }
+      return new AVLNode(key, value)
     }
 
     if (key < node.k) {
-      node.l = insertNode(node.l, key, newValue)
+      node.l = this.insertNode(node.l, key, value, rebalanceThreshold)
     } else if (key > node.k) {
-      node.r = insertNode(node.r, key, newValue)
+      node.r = this.insertNode(node.r, key, value, rebalanceThreshold)
     } else {
-      node.v.push(...newValue)
+      if (Array.isArray(node.v)) {
+        if (Array.isArray(value)) {
+          ;(node.v as any[]).push(...(value as V[]))
+        } else {
+          ;(node.v as any[]).push(value)
+        }
+      } else {
+        node.v = value
+      }
       return node
     }
 
-    // Rebalance the tree if the insert count reaches the threshold.
-    // This will improve insertion performance since we won't be rebalancing the tree on every insert.
-    // When inserting docs using `insertMultiple`, the threshold will be set to the number of docs being inserted.
-    // We can force rebalancing the tree by setting the threshold to 1 (default).
-    if (insertCount % rebalanceThreshold === 0) {
-      return rebalanceNode(node, key)
+    node.updateHeight()
+
+    if (this.insertCount++ % rebalanceThreshold === 0) {
+      return this.rebalanceNode(node)
     }
 
     return node
   }
 
-  rootNode.root = insertNode(rootNode.root, key, newValue)
-}
+  private rebalanceNode(node: AVLNode<K, V>): AVLNode<K, V> {
+    const balanceFactor = node.getBalanceFactor()
 
-function rebalanceNode<K, V>(node: Node<K, V[]>, key: K): Node<K, V[]> {
-  node.h = 1 + Math.max(getHeight(node.l), getHeight(node.r))
+    if (balanceFactor > 1) {
+      // Left heavy
+      if (node.l && node.l.getBalanceFactor() >= 0) {
+        // Left Left Case
+        return node.rotateRight()
+      } else if (node.l) {
+        // Left Right Case
+        node.l = node.l.rotateLeft()
+        return node.rotateRight()
+      }
+    }
 
-  const balanceFactor = getHeight(node.l) - getHeight(node.r)
+    if (balanceFactor < -1) {
+      // Right heavy
+      if (node.r && node.r.getBalanceFactor() <= 0) {
+        // Right Right Case
+        return node.rotateLeft()
+      } else if (node.r) {
+        // Right Left Case
+        node.r = node.r.rotateRight()
+        return node.rotateLeft()
+      }
+    }
 
-  if (balanceFactor > 1 && key < node.l!.k) {
-    return rotateRight(node)
+    return node
   }
 
-  if (balanceFactor < -1 && key > node.r!.k) {
-    return rotateLeft(node)
+  public find(key: K): Nullable<V> {
+    const node = this.findNodeByKey(key)
+    return node ? node.v : null
   }
 
-  if (balanceFactor > 1 && key > node.l!.k) {
-    node.l = rotateLeft(node.l!)
-    return rotateRight(node)
+  public contains(key: K): boolean {
+    return this.find(key) !== null
   }
 
-  if (balanceFactor < -1 && key < node.r!.k) {
-    node.r = rotateRight(node.r!)
-    return rotateLeft(node)
+  public getSize(): number {
+    const countNodes = (node: Nullable<AVLNode<K, V>>): number => {
+      if (!node) return 0
+      return 1 + countNodes(node.l) + countNodes(node.r)
+    }
+    return countNodes(this.root)
   }
 
-  return node
-}
+  public isBalanced(): boolean {
+    const checkBalanced = (node: Nullable<AVLNode<K, V>>): boolean => {
+      if (!node) return true
 
-function getHeight<K, V>(node: Nullable<Node<K, V>>): number {
-  return node !== null ? node.h : -1
-}
+      const balanceFactor = node.getBalanceFactor()
+      if (Math.abs(balanceFactor) > 1) {
+        return false
+      }
 
-export function find<K, V>(root: RootNode<K, V>, key: K): Nullable<V> {
-  const node = getNodeByKey(root.root, key)
-  if (node === null) {
+      return checkBalanced(node.l) && checkBalanced(node.r)
+    }
+    return checkBalanced(this.root)
+  }
+
+  public remove(key: K): void {
+    this.root = this.removeNode(this.root, key)
+  }
+
+  public removeDocument(key: K, id: V) {
+    const node = this.findNodeByKey(key)
+
+    if (!node) {
+      return
+    }
+
+    if ((node.v as unknown as Set<V>).size === 1) {
+      this.removeNode(node, key)
+    }
+    ;(node.v as unknown as Set<V>) = new Set([...(node.v as unknown as Set<V>).values()].filter((v) => v !== id))
+  }
+
+  private findNodeByKey(key: K): Nullable<AVLNode<K, V>> {
+    let node = this.root
+    while (node) {
+      if (key < node.k) {
+        node = node.l
+      } else if (key > node.k) {
+        node = node.r
+      } else {
+        return node
+      }
+    }
     return null
   }
-  return node.v
-}
 
-export function remove<K, V>(rootNode: Nullable<RootNode<K, V>>, key: K): void {
-  if (rootNode === null || rootNode.root === null) {
-    return
-  }
+  private removeNode(node: Nullable<AVLNode<K, V>>, key: K): Nullable<AVLNode<K, V>> {
+    if (!node) return null
 
-  let node = rootNode.root
-  let parentNode: Nullable<Node<K, V>> = null
-
-  while (node != null && node.k !== key) {
-    parentNode = node
     if (key < node.k) {
-      node = node.l!
+      node.l = this.removeNode(node.l, key)
+    } else if (key > node.k) {
+      node.r = this.removeNode(node.r, key)
     } else {
-      node = node.r!
-    }
-  }
-
-  if (node === null) {
-    return
-  }
-
-  const deleteNode = () => {
-    if (node.l === null && node.r === null) {
-      if (parentNode === null) {
-        rootNode.root = null!
+      if (!node.l || !node.r) {
+        node = node.l || node.r
       } else {
-        if (parentNode.l === node) {
-          parentNode.l = null
-        } else {
-          parentNode.r = null
-        }
-      }
-    } else if (node.l != null && node.r != null) {
-      let minValueNode = node.r
-      let minValueParent = node
-
-      while (minValueNode.l != null) {
-        minValueParent = minValueNode
-        minValueNode = minValueNode.l
-      }
-
-      node.k = minValueNode.k
-
-      if (minValueParent === node) {
-        minValueParent.r = minValueNode.r
-      } else {
-        minValueParent.l = minValueNode.r
-      }
-    } else {
-      const childNode = node.l != null ? node.l : node.r
-
-      if (parentNode === null) {
-        rootNode.root = childNode!
-      } else {
-        if (parentNode.l === node) {
-          parentNode.l = childNode
-        } else {
-          parentNode.r = childNode
-        }
+        const minLargerNode = this.findMinNode(node.r)
+        node.k = minLargerNode.k
+        node.v = minLargerNode.v
+        node.r = this.removeNode(node.r, minLargerNode.k)
       }
     }
+
+    if (!node) return null
+
+    node.updateHeight()
+    return this.rebalanceNode(node)
   }
 
-  deleteNode()
-}
-
-export function removeDocument<K, V>(root: RootNode<K, V[]>, id: V, key: K): void {
-  const node = getNodeByKey(root.root, key)!
-
-  if (!node) {
-    return
+  private findMinNode(node: AVLNode<K, V>): AVLNode<K, V> {
+    while (node.l) {
+      node = node.l
+    }
+    return node
   }
 
-  if (node.v.length === 1) {
-    remove(root, key)
-    return
+  public rangeSearch(min: K, max: K): V[] {
+    const result: V[] = []
+    const traverse = (node: Nullable<AVLNode<K, V>>) => {
+      if (!node) return
+      if (min < node.k) traverse(node.l)
+      if (node.k >= min && node.k <= max) {
+        if (Array.isArray(node.v)) {
+          result.push(...node.v)
+        } else {
+          result.push(node.v)
+        }
+      }
+      if (max > node.k) traverse(node.r)
+    }
+    traverse(this.root)
+    return result
   }
 
-  node.v.splice(node.v.indexOf(id), 1)
+  public greaterThan(key: K, inclusive = false): V[] {
+    const result: V[] = []
+    const traverse = (node: Nullable<AVLNode<K, V>>) => {
+      if (!node) return
+      if ((inclusive && node.k >= key) || (!inclusive && node.k > key)) {
+        if (Array.isArray(node.v)) {
+          result.push(...node.v)
+        } else {
+          result.push(node.v)
+        }
+        traverse(node.l)
+        traverse(node.r)
+      } else {
+        traverse(node.r)
+      }
+    }
+    traverse(this.root)
+    return result
+  }
+
+  public lessThan(key: K, inclusive = false): V[] {
+    const result: V[] = []
+    const traverse = (node: Nullable<AVLNode<K, V>>) => {
+      if (!node) return
+      if ((inclusive && node.k <= key) || (!inclusive && node.k < key)) {
+        if (Array.isArray(node.v)) {
+          result.push(...node.v)
+        } else {
+          result.push(node.v)
+        }
+        traverse(node.l)
+        traverse(node.r)
+      } else {
+        traverse(node.l)
+      }
+    }
+    traverse(this.root)
+    return result
+  }
 }
