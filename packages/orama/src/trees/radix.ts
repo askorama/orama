@@ -12,11 +12,17 @@ interface FindParams {
 type FindResult = Record<string, InternalDocumentID[]>
 
 export class RadixNode {
+  // Node key
   public k: string
+  // Node subword
   public s: string
+  // Node children
   public c: Map<string, RadixNode> = new Map()
+  // Node documents
   public d: Set<InternalDocumentID> = new Set()
+  // Node end
   public e: boolean
+  // Node word
   public w = ''
 
   constructor(key: string, subWord: string, end: boolean) {
@@ -320,25 +326,6 @@ export class RadixNode {
     return true
   }
 
-  public toJSON(): object {
-    return {
-      w: this.w,
-      s: this.s,
-      e: this.e,
-      k: this.k,
-      d: Array.from(this.d),
-      c: Array.from(this.c.entries()).map(([key, node]) => [key, node.toJSON()])
-    }
-  }
-
-  public static fromJSON(json: any): RadixNode {
-    const node = new RadixNode(json.k, json.s, json.e)
-    node.w = json.w
-    node.d = new Set(json.d)
-    node.c = new Map(json.c.map(([key, nodeJson]: [string, any]) => [key, RadixNode.fromJSON(nodeJson)]))
-    return node
-  }
-
   private static getCommonPrefix(a: string, b: string): string {
     let commonPrefix = ''
     const len = Math.min(a.length, b.length)
@@ -349,6 +336,25 @@ export class RadixNode {
       commonPrefix += a[i]
     }
     return commonPrefix
+  }
+
+  public toJSON(): object {
+    return {
+      w: this.w,
+      s: this.s,
+      e: this.e,
+      k: this.k,
+      d: Array.from(this.d),
+      c: Array.from(this.c?.entries())?.map(([key, node]) => [key, node.toJSON()])
+    }
+  }
+
+  public static fromJSON(json: any): RadixNode {
+    const node = new RadixNode(json.k, json.s, json.e)
+    node.w = json.w
+    node.d = new Set(json.d)
+    node.c = new Map(json?.c?.map(([key, nodeJson]: [string, any]) => [key, RadixNode.fromJSON(nodeJson)]))
+    return node
   }
 }
 
@@ -364,7 +370,7 @@ export class RadixTree extends RadixNode {
     tree.e = json.e
     tree.k = json.k
     tree.d = new Set(json.d)
-    tree.c = new Map(json.c.map(([key, nodeJson]: [string, any]) => [key, RadixNode.fromJSON(nodeJson)]))
+    tree.c = new Map(json.c?.map(([key, nodeJson]: [string, any]) => [key, RadixNode.fromJSON(nodeJson)]))
     return tree
   }
 

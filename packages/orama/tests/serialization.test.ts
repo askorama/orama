@@ -3,17 +3,17 @@ import { DocumentsStore } from '../src/components/documents-store.js'
 import { Index } from '../src/components/index.js'
 import { getInternalDocumentId } from '../src/components/internal-document-id-store.js'
 import { Result, create, insert, load, save, search } from '../src/index.js'
-import { RadixNode } from '../src/trees/radix.js'
+import { RadixTree } from '../src/trees/radix.js'
 import type { AnyDocument } from '../src/types.js'
 
 function extractOriginalDoc(result: Result<AnyDocument>[]): AnyDocument[] {
   return result.map(({ document }: AnyDocument) => document)
 }
 
-t.only('Edge getters', (t) => {
+t.test('Edge getters', (t) => {
   t.plan(4)
 
-  t.only('should correctly enable edge index getter', async (t) => {
+  t.test('should correctly enable edge index getter', async (t) => {
     t.plan(2)
 
     const db = create({
@@ -35,13 +35,14 @@ t.only('Edge getters', (t) => {
 
     const { index } = save(db)
     const nameIndex = (index as Index).indexes['name']
+    const newNameIndex = RadixTree.fromJSON(nameIndex.node)
 
     // Remember that tokenizers an stemmers sets content to lowercase
-    t.ok((nameIndex.node as RadixNode).contains('john'))
-    t.ok((nameIndex.node as RadixNode).contains('jane'))
+    t.ok(newNameIndex.contains('john'))
+    t.ok(newNameIndex.contains('jane'))
   })
 
-  t.only('should correctly enable edge docs getter', async (t) => {
+  t.test('should correctly enable edge docs getter', async (t) => {
     t.plan(2)
 
     const db = create({
@@ -73,7 +74,7 @@ t.only('Edge getters', (t) => {
     })
   })
 
-  t.only('should correctly enable index setter', async (t) => {
+  t.test('should correctly enable index setter', async (t) => {
     t.plan(6)
 
     const db = create({
@@ -133,7 +134,7 @@ t.only('Edge getters', (t) => {
     t.strictSame(extractOriginalDoc(search4.hits), [michele])
   })
 
-  t.only('should correctly save and load data', async (t) => {
+  t.test('should correctly save and load data', async (t) => {
     t.plan(2)
 
     const originalDB = await create({

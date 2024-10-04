@@ -635,12 +635,11 @@ export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentI
 
   for (const prop of Object.keys(rawIndexes)) {
     const { node, type, isArray } = rawIndexes[prop]
-
     switch (type) {
       case 'Radix':
         indexes[prop] = {
           type: 'Radix',
-          node: RadixNode.fromJSON(node),
+          node: RadixTree.fromJSON(node),
           isArray
         }
         break
@@ -713,15 +712,15 @@ export function save<R = unknown>(index: Index): R {
   const savedIndexes: any = {}
   for (const name of Object.keys(indexes)) {
     const { type, node, isArray } = indexes[name]
-    if (type !== 'Flat') {
+    if (type === 'Flat' || type === 'Radix') {
+      savedIndexes[name] = {
+        type,
+        node: node.toJSON(),
+        isArray
+      }
+    } else {
       savedIndexes[name] = indexes[name]
       savedIndexes[name].node = savedIndexes[name].node.toJSON()
-      continue
-    }
-    savedIndexes[name] = {
-      type: 'Flat',
-      node: node.toJSON(),
-      isArray
     }
   }
 
