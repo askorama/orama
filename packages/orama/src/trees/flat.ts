@@ -8,20 +8,6 @@ export class FlatTree {
     this.numberToDocumentId = new Map()
   }
 
-  static fromJSON(json: any): FlatTree {
-    const tree = new FlatTree()
-    for (const [key, ids] of json.numberToDocumentId) {
-      tree.numberToDocumentId.set(key, new Set(ids))
-    }
-    return tree
-  }
-
-  toJSON(): any {
-    return {
-      numberToDocumentId: Array.from(this.numberToDocumentId.entries()).map(([key, idSet]) => [key, Array.from(idSet)])
-    }
-  }
-
   insert(key: ScalarSearchableValue, value: InternalDocumentID): void {
     if (this.numberToDocumentId.has(key)) {
       this.numberToDocumentId.get(key)!.add(value)
@@ -127,6 +113,24 @@ export class FlatTree {
       }
       default:
         throw new Error('Invalid operation')
+    }
+  }
+
+  static fromJSON(json: any): FlatTree {
+    if (!json.numberToDocumentId) {
+      throw new Error('Invalid Flat Tree JSON')
+    }
+
+    const tree = new FlatTree()
+    for (const [key, ids] of json.numberToDocumentId) {
+      tree.numberToDocumentId.set(key, new Set(ids))
+    }
+    return tree
+  }
+
+  toJSON(): any {
+    return {
+      numberToDocumentId: Array.from(this.numberToDocumentId.entries()).map(([key, idSet]) => [key, Array.from(idSet)])
     }
   }
 }

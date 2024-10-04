@@ -184,7 +184,7 @@ t.test('enum', async (t) => {
   })
 
   t.test(`still serializable`, async (t) => {
-    const db1 = await create({
+    const db1 = create({
       schema: {
         categoryId: 'enum'
       } as const
@@ -197,14 +197,14 @@ t.test('enum', async (t) => {
       { categoryId: '5' }
     ])
 
-    const dump = await save(db1)
+    const dump = save(db1)
 
-    const db2 = await create({
+    const db2 = create({
       schema: {
         categoryId: 'enum'
       } as const
     })
-    await load(db2, dump)
+    load(db2, dump)
 
     const result1 = await search(db2, {
       term: '',

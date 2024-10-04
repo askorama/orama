@@ -30,6 +30,7 @@ import { AVLTree } from '../trees/avl.js'
 import { FlatTree } from '../trees/flat.js'
 import { RadixTree } from '../trees/radix.js'
 import { BKDTree } from '../trees/bkd.js'
+import { BoolNode } from '../trees/bool.js'
 
 import { convertDistanceToMeters, intersect, safeArrayPush, getOwnProperty } from '../utils.js'
 import { BM25 } from './algorithms.js'
@@ -52,11 +53,6 @@ export type FrequencyMap = {
   }
 }
 
-export type BooleanIndex = {
-  true: InternalDocumentID[]
-  false: InternalDocumentID[]
-}
-
 export type TreeType = 'AVL' | 'Radix' | 'Bool' | 'Flat' | 'BKD'
 
 export type TTree<T = TreeType, N = unknown> = {
@@ -68,7 +64,7 @@ export type TTree<T = TreeType, N = unknown> = {
 export type Tree =
   | TTree<'Radix', RadixNode>
   | TTree<'AVL', AVLTree<number, InternalDocumentID[]>>
-  | TTree<'Bool', BooleanIndex>
+  | TTree<'Bool', BoolNode>
   | TTree<'Flat', FlatTree>
   | TTree<'BKD', BKDTree>
 
@@ -225,7 +221,7 @@ export function create<T extends AnyOrama, TSchema extends T['schema']>(
       switch (type) {
         case 'boolean':
         case 'boolean[]':
-          index.indexes[path] = { type: 'Bool', node: { true: [], false: [] }, isArray }
+          index.indexes[path] = { type: 'Bool', node: new BoolNode(), isArray }
           break
         case 'number':
         case 'number[]':
@@ -274,7 +270,7 @@ function insertScalarBuilder(
     const { type, node } = index.indexes[prop]
     switch (type) {
       case 'Bool': {
-        node[value ? 'true' : 'false'].push(internalId)
+        node[value ? 'true' : 'false'].add(internalId)
         break
       }
       case 'AVL': {
@@ -371,10 +367,7 @@ function removeScalar(
       return true
     }
     case 'Bool': {
-      const booleanKey = value ? 'true' : 'false'
-      const position = node[booleanKey].indexOf(internalId)
-
-      node[value ? 'true' : 'false'].splice(position, 1)
+      node[value ? 'true' : 'false'].delete(internalId)
       return true
     }
     case 'Radix': {
@@ -494,7 +487,7 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
 
     if (type === 'Bool') {
       const idx = node
-      const filteredIDs = idx[operation.toString() as keyof BooleanIndex]
+      const filteredIDs = Array.from(operation ? idx.true : idx.false)
       safeArrayPush(filtersMap[param], filteredIDs)
       continue
     }
@@ -635,6 +628,7 @@ export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentI
 
   for (const prop of Object.keys(rawIndexes)) {
     const { node, type, isArray } = rawIndexes[prop]
+
     switch (type) {
       case 'Radix':
         indexes[prop] = {
@@ -646,7 +640,28 @@ export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentI
       case 'Flat':
         indexes[prop] = {
           type: 'Flat',
-          node: FlatTree.fromJSON({ numberToDocumentId: node }),
+          node: FlatTree.fromJSON(node),
+          isArray
+        }
+      break
+      case 'AVL':
+        indexes[prop] = {
+          type: 'AVL',
+          node: AVLTree.fromJSON(node),
+          isArray
+        }
+        break
+      case 'BKD':
+        indexes[prop] = {
+          type: 'BKD',
+          node: BKDTree.fromJSON(node),
+          isArray
+        }
+        break
+      case 'Bool':
+        indexes[prop] = {
+          type: 'Bool',
+          node: BoolNode.fromJSON(node),
           isArray
         }
         break
@@ -712,7 +727,7 @@ export function save<R = unknown>(index: Index): R {
   const savedIndexes: any = {}
   for (const name of Object.keys(indexes)) {
     const { type, node, isArray } = indexes[name]
-    if (type === 'Flat' || type === 'Radix') {
+    if (type === 'Flat' || type === 'Radix' || type === 'AVL' || type === 'BKD' || type === 'Bool') {
       savedIndexes[name] = {
         type,
         node: node.toJSON(),
