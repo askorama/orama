@@ -44,37 +44,42 @@ export class RadixNode {
   }
 
   public findAllWords(output: FindResult, term: string, exact?: boolean, tolerance?: number): FindResult {
-    if (this.e) {
-      const { w, d: docIDs } = this
+    const stack: RadixNode[] = [this]
+    while (stack.length > 0) {
+      const node = stack.pop()!
 
-      if (exact && w !== term) {
-        return {}
-      }
+      if (node.e) {
+        const { w, d: docIDs } = node
 
-      if (getOwnProperty(output, w) == null) {
-        if (tolerance) {
-          const difference = Math.abs(term.length - w.length)
+        if (exact && w !== term) {
+          continue
+        }
 
-          if (difference <= tolerance && syncBoundedLevenshtein(term, w, tolerance).isBounded) {
+        if (getOwnProperty(output, w) == null) {
+          if (tolerance) {
+            const difference = Math.abs(term.length - w.length)
+
+            if (difference <= tolerance && syncBoundedLevenshtein(term, w, tolerance).isBounded) {
+              output[w] = []
+            }
+          } else {
             output[w] = []
           }
-        } else {
-          output[w] = []
+        }
+
+        if (getOwnProperty(output, w) != null && docIDs.size > 0) {
+          const docs = new Set(output[w])
+
+          for (const docID of docIDs) {
+            docs.add(docID)
+          }
+          output[w] = Array.from(docs)
         }
       }
 
-      if (getOwnProperty(output, w) != null && docIDs.size > 0) {
-        const docs = new Set(output[w])
-
-        for (const docID of docIDs) {
-          docs.add(docID)
-        }
-        output[w] = Array.from(docs)
+      for (const [, childNode] of node.c) {
+        stack.push(childNode)
       }
-    }
-
-    for (const [, childNode] of this.c) {
-      childNode.findAllWords(output, term, exact, tolerance)
     }
     return output
   }
@@ -158,49 +163,61 @@ export class RadixNode {
     originalTolerance: number,
     output: FindResult
   ) {
-    if (tolerance < 0) {
-      return
-    }
+    const stack: Array<{ node: RadixNode; index: number; tolerance: number }> = [{ node: this, index, tolerance }]
 
-    if (this.w.startsWith(term)) {
-      this.findAllWords(output, term, false, 0)
-      return
-    }
+    while (stack.length > 0) {
+      const { node, index, tolerance } = stack.pop()!
 
-    if (this.e) {
-      const { w, d: docIDs } = this
-      if (w) {
-        if (syncBoundedLevenshtein(term, w, originalTolerance).isBounded) {
-          output[w] = []
-        }
-        if (getOwnProperty(output, w) != null && docIDs.size > 0) {
-          const docs = new Set(output[w])
+      if (tolerance < 0) {
+        continue
+      }
 
-          for (const docID of docIDs) {
-            docs.add(docID)
+      if (node.w.startsWith(term)) {
+        node.findAllWords(output, term, false, 0)
+        continue
+      }
+
+      if (node.e) {
+        const { w, d: docIDs } = node
+        if (w) {
+          if (syncBoundedLevenshtein(term, w, originalTolerance).isBounded) {
+            output[w] = []
           }
-          output[w] = Array.from(docs)
+          if (getOwnProperty(output, w) != null && docIDs.size > 0) {
+            const docs = new Set(output[w])
+
+            for (const docID of docIDs) {
+              docs.add(docID)
+            }
+            output[w] = Array.from(docs)
+          }
         }
       }
-    }
 
-    if (index >= term.length) {
-      return
-    }
+      if (index >= term.length) {
+        continue
+      }
 
-    if (this.c.has(term[index])) {
-      this.c.get(term[index])!._findLevenshtein(term, index + 1, tolerance, originalTolerance, output)
-    }
+      const currentChar = term[index]
 
-    this._findLevenshtein(term, index + 1, tolerance - 1, originalTolerance, output)
+      // 1. If node has child matching term[index], push { node: childNode, index +1, tolerance }
+      if (node.c.has(currentChar)) {
+        const childNode = node.c.get(currentChar)!
+        stack.push({ node: childNode, index: index + 1, tolerance })
+      }
 
-    for (const [, childNode] of this.c) {
-      childNode._findLevenshtein(term, index, tolerance - 1, originalTolerance, output)
-    }
+      // 2. Push { node, index +1, tolerance -1 } (Delete operation)
+      stack.push({ node: node, index: index + 1, tolerance: tolerance - 1 })
 
-    for (const [character, childNode] of this.c) {
-      if (character !== term[index]) {
-        childNode._findLevenshtein(term, index + 1, tolerance - 1, originalTolerance, output)
+      // 3. For each child:
+      for (const [character, childNode] of node.c) {
+        // a) Insert operation
+        stack.push({ node: childNode, index: index, tolerance: tolerance - 1 })
+
+        // b) Substitute operation
+        if (character !== currentChar) {
+          stack.push({ node: childNode, index: index + 1, tolerance: tolerance - 1 })
+        }
       }
     }
   }
