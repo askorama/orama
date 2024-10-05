@@ -1,3 +1,4 @@
+/* eslint-disable no-extra-semi */
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Nullable } from '../types.js'
 
@@ -105,27 +106,69 @@ export class AVLTree<K, V> {
       return new AVLNode(key, value)
     }
 
-    if (key < node.k) {
-      node.l = this.insertNode(node.l, key, value, rebalanceThreshold)
-    } else if (key > node.k) {
-      node.r = this.insertNode(node.r, key, value, rebalanceThreshold)
-    } else {
-      if (Array.isArray(node.v)) {
-        if (Array.isArray(value)) {
-          ;(node.v as any[]).push(...(value as V[]))
+    const path: Array<{ parent: Nullable<AVLNode<K, V>>; node: AVLNode<K, V> }> = []
+    let current = node
+    let parent: Nullable<AVLNode<K, V>> = null
+
+    while (current !== null) {
+      path.push({ parent, node: current })
+
+      if (key < current.k) {
+        if (current.l === null) {
+          current.l = new AVLNode(key, value)
+          path.push({ parent: current, node: current.l })
+          break
         } else {
-          ;(node.v as any[]).push(value)
+          parent = current
+          current = current.l
+        }
+      } else if (key > current.k) {
+        if (current.r === null) {
+          current.r = new AVLNode(key, value)
+          path.push({ parent: current, node: current.r })
+          break
+        } else {
+          parent = current
+          current = current.r
         }
       } else {
-        node.v = value
+        // Key already exists
+        if (Array.isArray(current.v)) {
+          if (Array.isArray(value)) {
+            ;(current.v as any[]).push(...(value as V[]))
+          } else {
+            ;(current.v as any[]).push(value)
+          }
+        } else {
+          current.v = value
+        }
+        return node
       }
-      return node
     }
 
-    node.updateHeight()
-
+    // Update heights and rebalance if necessary
+    let needRebalance = false
     if (this.insertCount++ % rebalanceThreshold === 0) {
-      return this.rebalanceNode(node)
+      needRebalance = true
+    }
+
+    for (let i = path.length - 1; i >= 0; i--) {
+      const { parent, node: currentNode } = path[i]
+      currentNode.updateHeight()
+
+      if (needRebalance) {
+        const rebalancedNode = this.rebalanceNode(currentNode)
+        if (parent) {
+          if (parent.l === currentNode) {
+            parent.l = rebalancedNode
+          } else if (parent.r === currentNode) {
+            parent.r = rebalancedNode
+          }
+        } else {
+          // This is the root node
+          node = rebalancedNode
+        }
+      }
     }
 
     return node
@@ -171,25 +214,40 @@ export class AVLTree<K, V> {
   }
 
   public getSize(): number {
-    const countNodes = (node: Nullable<AVLNode<K, V>>): number => {
-      if (!node) return 0
-      return 1 + countNodes(node.l) + countNodes(node.r)
+    let count = 0
+    const stack: Array<Nullable<AVLNode<K, V>>> = []
+    let current = this.root
+
+    while (current || stack.length > 0) {
+      while (current) {
+        stack.push(current)
+        current = current.l
+      }
+      current = stack.pop()!
+      count++
+      current = current.r
     }
-    return countNodes(this.root)
+
+    return count
   }
 
   public isBalanced(): boolean {
-    const checkBalanced = (node: Nullable<AVLNode<K, V>>): boolean => {
-      if (!node) return true
+    if (!this.root) return true
 
+    const stack: Array<AVLNode<K, V>> = [this.root]
+
+    while (stack.length > 0) {
+      const node = stack.pop()!
       const balanceFactor = node.getBalanceFactor()
       if (Math.abs(balanceFactor) > 1) {
         return false
       }
 
-      return checkBalanced(node.l) && checkBalanced(node.r)
+      if (node.l) stack.push(node.l)
+      if (node.r) stack.push(node.r)
     }
-    return checkBalanced(this.root)
+
+    return true
   }
 
   public remove(key: K): void {
@@ -204,9 +262,10 @@ export class AVLTree<K, V> {
     }
 
     if ((node.v as unknown as Set<V>).size === 1) {
-      this.removeNode(node, key)
+      this.root = this.removeNode(this.root, key)
+    } else {
+      ;(node.v as unknown as Set<V>) = new Set([...(node.v as unknown as Set<V>).values()].filter((v) => v !== id))
     }
-    ;(node.v as unknown as Set<V>) = new Set([...(node.v as unknown as Set<V>).values()].filter((v) => v !== id))
   }
 
   private findNodeByKey(key: K): Nullable<AVLNode<K, V>> {
@@ -224,91 +283,162 @@ export class AVLTree<K, V> {
   }
 
   private removeNode(node: Nullable<AVLNode<K, V>>, key: K): Nullable<AVLNode<K, V>> {
-    if (!node) return null
+    if (node === null) return null
 
-    if (key < node.k) {
-      node.l = this.removeNode(node.l, key)
-    } else if (key > node.k) {
-      node.r = this.removeNode(node.r, key)
-    } else {
-      if (!node.l || !node.r) {
-        node = node.l || node.r
+    const path: Array<AVLNode<K, V>> = []
+    let current = node
+
+    while (current !== null && current.k !== key) {
+      path.push(current)
+      if (key < current.k) {
+        current = current.l!
       } else {
-        const minLargerNode = this.findMinNode(node.r)
-        node.k = minLargerNode.k
-        node.v = minLargerNode.v
-        node.r = this.removeNode(node.r, minLargerNode.k)
+        current = current.r!
       }
     }
 
-    if (!node) return null
-
-    node.updateHeight()
-    return this.rebalanceNode(node)
-  }
-
-  private findMinNode(node: AVLNode<K, V>): AVLNode<K, V> {
-    while (node.l) {
-      node = node.l
+    if (current === null) {
+      // Key not found
+      return node
     }
+
+    // Node with only one child or no child
+    if (current.l === null || current.r === null) {
+      const child = current.l ? current.l : current.r
+
+      if (path.length === 0) {
+        // Node to be deleted is root
+        node = child
+      } else {
+        const parent = path[path.length - 1]
+        if (parent.l === current) {
+          parent.l = child
+        } else {
+          parent.r = child
+        }
+      }
+    } else {
+      // Node with two children: Get the inorder successor
+      let successorParent = current
+      let successor = current.r
+
+      while (successor.l !== null) {
+        successorParent = successor
+        successor = successor.l
+      }
+
+      // Copy the successor's content to current node
+      current.k = successor.k
+      current.v = successor.v
+
+      // Delete the successor
+      if (successorParent.l === successor) {
+        successorParent.l = successor.r
+      } else {
+        successorParent.r = successor.r
+      }
+
+      current = successorParent
+    }
+
+    // Update heights and rebalance
+    path.push(current)
+    for (let i = path.length - 1; i >= 0; i--) {
+      const currentNode = path[i]
+      currentNode.updateHeight()
+      const rebalancedNode = this.rebalanceNode(currentNode)
+      if (i > 0) {
+        const parent = path[i - 1]
+        if (parent.l === currentNode) {
+          parent.l = rebalancedNode
+        } else if (parent.r === currentNode) {
+          parent.r = rebalancedNode
+        }
+      } else {
+        // Root node
+        node = rebalancedNode
+      }
+    }
+
     return node
   }
 
   public rangeSearch(min: K, max: K): V[] {
     const result: V[] = []
-    const traverse = (node: Nullable<AVLNode<K, V>>) => {
-      if (!node) return
-      if (min < node.k) traverse(node.l)
-      if (node.k >= min && node.k <= max) {
-        if (Array.isArray(node.v)) {
-          result.push(...node.v)
+    const stack: Array<AVLNode<K, V>> = []
+    let current = this.root
+
+    while (current || stack.length > 0) {
+      while (current) {
+        stack.push(current)
+        current = current.l
+      }
+      current = stack.pop()!
+      if (current.k >= min && current.k <= max) {
+        if (Array.isArray(current.v)) {
+          result.push(...current.v)
         } else {
-          result.push(node.v)
+          result.push(current.v)
         }
       }
-      if (max > node.k) traverse(node.r)
+      if (current.k > max) {
+        break
+      }
+      current = current.r
     }
-    traverse(this.root)
+
     return result
   }
 
   public greaterThan(key: K, inclusive = false): V[] {
     const result: V[] = []
-    const traverse = (node: Nullable<AVLNode<K, V>>) => {
-      if (!node) return
-      if ((inclusive && node.k >= key) || (!inclusive && node.k > key)) {
-        if (Array.isArray(node.v)) {
-          result.push(...node.v)
-        } else {
-          result.push(node.v)
-        }
-        traverse(node.l)
-        traverse(node.r)
-      } else {
-        traverse(node.r)
+    const stack: Array<AVLNode<K, V>> = []
+    let current = this.root
+
+    while (current || stack.length > 0) {
+      while (current) {
+        stack.push(current)
+        current = current.r // Traverse right subtree first
       }
+      current = stack.pop()!
+      if ((inclusive && current.k >= key) || (!inclusive && current.k > key)) {
+        if (Array.isArray(current.v)) {
+          result.push(...current.v)
+        } else {
+          result.push(current.v)
+        }
+      } else if (current.k <= key) {
+        break // Since we're traversing in descending order, we can break early
+      }
+      current = current.l
     }
-    traverse(this.root)
+
     return result
   }
 
   public lessThan(key: K, inclusive = false): V[] {
     const result: V[] = []
-    const traverse = (node: Nullable<AVLNode<K, V>>) => {
-      if (!node) return
-      if ((inclusive && node.k <= key) || (!inclusive && node.k < key)) {
-        if (Array.isArray(node.v)) {
-          result.push(...node.v)
-        } else {
-          result.push(node.v)
-        }
-        traverse(node.l)
-        traverse(node.r)
-      } else {
-        traverse(node.l)
+    const stack: Array<AVLNode<K, V>> = []
+    let current = this.root
+
+    while (current || stack.length > 0) {
+      while (current) {
+        stack.push(current)
+        current = current.l
       }
+      current = stack.pop()!
+      if ((inclusive && current.k <= key) || (!inclusive && current.k < key)) {
+        if (Array.isArray(current.v)) {
+          result.push(...current.v)
+        } else {
+          result.push(current.v)
+        }
+      } else if (current.k > key) {
+        break // Since we're traversing in ascending order, we can break early
+      }
+      current = current.r
     }
-    traverse(this.root)
+
     return result
   }
 }
