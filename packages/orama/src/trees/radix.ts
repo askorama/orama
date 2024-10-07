@@ -47,42 +47,50 @@ export class RadixNode {
     const stack: RadixNode[] = [this]
     while (stack.length > 0) {
       const node = stack.pop()!
-
+  
       if (node.e) {
         const { w, d: docIDs } = node
-
+  
         if (exact && w !== term) {
           continue
         }
 
-        if (getOwnProperty(output, w) == null) {
+        // check if _output[w] exists and then add the doc to it
+        // always check in own property to prevent access to inherited properties
+        // fix https://github.com/askorama/orama/issues/137
+        if (getOwnProperty(output, w) !== null) {
           if (tolerance) {
             const difference = Math.abs(term.length - w.length)
-
+  
             if (difference <= tolerance && syncBoundedLevenshtein(term, w, tolerance).isBounded) {
               output[w] = []
+            } else {
+              continue
             }
           } else {
             output[w] = []
           }
-        }
+        }        
 
+        // check if _output[w] exists and then add the doc to it
+        // always check in own property to prevent access to inherited properties
+        // fix https://github.com/askorama/orama/issues/137
         if (getOwnProperty(output, w) != null && docIDs.size > 0) {
-          const docs = new Set(output[w])
-
+          const docs = output[w]
           for (const docID of docIDs) {
-            docs.add(docID)
+            if (!docs.includes(docID)) {
+              docs.push(docID)
+            }
           }
-          output[w] = Array.from(docs)
         }
       }
-
-      for (const [, childNode] of node.c) {
-        stack.push(childNode)
+  
+      if (node.c.size > 0) {
+        stack.push(...node.c.values())
       }
     }
     return output
-  }
+  }  
 
   public insert(word: string, docId: InternalDocumentID): void {
     let node: RadixNode = this
