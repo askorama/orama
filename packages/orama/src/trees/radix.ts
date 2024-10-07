@@ -260,28 +260,34 @@ export class RadixNode {
 
   public contains(term: string): boolean {
     let node: RadixNode = this
+    let i = 0
     const termLength = term.length
-    for (let i = 0; i < termLength; i++) {
+  
+    while (i < termLength) {
       const character = term[i]
-
-      if (node.c.has(character)) {
-        const childNode = node.c.get(character)!
+      const childNode = node.c.get(character)
+  
+      if (childNode) {
         const edgeLabel = childNode.s
-        const termSubstring = term.substring(i)
-        const commonPrefix = RadixNode.getCommonPrefix(edgeLabel, termSubstring)
-        const commonPrefixLength = commonPrefix.length
-
-        if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
+        const edgeLabelLength = edgeLabel.length
+        let j = 0
+  
+        while (j < edgeLabelLength && i + j < termLength && edgeLabel[j] === term[i + j]) {
+          j++
+        }
+  
+        if (j < edgeLabelLength) {
           return false
         }
-        i += childNode.s.length - 1
+  
+        i += edgeLabelLength
         node = childNode
       } else {
         return false
       }
     }
     return true
-  }
+  }  
 
   public removeWord(term: string): boolean {
     if (!term) {

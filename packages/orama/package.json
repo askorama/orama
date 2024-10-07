@@ -90,6 +90,7 @@
     "url": "https://github.com/askorama/orama"
   },
   "scripts": {
+    "benchmark": "node ../../benchmarks/index.js",
     "predev": "rm -rf dist && mkdir dist",
     "dev": "swc -s -w --extensions .ts,.cts -d dist src",
     "prebuild": "npm run lint",
