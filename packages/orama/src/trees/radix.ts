@@ -245,34 +245,55 @@ export class RadixNode {
       return output
     } else {
       let node: RadixNode = this
+      let i = 0
       const termLength = term.length
-      for (let i = 0; i < termLength; i++) {
+  
+      while (i < termLength) {
         const character = term[i]
-        if (node.c.has(character)) {
-          const childNode = node.c.get(character)!
+        const childNode = node.c.get(character)
+  
+        if (childNode) {
           const edgeLabel = childNode.s
-          const termSubstring = term.substring(i)
-
-          const commonPrefix = RadixNode.getCommonPrefix(edgeLabel, termSubstring)
-          const commonPrefixLength = commonPrefix.length
-          if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
-            if (tolerance) break
+          const edgeLabelLength = edgeLabel.length
+          let j = 0
+  
+          // Compare edge label with the term starting from position i
+          while (j < edgeLabelLength && i + j < termLength && edgeLabel[j] === term[i + j]) {
+            j++
+          }
+  
+          if (j === edgeLabelLength) {
+            // Full match of edge label; proceed to the child node
+            node = childNode
+            i += j
+          } else if (i + j === termLength) {
+            // The term ends in the middle of the edge label
+            if (exact) {
+              // Exact match required but term doesn't end at a node
+              return {}
+            } else {
+              // Partial match; collect words starting from this node
+              const output: FindResult = {}
+              childNode.findAllWords(output, term, exact, tolerance)
+              return output
+            }
+          } else {
+            // Mismatch found
             return {}
           }
-
-          i += childNode.s.length - 1
-          node = childNode
         } else {
+          // No matching child node
           return {}
         }
       }
-
+  
+      // Term fully matched; collect words starting from this node
       const output: FindResult = {}
       node.findAllWords(output, term, exact, tolerance)
       return output
     }
   }
-
+  
   public contains(term: string): boolean {
     let node: RadixNode = this
     let i = 0
