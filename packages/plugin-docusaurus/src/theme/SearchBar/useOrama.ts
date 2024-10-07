@@ -9,12 +9,25 @@ import { ungzip } from 'pako'
 import { OramaClient } from '@oramacloud/client'
 import { create, insertMultiple } from '@orama/orama'
 import { pluginAnalytics } from '@orama/plugin-analytics'
-import {DOCS_PRESET_SCHEMA} from '../../utils'
+import { DOCS_PRESET_SCHEMA } from '../../utils'
+
+export interface PluginData {
+  searchData: {
+    current: { data: ArrayBuffer } | null
+  },
+  searchBoxCustomConfig?: { [key:string]: any }
+  endpoint: { url: string; key: string } | null
+  analytics: { apiKey: string; indexId: string; enabled: boolean } | null
+  docsInstances: string[]
+}
 
 export const useOrama = () => {
-  const [searchBoxConfig, setSearchBoxConfig] = useState(null)
+  const [searchBoxConfig, setSearchBoxConfig] = useState({
+    basic: null,
+    custom: null
+  })
   const { colorMode } = useColorMode()
-  const { searchData, endpoint, analytics }: PluginData = usePluginData('@orama/plugin-docusaurus') as PluginData
+  const { searchData, endpoint, analytics, searchBoxCustomConfig }: PluginData = usePluginData('@orama/plugin-docusaurus') as PluginData
 
   const baseURL = useBaseUrl('orama-search-index-current.json.gz')
   const isBrowser = useIsBrowser()
@@ -69,8 +82,11 @@ export const useOrama = () => {
       }
 
       setSearchBoxConfig({
-        clientInstance: oramaInstance,
-        disableChat: !endpoint?.url
+        basic: {
+          clientInstance: oramaInstance,
+          disableChat: !endpoint?.url
+        },
+        custom: searchBoxCustomConfig
       })
     }
 

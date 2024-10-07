@@ -30,7 +30,8 @@ type PluginOptions = {
     apiKey: string
     indexId: string
   }
-  cloud?: CloudConfig
+  cloud?: CloudConfig,
+  searchbox?: { [key:string]: any }
 }
 
 export default function OramaPluginDocusaurus(
@@ -59,7 +60,7 @@ export default function OramaPluginDocusaurus(
 
     async contentLoaded({ actions, allContent }) {
       const isDevelopment =
-        process.env.NODE_ENV === 'development' || (options.cloud && !options.cloud?.oramaCloudAPIKey)
+        process.env.NODE_ENV === 'development' || !options.cloud?.oramaCloudAPIKey || !options.cloud?.deploy
       const docsInstances: string[] = []
       const oramaCloudAPIKey = options.cloud?.oramaCloudAPIKey
       const searchDataConfig = [
@@ -160,7 +161,8 @@ export default function OramaPluginDocusaurus(
         actions.setGlobalData({
           searchData: Object.fromEntries([['current', readFileSync(indexPath(ctx.generatedFilesDir, 'current'))]]),
           docsInstances,
-          availableVersions: versions
+          availableVersions: versions,
+          searchBoxCustomConfig: options.searchbox ?? {}
         })
       } else {
         const deployConfig = options.cloud && {
@@ -180,6 +182,7 @@ export default function OramaPluginDocusaurus(
           docsInstances,
           availableVersions: versions,
           analytics: options.analytics,
+          searchBoxCustomConfig: options.searchbox ?? {},
           endpoint: {
             url: endpointConfig?.endpoint,
             key: endpointConfig?.public_api_key
