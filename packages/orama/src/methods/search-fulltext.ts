@@ -7,6 +7,7 @@ import { Language } from '../components/tokenizer/languages.js'
 import { createError } from '../errors.js'
 import type {
   AnyOrama,
+  BM25Params,
   CustomSorterFunctionItem,
   ElapsedTime,
   Results,
@@ -15,11 +16,12 @@ import type {
   TypedDocument
 } from '../types.js'
 import { getNanosecondsTime, removeVectorsFromHits, sortTokenScorePredicate } from '../utils.js'
+import { count } from './docs.js'
 import { fetchDocuments, fetchDocumentsWithDistinct } from './search.js'
 
 export function innerFullTextSearch<T extends AnyOrama>(
   orama: T,
-  params: Pick<SearchParamsFullText<T>, 'term' | 'properties' | 'where' | 'exact' | 'tolerance' | 'boost'>,
+  params: Pick<SearchParamsFullText<T>, 'term' | 'properties' | 'where' | 'exact' | 'tolerance' | 'boost' | 'relevance'>,
   language: Language | undefined
 ) {
   const { term, properties } = params
@@ -54,6 +56,8 @@ export function innerFullTextSearch<T extends AnyOrama>(
   // - or we have properties to search
   //   in this case, we need to return all the documents that contains at least one of the given properties
   if (term || properties) {
+
+    const docsCount = count(orama)
     uniqueDocsIDs = orama.index.search(
       index,
       term || '',
@@ -62,7 +66,9 @@ export function innerFullTextSearch<T extends AnyOrama>(
       propertiesToSearch,
       params.exact || false,
       params.tolerance || 0,
-      params.boost || {}
+      params.boost || {},
+      applyDefault(params.relevance),
+      docsCount,
     )
   } else {
     // Tokenizer returns empty array and the search term is empty as well.
@@ -173,4 +179,18 @@ export function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocumen
   }
 
   return performSearchLogic()
+}
+
+
+export const defaultBM25Params: BM25Params = {
+  k: 1.2,
+  b: 0.75,
+  d: 0.5
+}
+function applyDefault(bm25Relevance?: BM25Params): Required<BM25Params> {
+  const r = bm25Relevance ?? {}
+  r.k = r.k ?? defaultBM25Params.k;
+  r.b = r.b ?? defaultBM25Params.b;
+  r.d = r.d ?? defaultBM25Params.d;
+  return r as Required<BM25Params>
 }

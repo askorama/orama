@@ -11,10 +11,8 @@ import {
   removeMultiple,
   search
 } from '../src/index.js'
-import { RadixTree } from '../src/trees/radix.js'
 
-
-t.test('remove method', async (t) => {
+t.test('remove method', (t) => {
   t.test('removes the given document', async (t) => {
     const [db, id1, id2, id3, id4] = createSimpleDB()
 
@@ -66,6 +64,8 @@ t.test('remove method', async (t) => {
   })
 
   t.test('remove index also for nested field', async (t) => {
+    t.plan(5)
+
     const [db, id1, id2] = createSimpleDB()
 
     const r1_gt = await search(db, {
@@ -98,6 +98,8 @@ t.test('remove method', async (t) => {
 
   // Tests for https://github.com/askorama/orama/issues/52
   t.test('should correctly remove documents via substring search', async (t) => {
+    t.plan(1)
+
     const orama = await create({
       schema: {
         word: 'string'
@@ -117,7 +119,7 @@ t.test('remove method', async (t) => {
     t.equal(searchResult.count, 2)
   })
 
-  t.test('should preserve identical docs after deletion', async (t) => {
+  t.test('should preserve identical docs after deletion', (t) => {
     t.test('- delete old document', async (t) => {
       const [db, id1] = createSimpleDB()
       const doc = getByID(db, id1)!
@@ -171,7 +173,7 @@ t.test('remove method', async (t) => {
     t.end()
   })
 
-  t.test('should throw an error on unknown document', async (t) => {
+  t.test('should throw an error on unknown document', (t) => {
     const [db] = createSimpleDB()
     t.equal(remove(db, 'unknown index id'), false)
     t.end()
@@ -189,7 +191,7 @@ t.test('remove method', async (t) => {
   t.end()
 })
 
-t.test('removeMultiple method', async (t) => {
+t.test('removeMultiple method', (t) => {
   t.test('should remove all the given items', async (t) => {
     const [db, id1, id2, id3, id4] = createSimpleDB()
 
@@ -248,11 +250,12 @@ t.test('removeMultiple method', async (t) => {
 })
 
 t.test('should remove a document and update index field length', async (t) => {
+  t.plan(2)
+
   const [db] = createSimpleDB()
 
-  const name = (db.data.index as Index).indexes['name'] as RadixTree
-  const fieldQuantums = { ...name.tokenQuantums }
-  const fieldTokensLength = new Map(name.tokensLength)
+  const fieldLengths = { ...(db.data.index as Index).fieldLengths }
+  const avgFieldLength = { ...(db.data.index as Index).avgFieldLength }
 
   const id4 = insert(db, {
     name: 'other machine',
@@ -262,18 +265,16 @@ t.test('should remove a document and update index field length', async (t) => {
       sales: 100
     }
   })
-
-  t.notSame(name.tokenQuantums, fieldQuantums)
-  t.notSame(name.tokensLength, fieldTokensLength)
-
   remove(db, id4 as string)
 
-  t.same(name.tokenQuantums, fieldQuantums)
-  t.same(name.tokensLength, fieldTokensLength)
+  t.same((db.data.index as Index).fieldLengths, fieldLengths)
+  t.same((db.data.index as Index).avgFieldLength, avgFieldLength)
 })
 
 // Test cases for issue https://github.com/askorama/orama/issues/486
 t.test('should correctly remove documents with vector properties', async (t) => {
+  t.plan(2)
+
   const db = await create({
     schema: {
       name: 'string',

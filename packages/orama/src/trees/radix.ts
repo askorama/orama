@@ -1,38 +1,7 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { syncBoundedLevenshtein } from '../components/levenshtein.js'
 import { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getOwnProperty } from '../utils.js'
-import { Tokenizer } from '../types.js'
-
-export class Node {
-  constructor(key: string, subWord: string, end: boolean) {
-    this.k = key
-    this.s = subWord
-    this.e = end
-  }
-
-  // Node key
-  public k: string
-  // Node subword
-  public s: string
-  // Node children
-  public c: Record<string, Node> = {}
-  // Node documents
-  public d: InternalDocumentID[] = []
-  // Node end
-  public e: boolean
-  // Node word
-  public w = ''
-
-  public toJSON(): object {
-    return {
-      w: this.w,
-      s: this.s,
-      c: this.c,
-      d: this.d,
-      e: this.e
-    }
-  }
-}
 
 interface FindParams {
   term: string
@@ -42,482 +11,387 @@ interface FindParams {
 
 type FindResult = Record<string, InternalDocumentID[]>
 
-function updateParent(node: Node, parent: Node): void {
-  node.w = parent.w + node.s
-}
+export class RadixNode {
+  // Node key
+  public k: string
+  // Node subword
+  public s: string
+  // Node children
+  public c: Map<string, RadixNode> = new Map()
+  // Node documents
+  public d: Set<InternalDocumentID> = new Set()
+  // Node end
+  public e: boolean
+  // Node word
+  public w = ''
 
-function addDocument(node: Node, docID: InternalDocumentID): void {
-  node.d.push(docID)
-}
-
-function removeDocument(node: Node, docID: InternalDocumentID): boolean {
-  const index = node.d.indexOf(docID)
-
-  /* c8 ignore next 3 */
-  if (index === -1) {
-    return false
+  constructor(key: string, subWord: string, end: boolean) {
+    this.k = key
+    this.s = subWord
+    this.e = end
   }
 
-  node.d.splice(index, 1)
+  public updateParent(parent: RadixNode): void {
+    this.w = parent.w + this.s
+  }
 
-  return true
-}
+  public addDocument(docID: InternalDocumentID): void {
+    this.d.add(docID)
+  }
 
-function findAllWords(node: Node, output: FindResult, term: string, exact?: boolean, tolerance?: number) {
-  if (node.e) {
-    const { w, d: docIDs } = node
+  public removeDocument(docID: InternalDocumentID): boolean {
+    return this.d.delete(docID)
+  }
 
-    if (exact && w !== term) {
-      return {}
-    }
+  public findAllWords(output: FindResult, term: string, exact?: boolean, tolerance?: number): FindResult {
+    const stack: RadixNode[] = [this]
+    while (stack.length > 0) {
+      const node = stack.pop()!
 
-    // always check in own property to prevent access to inherited properties
-    // fix https://github.com/askorama/orama/issues/137
-    if (getOwnProperty(output, w) == null) {
-      if (tolerance) {
-        // computing the absolute difference of letters between the term and the word
-        const difference = Math.abs(term.length - w.length)
+      if (node.e) {
+        const { w, d: docIDs } = node
 
-        // if the tolerance is set, check whether the edit distance is within tolerance.
-        // In that case, we don't need to add the word to the output
-        if (difference <= tolerance && syncBoundedLevenshtein(term, w, tolerance).isBounded) {
-          output[w] = []
+        if (exact && w !== term) {
+          continue
         }
-      } else {
-        // prevent default tolerance not set
-        output[w] = []
-      }
-    }
 
-    // check if _output[w] exists and then add the doc to it
-    // always check in own property to prevent access to inherited properties
-    // fix https://github.com/askorama/orama/issues/137
-    if (getOwnProperty(output, w) != null && docIDs.length > 0) {
-      const docs = new Set(output[w])
+        if (getOwnProperty(output, w) == null) {
+          if (tolerance) {
+            const difference = Math.abs(term.length - w.length)
 
-      const docIDsLength = docIDs.length
-      for (let i = 0; i < docIDsLength; i++) {
-        docs.add(docIDs[i])
-      }
-      output[w] = Array.from(docs)
-    }
-  }
-
-  // recursively search the children
-  for (const character of Object.keys(node.c)) {
-    findAllWords(node.c[character], output, term, exact, tolerance)
-  }
-  return output
-}
-
-export function getCommonPrefix(a: string, b: string) {
-  let commonPrefix = ''
-  const len = Math.min(a.length, b.length)
-  for (let i = 0; i < len; i++) {
-    if (a[i] !== b[i]) {
-      return commonPrefix
-    }
-    commonPrefix += a[i]
-  }
-  return commonPrefix
-}
-
-export const RadixType = 'Radix' as const
-export interface RadixTree {
-  type: typeof RadixType
-  node: Node
-  isArray: boolean
-  tokensLength: Map<number, number>
-  tokenQuantums: Record<number, Record<string, number>>
-}
-
-function createNode(end = false, subWord = '', key = ''): Node {
-  return new Node(key, subWord, end)
-}
-
-export function create(end: boolean, subWord: string, key: string, isArray: boolean): RadixTree {
-  return {
-    type: RadixType,
-    node: new Node(key, subWord, end),
-    isArray,
-    tokensLength: new Map(),
-    tokenQuantums: {}
-  }
-}
-
-function insertInner(tree: RadixTree, word: string, docId: InternalDocumentID) {
-  let root = tree.node
-
-  const wordLength = word.length
-  for (let i = 0; i < wordLength; i++) {
-    const currentCharacter = word[i]
-    const wordAtIndex = word.substring(i)
-    const rootChildCurrentChar = root.c[currentCharacter]
-
-    if (rootChildCurrentChar) {
-      const edgeLabel = rootChildCurrentChar.s
-      const edgeLabelLength = edgeLabel.length
-
-      const commonPrefix = getCommonPrefix(edgeLabel, wordAtIndex)
-      const commonPrefixLength = commonPrefix.length
-
-      // the wordAtIndex matches exactly with an existing child node
-      if (edgeLabel === wordAtIndex) {
-        addDocument(rootChildCurrentChar, docId)
-        rootChildCurrentChar.e = true
-        return
-      }
-
-      const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength]
-      // the wordAtIndex is completely contained in the child node subword
-      if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
-        const newNode = createNode(true, wordAtIndex, currentCharacter) // Create a new node with end set to true
-        newNode.c[edgeLabelAtCommonPrefix] = rootChildCurrentChar
-
-        const newNodeChild = newNode.c[edgeLabelAtCommonPrefix]
-        newNodeChild.s = edgeLabel.substring(commonPrefixLength)
-        newNodeChild.k = edgeLabelAtCommonPrefix
-
-        root.c[currentCharacter] = newNode
-
-        updateParent(newNode, root)
-        updateParent(newNodeChild, newNode)
-        addDocument(newNode, docId)
-        return
-      }
-
-      // the wordAtIndex is partially contained in the child node subword
-      if (commonPrefixLength < edgeLabelLength && commonPrefixLength < wordAtIndex.length) {
-        const inbetweenNode = createNode(false, commonPrefix, currentCharacter)
-        inbetweenNode.c[edgeLabelAtCommonPrefix] = rootChildCurrentChar
-        root.c[currentCharacter] = inbetweenNode
-
-        const inbetweenNodeChild = inbetweenNode.c[edgeLabelAtCommonPrefix]
-        inbetweenNodeChild.s = edgeLabel.substring(commonPrefixLength)
-        inbetweenNodeChild.k = edgeLabelAtCommonPrefix
-
-        const wordAtCommonPrefix = wordAtIndex[commonPrefixLength]
-        const newNode = createNode(true, word.substring(i + commonPrefixLength), wordAtCommonPrefix)
-        addDocument(newNode, docId)
-
-        inbetweenNode.c[wordAtCommonPrefix] = newNode
-
-        updateParent(inbetweenNode, root)
-        updateParent(newNode, inbetweenNode)
-        updateParent(inbetweenNodeChild, inbetweenNode)
-        return
-      }
-
-      // skip to the next divergent character
-      i += edgeLabelLength - 1
-      // navigate in the child node
-      root = rootChildCurrentChar
-    } else {
-      // if the node for the current character doesn't exist create new node
-      const newNode = createNode(true, wordAtIndex, currentCharacter)
-      addDocument(newNode, docId)
-
-      root.c[currentCharacter] = newNode
-      updateParent(newNode, root)
-      return
-    }
-  }
-}
-
-export function insert(
-  tree: RadixTree,
-  value: string,
-  docId: InternalDocumentID,
-  tokenizer: Tokenizer,
-  language: string | undefined,
-  prop: string
-) {
-  const quantums = value.split(/\.|\?|!/)
-
-  tree.tokenQuantums[docId] = {}
-
-  let quantumIndex = 0
-  let tokenNumber = 0
-  for (const quantum of quantums) {
-    const tokens = tokenizer.tokenize(quantum, language, prop)
-
-    for (const token of tokens) {
-      tokenNumber++
-
-      if (!tree.tokenQuantums[docId][token]) {
-        tree.tokenQuantums[docId][token] = 0
-      }
-
-      const tokenBitIndex = Math.min(quantumIndex, 20)
-
-      tree.tokenQuantums[docId][token] = calculateTokenQuantum(tree.tokenQuantums[docId][token], tokenBitIndex)
-      if (tree.tokenQuantums[docId][token] < 0) {
-        throw new Error('Overflow')
-      }
-
-      insertInner(tree, token, docId)
-    }
-
-    // Don't increment the quantum index if the sentence is too short
-    if (tokens.length > 1) {
-      quantumIndex++
-    }
-  }
-
-  tree.tokensLength.set(docId, tokenNumber)
-}
-
-export function calculateTokenQuantum(prevValue: number, bit: number) {
-  if (prevValue < 0) {
-    throw new Error('Overflow')
-  }
-  if (bit < 0 || bit > 20) {
-    throw new Error('Invalid bit')
-  }
-
-  const currentCount = count(prevValue)
-  const currentSentenceMask = bitmask_20(prevValue)
-  const newSentenceMask = currentSentenceMask | (1 << bit)
-  return ((currentCount + 1) << 20) | newSentenceMask
-}
-
-export function count(n: number) {
-  return n >> 20
-}
-const BIT_MASK_20 = 0b11111111111111111111
-export function bitmask_20(n: number) {
-  return n & BIT_MASK_20
-}
-export function numberOfOnes(n: number) {
-  let i = 0
-  do {
-    if (n & 1) {
-      ++i
-    }
-  } while ((n >>= 1))
-  return i
-}
-
-function _findLevenshtein(
-  node: Node,
-  term: string,
-  index: number,
-  tolerance: number,
-  originalTolerance: number,
-  output: FindResult
-) {
-  if (tolerance < 0) {
-    return
-  }
-
-  if (node.w.startsWith(term)) {
-    findAllWords(node, output, term, false, 0)
-    return
-  }
-
-  if (node.e) {
-    const { w, d: docIDs } = node
-    if (w) {
-      if (syncBoundedLevenshtein(term, w, originalTolerance).isBounded) {
-        output[w] = []
-      }
-      if (getOwnProperty(output, w) != null && docIDs.length > 0) {
-        const docs = new Set(output[w])
-
-        const docIDsLength = docIDs.length
-        for (let i = 0; i < docIDsLength; i++) {
-          docs.add(docIDs[i])
+            if (difference <= tolerance && syncBoundedLevenshtein(term, w, tolerance).isBounded) {
+              output[w] = []
+            }
+          } else {
+            output[w] = []
+          }
         }
-        output[w] = Array.from(docs)
+
+        if (getOwnProperty(output, w) != null && docIDs.size > 0) {
+          const docs = new Set(output[w])
+
+          for (const docID of docIDs) {
+            docs.add(docID)
+          }
+          output[w] = Array.from(docs)
+        }
+      }
+
+      for (const [, childNode] of node.c) {
+        stack.push(childNode)
       }
     }
-  }
-
-  if (index >= term.length) {
-    return
-  }
-
-  // Match current character without consuming tolerance
-  if (term[index] in node.c) {
-    _findLevenshtein(node.c[term[index]], term, index + 1, tolerance, originalTolerance, output)
-  }
-
-  // If tolerance is still available, consider other branches:
-  // 1. Deletion (skip the current term character)
-  _findLevenshtein(node, term, index + 1, tolerance - 1, originalTolerance, output)
-
-  // 2. Insertion (skip the current tree node character)
-  for (const character in node.c) {
-    _findLevenshtein(node.c[character], term, index, tolerance - 1, originalTolerance, output)
-  }
-
-  // 3. Substitution (skip both current term character and tree node character)
-  for (const character in node.c) {
-    if (character !== term[index]) {
-      _findLevenshtein(node.c[character], term, index + 1, tolerance - 1, originalTolerance, output)
-    }
-  }
-}
-
-export function find(tree: RadixTree, { term, exact, tolerance }: FindParams): FindResult {
-  let root = tree.node
-
-  // Find the closest node to the term
-
-  // Use `if` condition because tolerance `0` is supposed to match only prefix.
-  // (allows infinite insertions at end, which is against normal levenshtein logic).
-  // (new _findLevenshtein only handles not exact and tolerance>0 condition)
-  if (tolerance && !exact) {
-    const output: FindResult = {}
-    tolerance = tolerance || 0
-
-    _findLevenshtein(root, term, 0, tolerance || 0, tolerance, output)
     return output
-  } else {
-    const termLength = term.length
-    for (let i = 0; i < termLength; i++) {
-      const character = term[i]
-      if (character in root.c) {
-        const rootChildCurrentChar = root.c[character]
-        const edgeLabel = rootChildCurrentChar.s
-        const termSubstring = term.substring(i)
+  }
 
-        // find the common prefix between two words ex: prime and primate = prim
-        const commonPrefix = getCommonPrefix(edgeLabel, termSubstring)
+  public insert(word: string, docId: InternalDocumentID): void {
+    let node: RadixNode = this
+    const wordLength = word.length
+    for (let i = 0; i < wordLength; i++) {
+      const currentCharacter = word[i]
+      const wordAtIndex = word.substring(i)
+      const childNode = node.c.get(currentCharacter)
+
+      if (childNode) {
+        const edgeLabel = childNode.s
+        const edgeLabelLength = edgeLabel.length
+
+        const commonPrefix = RadixNode.getCommonPrefix(edgeLabel, wordAtIndex)
         const commonPrefixLength = commonPrefix.length
-        // if the common prefix length is equal to edgeLabel length (the node subword) it means they are a match
-        // if the common prefix is equal to the term means it is contained in the node
-        if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
-          // if tolerance is set we take the current node as the closest
-          if (tolerance) break
-          return {}
+
+        if (edgeLabel === wordAtIndex) {
+          childNode.addDocument(docId)
+          childNode.e = true
+          return
         }
 
-        // skip the subword length and check the next divergent character
-        i += rootChildCurrentChar.s.length - 1
-        // navigate into the child node
-        root = rootChildCurrentChar
+        const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength]
+        if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
+          const newNode = new RadixNode(currentCharacter, wordAtIndex, true)
+          newNode.c.set(edgeLabelAtCommonPrefix, childNode)
+
+          const newNodeChild = newNode.c.get(edgeLabelAtCommonPrefix)!
+          newNodeChild.s = edgeLabel.substring(commonPrefixLength)
+          newNodeChild.k = edgeLabelAtCommonPrefix
+
+          node.c.set(currentCharacter, newNode)
+
+          newNode.updateParent(node)
+          newNodeChild.updateParent(newNode)
+          newNode.addDocument(docId)
+          return
+        }
+
+        if (commonPrefixLength < edgeLabelLength && commonPrefixLength < wordAtIndex.length) {
+          const inbetweenNode = new RadixNode(currentCharacter, commonPrefix, false)
+          inbetweenNode.c.set(edgeLabel[commonPrefixLength], childNode)
+          node.c.set(currentCharacter, inbetweenNode)
+
+          const inbetweenNodeChild = inbetweenNode.c.get(edgeLabel[commonPrefixLength])!
+          inbetweenNodeChild.s = edgeLabel.substring(commonPrefixLength)
+          inbetweenNodeChild.k = edgeLabel[commonPrefixLength]
+
+          const wordAtCommonPrefix = wordAtIndex[commonPrefixLength]
+          const newNode = new RadixNode(wordAtCommonPrefix, word.substring(i + commonPrefixLength), true)
+          newNode.addDocument(docId)
+
+          inbetweenNode.c.set(wordAtCommonPrefix, newNode)
+
+          inbetweenNode.updateParent(node)
+          newNode.updateParent(inbetweenNode)
+          inbetweenNodeChild.updateParent(inbetweenNode)
+          return
+        }
+
+        i += edgeLabelLength - 1
+        node = childNode
       } else {
-        return {}
+        const newNode = new RadixNode(currentCharacter, wordAtIndex, true)
+        newNode.addDocument(docId)
+
+        node.c.set(currentCharacter, newNode)
+        newNode.updateParent(node)
+        return
       }
     }
-
-    const output: FindResult = {}
-    // found the closest node we recursively search through children
-    findAllWords(root, output, term, exact, tolerance)
-
-    return output
-  }
-}
-
-export function removeDocumentByWord(tree: RadixTree, term: string, docID: InternalDocumentID, exact = true): boolean {
-  if (!term) {
-    return true
-  }
-  let root = tree.node
-
-  const termLength = term.length
-  for (let i = 0; i < termLength; i++) {
-    const character = term[i]
-    if (character in root.c) {
-      const rootChildCurrentChar = root.c[character]
-      i += rootChildCurrentChar.s.length - 1
-      root = rootChildCurrentChar
-
-      if (exact && root.w !== term) {
-        // Do nothing if the exact condition is not met.
-      } else {
-        removeDocument(root, docID)
-      }
-    } else {
-      return false
-    }
   }
 
-  // Cleanup stats
-  tree.tokensLength.delete(docID)
-  delete tree.tokenQuantums[docID]
+  private _findLevenshtein(
+    term: string,
+    index: number,
+    tolerance: number,
+    originalTolerance: number,
+    output: FindResult
+  ) {
+    const stack: Array<{ node: RadixNode; index: number; tolerance: number }> = [{ node: this, index, tolerance }]
 
-  return true
-}
+    while (stack.length > 0) {
+      const { node, index, tolerance } = stack.pop()!
 
-interface RadixDump {
-  type: typeof RadixType
-  isArray: boolean
-  node: Node
-  tokenQuantums: Record<number, Record<string, number>>
-  tokensLength: [number, number][]
-}
-
-export function load(dumpRaw: unknown): RadixTree {
-  const dump = dumpRaw as RadixDump
-  return {
-    type: RadixType,
-    isArray: dump.isArray,
-    node: dump.node,
-    tokenQuantums: dump.tokenQuantums,
-    tokensLength: new Map(dump.tokensLength)
-  }
-}
-
-export function save(node: RadixTree): unknown {
-  const dump: RadixDump = {
-    type: RadixType,
-    isArray: node.isArray,
-    node: node.node,
-    tokenQuantums: node.tokenQuantums,
-    tokensLength: Array.from(node.tokensLength)
-  }
-  return dump as unknown
-}
-
-export function calculateScore(tree: RadixTree, tokens: string[], foundWords: FindResult, resultsMap: Map<number, number>, boost: number) {
-  const foundKeys = Object.getOwnPropertyNames(foundWords)
-
-  const foundKeysLength = foundKeys.length
-  const resultMap = new Map<number, [number, number]>()
-  for (let i = 0; i < foundKeysLength; i++) {
-    const key = foundKeys[i]
-    const matchedDocs = foundWords[key]
-    const matchedDocsLength = matchedDocs.length
-    const isExactMatch = tokens.includes(key)
-
-    for (let j = 0; j < matchedDocsLength; j++) {
-      const docId = matchedDocs[j]
-
-      const numberOfQuantums = tree.tokensLength.get(docId)!
-      const tokenQuantumDescriptor = tree.tokenQuantums[docId][key]
-
-      const occurrence = count(tokenQuantumDescriptor)
-      const bitMask = bitmask_20(tokenQuantumDescriptor)
-
-      const score = ((occurrence * occurrence) / numberOfQuantums + (isExactMatch ? 1 : 0)) * boost
-
-      if (!resultMap.has(docId)) {
-        resultMap.set(docId, [score, 0])
+      if (tolerance < 0) {
         continue
       }
 
-      const current = resultMap.get(docId)!
-      let totalScore = current[0] + score
-      const cumulativeBitMask = current[1]
+      if (node.w.startsWith(term)) {
+        node.findAllWords(output, term, false, 0)
+        continue
+      }
 
-      const overlappingBits = cumulativeBitMask & bitMask
-      const numberOfOverlappingBits = numberOfOnes(overlappingBits)
-      totalScore += numberOfOverlappingBits * 2 + score
+      if (node.e) {
+        const { w, d: docIDs } = node
+        if (w) {
+          if (syncBoundedLevenshtein(term, w, originalTolerance).isBounded) {
+            output[w] = []
+          }
+          if (getOwnProperty(output, w) != null && docIDs.size > 0) {
+            const docs = new Set(output[w])
 
-      current[0] = totalScore
-      current[1] = cumulativeBitMask | bitMask
+            for (const docID of docIDs) {
+              docs.add(docID)
+            }
+            output[w] = Array.from(docs)
+          }
+        }
+      }
+
+      if (index >= term.length) {
+        continue
+      }
+
+      const currentChar = term[index]
+
+      // 1. If node has child matching term[index], push { node: childNode, index +1, tolerance }
+      if (node.c.has(currentChar)) {
+        const childNode = node.c.get(currentChar)!
+        stack.push({ node: childNode, index: index + 1, tolerance })
+      }
+
+      // 2. Push { node, index +1, tolerance -1 } (Delete operation)
+      stack.push({ node: node, index: index + 1, tolerance: tolerance - 1 })
+
+      // 3. For each child:
+      for (const [character, childNode] of node.c) {
+        // a) Insert operation
+        stack.push({ node: childNode, index: index, tolerance: tolerance - 1 })
+
+        // b) Substitute operation
+        if (character !== currentChar) {
+          stack.push({ node: childNode, index: index + 1, tolerance: tolerance - 1 })
+        }
+      }
     }
   }
 
-  for (const res of resultMap) {
-    const id = res[0]
-    const score = res[1][0]
-    if (resultsMap.has(id)) {
-      resultsMap.set(id, resultsMap.get(id)! + score)
+  public find(params: FindParams): FindResult {
+    const { term, exact, tolerance } = params
+    if (tolerance && !exact) {
+      const output: FindResult = {}
+      this._findLevenshtein(term, 0, tolerance, tolerance, output)
+      return output
     } else {
-      resultsMap.set(id, score)
+      let node: RadixNode = this
+      const termLength = term.length
+      for (let i = 0; i < termLength; i++) {
+        const character = term[i]
+        if (node.c.has(character)) {
+          const childNode = node.c.get(character)!
+          const edgeLabel = childNode.s
+          const termSubstring = term.substring(i)
+
+          const commonPrefix = RadixNode.getCommonPrefix(edgeLabel, termSubstring)
+          const commonPrefixLength = commonPrefix.length
+          if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
+            if (tolerance) break
+            return {}
+          }
+
+          i += childNode.s.length - 1
+          node = childNode
+        } else {
+          return {}
+        }
+      }
+
+      const output: FindResult = {}
+      node.findAllWords(output, term, exact, tolerance)
+      return output
     }
+  }
+
+  public contains(term: string): boolean {
+    let node: RadixNode = this
+    const termLength = term.length
+    for (let i = 0; i < termLength; i++) {
+      const character = term[i]
+
+      if (node.c.has(character)) {
+        const childNode = node.c.get(character)!
+        const edgeLabel = childNode.s
+        const termSubstring = term.substring(i)
+        const commonPrefix = RadixNode.getCommonPrefix(edgeLabel, termSubstring)
+        const commonPrefixLength = commonPrefix.length
+
+        if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
+          return false
+        }
+        i += childNode.s.length - 1
+        node = childNode
+      } else {
+        return false
+      }
+    }
+    return true
+  }
+
+  public removeWord(term: string): boolean {
+    if (!term) {
+      return false
+    }
+
+    let node: RadixNode = this
+    const termLength = term.length
+    const stack: { parent: RadixNode; character: string }[] = []
+    for (let i = 0; i < termLength; i++) {
+      const character = term[i]
+      if (node.c.has(character)) {
+        const childNode = node.c.get(character)!
+        stack.push({ parent: node, character })
+        i += childNode.s.length - 1
+        node = childNode
+      } else {
+        return false
+      }
+    }
+
+    // Remove documents from the node
+    node.d.clear()
+    node.e = false
+
+    // Clean up any nodes that no longer lead to a word
+    while (stack.length > 0 && node.c.size === 0 && !node.e && node.d.size === 0) {
+      const { parent, character } = stack.pop()!
+      parent.c.delete(character)
+      node = parent
+    }
+
+    return true
+  }
+
+  public removeDocumentByWord(term: string, docID: InternalDocumentID, exact = true): boolean {
+    if (!term) {
+      return true
+    }
+
+    let node: RadixNode = this
+    const termLength = term.length
+    for (let i = 0; i < termLength; i++) {
+      const character = term[i]
+      if (node.c.has(character)) {
+        const childNode = node.c.get(character)!
+        i += childNode.s.length - 1
+        node = childNode
+
+        if (exact && node.w !== term) {
+          // Do nothing if the exact condition is not met.
+        } else {
+          node.removeDocument(docID)
+        }
+      } else {
+        return false
+      }
+    }
+    return true
+  }
+
+  private static getCommonPrefix(a: string, b: string): string {
+    let commonPrefix = ''
+    const len = Math.min(a.length, b.length)
+    for (let i = 0; i < len; i++) {
+      if (a[i] !== b[i]) {
+        return commonPrefix
+      }
+      commonPrefix += a[i]
+    }
+    return commonPrefix
+  }
+
+  public toJSON(): object {
+    return {
+      w: this.w,
+      s: this.s,
+      e: this.e,
+      k: this.k,
+      d: Array.from(this.d),
+      c: Array.from(this.c?.entries())?.map(([key, node]) => [key, node.toJSON()])
+    }
+  }
+
+  public static fromJSON(json: any): RadixNode {
+    const node = new RadixNode(json.k, json.s, json.e)
+    node.w = json.w
+    node.d = new Set(json.d)
+    node.c = new Map(json?.c?.map(([key, nodeJson]: [string, any]) => [key, RadixNode.fromJSON(nodeJson)]))
+    return node
+  }
+}
+
+export class RadixTree extends RadixNode {
+  constructor() {
+    super('', '', false)
+  }
+
+  public static fromJSON(json: any): RadixTree {
+    const tree = new RadixTree()
+    tree.w = json.w
+    tree.s = json.s
+    tree.e = json.e
+    tree.k = json.k
+    tree.d = new Set(json.d)
+    tree.c = new Map(json.c?.map(([key, nodeJson]: [string, any]) => [key, RadixNode.fromJSON(nodeJson)]))
+    return tree
+  }
+
+  public toJSON(): object {
+    return super.toJSON()
   }
 }

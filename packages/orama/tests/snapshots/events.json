@@ -4,7 +4,7 @@
     "hits": [
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "-89",
           "description": "Social War:",
@@ -17,7 +17,7 @@
       },
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "-57",
           "description": "Gallic Wars:",
@@ -30,7 +30,7 @@
       },
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "-55",
           "description": "Gallic War",
@@ -43,7 +43,7 @@
       },
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "-54",
           "description": "Gallic Wars",
@@ -56,7 +56,7 @@
       },
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "-53",
           "description": "Parthian war:",
@@ -69,7 +69,7 @@
       },
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "-53",
           "description": "Gallic War:",
@@ -82,7 +82,7 @@
       },
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "-48",
           "description": "Civil War:",
@@ -95,7 +95,7 @@
       },
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "-47",
           "description": "Civil War:",
@@ -108,7 +108,7 @@
       },
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "-46",
           "description": "Civil War:",
@@ -121,7 +121,7 @@
       },
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "1809/03/13",
           "description": "Peninsular War",
@@ -139,7 +139,7 @@
     "hits": [
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "1867/12/02",
           "description": "Paraguayan War.",
@@ -152,7 +152,7 @@
       },
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "1914/12/24",
           "description": " World War I:",
@@ -165,7 +165,7 @@
       },
       {
         "id": "",
-        "score": 1.5,
+        "score": 4.744426329679039,
         "document": {
           "date": "1950/02/14",
           "description": " Cold War:",
@@ -178,20 +178,7 @@
       },
       {
         "id": "",
-        "score": 1.4,
-        "document": {
-          "date": "1779/06/16",
-          "description": " American Revolutionary War: In support of the U.S., Spain declares war on England.",
-          "granularity": "year",
-          "categories": {
-            "first": "January/June",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "-113",
           "description": "War between the Celtiberians and the Romans.",
@@ -204,7 +191,7 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "-86",
           "description": "First Mithridatic War",
@@ -217,7 +204,7 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "630",
           "description": "The Byzantine-Arab Wars begin.",
@@ -230,7 +217,7 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "632/01/27",
           "description": "Ridda Wars begins",
@@ -243,7 +230,7 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "941",
           "description": "The Rus'-Byzantine War is fought.",
@@ -256,7 +243,7 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "988",
           "description": "Rus'–Byzantine War",
@@ -264,6 +251,19 @@
           "categories": {
             "first": "By place",
             "second": "Europe"
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1043/10/31",
+          "description": "Rus'-Byzantine War (1043).",
+          "granularity": "year",
+          "categories": {
+            "first": "",
+            "second": ""
           }
         }
       }
@@ -274,20 +274,7 @@
     "hits": [
       {
         "id": "",
-        "score": 1.3333333333333333,
-        "document": {
-          "date": "1043/10/31",
-          "description": "Rus'-Byzantine War (1043).",
-          "granularity": "year",
-          "categories": {
-            "first": "",
-            "second": ""
-          }
-        }
-      },
-      {
-        "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "1447/07/15",
           "description": "The Albanian-Venetian War of 1447-1448.",
@@ -300,7 +287,7 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "1470/10/30",
           "description": "Start of the Anglo-Hanseatic War.",
@@ -313,7 +300,7 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "1522/12/20",
           "description": "The Habsburg-Valois Wars begin.",
@@ -326,7 +313,7 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "1558/01/22",
           "description": " Beginning of the Livonian War.",
@@ -339,7 +326,7 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "1728/10/20",
           "description": "The Meerkat–Mongoose war.",
@@ -352,7 +339,7 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "1830/12/20",
           "description": "The Java War ends.",
@@ -365,7 +352,7 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "1857/04/04",
           "description": " End of the Anglo-Persian War.",
@@ -378,7 +365,7 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "1861/04/27",
           "description": " American Civil War:",
@@ -391,13 +378,26 @@
       },
       {
         "id": "",
-        "score": 1.3333333333333333,
+        "score": 4.087300377720357,
         "document": {
           "date": "1879/01/11",
           "description": " The Anglo-Zulu War begins.",
           "granularity": "year",
           "categories": {
             "first": "January/March",
+            "second": ""
+          }
+        }
+      },
+      {
+        "id": "",
+        "score": 4.087300377720357,
+        "document": {
+          "date": "1919/02/14",
+          "description": " The Polish-Soviet War begins.",
+          "granularity": "year",
+          "categories": {
+            "first": "February",
             "second": ""
           }
         }

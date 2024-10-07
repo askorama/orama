@@ -3,7 +3,7 @@ import { DocumentsStore } from '../src/components/documents-store.js'
 import { Index } from '../src/components/index.js'
 import { getInternalDocumentId } from '../src/components/internal-document-id-store.js'
 import { Result, create, insert, load, save, search } from '../src/index.js'
-import { getCommonPrefix, RadixTree } from '../src/trees/radix.js'
+import { RadixTree } from '../src/trees/radix.js'
 import type { AnyDocument } from '../src/types.js'
 
 function extractOriginalDoc(result: Result<AnyDocument>[]): AnyDocument[] {
@@ -12,7 +12,7 @@ function extractOriginalDoc(result: Result<AnyDocument>[]): AnyDocument[] {
 
 t.test('Edge getters', async (t) => {
   t.test('should correctly enable edge index getter', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         name: 'string',
         age: 'number'
@@ -29,16 +29,17 @@ t.test('Edge getters', async (t) => {
       age: 25
     })
 
-    const { index } = await save(db)
-    const nameIndex = (index as Index).indexes['name'] as RadixTree
+    const { index } = save(db)
+    const nameIndex = (index as Index).indexes['name']
+    const newNameIndex = RadixTree.fromJSON(nameIndex.node)
 
     // Remember that tokenizers an stemmers sets content to lowercase
-    t.ok(trieContains(nameIndex, 'john'))
-    t.ok(trieContains(nameIndex, 'jane'))
+    t.ok(newNameIndex.contains('john'))
+    t.ok(newNameIndex.contains('jane'))
   })
 
   t.test('should correctly enable edge docs getter', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         name: 'string',
         age: 'number'
@@ -55,7 +56,7 @@ t.test('Edge getters', async (t) => {
       age: 25
     })
 
-    const { docs } = await save(db)
+    const { docs } = save(db)
 
     t.strictSame((docs as DocumentsStore).docs[getInternalDocumentId(db.internalDocumentIDStore, doc1)], {
       name: 'John',
@@ -68,7 +69,7 @@ t.test('Edge getters', async (t) => {
   })
 
   t.test('should correctly enable index setter', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         name: 'string',
         age: 'number'
@@ -98,7 +99,7 @@ t.test('Edge getters', async (t) => {
     await insert(db, jonh)
     await insert(db, jane)
 
-    const db2 = await create({
+    const db2 = create({
       schema: {
         name: 'string',
         age: 'number'
@@ -108,8 +109,8 @@ t.test('Edge getters', async (t) => {
     await insert(db2, michele)
     await insert(db2, paolo)
 
-    const dbData = await save(db2)
-    await load(db, dbData)
+    const dbData = save(db2)
+    load(db, dbData)
 
     const search1 = await search(db, { term: 'Jane' })
     const search2 = await search(db, { term: 'John' })
@@ -143,16 +144,16 @@ t.test('Edge getters', async (t) => {
       age: 37
     })
 
-    const DBData = await save(originalDB)
+    const DBData = save(originalDB)
 
-    const newDB = await create({
+    const newDB = create({
       schema: {
         name: 'string',
         age: 'number'
       }
     })
 
-    await load(newDB, DBData)
+    load(newDB, DBData)
 
     const search1 = await search(originalDB, { term: 'Michele' })
     const search2 = await search(newDB, { term: 'Michele' })
@@ -164,29 +165,3 @@ t.test('Edge getters', async (t) => {
     t.strictSame(search3.hits, search4.hits)
   })
 })
-
-function trieContains(tree: RadixTree, term: string): boolean {
-  let root = tree.node
-
-  const termLength = term.length
-  for (let i = 0; i < termLength; i++) {
-    const character = term[i]
-
-    if (character in root.c) {
-      const rootChildrenChar = root.c[character]
-      const edgeLabel = rootChildrenChar.s
-      const termSubstring = term.substring(i)
-      const commonPrefix = getCommonPrefix(edgeLabel, termSubstring)
-      const commonPrefixLength = commonPrefix.length
-
-      if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
-        return false
-      }
-      i += rootChildrenChar.s.length - 1
-      root = rootChildrenChar
-    } else {
-      return false
-    }
-  }
-  return true
-}

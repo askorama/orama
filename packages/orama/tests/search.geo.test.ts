@@ -3,7 +3,7 @@ import { create, insert, search } from '../src/index.js'
 
 t.test('geosearch', async (t) => {
   t.test('should find geopoints inside a radius', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         id: 'string',
         location: 'geopoint'
@@ -88,7 +88,7 @@ t.test('geosearch', async (t) => {
   })
 
   t.test('should find geopoints inside a polygon', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         id: 'string',
         location: 'geopoint'
@@ -125,7 +125,7 @@ t.test('geosearch', async (t) => {
   })
 
   t.test('should find geopoints outside a polygon', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         id: 'string',
         location: 'geopoint'
@@ -163,7 +163,7 @@ t.test('geosearch', async (t) => {
   })
 
   t.test('should run in high-precision mode', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         id: 'string',
         location: 'geopoint'
@@ -216,10 +216,10 @@ t.test('geosearch', async (t) => {
       polygonResults.hits.map(({ id }) => id),
       ['1', '2', '3', '4', '5']
     )
-    t.same(radiusResults.count, 1)
+    t.same(radiusResults.count, 2)
     t.same(
       radiusResults.hits.map(({ id }) => id),
-      ['1']
+      ['1', '2']
     )
   })
 })

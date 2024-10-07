@@ -326,8 +326,7 @@ t.test('insert method', async (t) => {
         }
       })
     )
-
-    const index = db.data.index.indexes.location as BKDTree
+    const index = db.data.index.indexes.location.node as BKDTree
     t.equal(index.root?.point.lat, 45.5771622)
     t.equal(index.root?.point.lon, 9.261266)
   })
@@ -371,10 +370,10 @@ t.test('insert short prefixes, as in #327 and #328', async (t) => {
     t.same(exactResults.hits[0].document.abbrv, 'RD')
 
     t.same(prefixResults.count, 2)
-    t.same(prefixResults.hits[0].id, '2')
-    t.same(prefixResults.hits[0].document.abbrv, 'RD')
-    t.same(prefixResults.hits[1].id, '1')
-    t.same(prefixResults.hits[1].document.abbrv, 'RDGE')
+    t.same(prefixResults.hits[0].id, '1')
+    t.same(prefixResults.hits[0].document.abbrv, 'RDGE')
+    t.same(prefixResults.hits[1].id, '2')
+    t.same(prefixResults.hits[1].document.abbrv, 'RD')
   })
 
   await t.test('example 2', async (t) => {

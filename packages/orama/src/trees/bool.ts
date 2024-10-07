@@ -1,38 +1,43 @@
-import { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { ScalarSearchableValue } from '../types.js'
+export class BoolNode<V = unknown> {
+  true: Set<V>
+  false: Set<V>
 
-export const BoolType = 'Bool' as const
-
-export interface BoolTree {
-  type: typeof BoolType
-  true: InternalDocumentID[]
-  false: InternalDocumentID[]
-  isArray
-}
-
-export function create(isArray: boolean): BoolTree {
-  return {
-    type: BoolType,
-    true: [],
-    false: [],
-    isArray
+  constructor() {
+    this.true = new Set()
+    this.false = new Set()
   }
-}
 
-export function insert(root: BoolTree, internalId: InternalDocumentID, value: boolean) {
-  const booleanKey = value ? 'true' : 'false'
-  root[booleanKey].push(internalId)
-}
+  insert(value: V, bool: boolean): void {
+    if (bool) {
+      this.true.add(value)
+    } else {
+      this.false.add(value)
+    }
+  }
 
-export function where(root: BoolTree, value: boolean) {
-  const booleanKey = value ? 'true' : 'false'
-  return root[booleanKey]
-}
+  delete(value: V, bool: boolean): void {
+    if (bool) {
+      this.true.delete(value)
+    } else {
+      this.false.delete(value)
+    }
+  }
 
-export function removeDocument(root: BoolTree, internalId: InternalDocumentID, value: ScalarSearchableValue): void {
-  const booleanKey = value ? 'true' : 'false'
-  const position = root[booleanKey].indexOf(internalId)
-  if (position > -1) {
-    root[booleanKey].splice(position, 1)
+  getSize(): number {
+    return this.true.size + this.false.size
+  }
+
+  toJSON(): any {
+    return {
+      true: Array.from(this.true),
+      false: Array.from(this.false)
+    }
+  }
+
+  static fromJSON<V>(json: any): BoolNode<V> {
+    const node = new BoolNode<V>()
+    node.true = new Set(json.true)
+    node.false = new Set(json.false)
+    return node
   }
 }

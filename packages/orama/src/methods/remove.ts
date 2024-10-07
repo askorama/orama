@@ -83,6 +83,7 @@ async function removeAsync<T extends AnyOrama>(
         schemaType,
         language,
         orama.tokenizer,
+        docsCount
       ))
     ) {
       result = false
@@ -163,6 +164,7 @@ function removeSync<T extends AnyOrama>(orama: T, id: DocumentID, language?: str
         schemaType,
         language,
         orama.tokenizer,
+        docsCount,
       )
     ) {
       result = false

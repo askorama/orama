@@ -1,103 +1,104 @@
 import t from 'tap'
-import {
-  create,
-  insert,
-  find,
-  getSize,
-  remove,
-  contains,
-  greaterThan,
-  lessThan,
-  rangeSearch
-} from '../src/trees/zip.js'
+import { ZipTree } from '../src/trees/zip.js'
 
 t.test('ZIP Tree', async (t) => {
-  t.test('create', async (t) => {
-    const tree = create(1, 'foo')
-    t.equal(getSize(tree), 1)
-    t.equal(find(tree, 1), 'foo')
-    t.equal(find(tree, 4), null)
+  t.test('create', (t) => {
+    t.plan(3)
+
+    const tree = new ZipTree()
+    tree.insert(1, 'foo')
+    t.equal(tree.getSize(), 1)
+    t.equal(tree.find(1), 'foo')
+    t.equal(tree.find(4), null)
   })
 
-  t.test('insert', async (t) => {
-    const tree = create(1, 'foo')
+  t.test('insert', (t) => {
+    t.plan(1)
 
-    insert(tree, 2, 'bar')
-    insert(tree, 10, 'baz')
-    insert(tree, 25, 'qux')
-    insert(tree, 5, 'quux')
-    insert(tree, 20, 'quuz')
-    insert(tree, 12, 'corge')
+    const tree = new ZipTree()
 
-    t.equal(getSize(tree), 7)
+    tree.insert(1, 'foo')
+    tree.insert(2, 'bar')
+    tree.insert(10, 'baz')
+    tree.insert(25, 'qux')
+    tree.insert(5, 'quux')
+    tree.insert(20, 'quuz')
+    tree.insert(12, 'corge')
+
+    t.equal(tree.getSize(), 7)
   })
 
   t.test('find', async (t) => {
-    const tree = create(1, [1, 2, 3])
+    const tree = new ZipTree()
+    tree.insert(1, [1, 2, 3])
 
-    insert(tree, 2, [4, 5, 6])
-    insert(tree, 10, [7, 8, 9])
-    insert(tree, 25, [10, 11, 12])
-    insert(tree, 5, [13, 14, 15])
-    insert(tree, 20, [16, 17, 18])
-    insert(tree, 12, [19, 20, 21])
+    tree.insert(2, [4, 5, 6])
+    tree.insert(10, [7, 8, 9])
+    tree.insert(25, [10, 11, 12])
+    tree.insert(5, [13, 14, 15])
+    tree.insert(20, [16, 17, 18])
+    tree.insert(12, [19, 20, 21])
 
-    t.same(contains(tree, 20), true)
-    t.same(find(tree, 20), [16, 17, 18])
+    t.same(tree.contains(20), true)
+    t.same(tree.find(20), [16, 17, 18])
   })
 
   t.test('remove', async (t) => {
-    const tree = create(1, 'foo')
+    const tree = new ZipTree()
+    tree.insert(1, 'foo')
 
-    insert(tree, 2, 'bar')
-    insert(tree, 10, 'baz')
-    insert(tree, 25, 'qux')
-    insert(tree, 5, 'quux')
-    insert(tree, 20, 'quuz')
-    insert(tree, 12, 'corge')
+    tree.insert(2, 'bar')
+    tree.insert(10, 'baz')
+    tree.insert(25, 'qux')
+    tree.insert(5, 'quux')
+    tree.insert(20, 'quuz')
+    tree.insert(12, 'corge')
 
-    remove(tree, 20)
+    tree.remove(20)
 
-    t.equal(getSize(tree), 6)
-    t.equal(contains(tree, 20), false)
+    t.equal(tree.getSize(), 6)
+    t.equal(tree.contains(20), false)
   })
 
   t.test('rangeSearch', async (t) => {
-    const tree = create(1, 'foo')
+    const tree = new ZipTree()
+    tree.insert(1, 'foo')
 
-    insert(tree, 2, 'bar')
-    insert(tree, 10, 'baz')
-    insert(tree, 25, 'qux')
-    insert(tree, 5, 'quux')
-    insert(tree, 20, 'quuz')
-    insert(tree, 12, 'corge')
+    tree.insert(2, 'bar')
+    tree.insert(10, 'baz')
+    tree.insert(25, 'qux')
+    tree.insert(5, 'quux')
+    tree.insert(20, 'quuz')
+    tree.insert(12, 'corge')
 
-    t.same(rangeSearch(tree, 5, 20), ['quux', 'baz', 'corge', 'quuz'])
+    t.same(tree.rangeSearch(5, 20), ['quux', 'baz', 'corge', 'quuz'])
   })
 
   t.test('greaterThan', async (t) => {
-    const tree = create(1, 'foo')
+    const tree = new ZipTree()
+    tree.insert(1, 'foo')
 
-    insert(tree, 2, 'bar')
-    insert(tree, 10, 'baz')
-    insert(tree, 25, 'qux')
-    insert(tree, 5, 'quux')
-    insert(tree, 20, 'quuz')
-    insert(tree, 12, 'corge')
+    tree.insert(2, 'bar')
+    tree.insert(10, 'baz')
+    tree.insert(25, 'qux')
+    tree.insert(5, 'quux')
+    tree.insert(20, 'quuz')
+    tree.insert(12, 'corge')
 
-    t.same(greaterThan(tree, 10), ['corge', 'quuz', 'qux'])
+    t.same(tree.greaterThan(10), ['corge', 'quuz', 'qux'])
   })
 
   t.test('lessThan', async (t) => {
-    const tree = create(1, 'foo')
+    const tree = new ZipTree()
+    tree.insert(1, 'foo')
 
-    insert(tree, 2, 'bar')
-    insert(tree, 10, 'baz')
-    insert(tree, 25, 'qux')
-    insert(tree, 5, 'quux')
-    insert(tree, 20, 'quuz')
-    insert(tree, 12, 'corge')
+    tree.insert(2, 'bar')
+    tree.insert(10, 'baz')
+    tree.insert(25, 'qux')
+    tree.insert(5, 'quux')
+    tree.insert(20, 'quuz')
+    tree.insert(12, 'corge')
 
-    t.same(lessThan(tree, 10), ['foo', 'bar', 'quux'])
+    t.same(tree.lessThan(10), ['foo', 'bar', 'quux'])
   })
 })

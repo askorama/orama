@@ -251,23 +251,25 @@ t.test('search with groupBy', async (t) => {
       } as const
     })
 
-    t.throws( () =>
-      search(db, {
-        groupBy: {
-          properties: ['unknown-property']
-        }
-      }),
+    t.throws(
+      () =>
+        search(db, {
+          groupBy: {
+            properties: ['unknown-property']
+          }
+        }),
       {
         message: 'Unknown groupBy property "unknown-property"'
       }
     )
 
-    t.throws(() =>
-      search(db, {
-        groupBy: {
-          properties: ['tags']
-        }
-      }),
+    t.throws(
+      () =>
+        search(db, {
+          groupBy: {
+            properties: ['tags']
+          }
+        }),
       {
         message: 'Invalid groupBy property "tags". Allowed types: "string, number, boolean", but given "string[]"'
       }
