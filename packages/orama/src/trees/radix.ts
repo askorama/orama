@@ -47,114 +47,129 @@ export class RadixNode {
     const stack: RadixNode[] = [this]
     while (stack.length > 0) {
       const node = stack.pop()!
-
+  
       if (node.e) {
         const { w, d: docIDs } = node
-
+  
         if (exact && w !== term) {
           continue
         }
 
-        if (getOwnProperty(output, w) == null) {
+        // check if _output[w] exists and then add the doc to it
+        // always check in own property to prevent access to inherited properties
+        // fix https://github.com/askorama/orama/issues/137
+        if (getOwnProperty(output, w) !== null) {
           if (tolerance) {
             const difference = Math.abs(term.length - w.length)
-
+  
             if (difference <= tolerance && syncBoundedLevenshtein(term, w, tolerance).isBounded) {
               output[w] = []
+            } else {
+              continue
             }
           } else {
             output[w] = []
           }
-        }
+        }        
 
+        // check if _output[w] exists and then add the doc to it
+        // always check in own property to prevent access to inherited properties
+        // fix https://github.com/askorama/orama/issues/137
         if (getOwnProperty(output, w) != null && docIDs.size > 0) {
-          const docs = new Set(output[w])
-
+          const docs = output[w]
           for (const docID of docIDs) {
-            docs.add(docID)
+            if (!docs.includes(docID)) {
+              docs.push(docID)
+            }
           }
-          output[w] = Array.from(docs)
         }
       }
-
-      for (const [, childNode] of node.c) {
-        stack.push(childNode)
+  
+      if (node.c.size > 0) {
+        stack.push(...node.c.values())
       }
     }
     return output
-  }
+  }  
 
   public insert(word: string, docId: InternalDocumentID): void {
     let node: RadixNode = this
+    let i = 0
     const wordLength = word.length
-    for (let i = 0; i < wordLength; i++) {
+  
+    while (i < wordLength) {
       const currentCharacter = word[i]
-      const wordAtIndex = word.substring(i)
       const childNode = node.c.get(currentCharacter)
-
+  
       if (childNode) {
         const edgeLabel = childNode.s
         const edgeLabelLength = edgeLabel.length
-
-        const commonPrefix = RadixNode.getCommonPrefix(edgeLabel, wordAtIndex)
-        const commonPrefixLength = commonPrefix.length
-
-        if (edgeLabel === wordAtIndex) {
-          childNode.addDocument(docId)
-          childNode.e = true
-          return
+        let j = 0
+  
+        // Find the common prefix length between edgeLabel and the remaining word
+        while (j < edgeLabelLength && i + j < wordLength && edgeLabel[j] === word[i + j]) {
+          j++
         }
-
-        const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength]
-        if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
-          const newNode = new RadixNode(currentCharacter, wordAtIndex, true)
-          newNode.c.set(edgeLabelAtCommonPrefix, childNode)
-
-          const newNodeChild = newNode.c.get(edgeLabelAtCommonPrefix)!
-          newNodeChild.s = edgeLabel.substring(commonPrefixLength)
-          newNodeChild.k = edgeLabelAtCommonPrefix
-
-          node.c.set(currentCharacter, newNode)
-
-          newNode.updateParent(node)
-          newNodeChild.updateParent(newNode)
-          newNode.addDocument(docId)
-          return
+  
+        if (j === edgeLabelLength) {
+          // Edge label fully matches; proceed to the child node
+          node = childNode
+          i += j
+          if (i === wordLength) {
+            // The word is a prefix of an existing word
+            if (!childNode.e) {
+              childNode.e = true
+            }
+            childNode.addDocument(docId)
+            return
+          }
+          continue
         }
-
-        if (commonPrefixLength < edgeLabelLength && commonPrefixLength < wordAtIndex.length) {
-          const inbetweenNode = new RadixNode(currentCharacter, commonPrefix, false)
-          inbetweenNode.c.set(edgeLabel[commonPrefixLength], childNode)
-          node.c.set(currentCharacter, inbetweenNode)
-
-          const inbetweenNodeChild = inbetweenNode.c.get(edgeLabel[commonPrefixLength])!
-          inbetweenNodeChild.s = edgeLabel.substring(commonPrefixLength)
-          inbetweenNodeChild.k = edgeLabel[commonPrefixLength]
-
-          const wordAtCommonPrefix = wordAtIndex[commonPrefixLength]
-          const newNode = new RadixNode(wordAtCommonPrefix, word.substring(i + commonPrefixLength), true)
+  
+        // Split the edgeLabel at the common prefix
+        const commonPrefix = edgeLabel.slice(0, j)
+        const newEdgeLabel = edgeLabel.slice(j)
+        const newWordLabel = word.slice(i + j)
+  
+        // Create an intermediate node for the common prefix
+        const inbetweenNode = new RadixNode(commonPrefix[0], commonPrefix, false)
+        node.c.set(commonPrefix[0], inbetweenNode)
+        inbetweenNode.updateParent(node)
+  
+        // Update the existing childNode
+        childNode.s = newEdgeLabel
+        childNode.k = newEdgeLabel[0]
+        inbetweenNode.c.set(newEdgeLabel[0], childNode)
+        childNode.updateParent(inbetweenNode)
+  
+        if (newWordLabel) {
+          // Create a new node for the remaining part of the word
+          const newNode = new RadixNode(newWordLabel[0], newWordLabel, true)
           newNode.addDocument(docId)
-
-          inbetweenNode.c.set(wordAtCommonPrefix, newNode)
-
-          inbetweenNode.updateParent(node)
+          inbetweenNode.c.set(newWordLabel[0], newNode)
           newNode.updateParent(inbetweenNode)
-          inbetweenNodeChild.updateParent(inbetweenNode)
-          return
+        } else {
+          // The word ends at the inbetweenNode
+          inbetweenNode.e = true
+          inbetweenNode.addDocument(docId)
         }
-
-        i += edgeLabelLength - 1
-        node = childNode
+        return
       } else {
-        const newNode = new RadixNode(currentCharacter, wordAtIndex, true)
+        // No matching child; create a new node
+        const newNode = new RadixNode(currentCharacter, word.slice(i), true)
         newNode.addDocument(docId)
-
         node.c.set(currentCharacter, newNode)
         newNode.updateParent(node)
         return
       }
     }
-  }
+  
+    // If we reach here, the word already exists in the tree
+    if (!node.e) {
+      node.e = true
+    }
+    node.addDocument(docId)
+  }  
 
   private _findLevenshtein(
     term: string,
@@ -230,58 +245,85 @@ export class RadixNode {
       return output
     } else {
       let node: RadixNode = this
+      let i = 0
       const termLength = term.length
-      for (let i = 0; i < termLength; i++) {
+  
+      while (i < termLength) {
         const character = term[i]
-        if (node.c.has(character)) {
-          const childNode = node.c.get(character)!
+        const childNode = node.c.get(character)
+  
+        if (childNode) {
           const edgeLabel = childNode.s
-          const termSubstring = term.substring(i)
-
-          const commonPrefix = RadixNode.getCommonPrefix(edgeLabel, termSubstring)
-          const commonPrefixLength = commonPrefix.length
-          if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
-            if (tolerance) break
+          const edgeLabelLength = edgeLabel.length
+          let j = 0
+  
+          // Compare edge label with the term starting from position i
+          while (j < edgeLabelLength && i + j < termLength && edgeLabel[j] === term[i + j]) {
+            j++
+          }
+  
+          if (j === edgeLabelLength) {
+            // Full match of edge label; proceed to the child node
+            node = childNode
+            i += j
+          } else if (i + j === termLength) {
+            // The term ends in the middle of the edge label
+            if (exact) {
+              // Exact match required but term doesn't end at a node
+              return {}
+            } else {
+              // Partial match; collect words starting from this node
+              const output: FindResult = {}
+              childNode.findAllWords(output, term, exact, tolerance)
+              return output
+            }
+          } else {
+            // Mismatch found
             return {}
           }
-
-          i += childNode.s.length - 1
-          node = childNode
         } else {
+          // No matching child node
           return {}
         }
       }
-
+  
+      // Term fully matched; collect words starting from this node
       const output: FindResult = {}
       node.findAllWords(output, term, exact, tolerance)
       return output
     }
   }
-
+  
   public contains(term: string): boolean {
     let node: RadixNode = this
+    let i = 0
     const termLength = term.length
-    for (let i = 0; i < termLength; i++) {
+  
+    while (i < termLength) {
       const character = term[i]
-
-      if (node.c.has(character)) {
-        const childNode = node.c.get(character)!
+      const childNode = node.c.get(character)
+  
+      if (childNode) {
         const edgeLabel = childNode.s
-        const termSubstring = term.substring(i)
-        const commonPrefix = RadixNode.getCommonPrefix(edgeLabel, termSubstring)
-        const commonPrefixLength = commonPrefix.length
-
-        if (commonPrefixLength !== edgeLabel.length && commonPrefixLength !== termSubstring.length) {
+        const edgeLabelLength = edgeLabel.length
+        let j = 0
+  
+        while (j < edgeLabelLength && i + j < termLength && edgeLabel[j] === term[i + j]) {
+          j++
+        }
+  
+        if (j < edgeLabelLength) {
           return false
         }
-        i += childNode.s.length - 1
+  
+        i += edgeLabelLength
         node = childNode
       } else {
         return false
       }
     }
     return true
-  }
+  }  
 
   public removeWord(term: string): boolean {
     if (!term) {
@@ -344,16 +386,13 @@ export class RadixNode {
   }
 
   private static getCommonPrefix(a: string, b: string): string {
-    let commonPrefix = ''
     const len = Math.min(a.length, b.length)
-    for (let i = 0; i < len; i++) {
-      if (a[i] !== b[i]) {
-        return commonPrefix
-      }
-      commonPrefix += a[i]
+    let i = 0
+    while (i < len && a.charCodeAt(i) === b.charCodeAt(i)) {
+      i++
     }
-    return commonPrefix
-  }
+    return a.slice(0, i)
+  }  
 
   public toJSON(): object {
     return {
