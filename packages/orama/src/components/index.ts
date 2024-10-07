@@ -287,7 +287,7 @@ export function insert(
   }
 }
 
-function insertVector(index: Index, prop: string, value: number[] | VectorType, id: DocumentID): void {
+export function insertVector(index: AnyIndexStore, prop: string, value: number[] | VectorType, id: DocumentID): void {
   if (!(value instanceof Float32Array)) {
     value = new Float32Array(value)
   }
