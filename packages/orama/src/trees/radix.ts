@@ -94,75 +94,82 @@ export class RadixNode {
 
   public insert(word: string, docId: InternalDocumentID): void {
     let node: RadixNode = this
+    let i = 0
     const wordLength = word.length
-    for (let i = 0; i < wordLength; i++) {
+  
+    while (i < wordLength) {
       const currentCharacter = word[i]
-      const wordAtIndex = word.substring(i)
       const childNode = node.c.get(currentCharacter)
-
+  
       if (childNode) {
         const edgeLabel = childNode.s
         const edgeLabelLength = edgeLabel.length
-
-        const commonPrefix = RadixNode.getCommonPrefix(edgeLabel, wordAtIndex)
-        const commonPrefixLength = commonPrefix.length
-
-        if (edgeLabel === wordAtIndex) {
-          childNode.addDocument(docId)
-          childNode.e = true
-          return
+        let j = 0
+  
+        // Find the common prefix length between edgeLabel and the remaining word
+        while (j < edgeLabelLength && i + j < wordLength && edgeLabel[j] === word[i + j]) {
+          j++
         }
-
-        const edgeLabelAtCommonPrefix = edgeLabel[commonPrefixLength]
-        if (commonPrefixLength < edgeLabelLength && commonPrefixLength === wordAtIndex.length) {
-          const newNode = new RadixNode(currentCharacter, wordAtIndex, true)
-          newNode.c.set(edgeLabelAtCommonPrefix, childNode)
-
-          const newNodeChild = newNode.c.get(edgeLabelAtCommonPrefix)!
-          newNodeChild.s = edgeLabel.substring(commonPrefixLength)
-          newNodeChild.k = edgeLabelAtCommonPrefix
-
-          node.c.set(currentCharacter, newNode)
-
-          newNode.updateParent(node)
-          newNodeChild.updateParent(newNode)
-          newNode.addDocument(docId)
-          return
+  
+        if (j === edgeLabelLength) {
+          // Edge label fully matches; proceed to the child node
+          node = childNode
+          i += j
+          if (i === wordLength) {
+            // The word is a prefix of an existing word
+            if (!childNode.e) {
+              childNode.e = true
+            }
+            childNode.addDocument(docId)
+            return
+          }
+          continue
         }
-
-        if (commonPrefixLength < edgeLabelLength && commonPrefixLength < wordAtIndex.length) {
-          const inbetweenNode = new RadixNode(currentCharacter, commonPrefix, false)
-          inbetweenNode.c.set(edgeLabel[commonPrefixLength], childNode)
-          node.c.set(currentCharacter, inbetweenNode)
-
-          const inbetweenNodeChild = inbetweenNode.c.get(edgeLabel[commonPrefixLength])!
-          inbetweenNodeChild.s = edgeLabel.substring(commonPrefixLength)
-          inbetweenNodeChild.k = edgeLabel[commonPrefixLength]
-
-          const wordAtCommonPrefix = wordAtIndex[commonPrefixLength]
-          const newNode = new RadixNode(wordAtCommonPrefix, word.substring(i + commonPrefixLength), true)
+  
+        // Split the edgeLabel at the common prefix
+        const commonPrefix = edgeLabel.slice(0, j)
+        const newEdgeLabel = edgeLabel.slice(j)
+        const newWordLabel = word.slice(i + j)
+  
+        // Create an intermediate node for the common prefix
+        const inbetweenNode = new RadixNode(commonPrefix[0], commonPrefix, false)
+        node.c.set(commonPrefix[0], inbetweenNode)
+        inbetweenNode.updateParent(node)
+  
+        // Update the existing childNode
+        childNode.s = newEdgeLabel
+        childNode.k = newEdgeLabel[0]
+        inbetweenNode.c.set(newEdgeLabel[0], childNode)
+        childNode.updateParent(inbetweenNode)
+  
+        if (newWordLabel) {
+          // Create a new node for the remaining part of the word
+          const newNode = new RadixNode(newWordLabel[0], newWordLabel, true)
           newNode.addDocument(docId)
-
-          inbetweenNode.c.set(wordAtCommonPrefix, newNode)
-
-          inbetweenNode.updateParent(node)
+          inbetweenNode.c.set(newWordLabel[0], newNode)
           newNode.updateParent(inbetweenNode)
-          inbetweenNodeChild.updateParent(inbetweenNode)
-          return
+        } else {
+          // The word ends at the inbetweenNode
+          inbetweenNode.e = true
+          inbetweenNode.addDocument(docId)
         }
-
-        i += edgeLabelLength - 1
-        node = childNode
+        return
       } else {
-        const newNode = new RadixNode(currentCharacter, wordAtIndex, true)
+        // No matching child; create a new node
+        const newNode = new RadixNode(currentCharacter, word.slice(i), true)
         newNode.addDocument(docId)
-
         node.c.set(currentCharacter, newNode)
         newNode.updateParent(node)
         return
       }
     }
-  }
+  
+    // If we reach here, the word already exists in the tree
+    if (!node.e) {
+      node.e = true
+    }
+    node.addDocument(docId)
+  }  
 
   private _findLevenshtein(
     term: string,
