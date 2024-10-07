@@ -344,16 +344,13 @@ export class RadixNode {
   }
 
   private static getCommonPrefix(a: string, b: string): string {
-    let commonPrefix = ''
     const len = Math.min(a.length, b.length)
-    for (let i = 0; i < len; i++) {
-      if (a[i] !== b[i]) {
-        return commonPrefix
-      }
-      commonPrefix += a[i]
+    let i = 0
+    while (i < len && a.charCodeAt(i) === b.charCodeAt(i)) {
+      i++
     }
-    return commonPrefix
-  }
+    return a.slice(0, i)
+  }  
 
   public toJSON(): object {
     return {
