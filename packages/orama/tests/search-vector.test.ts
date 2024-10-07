@@ -1,9 +1,7 @@
 import t from 'tap'
 import { create, insertMultiple, search } from '../src/index.js'
 
-t.test('create', (t) => {
-  t.plan(3)
-
+t.test('create', async (t) => {
   t.test('should create a vector instance', async (t) => {
     const db = await create({
       schema: {
@@ -45,12 +43,8 @@ t.test('create', (t) => {
   })
 })
 
-t.test('search', (t) => {
-  t.plan(4)
-
+t.test('search', async (t) => {
   t.test('should return the most similar vectors', async (t) => {
-    t.plan(3)
-
     const db = await create({
       schema: {
         vector: 'vector[5]'
@@ -74,8 +68,6 @@ t.test('search', (t) => {
   })
 
   t.test('should search through nested properties', async (t) => {
-    t.plan(3)
-
     const db = await create({
       schema: {
         title: 'string',
@@ -106,8 +98,6 @@ t.test('search', (t) => {
   })
 
   t.test('should search through deeply nested properties', async (t) => {
-    t.plan(3)
-
     const db = await create({
       schema: {
         title: 'string',
@@ -140,8 +130,6 @@ t.test('search', (t) => {
   })
 
   t.test('should be able to work on multiple vector properties at creation time', async (t) => {
-    t.plan(7)
-
     const db = await create({
       schema: {
         title: 'string',

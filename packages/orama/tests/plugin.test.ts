@@ -13,11 +13,7 @@ import {
 import { getAllPluginsByHook } from '../src/components/plugins.js'
 
 t.only('getAllPluginsByHook', async (t) => {
-  t.plan(1)
-
   t.only('should return all the plugins that includes a given hook name', async (t) => {
-    t.plan(2)
-
     function plugin1() {
       return {
         name: 'plugin1',
@@ -160,7 +156,7 @@ t.only('plugin', async (t) => {
       '[Logger] beforeInsert - {"id":"1","name":"John Doe"}',
       '[Logger] afterInsert - {"id":"1","name":"John Doe"}',
       '[Logger] beforeSearch: {"term":"john"}',
-      '[Logger] afterSearch: {"term":"john","relevance":{"k":1.2,"b":0.75,"d":0.5}} - undefined',
+      '[Logger] afterSearch: {"term":"john"} - undefined',
       '[Logger] beforeInsert - {"id":"2","name":"Jane Doe"}',
       '[Logger] afterInsert - {"id":"2","name":"Jane Doe"}',
       '[Logger] beforeInsert - {"id":"3","name":"Jim Doe"}',

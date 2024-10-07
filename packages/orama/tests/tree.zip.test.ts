@@ -1,9 +1,7 @@
 import t from 'tap'
 import { ZipTree } from '../src/trees/zip.js'
 
-t.test('ZIP Tree', (t) => {
-  t.plan(7)
-
+t.test('ZIP Tree', async (t) => {
   t.test('create', (t) => {
     t.plan(3)
 
@@ -30,9 +28,7 @@ t.test('ZIP Tree', (t) => {
     t.equal(tree.getSize(), 7)
   })
 
-  t.test('find', (t) => {
-    t.plan(2)
-
+  t.test('find', async (t) => {
     const tree = new ZipTree()
     tree.insert(1, [1, 2, 3])
 
@@ -47,9 +43,7 @@ t.test('ZIP Tree', (t) => {
     t.same(tree.find(20), [16, 17, 18])
   })
 
-  t.test('remove', (t) => {
-    t.plan(2)
-
+  t.test('remove', async (t) => {
     const tree = new ZipTree()
     tree.insert(1, 'foo')
 
@@ -66,9 +60,7 @@ t.test('ZIP Tree', (t) => {
     t.equal(tree.contains(20), false)
   })
 
-  t.test('rangeSearch', (t) => {
-    t.plan(1)
-
+  t.test('rangeSearch', async (t) => {
     const tree = new ZipTree()
     tree.insert(1, 'foo')
 
@@ -82,9 +74,7 @@ t.test('ZIP Tree', (t) => {
     t.same(tree.rangeSearch(5, 20), ['quux', 'baz', 'corge', 'quuz'])
   })
 
-  t.test('greaterThan', (t) => {
-    t.plan(1)
-
+  t.test('greaterThan', async (t) => {
     const tree = new ZipTree()
     tree.insert(1, 'foo')
 
@@ -98,9 +88,7 @@ t.test('ZIP Tree', (t) => {
     t.same(tree.greaterThan(10), ['corge', 'quuz', 'qux'])
   })
 
-  t.test('lessThan', (t) => {
-    t.plan(1)
-
+  t.test('lessThan', async (t) => {
     const tree = new ZipTree()
     tree.insert(1, 'foo')
 

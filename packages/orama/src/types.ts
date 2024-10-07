@@ -935,6 +935,7 @@ export interface IIndex<I extends AnyIndexStore> {
     index: T,
     prop: string,
     id: DocumentID,
+    internalId: InternalDocumentID,
     value: SearchableValue,
     schemaType: SearchableType,
     language: string | undefined,
@@ -962,24 +963,35 @@ export interface IIndex<I extends AnyIndexStore> {
   insertTokenScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], token: string): void
   removeDocumentScoreParameters(index: I, prop: string, id: DocumentID, docsCount: number): SyncOrAsyncValue
   removeTokenScoreParameters(index: I, prop: string, token: string): void
-  calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-    context: SearchContext<T, ResultDocument>,
-    index: I,
+  calculateResultScores(
+    index: AnyIndexStore,
     prop: string,
     term: string,
-    ids: DocumentID[]
+    ids: InternalDocumentID[],
+    docsCount: number,
+    bm25Relevance: Required<BM25Params>,
+    resultsMap: Map<number, number>,
+    boostPerProperty: number,
+  )
+
+  search<T extends AnyOrama>(
+    index: AnyIndexStore,
+    term: string,
+    tokenizer: Tokenizer,
+    language: string | undefined,
+    propertiesToSearch: string[],
+    exact: boolean,
+    tolerance: number,
+    boost: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>,
+    relevance: Required<BM25Params>,
+    docsCount: number
   ): TokenScore[]
 
-  search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-    context: SearchContext<T, ResultDocument>,
-    index: I,
-    prop: string,
-    term: string
-  ): TokenScore[]
-  searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-    context: SearchContext<T, ResultDocument>,
-    index: I,
-    filters: Partial<WhereCondition<T['schema']>>
+  searchByWhereClause<T extends AnyOrama>(
+    index: AnyIndexStore,
+    tokenizer: Tokenizer,
+    filters: Partial<WhereCondition<T['schema']>>,
+    language: string | undefined
   ): InternalDocumentID[]
 
   getSearchableProperties(index: I): string[]

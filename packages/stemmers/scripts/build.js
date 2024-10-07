@@ -29,7 +29,12 @@ const stemmers = {
   romanian: 'ro',
   russian: 'ru',
   serbian: 'rs',
-  slovenian: 'ru',
+  //  This is never implemented actually.
+  //  We used `slovenian` as `russian`, but it was wrong, sorry!
+  //  Instead of providing a wrong implementation, we don't export it.
+  //  Anyway, this is never tested inside `orama` package.
+  //  Please, we need a PR to implement this correctly!
+  /* slovenian: 'sl', */
   spanish: 'es',
   swedish: 'se',
   tamil: 'ta',
@@ -54,7 +59,7 @@ async function compile(lang, fullLang, jsExtension, tsExtension, moduleType) {
   // Create the definition file
   await writeFile(
     resolve(destinationDir, `${lang}.d.${tsExtension}`),
-    'export declare function stemmer(word: string): string',
+    'export declare function stemmer(word: string): string;\n export const language: string;',
     'utf-8'
   )
 }

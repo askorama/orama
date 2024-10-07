@@ -1,7 +1,7 @@
 import t from 'tap'
 import { create, insert, insertMultiple, load, remove, save, search, update } from '../src/index.js'
 
-t.test('search with sortBy', (t) => {
+t.test('search with sortBy', async (t) => {
   t.test('on number', async (t) => {
     const db = await create({
       schema: {

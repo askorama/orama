@@ -19,7 +19,7 @@ t.test('create should support array of string', async (t) => {
     { id: '3', name: ['Lily', 'Lily', 'Lily', 'Lily', 'Evans', 'Potter'] }
   ])
 
-  await checkSearchTerm(t, db, 'Albus', [albusId])
+  await checkSearchTerm(t, db, 'Albus', [albusId])  
   await checkSearchTerm(t, db, 'Harry', [harryId])
   await checkSearchTerm(t, db, 'James', [harryId, jamesId])
   await checkSearchTerm(t, db, 'Potter', [harryId, jamesId, lilyId])
@@ -27,6 +27,7 @@ t.test('create should support array of string', async (t) => {
   await checkSearchTerm(t, db, 'foo', [])
 
   await checkSearchWhere(t, db, 'name', 'Albus', [albusId])
+
   await checkSearchWhere(t, db, 'name', 'Harry', [harryId])
   await checkSearchWhere(t, db, 'name', 'James', [harryId, jamesId])
   await checkSearchWhere(t, db, 'name', 'Potter', [harryId, jamesId, lilyId])
@@ -82,6 +83,7 @@ t.test('create should support array of number', async (t) => {
   ])
 
   await checkSearchWhere(t, db, 'num', { eq: 5 }, [first, third, fourth])
+
   await checkSearchWhere(t, db, 'num', { eq: 35 }, [third])
   await checkSearchWhere(t, db, 'num', { gt: 6 }, [second, third])
   await checkSearchWhere(t, db, 'num', { gte: 7 }, [second, third])
@@ -153,8 +155,6 @@ t.test('create should support array of boolean', async (t) => {
 })
 
 t.test('remove should support array as well', async (t) => {
-  t.plan(2)
-
   const db = create({
     schema: {
       strings: 'string[]',
@@ -175,8 +175,6 @@ t.test('remove should support array as well', async (t) => {
 })
 
 t.test('serialization should support array as well', async (t) => {
-  t.plan(2)
-
   const db = create({
     schema: {
       strings: 'string[]',
@@ -210,8 +208,6 @@ t.test('serialization should support array as well', async (t) => {
 })
 
 t.test('update supports array as well', async (t) => {
-  t.plan(2)
-
   const db = create({
     schema: {
       strings: 'string[]',
@@ -254,7 +250,7 @@ async function checkSearchWhere(t, db, key, where, expectedIds) {
   t.strictSame(new Set(result.hits.map((h) => h.id).sort()), new Set(expectedIds))
 }
 
-async function checkSearchFacets(t: Tap.Test, db, key, facet, expectedFacet) {
+async function checkSearchFacets(t: any, db, key, facet, expectedFacet) {
   const result = await search(db, {
     facets: {
       [key]: facet

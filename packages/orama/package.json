@@ -81,7 +81,9 @@
     }
   },
   "types": "./dist/commonjs/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/askorama/orama"
@@ -146,7 +148,7 @@
     "commitizen": "^4.2.6",
     "glob": "^9.2.3",
     "prettier": "^2.8.1",
-    "tap": "^18.6.1",
+    "tap": "^21.0.1",
     "tap-mocha-reporter": "^5.0.3",
     "tape": "^5.6.1",
     "tcompare": "^6.0.0",
@@ -169,7 +171,10 @@
       "./components": "./src/components.ts",
       "./trees": "./src/trees.ts"
     },
-    "esmDialects": ["deno", "browser"]
+    "esmDialects": [
+      "deno",
+      "browser"
+    ]
   },
   "module": "./dist/esm/index.js"
 }

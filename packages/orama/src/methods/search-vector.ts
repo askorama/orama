@@ -1,6 +1,5 @@
 import type { AnyOrama, Results, SearchParamsVector, TypedDocument, Result } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { createSearchContext } from './search.js'
 import { getNanosecondsTime, formatNanoseconds } from '../utils.js'
 import { getFacets } from '../components/facets.js'
 import { createError } from '../errors.js'
@@ -11,6 +10,63 @@ import { getInternalDocumentId, getDocumentIdFromInternalId } from '../component
 import { Language } from '../index.js'
 import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
 
+export function innerVectorSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+  orama: T,
+  params: Pick<SearchParamsVector<T, ResultDocument>, 'vector' | 'similarity' | 'where'>,
+  language: Language | undefined
+) {
+  const vector = params.vector
+
+  if (vector && (!('value' in vector) || !('property' in vector))) {
+    throw createError('INVALID_VECTOR_INPUT', Object.keys(vector).join(', '))
+  }
+
+  const vectorIndex = orama.data.index.vectorIndexes[vector!.property]
+  const vectorSize = vectorIndex.size
+  if (vector?.value.length !== vectorSize) {
+    if (vector?.property === undefined || vector?.value.length === undefined) {
+      throw createError('INVALID_INPUT_VECTOR', 'undefined', vectorSize, 'undefined')
+    }
+    throw createError('INVALID_INPUT_VECTOR', vector.property, vectorSize, vector.value.length)
+  }
+
+  if (!(vector instanceof Float32Array)) {
+    vector.value = new Float32Array(vector.value)
+  }
+
+  const vectors = vectorIndex.vectors
+
+  let results = findSimilarVectors(vector.value as Float32Array, vectors, vectorSize, params.similarity).map(
+    ([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score]
+  ) as [number, number][]
+
+
+  let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
+
+  const index = orama.data.index
+  if (!propertiesToSearch) {
+    const propertiesToSearchWithTypes = orama.index.getSearchablePropertiesWithTypes(index)
+
+    propertiesToSearch = orama.index.getSearchableProperties(index)
+    propertiesToSearch = propertiesToSearch.filter((prop: string) =>
+      propertiesToSearchWithTypes[prop].startsWith('string')
+    )
+
+    orama.caches['propertiesToSearch'] = propertiesToSearch
+  }
+
+
+  let whereFiltersIDs: InternalDocumentID[] = []
+
+  const hasFilters = Object.keys(params.where ?? {}).length > 0
+  if (hasFilters) {
+    whereFiltersIDs = orama.index.searchByWhereClause(index, orama.tokenizer, params.where!, language)
+    results = intersectFilteredIDs(whereFiltersIDs, results)
+  }
+
+  return results
+}
+
 export function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
   params: SearchParamsVector<T, ResultDocument>,
@@ -18,81 +74,22 @@ export function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<
 ): Results<ResultDocument> | Promise<Results<ResultDocument>> {
   const timeStart = getNanosecondsTime()
 
-  const asyncNeeded = orama.beforeSearch?.length || orama.afterSearch?.length
-
   function performSearchLogic(): Results<ResultDocument> {
-    const { vector } = params
-
-    if (vector && (!('value' in vector) || !('property' in vector))) {
-      throw createError('INVALID_VECTOR_INPUT', Object.keys(vector).join(', '))
-    }
-
-    const { limit = 10, offset = 0, includeVectors = false } = params
-    const vectorIndex = orama.data.index.vectorIndexes[vector!.property]
-    const vectorSize = vectorIndex.size
-    const vectors = vectorIndex.vectors
-    const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
-    const hasFilters = Object.keys(params.where ?? {}).length > 0
-    const { index, docs: oramaDocs } = orama.data
-
-    if (vector?.value.length !== vectorSize) {
-      if (vector?.property === undefined || vector?.value.length === undefined) {
-        throw createError('INVALID_INPUT_VECTOR', 'undefined', vectorSize, 'undefined')
-      }
-      throw createError('INVALID_INPUT_VECTOR', vector.property, vectorSize, vector.value.length)
-    }
-
-    if (!(vector instanceof Float32Array)) {
-      vector.value = new Float32Array(vector.value)
-    }
-
-    let results = findSimilarVectors(vector.value as Float32Array, vectors, vectorSize, params.similarity).map(
-      ([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score]
-    ) as [number, number][]
-
-    let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
-
-    if (!propertiesToSearch) {
-      const propertiesToSearchWithTypes = orama.index.getSearchablePropertiesWithTypes(index)
-
-      propertiesToSearch = orama.index.getSearchableProperties(index)
-      propertiesToSearch = propertiesToSearch.filter((prop: string) =>
-        propertiesToSearchWithTypes[prop].startsWith('string')
-      )
-
-      orama.caches['propertiesToSearch'] = propertiesToSearch
-    }
-
-    const tokens = []
-
-    const context = createSearchContext(
-      orama.tokenizer,
-      orama.index,
-      orama.documentsStore,
-      language,
-      params,
-      propertiesToSearch,
-      tokens,
-      orama.documentsStore.count(oramaDocs),
-      timeStart
-    )
-
-    let whereFiltersIDs: InternalDocumentID[] = []
-
-    if (hasFilters) {
-      whereFiltersIDs = orama.index.searchByWhereClause(context, index, params.where!)
-      results = intersectFilteredIDs(whereFiltersIDs, results)
-    }
+    const results = innerVectorSearch(orama, params, language)
 
     let facetsResults: any = []
 
+    const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
     if (shouldCalculateFacets) {
       const facets = getFacets(orama, results, params.facets!)
       facetsResults = facets
     }
 
+    const vectorProperty = params.vector!.property
+    const includeVectors = params.includeVectors ?? false
+    const limit = params.limit ?? 10
+    const offset = params.offset ?? 0
     const docs: Result<ResultDocument>[] = Array.from({ length: limit })
-
     for (let i = 0; i < limit; i++) {
       const result = results[i + offset]
       if (!result) {
@@ -103,7 +100,7 @@ export function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<
 
       if (doc) {
         if (!includeVectors) {
-          doc[vector.property] = null
+          doc[vectorProperty] = null
         }
 
         const newDoc: Result<ResultDocument> = {
@@ -150,6 +147,7 @@ export function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<
     return results
   }
 
+  const asyncNeeded = orama.beforeSearch?.length || orama.afterSearch?.length
   if (asyncNeeded) {
     return executeSearchAsync()
   }

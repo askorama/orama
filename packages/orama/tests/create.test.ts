@@ -3,8 +3,6 @@ import { create } from '../src/methods/create.js'
 
 t.test('create method', (t) => {
   t.test('should provide an unique ID for the instance', async (t) => {
-    t.plan(3)
-
     const orama1 = create({ schema: {} })
     const orama2 = create({ schema: {} })
 
@@ -15,8 +13,6 @@ t.test('create method', (t) => {
   })
 
   t.test('should accept an "id" property and set is as instance ID', async (t) => {
-    t.plan(2)
-
     const orama = create({ schema: {}, id: 'my-instance-id' })
 
     t.hasProp(orama, 'id')
@@ -35,8 +31,6 @@ t.test('create method', (t) => {
   })
 
   t.test('should allow creation of an index with a geopoint property', async (t) => {
-    t.plan(1)
-
     t.ok(
       create({
         schema: {

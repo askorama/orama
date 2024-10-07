@@ -3,8 +3,6 @@ import { create, insert, insertMultiple, search } from '../src/index.js'
 
 t.test('facets', (t) => {
   t.test('should generate correct facets', async (t) => {
-    t.plan(6)
-
     const db = await create({
       schema: {
         author: 'string',
@@ -73,7 +71,6 @@ t.test('facets', (t) => {
 
     const results = await search(db, {
       term: 'work time',
-      threshold: 1,
       facets: {
         'meta.isFavorite': {
           true: true,
@@ -93,8 +90,6 @@ t.test('facets', (t) => {
   })
 
   t.test('should correctly handle range facets', async (t) => {
-    t.plan(5)
-
     const db = await create({
       schema: {
         name: 'string',
@@ -141,7 +136,6 @@ t.test('facets', (t) => {
 
     const results = await search(db, {
       term: 'groceries',
-      threshold: 1,
       properties: ['category'],
       facets: {
         price: {
@@ -256,14 +250,13 @@ t.test('facets', (t) => {
 
     const results = await search(db, {
       term: 'person',
-      threshold: 1,
       facets: {
         author: {}
       }
     })
 
     t.same(results.facets?.['author'].count, orderedAuthors.length)
-    t.same(Object.keys(results.facets?.['author'].values).length, 10)
+    t.same(Object.keys(results.facets!['author'].values).length, 10)
   })
 
   t.test('should generate correct facets with correct number of items', async (t) => {
@@ -271,7 +264,6 @@ t.test('facets', (t) => {
 
     const results = await search(db, {
       term: 'person',
-      threshold: 1,
       facets: {
         author: {
           limit: orderedAuthors.length + 1
@@ -280,7 +272,7 @@ t.test('facets', (t) => {
     })
 
     t.same(results.facets?.['author'].count, orderedAuthors.length)
-    t.same(Object.keys(results.facets?.['author'].values).length, orderedAuthors.length)
+    t.same(Object.keys(results.facets!['author'].values).length, orderedAuthors.length)
   })
 
   t.test('should generate correct facets when limit is lower than total values', async (t) => {
@@ -288,7 +280,6 @@ t.test('facets', (t) => {
 
     const results = await search(db, {
       term: 'person',
-      threshold: 1,
       facets: {
         author: {
           limit: orderedAuthors.length - 1
@@ -297,7 +288,7 @@ t.test('facets', (t) => {
     })
 
     t.same(results.facets?.['author'].count, orderedAuthors.length)
-    t.same(Object.keys(results.facets?.['author'].values).length, orderedAuthors.length - 1)
+    t.same(Object.keys(results.facets!['author'].values).length, orderedAuthors.length - 1)
   })
 
   t.end()

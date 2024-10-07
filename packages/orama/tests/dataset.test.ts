@@ -67,7 +67,6 @@ t.test('orama.dataset', async (t) => {
     const s1 = await search(db, {
       term: 'august',
       exact: true,
-      threshold: 1,
       properties: ['categories.first'],
       limit: 10,
       offset: 0
@@ -76,7 +75,6 @@ t.test('orama.dataset', async (t) => {
     const s2 = await search(db, {
       term: 'january, june',
       exact: true,
-      threshold: 1,
       properties: ['categories.first'],
       limit: 10,
       offset: 0
@@ -85,7 +83,6 @@ t.test('orama.dataset', async (t) => {
     const s3 = await search(db, {
       term: 'january/june',
       exact: true,
-      threshold: 1,
       properties: ['categories.first'],
       limit: 10,
       offset: 0
@@ -103,19 +100,16 @@ t.test('orama.dataset', async (t) => {
   t.test('should correctly search long strings', async (t) => {
     const s1 = await search(db, {
       term: 'e into the',
-      threshold: 1,
       properties: ['description']
     })
 
     const s2 = await search(db, {
       term: 'The Roman armies',
-      threshold: 1,
       properties: ['description']
     })
 
     const s3 = await search(db, {
       term: 'the King of Epirus, is taken',
-      threshold: 1,
       properties: ['description']
     })
 
@@ -130,7 +124,6 @@ t.test('orama.dataset', async (t) => {
     const s1 = removeVariadicData(
       await search(db, {
         term: 'war',
-        threshold: 1,
         exact: true,
         // eslint-disable-next-line
         // @ts-ignore
@@ -143,7 +136,6 @@ t.test('orama.dataset', async (t) => {
     const s2 = removeVariadicData(
       await search(db, {
         term: 'war',
-        threshold: 1,
         exact: true,
         properties: ['description'],
         limit: 10,
@@ -154,7 +146,6 @@ t.test('orama.dataset', async (t) => {
     const s3 = removeVariadicData(
       await search(db, {
         term: 'war',
-        threshold: 1,
         exact: true,
         properties: ['description'],
         limit: 10,
@@ -164,7 +155,6 @@ t.test('orama.dataset', async (t) => {
 
     const s4 = await search(db, {
       term: 'war',
-      threshold: 1,
       exact: true,
       properties: ['description'],
       limit: 2240,
@@ -173,7 +163,6 @@ t.test('orama.dataset', async (t) => {
 
     const s5 = await search(db, {
       term: 'war',
-      threshold: 1,
       exact: true,
       properties: ['description'],
       limit: 10,
@@ -215,7 +204,6 @@ t.test('orama.dataset', async (t) => {
   t.test('should correctly delete documents', async (t) => {
     const documentsToDelete = await search(db, {
       term: 'war',
-      threshold: 1,
       exact: true,
       properties: ['description'],
       limit: 10,
@@ -228,7 +216,6 @@ t.test('orama.dataset', async (t) => {
 
     const newSearch = await search(db, {
       term: 'war',
-      threshold: 1,
       exact: true,
       properties: ['description'],
       limit: 10,

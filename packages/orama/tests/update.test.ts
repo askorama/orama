@@ -1,12 +1,8 @@
 import t from 'tap'
 import { create, insert, getByID, update, updateMultiple, count } from '../src/index.js'
 
-t.test('update method', (t) => {
-  t.plan(1)
-
+t.test('update method', async (t) => {
   t.test('should remove a document the old document and insert the new one', async (t) => {
-    t.plan(3)
-
     const db = create({
       schema: {
         quote: 'string',

@@ -1,12 +1,8 @@
 import t from 'tap'
 import { create, insert, search } from '../src/index.js'
 
-t.test('boosting', (t) => {
-  t.plan(1)
-
+t.test('boosting', async (t) => {
   t.test('field boosting', async (t) => {
-    t.plan(2)
-
     const db = await create({
       schema: {
         id: 'string',
@@ -30,12 +26,10 @@ t.test('boosting', (t) => {
 
     const { hits: hits1 } = await search(db, {
       term: 'computer for browsing and movies',
-      threshold: 1
     })
 
     const { hits: hits2 } = await search(db, {
       term: 'computer for browsing and movies',
-      threshold: 1,
       boost: {
         title: 2.5
       }

@@ -1,57 +1,7 @@
 import t from 'tap'
 import { create, insert, search, remove } from '../src/index.js'
 
-async function createSimpleDB() {
-  let i = 0
-  const db = await create({
-    schema: {
-      name: 'string',
-      rating: 'number',
-      price: 'number',
-      meta: {
-        sales: 'number'
-      }
-    } as const,
-    components: {
-      getDocumentIndexId(): string {
-        return `__${++i}`
-      }
-    }
-  })
-
-  await insert(db, {
-    name: 'washing machine',
-    rating: 5,
-    price: 900,
-    meta: {
-      sales: 100
-    }
-  })
-
-  await insert(db, {
-    name: 'coffee maker',
-    rating: 3,
-    price: 30,
-    meta: {
-      sales: 25
-    }
-  })
-
-  await insert(db, {
-    name: 'coffee maker deluxe',
-    rating: 5,
-    price: 45,
-    meta: {
-      sales: 25
-    }
-  })
-
-  return db
-}
-
-t.test('filters', (t) => {
-  t.plan(9)
-
+t.test('filters', async (t) => {
   t.test('should throw on unknown field', async (t) => {
     const db = await createSimpleDB()
 
@@ -104,8 +54,6 @@ t.test('filters', (t) => {
   })
 
   t.test('greater than', async (t) => {
-    t.plan(2)
-
     const db = await createSimpleDB()
 
     const r1_gt = await search(db, {
@@ -122,8 +70,6 @@ t.test('filters', (t) => {
   })
 
   t.test('greater than or equal to', async (t) => {
-    t.plan(3)
-
     const db = await createSimpleDB()
 
     const r1_gte = await search(db, {
@@ -141,8 +87,6 @@ t.test('filters', (t) => {
   })
 
   t.test('less than', async (t) => {
-    t.plan(2)
-
     const db = await createSimpleDB()
 
     const r1_lt = await search(db, {
@@ -159,8 +103,6 @@ t.test('filters', (t) => {
   })
 
   t.test('less than or equal to', async (t) => {
-    t.plan(2)
-
     const db = await createSimpleDB()
 
     const r1_lte = await search(db, {
@@ -177,8 +119,6 @@ t.test('filters', (t) => {
   })
 
   t.test('equal', async (t) => {
-    t.plan(2)
-
     const db = await createSimpleDB()
 
     const r1_lte = await search(db, {
@@ -195,8 +135,6 @@ t.test('filters', (t) => {
   })
 
   t.test('between', async (t) => {
-    t.plan(2)
-
     const db = await createSimpleDB()
 
     const r1_lte = await search(db, {
@@ -213,8 +151,6 @@ t.test('filters', (t) => {
   })
 
   t.test('multiple filters', async (t) => {
-    t.plan(2)
-
     const db = await createSimpleDB()
 
     const r1_lte = await search(db, {
@@ -234,8 +170,6 @@ t.test('filters', (t) => {
   })
 
   t.test('multiple filters, and operation', async (t) => {
-    t.plan(2)
-
     const db = await createSimpleDB()
 
     const r1_lte = await search(db, {
@@ -260,8 +194,6 @@ t.test('filters', (t) => {
 })
 
 t.test('should throw when using multiple operators', async (t) => {
-  t.plan(1)
-
   const db = await createSimpleDB()
 
   t.throws(
@@ -280,8 +212,6 @@ t.test('should throw when using multiple operators', async (t) => {
 })
 
 t.test('boolean filters', async (t) => {
-  t.plan(7)
-
   const db = create({
     schema: {
       id: 'string',
@@ -428,8 +358,6 @@ t.test('string filters', async (t) => {
 })
 
 t.test('string filters with stemming', async (t) => {
-  t.plan(6)
-
   const db = await create({
     schema: {
       id: 'string',
@@ -479,3 +407,51 @@ t.test('string filters with stemming', async (t) => {
   t.equal(r2.hits[0].id, '1')
   t.equal(r2.hits[1].id, '2')
 })
+
+async function createSimpleDB() {
+  let i = 0
+  const db = await create({
+    schema: {
+      name: 'string',
+      rating: 'number',
+      price: 'number',
+      meta: {
+        sales: 'number'
+      }
+    } as const,
+    components: {
+      getDocumentIndexId(): string {
+        return `__${++i}`
+      }
+    }
+  })
+
+  await insert(db, {
+    name: 'washing machine',
+    rating: 5,
+    price: 900,
+    meta: {
+      sales: 100
+    }
+  })
+
+  await insert(db, {
+    name: 'coffee maker',
+    rating: 3,
+    price: 30,
+    meta: {
+      sales: 25
+    }
+  })
+
+  await insert(db, {
+    name: 'coffee maker deluxe',
+    rating: 5,
+    price: 45,
+    meta: {
+      sales: 25
+    }
+  })
+
+  return db
+}

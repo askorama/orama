@@ -117,11 +117,6 @@
       "import": "./dist/rs.js",
       "require": "./dist/rs.cjs"
     },
-    "./slovenian": {
-      "types": "./dist/ru.d.ts",
-      "import": "./dist/ru.js",
-      "require": "./dist/ru.cjs"
-    },
     "./spanish": {
       "types": "./dist/es.d.ts",
       "import": "./dist/es.js",

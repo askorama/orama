@@ -164,7 +164,7 @@ function removeSync<T extends AnyOrama>(orama: T, id: DocumentID, language?: str
         schemaType,
         language,
         orama.tokenizer,
-        docsCount
+        docsCount,
       )
     ) {
       result = false

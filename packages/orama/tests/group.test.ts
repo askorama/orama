@@ -4,7 +4,7 @@ import { GroupResult, create, insertMultiple, search } from '../src/index.js'
 t.test('search with groupBy', async (t) => {
   const [db] = createDb()
 
-  t.test('should group by a single property', (t) => {
+  t.test('should group by a single property', async (t) => {
     t.test('', async (t) => {
       const results = await search(db, {
         term: 't-shirt',
@@ -83,10 +83,9 @@ t.test('search with groupBy', async (t) => {
       t.end()
     })
 
-    t.end()
   })
 
-  t.test('should group by a 2 properties', (t) => {
+  t.test('should group by a 2 properties', async (t) => {
     t.test('', async (t) => {
       const results = await search(db, {
         groupBy: {
@@ -132,8 +131,6 @@ t.test('search with groupBy', async (t) => {
 
       t.end()
     })
-
-    t.end()
   })
 
   t.test('should group by a 3 properties', async (t) => {
@@ -183,8 +180,6 @@ t.test('search with groupBy', async (t) => {
 
       t.end()
     })
-
-    t.end()
   })
 
   t.test('with custom aggregator', async (t) => {
@@ -247,8 +242,6 @@ t.test('search with groupBy', async (t) => {
         }
       ])
     )
-
-    t.end()
   })
 
   t.test('only scalar values are supported', async (t) => {
@@ -281,11 +274,7 @@ t.test('search with groupBy', async (t) => {
         message: 'Invalid groupBy property "tags". Allowed types: "string, number, boolean", but given "string[]"'
       }
     )
-
-    t.end()
   })
-
-  t.end()
 })
 
 t.test('real test', async (t) => {
@@ -306,8 +295,6 @@ t.test('real test', async (t) => {
     { values: ['A'], result: ['1'] },
     { values: ['B'], result: ['6'] }
   ])
-
-  t.end()
 })
 
 function compareGroupResults(t: Tap.Test, groups: GroupResult<any>, expected) {
