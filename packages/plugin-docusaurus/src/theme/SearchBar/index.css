@@ -1,0 +1,11 @@
+.DocSearch-Button {
+  -webkit-user-select: none;
+  user-select: none
+}
+
+.DocSearch-Button kbd {
+  border: 0;
+  box-shadow: none;
+  font-size: .8rem !important;
+  padding: 0 !important;
+}
