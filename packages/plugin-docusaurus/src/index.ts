@@ -44,7 +44,7 @@ export default function OramaPluginDocusaurus(
   let versions: any[] = []
 
   return {
-    name: '@orama/plugin-docusaurus-v3',
+    name: '@orama/plugin-docusaurus',
 
     getThemePath() {
       return '../dist/theme'
@@ -58,7 +58,7 @@ export default function OramaPluginDocusaurus(
       return ['../dist/theme/SearchBar/index.css']
     },
 
-    async allContentLoaded({ actions, allContent }) {
+    async contentLoaded({ actions, allContent }) {
       const isDevelopment =
         process.env.NODE_ENV === 'development' || !options.cloud?.oramaCloudAPIKey || !options.cloud?.deploy
       const docsInstances: string[] = []
