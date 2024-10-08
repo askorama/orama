@@ -1,0 +1,33 @@
+{
+  "name": "insert",
+  "date": "2024-10-08T13:34:21.827Z",
+  "version": "1.0.0",
+  "results": [
+    {
+      "name": "insert in Orama 2.1.1",
+      "ops": 7.95,
+      "margin": 1.63,
+      "percentSlower": 11.17
+    },
+    {
+      "name": "insert in Orama 3.0.0-rc-2",
+      "ops": 8.95,
+      "margin": 3.28,
+      "percentSlower": 0
+    },
+    {
+      "name": "insert in Orama latest",
+      "ops": 8.02,
+      "margin": 4.78,
+      "percentSlower": 10.39
+    }
+  ],
+  "fastest": {
+    "name": "insert in Orama 3.0.0-rc-2",
+    "index": 1
+  },
+  "slowest": {
+    "name": "insert in Orama 2.1.1",
+    "index": 0
+  }
+}
