@@ -727,7 +727,7 @@ t.test('search method', (t) => {
   t.test('with custom tokenizer', async (t) => {
     t.plan(4)
 
-    const normalizationCache = new Map([['english:foo:dogs', 'Dogs']])
+    const normalizationCache = new Map([['dogs', 'Dogs']])
 
     const db = await create({
       schema: {
