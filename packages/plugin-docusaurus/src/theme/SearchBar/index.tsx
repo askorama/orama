@@ -8,11 +8,11 @@ import { OramaSearchBox, OramaSearchButton } from "@orama/react-components"
 import { useOrama, PluginData } from "./useOrama"
 
 export function OramaSearchNoDocs() {
-	const { searchBoxConfig, colorMode } = useOrama()
+	const { searchBoxConfig, searchBtnConfig, colorMode } = useOrama()
 
 	return (
 		<div>
-			<OramaSearchButton colorScheme={colorMode} className="DocSearch-Button" />
+			<OramaSearchButton {...searchBtnConfig} colorScheme={colorMode} className="DocSearch-Button" />
 			{searchBoxConfig.basic && (
 				<OramaSearchBox
 					{...searchBoxConfig.basic}
@@ -35,7 +35,7 @@ export function OramaSearchWithDocs({ pluginId }: { pluginId: string }) {
 	const activeVersion = useActiveVersion(pluginId)
 	const { preferredVersion } = useDocsPreferredVersion(pluginId)
 	const currentVersion = activeVersion || preferredVersion || versions[0]
-	const { searchBoxConfig, colorMode } = useOrama()
+	const { searchBoxConfig, searchBtnConfig, colorMode } = useOrama()
 
 	const searchParams = {
 		...(currentVersion && {
@@ -47,7 +47,7 @@ export function OramaSearchWithDocs({ pluginId }: { pluginId: string }) {
 
 	return (
 		<div>
-			<OramaSearchButton colorScheme={colorMode} className="DocSearch-Button" />
+			<OramaSearchButton {...searchBtnConfig} colorScheme={colorMode} className="DocSearch-Button" />
 			{searchBoxConfig.basic && (
 				<OramaSearchBox
 					{...searchBoxConfig.basic}
