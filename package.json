@@ -1,7 +1,7 @@
 {
   "name": "orama-monorepo",
   "version": "3.0.0-rc-3",
-  "description": "Next generation full-text and vector search engine, written in TypeScript",
+  "description": "A complete RAG pipeline in your browser, server, or edge network with support for full-text, vector, and hybrid search in less than 2kb.",
   "workspaces": [
     "packages/*",
     "sandboxes/*"
@@ -44,14 +44,14 @@
   },
   "author": {
     "name": "Michele Riva",
-    "email": "michele.riva@oramasearch.com",
+    "email": "michele@orama.com",
     "url": "https://github.com/MicheleRiva",
     "author": true
   },
   "contributors": [
     {
       "name": "Tommaso Allevi",
-      "email": "tommaso.allevi@oramasearch.com",
+      "email": "tommaso.allevi@orama.com",
       "url": "https://github.com/allevo",
       "author": true
     }
