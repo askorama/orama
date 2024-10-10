@@ -55,42 +55,45 @@ t.test('filters', (t) => {
   t.test('should throw on unknown field', async (t) => {
     const db = await createSimpleDB()
 
-    await t.rejects(
-      search(db, {
-        term: 'coffee',
-        where: {
-          // @ts-expect-error - unknown field
-          unknownField: '5'
-        }
-      }),
+    t.throws(
+      () =>
+        search(db, {
+          term: 'coffee',
+          where: {
+            // @ts-expect-error - unknown field
+            unknownField: '5'
+          }
+        }),
       {
         message: 'Unknown filter property "unknownField"',
         code: 'UNKNOWN_FILTER_PROPERTY'
       }
     )
 
-    await t.rejects(
-      search(db, {
-        term: 'coffee',
-        where: {
-          // @ts-expect-error - unknown field
-          unknownField: { gt: '5' } as unknown as string
-        }
-      }),
+    t.throws(
+      () =>
+        search(db, {
+          term: 'coffee',
+          where: {
+            // @ts-expect-error - unknown field
+            unknownField: { gt: '5' } as unknown as string
+          }
+        }),
       {
         message: 'Unknown filter property "unknownField"',
         code: 'UNKNOWN_FILTER_PROPERTY'
       }
     )
 
-    await t.rejects(
-      search(db, {
-        term: 'coffee',
-        where: {
-          // @ts-expect-error - unknown field
-          unknownField: true as unknown as string
-        }
-      }),
+    t.throws(
+      () =>
+        search(db, {
+          term: 'coffee',
+          where: {
+            // @ts-expect-error - unknown field
+            unknownField: true as unknown as string
+          }
+        }),
       {
         message: 'Unknown filter property "unknownField"',
         code: 'UNKNOWN_FILTER_PROPERTY'
@@ -261,7 +264,7 @@ t.test('should throw when using multiple operators', async (t) => {
 
   const db = await createSimpleDB()
 
-  await t.rejects(
+  t.throws(
     () =>
       search(db, {
         term: 'coffee',
@@ -279,7 +282,7 @@ t.test('should throw when using multiple operators', async (t) => {
 t.test('boolean filters', async (t) => {
   t.plan(7)
 
-  const db = await create({
+  const db = create({
     schema: {
       id: 'string',
       isAvailable: 'boolean',

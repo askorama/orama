@@ -7,7 +7,7 @@ t.test('geosearch', (t) => {
   t.test('should find geopoints inside a radius', async (t) => {
     t.plan(2)
 
-    const db = await create({
+    const db = create({
       schema: {
         id: 'string',
         location: 'geopoint'
@@ -96,7 +96,7 @@ t.test('geosearch', (t) => {
   t.test('should find geopoints inside a polygon', async (t) => {
     t.plan(2)
 
-    const db = await create({
+    const db = create({
       schema: {
         id: 'string',
         location: 'geopoint'
@@ -135,7 +135,7 @@ t.test('geosearch', (t) => {
   t.test('should find geopoints outside a polygon', async (t) => {
     t.plan(2)
 
-    const db = await create({
+    const db = create({
       schema: {
         id: 'string',
         location: 'geopoint'
@@ -175,7 +175,7 @@ t.test('geosearch', (t) => {
   t.test('should run in high-precision mode', async (t) => {
     t.plan(4)
 
-    const db = await create({
+    const db = create({
       schema: {
         id: 'string',
         location: 'geopoint'
@@ -228,10 +228,10 @@ t.test('geosearch', (t) => {
       polygonResults.hits.map(({ id }) => id),
       ['1', '2', '3', '4', '5']
     )
-    t.same(radiusResults.count, 1)
+    t.same(radiusResults.count, 2)
     t.same(
       radiusResults.hits.map(({ id }) => id),
-      ['1']
+      ['1', '2']
     )
   })
 })

@@ -1,3 +1,4 @@
+import type { Optional } from '../../types.js'
 import { createError } from '../../errors.js'
 import { Stemmer, Tokenizer, DefaultTokenizerConfig } from '../../types.js'
 import { replaceDiacritics } from './diacritics.js'
@@ -12,7 +13,7 @@ export interface DefaultTokenizer extends Tokenizer {
   stopWords?: string[]
   allowDuplicates: boolean
   normalizationCache: Map<string, string>
-  normalizeToken(this: DefaultTokenizer, token: string, prop: string | undefined): string
+  normalizeToken(this: DefaultTokenizer, token: string, prop: Optional<string>): string
 }
 
 export function normalizeToken(this: DefaultTokenizer, prop: string, token: string): string {
@@ -80,7 +81,7 @@ function tokenize(this: DefaultTokenizer, input: string, language?: string, prop
   return trimTokens
 }
 
-export async function createTokenizer(config: DefaultTokenizerConfig = {}): Promise<DefaultTokenizer> {
+export function createTokenizer(config: DefaultTokenizerConfig = {}): DefaultTokenizer {
   if (!config.language) {
     config.language = 'english'
   } else if (!SUPPORTED_LANGUAGES.includes(config.language)) {
@@ -88,7 +89,7 @@ export async function createTokenizer(config: DefaultTokenizerConfig = {}): Prom
   }
 
   // Handle stemming - It is disabled by default
-  let stemmer: Stemmer | undefined
+  let stemmer: Optional<Stemmer>
 
   if (config.stemming || (config.stemmer && !('stemming' in config))) {
     if (config.stemmer) {
@@ -107,7 +108,7 @@ export async function createTokenizer(config: DefaultTokenizerConfig = {}): Prom
   }
 
   // Handle stopwords
-  let stopWords: string[] | undefined
+  let stopWords: Optional<string[]>
 
   if (config.stopWords !== false) {
     stopWords = []
@@ -115,7 +116,7 @@ export async function createTokenizer(config: DefaultTokenizerConfig = {}): Prom
     if (Array.isArray(config.stopWords)) {
       stopWords = config.stopWords
     } else if (typeof config.stopWords === 'function') {
-      stopWords = await config.stopWords(stopWords)
+      stopWords = config.stopWords(stopWords)
     } else if (config.stopWords) {
       throw createError('CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY')
     }

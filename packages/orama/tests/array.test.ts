@@ -2,8 +2,9 @@ import t from 'tap'
 import { create, getByID, insert, insertMultiple, load, remove, save, search, update } from '../src/index.js'
 
 t.test('create should support array of string', async (t) => {
-  const db = await create({
+  const db = create({
     schema: {
+      id: 'string',
       name: 'string[]'
     } as const
   })
@@ -13,9 +14,9 @@ t.test('create should support array of string', async (t) => {
   })
 
   const [harryId, jamesId, lilyId] = await insertMultiple(db, [
-    { name: ['Harry', 'James', 'Potter'] },
-    { name: ['James', 'Potter'] },
-    { name: ['Lily', 'Lily', 'Lily', 'Lily', 'Evans', 'Potter'] }
+    { id: '1', name: ['Harry', 'James', 'Potter'] },
+    { id: '2', name: ['James', 'Potter'] },
+    { id: '3', name: ['Lily', 'Lily', 'Lily', 'Lily', 'Evans', 'Potter'] }
   ])
 
   await checkSearchTerm(t, db, 'Albus', [albusId])
@@ -40,7 +41,7 @@ t.test('create should support array of string', async (t) => {
   await checkSearchWhere(t, db, 'name', ['foo'], [])
 
   await checkSearchFacets(
-    t,
+    t as unknown as Tap.Test,
     db,
     'name',
     {},
@@ -64,7 +65,7 @@ t.test('create should support array of string', async (t) => {
 })
 
 t.test('create should support array of number', async (t) => {
-  const db = await create({
+  const db = create({
     schema: {
       num: 'number[]'
     } as const
@@ -88,7 +89,7 @@ t.test('create should support array of number', async (t) => {
   await checkSearchWhere(t, db, 'num', { eg: 42 }, [])
 
   await checkSearchFacets(
-    t,
+    t as unknown as Tap.Test,
     db,
     'num',
     {
@@ -112,7 +113,7 @@ t.test('create should support array of number', async (t) => {
 })
 
 t.test('create should support array of boolean', async (t) => {
-  const db = await create({
+  const db = create({
     schema: {
       b: 'boolean[]'
     } as const
@@ -132,7 +133,7 @@ t.test('create should support array of boolean', async (t) => {
   await checkSearchWhere(t, db, 'b', false, [second, third])
 
   await checkSearchFacets(
-    t,
+    t as unknown as Tap.Test,
     db,
     'b',
     {
@@ -154,7 +155,7 @@ t.test('create should support array of boolean', async (t) => {
 t.test('remove should support array as well', async (t) => {
   t.plan(2)
 
-  const db = await create({
+  const db = create({
     schema: {
       strings: 'string[]',
       num: 'number[]',
@@ -176,7 +177,7 @@ t.test('remove should support array as well', async (t) => {
 t.test('serialization should support array as well', async (t) => {
   t.plan(2)
 
-  const db = await create({
+  const db = create({
     schema: {
       strings: 'string[]',
       num: 'number[]',
@@ -190,17 +191,17 @@ t.test('serialization should support array as well', async (t) => {
   })
   t.ok(docId)
 
-  const raw = await save(db)
-  const db2 = await create({
+  const raw = save(db)
+  const db2 = create({
     schema: {
       strings: 'string[]',
       num: 'number[]',
       b: 'boolean[]'
     }
   })
-  await load(db2, raw)
+  load(db2, raw)
 
-  const doc = await getByID(db, docId)
+  const doc = getByID(db, docId)
   t.strictSame(doc, {
     strings: ['Albus', 'Percival', 'Wulfric', 'Brian'],
     num: [3, 5, 7, 35],
@@ -211,7 +212,7 @@ t.test('serialization should support array as well', async (t) => {
 t.test('update supports array as well', async (t) => {
   t.plan(2)
 
-  const db = await create({
+  const db = create({
     schema: {
       strings: 'string[]',
       num: 'number[]',

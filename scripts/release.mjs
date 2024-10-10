@@ -15,6 +15,7 @@ const packages = [
   'plugin-parsedoc',
   'plugin-analytics',
   'plugin-secure-proxy',
+  'plugin-embeddings',
   'stemmers',
   'stopwords',
   'tokenizers',

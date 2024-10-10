@@ -1,7 +1,7 @@
 import type { AnyOrama } from '@orama/orama'
+import type { FileSystem, PersistenceFormat, Runtime } from './types.js'
 import { FILESYSTEM_NOT_SUPPORTED_ON_RUNTIME } from './errors.js'
 import { persist, restore } from './index.js'
-import type { FileSystem, PersistenceFormat, Runtime } from './types.js'
 import { detectRuntime } from './utils.js'
 
 export const DEFAULT_DB_NAME = `orama_bump_${+new Date()}`

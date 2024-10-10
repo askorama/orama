@@ -1,6 +1,6 @@
-import type { AnyOrama, Results, SearchParams, Nullable } from '@orama/orama'
-import { search } from '@orama/orama'
-import { OramaClient, ClientSearchParams } from '@oramacloud/client'
+import type { AnyOrama, Results, SearchParams, Nullable, IAnswerSessionConfig as OSSAnswerSessionConfig } from '@orama/orama'
+import { search, AnswerSession as OSSAnswerSession } from '@orama/orama'
+import { OramaClient, ClientSearchParams, AnswerSessionParams as CloudAnswerSessionConfig, AnswerSession as CloudAnswerSession } from '@oramacloud/client'
 
 export type OramaSwitchClient = AnyOrama | OramaClient
 
@@ -13,6 +13,7 @@ export type SearchConfig = {
 }
 
 export class Switch<T = OramaSwitchClient> {
+  private invalidClientError = 'Invalid client. Expected either an OramaClient or an Orama OSS database.'
   client: OramaSwitchClient
   clientType: ClientType
   isCloud: boolean = false
@@ -28,7 +29,7 @@ export class Switch<T = OramaSwitchClient> {
       this.clientType = 'oss'
       this.isOSS = true
     } else {
-      throw new Error('Invalid client. Expected either an OramaClient or an Orama OSS database.')
+      throw new Error(this.invalidClientError)
     }
   }
 
@@ -41,5 +42,25 @@ export class Switch<T = OramaSwitchClient> {
     } else {
       return search(this.client as AnyOrama, params as SearchParams<AnyOrama>) as Promise<Nullable<Results<R>>>
     }
+  }
+
+  createAnswerSession(params: T extends OramaClient ? CloudAnswerSessionConfig : OSSAnswerSessionConfig): T extends OramaClient ? CloudAnswerSession : OSSAnswerSession {
+    if (this.isCloud) {
+      const p = params as CloudAnswerSessionConfig
+      return (this.client as OramaClient).createAnswerSession(p) as unknown as T extends OramaClient ? CloudAnswerSession : OSSAnswerSession
+    }
+
+    if (this.isOSS) {
+      const p = params as OSSAnswerSessionConfig
+      return new OSSAnswerSession(this.client as AnyOrama, {
+          conversationID: p.conversationID,
+          initialMessages: p.initialMessages,
+          events: p.events,
+          userContext: p.userContext,
+          systemPrompt: p.systemPrompt,
+      }) as unknown as T extends OramaClient ? CloudAnswerSession : OSSAnswerSession
+    }
+
+    throw new Error(this.invalidClientError)
   }
 }

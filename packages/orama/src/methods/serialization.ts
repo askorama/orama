@@ -9,20 +9,20 @@ export interface RawData {
   language: Language
 }
 
-export async function load<T extends AnyOrama>(orama: T, raw: RawData): Promise<void> {
+export function load<T extends AnyOrama>(orama: T, raw: RawData): void {
   orama.internalDocumentIDStore.load(orama, raw.internalDocumentIDStore)
-  orama.data.index = await orama.index.load(orama.internalDocumentIDStore, raw.index)
-  orama.data.docs = await orama.documentsStore.load(orama.internalDocumentIDStore, raw.docs)
-  orama.data.sorting = await orama.sorter.load(orama.internalDocumentIDStore, raw.sorting)
+  orama.data.index = orama.index.load(orama.internalDocumentIDStore, raw.index)
+  orama.data.docs = orama.documentsStore.load(orama.internalDocumentIDStore, raw.docs)
+  orama.data.sorting = orama.sorter.load(orama.internalDocumentIDStore, raw.sorting)
   orama.tokenizer.language = raw.language
 }
 
-export async function save<T extends AnyOrama>(orama: T): Promise<RawData> {
+export function save<T extends AnyOrama>(orama: T): RawData {
   return {
     internalDocumentIDStore: orama.internalDocumentIDStore.save(orama.internalDocumentIDStore),
-    index: await orama.index.save(orama.data.index),
-    docs: await orama.documentsStore.save(orama.data.docs),
-    sorting: await orama.sorter.save(orama.data.sorting),
+    index: orama.index.save(orama.data.index),
+    docs: orama.documentsStore.save(orama.data.docs),
+    sorting: orama.sorter.save(orama.data.sorting),
     language: orama.tokenizer.language
   }
 }

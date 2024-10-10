@@ -97,7 +97,7 @@ export async function restore<T extends AnyOrama>(
     runtime = detectRuntime()
   }
 
-  const db = await create({
+  const db = create({
     schema: {
       __placeholder: 'string'
     }
@@ -116,6 +116,7 @@ export async function restore<T extends AnyOrama>(
         data = Buffer.from(data.toString(), 'hex')
         /* c8 ignore next 3 */
       } else {
+        // @ts-ignore
         data = slowHexToBuffer(data as string) as Buffer
       }
       deserialized = decode(data)
@@ -124,14 +125,14 @@ export async function restore<T extends AnyOrama>(
       throw new Error(UNSUPPORTED_FORMAT(format))
   }
 
-  await load(db, deserialized)
+  load(db, deserialized)
 
   return db as unknown as T
 }
 
 export async function persistToFile<T extends AnyOrama>(
   db: T,
-  format: PersistenceFormat = 'binary',
+  format: PersistenceFormat = 'json',
   path?: string,
   runtime?: Runtime
 ): Promise<never> {
@@ -139,7 +140,7 @@ export async function persistToFile<T extends AnyOrama>(
 }
 
 export async function restoreFromFile<T extends AnyOrama>(
-  format: PersistenceFormat = 'binary',
+  format: PersistenceFormat = 'json',
   path?: string,
   runtime?: Runtime
 ): Promise<never> {
