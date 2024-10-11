@@ -50,6 +50,14 @@
       "dependsOn": ["@orama/orama#build"],
       "outputs": ["dist/**"]
     },
+    "@orama/plugin-qps#build": {
+      "dependsOn": ["@orama/orama#build"],
+      "outputs": ["dist/**"]
+    },
+    "@orama/plugin-pt15#build": {
+      "dependsOn": ["@orama/orama#build"],
+      "outputs": ["dist/**"]
+    },
     "@orama/tokenizers#build": {
       "dependsOn": ["@orama/orama#build"]
     },

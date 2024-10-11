@@ -86,6 +86,24 @@ export function create<
     components = {}
   }
 
+  for (const plugin of plugins ?? []) {
+    if (!('getComponents' in plugin)) {
+      continue
+    }
+    if (typeof plugin.getComponents !== 'function') {
+      continue;
+    }
+
+    const pluginComponents = plugin.getComponents(schema);
+
+    const keys = Object.keys(pluginComponents)
+    for (const key of keys) {
+      if (components[key]) {
+        throw createError('PLUGIN_COMPONENT_CONFLICT', key, plugin.name)
+      }
+    }
+  }
+
   if (!id) {
     id = uniqueId()
   }

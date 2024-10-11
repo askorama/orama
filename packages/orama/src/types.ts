@@ -1315,6 +1315,7 @@ export type OramaPluginSync<T = unknown> = {
   beforeUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
   afterUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
   afterCreate?: <T extends AnyOrama>(orama: T) => SyncOrAsyncValue
+  getComponents?: <T extends AnyOrama>(schema: T['schema']) => SyncOrAsyncValue<Components<T, any, any, any, any>>
 }
 
 export type OramaPluginAsync<T = unknown> = Promise<OramaPluginSync<T>>

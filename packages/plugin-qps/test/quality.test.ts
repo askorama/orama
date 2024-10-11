@@ -1,6 +1,7 @@
 import t from 'tap'
 import { AnyOrama, create, insertMultiple, search } from '@orama/orama'
-import { bitmask_20, calculateTokenQuantum, count, numberOfOnes } from '../src/trees/radix.js'
+import { bitmask_20, calculateTokenQuantum, count, numberOfOnes } from '../src/algorithm.js'
+import { qpsComponents } from '../src/index.js'
 
 async function createNew(docs: { description: string }[]) {
   const db = await create({
@@ -10,7 +11,8 @@ async function createNew(docs: { description: string }[]) {
     components: {
       tokenizer: {
         stopWords: ['the', 'is', 'on', 'under']
-      }
+      },
+      ...qpsComponents()
     }
   })
   await insertMultiple(
@@ -40,6 +42,8 @@ t.test('order of the results', async (t) => {
     const results = await searchNew(s, {
       term: 'table'
     })
+
+    console.log(s.data.index)
 
     t.equal(results.length, 4)
     t.equal(results[0].id, '0')
@@ -356,6 +360,8 @@ t.test('test #2', async t => {
       term: 'the sound of pencils scratching on paper'
     })
 
+    console.log(results.length)
+
     t.equal(results.length, 9)
 
     // This contains a lot of word in the same sentence.
@@ -375,10 +381,6 @@ t.test('test #2', async t => {
     t.equal(results[8].id, '7')
   })
 })
-
-
-
-
 
 function permutator<T>(inputArr: T[]): T[][] {
   const result: T[][] = []

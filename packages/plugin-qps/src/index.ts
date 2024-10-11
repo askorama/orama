@@ -1,86 +1,66 @@
-import type { create, AnyOrama, SearchableType, IIndex, AnyIndexStore, VectorIndex, AnySchema, SearchableValue, Tokenizer } from '@orama/orama'
+import type { create, AnyOrama, SearchableType, IIndex, AnyIndexStore, SearchableValue, Tokenizer, OnlyStrings, FlattenSchemaProperty, TokenScore, WhereCondition } from '@orama/orama'
 import {
-  getVectorSize, index as Index, internalDocumentIDStore, isVectorType } from '@orama/orama/components'
-import { avl, bkd, flat, radix, bool } from '@orama/orama/trees'
+  index as Index, internalDocumentIDStore } from '@orama/orama/components'
+import { insertString, QPSIndex, recursiveCreate, searchString } from './algorithm.js';
+import { radix } from '@orama/orama/trees';
 
 type InternalDocumentID = internalDocumentIDStore.InternalDocumentID;
+type InternalDocumentIDStore = internalDocumentIDStore.InternalDocumentIDStore;
 
 type CreateParams = Parameters<typeof create<AnyOrama, IIndex<QPSIndex>>>[0]
 type Component = NonNullable<CreateParams['components']>
 type IndexParameter = NonNullable<Component['index']>
+type DocumentID = internalDocumentIDStore.DocumentID;
 
 
-export type Tree =
-  | Index.TTree<'Radix', radix.RadixNode>
-  | Index.TTree<'AVL', avl.AVLTree<number, InternalDocumentID[]>>
-  | Index.TTree<'Bool', bool.BoolNode>
-  | Index.TTree<'Flat', flat.FlatTree>
-  | Index.TTree<'BKD', bkd.BKDTree>
-
-export interface QPSIndex extends AnyIndexStore {
-  indexes: Record<string, Tree>
-  vectorIndexes: Record<string, VectorIndex>
-  searchableProperties: string[]
-  searchablePropertiesWithTypes: Record<string, SearchableType>
+const unusedRadix = new radix.RadixNode('', '', false)
+const unusedStats = {
+  tokenQuantums: {},
+  tokensLength: new Map(),
 }
 
-function recursiveCreate<T extends AnyOrama>(indexDatastore: QPSIndex, schema: T['schema'], prefix: string) {
-  for (const [prop, type] of Object.entries<SearchableType>(schema)) {
-    const path = `${prefix}${prefix ? '.' : ''}${prop}`
+function search<T extends AnyOrama>(index: QPSIndex, term: string, tokenizer: Tokenizer, language: string | undefined, propertiesToSearch: string[], exact: boolean, tolerance: number, boost: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>): TokenScore[] {
+  const all: Map<InternalDocumentID, [number, number]> = new Map()
 
-    if (typeof type === 'object' && !Array.isArray(type)) {
-      // Nested
-      recursiveCreate(indexDatastore, type, path)
-      continue
-    }
-
-    if (isVectorType(type)) {
-      indexDatastore.searchableProperties.push(path)
-      indexDatastore.searchablePropertiesWithTypes[path] = type
-      indexDatastore.vectorIndexes[path] = {
-        size: getVectorSize(type),
-        vectors: {}
-      }
-    } else {
-      const isArray = /\[/.test(type as string)
-      switch (type) {
-        case 'boolean':
-        case 'boolean[]':
-          indexDatastore.indexes[path] = { type: 'Bool', node: new bool.BoolNode(), isArray }
-          break
-        case 'number':
-        case 'number[]':
-          indexDatastore.indexes[path] = { type: 'AVL', node: new avl.AVLTree<number, InternalDocumentID[]>(0, []), isArray }
-          break
-        case 'string':
-        case 'string[]':
-          indexDatastore.indexes[path] = { type: 'Radix', node: new radix.RadixTree(), isArray }
-          // indexDatastore.avgFieldLength[path] = 0
-          // indexDatastore.frequencies[path] = {}
-          // indexDatastore.tokenOccurrences[path] = {}
-          // indexDatastore.fieldLengths[path] = {}
-          break
-        case 'enum':
-        case 'enum[]':
-          indexDatastore.indexes[path] = { type: 'Flat', node: new flat.FlatTree(), isArray }
-          break
-        case 'geopoint':
-          indexDatastore.indexes[path] = { type: 'BKD', node: new bkd.BKDTree(), isArray }
-          break
-        default:
-          throw new Error('INVALID_SCHEMA_TYPE: ' + path)
-      }
-
-      indexDatastore.searchableProperties.push(path)
-      indexDatastore.searchablePropertiesWithTypes[path] = type
-    }
+  const args = {
+    tokens: tokenizer.tokenize(term, language),
+    radixNode: unusedRadix,
+    exact,
+    tolerance,
+    stats: unusedStats,
+    boostPerProp: 0,
+    all,
+    resultMap: all,
   }
+
+  const propertiesToSearchLength = propertiesToSearch.length
+  for (let i = 0; i < propertiesToSearchLength; i++) {
+    const prop = propertiesToSearch[i]
+    const stats = index.stats[prop]
+    const boostPerProp = boost[prop] ?? 1
+    args.radixNode = index.indexes[prop].node as radix.RadixNode
+    args.stats = stats
+    args.boostPerProp = boostPerProp
+    searchString(args)
+  }
+
+  const g: [number, [number, number]][] = Array.from(all)
+  const gLength = g.length
+  const res: TokenScore[] = []
+  for (let i = 0; i < gLength; i++) {
+    const element = g[i]
+    const id = element[0]
+    const score = element[1][0]
+
+    res.push([id, score])
+  }
+
+  return res
 }
 
 export function qpsComponents(): {
   index: IndexParameter,
 } {
-
   return {
     index: {
       create: function create<T extends AnyOrama>(orama: T, sharedInternalDocumentStore: T['internalDocumentIDStore'], schema: T['schema']) {
@@ -89,6 +69,7 @@ export function qpsComponents(): {
           vectorIndexes: {},
           searchableProperties: [],
           searchablePropertiesWithTypes: {},
+          stats: {}
         }
 
         recursiveCreate(indexDatastore, schema, '')
@@ -107,34 +88,108 @@ export function qpsComponents(): {
         tokenizer: Tokenizer,
         docsCount: number
       ) {
-        if (isVectorType(schemaType)) {
-          return Index.insertVector(indexDatastorage, prop, value as number[] | Float32Array, id)
+        if (!(schemaType === 'string' || schemaType === 'string[]')) {
+          return Index.insert(implementation as unknown as IIndex<Index.Index>, indexDatastorage as unknown as Index.Index, prop, id, internalId, value, schemaType, language, tokenizer, docsCount)
         }
-      
-        const insertScalar = insertScalarBuilder(implementation, index, prop, internalId, language, tokenizer, docsCount, options)
-      
-        if (!isArrayType(schemaType)) {
-          return insertScalar(value)
+
+        if (!indexDatastorage.stats[prop]) {
+          indexDatastorage.stats[prop] = {
+            tokenQuantums: {},
+            tokensLength: new Map()
+          }
         }
-      
-        const elements = value as Array<string | number | boolean>
-        const elementsLength = elements.length
-        for (let i = 0; i < elementsLength; i++) {
-          insertScalar(elements[i])
+
+        const stats = indexDatastorage.stats[prop]
+        const radixTree = indexDatastorage.indexes[prop].node as radix.RadixNode
+
+        stats.tokenQuantums[internalId] = {}
+
+        if (Array.isArray(value)) {
+          for (const item of value) {
+            insertString(
+              item as string,
+              radixTree,
+              stats,
+              prop,
+              internalId,
+              language,
+              tokenizer,
+            )
+          }
+        } else {
+          insertString(
+            value as string,
+            radixTree,
+            stats,
+            prop,
+            internalId,
+            language,
+            tokenizer,
+          )
         }
       },
-      remove: Index.remove,
-      insertDocumentScoreParameters: Index.insertDocumentScoreParameters,
-      insertTokenScoreParameters: Index.insertTokenScoreParameters,
-      removeDocumentScoreParameters: Index.removeDocumentScoreParameters,
-      removeTokenScoreParameters: Index.removeTokenScoreParameters,
-      calculateResultScores: Index.calculateResultScores,
-      search: Index.search,
-      searchByWhereClause: Index.searchByWhereClause,
-      getSearchableProperties: Index.getSearchableProperties,
-      getSearchablePropertiesWithTypes: Index.getSearchablePropertiesWithTypes,
-      load: Index.load,
-      save: Index.save
+      remove: function remove() {
+        throw new Error('Not implemented yet')
+      },
+      insertDocumentScoreParameters: () => {throw new Error()},
+      insertTokenScoreParameters: () => {throw new Error()},
+      removeDocumentScoreParameters: () => {throw new Error()},
+      removeTokenScoreParameters: () => {throw new Error()},
+      calculateResultScores: () => {throw new Error()},
+      search,
+      searchByWhereClause: function searchByWhereClause<T extends AnyOrama>(index: AnyIndexStore, tokenizer: Tokenizer, filters: Partial<WhereCondition<T['schema']>>, language: string | undefined): InternalDocumentID[] {
+        return Index.searchByWhereClause(index as Index.Index, tokenizer, filters, language)
+      },
+      getSearchableProperties: function getSearchableProperties(index: QPSIndex): string[] {
+        return index.searchableProperties
+      },
+      getSearchablePropertiesWithTypes: function (index: QPSIndex) {
+        return index.searchablePropertiesWithTypes
+      },
+      load: function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): QPSIndex {
+        const dump1 = Index.load(sharedInternalDocumentStore, raw[0])
+
+        const dump2 = raw[1] as {
+          radixTrees: [string, boolean, string, unknown][],
+          stats: [string, {
+            tokenQuantums: [InternalDocumentID, Record<string, number>][],
+            tokensLength: [InternalDocumentID, number][]
+          }][]
+        }
+
+        const indexes = {
+          ...dump1.indexes,
+          ...Object.fromEntries(dump2.radixTrees.map(([prop, isArray, type, node]) => [prop, { node: radix.RadixNode.fromJSON(node), isArray, type } as Index.Tree]))
+        };
+
+        return {
+          ...dump1,
+          indexes,
+          stats: Object.fromEntries(dump2.stats.map(([prop, { tokenQuantums, tokensLength }]) => [prop, {
+            tokenQuantums,
+            tokensLength: new Map(tokensLength)
+          }]))
+        } as unknown as QPSIndex
+      },
+      save: function save<R = unknown>(index: QPSIndex): R {
+        const baseIndex = index as unknown as Index.Index
+        const nonStringIndexes = Object.entries(baseIndex.indexes).filter(([, { type }]) => type !== 'Radix')
+        const dump1 = Index.save({
+          ...baseIndex,
+          indexes: Object.fromEntries(nonStringIndexes)
+        })
+
+        const stringIndexes = Object.entries(baseIndex.indexes).filter(([, { type }]) => type === 'Radix')
+        const dump2 = {
+          radixTrees: stringIndexes.map(([prop, { node, isArray, type }]) => [prop, isArray, type, node.toJSON()]),
+          stats: Object.entries(index.stats).map(([prop, { tokenQuantums, tokensLength }]) => [prop, {
+            tokenQuantums,
+            tokensLength: Array.from(tokensLength.entries())
+          }])
+        }
+
+        return [dump1, dump2] as unknown as R
+      }
     }
   }
 }
