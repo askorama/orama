@@ -1,32 +1,24 @@
-import type { create, AnyOrama, SearchableType, IIndex, AnyIndexStore, SearchableValue, Tokenizer, OnlyStrings, FlattenSchemaProperty, TokenScore, WhereCondition, OramaPluginSync } from '@orama/orama'
+import type { AnyOrama, SearchableType, IIndex, AnyIndexStore, SearchableValue, Tokenizer, OnlyStrings, FlattenSchemaProperty, TokenScore, WhereCondition, OramaPluginSync, AnySchema, ObjectComponents } from '@orama/orama'
 import {
   index as Index, internalDocumentIDStore } from '@orama/orama/components'
 import { PT15IndexStore, insertString, recursiveCreate, PositionsStorage, searchString } from './algorithm.js';
 
 type InternalDocumentID = internalDocumentIDStore.InternalDocumentID;
 type InternalDocumentIDStore = internalDocumentIDStore.InternalDocumentIDStore;
-
-type CreateParams = Parameters<typeof create<AnyOrama, IIndex<PT15IndexStore>>>[0]
-type Component = NonNullable<CreateParams['components']>
-type IndexParameter = NonNullable<Component['index']>
 type DocumentID = internalDocumentIDStore.DocumentID;
-
 
 export function pluginPT15(): OramaPluginSync {
 
   return {
     name: 'orama-plugin-pt15',
 
-    getComponents: function getComponents<T extends AnyOrama>(schema: T['schema']) {
+    getComponents: function getComponents(schema: AnySchema) {
       return createComponents(schema)
-    }
+    },
   }
 }
 
-function createComponents<T extends AnyOrama>(schema: T['schema']): {
-  index: IndexParameter,
-} {
-
+function createComponents(schema: AnySchema): Partial<ObjectComponents<any, any, any>> {
   return {
     index: {
       create: function create() {

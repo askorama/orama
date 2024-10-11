@@ -36,7 +36,7 @@ t.test('get_position', async t => {
     t.equal(get_position(49, 50), 14)
 })
 
-t.test('plugin-position', async t => {
+t.test('plugin-pt15', async t => {
     const db = create({
         schema: {
             name: 'string',
