@@ -27,7 +27,7 @@ export const useOrama = () => {
     custom: null
   })
   const { colorMode } = useColorMode()
-  const { searchData, endpoint, analytics, searchBoxCustomConfig }: PluginData = usePluginData('@orama/plugin-docusaurus-v3') as PluginData
+  const { searchData, endpoint, analytics, searchBoxCustomConfig }: PluginData = usePluginData('@orama/plugin-docusaurus') as PluginData
 
   const baseURL = useBaseUrl('orama-search-index-current.json.gz')
   const isBrowser = useIsBrowser()
@@ -66,12 +66,12 @@ export const useOrama = () => {
           plugins: [
             ...(analytics
               ? [
-                pluginAnalytics({
-                  apiKey: analytics.apiKey,
-                  indexId: analytics.indexId,
-                  enabled: analytics.enabled
-                })
-              ]
+                  pluginAnalytics({
+                    apiKey: analytics.apiKey,
+                    indexId: analytics.indexId,
+                    enabled: analytics.enabled
+                  })
+                ]
               : [])
           ]
         })

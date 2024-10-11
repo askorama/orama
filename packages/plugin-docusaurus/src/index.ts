@@ -3,11 +3,12 @@ import type { Plugin } from '@docusaurus/types'
 import { cp } from 'node:fs/promises'
 import { gzip } from 'pako'
 import { resolve } from 'node:path'
-import { type AnySchema, create, insertMultiple, save } from '@orama/orama'
+// @ts-ignore
+import { create, insertMultiple, save } from '@orama/orama'
 import { JSDOM } from 'jsdom'
 import MarkdownIt from 'markdown-it'
 import matter from 'gray-matter'
-import { createSnapshot, deployIndex, DOCS_PRESET_SCHEMA, fetchEndpointConfig } from "./utils.js"
+import { createSnapshot, deployIndex, DOCS_PRESET_SCHEMA, fetchEndpointConfig } from "./utils"
 import { parseMarkdownHeadingId, writeMarkdownHeadingId } from '@docusaurus/utils'
 
 enum DeployType {
@@ -43,7 +44,7 @@ export default function OramaPluginDocusaurus(
   let versions: any[] = []
 
   return {
-    name: '@orama/plugin-docusaurus-v3',
+    name: '@orama/plugin-docusaurus',
 
     getThemePath() {
       return '../dist/theme'
@@ -57,7 +58,7 @@ export default function OramaPluginDocusaurus(
       return ['../dist/theme/SearchBar/index.css']
     },
 
-    async allContentLoaded({ actions, allContent }) {
+    async contentLoaded({ actions, allContent }) {
       const isDevelopment =
         process.env.NODE_ENV === 'development' || !options.cloud?.oramaCloudAPIKey || !options.cloud?.deploy
       const docsInstances: string[] = []
@@ -329,7 +330,7 @@ async function deployData({
     }
   } else {
     const db = await create({
-      schema: { ...DOCS_PRESET_SCHEMA, version: 'enum' } as AnySchema
+      schema: { ...DOCS_PRESET_SCHEMA, version: 'enum' }
     })
 
     await insertMultiple(db, oramaDocs as any)

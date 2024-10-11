@@ -1,19 +1,37 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "target": "ESNext",
-    "module": "NodeNext",
-    "outDir": "dist",
+    "target": "ES2019",
+    "module": "commonjs",
     "lib": ["ESNext", "DOM"],
-    "jsx": "react-jsx",
-    "esModuleInterop": true,
     "declaration": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    // "allowJs": true, // causing strange issue
     "skipLibCheck": true,
+    "jsx": "react",
+
+    /* Strict Type-Checking Options */
+    "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+
+    /* Additional Checks */
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Module Resolution Options */
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    /* Advanced Options */
     "resolveJsonModule": true,
-    "sourceMap": true,
-    "moduleResolution": "nodenext"
+    "isolatedModules": true,
+
+    "outDir": "dist"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src"]
 }
