@@ -3,7 +3,7 @@ import type { Plugin } from '@docusaurus/types'
 import { cp } from 'node:fs/promises'
 import { gzip } from 'pako'
 import { resolve } from 'node:path'
-import { type AnySchema, create, insertMultiple, save } from '@orama/orama'
+import { create, insertMultiple, save } from '@orama/orama'
 import { JSDOM } from 'jsdom'
 import MarkdownIt from 'markdown-it'
 import matter from 'gray-matter'
@@ -329,7 +329,7 @@ async function deployData({
     }
   } else {
     const db = await create({
-      schema: { ...DOCS_PRESET_SCHEMA, version: 'enum' } as AnySchema
+      schema: { ...DOCS_PRESET_SCHEMA, version: 'enum' }
     })
 
     await insertMultiple(db, oramaDocs as any)

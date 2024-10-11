@@ -674,28 +674,6 @@ importers:
         specifier: ^5.0.0
         version: 5.6.2
 
-  packages/plugin-qps:
-    dependencies:
-      '@orama/orama':
-        specifier: workspace:*
-        version: link:../orama
-    devDependencies:
-      '@types/node':
-        specifier: ^20.9.0
-        version: 20.16.9
-      tap:
-        specifier: ^21.0.1
-        version: 21.0.1(@swc/core@1.7.28(@swc/helpers@0.5.5))(@types/node@20.16.9)(@types/react@18.3.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
-      tsup:
-        specifier: ^7.2.0
-        version: 7.3.0(@swc/core@1.7.28(@swc/helpers@0.5.5))(postcss@8.4.47)(ts-node@10.9.2(@swc/core@1.7.28(@swc/helpers@0.5.5))(@types/node@20.16.9)(typescript@5.6.2))(typescript@5.6.2)
-      tsx:
-        specifier: ^4.19.1
-        version: 4.19.1
-      typescript:
-        specifier: ^5.0.0
-        version: 5.6.2
-
   packages/plugin-secure-proxy:
     dependencies:
       '@oramacloud/client':

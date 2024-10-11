@@ -1,3 +1,5 @@
+import { AnySchema } from "@orama/orama";
+
 export const restFetcher = async <T = unknown>(url: string, options?: any): Promise<T> => {
   const response = await fetch(url, options)
 
@@ -83,7 +85,7 @@ export async function deployIndex(baseUrl: string, APIKey: string, indexId: stri
   )
 }
 
-export const DOCS_PRESET_SCHEMA = {
+export const DOCS_PRESET_SCHEMA: AnySchema = {
   title: 'string',
   content: 'string',
   path: 'string',
