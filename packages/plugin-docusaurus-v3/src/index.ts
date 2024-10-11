@@ -3,13 +3,13 @@ import type { Plugin } from '@docusaurus/types'
 import { cp } from 'node:fs/promises'
 import { gzip } from 'pako'
 import { resolve } from 'node:path'
-// @ts-ignore
+// @ts-expect-error: bad types
 import { presets } from '@orama/searchbox'
-import { create, insertMultiple, save } from '@orama/orama'
+import { AnySchema, create, insertMultiple, save } from '@orama/orama'
 import { JSDOM } from 'jsdom'
 import MarkdownIt from 'markdown-it'
 import matter from 'gray-matter'
-import { createSnapshot, deployIndex, fetchEndpointConfig } from './utils'
+import { createSnapshot, deployIndex, fetchEndpointConfig } from './utils.js'
 import { parseMarkdownHeadingId, writeMarkdownHeadingId } from '@docusaurus/utils'
 
 enum DeployType {
@@ -328,7 +328,7 @@ async function deployData({
     }
   } else {
     const db = await create({
-      schema: { ...presets.docs.schema, version: 'enum' }
+      schema: { ...presets.docs.schema, version: 'enum' } as AnySchema
     })
 
     await insertMultiple(db, oramaDocs as any)
