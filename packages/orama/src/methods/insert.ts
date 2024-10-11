@@ -5,6 +5,7 @@ import { runMultipleHook, runSingleHook } from '../components/hooks.js'
 import { trackInsertion } from '../components/sync-blocking-checker.js'
 import { createError } from '../errors.js'
 import { Point } from '../trees/bkd.js'
+import { getInternalDocumentId } from '../components/internal-document-id-store.js'
 
 export type InsertOptions = {
   avlRebalanceThreshold?: number
@@ -178,11 +179,13 @@ async function indexAndSortDocument<T extends AnyOrama>(
       orama.tokenizer,
       docsCount
     )
+    const internalId = orama.internalDocumentIDStore.idToInternalId.get(id)
     await orama.index.insert(
       orama.index,
       orama.data.index,
       prop,
       id,
+      internalId!,
       value,
       expectedType,
       language,
@@ -231,12 +234,14 @@ function indexAndSortDocumentSync<T extends AnyOrama>(
 
     const expectedType = orama.index.getSearchablePropertiesWithTypes(orama.data.index)[prop]
 
+    const internalDocumentId = getInternalDocumentId(orama.internalDocumentIDStore, id)
     orama.index.beforeInsert?.(orama.data.index, prop, id, value, expectedType, language, orama.tokenizer, docsCount)
     orama.index.insert(
       orama.index,
       orama.data.index,
       prop,
       id,
+      internalDocumentId,
       value,
       expectedType,
       language,

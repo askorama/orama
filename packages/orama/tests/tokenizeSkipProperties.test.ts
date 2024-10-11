@@ -1,7 +1,7 @@
 import t from 'tap'
 import { Orama, create, insert, search } from '../src/index.js'
 
-t.test('tokenizeSkipProperties', (t) => {
+t.test('tokenizeSkipProperties', async (t) => {
   t.test('skipProperties', async (t) => {
     const [db, id1] = await createSimpleDB(true)
 

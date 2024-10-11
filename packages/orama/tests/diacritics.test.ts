@@ -1,12 +1,8 @@
 import t from 'tap'
 import { replaceDiacritics } from '../src/components/tokenizer/diacritics.js'
 
-t.test('Diacritics Replacer', (t) => {
-  t.plan(1)
-
-  t.test('should replace diacritics', (t) => {
-    t.plan(3)
-
+t.test('Diacritics Replacer', async (t) => {
+  t.test('should replace diacritics', async (t) => {
     const I1 = 'áàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'
     const I2 = 'áaauioèaíïóiuubnÁoiÃotytÓhygÚnÑ'
     const I3 = 'aaaaeeeiiooooucnAAAAEEIIOOOOUCN'

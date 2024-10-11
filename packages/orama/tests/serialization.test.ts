@@ -10,12 +10,8 @@ function extractOriginalDoc(result: Result<AnyDocument>[]): AnyDocument[] {
   return result.map(({ document }: AnyDocument) => document)
 }
 
-t.test('Edge getters', (t) => {
-  t.plan(4)
-
+t.test('Edge getters', async (t) => {
   t.test('should correctly enable edge index getter', async (t) => {
-    t.plan(2)
-
     const db = create({
       schema: {
         name: 'string',
@@ -43,8 +39,6 @@ t.test('Edge getters', (t) => {
   })
 
   t.test('should correctly enable edge docs getter', async (t) => {
-    t.plan(2)
-
     const db = create({
       schema: {
         name: 'string',
@@ -75,8 +69,6 @@ t.test('Edge getters', (t) => {
   })
 
   t.test('should correctly enable index setter', async (t) => {
-    t.plan(6)
-
     const db = create({
       schema: {
         name: 'string',
@@ -135,8 +127,6 @@ t.test('Edge getters', (t) => {
   })
 
   t.test('should correctly save and load data', async (t) => {
-    t.plan(2)
-
     const originalDB = await create({
       schema: {
         name: 'string',

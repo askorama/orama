@@ -1,0 +1,21 @@
+{
+  "name": "Example",
+  "date": "2023-06-07T13:16:45.810Z",
+  "version": "1.0.0",
+  "results": [
+    {
+      "name": "3arr - 0.5",
+      "ops": 2606835,
+      "margin": 0.16,
+      "percentSlower": 0
+    }
+  ],
+  "fastest": {
+    "name": "3arr - 0.5",
+    "index": 0
+  },
+  "slowest": {
+    "name": "3arr - 0.5",
+    "index": 0
+  }
+}
