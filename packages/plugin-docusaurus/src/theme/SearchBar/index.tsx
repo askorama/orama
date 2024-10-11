@@ -63,7 +63,7 @@ export function OramaSearchWithDocs({ pluginId }: { pluginId: string }) {
 
 export default function OramaSearchWrapper() {
 	const { pathname } = useLocation()
-	const { docsInstances }: PluginData = usePluginData("@orama/plugin-docusaurus-v3") as PluginData
+	const { docsInstances }: PluginData = usePluginData("@orama/plugin-docusaurus") as PluginData
 	const pluginId = docsInstances.filter((id: string) => pathname.includes(id))[0] || docsInstances[0]
 
 	if (!pluginId) {
