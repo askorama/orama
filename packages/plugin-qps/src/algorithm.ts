@@ -3,10 +3,7 @@ import { avl, bkd, flat, radix, bool } from '@orama/orama/trees'
 import {
   getVectorSize, index as Index, internalDocumentIDStore, isVectorType } from '@orama/orama/components'
 
-
 type InternalDocumentID = internalDocumentIDStore.InternalDocumentID;
-// type InternalDocumentIDStore = internalDocumentIDStore.InternalDocumentIDStore;
-// type DocumentID = internalDocumentIDStore.DocumentID;
 
 export interface QPSIndex extends AnyIndexStore {
   indexes: Record<string, Index.Tree>
@@ -52,10 +49,6 @@ export function recursiveCreate<T extends AnyOrama>(indexDatastore: QPSIndex, sc
         case 'string':
         case 'string[]':
           indexDatastore.indexes[path] = { type: 'Radix', node: new radix.RadixTree(), isArray }
-          // indexDatastore.avgFieldLength[path] = 0
-          // indexDatastore.frequencies[path] = {}
-          // indexDatastore.tokenOccurrences[path] = {}
-          // indexDatastore.fieldLengths[path] = {}
           break
         case 'enum':
         case 'enum[]':
@@ -123,9 +116,6 @@ export function insertString(
         stats.tokenQuantums[internalId][token],
         tokenBitIndex
       )
-      // if (stats.tokenQuantums[internalId][token] < 0) {
-      //   throw new Error("Overflow")
-      // }
 
       radixTree.insert(token, internalId)
     }

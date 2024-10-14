@@ -131,7 +131,6 @@ function qpsComponents(schema: AnySchema): Partial<ObjectComponents<any, any, an
           )
         }
       },
-      // <T extends I>(implementation: IIndex<T>, index: T, prop: string, id: DocumentID, internalId: InternalDocumentID, value: SearchableValue, schemaType: SearchableType, language: string | undefined, tokenizer: Tokenizer, docsCount: number) => SyncOrAsyncValue<boolean>;
       remove: function remove(implementation: IIndex<QPSIndexStorage>, indexDatastorage: QPSIndexStorage, prop: string, id: DocumentID, internalId: InternalDocumentID, value: SearchableValue, schemaType: SearchableType, language: string | undefined, tokenizer: Tokenizer, docsCount: number) {
         if (!(schemaType === 'string' || schemaType === 'string[]')) {
           return Index.remove(implementation as unknown as IIndex<Index.Index>, indexDatastorage as unknown as Index.Index, prop, id, internalId, value, schemaType, language, tokenizer, docsCount)
