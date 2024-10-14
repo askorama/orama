@@ -3,7 +3,7 @@ import type { SiteConfig } from 'vitepress'
 import MarkdownIt from 'markdown-it'
 import { JSDOM } from 'jsdom'
 import { presets } from '@orama/searchbox'
-import { create, insertMultiple } from '@orama/orama'
+import { AnySchema, create, insertMultiple } from '@orama/orama'
 import { persist } from '@orama/plugin-data-persistence'
 import slugify from 'slugify'
 import { readFileSync } from 'fs'
@@ -45,10 +45,9 @@ async function createOramaContentLoader(paths: string[], root: string, base: str
     .flatMap((data) => formatForOrama(data, base))
 
   const db = await create({
-    schema: presets.docs.schema
+    schema: presets.docs.schema as AnySchema
   })
 
-  // @ts-expect-error - can't strongly type contents here
   await insertMultiple(db, contents)
 
   return persist(db, 'json', 'browser')

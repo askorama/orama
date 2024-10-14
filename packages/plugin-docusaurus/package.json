@@ -18,6 +18,11 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "postbuild": "sh scripts/postbuild.sh",
+    "pretest": "node ../../scripts/test-pack.mjs plugin-docusaurus",
+    "test": "echo \"Docusaurus v2 will become unmaintained soon. Use Docusaurus v3.\" # node --loader=tsx --no-warnings=loader --test ./test/integration.ts | tap-mocha-reporter spec",
+    "format": "prettier -w src",
+    "lint": "eslint src --ext .js,.ts,.tsx,.cts",
+    "changelog": "auto-changelog -p",
     "watch": "tsc --watch"
   },
   "dependencies": {

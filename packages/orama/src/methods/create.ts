@@ -8,11 +8,13 @@ import { Sorter, createSorter } from '../components/sorter.js'
 import { createTokenizer } from '../components/tokenizer/index.js'
 import { createError } from '../errors.js'
 import {
+  AnySchema,
   Components,
   FunctionComponents,
   IDocumentsStore,
   IIndex,
   ISorter,
+  ObjectComponents,
   Orama,
   OramaPlugin,
   SorterConfig,
@@ -70,7 +72,7 @@ function validateComponents<
 }
 
 export function create<
-  OramaSchema,
+  OramaSchema extends AnySchema,
   TIndex = IIndex<Index>,
   TDocumentStore = IDocumentsStore<DocumentsStore>,
   TSorter = ISorter<Sorter>
@@ -84,6 +86,28 @@ export function create<
 }: CreateArguments<OramaSchema, TIndex, TDocumentStore, TSorter>): Orama<OramaSchema, TIndex, TDocumentStore, TSorter> {
   if (!components) {
     components = {}
+  }
+
+  for (const plugin of plugins ?? []) {
+    if (!('getComponents' in plugin)) {
+      continue
+    }
+    if (typeof plugin.getComponents !== 'function') {
+      continue;
+    }
+
+    const pluginComponents = plugin.getComponents(schema) as Partial<ObjectComponents<TIndex, TDocumentStore, TSorter>>;
+
+    const keys = Object.keys(pluginComponents)
+    for (const key of keys) {
+      if (components![key]) {
+        throw createError('PLUGIN_COMPONENT_CONFLICT', key, plugin.name)
+      }
+    }
+    components = {
+      ...components,
+      ...pluginComponents
+    }
   }
 
   if (!id) {

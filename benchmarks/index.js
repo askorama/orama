@@ -12,6 +12,9 @@ function benchmarkInsert() {
     b.add('insert in Orama latest', () => {
       insert.oramaLatest()
     }),
+    b.add('insert in Orama latest with PT15', () => {
+      insert.oramaLatestPT15()
+    }),
     b.cycle(),
     b.complete(),
     b.save({ file: 'insert', version: '1.0.0' }),
@@ -29,6 +32,9 @@ function benchmarkInsertMultiple() {
     }),
     b.add('insert multiple in Orama latest', () => {
       insertMultiple.oramaLatest()
+    }),
+    b.add('insert multiple in Orama latest with PT15', () => {
+      insertMultiple.oramaLatestPT15()
     }),
     b.cycle(),
     b.complete(),
@@ -48,6 +54,9 @@ function benchmarkSearch() {
     b.add('plain search in Orama latest', () => {
       searchPlain.oramaLatest()
     }),
+    b.add('plain search in Orama latest with PT15', () => {
+      searchPlain.oramaLatestPT15()
+    }),
     b.cycle(),
     b.complete(),
     b.save({ file: 'plain search', version: '1.0.0' }),
@@ -66,6 +75,9 @@ function benchmarkSearchWithFilters() {
     b.add('search with filters in Orama latest', () => {
       searchWithFilters.oramaLatest()
     }),
+    b.add('search with filters in Orama latest with PT15', () => {
+      searchWithFilters.oramaLatestPT15()
+    }),
     b.cycle(),
     b.complete(),
     b.save({ file: 'search with filters', version: '1.0.0' }),
@@ -83,6 +95,9 @@ function benchmarkSearchWithLongTextAndComplexFilters() {
     }),
     b.add('search with long text and complex filters in Orama latest', () => {
       searchWithLongTextAndComplexFilters.oramaLatest()
+    }),
+    b.add('search with long text and complex filters in Orama latest with PT15', () => {
+      searchWithLongTextAndComplexFilters.oramaLatestPT15()
     }),
     b.cycle(),
     b.complete(),

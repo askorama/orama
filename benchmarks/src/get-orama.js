@@ -1,6 +1,7 @@
 import * as orama211 from 'orama_211'
 import * as orama300rc2 from 'orama_300_rc_2'
 import * as oramaLatest from 'orama_latest'
+import { pluginPT15 } from '@orama/plugin-pt15'
 import dataset from './dataset.json' assert { type: 'json' }
 
 export const schema = {
@@ -13,12 +14,14 @@ export const schema = {
 const create = {
   orama211: () => orama211.create({ schema }),
   orama300rc2: () => orama300rc2.create({ schema }),
-  oramaLatest: () => oramaLatest.create({ schema })
+  oramaLatest: () => oramaLatest.create({ schema }),
+  oramaLatestPT15: () => oramaLatest.create({ schema, plugins: [pluginPT15()] })
 }
 
 const db211 = await create.orama211()
 const db300rc2 = create.orama300rc2()
 const dbLatest = create.oramaLatest()
+const dbLatestPT15 = create.oramaLatestPT15()
 
 export const insert = {
   orama211: async () => {
@@ -38,6 +41,12 @@ export const insert = {
     for (const record of dataset) {
       oramaLatest.insert(db, record)
     }
+  },
+  oramaLatestPT15: () => {
+    const db = create.oramaLatestPT15()
+    for (const record of dataset) {
+      oramaLatest.insert(db, record)
+    }
   }
 }
 
@@ -50,6 +59,9 @@ export const insertMultiple = {
   },
   oramaLatest: () => {
     oramaLatest.insertMultiple(dbLatest, dataset, 50)
+  },
+  oramaLatestPT15: () => {
+    oramaLatest.insertMultiple(dbLatestPT15, dataset, 50)
   }
 }
 
@@ -62,6 +74,9 @@ export const searchPlain = {
   },
   oramaLatest: () => {
     oramaLatest.search(dbLatest, { term: 'Legend of Zelda' })
+  },
+  oramaLatestPT15: () => {
+    oramaLatest.search(dbLatestPT15, { term: 'Legend of Zelda' })
   }
 }
 
@@ -74,6 +89,9 @@ export const searchWithFilters = {
   },
   oramaLatest: () => {
     oramaLatest.search(dbLatest, { term: 'Super Hero', where: { rating: { gte: 4 } } })
+  },
+  oramaLatestPT15: () => {
+    oramaLatest.search(dbLatestPT15, { term: 'Super Hero', where: { rating: { gte: 4 } } })
   }
 }
 
@@ -86,5 +104,8 @@ export const searchWithLongTextAndComplexFilters = {
   },
   oramaLatest: () => {
     oramaLatest.search(dbLatest, { term: 'classic run gun, action game focused on boss battles', where: { rating: { gte: 4 }, genres: { containsAll: ['Shooter'] } } })
+  },
+  oramaLatestPT15: () => {
+    oramaLatest.search(dbLatestPT15, { term: 'classic run gun, action game focused on boss battles', where: { rating: { gte: 4 }, genres: { containsAll: ['Shooter'] } } })
   }
 }

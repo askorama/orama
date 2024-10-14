@@ -287,7 +287,7 @@ export function insert(
   }
 }
 
-function insertVector(index: Index, prop: string, value: number[] | VectorType, id: DocumentID): void {
+export function insertVector(index: AnyIndexStore, prop: string, value: number[] | VectorType, id: DocumentID): void {
   if (!(value instanceof Float32Array)) {
     value = new Float32Array(value)
   }
@@ -303,14 +303,13 @@ function removeScalar(
   index: Index,
   prop: string,
   id: DocumentID,
+  internalId: InternalDocumentID,
   value: SearchableValue,
   schemaType: ScalarSearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number
 ): boolean {
-  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
-
   if (isVectorType(schemaType)) {
     delete index.vectorIndexes[prop].vectors[id]
     return true
@@ -354,6 +353,7 @@ export function remove(
   index: Index,
   prop: string,
   id: DocumentID,
+  internalId: InternalDocumentID,
   value: SearchableValue,
   schemaType: SearchableType,
   language: string | undefined,
@@ -366,6 +366,7 @@ export function remove(
       index,
       prop,
       id,
+      internalId,
       value,
       schemaType as ScalarSearchableType,
       language,
@@ -379,7 +380,7 @@ export function remove(
   const elements = value as Array<string | number | boolean>
   const elementsLength = elements.length
   for (let i = 0; i < elementsLength; i++) {
-    removeScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer, docsCount)
+    removeScalar(implementation, index, prop, id, internalId, elements[i], innerSchemaType, language, tokenizer, docsCount)
   }
 
   return true
