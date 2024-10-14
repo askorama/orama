@@ -2,21 +2,15 @@ import t from 'tap'
 
 import { AVLTree } from '../src/trees/avl.js'
 
-t.test('AVL Tree', (t) => {
-  t.plan(7)
-
-  t.test('create', (t) => {
-    t.plan(3)
-
+t.test('AVL Tree', async (t) => {
+  t.test('create', async (t) => {
     const tree = new AVLTree<number, string>(1, 'foo')
     t.equal(tree.getSize(), 1)
     t.equal(tree.find(1), 'foo')
     t.equal(tree.find(4), null)
   })
 
-  t.test('insert', (t) => {
-    t.plan(1)
-
+  t.test('insert', async (t) => {
     const tree = new AVLTree(1, 'foo')
 
     tree.insert(2, 'bar')
@@ -29,9 +23,7 @@ t.test('AVL Tree', (t) => {
     t.equal(tree.getSize(), 7)
   })
 
-  t.test('find', (t) => {
-    t.plan(2)
-
+  t.test('find', async (t) => {
     const tree = new AVLTree(1, [1, 2, 3])
 
     tree.insert(2, [4, 5, 6])
@@ -45,9 +37,7 @@ t.test('AVL Tree', (t) => {
     t.same(tree.find(20), [16, 17, 18])
   })
 
-  t.test('remove', (t) => {
-    t.plan(2)
-
+  t.test('remove', async (t) => {
     const tree = new AVLTree(1, 'foo')
 
     tree.insert(2, 'bar')
@@ -63,9 +53,7 @@ t.test('AVL Tree', (t) => {
     t.equal(tree.contains(20), false)
   })
 
-  t.test('rangeSearch', (t) => {
-    t.plan(1)
-
+  t.test('rangeSearch', async (t) => {
     const tree = new AVLTree(1, ['foo'])
 
     tree.insert(2, ['bar'])
@@ -78,9 +66,7 @@ t.test('AVL Tree', (t) => {
     t.same(tree.rangeSearch(5, 20), ['quux', 'baz', 'corge', 'quuz'])
   })
 
-  t.test('greaterThan', (t) => {
-    t.plan(1)
-
+  t.test('greaterThan', async (t) => {
     const tree = new AVLTree(1, ['foo'])
 
     tree.insert(2, ['bar'])
@@ -93,9 +79,7 @@ t.test('AVL Tree', (t) => {
     t.same(tree.greaterThan(10), ['qux', 'quuz', 'corge'])
   })
 
-  t.test('lessThan', (t) => {
-    t.plan(1)
-
+  t.test('lessThan', async (t) => {
     const tree = new AVLTree(1, ['foo'])
 
     tree.insert(2, ['bar'])

@@ -13,11 +13,8 @@ import type {
   ScalarSearchableType,
   SearchableType,
   SearchableValue,
-  SearchContext,
-  SearchParamsFullText,
   Tokenizer,
   TokenScore,
-  TypedDocument,
   VectorIndex,
   VectorType,
   WhereCondition
@@ -32,7 +29,7 @@ import { RadixTree } from '../trees/radix.js'
 import { BKDTree } from '../trees/bkd.js'
 import { BoolNode } from '../trees/bool.js'
 
-import { convertDistanceToMeters, intersect, safeArrayPush, getOwnProperty } from '../utils.js'
+import { convertDistanceToMeters, intersect, safeArrayPush } from '../utils.js'
 import { BM25 } from './algorithms.js'
 import { getMagnitude } from './cosine-similarity.js'
 import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
@@ -139,46 +136,6 @@ export function removeTokenScoreParameters(index: Index, prop: string, token: st
   index.tokenOccurrences[prop][token]--
 }
 
-export function calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-  context: SearchContext<T, ResultDocument, SearchParamsFullText<T, ResultDocument>>,
-  index: Index,
-  prop: string,
-  term: string,
-  ids: DocumentID[]
-): TokenScore[] {
-  const documentIDs = Array.from(ids)
-
-  // Exact fields for TF-IDF
-  const avgFieldLength = index.avgFieldLength[prop]
-  const fieldLengths = index.fieldLengths[prop]
-  const oramaOccurrences = index.tokenOccurrences[prop]
-  const oramaFrequencies = index.frequencies[prop]
-
-  // oramaOccurrences[term] can be undefined, 0, string, or { [k: string]: number }
-  const termOccurrences = typeof oramaOccurrences[term] === 'number' ? oramaOccurrences[term] ?? 0 : 0
-
-  const scoreList: TokenScore[] = []
-
-  // Calculate TF-IDF value for each term, in each document, for each index.
-  const documentIDsLength = documentIDs.length
-  for (let k = 0; k < documentIDsLength; k++) {
-    const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, documentIDs[k])
-    const tf = oramaFrequencies?.[internalId]?.[term] ?? 0
-
-    const bm25 = BM25(
-      tf,
-      termOccurrences,
-      context.docsCount,
-      fieldLengths[internalId]!,
-      avgFieldLength,
-      context.params.relevance! as Required<BM25Params>
-    )
-
-    scoreList.push([internalId, bm25])
-  }
-  return scoreList
-}
-
 export function create<T extends AnyOrama, TSchema extends T['schema']>(
   orama: T,
   sharedInternalDocumentStore: T['internalDocumentIDStore'],
@@ -258,15 +215,13 @@ function insertScalarBuilder(
   implementation: IIndex<Index>,
   index: Index,
   prop: string,
-  id: DocumentID,
+  internalId: InternalDocumentID,
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number,
   options?: InsertOptions
 ) {
   return (value: SearchableValue) => {
-    const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
-
     const { type, node } = index.indexes[prop]
     switch (type) {
       case 'Bool': {
@@ -307,6 +262,7 @@ export function insert(
   index: Index,
   prop: string,
   id: DocumentID,
+  internalId: InternalDocumentID,
   value: SearchableValue,
   schemaType: SearchableType,
   language: string | undefined,
@@ -318,7 +274,7 @@ export function insert(
     return insertVector(index, prop, value as number[] | Float32Array, id)
   }
 
-  const insertScalar = insertScalarBuilder(implementation, index, prop, id, language, tokenizer, docsCount, options)
+  const insertScalar = insertScalarBuilder(implementation, index, prop, internalId, language, tokenizer, docsCount, options)
 
   if (!isArrayType(schemaType)) {
     return insertScalar(value)
@@ -331,7 +287,7 @@ export function insert(
   }
 }
 
-function insertVector(index: Index, prop: string, value: number[] | VectorType, id: DocumentID): void {
+export function insertVector(index: AnyIndexStore, prop: string, value: number[] | VectorType, id: DocumentID): void {
   if (!(value instanceof Float32Array)) {
     value = new Float32Array(value)
   }
@@ -347,14 +303,13 @@ function removeScalar(
   index: Index,
   prop: string,
   id: DocumentID,
+  internalId: InternalDocumentID,
   value: SearchableValue,
   schemaType: ScalarSearchableType,
   language: string | undefined,
   tokenizer: Tokenizer,
   docsCount: number
 ): boolean {
-  const internalId = getInternalDocumentId(index.sharedInternalDocumentStore, id)
-
   if (isVectorType(schemaType)) {
     delete index.vectorIndexes[prop].vectors[id]
     return true
@@ -398,6 +353,7 @@ export function remove(
   index: Index,
   prop: string,
   id: DocumentID,
+  internalId: InternalDocumentID,
   value: SearchableValue,
   schemaType: SearchableType,
   language: string | undefined,
@@ -410,6 +366,7 @@ export function remove(
       index,
       prop,
       id,
+      internalId,
       value,
       schemaType as ScalarSearchableType,
       language,
@@ -423,48 +380,150 @@ export function remove(
   const elements = value as Array<string | number | boolean>
   const elementsLength = elements.length
   for (let i = 0; i < elementsLength; i++) {
-    removeScalar(implementation, index, prop, id, elements[i], innerSchemaType, language, tokenizer, docsCount)
+    removeScalar(implementation, index, prop, id, internalId, elements[i], innerSchemaType, language, tokenizer, docsCount)
   }
 
   return true
 }
 
-export function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-  context: SearchContext<T, ResultDocument, SearchParamsFullText<T, ResultDocument>>,
+export function calculateResultScores(
   index: Index,
   prop: string,
-  term: string
-): TokenScore[] {
-  if (!(prop in index.tokenOccurrences)) {
-    return []
-  }
+  term: string,
+  ids: InternalDocumentID[],
+  docsCount: number,
+  bm25Relevance: Required<BM25Params>,
+  resultsMap: Map<number, number>,
+  boostPerProperty: number,
+) {
+  const documentIDs = Array.from(ids)
 
-  const { node, type } = index.indexes[prop]
-  if (type !== 'Radix') {
-    throw createError('WRONG_SEARCH_PROPERTY_TYPE', prop)
-  }
+  // Exact fields for TF-IDF
+  const avgFieldLength = index.avgFieldLength[prop]
+  const fieldLengths = index.fieldLengths[prop]
+  const oramaOccurrences = index.tokenOccurrences[prop]
+  const oramaFrequencies = index.frequencies[prop]
 
-  const { exact, tolerance } = context.params
-  const searchResult = node.find({ term, exact, tolerance })
-  const ids = new Set<InternalDocumentID>()
+  // oramaOccurrences[term] can be undefined, 0, string, or { [k: string]: number }
+  const termOccurrences = typeof oramaOccurrences[term] === 'number' ? oramaOccurrences[term] ?? 0 : 0
 
-  for (const key in searchResult) {
-    //skip keys inherited from prototype
-    const ownProperty = getOwnProperty(searchResult, key)
-    if (!ownProperty) continue
+  // Calculate TF-IDF value for each term, in each document, for each index.
+  const documentIDsLength = documentIDs.length
+  for (let k = 0; k < documentIDsLength; k++) {
+    const internalId = documentIDs[k]
+    const tf = oramaFrequencies?.[internalId]?.[term] ?? 0
 
-    for (const id of searchResult[key]) {
-      ids.add(id)
+    const bm25 = BM25(
+      tf,
+      termOccurrences,
+      docsCount,
+      fieldLengths[internalId]!,
+      avgFieldLength,
+      bm25Relevance,
+    )
+
+    if (resultsMap.has(internalId)) {
+      resultsMap.set(internalId, resultsMap.get(internalId)! + bm25 * boostPerProperty)
+    } else {
+      resultsMap.set(internalId, bm25 * boostPerProperty)
     }
   }
-
-  return context.index.calculateResultScores(context, index, prop, term, Array.from(ids))
 }
 
-export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-  context: SearchContext<T, ResultDocument>,
+function searchInProperty(
   index: Index,
-  filters: Partial<WhereCondition<T['schema']>>
+  tree: RadixTree,
+  prop: string,
+  tokens: string[],
+  exact: boolean,
+  tolerance: number,
+  resultsMap: Map<number, number>,
+  boostPerProperty: number,
+  bm25Relevance: Required<BM25Params>,
+  docsCount: number,
+) {
+  const tokenLength = tokens.length;
+  for (let i = 0; i < tokenLength; i++) {
+    const term = tokens[i];
+
+    const searchResult = tree.find({ term, exact, tolerance })
+
+    const termsFound = Object.keys(searchResult)
+    const termsFoundLength = termsFound.length;
+    for (let j = 0; j < termsFoundLength; j++) {
+      const word = termsFound[j]
+      const ids = searchResult[word]
+      calculateResultScores(
+        index,
+        prop,
+        word,
+        ids,
+        docsCount,
+        bm25Relevance,
+        resultsMap,
+        boostPerProperty,
+      )
+    }
+  }
+}
+
+export function search(
+  index: Index,
+  term: string,
+  tokenizer: Tokenizer,
+  language: string | undefined,
+  propertiesToSearch: string[],
+  exact: boolean,
+  tolerance: number,
+  boost: Record<string, number>,
+  relevance: Required<BM25Params>,
+  docsCount: number
+): TokenScore[] {
+  const tokens = tokenizer.tokenize(term, language)
+
+  const resultsMap = new Map<number, number>()
+  for (const prop of propertiesToSearch) {
+    if (!(prop in index.indexes)) {
+      continue
+    }
+
+    const tree = index.indexes[prop]
+    const { type } = tree
+    if (type !== 'Radix') {
+      throw createError('WRONG_SEARCH_PROPERTY_TYPE', prop)
+    }
+    const boostPerProperty = boost[prop] ?? 1
+    if (boostPerProperty <= 0) {
+      throw createError('INVALID_BOOST_VALUE', boostPerProperty)
+    }
+
+    // if the tokenizer returns an empty array, we returns all the documents
+    if (tokens.length === 0 && !term) {
+      tokens.push('')
+    }
+
+    searchInProperty(
+      index,
+      tree.node,
+      prop,
+      tokens,
+      exact,
+      tolerance,
+      resultsMap,
+      boostPerProperty,
+      relevance,
+      docsCount
+    )
+  }
+
+  return Array.from(resultsMap)
+}
+
+export function searchByWhereClause<T extends AnyOrama>(
+  index: Index,
+  tokenizer: Tokenizer,
+  filters: Partial<WhereCondition<T['schema']>>,
+  language: string | undefined
 ): number[] {
   const filterKeys = Object.keys(filters)
 
@@ -537,7 +596,7 @@ export function searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDo
 
     if (type === 'Radix' && (typeof operation === 'string' || Array.isArray(operation))) {
       for (const raw of [operation].flat()) {
-        const term = context.tokenizer.tokenize(raw, context.language, param)
+        const term = tokenizer.tokenize(raw, language, param)
         for (const t of term) {
           const filteredIDsResults = node.find({ term: t, exact: true })
           safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())

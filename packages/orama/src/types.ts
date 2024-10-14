@@ -935,6 +935,7 @@ export interface IIndex<I extends AnyIndexStore> {
     index: T,
     prop: string,
     id: DocumentID,
+    internalId: InternalDocumentID,
     value: SearchableValue,
     schemaType: SearchableType,
     language: string | undefined,
@@ -950,6 +951,7 @@ export interface IIndex<I extends AnyIndexStore> {
     index: T,
     prop: string,
     id: DocumentID,
+    internalId: InternalDocumentID,
     value: SearchableValue,
     schemaType: SearchableType,
     language: string | undefined,
@@ -962,24 +964,35 @@ export interface IIndex<I extends AnyIndexStore> {
   insertTokenScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], token: string): void
   removeDocumentScoreParameters(index: I, prop: string, id: DocumentID, docsCount: number): SyncOrAsyncValue
   removeTokenScoreParameters(index: I, prop: string, token: string): void
-  calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-    context: SearchContext<T, ResultDocument>,
-    index: I,
+  calculateResultScores(
+    index: AnyIndexStore,
     prop: string,
     term: string,
-    ids: DocumentID[]
+    ids: InternalDocumentID[],
+    docsCount: number,
+    bm25Relevance: Required<BM25Params>,
+    resultsMap: Map<number, number>,
+    boostPerProperty: number,
+  )
+
+  search<T extends AnyOrama>(
+    index: AnyIndexStore,
+    term: string,
+    tokenizer: Tokenizer,
+    language: string | undefined,
+    propertiesToSearch: string[],
+    exact: boolean,
+    tolerance: number,
+    boost: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>,
+    relevance: Required<BM25Params>,
+    docsCount: number
   ): TokenScore[]
 
-  search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-    context: SearchContext<T, ResultDocument>,
-    index: I,
-    prop: string,
-    term: string
-  ): TokenScore[]
-  searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-    context: SearchContext<T, ResultDocument>,
-    index: I,
-    filters: Partial<WhereCondition<T['schema']>>
+  searchByWhereClause<T extends AnyOrama>(
+    index: AnyIndexStore,
+    tokenizer: Tokenizer,
+    filters: Partial<WhereCondition<T['schema']>>,
+    language: string | undefined
   ): InternalDocumentID[]
 
   getSearchableProperties(index: I): string[]
@@ -998,8 +1011,8 @@ export interface IDocumentsStore<D extends AnyDocumentStore = AnyDocumentStore> 
   get(store: D, id: DocumentID): Optional<AnyDocument>
   getMultiple(store: D, ids: DocumentID[]): Optional<AnyDocument>[]
   getAll(store: D): SyncOrAsyncValue<Record<InternalDocumentID, AnyDocument>>
-  store(store: D, id: DocumentID, doc: AnyDocument): boolean
-  remove(store: D, id: DocumentID): SyncOrAsyncValue<boolean>
+  store(store: D, id: DocumentID, internalId: InternalDocumentID, doc: AnyDocument): boolean
+  remove(store: D, id: DocumentID, internalId: InternalDocumentID): SyncOrAsyncValue<boolean>
   count(store: D): number
 
   load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): D
@@ -1303,6 +1316,7 @@ export type OramaPluginSync<T = unknown> = {
   beforeUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
   afterUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
   afterCreate?: <T extends AnyOrama>(orama: T) => SyncOrAsyncValue
+  getComponents?: <IndexStore extends AnyIndexStore, TDocumentStore, TSorter>(schema: AnySchema) => SyncOrAsyncValue<Partial<ObjectComponents<IIndex<IndexStore>, TDocumentStore, TSorter>>>
 }
 
 export type OramaPluginAsync<T = unknown> = Promise<OramaPluginSync<T>>

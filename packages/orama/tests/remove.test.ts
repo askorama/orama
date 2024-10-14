@@ -298,6 +298,26 @@ t.test('should correctly remove documents with vector properties', async (t) => 
   t.ok(await getByID(db, id2))
 })
 
+t.test(
+  'test case for #766: Zero division when computing scores after removing all documents from an index.',
+  async (t) => {
+    const db = create({
+      schema: {
+        name: 'string'
+      } as const
+    })
+
+    const id = insert(db, { name: 'test' })
+
+    const success = remove(db, id as string)
+
+    insert(db, { name: 'foo' })
+    insert(db, { name: 'bar' })
+
+    t.ok(success)
+  }
+)
+
 function createSimpleDB() {
   let i = 0
   const db = create({
@@ -354,23 +374,3 @@ function createSimpleDB() {
 
   return [db, id1, id2, id3, id4] as const
 }
-
-t.test(
-  'test case for #766: Zero division when computing scores after removing all documents from an index.',
-  async (t) => {
-    const db = create({
-      schema: {
-        name: 'string'
-      } as const
-    })
-
-    const id = insert(db, { name: 'test' })
-
-    const success = remove(db, id as string)
-
-    insert(db, { name: 'foo' })
-    insert(db, { name: 'bar' })
-
-    t.ok(success)
-  }
-)

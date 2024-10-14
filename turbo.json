@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
@@ -47,6 +47,10 @@
       "outputs": ["dist/**"]
     },
     "@orama/plugin-embeddings#build": {
+      "dependsOn": ["@orama/orama#build"],
+      "outputs": ["dist/**"]
+    },
+    "@orama/plugin-pt15#build": {
       "dependsOn": ["@orama/orama#build"],
       "outputs": ["dist/**"]
     },

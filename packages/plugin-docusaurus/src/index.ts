@@ -3,12 +3,11 @@ import type { Plugin } from '@docusaurus/types'
 import { cp } from 'node:fs/promises'
 import { gzip } from 'pako'
 import { resolve } from 'node:path'
-// @ts-ignore
 import { create, insertMultiple, save } from '@orama/orama'
 import { JSDOM } from 'jsdom'
 import MarkdownIt from 'markdown-it'
 import matter from 'gray-matter'
-import { createSnapshot, deployIndex, DOCS_PRESET_SCHEMA, fetchEndpointConfig } from "./utils"
+import { createSnapshot, deployIndex, DOCS_PRESET_SCHEMA, fetchEndpointConfig } from "./utils.js"
 import { parseMarkdownHeadingId, writeMarkdownHeadingId } from '@docusaurus/utils'
 
 enum DeployType {
