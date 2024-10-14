@@ -51,9 +51,7 @@ export function getAll<T extends AnyOrama, ResultDocument extends TypedDocument<
   return store.docs
 }
 
-export function store(store: DocumentsStore, id: DocumentID, doc: AnyDocument): boolean {
-  const internalId = getInternalDocumentId(store.sharedInternalDocumentStore, id)
-
+export function store(store: DocumentsStore, id: DocumentID, internalId: InternalDocumentID, doc: AnyDocument): boolean {
   if (typeof store.docs[internalId] !== 'undefined') {
     return false
   }

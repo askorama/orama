@@ -1,5 +1,5 @@
 import t from 'tap'
-import { create, insertMultiple, load, save, search } from '@orama/orama'
+import { create, insertMultiple, load, remove, save, search } from '@orama/orama'
 import {pluginPT15} from '../src/index.js'
 import { get_position } from '../src/algorithm.js'
 
@@ -49,9 +49,9 @@ t.test('plugin-pt15', async t => {
     })
 
     await insertMultiple(db, [
-        { name: 'The pen is on the table', age: 33, isCool: true, algo: ['algo1', 'algo2'], preferredNumbers: [20] },
-        { name: 'The can is near the table', age: 32, isCool: true, algo: ['algo3'], preferredNumbers: [55] },
-        { name: 'My table is cool', age: 22, isCool: false, algo: ['algo4'], preferredNumbers: [22] }
+        { id: '1', name: 'The pen is on the table', age: 33, isCool: true, algo: ['algo1', 'algo2'], preferredNumbers: [20] },
+        { id: '2', name: 'The can is near the table', age: 32, isCool: true, algo: ['algo3'], preferredNumbers: [55] },
+        { id: '3', name: 'My table is cool', age: 22, isCool: false, algo: ['algo4'], preferredNumbers: [22] }
     ])
 
     const result = await search(db, {
@@ -75,8 +75,15 @@ t.test('plugin-pt15', async t => {
     })
     await load(db2, restored)
 
-    const result2 = await search(db, {
+    const result2 = await search(db2, {
         term: 't'
     })
     t.equal(result2.count, 3)
+
+    await remove(db2, '1')
+
+    const result3 = await search(db2, {
+        term: 't'
+    })
+    t.equal(result3.count, 2)
 })

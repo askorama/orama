@@ -52,7 +52,8 @@ async function innerInsertAsync<T extends AnyOrama>(
     throw createError('DOCUMENT_ID_MUST_BE_STRING', typeof id)
   }
 
-  if (!orama.documentsStore.store(docs, id, doc)) {
+  const internalId = getInternalDocumentId(orama.internalDocumentIDStore, id)
+  if (!orama.documentsStore.store(docs, id, internalId, doc)) {
     throw createError('DOCUMENT_ALREADY_EXISTS', id)
   }
 
@@ -100,7 +101,8 @@ function innerInsertSync<T extends AnyOrama>(
     throw createError('DOCUMENT_ID_MUST_BE_STRING', typeof id)
   }
 
-  if (!orama.documentsStore.store(docs, id, doc)) {
+  const internalId = getInternalDocumentId(orama.internalDocumentIDStore, id)
+  if (!orama.documentsStore.store(docs, id, internalId, doc)) {
     throw createError('DOCUMENT_ALREADY_EXISTS', id)
   }
 

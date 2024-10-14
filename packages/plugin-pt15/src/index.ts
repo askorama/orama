@@ -1,7 +1,7 @@
 import type { AnyOrama, SearchableType, IIndex, AnyIndexStore, SearchableValue, Tokenizer, OnlyStrings, FlattenSchemaProperty, TokenScore, WhereCondition, OramaPluginSync, AnySchema, ObjectComponents } from '@orama/orama'
 import {
   index as Index, internalDocumentIDStore } from '@orama/orama/components'
-import { PT15IndexStore, insertString, recursiveCreate, PositionsStorage, searchString } from './algorithm.js';
+import { PT15IndexStore, insertString, recursiveCreate, PositionsStorage, searchString, removeString } from './algorithm.js';
 
 type InternalDocumentID = internalDocumentIDStore.InternalDocumentID;
 type InternalDocumentIDStore = internalDocumentIDStore.InternalDocumentIDStore;
@@ -73,8 +73,37 @@ function createComponents(schema: AnySchema): Partial<ObjectComponents<any, any,
           )
         }
       },
-      remove: function remove() {
-        throw new Error('not implemented yet')
+      // remove: <T extends I>(implementation: IIndex<T>, index: T, prop: string, id: DocumentID, value: SearchableValue, schemaType: SearchableType, language: string | undefined, tokenizer: Tokenizer, docsCount: number) => SyncOrAsyncValue<boolean>;
+      remove: function remove(implementation: IIndex<PT15IndexStore>, indexDatastorage: PT15IndexStore, prop: string, id: DocumentID, internalId: InternalDocumentID, value: SearchableValue, schemaType: SearchableType, language: string | undefined, tokenizer: Tokenizer, docsCount: number) {
+        if (!(schemaType === 'string' || schemaType === 'string[]')) {
+          return Index.remove(implementation as IIndex<Index.Index>, indexDatastorage as Index.Index, prop, id, internalId, value, schemaType, language, tokenizer, docsCount)
+        }
+
+        const storage = indexDatastorage.indexes[prop].node as PositionsStorage
+
+        if (Array.isArray(value)) {
+          for (const item of value) {
+            removeString(
+              item as string,
+              storage,
+              prop,
+              internalId,
+              tokenizer,
+              language
+            )
+          }
+        } else {
+          removeString(
+            value as string,
+            storage,
+            prop,
+            internalId,
+            tokenizer,
+            language
+          )
+        }
+
+        return true
       },
       insertDocumentScoreParameters: () => {throw new Error()},
       insertTokenScoreParameters: () => {throw new Error()},

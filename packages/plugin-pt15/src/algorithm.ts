@@ -181,3 +181,34 @@ export function searchString(
 
   return ret
 }
+
+export function removeString(
+  value: string,
+  positionsStorage: PositionsStorage,
+  prop: string,
+  internalId: InternalDocumentID,
+  tokenizer: Tokenizer,
+  language: string | undefined,
+) {
+  const tokens = tokenizer.tokenize(value, language, prop)
+  const tokensLength = tokens.length
+  for (let i = 0; i < tokensLength; i++) {
+    const token = tokens[i]
+    const position = MAX_POSITION - get_position(i, tokensLength) - 1
+
+    const positionStorage = positionsStorage[position]
+
+    const tokenLength = token.length
+    for (let j = tokenLength; j > 0; j--) {
+      const tokenPart = token.slice(0, j)
+      const a = positionStorage[tokenPart]
+      if (a) {
+        const index = a.indexOf(internalId)
+        if (index !== -1) {
+          a.splice(index, 1)
+        }
+      }
+    }
+  }
+
+}

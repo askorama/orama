@@ -951,6 +951,7 @@ export interface IIndex<I extends AnyIndexStore> {
     index: T,
     prop: string,
     id: DocumentID,
+    internalId: InternalDocumentID,
     value: SearchableValue,
     schemaType: SearchableType,
     language: string | undefined,
@@ -1010,8 +1011,8 @@ export interface IDocumentsStore<D extends AnyDocumentStore = AnyDocumentStore> 
   get(store: D, id: DocumentID): Optional<AnyDocument>
   getMultiple(store: D, ids: DocumentID[]): Optional<AnyDocument>[]
   getAll(store: D): SyncOrAsyncValue<Record<InternalDocumentID, AnyDocument>>
-  store(store: D, id: DocumentID, doc: AnyDocument): boolean
-  remove(store: D, id: DocumentID): SyncOrAsyncValue<boolean>
+  store(store: D, id: DocumentID, internalId: InternalDocumentID, doc: AnyDocument): boolean
+  remove(store: D, id: DocumentID, internalId: InternalDocumentID): SyncOrAsyncValue<boolean>
   count(store: D): number
 
   load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): D
