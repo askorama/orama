@@ -1,7 +1,9 @@
 <p align="center">
-  <img src="/misc/orama-readme-hero-dark#gh-dark-mode-only" />
-  <img src="/misc/readme/orama-readme-light.png#gh-light-mode-only" />
+  <img src="/misc/readme/orama-readme-hero-dark#gh-dark-mode-only" />
+  <img src="/misc/readme/orama-readme-hero-light.png#gh-light-mode-only" />
 </p>
+
+[![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
 
 If you need more info, help, or want to provide general feedback on Orama, join the [Orama Slack channel](https://orama.to/slack)
 
@@ -129,12 +131,13 @@ Orama currently supports 10 different data types:
 
 # Official Docs
 
-Read the complete documentation at [https://docs.orama.com](https://docs.orama.com).
+Read the complete documentation at [https://docs.orama.com/open-source](https://docs.orama.com/open-source).
 
 # Official Orama Plugins
 
 - [Plugin Vitepress](https://docs.orama.com/open-source/plugins/plugin-vitepress)
 - [Plugin Docusaurus](https://docs.orama.com/open-source/plugins/plugin-docusaurus)
+- [Plugin Secure Proxy](https://docs.orama.com/open-source/plugins/plugin-secure-proxy)
 - [Plugin Analytics](https://docs.orama.com/open-source/plugins/plugin-analytics)
 - [Plugin Astro](https://docs.orama.com/open-source/plugins/plugin-astro)
 - [Plugin Data Persistence](https://docs.orama.com/open-source/plugins/plugin-data-persistence)
