@@ -87,3 +87,29 @@ t.test('plugin-pt15', async t => {
     })
     t.equal(result3.count, 2)
 })
+
+t.test('where string', async t => {
+    const db = create({
+        schema: {
+            name: 'string',
+            age: 'number',
+            isCool: 'boolean',
+            algo: 'string[]',
+            preferredNumbers: 'number[]',
+        } as const,
+        plugins: [pluginPT15()]
+    })
+
+    await insertMultiple(db, [
+        { id: '1', name: 'The pen is on the table', age: 33, isCool: true, algo: ['algo1', 'algo2'], preferredNumbers: [20] },
+        { id: '2', name: 'The can is near the table', age: 32, isCool: true, algo: ['algo3'], preferredNumbers: [55] },
+        { id: '3', name: 'My table is cool', age: 22, isCool: false, algo: ['algo4'], preferredNumbers: [22] }
+    ])
+
+
+    t.throws(() => search(db, {
+        where: {
+            name: 'The pen is on the table'
+        }
+    }), 'String filters are not supported')
+})

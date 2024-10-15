@@ -54,3 +54,46 @@ t.test('plugin-qps', async t => {
 
     t.equal(result3.count, 1)
 })
+
+t.test('filter on string', async t => {
+    const db = create({
+        schema: {
+            name: 'string',
+            surname: 'string',
+        } as const,
+        plugins: [pluginQPS()]
+    })
+
+    await insertMultiple(db, [
+        { id: '1', name: 'Tommaso', surname: 'Allevi' },
+    ])
+
+    const result1 = await search(db, {
+        term: '',
+        where: {
+            name: 'Tommaso'
+        }
+    })
+
+    t.equal(result1.count, 1)
+
+    const result2 = await search(db, {
+        term: '',
+        where: {
+            name: 'Tommaso',
+            surname: 'Allevi'
+        }
+    })
+
+    t.equal(result2.count, 1)
+
+    const result3 = await search(db, {
+        term: '',
+        where: {
+            name: 'Tommaso',
+            surname: 'unknown'
+        }
+    })
+
+    t.equal(result3.count, 0)
+})

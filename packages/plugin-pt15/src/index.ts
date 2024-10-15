@@ -1,4 +1,4 @@
-import type { AnyOrama, SearchableType, IIndex, AnyIndexStore, SearchableValue, Tokenizer, OnlyStrings, FlattenSchemaProperty, TokenScore, WhereCondition, OramaPluginSync, AnySchema, ObjectComponents } from '@orama/orama'
+import type { AnyOrama, SearchableType, IIndex, SearchableValue, Tokenizer, OnlyStrings, FlattenSchemaProperty, TokenScore, WhereCondition, OramaPluginSync, AnySchema, ObjectComponents, BM25Params } from '@orama/orama'
 import {
   index as Index, internalDocumentIDStore } from '@orama/orama/components'
 import { PT15IndexStore, insertString, recursiveCreate, PositionsStorage, searchString, removeString } from './algorithm.js';
@@ -110,7 +110,7 @@ function createComponents(schema: AnySchema): Partial<ObjectComponents<any, any,
       removeDocumentScoreParameters: () => {throw new Error()},
       removeTokenScoreParameters: () => {throw new Error()},
       calculateResultScores: () => {throw new Error()},
-      search: function search<T extends AnyOrama>(index: PT15IndexStore, term: string, tokenizer: Tokenizer, language: string | undefined, propertiesToSearch: string[], exact: boolean, tolerance: number, boost: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>): TokenScore[] {
+      search: function search<T extends AnyOrama>(index: PT15IndexStore, term: string, tokenizer: Tokenizer, language: string | undefined, propertiesToSearch: string[], exact: boolean, tolerance: number, boost: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>, relevance: Required<BM25Params>, docsCount: number, whereFiltersIDs: Set<InternalDocumentID> | undefined): TokenScore[] {
         if (tolerance !== 0) {
           throw new Error('Tolerance not implemented yet')
         }
@@ -128,7 +128,7 @@ function createComponents(schema: AnySchema): Partial<ObjectComponents<any, any,
           const property = propertiesToSearch[i]
           const storage = index.indexes[property].node as PositionsStorage
           const boostPerProp = boost[property] ?? 1
-          const map = searchString(tokenizer, term, storage, boostPerProp);
+          const map = searchString(tokenizer, term, storage, boostPerProp, whereFiltersIDs);
           if (map.size > max.score) {
             max = {
               score: map.size,
@@ -160,7 +160,15 @@ function createComponents(schema: AnySchema): Partial<ObjectComponents<any, any,
         
         return Array.from(base)
       },
-      searchByWhereClause: function searchByWhereClause<T extends AnyOrama>(index: AnyIndexStore, tokenizer: Tokenizer, filters: Partial<WhereCondition<T['schema']>>, language: string | undefined): InternalDocumentID[] {
+      searchByWhereClause: function searchByWhereClause<T extends AnyOrama>(index: PT15IndexStore, tokenizer: Tokenizer, filters: Partial<WhereCondition<T['schema']>>, language: string | undefined) {
+        const stringFiltersList = Object.entries(filters).filter(([propName]) => index.indexes[propName].type === 'Position')
+
+        // PT15 doen't support string filters.
+        // this plugin doesn't distringuish between prefix and exact match.
+        if (stringFiltersList.length !== 0) {
+          throw new Error('String filters are not supported')
+        }
+
         return Index.searchByWhereClause(index as Index.Index, tokenizer, filters, language)
       },
       getSearchableProperties: function getSearchableProperties(index: PT15IndexStore): string[] {

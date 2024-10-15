@@ -1,5 +1,5 @@
-import { AnyIndexStore, AnyOrama, SearchableType, Tokenizer, VectorIndex } from "@orama/orama"
-import { avl, bkd, flat, bool } from '@orama/orama/trees'
+import { AnyIndexStore, AnyOrama, SearchableType, Tokenizer } from "@orama/orama"
+import { avl, bkd, flat, bool, vector } from '@orama/orama/trees'
 import {
   getVectorSize, internalDocumentIDStore, isVectorType } from '@orama/orama/components'
 
@@ -43,7 +43,6 @@ export type PositionsStorage = [
 
 export interface PT15IndexStore extends AnyIndexStore {
   indexes: Record<string, Tree>
-  vectorIndexes: Record<string, VectorIndex>
   searchableProperties: string[]
   searchablePropertiesWithTypes: Record<string, SearchableType>
 }
@@ -67,8 +66,9 @@ export function recursiveCreate<T extends AnyOrama>(indexDatastore: PT15IndexSto
       indexDatastore.searchableProperties.push(path)
       indexDatastore.searchablePropertiesWithTypes[path] = type
       indexDatastore.vectorIndexes[path] = {
-        size: getVectorSize(type),
-        vectors: {}
+        type: 'Vector',
+        node: new vector.VectorIndex(getVectorSize(type)),
+        isArray: false,
       }
     } else {
       const isArray = /\[/.test(type as string)
@@ -156,6 +156,7 @@ export function searchString(
   term: string,
   positionsStorage: PositionsStorage,
   boostPerProp: number,
+  whereFiltersIDs: Set<InternalDocumentID> | undefined,
 ) {
   const tokens = tokenizer.tokenize(term)
 
@@ -168,6 +169,10 @@ export function searchString(
         const aLength = a.length
 
         for (let j = 0; j < aLength; j++) {
+          if (whereFiltersIDs && !whereFiltersIDs.has(a[j])) {
+            continue
+          }
+
           const id = a[j]
           if (ret.has(id)) {
             ret.set(id, ret.get(id)! + i * boostPerProp)

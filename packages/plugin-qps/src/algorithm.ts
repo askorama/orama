@@ -1,5 +1,5 @@
-import { AnyIndexStore, AnyOrama, SearchableType, Tokenizer, VectorIndex } from "@orama/orama"
-import { avl, bkd, flat, radix, bool } from '@orama/orama/trees'
+import { AnyIndexStore, AnyOrama, SearchableType, Tokenizer } from "@orama/orama"
+import { avl, bkd, flat, radix, bool, vector } from '@orama/orama/trees'
 import {
   getVectorSize, index as Index, internalDocumentIDStore, isVectorType } from '@orama/orama/components'
 
@@ -7,7 +7,6 @@ type InternalDocumentID = internalDocumentIDStore.InternalDocumentID;
 
 export interface QPSIndex extends AnyIndexStore {
   indexes: Record<string, Index.Tree>
-  vectorIndexes: Record<string, VectorIndex>
   searchableProperties: string[]
   searchablePropertiesWithTypes: Record<string, SearchableType>
   stats: Record<string, {
@@ -32,8 +31,9 @@ export function recursiveCreate<T extends AnyOrama>(indexDatastore: QPSIndex, sc
       indexDatastore.searchableProperties.push(path)
       indexDatastore.searchablePropertiesWithTypes[path] = type
       indexDatastore.vectorIndexes[path] = {
-        size: getVectorSize(type),
-        vectors: {}
+        type: 'Vector',
+        node: new vector.VectorIndex(getVectorSize(type)),
+        isArray: false,
       }
     } else {
       const isArray = /\[/.test(type as string)
@@ -44,7 +44,7 @@ export function recursiveCreate<T extends AnyOrama>(indexDatastore: QPSIndex, sc
           break
         case 'number':
         case 'number[]':
-          indexDatastore.indexes[path] = { type: 'AVL', node: new avl.AVLTree<number, InternalDocumentID[]>(0, []), isArray }
+          indexDatastore.indexes[path] = { type: 'AVL', node: new avl.AVLTree<number, InternalDocumentID>(0, []), isArray }
           break
         case 'string':
         case 'string[]':
@@ -140,6 +140,7 @@ export function searchString(prop: {
   },
   boostPerProp: number,
   resultMap: Map<number, [number, number]>,
+  whereFiltersIDs: Set<number> | undefined,
 }) {
   const tokens = prop.tokens
   const radixNode = prop.radixNode
@@ -148,6 +149,7 @@ export function searchString(prop: {
   const stats = prop.stats
   const boostPerProp = prop.boostPerProp
   const resultMap = prop.resultMap
+  const whereFiltersIDs = prop.whereFiltersIDs
   const tokensLength = stats.tokensLength
   const tokenQuantums = stats.tokenQuantums
 
@@ -179,6 +181,10 @@ export function searchString(prop: {
 
     for (let j = 0; j < matchedDocsLength; j++) {
       const docId = matchedDocs[j]
+
+      if (whereFiltersIDs && !whereFiltersIDs.has(docId)) {
+        continue
+      }
 
       const numberOfQuantums = tokensLength.get(docId)!
       const tokenQuantumDescriptor = tokenQuantums[docId][key]

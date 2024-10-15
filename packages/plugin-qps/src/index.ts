@@ -1,8 +1,9 @@
-import type { AnyOrama, SearchableType, IIndex, AnyIndexStore, SearchableValue, Tokenizer, OnlyStrings, FlattenSchemaProperty, TokenScore, WhereCondition, OramaPluginSync, AnySchema, ObjectComponents } from '@orama/orama'
+import type { AnyOrama, SearchableType, IIndex, SearchableValue, Tokenizer, OnlyStrings, FlattenSchemaProperty, TokenScore, WhereCondition, OramaPluginSync, AnySchema, ObjectComponents, BM25Params } from '@orama/orama'
 import {
   index as Index, internalDocumentIDStore } from '@orama/orama/components'
 import { insertString, QPSIndex as QPSIndexStorage, recursiveCreate, removeString, searchString } from './algorithm.js';
 import { radix } from '@orama/orama/trees';
+import { setIntersection } from '@orama/orama/internals';
 
 type InternalDocumentID = internalDocumentIDStore.InternalDocumentID;
 type InternalDocumentIDStore = internalDocumentIDStore.InternalDocumentIDStore;
@@ -15,7 +16,7 @@ const unusedStats = {
   tokensLength: new Map(),
 }
 
-function search<T extends AnyOrama>(index: QPSIndexStorage, term: string, tokenizer: Tokenizer, language: string | undefined, propertiesToSearch: string[], exact: boolean, tolerance: number, boost: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>): TokenScore[] {
+function search<T extends AnyOrama>(index: QPSIndexStorage, term: string, tokenizer: Tokenizer, language: string | undefined, propertiesToSearch: string[], exact: boolean, tolerance: number, boost: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>, relevance: Required<BM25Params>, docsCount: number, whereFiltersIDs: Set<InternalDocumentID> | undefined): TokenScore[] {
   const all: Map<InternalDocumentID, [number, number]> = new Map()
 
   const args = {
@@ -27,6 +28,7 @@ function search<T extends AnyOrama>(index: QPSIndexStorage, term: string, tokeni
     boostPerProp: 0,
     all,
     resultMap: all,
+    whereFiltersIDs,
   }
 
   const propertiesToSearchLength = propertiesToSearch.length
@@ -169,8 +171,51 @@ function qpsComponents(schema: AnySchema): Partial<ObjectComponents<any, any, an
       removeTokenScoreParameters: () => {throw new Error()},
       calculateResultScores: () => {throw new Error()},
       search,
-      searchByWhereClause: function searchByWhereClause<T extends AnyOrama>(index: AnyIndexStore, tokenizer: Tokenizer, filters: Partial<WhereCondition<T['schema']>>, language: string | undefined): InternalDocumentID[] {
-        return Index.searchByWhereClause(index as Index.Index, tokenizer, filters, language)
+      searchByWhereClause: function searchByWhereClause<T extends AnyOrama>(index: QPSIndexStorage, tokenizer: Tokenizer, filters: Partial<WhereCondition<T['schema']>>, language: string | undefined) {
+        const stringFiltersList = Object.entries(filters).filter(([propName]) => index.indexes[propName].type === 'Radix')
+
+        // If there are no string filters, we can use the regular search
+        if (stringFiltersList.length === 0) {
+          return Index.searchByWhereClause(index as unknown as Index.Index, tokenizer, filters, language)
+        }
+
+        let idsFromStringFilters: Set<InternalDocumentID> | undefined
+        for (const [propName, filter] of stringFiltersList) {
+          const tokens = tokenizer.tokenize(filter as string, language)
+
+          const radixTree = index.indexes[propName].node as radix.RadixNode
+          const propIds = new Set<InternalDocumentID>()          
+          for (const token of tokens) {
+            const ret = radixTree.find({
+              term: token,
+              exact: true,
+            })
+
+            const ids = ret[token];
+
+            if (ids) {
+              for (const id of ids) {
+                propIds.add(id)
+              }
+            }
+          }
+
+          if (idsFromStringFilters) {
+            idsFromStringFilters = setIntersection(idsFromStringFilters, propIds)
+          } else {
+            idsFromStringFilters = propIds
+          }
+        }
+
+        // Split the filters into string and non-string filters
+        const nonStringFiltersList = Object.entries(filters).filter(([propName]) => index.indexes[propName].type !== 'Radix')
+        if (nonStringFiltersList.length === 0) {
+          return idsFromStringFilters
+        }
+
+        const idsFromNonStringFilters = Index.searchByWhereClause(index as unknown as Index.Index, tokenizer, filters, language);
+
+        return setIntersection(idsFromStringFilters!, idsFromNonStringFilters)
       },
       getSearchableProperties: function getSearchableProperties(index: QPSIndexStorage): string[] {
         return index.searchableProperties
