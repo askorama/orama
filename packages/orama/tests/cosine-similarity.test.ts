@@ -43,7 +43,7 @@ t.test('cosine similarity', async (t) => {
 
       const similarVectors = findSimilarVectors(
         targetVector,
-        Array.from(vectors.keys()),
+        new Set(vectors.keys()),
         vectors,
         targetVector.length,
         DEFAULT_SIMILARITY

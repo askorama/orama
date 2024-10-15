@@ -965,6 +965,7 @@ export interface IIndex<I extends AnyIndexStore> {
     bm25Relevance: Required<BM25Params>,
     resultsMap: Map<number, number>,
     boostPerProperty: number,
+    whereFiltersIDs: Set<InternalDocumentID> | undefined,
   )
 
   search<T extends AnyOrama>(
@@ -977,7 +978,8 @@ export interface IIndex<I extends AnyIndexStore> {
     tolerance: number,
     boost: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>,
     relevance: Required<BM25Params>,
-    docsCount: number
+    docsCount: number,
+    whereFiltersIDs: Set<InternalDocumentID> | undefined,
   ): TokenScore[]
 
   searchByWhereClause<T extends AnyOrama>(
@@ -985,7 +987,7 @@ export interface IIndex<I extends AnyIndexStore> {
     tokenizer: Tokenizer,
     filters: Partial<WhereCondition<T['schema']>>,
     language: string | undefined
-  ): InternalDocumentID[]
+  ): Set<InternalDocumentID>
 
   getSearchableProperties(index: I): string[]
   getSearchablePropertiesWithTypes(index: I): Record<string, SearchableType>

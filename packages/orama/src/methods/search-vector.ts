@@ -3,11 +3,11 @@ import type { InternalDocumentID } from '../components/internal-document-id-stor
 import { getNanosecondsTime, formatNanoseconds } from '../utils.js'
 import { getFacets } from '../components/facets.js'
 import { createError } from '../errors.js'
-import { intersectFilteredIDs } from '../components/filters.js'
 import { getGroups } from '../components/groups.js'
 import { getDocumentIdFromInternalId } from '../components/internal-document-id-store.js'
 import { Language } from '../index.js'
 import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
+import { DEFAULT_SIMILARITY } from '../trees/vector.js'
 
 export function innerVectorSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
@@ -29,10 +29,16 @@ export function innerVectorSearch<T extends AnyOrama, ResultDocument = TypedDocu
     throw createError('INVALID_INPUT_VECTOR', vector.property, vectorSize, vector.value.length)
   }
 
-  let results = vectorIndex.node.find(vector.value as Float32Array, params.similarity)
+  const index = orama.data.index
+  let whereFiltersIDs: Set<InternalDocumentID> | undefined
+  const hasFilters = Object.keys(params.where ?? {}).length > 0
+  if (hasFilters) {
+    whereFiltersIDs = orama.index.searchByWhereClause(index, orama.tokenizer, params.where!, language)
+  }
+
+  const results = vectorIndex.node.find(vector.value as Float32Array, params.similarity ?? DEFAULT_SIMILARITY, whereFiltersIDs)
   let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
 
-  const index = orama.data.index
   if (!propertiesToSearch) {
     const propertiesToSearchWithTypes = orama.index.getSearchablePropertiesWithTypes(index)
 
@@ -42,15 +48,6 @@ export function innerVectorSearch<T extends AnyOrama, ResultDocument = TypedDocu
     )
 
     orama.caches['propertiesToSearch'] = propertiesToSearch
-  }
-
-
-  let whereFiltersIDs: InternalDocumentID[] = []
-
-  const hasFilters = Object.keys(params.where ?? {}).length > 0
-  if (hasFilters) {
-    whereFiltersIDs = orama.index.searchByWhereClause(index, orama.tokenizer, params.where!, language)
-    results = intersectFilteredIDs(whereFiltersIDs, results)
   }
 
   return results

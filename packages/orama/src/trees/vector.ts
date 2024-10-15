@@ -10,7 +10,6 @@ export const DEFAULT_SIMILARITY = 0.8
 
 export class VectorIndex {
     private vectors: Map<InternalDocumentID, [Magnitude, VectorType]> = new Map()
-    private keys: InternalDocumentID[] = [];
 
     constructor(
         public size: number,
@@ -23,23 +22,23 @@ export class VectorIndex {
 
         const magnitude = getMagnitude(value, this.size)
         this.vectors.set(internalDocumentId, [magnitude, value])
-        this.keys.push(internalDocumentId)
     }
 
     remove(internalDocumentId: InternalDocumentID) {
         this.vectors.delete(internalDocumentId)
-        this.keys = this.keys.filter((key) => key !== internalDocumentId)
     }
 
-    find(vector: VectorTypeLike, similarity: number = DEFAULT_SIMILARITY) {
+    find(vector: VectorTypeLike, similarity: number, whereFiltersIDs: Set<InternalDocumentID> | undefined): SimilarVector[] {
         if (!(vector instanceof Float32Array)) {
             vector = new Float32Array(vector)
         }
 
-        const results = findSimilarVectors(vector, this.keys, this.vectors, this.size, similarity)
-        // .map(
-        //     ([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score]
-        // ) as [number, number][]
+        const results = findSimilarVectors(
+            vector,
+            whereFiltersIDs,
+            this.vectors,
+            this.size, similarity
+        )
 
         return results
     }
@@ -63,7 +62,6 @@ export class VectorIndex {
         const index = new VectorIndex(raw.size)
         for (const [id, [magnitude, vector]] of raw.vectors) {
             index.vectors.set(id, [magnitude, new Float32Array(vector)])
-            index.keys.push(id)
         }
 
         return index
@@ -82,7 +80,7 @@ export function getMagnitude(vector: Float32Array, vectorLength: number): number
 // @todo: Write plugins for Node and Browsers to use parallel computation for this function
 export function findSimilarVectors(
     targetVector: Float32Array,
-    keys: Array<InternalDocumentID>,
+    keys: Set<InternalDocumentID> | undefined,
     vectors: Map<InternalDocumentID, [Magnitude, VectorType]>,
     length: number,
     threshold
@@ -91,9 +89,16 @@ export function findSimilarVectors(
 
     const similarVectors: SimilarVector[] = []
 
-    for (const [vectorId, [magnitude, vector]] of vectors) {
-        let dotProduct = 0
+    const base = keys ? keys : vectors.keys()
+    for (const vectorId of base) {
+        const entry = vectors.get(vectorId)
+        if (!entry) {
+            continue
+        }
+        const magnitude = entry[0]
+        const vector = entry[1]
 
+        let dotProduct = 0
         for (let i = 0; i < length; i++) {
             dotProduct += targetVector[i] * vector[i]
         }

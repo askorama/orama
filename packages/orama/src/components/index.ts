@@ -387,6 +387,7 @@ export function calculateResultScores(
   bm25Relevance: Required<BM25Params>,
   resultsMap: Map<number, number>,
   boostPerProperty: number,
+  whereFiltersIDs: Set<InternalDocumentID> | undefined
 ) {
   const documentIDs = Array.from(ids)
 
@@ -403,6 +404,10 @@ export function calculateResultScores(
   const documentIDsLength = documentIDs.length
   for (let k = 0; k < documentIDsLength; k++) {
     const internalId = documentIDs[k]
+    if (whereFiltersIDs && !whereFiltersIDs.has(internalId)) {
+      continue
+    }
+
     const tf = oramaFrequencies?.[internalId]?.[term] ?? 0
 
     const bm25 = BM25(
@@ -433,6 +438,7 @@ function searchInProperty(
   boostPerProperty: number,
   bm25Relevance: Required<BM25Params>,
   docsCount: number,
+  whereFiltersIDs: Set<InternalDocumentID> | undefined
 ) {
   const tokenLength = tokens.length;
   for (let i = 0; i < tokenLength; i++) {
@@ -454,6 +460,7 @@ function searchInProperty(
         bm25Relevance,
         resultsMap,
         boostPerProperty,
+        whereFiltersIDs,
       )
     }
   }
@@ -469,7 +476,8 @@ export function search(
   tolerance: number,
   boost: Record<string, number>,
   relevance: Required<BM25Params>,
-  docsCount: number
+  docsCount: number,
+  whereFiltersIDs: Set<InternalDocumentID> | undefined,
 ): TokenScore[] {
   const tokens = tokenizer.tokenize(term, language)
 
@@ -504,7 +512,8 @@ export function search(
       resultsMap,
       boostPerProperty,
       relevance,
-      docsCount
+      docsCount,
+      whereFiltersIDs,
     )
   }
 
@@ -516,7 +525,7 @@ export function searchByWhereClause<T extends AnyOrama>(
   tokenizer: Tokenizer,
   filters: Partial<WhereCondition<T['schema']>>,
   language: string | undefined
-): number[] {
+): Set<InternalDocumentID> {
   const filterKeys = Object.keys(filters)
 
   const filtersMap: Record<string, Set<InternalDocumentID>> = filterKeys.reduce(
@@ -647,7 +656,7 @@ export function searchByWhereClause<T extends AnyOrama>(
   }
 
   // AND operation: calculate the intersection between all the IDs in filterMap
-  return Array.from(setIntersection(...Object.values(filtersMap)))
+  return setIntersection(...Object.values(filtersMap))
 }
 
 export function getSearchableProperties(index: Index): string[] {
