@@ -4,7 +4,7 @@
 
 ## Installation
 
-To get started with **Orama Plugin PT15**, just install it with npm:
+To get started with **Orama Plugin QPS**, just install it with npm:
 
 ```sh
 npm i @orama/plugin-qps

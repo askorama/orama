@@ -16,6 +16,8 @@ const packages = [
   'plugin-analytics',
   'plugin-secure-proxy',
   'plugin-embeddings',
+  'plugin-qps',
+  'plugin-pt15',
   'stemmers',
   'stopwords',
   'tokenizers',
