@@ -233,7 +233,7 @@ function insertScalarBuilder(
         break
       }
       case 'Radix': {
-        const tokens = tokenizer.tokenize(value as string, language, prop)
+        const tokens = tokenizer.tokenize(value as string, language, prop, false)
         implementation.insertDocumentScoreParameters(index, prop, internalId, tokens, docsCount)
 
         for (const token of tokens) {

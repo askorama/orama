@@ -1063,7 +1063,7 @@ export type DefaultTokenizerConfig = {
 export interface Tokenizer {
   language: string
   normalizationCache: Map<string, string>
-  tokenize: (raw: string, language?: string, prop?: string) => string[]
+  tokenize: (raw: string, language?: string, prop?: string, withCache?: boolean) => string[]
 }
 
 export interface ObjectComponents<I, D, So> {

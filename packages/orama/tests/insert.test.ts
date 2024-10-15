@@ -549,6 +549,21 @@ t.test('insertMultiple method', async (t) => {
   })
 })
 
+t.test('insert shouldn\'t use tokenizer cache', async (t) => {
+  const db = await create({
+    schema: {
+      name: 'string'
+    } as const
+  })
+
+  await insert(db, {
+    name: 'The quick brown fox jumps over the lazy dog'
+  })
+
+  // Empty map
+  t.strictSame(db.tokenizer.normalizationCache, new Map())
+});
+
 interface BaseDataEvent extends AnyDocument {
   description: string
   lang: string
