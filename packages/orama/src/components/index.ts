@@ -21,7 +21,7 @@ import type {
 } from '../types.js'
 import type { InsertOptions } from '../methods/insert.js'
 import type { Point as BKDGeoPoint } from '../trees/bkd.js'
-import { RadixNode } from '../trees/radix.js'
+import { FindResult, RadixNode } from '../trees/radix.js'
 import { createError } from '../errors.js'
 import { AVLTree } from '../trees/avl.js'
 import { FlatTree } from '../trees/flat.js'
@@ -29,7 +29,7 @@ import { RadixTree } from '../trees/radix.js'
 import { BKDTree } from '../trees/bkd.js'
 import { BoolNode } from '../trees/bool.js'
 
-import { convertDistanceToMeters, intersect, safeArrayPush } from '../utils.js'
+import { convertDistanceToMeters } from '../utils.js'
 import { BM25 } from './algorithms.js'
 import { getMagnitude } from './cosine-similarity.js'
 import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
@@ -60,8 +60,8 @@ export type TTree<T = TreeType, N = unknown> = {
 
 export type Tree =
   | TTree<'Radix', RadixNode>
-  | TTree<'AVL', AVLTree<number, InternalDocumentID[]>>
-  | TTree<'Bool', BoolNode>
+  | TTree<'AVL', AVLTree<number, InternalDocumentID>>
+  | TTree<'Bool', BoolNode<InternalDocumentID>>
   | TTree<'Flat', FlatTree>
   | TTree<'BKD', BKDTree>
 
@@ -182,7 +182,7 @@ export function create<T extends AnyOrama, TSchema extends T['schema']>(
           break
         case 'number':
         case 'number[]':
-          index.indexes[path] = { type: 'AVL', node: new AVLTree<number, InternalDocumentID[]>(0, []), isArray }
+          index.indexes[path] = { type: 'AVL', node: new AVLTree<number, InternalDocumentID>(0, []), isArray }
           break
         case 'string':
         case 'string[]':
@@ -230,7 +230,7 @@ function insertScalarBuilder(
       }
       case 'AVL': {
         const avlRebalanceThreshold = options?.avlRebalanceThreshold ?? 1
-        node.insert(value as number, [internalId], avlRebalanceThreshold)
+        node.insert(value as number, internalId, avlRebalanceThreshold)
         break
       }
       case 'Radix': {
@@ -318,7 +318,7 @@ function removeScalar(
   const { type, node } = index.indexes[prop]
   switch (type) {
     case 'AVL': {
-      node.removeDocument(internalId, value as number[])
+      node.removeDocument(value as number, internalId)
       return true
     }
     case 'Bool': {
@@ -527,9 +527,9 @@ export function searchByWhereClause<T extends AnyOrama>(
 ): number[] {
   const filterKeys = Object.keys(filters)
 
-  const filtersMap: Record<string, InternalDocumentID[]> = filterKeys.reduce(
+  const filtersMap: Record<string, Set<InternalDocumentID>> = filterKeys.reduce(
     (acc, key) => ({
-      [key]: [],
+      [key]: new Set(),
       ...acc
     }),
     {}
@@ -546,8 +546,8 @@ export function searchByWhereClause<T extends AnyOrama>(
 
     if (type === 'Bool') {
       const idx = node
-      const filteredIDs = Array.from(operation ? idx.true : idx.false)
-      safeArrayPush(filtersMap[param], filteredIDs)
+      const filteredIDs = operation ? idx.true : idx.false
+      filtersMap[param] = setUnion(filtersMap[param], filteredIDs)
       continue
     }
 
@@ -572,11 +572,7 @@ export function searchByWhereClause<T extends AnyOrama>(
         } = operation[reqOperation] as GeosearchRadiusOperator['radius']
         const distanceInMeters = convertDistanceToMeters(value, unit)
         const ids = node.searchByRadius(coordinates as BKDGeoPoint, distanceInMeters, inside, undefined, highPrecision)
-        // @todo: convert this into a for loop
-        safeArrayPush(
-          filtersMap[param],
-          ids.flatMap(({ docIDs }) => docIDs)
-        )
+        filtersMap[param] = addGeoResult(filtersMap[param], ids)
       } else {
         const {
           coordinates,
@@ -584,11 +580,7 @@ export function searchByWhereClause<T extends AnyOrama>(
           highPrecision = false
         } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
         const ids = node.searchByPolygon(coordinates as BKDGeoPoint[], inside, undefined, highPrecision)
-        // @todo: convert this into a for loop
-        safeArrayPush(
-          filtersMap[param],
-          ids.flatMap(({ docIDs }) => docIDs)
-        )
+        filtersMap[param] = addGeoResult(filtersMap[param], ids)
       }
 
       continue
@@ -599,7 +591,7 @@ export function searchByWhereClause<T extends AnyOrama>(
         const term = tokenizer.tokenize(raw, language, param)
         for (const t of term) {
           const filteredIDsResults = node.find({ term: t, exact: true })
-          safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())
+          filtersMap[param] = addFindResult(filtersMap[param], filteredIDsResults)
         }
       }
 
@@ -613,53 +605,57 @@ export function searchByWhereClause<T extends AnyOrama>(
     }
 
     if (type === 'Flat') {
-      const results = isArray
+      const results = new Set(isArray
         ? node.filterArr(operation as EnumArrComparisonOperator)
-        : node.filter(operation as EnumComparisonOperator)
+        : node.filter(operation as EnumComparisonOperator))
 
-      safeArrayPush(filtersMap[param], results)
+      filtersMap[param] = setUnion(filtersMap[param], results)
+
       continue
     }
 
     if (type === 'AVL') {
       const operationOpt = operationKeys[0] as keyof ComparisonOperator
       const operationValue = (operation as ComparisonOperator)[operationOpt]
-      let filteredIDs: InternalDocumentID[] = []
+      let filteredIDs: Set<InternalDocumentID> 
 
       switch (operationOpt) {
         case 'gt': {
-          filteredIDs = node.greaterThan(operationValue as number, false) as unknown as number[]
+          filteredIDs = node.greaterThan(operationValue as number, false)
           break
         }
         case 'gte': {
-          filteredIDs = node.greaterThan(operationValue as number, true) as unknown as number[]
+          filteredIDs = node.greaterThan(operationValue as number, true)
           break
         }
         case 'lt': {
-          filteredIDs = node.lessThan(operationValue as number, false) as unknown as number[]
+          filteredIDs = node.lessThan(operationValue as number, false)
           break
         }
         case 'lte': {
-          filteredIDs = node.lessThan(operationValue as number, true) as unknown as number[]
+          filteredIDs = node.lessThan(operationValue as number, true)
           break
         }
         case 'eq': {
-          filteredIDs = node.find(operationValue as number) ?? []
+          const ret = node.find(operationValue as number)
+          filteredIDs = ret ?? new Set()
           break
         }
         case 'between': {
           const [min, max] = operationValue as number[]
-          filteredIDs = node.rangeSearch(min, max) as unknown as number[]
+          filteredIDs = node.rangeSearch(min, max)
           break
         }
+        default:
+          throw createError('INVALID_FILTER_OPERATION', operationOpt)
       }
 
-      safeArrayPush(filtersMap[param], filteredIDs)
+      filtersMap[param] = setUnion(filtersMap[param], filteredIDs)
     }
   }
 
   // AND operation: calculate the intersection between all the IDs in filterMap
-  return intersect(Object.values(filtersMap))
+  return Array.from(setIntersection(...Object.values(filtersMap)))
 }
 
 export function getSearchableProperties(index: Index): string[] {
@@ -827,4 +823,127 @@ export function createIndex(): IIndex<Index> {
     load,
     save
   }
+}
+
+
+const withIntersection = 'intersection' in (new Set());
+function setIntersection<V>(...sets: Set<V>[]): Set<V> {
+  // Fast path 1
+  if (sets.length === 0) {
+    return new Set();
+  }
+  // Fast path 2
+  if (sets.length === 1) {
+    return sets[0];
+  }
+  // Fast path 3
+  if (sets.length === 2) {
+    const set1 = sets[0];
+    const set2 = sets[1];
+
+    if (withIntersection) {
+      return set1.intersection(set2);
+    }
+    const result = new Set<V>();
+    const base = set1.size < set2.size ? set1 : set2;
+    const other = base === set1 ? set2 : set1;
+    for (const value of base) {
+      if (other.has(value)) {
+        result.add(value);
+      }
+    }
+    return result;
+  }
+
+  // Slow path
+  // Find the smallest set
+  const min = {
+    index: 0,
+    size: sets[0].size,
+  }
+  for (let i = 1; i < sets.length; i++) {
+    if (sets[i].size < min.size) {
+      min.index = i;
+      min.size = sets[i].size;
+    }
+  }
+
+  if (withIntersection) {
+    let base = sets[min.index];
+    for (let i = 0; i < sets.length; i++) {
+      if (i === min.index) {
+        continue;
+      }
+      base = base.intersection(sets[i]);
+    }
+
+    return base;
+  }
+
+  // manual implementation:
+  // intersect all sets with the smallest set
+  const base = sets[min.index];
+  for (let i = 0; i < sets.length; i++) {
+    if (i === min.index) {
+      continue;
+    }
+    const other = sets[i];
+    for (const value of base) {
+      if (!other.has(value)) {
+        base.delete(value);
+      }
+    }
+  }
+
+  return base;
+}
+
+const withUnion = 'union' in (new Set());
+function setUnion<V>(set1: Set<V> | undefined, set2: Set<V>) {
+  if (withUnion) {
+    if (set1) {
+      return set1.union(set2);
+    }
+    return set2;
+  }
+
+  if (!set1) {
+    return new Set(set2);
+  }
+  return new Set([...set1, ...set2]);
+}
+
+function addGeoResult(set: Set<InternalDocumentID> | undefined, ids: Array<{ docIDs: InternalDocumentID[] }>): Set<InternalDocumentID> {
+  if (!set) {
+    set = new Set()
+  }
+
+  const idsLength = ids.length
+  for (let i = 0; i < idsLength; i++) {
+    const entry = ids[i].docIDs
+    const idsLength = entry.length
+    for (let j = 0; j < idsLength; j++) {
+      set.add(entry[j])
+    }
+  }
+
+  return set
+}
+
+function addFindResult(set: Set<InternalDocumentID> | undefined, filteredIDsResults: FindResult): Set<InternalDocumentID> {
+  if (!set) {
+    set = new Set()
+  }
+
+  const keys = Object.keys(filteredIDsResults)
+  const keysLength = keys.length
+  for (let i = 0; i < keysLength; i++) {
+    const ids = filteredIDsResults[keys[i]]
+    const idsLength = ids.length
+    for (let j = 0; j < idsLength; j++) {
+      set.add(ids[j])
+    }
+  }
+
+  return set
 }

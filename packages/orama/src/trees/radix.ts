@@ -9,7 +9,7 @@ interface FindParams {
   tolerance?: number
 }
 
-type FindResult = Record<string, InternalDocumentID[]>
+export type FindResult = Record<string, InternalDocumentID[]>
 
 export class RadixNode {
   // Node key

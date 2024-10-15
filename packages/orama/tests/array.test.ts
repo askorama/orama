@@ -88,7 +88,7 @@ t.test('create should support array of number', async (t) => {
   await checkSearchWhere(t, db, 'num', { gt: 6 }, [second, third])
   await checkSearchWhere(t, db, 'num', { gte: 7 }, [second, third])
   await checkSearchWhere(t, db, 'num', { between: [6, 10] }, [second, third])
-  await checkSearchWhere(t, db, 'num', { eg: 42 }, [])
+  await checkSearchWhere(t, db, 'num', { eq: 42 }, [])
 
   await checkSearchFacets(
     t as unknown as Tap.Test,

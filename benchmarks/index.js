@@ -106,8 +106,8 @@ function benchmarkSearchWithLongTextAndComplexFilters() {
   )  
 }
 
-await benchmarkInsert()
-await benchmarkInsertMultiple()
-await benchmarkSearch()
+// await benchmarkInsert()
+// await benchmarkInsertMultiple()
+// await benchmarkSearch()
 await benchmarkSearchWithFilters()
-await benchmarkSearchWithLongTextAndComplexFilters()
+// await benchmarkSearchWithLongTextAndComplexFilters()

@@ -4,14 +4,14 @@ import { Nullable } from '../types.js'
 
 export class AVLNode<K, V> {
   public k: K
-  public v: V
+  public v: Set<V>
   public l: Nullable<AVLNode<K, V>> = null
   public r: Nullable<AVLNode<K, V>> = null
   public h: number = 1
 
-  constructor(key: K, value: V) {
+  constructor(key: K, value: V[]) {
     this.k = key
-    this.v = value
+    this.v = new Set(value)
   }
 
   public updateHeight(): void {
@@ -47,7 +47,7 @@ export class AVLNode<K, V> {
   public toJSON(): object {
     return {
       k: this.k,
-      v: this.v,
+      v: Array.from(this.v),
       l: this.l ? this.l.toJSON() : null,
       r: this.r ? this.r.toJSON() : null,
       h: this.h
@@ -67,7 +67,7 @@ export class AVLTree<K, V> {
   public root: Nullable<AVLNode<K, V>> = null
   private insertCount = 0
 
-  constructor(key?: K, value?: V) {
+  constructor(key?: K, value?: V[]) {
     if (key !== undefined && value !== undefined) {
       this.root = new AVLNode(key, value)
     }
@@ -75,6 +75,12 @@ export class AVLTree<K, V> {
 
   public insert(key: K, value: V, rebalanceThreshold = 1000): void {
     this.root = this.insertNode(this.root, key, value, rebalanceThreshold)
+  }
+
+  public insertMultiple(key: K, value: V[], rebalanceThreshold = 1000): void {
+    for (const v of value) {
+      this.insert(key, v, rebalanceThreshold)
+    }
   }
 
   // Rebalance the tree if the insert count reaches the threshold.
@@ -103,7 +109,7 @@ export class AVLTree<K, V> {
 
   private insertNode(node: Nullable<AVLNode<K, V>>, key: K, value: V, rebalanceThreshold: number): AVLNode<K, V> {
     if (node === null) {
-      return new AVLNode(key, value)
+      return new AVLNode(key, [value])
     }
 
     const path: Array<{ parent: Nullable<AVLNode<K, V>>; node: AVLNode<K, V> }> = []
@@ -115,7 +121,7 @@ export class AVLTree<K, V> {
 
       if (key < current.k) {
         if (current.l === null) {
-          current.l = new AVLNode(key, value)
+          current.l = new AVLNode(key, [value])
           path.push({ parent: current, node: current.l })
           break
         } else {
@@ -124,7 +130,7 @@ export class AVLTree<K, V> {
         }
       } else if (key > current.k) {
         if (current.r === null) {
-          current.r = new AVLNode(key, value)
+          current.r = new AVLNode(key, [value])
           path.push({ parent: current, node: current.r })
           break
         } else {
@@ -133,6 +139,8 @@ export class AVLTree<K, V> {
         }
       } else {
         // Key already exists
+        current.v.add(value)
+        /*
         if (Array.isArray(current.v)) {
           if (Array.isArray(value)) {
             ;(current.v as any[]).push(...(value as V[]))
@@ -140,8 +148,9 @@ export class AVLTree<K, V> {
             ;(current.v as any[]).push(value)
           }
         } else {
-          current.v = value
+          current.v = new Set([value])
         }
+        */
         return node
       }
     }
@@ -204,7 +213,7 @@ export class AVLTree<K, V> {
     return node
   }
 
-  public find(key: K): Nullable<V> {
+  public find(key: K): Nullable<Set<V>> {
     const node = this.findNodeByKey(key)
     return node ? node.v : null
   }
@@ -261,10 +270,10 @@ export class AVLTree<K, V> {
       return
     }
 
-    if ((node.v as unknown as Set<V>).size === 1) {
+    if (node.v.size === 1) {
       this.root = this.removeNode(this.root, key)
     } else {
-      ;(node.v as unknown as Set<V>) = new Set([...(node.v as unknown as Set<V>).values()].filter((v) => v !== id))
+      node.v = new Set([...node.v.values()].filter((v) => v !== id))
     }
   }
 
@@ -363,8 +372,8 @@ export class AVLTree<K, V> {
     return node
   }
 
-  public rangeSearch(min: K, max: K): V[] {
-    const result: V[] = []
+  public rangeSearch(min: K, max: K): Set<V> {
+    let result: Set<V> = new Set()
     const stack: Array<AVLNode<K, V>> = []
     let current = this.root
 
@@ -375,11 +384,7 @@ export class AVLTree<K, V> {
       }
       current = stack.pop()!
       if (current.k >= min && current.k <= max) {
-        if (Array.isArray(current.v)) {
-          result.push(...current.v)
-        } else {
-          result.push(current.v)
-        }
+        result = setUnion(result, current.v)
       }
       if (current.k > max) {
         break
@@ -390,8 +395,8 @@ export class AVLTree<K, V> {
     return result
   }
 
-  public greaterThan(key: K, inclusive = false): V[] {
-    const result: V[] = []
+  public greaterThan(key: K, inclusive = false): Set<V> {
+    let result: Set<V> = new Set()
     const stack: Array<AVLNode<K, V>> = []
     let current = this.root
 
@@ -402,11 +407,7 @@ export class AVLTree<K, V> {
       }
       current = stack.pop()!
       if ((inclusive && current.k >= key) || (!inclusive && current.k > key)) {
-        if (Array.isArray(current.v)) {
-          result.push(...current.v)
-        } else {
-          result.push(current.v)
-        }
+        result = setUnion(result, current.v)
       } else if (current.k <= key) {
         break // Since we're traversing in descending order, we can break early
       }
@@ -416,8 +417,8 @@ export class AVLTree<K, V> {
     return result
   }
 
-  public lessThan(key: K, inclusive = false): V[] {
-    const result: V[] = []
+  public lessThan(key: K, inclusive = false): Set<V> {
+    let result: Set<V> = new Set()
     const stack: Array<AVLNode<K, V>> = []
     let current = this.root
 
@@ -428,11 +429,7 @@ export class AVLTree<K, V> {
       }
       current = stack.pop()!
       if ((inclusive && current.k <= key) || (!inclusive && current.k < key)) {
-        if (Array.isArray(current.v)) {
-          result.push(...current.v)
-        } else {
-          result.push(current.v)
-        }
+        result = setUnion(result, current.v)
       } else if (current.k > key) {
         break // Since we're traversing in ascending order, we can break early
       }
@@ -441,4 +438,12 @@ export class AVLTree<K, V> {
 
     return result
   }
+}
+
+const withUnion = 'union' in (new Set());
+function setUnion<V>(set1: Set<V>, set2: Set<V>) {
+  if (withUnion) {
+    return set1.union(set2);
+  }
+  return new Set([...set1, ...set2]);
 }
