@@ -1,6 +1,6 @@
 import type { AnyOrama, Results, SearchParamsVector, TypedDocument, Result } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { getNanosecondsTime, formatNanoseconds } from '../utils.js'
+import { getNanosecondsTime, formatNanoseconds, sortTokenScorePredicate } from '../utils.js'
 import { getFacets } from '../components/facets.js'
 import { createError } from '../errors.js'
 import { getGroups } from '../components/groups.js'
@@ -36,21 +36,7 @@ export function innerVectorSearch<T extends AnyOrama, ResultDocument = TypedDocu
     whereFiltersIDs = orama.index.searchByWhereClause(index, orama.tokenizer, params.where!, language)
   }
 
-  const results = vectorIndex.node.find(vector.value as Float32Array, params.similarity ?? DEFAULT_SIMILARITY, whereFiltersIDs)
-  let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
-
-  if (!propertiesToSearch) {
-    const propertiesToSearchWithTypes = orama.index.getSearchablePropertiesWithTypes(index)
-
-    propertiesToSearch = orama.index.getSearchableProperties(index)
-    propertiesToSearch = propertiesToSearch.filter((prop: string) =>
-      propertiesToSearchWithTypes[prop].startsWith('string')
-    )
-
-    orama.caches['propertiesToSearch'] = propertiesToSearch
-  }
-
-  return results
+  return vectorIndex.node.find(vector.value as Float32Array, params.similarity ?? DEFAULT_SIMILARITY, whereFiltersIDs)
 }
 
 export function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
@@ -62,6 +48,7 @@ export function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<
 
   function performSearchLogic(): Results<ResultDocument> {
     const results = innerVectorSearch(orama, params, language)
+      .sort(sortTokenScorePredicate)
 
     let facetsResults: any = []
 

@@ -110,5 +110,5 @@ export function findSimilarVectors(
         }
     }
 
-    return similarVectors.sort((a, b) => b[1] - a[1])
+    return similarVectors
 }
