@@ -13,19 +13,21 @@ export interface DefaultTokenizer extends Tokenizer {
   stopWords?: string[]
   allowDuplicates: boolean
   normalizationCache: Map<string, string>
-  normalizeToken(this: DefaultTokenizer, token: string, prop: Optional<string>): string
+  normalizeToken(this: DefaultTokenizer, prop: Optional<string>, token: string, withCache:Optional<boolean>): string
 }
 
-export function normalizeToken(this: DefaultTokenizer, prop: string, token: string): string {
+export function normalizeToken(this: DefaultTokenizer, prop: string, token: string, withCache: boolean = true): string {
   const key = `${this.language}:${prop}:${token}`
 
-  if (this.normalizationCache.has(key)) {
+  if (withCache && this.normalizationCache.has(key)) {
     return this.normalizationCache.get(key)!
   }
 
   // Remove stopwords if enabled
   if (this.stopWords?.includes(token)) {
-    this.normalizationCache.set(key, '')
+    if (withCache) {
+      this.normalizationCache.set(key, '')
+    }
     return ''
   }
 
@@ -35,7 +37,9 @@ export function normalizeToken(this: DefaultTokenizer, prop: string, token: stri
   }
 
   token = replaceDiacritics(token)
-  this.normalizationCache.set(key, token)
+  if (withCache) {
+    this.normalizationCache.set(key, token)
+  }
   return token
 }
 
@@ -50,7 +54,7 @@ function trim(text: string[]): string[] {
   return text
 }
 
-function tokenize(this: DefaultTokenizer, input: string, language?: string, prop?: string): string[] {
+function tokenize(this: DefaultTokenizer, input: string, language?: string, prop?: string, withCache: boolean = true): string[] {
   if (language && language !== this.language) {
     throw createError('LANGUAGE_NOT_SUPPORTED', language)
   }
@@ -62,13 +66,14 @@ function tokenize(this: DefaultTokenizer, input: string, language?: string, prop
 
   let tokens: string[]
   if (prop && this.tokenizeSkipProperties.has(prop)) {
-    tokens = [this.normalizeToken.bind(this, prop ?? '')(input)]
+    tokens = [this.normalizeToken.bind(this, prop ?? '')(input, withCache)]
   } else {
     const splitRule = SPLITTERS[this.language]
+    const a = this.normalizeToken.bind(this, prop ?? '')
     tokens = input
       .toLowerCase()
       .split(splitRule)
-      .map(this.normalizeToken.bind(this, prop ?? ''))
+      .map(t => a(t, withCache))
       .filter(Boolean)
   }
 
