@@ -64,16 +64,16 @@ function tokenize(this: DefaultTokenizer, input: string, language?: string, prop
     return [input]
   }
 
+  const normalizeToken = this.normalizeToken.bind(this, prop ?? '')
   let tokens: string[]
   if (prop && this.tokenizeSkipProperties.has(prop)) {
-    tokens = [this.normalizeToken.bind(this, prop ?? '')(input, withCache)]
+    tokens = [normalizeToken(input, withCache)]
   } else {
     const splitRule = SPLITTERS[this.language]
-    const a = this.normalizeToken.bind(this, prop ?? '')
     tokens = input
       .toLowerCase()
       .split(splitRule)
-      .map(t => a(t, withCache))
+      .map(t => normalizeToken(t, withCache))
       .filter(Boolean)
   }
 
