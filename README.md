@@ -116,7 +116,7 @@ const results = search(db, {
 
 Orama currently supports 10 different data types:
 
-| Type             | Description                                                                 | example                                                                     |
+| Type             | Description                                                                 | Example                                                                     |
 | ---------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | `string`         | A string of characters.                                                     | `'Hello world'`                                                             |
 | `number`         | A numeric value, either float or integer.                                   | `42`                                                                        |
@@ -135,12 +135,15 @@ Read the complete documentation at [https://docs.orama.com/open-source](https://
 
 # Official Orama Plugins
 
+- [Plugin Embeddings](https://docs.orama.com/open-source/plugins/plugin-embeddings)
+- [Plugin Analytics](https://docs.orama.com/open-source/plugins/plugin-analytics)
+- [Plugin Data Persistence](https://docs.orama.com/open-source/plugins/plugin-data-persistence)
+- [Plugin QPS](https://docs.orama.com/open-source/plugins/plugin-qps)
+- [Plugin PT15](https://docs.orama.com/open-source/plugins/plugin-pt15)
 - [Plugin Vitepress](https://docs.orama.com/open-source/plugins/plugin-vitepress)
 - [Plugin Docusaurus](https://docs.orama.com/open-source/plugins/plugin-docusaurus)
 - [Plugin Secure Proxy](https://docs.orama.com/open-source/plugins/plugin-secure-proxy)
-- [Plugin Analytics](https://docs.orama.com/open-source/plugins/plugin-analytics)
 - [Plugin Astro](https://docs.orama.com/open-source/plugins/plugin-astro)
-- [Plugin Data Persistence](https://docs.orama.com/open-source/plugins/plugin-data-persistence)
 - [Plugin Nextra](https://docs.orama.com/open-source/plugins/plugin-nextra)
 
 Write your own plugin: [https://docs.orama.com/open-source/plugins/writing-your-own-plugins](https://docs.orama.com/open-source/plugins/writing-your-own-plugins)
