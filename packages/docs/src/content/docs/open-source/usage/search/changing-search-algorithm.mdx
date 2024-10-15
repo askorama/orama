@@ -36,6 +36,12 @@ Each algorithm has its unique approach to scoring and relevance, making them sui
 
 <img src="/open-source/search-algorithms/bm25.png" alt="Best Match 25 (BM25) image representation" />
 
+BM25 (Best Matching 25) is a probabilistic information retrieval algorithm developed by Stephen E. Robertson and Karen Spärck Jones in the 1990s.
+
+It's a ranking function that scores documents based on the frequency of query terms (term frequency), the rarity of terms across the document set (inverse document frequency), and the length of the document.
+
+BM25 is widely used in search engines and information retrieval systems due to its ability to provide relevant results by balancing term frequency and document length, ensuring that longer documents aren't unfairly penalized.
+
 - **Primary Focus**: Term frequency and document length normalization.
 - **Scoring Method**: Based on term frequency (TF) and inverse document frequency (IDF).
 - **Proximity Consideration**: No direct proximity calculation.
@@ -53,6 +59,12 @@ Each algorithm has its unique approach to scoring and relevance, making them sui
 
 <img src="/open-source/search-algorithms/qps.png" alt="Quantum Proximity Scoring (QPS) image representation" />
 
+QPS (Quantum Proximity Scoring) is a search algorithm developed by the Orama team in 2024. It was designed to improve search performance, particularly in browser-based environments and memory-constrained systems.
+
+QPS enhances relevance by focusing on the proximity of search terms within documents, assigning higher scores to terms that appear close together.
+
+By leveraging token proximity and efficient memory usage, QPS is optimized for fast and relevant search results in scenarios where resource limitations, such as memory and processing power, are a concernm like web browsers and edge networks.
+
 - **Primary Focus**: Token proximity and quantization.
 - **Scoring Method**: Based on the proximity of tokens and their occurrence within predefined "quantums."
 - **Proximity Consideration**: High priority on token proximity.
@@ -69,6 +81,12 @@ Each algorithm has its unique approach to scoring and relevance, making them sui
 ### PT15 (Positional Token 15)
 
 <img src="/open-source/search-algorithms/pt15.png" alt="Positional Token 15 (PT15) image representation" />
+
+PT15 (Positional Token 15) is a search algorithm developed by the Orama team in 2024, inspired by Thomas Wilkerling's work on Flexsearch.
+
+The algorithm prioritizes the position of tokens within a document, assigning higher relevance to terms that appear earlier or in key positions.
+
+PT15 uses a fixed set of 15 positional buckets to store tokens, allowing it to efficiently track token locations. Designed for performance in structured text searches, PT15 is particularly effective for cases where the order and placement of terms play a crucial role in determining relevance.
 
 - **Primary Focus**: Token position within a document.
 - **Scoring Method**: Tokens are stored and scored based on their relative position in 15 fixed buckets.

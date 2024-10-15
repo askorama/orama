@@ -143,6 +143,10 @@ const openSourceMenu = [
             link: '/open-source/plugins/writing-your-own-plugins'
           },
           {
+            label: 'Plugin Embeddings',
+            link: '/open-source/plugins/plugin-embeddings'
+          },
+          {
             label: 'Plugin Vitepress',
             link: '/open-source/plugins/plugin-vitepress'
           },
