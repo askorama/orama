@@ -3,10 +3,9 @@ import type { InternalDocumentID } from '../components/internal-document-id-stor
 import { getNanosecondsTime, formatNanoseconds } from '../utils.js'
 import { getFacets } from '../components/facets.js'
 import { createError } from '../errors.js'
-import { findSimilarVectors } from '../components/cosine-similarity.js'
 import { intersectFilteredIDs } from '../components/filters.js'
 import { getGroups } from '../components/groups.js'
-import { getInternalDocumentId, getDocumentIdFromInternalId } from '../components/internal-document-id-store.js'
+import { getDocumentIdFromInternalId } from '../components/internal-document-id-store.js'
 import { Language } from '../index.js'
 import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
 
@@ -22,7 +21,7 @@ export function innerVectorSearch<T extends AnyOrama, ResultDocument = TypedDocu
   }
 
   const vectorIndex = orama.data.index.vectorIndexes[vector!.property]
-  const vectorSize = vectorIndex.size
+  const vectorSize = vectorIndex.node.size
   if (vector?.value.length !== vectorSize) {
     if (vector?.property === undefined || vector?.value.length === undefined) {
       throw createError('INVALID_INPUT_VECTOR', 'undefined', vectorSize, 'undefined')
@@ -30,17 +29,7 @@ export function innerVectorSearch<T extends AnyOrama, ResultDocument = TypedDocu
     throw createError('INVALID_INPUT_VECTOR', vector.property, vectorSize, vector.value.length)
   }
 
-  if (!(vector instanceof Float32Array)) {
-    vector.value = new Float32Array(vector.value)
-  }
-
-  const vectors = vectorIndex.vectors
-
-  let results = findSimilarVectors(vector.value as Float32Array, vectors, vectorSize, params.similarity).map(
-    ([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score]
-  ) as [number, number][]
-
-
+  let results = vectorIndex.node.find(vector.value as Float32Array, params.similarity)
   let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
 
   const index = orama.data.index

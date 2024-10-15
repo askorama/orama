@@ -15,8 +15,6 @@ import type {
   SearchableValue,
   Tokenizer,
   TokenScore,
-  VectorIndex,
-  VectorType,
   WhereCondition
 } from '../types.js'
 import type { InsertOptions } from '../methods/insert.js'
@@ -31,7 +29,6 @@ import { BoolNode } from '../trees/bool.js'
 
 import { convertDistanceToMeters, setIntersection, setUnion } from '../utils.js'
 import { BM25 } from './algorithms.js'
-import { getMagnitude } from './cosine-similarity.js'
 import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
 import {
   DocumentID,
@@ -39,6 +36,7 @@ import {
   InternalDocumentID,
   InternalDocumentIDStore
 } from './internal-document-id-store.js'
+import { VectorIndex, VectorType } from '../trees/vector.js'
 
 export type FrequencyMap = {
   [property: string]: {
@@ -68,7 +66,7 @@ export type Tree =
 export interface Index extends AnyIndexStore {
   sharedInternalDocumentStore: InternalDocumentIDStore
   indexes: Record<string, Tree>
-  vectorIndexes: Record<string, VectorIndex>
+  // vectorIndexes: Record<string, TTree<'Vector', VectorIndex>>
   searchableProperties: string[]
   searchablePropertiesWithTypes: Record<string, SearchableType>
   frequencies: FrequencyMap
@@ -170,8 +168,9 @@ export function create<T extends AnyOrama, TSchema extends T['schema']>(
       index.searchableProperties.push(path)
       index.searchablePropertiesWithTypes[path] = type
       index.vectorIndexes[path] = {
-        size: getVectorSize(type),
-        vectors: {}
+        type: 'Vector',
+        node: new VectorIndex(getVectorSize(type)),
+        isArray: false,
       }
     } else {
       const isArray = /\[/.test(type as string)
@@ -271,7 +270,7 @@ export function insert(
   options?: InsertOptions
 ): void {
   if (isVectorType(schemaType)) {
-    return insertVector(index, prop, value as number[] | Float32Array, id)
+    return insertVector(index, prop, value as number[] | Float32Array, id, internalId)
   }
 
   const insertScalar = insertScalarBuilder(implementation, index, prop, internalId, language, tokenizer, docsCount, options)
@@ -287,15 +286,8 @@ export function insert(
   }
 }
 
-export function insertVector(index: AnyIndexStore, prop: string, value: number[] | VectorType, id: DocumentID): void {
-  if (!(value instanceof Float32Array)) {
-    value = new Float32Array(value)
-  }
-
-  const size = index.vectorIndexes[prop].size
-  const magnitude = getMagnitude(value, size)
-
-  index.vectorIndexes[prop].vectors[id] = [magnitude, value]
+export function insertVector(index: AnyIndexStore, prop: string, value: number[] | VectorType, id: DocumentID, internalDocumentId: InternalDocumentID): void {
+  index.vectorIndexes[prop].node.add(internalDocumentId, value)
 }
 
 function removeScalar(
@@ -311,7 +303,7 @@ function removeScalar(
   docsCount: number
 ): boolean {
   if (isVectorType(schemaType)) {
-    delete index.vectorIndexes[prop].vectors[id]
+    index.vectorIndexes[prop].node.remove(internalId)
     return true
   }
 
@@ -726,15 +718,10 @@ export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentI
   }
 
   for (const idx of Object.keys(rawVectorIndexes)) {
-    const vectors = rawVectorIndexes[idx].vectors
-
-    for (const vec in vectors) {
-      vectors[vec] = [vectors[vec][0], new Float32Array(vectors[vec][1])]
-    }
-
     vectorIndexes[idx] = {
-      size: rawVectorIndexes[idx].size,
-      vectors
+      type: 'Vector',
+      isArray: false,
+      node: VectorIndex.fromJSON(rawVectorIndexes[idx])
     }
   }
 
@@ -763,26 +750,21 @@ export function save<R = unknown>(index: Index): R {
     fieldLengths
   } = index
 
-  const vectorIndexesAsArrays: Index['vectorIndexes'] = {}
-
+  const dumpVectorIndexes: Record<string, unknown> = {}
   for (const idx of Object.keys(vectorIndexes)) {
-    const vectors = vectorIndexes[idx].vectors
-
-    for (const vec in vectors) {
-      vectors[vec] = [vectors[vec][0], Array.from(vectors[vec][1]) as unknown as Float32Array]
-    }
-
-    vectorIndexesAsArrays[idx] = {
-      size: vectorIndexes[idx].size,
-      vectors
-    }
+    dumpVectorIndexes[idx] = vectorIndexes[idx].node.toJSON()
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const savedIndexes: any = {}
   for (const name of Object.keys(indexes)) {
     const { type, node, isArray } = indexes[name]
-    if (type === 'Flat' || type === 'Radix' || type === 'AVL' || type === 'BKD' || type === 'Bool') {
+    if (type === 'Flat'
+        || type === 'Radix'
+        || type === 'AVL'
+        || type === 'BKD'
+        || type === 'Bool'
+    ) {
       savedIndexes[name] = {
         type,
         node: node.toJSON(),
@@ -796,7 +778,7 @@ export function save<R = unknown>(index: Index): R {
 
   return {
     indexes: savedIndexes,
-    vectorIndexes: vectorIndexesAsArrays,
+    vectorIndexes: dumpVectorIndexes,
     searchableProperties,
     searchablePropertiesWithTypes,
     frequencies,
