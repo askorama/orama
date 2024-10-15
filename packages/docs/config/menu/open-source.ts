@@ -93,6 +93,16 @@ const openSourceMenu = [
             ]
           },
           {
+            label: 'Answer Engine',
+            collapsed: false,
+            items: [
+              {
+                label: 'Orama Answer Engine',
+                link: '/open-source/usage/answer-engine/introduction'
+              }
+            ]
+          },
+          {
             label: 'Supported languages',
             collapsed: true,
             items: [
