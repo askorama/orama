@@ -8,13 +8,12 @@ import { Aside } from '@astrojs/starlight/components';
 
 Hybrid search is an Orama feature that allows you to perform full-text and vector search in one unique query, combining the results to get the best of both worlds.
 
-<Aside type="note">
-Using Orama Secure Proxy
-Running hybrid search on the front-end requires a translation from text to vector.
+<Aside type="note" title="Generating Embeddings">
+In this page, we will assume that you already have the embeddings for your documents.
 
-If you're using systems such as OpenAI to generate text embeddings, this would put you at risk of exposing your API Keys.
+If you don't, you can use the [Plugin Embeddings](/open-source/plugins/plugin-embeddings) to generate them directly offline and on-device at insert and search time.
 
-We highly recommend using the [Orama Secure Proxy Plugin](/open-source/plugins/plugin-secure-proxy) to mask your API Keys securely and prevent abuse of any kind.
+If you're running Orama in a memory-constrained environment, you can also use the [Plugin Secure Proxy](/open-source/plugins/plugin-secure-proxy) to generate embeddings on the fly using the OpenAI API directly from the client-side.
 </Aside>
 
 ## Performing Hybrid Search
@@ -64,20 +63,17 @@ const results = search(db, {
 })
 ```
 
-<Aside type="tip">
-When running hybrid search using the secure proxy, you won't need to explicitly pass the `vector` configuration. Just run a simple search query!
-
+<Aside type="tip" title="Simplify it!">
+When running vector search using the [secure proxy](/open-source/plugins/plugin-embeddings) or [embeddings](/open-source/plugins/plugin-secure-proxy) plugins, you won't need to explicitly pass the `vector` configuration. Just run a simple search query!
 
 ```js
 const results = search(db, {
-  mode: "hybrid",
-  term: "The Prestige",
+  mode: "vector",
+  term: "Videogame for little kids with a passion about ice cream",
 });
 ```
 
 The plugin will automatically convert this text to vector for you, and will also prevent you from exposing your OpenAI API key when using it on the front-end.
-
-[Learn more](/open-source/plugins/plugin-secure-proxy).
 </Aside>
 
 The returning object will be exactly the same as the one we would expect when performing full-text search:
