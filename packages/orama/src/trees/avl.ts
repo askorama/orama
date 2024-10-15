@@ -1,6 +1,7 @@
 /* eslint-disable no-extra-semi */
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Nullable } from '../types.js'
+import { setUnion } from '../utils.js'
 
 export class AVLNode<K, V> {
   public k: K
@@ -438,12 +439,4 @@ export class AVLTree<K, V> {
 
     return result
   }
-}
-
-const withUnion = 'union' in (new Set());
-function setUnion<V>(set1: Set<V>, set2: Set<V>) {
-  if (withUnion) {
-    return set1.union(set2);
-  }
-  return new Set([...set1, ...set2]);
 }
