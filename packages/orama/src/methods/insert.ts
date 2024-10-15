@@ -93,7 +93,12 @@ async function innerInsert<T extends AnyOrama>(
 
   for (const prop of indexableProperties) {
     const value = indexableValues[prop]
+
     if (typeof value === 'undefined') {
+      continue
+    }
+
+    if (typeof value === 'string' && value.length === 0) {
       continue
     }
 
