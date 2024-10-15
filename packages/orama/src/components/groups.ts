@@ -43,15 +43,15 @@ const DEFAULT_REDUCE: Reduce<Result<AnyDocument>[]> = {
 
 const ALLOWED_TYPES = ['string', 'number', 'boolean']
 
-export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+export function getGroups<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
   results: TokenScore[],
   groupBy: GroupByParams<T, ResultDocument>
-): Promise<GroupResult<ResultDocument>> {
+): GroupResult<ResultDocument> {
   const properties = groupBy.properties
   const propertiesLength = properties.length
 
-  const schemaProperties = await orama.index.getSearchablePropertiesWithTypes(orama.data.index)
+  const schemaProperties = orama.index.getSearchablePropertiesWithTypes(orama.data.index)
   for (let i = 0; i < propertiesLength; i++) {
     const property = properties[i]
     if (typeof schemaProperties[property] === 'undefined') {
@@ -66,7 +66,7 @@ export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocume
 
   // allDocs is already sorted by the sortBy algorithm
   // We leverage on that to limit the number of documents returned
-  const allDocs = await orama.documentsStore.getMultiple(orama.data.docs, allIDs)
+  const allDocs = orama.documentsStore.getMultiple(orama.data.docs, allIDs)
   const allDocsLength = allDocs.length
 
   const returnedCount = groupBy.maxResult || Number.MAX_SAFE_INTEGER
@@ -87,7 +87,7 @@ export async function getGroups<T extends AnyOrama, ResultDocument = TypedDocume
     for (let j = 0; j < allDocsLength; j++) {
       const doc = allDocs[j]
 
-      const value = await getNested<ScalarSearchableValue>(doc as object, groupByKey)
+      const value = getNested<ScalarSearchableValue>(doc as object, groupByKey)
       // we don't want to consider undefined values
       if (typeof value === 'undefined') {
         continue

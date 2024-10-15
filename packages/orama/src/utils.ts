@@ -1,4 +1,4 @@
-import type { AnyDocument, GeosearchDistanceUnit, Results, SearchableValue, TokenScore } from './types.js'
+import type { AnyDocument, GeosearchDistanceUnit, Optional, Results, SearchableValue, TokenScore } from './types.js'
 import { createError } from './errors.js'
 
 const baseId = Date.now().toString().slice(5)
@@ -73,7 +73,7 @@ export function sprintf(template: string, ...args: Array<string | number>): stri
   )
 }
 
-export async function formatBytes(bytes: number, decimals = 2): Promise<string> {
+export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) {
     return '0 Bytes'
   }
@@ -96,7 +96,7 @@ export function getNanosecondTimeViaPerformance() {
   return BigInt(Math.floor(performance.now() * 1e6))
 }
 
-export async function formatNanoseconds(value: number | bigint): Promise<string> {
+export function formatNanoseconds(value: number | bigint): string {
   if (typeof value === 'number') {
     value = BigInt(value)
   }
@@ -112,8 +112,7 @@ export async function formatNanoseconds(value: number | bigint): Promise<string>
   return `${value / second}s`
 }
 
-// TODO: none of these operations is async. Should we change the signature of this function?
-export async function getNanosecondsTime(): Promise<bigint> {
+export function getNanosecondsTime(): bigint {
   if (isInsideWebWorker()) {
     return getNanosecondTimeViaPerformance()
   }
@@ -134,7 +133,7 @@ export async function getNanosecondsTime(): Promise<bigint> {
   return BigInt(0)
 }
 
-export async function uniqueId(): Promise<string> {
+export function uniqueId(): string {
   return `${baseId}-${lastId++}`
 }
 
@@ -230,10 +229,7 @@ export function intersect<T>(arrays: Array<readonly T[]>): T[] {
   })
 }
 
-export async function getDocumentProperties(
-  doc: AnyDocument,
-  paths: string[]
-): Promise<Record<string, SearchableValue>> {
+export function getDocumentProperties(doc: AnyDocument, paths: string[]): Record<string, SearchableValue> {
   const properties: Record<string, SearchableValue> = {}
 
   const pathsLength = paths.length
@@ -276,8 +272,8 @@ export async function getDocumentProperties(
   return properties
 }
 
-export async function getNested<T = SearchableValue>(obj: object, path: string): Promise<T | undefined> {
-  const props = await getDocumentProperties(obj as AnyDocument, [path])
+export function getNested<T = SearchableValue>(obj: object, path: string): Optional<T> {
+  const props = getDocumentProperties(obj as AnyDocument, [path])
 
   return props[path] as T | undefined
 }
@@ -336,4 +332,100 @@ export function removeVectorsFromHits(searchResult: Results<AnyDocument>, vector
       }, result.document)
     }
   }))
+}
+
+export function isPromise(obj: any): obj is Promise<unknown> {
+  return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function'
+}
+
+export function isAsyncFunction(func: any): boolean {
+  return func?.constructor?.name === 'AsyncFunction'
+}
+
+
+const withIntersection = 'intersection' in (new Set());
+export function setIntersection<V>(...sets: Set<V>[]): Set<V> {
+  // Fast path 1
+  if (sets.length === 0) {
+    return new Set();
+  }
+  // Fast path 2
+  if (sets.length === 1) {
+    return sets[0];
+  }
+  // Fast path 3
+  if (sets.length === 2) {
+    const set1 = sets[0];
+    const set2 = sets[1];
+
+    if (withIntersection) {
+      return set1.intersection(set2);
+    }
+    const result = new Set<V>();
+    const base = set1.size < set2.size ? set1 : set2;
+    const other = base === set1 ? set2 : set1;
+    for (const value of base) {
+      if (other.has(value)) {
+        result.add(value);
+      }
+    }
+    return result;
+  }
+
+  // Slow path
+  // Find the smallest set
+  const min = {
+    index: 0,
+    size: sets[0].size,
+  }
+  for (let i = 1; i < sets.length; i++) {
+    if (sets[i].size < min.size) {
+      min.index = i;
+      min.size = sets[i].size;
+    }
+  }
+
+  if (withIntersection) {
+    let base = sets[min.index];
+    for (let i = 0; i < sets.length; i++) {
+      if (i === min.index) {
+        continue;
+      }
+      base = base.intersection(sets[i]);
+    }
+
+    return base;
+  }
+
+  // manual implementation:
+  // intersect all sets with the smallest set
+  const base = sets[min.index];
+  for (let i = 0; i < sets.length; i++) {
+    if (i === min.index) {
+      continue;
+    }
+    const other = sets[i];
+    for (const value of base) {
+      if (!other.has(value)) {
+        base.delete(value);
+      }
+    }
+  }
+
+  return base;
+}
+
+const withUnion = 'union' in (new Set());
+export function setUnion<V>(set1: Set<V> | undefined, set2: Set<V>) {
+  if (withUnion) {
+    if (set1) {
+      return set1.union(set2);
+    }
+    return set2;
+  }
+
+  if (!set1) {
+    return new Set(set2);
+  }
+  return new Set([...set1, ...set2]);
 }

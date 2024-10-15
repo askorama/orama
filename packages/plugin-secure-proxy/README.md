@@ -6,7 +6,7 @@ Orama plugin for generating embeddings and performing vector/hybrid search secur
 
 # Usage
 
-For the complete usage guide, please refer to the [official plugin documentation](https://docs.oramasearch.com/open-source/plugins/plugin-secure-proxy).
+For the complete usage guide, please refer to the [official plugin documentation](https://docs.orama.com/open-source/plugins/plugin-secure-proxy).
 
 To use the Orama Secure Proxy Plugin, you will need to sign up for a free account at [https://cloud.orama.com](https://cloud.orama.com)
 
@@ -22,15 +22,25 @@ const db = await create({
   },
   plugins: [
     pluginSecureProxy({
-      apiKey: '<API-KEY>',
-      defaultProperty: 'embeddings',
-      model: 'orama/gte-small'
+      apiKey: 'xyz',
+      embeddings: {
+        defaultProperty: 'embeddings',
+        model: 'orama/gte-small',
+        onInsert: {
+          generate: true, // Generate the embeddings at insert-time
+          properties: ['title', 'description'], // Properties to generate embeddings from
+          verbose: false
+        },
+      },
+      chat: {
+        model: 'openai/gpt-4o'
+      }
     })
   ]
 })
 ```
 
-Available models:
+Available **embeddings** models:
 
 | Model name                       | Provider | Dimensions |
 | -------------------------------- | -------- | ---------- |
@@ -40,6 +50,16 @@ Available models:
 | `openai/text-embedding-ada-002`  | Openai   | 1536       |
 | `openai/text-embedding-3-small`  | Openai   | 1536       |
 | `openai/text-embedding-3-large`  | Openai   | 3072       |
+
+Available **chat** models:
+
+| Model name                       | Provider |
+| -------------------------------- | -------- |
+| `openai/openai/gpt-4o`           | Openai   |
+| `openai/gpt-4o-mini`             | Openai   |
+| `openai/gpt-4-turbo`             | Openai   |
+| `openai/gpt-4`                   | Openai   |
+| `openai/gpt-3.5-turbo`           | Openai   |
 
 Mode models coming soon!
 

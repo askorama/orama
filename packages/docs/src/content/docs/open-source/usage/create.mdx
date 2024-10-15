@@ -32,7 +32,7 @@ A database can be as simple as:
 ```javascript copy
 import { create } from "@orama/orama";
 
-const db = await create({
+const db = create({
   schema: {
     word: "string",
   },
@@ -44,7 +44,7 @@ or more variegated:
 ```javascript copy
 import { create } from "@orama/orama";
 
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -60,7 +60,7 @@ const movieDB = await create({
 Orama supports nested properties natively. Just add them as you would typically do in any JavaScript object:
 
 ```javascript copy
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     plot: "string",
@@ -74,7 +74,7 @@ const movieDB = await create({
   },
 });
 
-await insert(movieDB, {
+insert(movieDB, {
   title: "The Godfather",
   plot: "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
   cast: {
@@ -93,14 +93,14 @@ Since version `1.2.0`, Orama supports vector search. \
 To run vector queries, you first need to initialize a vector property in the schema:
 
 ```javascript copy
-const db = await create({
+const db = create({
   schema: {
     title: "string",
     embedding: "vector[10]", // replace 10 with the appropriate size of your vector
   },
 });
 
-await insert(db, {
+insert(db, {
   title: "The Godfather",
   embedding: [
     -0.8469661901208547, 0.6762289692745016, 0.3294302068627739,
@@ -128,7 +128,7 @@ You can customize it by passing an `id` property during the creation of the inst
 ```javascript copy
 import { create } from "@orama/orama";
 
-const db = await create({
+const db = create({
   schema: {
     word: "string",
   },

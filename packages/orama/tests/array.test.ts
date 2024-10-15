@@ -2,8 +2,9 @@ import t from 'tap'
 import { create, getByID, insert, insertMultiple, load, remove, save, search, update } from '../src/index.js'
 
 t.test('create should support array of string', async (t) => {
-  const db = await create({
+  const db = create({
     schema: {
+      id: 'string',
       name: 'string[]'
     } as const
   })
@@ -13,12 +14,12 @@ t.test('create should support array of string', async (t) => {
   })
 
   const [harryId, jamesId, lilyId] = await insertMultiple(db, [
-    { name: ['Harry', 'James', 'Potter'] },
-    { name: ['James', 'Potter'] },
-    { name: ['Lily', 'Lily', 'Lily', 'Lily', 'Evans', 'Potter'] }
+    { id: '1', name: ['Harry', 'James', 'Potter'] },
+    { id: '2', name: ['James', 'Potter'] },
+    { id: '3', name: ['Lily', 'Lily', 'Lily', 'Lily', 'Evans', 'Potter'] }
   ])
 
-  await checkSearchTerm(t, db, 'Albus', [albusId])
+  await checkSearchTerm(t, db, 'Albus', [albusId])  
   await checkSearchTerm(t, db, 'Harry', [harryId])
   await checkSearchTerm(t, db, 'James', [harryId, jamesId])
   await checkSearchTerm(t, db, 'Potter', [harryId, jamesId, lilyId])
@@ -26,6 +27,7 @@ t.test('create should support array of string', async (t) => {
   await checkSearchTerm(t, db, 'foo', [])
 
   await checkSearchWhere(t, db, 'name', 'Albus', [albusId])
+
   await checkSearchWhere(t, db, 'name', 'Harry', [harryId])
   await checkSearchWhere(t, db, 'name', 'James', [harryId, jamesId])
   await checkSearchWhere(t, db, 'name', 'Potter', [harryId, jamesId, lilyId])
@@ -40,7 +42,7 @@ t.test('create should support array of string', async (t) => {
   await checkSearchWhere(t, db, 'name', ['foo'], [])
 
   await checkSearchFacets(
-    t,
+    t as unknown as Tap.Test,
     db,
     'name',
     {},
@@ -64,7 +66,7 @@ t.test('create should support array of string', async (t) => {
 })
 
 t.test('create should support array of number', async (t) => {
-  const db = await create({
+  const db = create({
     schema: {
       num: 'number[]'
     } as const
@@ -81,14 +83,15 @@ t.test('create should support array of number', async (t) => {
   ])
 
   await checkSearchWhere(t, db, 'num', { eq: 5 }, [first, third, fourth])
+
   await checkSearchWhere(t, db, 'num', { eq: 35 }, [third])
   await checkSearchWhere(t, db, 'num', { gt: 6 }, [second, third])
   await checkSearchWhere(t, db, 'num', { gte: 7 }, [second, third])
   await checkSearchWhere(t, db, 'num', { between: [6, 10] }, [second, third])
-  await checkSearchWhere(t, db, 'num', { eg: 42 }, [])
+  await checkSearchWhere(t, db, 'num', { eq: 42 }, [])
 
   await checkSearchFacets(
-    t,
+    t as unknown as Tap.Test,
     db,
     'num',
     {
@@ -112,7 +115,7 @@ t.test('create should support array of number', async (t) => {
 })
 
 t.test('create should support array of boolean', async (t) => {
-  const db = await create({
+  const db = create({
     schema: {
       b: 'boolean[]'
     } as const
@@ -132,7 +135,7 @@ t.test('create should support array of boolean', async (t) => {
   await checkSearchWhere(t, db, 'b', false, [second, third])
 
   await checkSearchFacets(
-    t,
+    t as unknown as Tap.Test,
     db,
     'b',
     {
@@ -152,9 +155,7 @@ t.test('create should support array of boolean', async (t) => {
 })
 
 t.test('remove should support array as well', async (t) => {
-  t.plan(2)
-
-  const db = await create({
+  const db = create({
     schema: {
       strings: 'string[]',
       num: 'number[]',
@@ -174,9 +175,7 @@ t.test('remove should support array as well', async (t) => {
 })
 
 t.test('serialization should support array as well', async (t) => {
-  t.plan(2)
-
-  const db = await create({
+  const db = create({
     schema: {
       strings: 'string[]',
       num: 'number[]',
@@ -190,17 +189,17 @@ t.test('serialization should support array as well', async (t) => {
   })
   t.ok(docId)
 
-  const raw = await save(db)
-  const db2 = await create({
+  const raw = save(db)
+  const db2 = create({
     schema: {
       strings: 'string[]',
       num: 'number[]',
       b: 'boolean[]'
     }
   })
-  await load(db2, raw)
+  load(db2, raw)
 
-  const doc = await getByID(db, docId)
+  const doc = getByID(db, docId)
   t.strictSame(doc, {
     strings: ['Albus', 'Percival', 'Wulfric', 'Brian'],
     num: [3, 5, 7, 35],
@@ -209,9 +208,7 @@ t.test('serialization should support array as well', async (t) => {
 })
 
 t.test('update supports array as well', async (t) => {
-  t.plan(2)
-
-  const db = await create({
+  const db = create({
     schema: {
       strings: 'string[]',
       num: 'number[]',
@@ -253,7 +250,7 @@ async function checkSearchWhere(t, db, key, where, expectedIds) {
   t.strictSame(new Set(result.hits.map((h) => h.id).sort()), new Set(expectedIds))
 }
 
-async function checkSearchFacets(t: Tap.Test, db, key, facet, expectedFacet) {
+async function checkSearchFacets(t: any, db, key, facet, expectedFacet) {
   const result = await search(db, {
     facets: {
       [key]: facet

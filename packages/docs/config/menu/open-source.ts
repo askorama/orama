@@ -39,6 +39,10 @@ const openSourceMenu = [
                 link: '/open-source/usage/search/introduction'
               },
               {
+                label: 'Changing Default Search Algorithm',
+                link: '/open-source/usage/search/changing-search-algorithm'
+              },
+              {
                 label: 'Vector Search',
                 link: '/open-source/usage/search/vector-search'
               },
@@ -139,6 +143,10 @@ const openSourceMenu = [
             link: '/open-source/plugins/writing-your-own-plugins'
           },
           {
+            label: 'Plugin Embeddings',
+            link: '/open-source/plugins/plugin-embeddings'
+          },
+          {
             label: 'Plugin Vitepress',
             link: '/open-source/plugins/plugin-vitepress'
           },
@@ -161,6 +169,14 @@ const openSourceMenu = [
           {
             label: 'Plugin Data Persistence',
             link: '/open-source/plugins/plugin-data-persistence'
+          },
+          {
+            label: 'Plugin QPS',
+            link: '/open-source/plugins/plugin-qps'
+          },
+          {
+            label: 'Plugin PT15',
+            link: '/open-source/plugins/plugin-pt15'
           },
           {
             label: 'Plugin Match Highlight',

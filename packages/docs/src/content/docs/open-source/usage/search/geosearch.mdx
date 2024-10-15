@@ -10,7 +10,7 @@ To perform geosearch queries, you first have to define a new `geopoint` property
 ```javascript
 import { create } from "@orama/orama";
 
-const db = await create({
+const db = create({
   schema: {
     name: "string",
     location: "geopoint",
@@ -38,22 +38,22 @@ You can insert documents with geopoints as you would with any other property:
 ```javascript
 import { create, insert } from "@orama/orama";
 
-const db = await create({
+const db = create({
   schema: {
     name: "string",
     location: "geopoint",
   },
 });
 
-await insert(db, {
+insert(db, {
   name: "Duomo di Milano",
   location: { lat: 45.46409, lon: 9.19192 },
 });
-await insert(db, {
+insert(db, {
   name: "Piazza Duomo",
   location: { lat: 45.46416, lon: 9.18945 },
 });
-await insert(db, {
+insert(db, {
   name: "Piazzetta Reale",
   location: { lat: 45.46339, lon: 9.19092 },
 });
@@ -84,13 +84,13 @@ To filter by distance, we use the `radius` property. Let's see how it works:
 ```javascript
 import { create, insert, search } from '@orama/orama'
 
-const db = await create({ ... })
+const db = create({ ... })
 
-await insert(db, { ... })
-await insert(db, { ... })
-await insert(db, { ... })
+insert(db, { ... })
+insert(db, { ... })
+insert(db, { ... })
 
-const searchResult = await search(db, {
+const searchResult = search(db, {
   term: 'Duomo',
   where: {
     location: {           // The property we want to filter by
@@ -141,13 +141,13 @@ To filter by bounding polygon, we use the `polygon` property. Let's see how it w
 ```javascript
 import { create, insert, search } from '@orama/orama'
 
-const db = await create({ ... })
+const db = create({ ... })
 
-await insert(db, { ... })
-await insert(db, { ... })
-await insert(db, { ... })
+insert(db, { ... })
+insert(db, { ... })
+insert(db, { ... })
 
-const searchResult = await search(db, {
+const searchResult = search(db, {
   term: 'Duomo',
   where: {
     location: {            // The property we want to filter by
@@ -187,13 +187,13 @@ Even though the Haversine Formula is more than enough for most use cases, if you
 ```javascript
 import { create, insert, search } from '@orama/orama'
 
-const db = await create({ ... })
+const db = create({ ... })
 
-await insert(db, { ... })
-await insert(db, { ... })
-await insert(db, { ... })
+insert(db, { ... })
+insert(db, { ... })
+insert(db, { ... })
 
-const searchResult = await search(db, {
+const searchResult = search(db, {
   term: 'Duomo',
   where: {
     location: {

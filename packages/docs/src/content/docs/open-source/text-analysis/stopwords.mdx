@@ -27,7 +27,7 @@ By default, Orama does not remove any stop-word, as this is intended to be an ex
 ```javascript copy
 import { create } from "@orama/orama";
 
-const db = await create({
+const db = create({
   schema: {
     author: "string",
     quote: "string",
@@ -48,7 +48,7 @@ By installing the `@orama/stopwords` package, you can use the default stop-words
 import { create } from "@orama/orama";
 import { stopwords as englishStopwords } from "@orama/stopwords/english";
 
-const db = await create({
+const db = create({
   schema: {
     author: "string",
     quote: "string",
@@ -71,7 +71,7 @@ You can always extend the default stop-words list by adding or removing words:
 import { create } from "@orama/orama";
 import { stopwords as italianStopwords } from "@orama/stopwords/italian";
 
-const db = await create({
+const db = create({
   schema: {
     author: "string",
     quote: "string",

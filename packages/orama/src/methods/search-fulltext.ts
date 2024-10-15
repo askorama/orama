@@ -1,13 +1,12 @@
-import { prioritizeTokenScores } from '../components/algorithms.js'
 import { getFacets } from '../components/facets.js'
-import { intersectFilteredIDs } from '../components/filters.js'
 import { getGroups } from '../components/groups.js'
 import { runAfterSearch, runBeforeSearch } from '../components/hooks.js'
-import type { InternalDocumentID } from '../components/internal-document-id-store.js'
 import { getInternalDocumentId } from '../components/internal-document-id-store.js'
+import { Language } from '../components/tokenizer/languages.js'
 import { createError } from '../errors.js'
 import type {
   AnyOrama,
+  BM25Params,
   CustomSorterFunctionItem,
   ElapsedTime,
   Results,
@@ -15,37 +14,24 @@ import type {
   TokenScore,
   TypedDocument
 } from '../types.js'
-import { getNanosecondsTime, removeVectorsFromHits, safeArrayPush, sortTokenScorePredicate } from '../utils.js'
-import { createSearchContext, defaultBM25Params, fetchDocuments, fetchDocumentsWithDistinct } from './search.js'
+import { getNanosecondsTime, removeVectorsFromHits, sortTokenScorePredicate } from '../utils.js'
+import { count } from './docs.js'
+import { fetchDocuments, fetchDocumentsWithDistinct } from './search.js'
 
-export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+export function innerFullTextSearch<T extends AnyOrama>(
   orama: T,
-  params: SearchParamsFullText<T, ResultDocument>,
-  language?: string
-): Promise<Results<ResultDocument>> {
-  const timeStart = await getNanosecondsTime()
+  params: Pick<SearchParamsFullText<T>, 'term' | 'properties' | 'where' | 'exact' | 'tolerance' | 'boost' | 'relevance'>,
+  language: Language | undefined
+) {
+  const { term, properties } = params
 
-  if (orama.beforeSearch) {
-    await runBeforeSearch(orama.beforeSearch, orama, params, language)
-  }
-
-  params.relevance = Object.assign(defaultBM25Params, params.relevance ?? {})
-
-  const vectorProperties = Object.keys(orama.data.index.vectorIndexes)
-
-  const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
-  const { limit = 10, offset = 0, term, properties, threshold = 0, distinctOn, includeVectors = false } = params
-  const isPreflight = params.preflight === true
-
-  const { index, docs } = orama.data
-  const tokens = await orama.tokenizer.tokenize(term ?? '', language)
-
+  const index = orama.data.index
   // Get searchable string properties
   let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
   if (!propertiesToSearch) {
-    const propertiesToSearchWithTypes = await orama.index.getSearchablePropertiesWithTypes(index)
+    const propertiesToSearchWithTypes = orama.index.getSearchablePropertiesWithTypes(index)
 
-    propertiesToSearch = await orama.index.getSearchableProperties(index)
+    propertiesToSearch = orama.index.getSearchableProperties(index)
     propertiesToSearch = propertiesToSearch.filter((prop: string) =>
       propertiesToSearchWithTypes[prop].startsWith('string')
     )
@@ -63,151 +49,151 @@ export async function fullTextSearch<T extends AnyOrama, ResultDocument = TypedD
     propertiesToSearch = propertiesToSearch.filter((prop: string) => (properties as string[]).includes(prop))
   }
 
-  // Create the search context and the results
-  const context = await createSearchContext(
-    orama.tokenizer,
-    orama.index,
-    orama.documentsStore,
-    language,
-    params,
-    propertiesToSearch,
-    tokens,
-    await orama.documentsStore.count(docs),
-    timeStart
-  )
 
   // If filters are enabled, we need to get the IDs of the documents that match the filters.
   const hasFilters = Object.keys(params.where ?? {}).length > 0
-  let whereFiltersIDs: InternalDocumentID[] = []
-
+  let whereFiltersIDs: Set<number> | undefined
   if (hasFilters) {
-    whereFiltersIDs = await orama.index.searchByWhereClause(context, index, params.where!)
+    whereFiltersIDs = orama.index.searchByWhereClause(index, orama.tokenizer, params.where!, language)
   }
 
-  const tokensLength = tokens.length
 
-  if (tokensLength || properties?.length) {
-    // Now it's time to loop over all the indices and get the documents IDs for every single term
-    const indexesLength = propertiesToSearch.length
-    for (let i = 0; i < indexesLength; i++) {
-      const prop = propertiesToSearch[i]
-      const docIds = context.indexMap[prop]
+  let uniqueDocsIDs: TokenScore[]
+  // We need to perform the search if:
+  // - we have a search term
+  // - or we have properties to search
+  //   in this case, we need to return all the documents that contains at least one of the given properties
+  if (term || properties) {
 
-      if (tokensLength !== 0) {
-        for (let j = 0; j < tokensLength; j++) {
-          const term = tokens[j]
-
-          // Lookup
-          const scoreList = await orama.index.search(context, index, prop, term)
-
-          safeArrayPush(docIds[term], scoreList)
-        }
-      } else {
-        docIds[''] = []
-        const scoreList = await orama.index.search(context, index, prop, '')
-        safeArrayPush(docIds[''], scoreList)
-      }
-
-      const vals = Object.values(docIds)
-      context.docsIntersection[prop] = prioritizeTokenScores(vals, params?.boost?.[prop] ?? 1, threshold, tokensLength)
-      const uniqueDocs = context.docsIntersection[prop]
-
-      const uniqueDocsLength = uniqueDocs.length
-      for (let i = 0; i < uniqueDocsLength; i++) {
-        const [id, score] = uniqueDocs[i]
-        const prevScore = context.uniqueDocsIDs[id]
-        if (prevScore) {
-          context.uniqueDocsIDs[id] = prevScore + score + 0.5
-        } else {
-          context.uniqueDocsIDs[id] = score
-        }
-      }
-    }
-  } else if (tokens.length === 0 && term) {
-    // This case is hard to handle correctly.
-    // For the time being, if tokenizer returns empty array but the term is not empty,
-    // we returns an empty result set
-    context.uniqueDocsIDs = {}
-  } else {
-    context.uniqueDocsIDs = Object.fromEntries(
-      Object.keys(await orama.documentsStore.getAll(orama.data.docs)).map((k) => [k, 0])
+    const docsCount = count(orama)
+    uniqueDocsIDs = orama.index.search(
+      index,
+      term || '',
+      orama.tokenizer,
+      language,
+      propertiesToSearch,
+      params.exact || false,
+      params.tolerance || 0,
+      params.boost || {},
+      applyDefault(params.relevance),
+      docsCount,
+      whereFiltersIDs,
     )
-  }
-
-  // Get unique doc IDs from uniqueDocsIDs map
-  let uniqueDocsArray = Object.entries(context.uniqueDocsIDs).map(([id, score]) => [+id, score] as TokenScore)
-
-  // If filters are enabled, we need to remove the IDs of the documents that don't match the filters.
-  if (hasFilters) {
-    uniqueDocsArray = intersectFilteredIDs(whereFiltersIDs, uniqueDocsArray)
-  }
-
-  if (params.sortBy) {
-    if (typeof params.sortBy === 'function') {
-      const ids = uniqueDocsArray.map(([id]) => id)
-      const docs = await orama.documentsStore.getMultiple(orama.data.docs, ids)
-      const docsWithIdAndScore: CustomSorterFunctionItem<ResultDocument>[] = docs.map((d, i) => [
-        uniqueDocsArray[i][0],
-        uniqueDocsArray[i][1],
-        d!
-      ])
-      docsWithIdAndScore.sort(params.sortBy)
-      uniqueDocsArray = docsWithIdAndScore.map(([id, score]) => [id, score])
-    } else {
-      uniqueDocsArray = await orama.sorter
-        .sortBy(orama.data.sorting, uniqueDocsArray, params.sortBy)
-        .then((results) =>
-          results.map(([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score])
-        )
-    }
   } else {
-    uniqueDocsArray = uniqueDocsArray.sort(sortTokenScorePredicate)
+    // Tokenizer returns empty array and the search term is empty as well.
+    // We return all the documents.
+    const docIds = whereFiltersIDs ? Array.from(whereFiltersIDs) : Object.keys(orama.documentsStore.getAll(orama.data.docs))
+    uniqueDocsIDs = docIds.map((k) => [+k, 0] as TokenScore)
   }
 
-  let results
-  if (!isPreflight) {
-    results = await (distinctOn
-      ? fetchDocumentsWithDistinct(orama, uniqueDocsArray, offset, limit, distinctOn)
-      : fetchDocuments(orama, uniqueDocsArray, offset, limit))
-  }
+  return uniqueDocsIDs
+}
 
-  const searchResult: Results<ResultDocument> = {
-    elapsed: {
-      formatted: '',
-      raw: 0
-    },
-    // We keep the hits array empty if it's a preflight request.
-    hits: [],
-    count: uniqueDocsArray.length
-  }
 
-  if (typeof results !== 'undefined') {
-    searchResult.hits = results.filter(Boolean)
+export function fullTextSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+  orama: T,
+  params: SearchParamsFullText<T, ResultDocument>,
+  language?: string
+): Results<ResultDocument> | Promise<Results<ResultDocument>> {
+  const timeStart = getNanosecondsTime()
 
-    // Vectors can be very large, so we remove them from the result if not needed
-    if (!includeVectors) {
-      removeVectorsFromHits(searchResult, vectorProperties)
+  function performSearchLogic(): Results<ResultDocument> {
+    const vectorProperties = Object.keys(orama.data.index.vectorIndexes)
+    const shouldCalculateFacets = params.facets && Object.keys(params.facets).length > 0
+    const { limit = 10, offset = 0, distinctOn, includeVectors = false } = params
+    const isPreflight = params.preflight === true
+
+    let uniqueDocsArray = innerFullTextSearch(orama, params, language)
+
+    if (params.sortBy) {
+      if (typeof params.sortBy === 'function') {
+        const ids = uniqueDocsArray.map(([id]) => id)
+        const docs = orama.documentsStore.getMultiple(orama.data.docs, ids)
+        const docsWithIdAndScore: CustomSorterFunctionItem<ResultDocument>[] = docs.map((d, i) => [
+          uniqueDocsArray[i][0],
+          uniqueDocsArray[i][1],
+          d!
+        ])
+        docsWithIdAndScore.sort(params.sortBy)
+        uniqueDocsArray = docsWithIdAndScore.map(([id, score]) => [id, score])
+      } else {
+        uniqueDocsArray = orama.sorter
+          .sortBy(orama.data.sorting, uniqueDocsArray, params.sortBy)
+          .map(([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score])
+      }
+    } else {
+      uniqueDocsArray = uniqueDocsArray.sort(sortTokenScorePredicate)
     }
+
+    let results
+    if (!isPreflight) {
+      results = distinctOn
+        ? fetchDocumentsWithDistinct(orama, uniqueDocsArray, offset, limit, distinctOn)
+        : fetchDocuments(orama, uniqueDocsArray, offset, limit)
+    }
+
+    const searchResult: Results<ResultDocument> = {
+      elapsed: {
+        formatted: '',
+        raw: 0
+      },
+      hits: [],
+      count: uniqueDocsArray.length
+    }
+
+    if (typeof results !== 'undefined') {
+      searchResult.hits = results.filter(Boolean)
+      if (!includeVectors) {
+        removeVectorsFromHits(searchResult, vectorProperties)
+      }
+    }
+
+    if (shouldCalculateFacets) {
+      const facets = getFacets(orama, uniqueDocsArray, params.facets!)
+      searchResult.facets = facets
+    }
+
+    if (params.groupBy) {
+      searchResult.groups = getGroups<T, ResultDocument>(orama, uniqueDocsArray, params.groupBy)
+    }
+
+    searchResult.elapsed = orama.formatElapsedTime(getNanosecondsTime() - timeStart) as ElapsedTime
+
+    return searchResult
   }
 
-  if (shouldCalculateFacets) {
-    // Populate facets if needed
-    const facets = await getFacets(orama, uniqueDocsArray, params.facets!)
-    searchResult.facets = facets
+  async function executeSearchAsync() {
+    if (orama.beforeSearch) {
+      await runBeforeSearch(orama.beforeSearch, orama, params, language)
+    }
+
+    const searchResult = performSearchLogic()
+
+    if (orama.afterSearch) {
+      await runAfterSearch(orama.afterSearch, orama, params, language, searchResult)
+    }
+
+    return searchResult
   }
 
-  if (params.groupBy) {
-    searchResult.groups = await getGroups<T, ResultDocument>(orama, uniqueDocsArray, params.groupBy)
+  const asyncNeeded = orama.beforeSearch?.length || orama.afterSearch?.length
+  if (asyncNeeded) {
+    return executeSearchAsync()
   }
 
-  if (orama.afterSearch) {
-    await runAfterSearch(orama.afterSearch, orama, params, language, searchResult)
-  }
+  return performSearchLogic()
+}
 
-  // Calculate elapsed time only at the end of the function
-  searchResult.elapsed = (await orama.formatElapsedTime(
-    (await getNanosecondsTime()) - context.timeStart
-  )) as ElapsedTime
 
-  return searchResult
+export const defaultBM25Params: BM25Params = {
+  k: 1.2,
+  b: 0.75,
+  d: 0.5
+}
+function applyDefault(bm25Relevance?: BM25Params): Required<BM25Params> {
+  const r = bm25Relevance ?? {}
+  r.k = r.k ?? defaultBM25Params.k;
+  r.b = r.b ?? defaultBM25Params.b;
+  r.d = r.d ?? defaultBM25Params.d;
+  return r as Required<BM25Params>
 }

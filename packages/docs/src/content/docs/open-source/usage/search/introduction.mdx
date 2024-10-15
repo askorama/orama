@@ -17,7 +17,7 @@ Let's say we have a database that contains some elements:
 ```javascript copy
 import { create, insert, search } from "@orama/orama";
 
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -27,7 +27,7 @@ const movieDB = await create({
   },
 });
 
-await insert(movieDB, {
+insert(movieDB, {
   title: "The prestige",
   director: "Christopher Nolan",
   plot: "Two friends and fellow magicians become bitter enemies after a sudden tragedy. As they devote themselves to this rivalry, they make sacrifices that bring them fame but with terrible consequences.",
@@ -35,7 +35,7 @@ await insert(movieDB, {
   isFavorite: true,
 });
 
-await insert(movieDB, {
+insert(movieDB, {
   title: "Big Fish",
   director: "Tim Burton",
   plot: "Will Bloom returns home to care for his dying father, who had a penchant for telling unbelievable stories. After he passes away, Will tries to find out if his tales were really true.",
@@ -43,7 +43,7 @@ await insert(movieDB, {
   isFavorite: true,
 });
 
-await insert(movieDB, {
+insert(movieDB, {
   title: "Harry Potter and the Philosopher's Stone",
   director: "Chris Columbus",
   plot: "Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.",
@@ -55,7 +55,7 @@ await insert(movieDB, {
 We can now search for documents as easily as:
 
 ```javascript copy
-const searchResult = await search(movieDB, {
+const searchResult = search(movieDB, {
   term: "Harry",
 });
 ```
@@ -70,7 +70,7 @@ briefly analyze the response that Orama gives us back.
 Let's say we have run the following query:
 
 ```javascript copy
-const searchResult = await search(movieDB, {
+const searchResult = search(movieDB, {
   term: "Cris",
   properties: ["director"],
   tolerance: 1,
@@ -127,7 +127,7 @@ In case of missing or empty `term`, all scores will be returned as `0`.
 The `properties` property defines in which properties to run our query.
 
 ```javascript copy
-const searchResult = await search(movieDB, {
+const searchResult = search(movieDB, {
   term: "Chris",
   properties: ["director"],
 });
@@ -139,7 +139,7 @@ We are now searching for all the documents that contain the word `Chris` in the
 We can also search through nested properties:
 
 ```javascript copy
-const searchResult = await search(movieDB, {
+const searchResult = search(movieDB, {
   term: "Chris",
   properties: ["cast.director"],
 });
@@ -153,7 +153,7 @@ The `exact` property finds all the document with an exact match of the `term`
 property.
 
 ```javascript copy
-const searchResult = await search(movieDB, {
+const searchResult = search(movieDB, {
   term: "Chris",
   properties: ["director"],
   exact: true,
@@ -180,7 +180,7 @@ Levenshtein algorithm) between the term and the searchable property.
 > substitutions) required to change one word into the other._ ([read more](https://orama.com/blog/typo-no-more-an-in-depths-guide-to-the-levenshtein-edit-distance))
 
 ```javascript copy
-const searchResult = await search(movieDB, {
+const searchResult = search(movieDB, {
   term: "Cris",
   properties: ["director"],
   tolerance: 1,
@@ -199,7 +199,7 @@ of `1` (e.g. `Chris`) in the `director` property.
 The `limit` property limits the result at the specified number.
 
 ```javascript copy
-const searchResult = await search(movieDB, {
+const searchResult = search(movieDB, {
   term: "Chris",
   properties: ["director"],
   limit: 1,
@@ -214,7 +214,7 @@ We are searching for the `first` document that contains the term `Chris` in the
 The `offset` property skips the first `X` results.
 
 ```javascript copy
-const searchResult = await search(movieDB, {
+const searchResult = search(movieDB, {
   term: "Chris",
   properties: ["director"],
   offset: 1,
@@ -234,7 +234,7 @@ By default, Orama limits the search results to `10`, without any offset (so, `0`
 Orama can calculate distinct values letting you specify a unique key as follows:
 
 ```javascript copy
-const results = await search(db, {
+const results = search(db, {
   distinctOn: "type",
   sortBy: {
     property: "rank",
@@ -253,7 +253,7 @@ NB: you can use this feature in combination with `sortBy`.
 You can always customize the behavior of the `elapsed` property by using the `formatElapsedTime` component when creating a new Orama instance:
 
 ```javascript copy
-const db = await create({
+const db = create({
   schema: {
     title: "string",
     body: "string",

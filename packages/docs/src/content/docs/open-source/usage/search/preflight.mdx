@@ -14,18 +14,18 @@ Let's see it in action:
 ```javascript
 import { create, insert, search } from "@orama/orama";
 
-const db = await create({
+const db = create({
   schema: {
     title: "string",
   },
 });
 
-await insert(db, { title: "Red headphones" });
-await insert(db, { title: "Green headphones" });
-await insert(db, { title: "Blue headphones" });
-await insert(db, { title: "Yellow headphones" });
+insert(db, { title: "Red headphones" });
+insert(db, { title: "Green headphones" });
+insert(db, { title: "Blue headphones" });
+insert(db, { title: "Yellow headphones" });
 
-const results = await search(db, {
+const results = search(db, {
   term: "headphones",
   preflight: true,
 });

@@ -27,29 +27,29 @@ import { create, insert, search } from "@orama/orama";
 import { createTokenizer } from '@orama/tokenizers/japanese'
 import { stopwords as japaneseStopwords } from "@orama/stopwords/japanese";
 
-const db = await create({
+const db = create({
   schema: {
     name: "string",
   },
   components: {
-    tokenizer: await createTokenizer({
+    tokenizer: createTokenizer({
       stopWords: japaneseStopwords,
     }),
   },
 });
 
-await insert(db, { name: "東京" }); // Tokyo
-await insert(db, { name: "大阪" }); // Osaka
-await insert(db, { name: "京都" }); // Kyoto
-await insert(db, { name: "横浜" }); // Yokohama
-await insert(db, { name: "札幌" }); // Sapporo
-await insert(db, { name: "仙台" }); // Sendai
-await insert(db, { name: "広島" }); // Hiroshima
-await insert(db, { name: "東京大学" }); // University of Tokyo
-await insert(db, { name: "京都大学" }); // Kyoto University
-await insert(db, { name: "大阪大学" }); // Osaka University
+insert(db, { name: "東京" }); // Tokyo
+insert(db, { name: "大阪" }); // Osaka
+insert(db, { name: "京都" }); // Kyoto
+insert(db, { name: "横浜" }); // Yokohama
+insert(db, { name: "札幌" }); // Sapporo
+insert(db, { name: "仙台" }); // Sendai
+insert(db, { name: "広島" }); // Hiroshima
+insert(db, { name: "東京大学" }); // University of Tokyo
+insert(db, { name: "京都大学" }); // Kyoto University
+insert(db, { name: "大阪大学" }); // Osaka University
 
-const results = await search(db, {
+const results = search(db, {
   term: "大阪",
   threshold: 0,
 });

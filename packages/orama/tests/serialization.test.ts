@@ -3,24 +3,20 @@ import { DocumentsStore } from '../src/components/documents-store.js'
 import { Index } from '../src/components/index.js'
 import { getInternalDocumentId } from '../src/components/internal-document-id-store.js'
 import { Result, create, insert, load, save, search } from '../src/index.js'
-import { Node as RadixNode, contains as trieContains } from '../src/trees/radix.js'
+import { RadixTree } from '../src/trees/radix.js'
 import type { AnyDocument } from '../src/types.js'
 
 function extractOriginalDoc(result: Result<AnyDocument>[]): AnyDocument[] {
   return result.map(({ document }: AnyDocument) => document)
 }
 
-t.test('Edge getters', (t) => {
-  t.plan(4)
-
+t.test('Edge getters', async (t) => {
   t.test('should correctly enable edge index getter', async (t) => {
-    t.plan(2)
-
-    const db = await create({
+    const db = create({
       schema: {
         name: 'string',
         age: 'number'
-      }
+      } as const
     })
 
     await insert(db, {
@@ -33,22 +29,21 @@ t.test('Edge getters', (t) => {
       age: 25
     })
 
-    const { index } = await save(db)
+    const { index } = save(db)
     const nameIndex = (index as Index).indexes['name']
+    const newNameIndex = RadixTree.fromJSON(nameIndex.node)
 
     // Remember that tokenizers an stemmers sets content to lowercase
-    t.ok(trieContains(nameIndex.node as RadixNode, 'john'))
-    t.ok(trieContains(nameIndex.node as RadixNode, 'jane'))
+    t.ok(newNameIndex.contains('john'))
+    t.ok(newNameIndex.contains('jane'))
   })
 
   t.test('should correctly enable edge docs getter', async (t) => {
-    t.plan(2)
-
-    const db = await create({
+    const db = create({
       schema: {
         name: 'string',
         age: 'number'
-      }
+      } as const
     })
 
     const doc1 = await insert(db, {
@@ -61,7 +56,7 @@ t.test('Edge getters', (t) => {
       age: 25
     })
 
-    const { docs } = await save(db)
+    const { docs } = save(db)
 
     t.strictSame((docs as DocumentsStore).docs[getInternalDocumentId(db.internalDocumentIDStore, doc1)], {
       name: 'John',
@@ -74,13 +69,11 @@ t.test('Edge getters', (t) => {
   })
 
   t.test('should correctly enable index setter', async (t) => {
-    t.plan(6)
-
-    const db = await create({
+    const db = create({
       schema: {
         name: 'string',
         age: 'number'
-      }
+      } as const
     })
 
     const jonh = {
@@ -106,18 +99,18 @@ t.test('Edge getters', (t) => {
     await insert(db, jonh)
     await insert(db, jane)
 
-    const db2 = await create({
+    const db2 = create({
       schema: {
         name: 'string',
         age: 'number'
-      }
+      } as const
     })
 
     await insert(db2, michele)
     await insert(db2, paolo)
 
-    const dbData = await save(db2)
-    await load(db, dbData)
+    const dbData = save(db2)
+    load(db, dbData)
 
     const search1 = await search(db, { term: 'Jane' })
     const search2 = await search(db, { term: 'John' })
@@ -134,13 +127,11 @@ t.test('Edge getters', (t) => {
   })
 
   t.test('should correctly save and load data', async (t) => {
-    t.plan(2)
-
     const originalDB = await create({
       schema: {
         name: 'string',
         age: 'number'
-      }
+      } as const
     })
 
     await insert(originalDB, {
@@ -153,16 +144,16 @@ t.test('Edge getters', (t) => {
       age: 37
     })
 
-    const DBData = await save(originalDB)
+    const DBData = save(originalDB)
 
-    const newDB = await create({
+    const newDB = create({
       schema: {
         name: 'string',
         age: 'number'
       }
     })
 
-    await load(newDB, DBData)
+    load(newDB, DBData)
 
     const search1 = await search(originalDB, { term: 'Michele' })
     const search2 = await search(newDB, { term: 'Michele' })

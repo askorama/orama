@@ -16,7 +16,7 @@ you want to use filters on (when using the default tokenizer you can provide the
 If we consider the following schema:
 
 ```javascript copy
-const db = await create({
+const db = create({
   schema: {
     title: "string",
     tag: "string",
@@ -29,7 +29,7 @@ const db = await create({
   },
 });
 
-const results = await search(db, {
+const results = search(db, {
   term: "prestige",
   where: {
     tag: "new",
@@ -42,7 +42,7 @@ The `results` will contain all documents that contain the word `prestige` in the
 You can also specify a list of string, in this case it will return all documents that contain at least one of the values provided:
 
 ```javascript copy
-const results = await search(db, {
+const results = search(db, {
   term: "prestige",
   where: {
     tag: ["favorite", "new"],
@@ -64,7 +64,7 @@ The number properties support the following operators:
 | `between` | Between two values (inclusive) | `year: { between: [2000, 2008] }` |
 
 ```javascript copy
-const db = await create({
+const db = create({
   schema: {
     id: "string",
     title: "string",
@@ -84,7 +84,7 @@ const db = await create({
   },
 });
 
-const results = await search(db, {
+const results = search(db, {
   term: "prestige",
   where: {
     year: {
@@ -105,7 +105,7 @@ const results = await search(db, {
 For boolean properties, you can simply set the property to `true` or `false`:
 
 ```javascript copy
-const results = await search(db, {
+const results = search(db, {
   term: "prestige",
   where: {
     "meta.favorite": true,
@@ -119,7 +119,7 @@ The available operators depend on the type (string, number of boolean) as descri
 A document matches if at least one of the array elements matches the filter condition.
 
 ```javascript copy
-const db = await create({
+const db = create({
   schema: {
     title: "string",
     tags: "string[]",
@@ -128,23 +128,23 @@ const db = await create({
   }
 });
 
-await insertMultiple(db, [
+insertMultiple(db, [
   {title: "a", tags: ["foo", "bar"], editions: [1990, 2024], limited: [false, false]},
   {title: "b", tags: ["foo"], editions: [1942, 2024], limited: [false, true]},
   {title: "c", tags: ["bar"], editions: [2020], limited: [false]},
 ])
 
 // Books with tag foo
-await search(db, {where: {tags: "foo"}}); // returns  a, b
+search(db, {where: {tags: "foo"}}); // returns  a, b
 
 // Books tagged either as foo or bar
-await search(db, {where: {tags: ["foo", "bar"]}}); // returns a, b, c
+search(db, {where: {tags: ["foo", "bar"]}}); // returns a, b, c
 
 // Books with a 2024 edition
-await search(db, {where: {editions: {eq: 2024}}}); // returns a, b
+search(db, {where: {editions: {eq: 2024}}}); // returns a, b
 
 // Books with a limited edition
-await search(db, {where: {limited: true}}); // returns b
+search(db, {where: {limited: true}}); // returns b
 ```
 
 ## Enum operators

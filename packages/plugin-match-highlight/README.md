@@ -1,12 +1,6 @@
-# Match Highlight Plugin
+# Match Highlight Plugin - DEPRECATED
 
-[![Tests](https://github.com/askorama/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/askorama/orama/actions/workflows/turbo.yml)
-
-This plugin aims to provide a match location for search results.
-
-# Usage
-
-For the complete usage guide, please refer to the [official plugin documentation](https://docs.oramasearch.com/open-source/plugins/plugin-match-highlight).
+This plugin is deprecated in favor of [Orama Highlight](https://www.npmjs.com/package/@orama/highlight). It's faster, easier to use, and with a minimal memory footprint. Give it a try! 
 
 # License
 

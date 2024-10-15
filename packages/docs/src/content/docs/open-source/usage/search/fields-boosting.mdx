@@ -6,7 +6,7 @@ description: Learn how to boost the importance of a field in the search results.
 You can use the `boost` interface to boost the importance of a field in the search results.
 
 ```javascript copy
-const searchResult = await search(movieDB, {
+const searchResult = search(movieDB, {
   term: "Harry",
   properties: "*",
   boost: {
@@ -22,7 +22,7 @@ That means that any match of `'Harry'` in the `title` field will be considered t
 You can boost multiple fields:
 
 ```javascript copy
-const searchResult = await search(movieDB, {
+const searchResult = search(movieDB, {
   term: "Harry",
   properties: "*",
   boost: {

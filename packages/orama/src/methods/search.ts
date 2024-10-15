@@ -3,19 +3,14 @@ import { createError } from '../errors.js'
 import { getNested } from '../utils.js'
 import type {
   AnyOrama,
-  BM25Params,
-  IndexMap,
   LiteralUnion,
   Result,
   Results,
-  SearchContext,
   SearchParams,
   SearchParamsFullText,
   SearchParamsHybrid,
   SearchParamsVector,
   SearchableValue,
-  TokenMap,
-  Tokenizer,
   TypedDocument
 } from '../types.js'
 import { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from '../constants.js'
@@ -23,85 +18,11 @@ import { fullTextSearch } from './search-fulltext.js'
 import { searchVector } from './search-vector.js'
 import { hybridSearch } from './search-hybrid.js'
 
-export const defaultBM25Params: BM25Params = {
-  k: 1.2,
-  b: 0.75,
-  d: 0.5
-}
-
-export async function createSearchContext<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-  tokenizer: Tokenizer,
-  index: T['index'],
-  documentsStore: T['documentsStore'],
-  language: string | undefined,
-  params: SearchParams<T, ResultDocument>,
-  properties: string[],
-  tokens: string[],
-  docsCount: number,
-  timeStart: bigint
-): Promise<SearchContext<T, ResultDocument>> {
-  // If filters are enabled, we need to get the IDs of the documents that match the filters.
-  // const hasFilters = Object.keys(params.where ?? {}).length > 0;
-  // let whereFiltersIDs: string[] = [];
-
-  // if (hasFilters) {
-  //   whereFiltersIDs = getWhereFiltersIDs(params.where!, orama);
-  // }
-
-  // indexMap is an object containing all the indexes considered for the current search,
-  // and an array of doc IDs for each token in all the indices.
-  //
-  // Given the search term "quick brown fox" on the "description" index,
-  // indexMap will look like this:
-  //
-  // {
-  //   description: {
-  //     quick: [doc1, doc2, doc3],
-  //     brown: [doc2, doc4],
-  //     fox:   [doc2]
-  //   }
-  // }
-  const indexMap: IndexMap = {}
-
-  // After we create the indexMap, we need to calculate the intersection
-  // between all the postings lists for each token.
-  // Given the example above, docsIntersection will look like this:
-  //
-  // {
-  //   description: [doc2]
-  // }
-  //
-  // as doc2 is the only document present in all the postings lists for the "description" index.
-  const docsIntersection: TokenMap = {}
-
-  for (const prop of properties) {
-    const tokensMap: TokenMap = {}
-    for (const token of tokens) {
-      tokensMap[token] = []
-    }
-    indexMap[prop] = tokensMap
-    docsIntersection[prop] = []
-  }
-
-  return {
-    timeStart,
-    tokenizer,
-    index,
-    documentsStore,
-    language,
-    params,
-    docsCount,
-    uniqueDocsIDs: {},
-    indexMap,
-    docsIntersection
-  }
-}
-
-export async function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
+export function search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
   params: SearchParams<T, ResultDocument>,
   language?: string
-): Promise<Results<ResultDocument>> {
+): Results<ResultDocument> | Promise<Results<ResultDocument>> {
   const mode = params.mode ?? MODE_FULLTEXT_SEARCH
 
   if (mode === MODE_FULLTEXT_SEARCH) {
@@ -119,13 +40,13 @@ export async function search<T extends AnyOrama, ResultDocument = TypedDocument<
   throw createError('INVALID_SEARCH_MODE', mode)
 }
 
-export async function fetchDocumentsWithDistinct<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+export function fetchDocumentsWithDistinct<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
   orama: T,
   uniqueDocsArray: [InternalDocumentID, number][],
   offset: number,
   limit: number,
   distinctOn: LiteralUnion<T['schema']>
-): Promise<Result<ResultDocument>[]> {
+): Result<ResultDocument>[] {
   const docs = orama.data.docs
 
   // Keep track which values we already seen
@@ -152,8 +73,8 @@ export async function fetchDocumentsWithDistinct<T extends AnyOrama, ResultDocum
       continue
     }
 
-    const doc = await orama.documentsStore.get(docs, id)
-    const value = await getNested(doc as object, distinctOn)
+    const doc = orama.documentsStore.get(docs, id)
+    const value = getNested(doc as object, distinctOn)
     if (typeof value === 'undefined' || values.has(value)) {
       continue
     }
@@ -177,12 +98,12 @@ export async function fetchDocumentsWithDistinct<T extends AnyOrama, ResultDocum
   return results
 }
 
-export async function fetchDocuments<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
+export function fetchDocuments<T extends AnyOrama, ResultDocument extends TypedDocument<T>>(
   orama: T,
   uniqueDocsArray: [InternalDocumentID, number][],
   offset: number,
   limit: number
-): Promise<Result<ResultDocument>[]> {
+): Result<ResultDocument>[] {
   const docs = orama.data.docs
 
   const results: Result<ResultDocument>[] = Array.from({
@@ -207,7 +128,7 @@ export async function fetchDocuments<T extends AnyOrama, ResultDocument extends 
     if (!resultIDs.has(id)) {
       // We retrieve the full document only AFTER making sure that we really want it.
       // We never retrieve the full document preventively.
-      const fullDoc = await orama.documentsStore.get(docs, id)
+      const fullDoc = orama.documentsStore.get(docs, id)
       results[i] = { id: getDocumentIdFromInternalId(orama.internalDocumentIDStore, id), score, document: fullDoc! }
       resultIDs.add(id)
     }

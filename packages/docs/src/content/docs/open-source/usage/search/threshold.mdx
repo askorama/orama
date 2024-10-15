@@ -12,16 +12,16 @@ Let's consider the following example:
 ```javascript
 import { create, insert, search } from "@orama/orama";
 
-const db = await create({
+const db = create({
   schema: {
     title: "string",
   },
 });
 
-await insert(db, { title: "Blue t-shirt, slim fit" });
-await insert(db, { title: "Blue t-shirt, regular fit" });
-await insert(db, { title: "Red t-shirt, slim fit" });
-await insert(db, { title: "Red t-shirt, oversize fit" });
+insert(db, { title: "Blue t-shirt, slim fit" });
+insert(db, { title: "Blue t-shirt, regular fit" });
+insert(db, { title: "Red t-shirt, slim fit" });
+insert(db, { title: "Red t-shirt, oversize fit" });
 ```
 
 As you can see, we're inserting 4 documents with a lot of common keywords.
@@ -29,7 +29,7 @@ As you can see, we're inserting 4 documents with a lot of common keywords.
 What happens if I search for `"t-shirt"`?
 
 ```javascript
-const results = await search(db, {
+const results = search(db, {
   term: "t-shirt",
 });
 
@@ -41,7 +41,7 @@ In that case, every single document will be returned, as they all contain the `"
 Now, what happens if I search for `"regular fit"`?
 
 ```javascript
-const results = await search(db, {
+const results = search(db, {
   term: "regular fit",
 });
 
@@ -66,7 +66,7 @@ It must be a number between `0` and `1`, and it represents the percentage of res
 By default, Orama sets the threshold to `1`. This means that all the results will be returned.
 
 ```javascript
-const results = await search(db, {
+const results = search(db, {
   term: "slim fit",
 });
 ```
@@ -78,7 +78,7 @@ This will return **all** the documents containing **either** the `"slim"` keywor
 Considering the example above, it will work the following way:
 
 ```javascript
-const results = await search(db, {
+const results = search(db, {
   term: "slim fit",
   threshold: 0,
 });
@@ -92,7 +92,7 @@ You can boost the results depending on where a property is found using the [fiel
 ### Setting the threshold to a value between `0` and `1`
 
 ```javascript
-const results = await search(db, {
+const results = search(db, {
   term: "slim fit",
   threshold: 0.6,
 });

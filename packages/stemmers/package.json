@@ -1,6 +1,6 @@
 {
   "name": "@orama/stemmers",
-  "version": "2.1.1",
+  "version": "3.0.0-rc-4",
   "type": "module",
   "description": "Stemmers for Orama",
   "sideEffects": false,
@@ -116,11 +116,6 @@
       "types": "./dist/rs.d.ts",
       "import": "./dist/rs.js",
       "require": "./dist/rs.cjs"
-    },
-    "./slovenian": {
-      "types": "./dist/ru.d.ts",
-      "import": "./dist/ru.js",
-      "require": "./dist/ru.cjs"
     },
     "./spanish": {
       "types": "./dist/es.d.ts",

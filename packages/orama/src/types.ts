@@ -1,17 +1,32 @@
 import type { InsertOptions } from './methods/insert.js'
 import { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from './constants.js'
 import { DocumentsStore } from './components/documents-store.js'
-import { Index } from './components/index.js'
+import { Index, TTree } from './components/index.js'
 import { DocumentID, InternalDocumentID, InternalDocumentIDStore } from './components/internal-document-id-store.js'
 import { Sorter } from './components/sorter.js'
 import { Language } from './components/tokenizer/languages.js'
 import { Point } from './trees/bkd.js'
+import { VectorIndex, VectorType } from './trees/vector.js'
+
+export type {
+  IAnswerSessionConfig,
+  AnswerSession,
+  AnswerSessionEvents,
+  AskParams,
+  GenericContext,
+  Interaction,
+  Message,
+  MessageRole,
+  RegenerateLastParams
+} from './methods/answer-session.js'
 
 export { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from './constants.js'
 
 export type { DefaultTokenizer } from './components/tokenizer/index.js'
 
 export type Nullable<T> = T | null
+
+export type Optional<T> = T | undefined
 
 export type SingleOrArray<T> = T | T[]
 
@@ -109,9 +124,7 @@ export type PartialSchemaDeep<T> = {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Document extends Record<string, SearchableValue | Document | unknown> {}
 
-export type Magnitude = number
 export type Vector = `vector[${number}]`
-export type VectorType = Float32Array
 
 export type ScalarSearchableType = 'string' | 'number' | 'boolean' | 'enum' | 'geopoint'
 export type ArraySearchableType = 'string[]' | 'number[]' | 'boolean[]' | 'enum[]' | Vector
@@ -124,13 +137,6 @@ export type SearchableValue = ScalarSearchableValue | ArraySearchableValue
 
 export type SortType = 'string' | 'number' | 'boolean'
 export type SortValue = string | number | boolean
-
-export type VectorIndex = {
-  size: number
-  vectors: {
-    [docID: string]: [Magnitude, VectorType]
-  }
-}
 
 export type BM25Params = {
   k?: number
@@ -904,7 +910,7 @@ export type IIndexInsertOrRemoveHookFunction = <R = void>(
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface AnyIndexStore {
-  vectorIndexes: Record<string, VectorIndex>
+  vectorIndexes: Record<string, TTree<'Vector', VectorIndex>>
 }
 export type AnyIndex = IIndex<AnyIndexStore>
 
@@ -913,7 +919,7 @@ export interface IIndex<I extends AnyIndexStore> {
     orama: T,
     sharedInternalDocumentStore: T['internalDocumentIDStore'],
     schema: T['schema']
-  ): SyncOrAsyncValue<I>
+  ): I
 
   beforeInsert?: IIndexInsertOrRemoveHookFunction
   insert: <T extends I>(
@@ -921,13 +927,14 @@ export interface IIndex<I extends AnyIndexStore> {
     index: T,
     prop: string,
     id: DocumentID,
+    internalId: InternalDocumentID,
     value: SearchableValue,
     schemaType: SearchableType,
     language: string | undefined,
     tokenizer: Tokenizer,
     docsCount: number,
     options?: InsertOptions
-  ) => SyncOrAsyncValue
+  ) => void
   afterInsert?: IIndexInsertOrRemoveHookFunction
 
   beforeRemove?: IIndexInsertOrRemoveHookFunction
@@ -936,6 +943,7 @@ export interface IIndex<I extends AnyIndexStore> {
     index: T,
     prop: string,
     id: DocumentID,
+    internalId: InternalDocumentID,
     value: SearchableValue,
     schemaType: SearchableType,
     language: string | undefined,
@@ -944,40 +952,47 @@ export interface IIndex<I extends AnyIndexStore> {
   ) => SyncOrAsyncValue<boolean>
   afterRemove?: IIndexInsertOrRemoveHookFunction
 
-  insertDocumentScoreParameters(
-    index: I,
-    prop: string,
-    id: DocumentID,
-    tokens: string[],
-    docsCount: number
-  ): SyncOrAsyncValue
-  insertTokenScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], token: string): SyncOrAsyncValue
+  insertDocumentScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], docsCount: number): void
+  insertTokenScoreParameters(index: I, prop: string, id: DocumentID, tokens: string[], token: string): void
   removeDocumentScoreParameters(index: I, prop: string, id: DocumentID, docsCount: number): SyncOrAsyncValue
-  removeTokenScoreParameters(index: I, prop: string, token: string): SyncOrAsyncValue
-  calculateResultScores<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-    context: SearchContext<T, ResultDocument>,
-    index: I,
+  removeTokenScoreParameters(index: I, prop: string, token: string): void
+  calculateResultScores(
+    index: AnyIndexStore,
     prop: string,
     term: string,
-    ids: DocumentID[]
-  ): SyncOrAsyncValue<TokenScore[]>
+    ids: InternalDocumentID[],
+    docsCount: number,
+    bm25Relevance: Required<BM25Params>,
+    resultsMap: Map<number, number>,
+    boostPerProperty: number,
+    whereFiltersIDs: Set<InternalDocumentID> | undefined,
+  )
 
-  search<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-    context: SearchContext<T, ResultDocument>,
-    index: I,
-    prop: string,
-    term: string
-  ): SyncOrAsyncValue<TokenScore[]>
-  searchByWhereClause<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
-    context: SearchContext<T, ResultDocument>,
-    index: I,
-    filters: Partial<WhereCondition<T['schema']>>
-  ): SyncOrAsyncValue<InternalDocumentID[]>
+  search<T extends AnyOrama>(
+    index: AnyIndexStore,
+    term: string,
+    tokenizer: Tokenizer,
+    language: string | undefined,
+    propertiesToSearch: string[],
+    exact: boolean,
+    tolerance: number,
+    boost: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>,
+    relevance: Required<BM25Params>,
+    docsCount: number,
+    whereFiltersIDs: Set<InternalDocumentID> | undefined,
+  ): TokenScore[]
 
-  getSearchableProperties(index: I): SyncOrAsyncValue<string[]>
-  getSearchablePropertiesWithTypes(index: I): SyncOrAsyncValue<Record<string, SearchableType>>
+  searchByWhereClause<T extends AnyOrama>(
+    index: AnyIndexStore,
+    tokenizer: Tokenizer,
+    filters: Partial<WhereCondition<T['schema']>>,
+    language: string | undefined
+  ): Set<InternalDocumentID>
 
-  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): SyncOrAsyncValue<I>
+  getSearchableProperties(index: I): string[]
+  getSearchablePropertiesWithTypes(index: I): Record<string, SearchableType>
+
+  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): I
   save<R = unknown>(index: I): SyncOrAsyncValue<R>
 }
 
@@ -986,15 +1001,15 @@ export interface AnyDocumentStore {
 }
 
 export interface IDocumentsStore<D extends AnyDocumentStore = AnyDocumentStore> {
-  create<T extends AnyOrama>(orama: T, sharedInternalDocumentStore: InternalDocumentIDStore): SyncOrAsyncValue<D>
-  get(store: D, id: DocumentID): SyncOrAsyncValue<AnyDocument | undefined>
-  getMultiple(store: D, ids: DocumentID[]): SyncOrAsyncValue<(AnyDocument | undefined)[]>
+  create<T extends AnyOrama>(orama: T, sharedInternalDocumentStore: InternalDocumentIDStore): D
+  get(store: D, id: DocumentID): Optional<AnyDocument>
+  getMultiple(store: D, ids: DocumentID[]): Optional<AnyDocument>[]
   getAll(store: D): SyncOrAsyncValue<Record<InternalDocumentID, AnyDocument>>
-  store(store: D, id: DocumentID, doc: AnyDocument): SyncOrAsyncValue<boolean>
-  remove(store: D, id: DocumentID): SyncOrAsyncValue<boolean>
-  count(store: D): SyncOrAsyncValue<number>
+  store(store: D, id: DocumentID, internalId: InternalDocumentID, doc: AnyDocument): boolean
+  remove(store: D, id: DocumentID, internalId: InternalDocumentID): SyncOrAsyncValue<boolean>
+  count(store: D): number
 
-  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): SyncOrAsyncValue<D>
+  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): D
   save<R = unknown>(store: D): SyncOrAsyncValue<R>
 }
 
@@ -1013,7 +1028,7 @@ export interface ISorter<So extends AnySorterStore> {
     sharedInternalDocumentStore: InternalDocumentIDStore,
     schema: T['schema'],
     sorterConfig?: SorterConfig
-  ): SyncOrAsyncValue<So>
+  ): So
   insert: <T extends So>(
     sorter: T,
     prop: string,
@@ -1021,20 +1036,16 @@ export interface ISorter<So extends AnySorterStore> {
     value: SortValue,
     schemaType: SortType,
     language: string | undefined
-  ) => SyncOrAsyncValue
-  remove: <T extends So>(sorter: T, prop: string, id: DocumentID) => SyncOrAsyncValue
+  ) => void
+  remove: <T extends So>(sorter: T, prop: string, id: DocumentID) => void
 
-  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): SyncOrAsyncValue<So>
-  save<R = unknown>(sorter: So): SyncOrAsyncValue<R>
+  load<R = unknown>(sharedInternalDocumentStore: InternalDocumentIDStore, raw: R): So
+  save<R = unknown>(sorter: So): R
 
-  sortBy<T extends AnyOrama>(
-    sorter: So,
-    docIds: [DocumentID, number][],
-    by: SorterParams<T>
-  ): Promise<[DocumentID, number][]>
+  sortBy<T extends AnyOrama>(sorter: So, docIds: [DocumentID, number][], by: SorterParams<T>): [DocumentID, number][]
 
-  getSortableProperties(sorter: So): SyncOrAsyncValue<string[]>
-  getSortablePropertiesWithTypes(sorter: So): SyncOrAsyncValue<Record<string, SortType>>
+  getSortableProperties(sorter: So): string[]
+  getSortablePropertiesWithTypes(sorter: So): Record<string, SortType>
 }
 
 export type Stemmer = (word: string) => string
@@ -1045,14 +1056,14 @@ export type DefaultTokenizerConfig = {
   stemmer?: Stemmer
   stemmerSkipProperties?: string | string[]
   tokenizeSkipProperties?: string | string[]
-  stopWords?: boolean | string[] | ((stopWords: string[]) => string[] | Promise<string[]>)
+  stopWords?: boolean | string[] | ((stopWords: string[]) => string[])
   allowDuplicates?: boolean
 }
 
 export interface Tokenizer {
   language: string
   normalizationCache: Map<string, string>
-  tokenize: (raw: string, language?: string, prop?: string) => SyncOrAsyncValue<string[]>
+  tokenize: (raw: string, language?: string, prop?: string, withCache?: boolean) => string[]
 }
 
 export interface ObjectComponents<I, D, So> {
@@ -1063,10 +1074,10 @@ export interface ObjectComponents<I, D, So> {
 }
 
 export interface FunctionComponents<S> {
-  validateSchema(doc: AnyDocument, schema: S): SyncOrAsyncValue<string | undefined>
-  getDocumentIndexId(doc: AnyDocument): SyncOrAsyncValue<string>
-  getDocumentProperties(doc: AnyDocument, paths: string[]): SyncOrAsyncValue<Record<string, string | number | boolean>>
-  formatElapsedTime(number: bigint): SyncOrAsyncValue<number | string | object | ElapsedTime>
+  validateSchema(doc: AnyDocument, schema: S): string | undefined
+  getDocumentIndexId(doc: AnyDocument): string
+  getDocumentProperties(doc: AnyDocument, paths: string[]): Record<string, string | number | boolean>
+  formatElapsedTime(number: bigint): number | string | object | ElapsedTime
 }
 
 export interface SingleOrArrayCallbackComponents<T extends AnyOrama> {
@@ -1272,8 +1283,9 @@ export type AnyOrama<TSchema = any> = FunctionComponents<TSchema> &
   ArrayCallbackComponents<any> &
   OramaID & { plugins: OramaPlugin[] }
 
-export type OramaPluginSync = {
+export type OramaPluginSync<T = unknown> = {
   name: string
+  extra?: T
   beforeInsert?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
   afterInsert?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
   beforeRemove?: <T extends AnyOrama>(orama: T, id: string, doc: AnyDocument) => SyncOrAsyncValue
@@ -1298,8 +1310,9 @@ export type OramaPluginSync = {
   beforeUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
   afterUpdateMultiple?: <T extends AnyOrama>(orama: T, docs: AnyDocument[]) => SyncOrAsyncValue
   afterCreate?: <T extends AnyOrama>(orama: T) => SyncOrAsyncValue
+  getComponents?: <IndexStore extends AnyIndexStore, TDocumentStore, TSorter>(schema: AnySchema) => SyncOrAsyncValue<Partial<ObjectComponents<IIndex<IndexStore>, TDocumentStore, TSorter>>>
 }
 
-export type OramaPluginAsync = Promise<OramaPluginSync>
+export type OramaPluginAsync<T = unknown> = Promise<OramaPluginSync<T>>
 
-export type OramaPlugin = OramaPluginSync | OramaPluginAsync
+export type OramaPlugin<T = unknown> = OramaPluginSync<T> | OramaPluginAsync<T>

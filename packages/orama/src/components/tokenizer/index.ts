@@ -1,3 +1,4 @@
+import type { Optional } from '../../types.js'
 import { createError } from '../../errors.js'
 import { Stemmer, Tokenizer, DefaultTokenizerConfig } from '../../types.js'
 import { replaceDiacritics } from './diacritics.js'
@@ -12,19 +13,21 @@ export interface DefaultTokenizer extends Tokenizer {
   stopWords?: string[]
   allowDuplicates: boolean
   normalizationCache: Map<string, string>
-  normalizeToken(this: DefaultTokenizer, token: string, prop: string | undefined): string
+  normalizeToken(this: DefaultTokenizer, prop: Optional<string>, token: string, withCache:Optional<boolean>): string
 }
 
-export function normalizeToken(this: DefaultTokenizer, prop: string, token: string): string {
+export function normalizeToken(this: DefaultTokenizer, prop: string, token: string, withCache: boolean = true): string {
   const key = `${this.language}:${prop}:${token}`
 
-  if (this.normalizationCache.has(key)) {
+  if (withCache && this.normalizationCache.has(key)) {
     return this.normalizationCache.get(key)!
   }
 
   // Remove stopwords if enabled
   if (this.stopWords?.includes(token)) {
-    this.normalizationCache.set(key, '')
+    if (withCache) {
+      this.normalizationCache.set(key, '')
+    }
     return ''
   }
 
@@ -34,7 +37,9 @@ export function normalizeToken(this: DefaultTokenizer, prop: string, token: stri
   }
 
   token = replaceDiacritics(token)
-  this.normalizationCache.set(key, token)
+  if (withCache) {
+    this.normalizationCache.set(key, token)
+  }
   return token
 }
 
@@ -49,7 +54,7 @@ function trim(text: string[]): string[] {
   return text
 }
 
-function tokenize(this: DefaultTokenizer, input: string, language?: string, prop?: string): string[] {
+function tokenize(this: DefaultTokenizer, input: string, language?: string, prop?: string, withCache: boolean = true): string[] {
   if (language && language !== this.language) {
     throw createError('LANGUAGE_NOT_SUPPORTED', language)
   }
@@ -59,15 +64,16 @@ function tokenize(this: DefaultTokenizer, input: string, language?: string, prop
     return [input]
   }
 
+  const normalizeToken = this.normalizeToken.bind(this, prop ?? '')
   let tokens: string[]
   if (prop && this.tokenizeSkipProperties.has(prop)) {
-    tokens = [this.normalizeToken.bind(this, prop ?? '')(input)]
+    tokens = [normalizeToken(input, withCache)]
   } else {
     const splitRule = SPLITTERS[this.language]
     tokens = input
       .toLowerCase()
       .split(splitRule)
-      .map(this.normalizeToken.bind(this, prop ?? ''))
+      .map(t => normalizeToken(t, withCache))
       .filter(Boolean)
   }
 
@@ -80,7 +86,7 @@ function tokenize(this: DefaultTokenizer, input: string, language?: string, prop
   return trimTokens
 }
 
-export async function createTokenizer(config: DefaultTokenizerConfig = {}): Promise<DefaultTokenizer> {
+export function createTokenizer(config: DefaultTokenizerConfig = {}): DefaultTokenizer {
   if (!config.language) {
     config.language = 'english'
   } else if (!SUPPORTED_LANGUAGES.includes(config.language)) {
@@ -88,7 +94,7 @@ export async function createTokenizer(config: DefaultTokenizerConfig = {}): Prom
   }
 
   // Handle stemming - It is disabled by default
-  let stemmer: Stemmer | undefined
+  let stemmer: Optional<Stemmer>
 
   if (config.stemming || (config.stemmer && !('stemming' in config))) {
     if (config.stemmer) {
@@ -107,7 +113,7 @@ export async function createTokenizer(config: DefaultTokenizerConfig = {}): Prom
   }
 
   // Handle stopwords
-  let stopWords: string[] | undefined
+  let stopWords: Optional<string[]>
 
   if (config.stopWords !== false) {
     stopWords = []
@@ -115,7 +121,7 @@ export async function createTokenizer(config: DefaultTokenizerConfig = {}): Prom
     if (Array.isArray(config.stopWords)) {
       stopWords = config.stopWords
     } else if (typeof config.stopWords === 'function') {
-      stopWords = await config.stopWords(stopWords)
+      stopWords = config.stopWords(stopWords)
     } else if (config.stopWords) {
       throw createError('CUSTOM_STOP_WORDS_MUST_BE_FUNCTION_OR_ARRAY')
     }

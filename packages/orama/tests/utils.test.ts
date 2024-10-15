@@ -1,12 +1,8 @@
 import t from 'tap'
-import { formatBytes, formatNanoseconds, getOwnProperty, getNested, flattenObject } from '../src/utils.js'
+import { formatBytes, formatNanoseconds, getOwnProperty, getNested, flattenObject, setUnion, setIntersection } from '../src/utils.js'
 
-t.test('utils', (t) => {
-  t.plan(5)
-
+t.test('utils', async (t) => {
   t.test('should correctly format bytes', async (t) => {
-    t.plan(9)
-
     t.equal(await formatBytes(0), '0 Bytes')
     t.equal(await formatBytes(1), '1 Bytes')
     t.equal(await formatBytes(1024), '1 KB')
@@ -19,8 +15,6 @@ t.test('utils', (t) => {
   })
 
   t.test('should correctly format nanoseconds', async (t) => {
-    t.plan(13)
-
     t.equal(await formatNanoseconds(1n), '1ns')
     t.equal(await formatNanoseconds(10n), '10ns')
     t.equal(await formatNanoseconds(100n), '100ns')
@@ -36,12 +30,8 @@ t.test('utils', (t) => {
     t.equal(await formatNanoseconds(1000_000_000_000n), '1000s')
   })
 
-  t.test('should check object properties', (t) => {
-    t.plan(2)
-
-    t.test('should return the value of the property or undefined', (t) => {
-      t.plan(2)
-
+  t.test('should check object properties', async (t) => {
+    t.test('should return the value of the property or undefined', async (t) => {
       const myObject = {
         foo: 'bar'
       }
@@ -50,9 +40,7 @@ t.test('utils', (t) => {
       t.equal(getOwnProperty(myObject, 'bar'), undefined)
     })
 
-    t.test('should return even if the hasOwn method is not available', (t) => {
-      t.plan(2)
-
+    t.test('should return even if the hasOwn method is not available', async (t) => {
       // @ts-expect-error - we are testing the fallback
       globalThis.Object.hasOwn = undefined
 
@@ -66,8 +54,6 @@ t.test('utils', (t) => {
   })
 
   t.test('should get value from a nested object', async (t) => {
-    t.plan(7)
-
     const myObject = {
       foo: 'bar',
       nested: {
@@ -90,9 +76,7 @@ t.test('utils', (t) => {
     t.equal(await getNested(myObject, 'nested.noop.bar'), undefined)
   })
 
-  t.test('should flatten an object', (t) => {
-    t.plan(2)
-
+  t.test('should flatten an object', async (t) => {
     const myObject = {
       foo: 'bar',
       nested: {
@@ -111,4 +95,37 @@ t.test('utils', (t) => {
     t.equal((flattened as Record<string, string>).foo, 'bar')
     t.equal(flattened['nested.nested2.nested3.bar'], 'baz')
   })
+})
+
+t.test('setUnion', async t => {
+  const set1 = new Set([1, 2, 3])
+  const set2 = new Set([2, 3, 4])
+
+  t.strictSame(setUnion(undefined, set2), set2)
+  t.strictSame(setUnion(set1, set2), new Set([1, 2, 3, 4]))
+  t.strictSame(setUnion(set2, set1), new Set([1, 2, 3, 4]))
+})
+
+t.test('setIntersection', async t => {
+  const set1 = new Set([1, 2, 3])
+  const set2 = new Set([2, 3, 4])
+  const set3 = new Set([2, 3, 5])
+
+  // empty set
+  t.strictSame(setIntersection(), new Set())
+
+  // single set
+  t.strictSame(setIntersection(set1), set1)
+
+  // two sets
+  t.strictSame(setIntersection(set1, set2), new Set([2, 3]))
+  t.strictSame(setIntersection(set2, set1), new Set([2, 3]))
+
+  // three sets
+  t.strictSame(setIntersection(set1, set2, set3), new Set([2, 3]))
+  t.strictSame(setIntersection(set1, set3, set2), new Set([2, 3]))
+  t.strictSame(setIntersection(set2, set1, set3), new Set([2, 3]))
+  t.strictSame(setIntersection(set2, set3, set1), new Set([2, 3]))
+  t.strictSame(setIntersection(set3, set1, set2), new Set([2, 3]))
+  t.strictSame(setIntersection(set3, set2, set1), new Set([2, 3]))
 })

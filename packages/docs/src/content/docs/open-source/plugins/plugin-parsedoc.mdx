@@ -22,7 +22,7 @@ The plugin exports `defaultHtmlSchema` which will be the schema used in the inde
 import { create, insert } from "@orama/orama";
 import { populateFromGlob, defaultHtmlSchema } from "@orama/plugin-parsedoc";
 
-const db = await create({
+const db = create({
   schema: defaultHtmlSchema,
 });
 

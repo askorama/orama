@@ -2,9 +2,9 @@ import t from 'tap'
 import { stopwords as englishStopwords } from '@orama/stopwords/english'
 import { create, getByID, insert, insertMultiple, search } from '../src/index.js'
 
-t.test('search method', (t) => {
+t.test('search method', async (t) => {
   t.test('with term', async (t) => {
-    const [db, id1, id2, id3, id4] = await createSimpleDB()
+    const [db, id1, id2, id3, id4] = createSimpleDB()
 
     t.test('should return all the document on empty string', async (t) => {
       const result = await search(db, {
@@ -16,7 +16,7 @@ t.test('search method', (t) => {
       t.ok(result.elapsed.formatted)
 
       for (const id of [id1, id2, id3, id4]) {
-        const doc = await getByID(db, id)
+        const doc = getByID(db, id as string)
         t.strictSame(
           result.hits.find((d) => d.id === id),
           {
@@ -34,7 +34,7 @@ t.test('search method', (t) => {
       const result = await search(db, {})
 
       for (const id of [id1, id2, id3, id4]) {
-        const doc = await getByID(db, id)
+        const doc = getByID(db, id as string)
         t.strictSame(
           result.hits.find((d) => d.id === id),
           {
@@ -55,7 +55,6 @@ t.test('search method', (t) => {
 
       const result = await search(db, {
         term: 'coffee',
-        threshold: 1
       })
 
       const matchedIds = result.hits.map((d) => d.id)
@@ -66,9 +65,7 @@ t.test('search method', (t) => {
     })
 
     t.test('should filter the result based on "term" value # 2', async (t) => {
-      t.plan(8)
-
-      const db = await create({
+      const db = create({
         schema: {
           quote: 'string',
           author: 'string'
@@ -108,30 +105,28 @@ t.test('search method', (t) => {
       t.equal(result6.count, 4)
 
       // Long string search (Tests for https://github.com/askorama/orama/issues/159 )
-      const result7 = await search(db, { term: 'They are the best', threshold: 1 })
-      const result8 = await search(db, { term: 'Foxes are nice animals', threshold: 1 })
+      const result7 = await search(db, { term: 'They are the best'})
+      const result8 = await search(db, { term: 'Foxes are nice animals'})
 
       t.equal(result7.count, 2)
       t.equal(result8.count, 2)
     })
 
     t.test('should apply term only on indexed fields', async (t) => {
-      t.plan(2)
-
-      const db = await create({
+      const db = create({
         schema: {
           quote: 'string',
           author: 'string'
         } as const
       })
 
-      await insert(db, {
+      insert(db, {
         quote: 'I like dogs. They are the best.',
         author: 'Jane Doe',
         nested: { unindexedNestedField: 'unindexedNestedValue' }
       })
 
-      await insert(db, {
+      insert(db, {
         quote: 'I like cats. They are the best.',
         author: 'Jane Doe',
         unindexedField: 'unindexedValue'
@@ -145,11 +140,9 @@ t.test('search method', (t) => {
     })
 
     t.test('should throw an error when searching in non-existing indices', async (t) => {
-      t.plan(1)
+      const db = create({ schema: { foo: 'string', baz: 'string' } as const })
 
-      const db = await create({ schema: { foo: 'string', baz: 'string' } })
-
-      await t.rejects(
+      t.throws(
         () =>
           search(db, {
             term: 'foo',
@@ -162,7 +155,7 @@ t.test('search method', (t) => {
     })
 
     t.test('should return empty array if term is removed by tokenizer', async (t) => {
-      const [db] = await createSimpleDB()
+      const [db] = createSimpleDB()
 
       await insert(db, {
         name: 'Allowed',
@@ -184,11 +177,9 @@ t.test('search method', (t) => {
     t.end()
   })
 
-  t.test('with exact', (t) => {
+  t.test('with exact', async (t) => {
     t.test('should exact match', async (t) => {
-      t.plan(4)
-
-      const db = await create({
+      const db = create({
         schema: {
           author: 'string',
           quote: 'string'
@@ -223,11 +214,9 @@ t.test('search method', (t) => {
     t.end()
   })
 
-  t.test('with tollerate', (t) => {
+  t.test('with tollerate', async (t) => {
     t.test("shouldn't tolerate typos if set to 0", async (t) => {
-      t.plan(1)
-
-      const db = await create({
+      const db = create({
         schema: {
           quote: 'string',
           author: 'string'
@@ -249,9 +238,7 @@ t.test('search method', (t) => {
     })
 
     t.test('should tolerate typos', async (t) => {
-      t.plan(4)
-
-      const db = await create({
+      const db = create({
         schema: {
           quote: 'string',
           author: 'string'
@@ -287,7 +274,7 @@ t.test('search method', (t) => {
     })
 
     t.test('should correctly match with tolerance. even if prefix doesnt match.', async (t) => {
-      const db = await create({
+      const db = create({
         schema: {
           name: 'string'
         } as const,
@@ -326,7 +313,7 @@ t.test('search method', (t) => {
     //bug both words apple and apply arent matching even after PR#580
     t.test('match exact prefix , along with tolerance', async (t) => {
       // Creating the database
-      const db = await create({
+      const db = create({
         schema: {
           word: 'string'
         } as const,
@@ -355,9 +342,9 @@ t.test('search method', (t) => {
     t.end()
   })
 
-  t.test('with pagination', (t) => {
+  t.test('with pagination', async (t) => {
     t.test('should correctly paginate results', async (t) => {
-      const db = await create({
+      const db = create({
         schema: {
           animal: 'string'
         } as const
@@ -396,10 +383,7 @@ t.test('search method', (t) => {
     t.end()
   })
 
-  t.test('should correctly search without term', async (t) => {
-    t.plan(4)
-
-    const db = await create({
+  t.test('should correctly search without term', async (t) => {    const db = create({
       schema: {
         quote: 'string',
         author: 'string'
@@ -438,10 +422,7 @@ t.test('search method', (t) => {
     )
   })
 
-  t.test('should correctly search for data returning doc including with unindexed keys', async (t) => {
-    t.plan(4)
-
-    const db = await create({
+  t.test('should correctly search for data returning doc including with unindexed keys', async (t) => {    const db = create({
       schema: {
         quote: 'string',
         author: 'string'
@@ -474,12 +455,9 @@ t.test('search method', (t) => {
     t.same(result2.hits[0].document, documentWithNestedUnindexedField)
   })
 
-  t.test('should throw an error when searching in non-existing indices', async (t) => {
-    t.plan(1)
+  t.test('should throw an error when searching in non-existing indices', async (t) => {    const db = create({ schema: { foo: 'string', baz: 'string' } })
 
-    const db = await create({ schema: { foo: 'string', baz: 'string' } })
-
-    await t.rejects(
+    t.throws(
       () =>
         search(db, {
           term: 'foo',
@@ -491,10 +469,7 @@ t.test('search method', (t) => {
     )
   })
 
-  t.test('should support nested properties', async (t) => {
-    t.plan(4)
-
-    const db = await create({
+  t.test('should support nested properties', async (t) => {    const db = create({
       schema: {
         quote: 'string',
         author: {
@@ -546,10 +521,7 @@ t.test('search method', (t) => {
     t.equal(resultAuthorName.count, 0)
   })
 
-  t.test('should support multiple nested properties', async (t) => {
-    t.plan(3)
-
-    const db = await create({
+  t.test('should support multiple nested properties', async (t) => {    const db = create({
       schema: {
         quote: 'string',
         author: {
@@ -616,10 +588,10 @@ t.test('search method', (t) => {
     t.equal(resultQuotes.count, 3)
   })
 
-  t.test('with afterSearchHook', (t) => {
+  t.test('with afterSearchHook', async (t) => {
     t.test('should run afterSearch hook', async (t) => {
       let called = 0
-      const db = await create({
+      const db = create({
         schema: {
           animal: 'string'
         } as const,
@@ -652,7 +624,7 @@ t.test('search method', (t) => {
   })
 
   t.test('should return all the documents that contains the property on empty search', async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         animal: 'string'
       } as const
@@ -662,7 +634,6 @@ t.test('search method', (t) => {
 
     const result = await search(db, {
       term: '',
-      threshold: 1,
       properties: ['animal']
     })
 
@@ -671,10 +642,7 @@ t.test('search method', (t) => {
     t.end()
   })
 
-  t.test('with geosearch', async (t) => {
-    t.plan(4)
-
-    const db = await create({
+  t.test('with geosearch', async (t) => {    const db = create({
       schema: {
         id: 'string',
         name: 'string',
@@ -724,12 +692,9 @@ t.test('search method', (t) => {
     t.strictSame(r2.hits.map((h) => h.id).sort(), ['1', '2'])
   })
 
-  t.test('with custom tokenizer', async (t) => {
-    t.plan(4)
+  t.test('with custom tokenizer', async (t) => {    const normalizationCache = new Map([['english:foo:dogs', 'Dogs']])
 
-    const normalizationCache = new Map([['english:foo:dogs', 'Dogs']])
-
-    const db = await create({
+    const db = create({
       schema: {
         quote: 'string',
         author: 'string'
@@ -766,7 +731,7 @@ t.test('search method', (t) => {
 })
 
 t.test('fix-544', async (t) => {
-  const db = await create({
+  const db = create({
     schema: {
       name: 'string'
     } as const,
@@ -794,7 +759,7 @@ t.test('fix-544', async (t) => {
 })
 
 t.test('fix-601', async (t) => {
-  const db = await create({
+  const db = create({
     schema: {
       name: 'string'
     } as const
@@ -811,7 +776,7 @@ t.test('fix-601', async (t) => {
 
 t.test('full-text search with vector properties', async (t) => {
   t.test("shouldn't return vectors unless explicitly specified", async (t) => {
-    const db = await create({
+    const db = create({
       schema: {
         text: 'string',
         embeddings: {
@@ -848,9 +813,9 @@ t.test('full-text search with vector properties', async (t) => {
   })
 })
 
-async function createSimpleDB() {
+function createSimpleDB() {
   let i = 0
-  const db = await create({
+  const db = create({
     schema: {
       name: 'string',
       rating: 'number',
@@ -869,7 +834,7 @@ async function createSimpleDB() {
     }
   })
 
-  const id1 = await insert(db, {
+  const id1 = insert(db, {
     name: 'super coffee maker',
     rating: 5,
     price: 900,
@@ -878,7 +843,7 @@ async function createSimpleDB() {
     }
   })
 
-  const id2 = await insert(db, {
+  const id2 = insert(db, {
     name: 'washing machine',
     rating: 5,
     price: 900,
@@ -887,7 +852,7 @@ async function createSimpleDB() {
     }
   })
 
-  const id3 = await insert(db, {
+  const id3 = insert(db, {
     name: 'coffee maker',
     rating: 3,
     price: 30,
@@ -896,7 +861,7 @@ async function createSimpleDB() {
     }
   })
 
-  const id4 = await insert(db, {
+  const id4 = insert(db, {
     name: 'coffee maker deluxe',
     rating: 5,
     price: 45,

@@ -6,7 +6,7 @@ description: Learn how to sort the search results in Orama.
 To sort, Orama uses the properties defined in the `schema` to know on which properties you want to sort.
 
 ```javascript copy
-const db = await create({
+const db = create({
   schema: {
     title: "string",
     year: "number",
@@ -18,7 +18,7 @@ const db = await create({
     },
   },
 });
-const results = await search(db, {
+const results = search(db, {
   term: "prestige",
   sortBy: {
     property: "title", // or 'year', 'inPromotion'
@@ -31,7 +31,7 @@ Orama supports sorting on 'string', 'number' and 'boolean'. The arrays are not s
 You can also specify nested properties using the '.' notation: `'meta.tag'`, `'meta.rating'` and `'meta.favorite'`. For example:
 
 ```javascript
-const results = await search(db, {
+const results = search(db, {
   term: "prestige",
   sortBy: {
     property: "meta.rating",
@@ -44,7 +44,7 @@ const results = await search(db, {
 Orama supports the reverse order specifying the key `order`:
 
 ```javascript
-const db = await create({
+const db = create({
   schema: {
     title: "string",
     year: "number",
@@ -56,7 +56,7 @@ const db = await create({
     },
   },
 });
-const results = await search(db, {
+const results = search(db, {
   term: "prestige",
   sortBy: {
     property: "title", // or 'year', 'inPromotion'
@@ -72,7 +72,7 @@ This creates an in-memory sort index for each properties.
 If you want to optimize the memory usage, Orama supports the `unsortableProperties` list.
 
 ```javascript
-const db = await create({
+const db = create({
   schema: {
     title: "string",
     year: "number",
@@ -94,7 +94,7 @@ const db = await create({
 Orama allows you to specify the sort algorithm in the following way:
 
 ```javascript
-const db = await create({
+const db = create({
   schema: {
     title: "string",
     year: "number",
@@ -123,7 +123,7 @@ The function accepts 2 parameter with the following format `[string, number, Doc
 You can disable the sort functionality using the following snippet:
 
 ```javascript
-const db = await create({
+const db = create({
   schema: {
     // The schema
   },
