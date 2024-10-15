@@ -13,7 +13,7 @@ You can edit the BM25 parameters by using the `relevance` property in the `searc
 configuration object.
 
 ```javascript copy
-const searchResult = await search(movieDB, {
+const searchResult = search(movieDB, {
   term: "Chris",
   properties: ["director"],
   relevance: {

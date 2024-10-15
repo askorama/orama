@@ -19,7 +19,7 @@ Then, add it to your Orama configuration:
 import { Orama } from '@orama/core';
 import { pluginAnalytics } from '@orama/plugin-analytics';
 
-const db = await create({
+const db = create({
   schema: { name: 'string' } as const,
   plugins: [
     pluginAnalytics({
@@ -29,14 +29,14 @@ const db = await create({
   ]
 })
 
-await insertMultiple(db, [
+insertMultiple(db, [
   { name: 'foo' },
   { name: 'bar' },
   { name: 'baz' },
 ])
 
 // Collects anonymous analytics data and sends it to Orama Cloud
-await search(db, { term: 'foo' })
+search(db, { term: 'foo' })
 ```
 
 ## Disabling Analytics
@@ -49,7 +49,7 @@ Anyway, you can disable it by passing `enabled: false` to the `pluginAnalytics` 
 import { Orama } from '@orama/core';
 import { pluginAnalytics } from '@orama/plugin-analytics';
 
-const db = await create({
+const db = create({
   schema: { name: 'string' } as const,
   plugins: [
     pluginAnalytics({

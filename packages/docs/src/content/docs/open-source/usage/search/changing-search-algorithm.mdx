@@ -15,7 +15,7 @@ import { create } from '@orama/orama'
 import { pluginQPS } from '@orama/plugin-qps'
 import { pluginPT15 } from '@orama/plugin-pt15'
 
-const db = await create({
+const db = create({
   schema: {
     title: 'string',
     description: 'string',

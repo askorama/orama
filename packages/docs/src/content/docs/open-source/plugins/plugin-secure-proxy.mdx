@@ -33,7 +33,7 @@ const secureProxy = secureProxyPlugin({
   model: "openai/text-embedding-ada-002",
 });
 
-const db = await create({
+const db = create({
   schema: {
     title: "string",
     description: "string",
@@ -65,12 +65,12 @@ This will finally allow you to perform hybrid and vector search with the exact s
 ```js
 import { search } from '@orama/orama'
 
-const resultsHybrid = await search(db, {
+const resultsHybrid = search(db, {
   mode: 'hybrid',
   term: 'Videogame for little kids with a passion about ice cream'
 })
 
-const resultsVector = await search(db, {
+const resultsVector = search(db, {
   mode: 'vector',
   term: 'Videogame for little kids with a passion about ice cream'
 })
@@ -81,7 +81,7 @@ const resultsVector = await search(db, {
 If you have a more complex schema with multiple vector properties, you can always override the vector property to perform search on by using the default `vector` property:
 
 ```js
-const resultsVector = await search(db, {
+const resultsVector = search(db, {
   mode: 'vector',
   term: 'Videogame for little kids with a passion about ice cream'
   vector: {

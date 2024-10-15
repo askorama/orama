@@ -7,7 +7,7 @@ Orama supports `groupBy` operations.
 That allows you to group results in groups calculating an aggregation on the item that belongs to the same bucket.
 
 ```javascript
-const results = await search(db, {
+const results = search(db, {
   term: "t-shirt",
   groupBy: {
     properties: ["design"], // required: property on which we want to group on
@@ -30,7 +30,7 @@ By default, Orama groups all the matched documents into an array.
 If we consider the following schema:
 
 ```javascript copy+
-const db = await create({
+const db = create({
   schema: {
     id: "string",
     type: "string",
@@ -40,7 +40,7 @@ const db = await create({
     isPromoted: "boolean",
   },
 });
-const ids = await insertMultiple(db, [
+const ids = insertMultiple(db, [
   {
     id: "0",
     type: "t-shirt",
@@ -119,7 +119,7 @@ const ids = await insertMultiple(db, [
 We will be able to have the documents per `design` ordered by `rank`:
 
 ```javascript copy
-const results = await search(db, {
+const results = search(db, {
   term: "t-shirt",
   groupBy: {
     properties: ["design"], // property on which we want to group on
@@ -134,7 +134,7 @@ const results = await search(db, {
 If you want only the top-ranked document per `design`, you can specify the `maxResult`:
 
 ```javascript
-const results = await search(db, {
+const results = search(db, {
   term: "t-shirt",
   groupBy: {
     properties: ["design"],
@@ -180,7 +180,7 @@ The above query returns something like this:
 You can group on multiple properties as follows:
 
 ```javascript
-const results = await search(db, {
+const results = search(db, {
   term: "red t-shirt",
   groupBy: {
     properties: ["design", "rank", "isPromoted"], // group on the combination of the values
@@ -214,7 +214,7 @@ interface AggregationValue {
   isPromoted: boolean;
 }
 
-const results = await search(db, {
+const results = search(db, {
   term: "red t-shirt",
   groupBy: {
     properties: ["type", "design"], // group on both properties

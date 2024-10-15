@@ -12,7 +12,7 @@ Given the following Orama schema:
 ```js
 import { create } from "@orama/orama";
 
-const db = await create({
+const db = create({
   schema: {
     title: "string",
     description: "string",
@@ -30,7 +30,7 @@ Orama will be able to generate facets at search-time based on the schema.
 To do so, we need to specify the `facets` property in the `search` configuration:
 
 ```js
-const results = await search(db, {
+const results = search(db, {
   term: "Movie about cars and racing",
   properties: ["description"],
   facets: {
@@ -201,16 +201,16 @@ In the search result, `enum` facets will be returned as an `object` with the fol
 Orama treats each array element as a single element of the facet:
 
 ```javascript copy
-const db = await create({
+const db = create({
   schema: {
     name: "string[]",
   },
 });
-await insert(db, {
+insert(db, {
   name: ["Albus", "Percival Wulfric Brian"],
 });
 
-const results = await search(db, {
+const results = search(db, {
   facets: {
     name: {},
   },

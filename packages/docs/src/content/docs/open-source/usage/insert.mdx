@@ -12,7 +12,7 @@ Let's say our database and schema look like this:
 ```javascript copy
 import { create, insert } from "@orama/orama";
 
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -30,7 +30,7 @@ const movieDB = await create({
 Data insertion in Orama is quick and intuitive:
 
 ```javascript copy
-const thePrestigeId = await insert(movieDB, {
+const thePrestigeId = insert(movieDB, {
   title: "The prestige",
   director: "Christopher Nolan",
   plot: "Two friends and fellow magicians become bitter enemies after a sudden tragedy. As they devote themselves to this rivalry, they make sacrifices that bring them fame but with terrible consequences.",
@@ -38,7 +38,7 @@ const thePrestigeId = await insert(movieDB, {
   isFavorite: true,
 });
 
-const bigFishId = await insert(movieDB, {
+const bigFishId = insert(movieDB, {
   title: "Big Fish",
   director: "Tim Burton",
   plot: "Will Bloom returns home to care for his dying father, who had a penchant for telling unbelievable stories. After he passes away, Will tries to find out if his tales were really true.",
@@ -46,7 +46,7 @@ const bigFishId = await insert(movieDB, {
   isFavorite: true,
 });
 
-const harryPotterId = await insert(movieDB, {
+const harryPotterId = insert(movieDB, {
   title: "Harry Potter and the Philosopher's Stone",
   director: "Chris Columbus",
   plot: "Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.",
@@ -82,7 +82,7 @@ const docs = [
   },
 ];
 
-await insertMultiple(movieDB, docs);
+insertMultiple(movieDB, docs);
 ```
 
 Inserting a large number of documents in a loop could potentially block the event loop.
@@ -94,7 +94,7 @@ the event loop. The `batchSize` refers to the maximum number of `insert`
 operations to perform before yielding the event loop.
 
 ```javascript
-await insertMultiple(movieDB, docs, 500);
+insertMultiple(movieDB, docs, 500);
 ```
 
 ## Validation rules
@@ -110,14 +110,14 @@ So the following document will be accepted:
 ```javascript copy
 import { create, insert } from "@orama/orama";
 
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     year: "number",
   },
 });
 
-await insert(movieDB, {
+insert(movieDB, {
   title: "The prestige",
   // `year` field is missing but it's ok
   // year: 2006,
@@ -136,7 +136,7 @@ That means that given the following document and schema:
 ```js
 import { create, search } from "@orama/orama";
 
-const db = await create({
+const db = create({
   schema: {
     id: "string",
     author: "string",
@@ -144,7 +144,7 @@ const db = await create({
   },
 });
 
-await insert(db, {
+insert(db, {
   id: "73cbcc79-2203-49b8-bb52-60d8e9a66c5f",
   author: "Fernando Pessoa",
   quote: "I wasn't meant for reality, but life came and found me",
@@ -194,7 +194,7 @@ async function listDocuments() {
   return allFiles.filter((id) => id.endsWith(".json"));
 }
 
-const database = await create({
+const database = create({
   schema: {
     title: "string",
     director: "string",

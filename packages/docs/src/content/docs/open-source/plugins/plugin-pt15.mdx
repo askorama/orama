@@ -30,7 +30,7 @@ This plugin will replace the default scoring algorithm (BM25) with the PT15 algo
 import { create } from '@orama/orama'
 import { pluginPT15 } from '@orama/plugin-pt15'
 
-const db = await create({
+const db = create({
   schema: {
     title: 'string',
     description: 'string',

@@ -24,7 +24,7 @@ For instance, this code:
 ```javascript
 import { create, insert, search } from "@orama/orama";
 
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -39,7 +39,7 @@ const movieDB = await create({
   },
 });
 
-await insert(movieDB, {
+insert(movieDB, {
   title: "Harry Potter and the Philosopher's Stone",
   director: "Chris Columbus",
   plot: "Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.",
@@ -47,7 +47,7 @@ await insert(movieDB, {
   isFavorite: false,
 });
 
-const results = await search(movieDB, { term: "Harry" });
+const results = search(movieDB, { term: "Harry" });
 console.log(results.count);
 ```
 
@@ -89,7 +89,7 @@ For instance, with the following configuration only the first character of each 
 ```javascript
 import { create } from "@orama/orama";
 
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -112,7 +112,7 @@ The Orama's default tokenizer is exported via `@orama/orama/components` and can 
 import { create } from "@orama/orama";
 import { tokenizer as defaultTokenizer } from "@orama/orama/components";
 
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -131,7 +131,7 @@ Optionally you can pass the customization options without using `createTokenizer
 ```javascript
 import { create } from "@orama/orama";
 
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -219,7 +219,7 @@ import { create } from "@orama/orama";
 import { index as defaultIndex } from "@orama/orama/components";
 
 const index = await defaultIndex.createIndex();
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -275,7 +275,7 @@ import { create } from "@orama/orama";
 import { documentsStore as defaultDocumentsStore } from "@orama/orama/components";
 
 const store = await defaultDocumentsStore.createDocumentsStore();
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -328,7 +328,7 @@ import { create } from "@orama/orama";
 import { sorter as defaultSorter } from "@orama/orama/components.js";
 
 const s = await defaultSort.createSorter();
-const db = await create({
+const db = create({
   schema: {
     number: "number",
   },
@@ -364,7 +364,7 @@ The function will receive two arguments:
 ```javascript
 import { create, insert } from "@orama/orama";
 
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -377,7 +377,7 @@ const movieDB = await create({
 });
 
 // This will throw
-await insert(movieDB, {
+insert(movieDB, {
   title: "Harry Potter and the Philosopher's Stone",
   director: 42,
 });
@@ -394,7 +394,7 @@ The function will receive one argument:
 ```javascript
 import { create, insert } from "@orama/orama";
 
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -410,7 +410,7 @@ const movieDB = await create({
 });
 
 // This will print something like "1679476550629"
-await insert(movieDB, {
+insert(movieDB, {
   title: "Harry Potter and the Philosopher's Stone",
   director: "Chris Columbus",
 });
@@ -431,7 +431,7 @@ The function must return an object where the keys are the paths received as argu
 import { create } from "@orama/orama";
 import { get } from "lodash/get";
 
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -457,7 +457,7 @@ The function receives a single argument: the search elapsed time as BigInt.
 ```javascript
 import { create, insert, search } from "@orama/orama";
 
-const movieDB = await create({
+const movieDB = create({
   schema: {
     title: "string",
     director: "string",
@@ -472,7 +472,7 @@ const movieDB = await create({
   },
 });
 
-await insert(movieDB, {
+insert(movieDB, {
   title: "Harry Potter and the Philosopher's Stone",
   director: "Chris Columbus",
   plot: "Harry Potter, an eleven-year-old orphan, discovers that he is a wizard and is invited to study at Hogwarts. Even as he escapes a dreary life and enters a world of magic, he finds trouble awaiting him.",
@@ -480,7 +480,7 @@ await insert(movieDB, {
   isFavorite: false,
 });
 
-const results = await search(movieDB, { term: "Harry" });
+const results = search(movieDB, { term: "Harry" });
 
 // This will print something like: 100 - custom
 console.log(results.elapsed);
@@ -604,7 +604,7 @@ export async function create({ schema, language, components }: CreateArguments):
     data: {},
     caches: {},
     // ...
-+   shiningDetector: components.shiningDetector ?? await createShiningDetector()
++   shiningDetector: components.shiningDetector ?? createShiningDetector()
   } as Orama
 
   orama.data = {

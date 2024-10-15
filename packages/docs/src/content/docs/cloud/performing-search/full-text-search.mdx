@@ -952,7 +952,7 @@ To filter by bounding polygon, we use the `polygon` property. Let's see how it w
 <Tabs syncKey="sdk">
   <TabItem label="JavaScript" icon="seti:javascript">
     ```javascript copy
-    const searchResult = await search(db, {
+    const searchResult = search(db, {
       term: 'Duomo',
       where: {
         location: {            // The property we want to filter by

@@ -55,8 +55,8 @@ const orama = create({
   plugins: [loggerPlugin()],
 });
 
-await insert(orama, { name: "John" });
-await search(orama, { term: "John" });
+insert(orama, { name: "John" });
+search(orama, { term: "John" });
 
 // Console logs: "About to search for john on Orama instance my-instance"
 ```
@@ -366,7 +366,7 @@ For instance, if you had a `beforeInsert` hook, you can migrate it to a plugin l
 ```diff
 import { create } from '@orama/orama'
 
-const db = await create({
+const db = create({
   schema: {
     name: 'string'
   },

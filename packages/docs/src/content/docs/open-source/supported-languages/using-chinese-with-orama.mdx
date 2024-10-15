@@ -21,29 +21,29 @@ import { create, insert, search } from "@orama/orama";
 import { createTokenizer } from '@orama/tokenizers/mandarin'
 import { stopwords as mandarinStopwords } from "@orama/stopwords/mandarin";
 
-const db = await create({
+const db = create({
   schema: {
     name: "string",
   },
   components: {
-    tokenizer: await createTokenizer({
+    tokenizer: createTokenizer({
       stopWords: mandarinStopwords,
     }),
   },
 });
 
-await insert(db, { name: "北京" }); // Beijing
-await insert(db, { name: "上海" }); // Shanghai
-await insert(db, { name: "广州" }); // Guangzhou
-await insert(db, { name: "深圳" }); // Shenzhen
-await insert(db, { name: "成都" }); // Chengdu
-await insert(db, { name: "杭州" }); // Hangzhou
-await insert(db, { name: "南京" }); // Nanjing
-await insert(db, { name: "北京大学" }); // Peking University
-await insert(db, { name: "上海交通大学" }); // Shanghai Jiao Tong University
-await insert(db, { name: "广州中医药大学" }); // Guangzhou University of Chinese Medicine
+insert(db, { name: "北京" }); // Beijing
+insert(db, { name: "上海" }); // Shanghai
+insert(db, { name: "广州" }); // Guangzhou
+insert(db, { name: "深圳" }); // Shenzhen
+insert(db, { name: "成都" }); // Chengdu
+insert(db, { name: "杭州" }); // Hangzhou
+insert(db, { name: "南京" }); // Nanjing
+insert(db, { name: "北京大学" }); // Peking University
+insert(db, { name: "上海交通大学" }); // Shanghai Jiao Tong University
+insert(db, { name: "广州中医药大学" }); // Guangzhou University of Chinese Medicine
 
-const results = await search(db, {
+const results = search(db, {
   term: "广州",
   threshold: 0,
 });

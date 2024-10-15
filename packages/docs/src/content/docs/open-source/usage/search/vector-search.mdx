@@ -36,14 +36,14 @@ Let's see a full example of how to perform vector search:
 ```js copy
 import { create, insertMultiple, search } from "@orama/orama";
 
-const db = await create({
+const db = create({
   schema: {
     title: "string", // To make it simple, let's pretend that
     embedding: "vector[5]", // we are using a 5-dimensional vector.
   },
 });
 
-await insertMultiple(db, [
+insertMultiple(db, [
   {
     title: "The Prestige",
     embedding: [0.938293, 0.284951, 0.348264, 0.948276, 0.56472],
@@ -58,7 +58,7 @@ await insertMultiple(db, [
   },
 ]);
 
-const results = await search(db, {
+const results = search(db, {
   mode: "vector",
   vector: {
     value: [0.938292, 0.284961, 0.248264, 0.748276, 0.26472],
@@ -75,7 +75,7 @@ const results = await search(db, {
 When running vector search using the secure proxy, you won't need to explicitly pass the `vector` configuration. Just run a simple search query!
 
 ```js
-const results = await search(db, {
+const results = search(db, {
   mode: "vector",
   term: "Videogame for little kids with a passion about ice cream",
 });

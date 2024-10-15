@@ -28,7 +28,7 @@ import {
 } from "@orama/plugin-match-highlight";
 
 // Create a new Orama instance
-const db = await create({
+const db = create({
   schema: {
     text: "string",
   },
@@ -42,10 +42,10 @@ const db = await create({
 });
 
 // Insert a document
-await insert(db, { text: "hello world" });
+insert(db, { text: "hello world" });
 
 // Use the plugin's searchWithHighlight function to query the database
-const results = await searchWithHighlight(db, { term: "hello" });
+const results = searchWithHighlight(db, { term: "hello" });
 ```
 
 This will add the `positions` property to each `hit`:
@@ -87,7 +87,7 @@ import {
   loadWithHighlight,
 } from "@orama/plugin-match-highlight";
 
-const db = await create({
+const db = create({
   schema: {
     text: "string",
   },
@@ -100,7 +100,7 @@ const db = await create({
   ],
 });
 
-await insert(db, { text: "hello world" });
+insert(db, { text: "hello world" });
 
 const savedDB = await saveWithHighlight(db);
 

@@ -23,11 +23,11 @@ const movieSchema = {
   stars: "enum",
 } as const; // <-- this is important
 
-const movieDB: Orama<typeof movieSchema> = await create({
+const movieDB: Orama<typeof movieSchema> = create({
   schema: movieSchema,
 });
 
-const idP: string = await insert(movieDB, {
+const idP: string = insert(movieDB, {
   title: "The Godfather",
   year: 1972,
   actors: ["Marlon Brando", "Al Pacino"],
@@ -37,7 +37,7 @@ const idP: string = await insert(movieDB, {
 const searchParams: SearchParams<Orama<typeof movieSchema>> = {
   term: "godfather",
 };
-const result: Results<MovieDocument> = await search(movieDB, searchParams);
+const result: Results<MovieDocument> = search(movieDB, searchParams);
 const title = result.hits[0].document.title; // well typed!
 ```
 
@@ -51,7 +51,7 @@ The following example shows how to enrich the type of the documents.
 const movieSchema = {
   title: "string",
 } as const;
-const db = await create({ schema: movieSchema });
+const db = create({ schema: movieSchema });
 
 interface Movie {
   title: string;
@@ -59,7 +59,7 @@ interface Movie {
 }
 
 //             this is important ---v
-const r = await search<typeof db, Movie>(db, { term: "" });
+const r = search<typeof db, Movie>(db, { term: "" });
 const title = r.hits[0].document.title; // well typed!
 const year = r.hits[0].document.year; // well typed!
 ```

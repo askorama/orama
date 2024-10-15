@@ -26,24 +26,24 @@ browsers and JavaScript engines:
 ```javascript copy
 import { create, insert } from "@orama/orama";
 
-const originalInstance = await create({
+const originalInstance = create({
   schema: {
     author: "string",
     quote: "string",
   },
 });
 
-await insert(originalInstance, {
+insert(originalInstance, {
   quote: "He who is brave is free",
   author: "Seneca",
 });
 
-await insert(originalInstance, {
+insert(originalInstance, {
   quote: "Make each day your masterpiece",
   author: "John Wooden",
 });
 
-await insert(originalInstance, {
+insert(originalInstance, {
   quote: "You must be the change you wish to see in the world",
   author: "Mahatma Gandhi",
 });
@@ -70,7 +70,7 @@ import { restore } from "@orama/plugin-data-persistence";
 
 const newInstance = await restore("json", JSONIndex);
 
-await search(newInstance, {
+search(newInstance, {
   term: "...",
 });
 ```

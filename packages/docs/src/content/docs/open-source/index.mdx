@@ -59,7 +59,7 @@ Or import it directly in a browser module:
 ```ts copy
 import { create, search, insert } from "@orama/orama";
 
-const db = await create({
+const db = create({
   schema: {
     name: "string",
     description: "string",
@@ -70,7 +70,7 @@ const db = await create({
   },
 });
 
-await insert(db, {
+insert(db, {
   name: "Wireless Headphones",
   description:
     "Experience immersive sound quality with these noise-cancelling wireless headphones.",
@@ -80,7 +80,7 @@ await insert(db, {
   },
 });
 
-const searchResult = await search(db, {
+const searchResult = search(db, {
   term: "headphones",
 });
 
