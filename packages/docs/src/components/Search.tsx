@@ -47,8 +47,6 @@ export function Search() {
   const [theme, setTheme] = useState(document.documentElement.dataset.theme || 'dark')
   const [currentCategory, setCurrentCategory] = useState(null)
   const [userId, setUserId] = useState(getOramaUserId())
-
-  // TODO: Remove when fully integrated
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
@@ -125,13 +123,14 @@ export function Search() {
           description: 'content'
         }}
         searchParams={{
-          // @ts-ignore
-          where: oramaWhere
+          where: oramaWhere as any
         }}
         facetProperty={facetProperty}
         colorScheme={theme === 'light' ? 'light' : 'dark'}
         open={isOpen}
         suggestions={suggestions}
+        searchPlaceholder={`Search ${currentCategory === 'Open Source' ? 'Open Source' : 'Orama Cloud'}`}
+        chatPlaceholder='Ask me anything about Orama'
       />
 
       <OramaSearchButton
@@ -142,7 +141,7 @@ export function Search() {
         }}
         style={{ width: '100%' }}
       >
-        Search {currentCategory === 'Open Source' && 'Open Source'}
+        Search
       </OramaSearchButton>
     </>
   )

@@ -31,6 +31,7 @@ type PluginOptions = {
   }
   cloud?: CloudConfig,
   searchbox?: { [key:string]: any }
+  searchButton?: { [key:string]: any }
 }
 
 export default function OramaPluginDocusaurus(
@@ -161,7 +162,8 @@ export default function OramaPluginDocusaurus(
           searchData: Object.fromEntries([['current', readFileSync(indexPath(ctx.generatedFilesDir, 'current'))]]),
           docsInstances,
           availableVersions: versions,
-          searchBoxCustomConfig: options.searchbox ?? {}
+          searchBoxCustomConfig: options.searchbox ?? {},
+          searchBtnConfig: options.searchButton ?? {}
         })
       } else {
         const deployConfig = options.cloud && {
@@ -182,6 +184,7 @@ export default function OramaPluginDocusaurus(
           availableVersions: versions,
           analytics: options.analytics,
           searchBoxCustomConfig: options.searchbox ?? {},
+          searchBtnConfig: options.searchButton ?? {},
           endpoint: {
             url: endpointConfig?.endpoint,
             key: endpointConfig?.public_api_key
