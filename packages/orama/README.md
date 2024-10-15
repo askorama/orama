@@ -1,33 +1,24 @@
 # Orama
 
-Full-text, vector, and hybrid search with a unique API. <br />
-On your browser, server, mobile app, or at the edge. <br />
-In less than 2kb.
+A complete RAG pipeline in your browser, server or edge network with support for full-text, vector, and hybrid search in less than 2kb.
 
 [![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
-![NPM Downloads](https://img.shields.io/npm/dm/%40orama%2Forama)
-![jsDelivr hits (npm)](https://img.shields.io/jsdelivr/npm/hm/%40orama%2Forama)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/%40orama%2Forama?label=Bundle%20Size&link=https%3A%2F%2Fbundlephobia.com%2Fpackage%2F%40orama%2Forama%40latest)
 
-# Join Orama's Slack channel
-
-If you need more info, help, or want to provide general feedback on Orama, join
-the
-[Orama Slack channel](https://orama.to/slack)
+If you need more info, help, or want to provide general feedback on Orama, join the [Orama Slack channel](https://orama.to/slack)
 
 # Highlighted features
 
-- [Vector Search](https://docs.askorama.ai/open-source/usage/search/vector-search)
-- [Hybrid Search](https://docs.askorama.ai/open-source/usage/search/hybrid-search)
-- [Search Filters](https://docs.askorama.ai/open-source/usage/search/filters)
-- [Geosearch](https://docs.askorama.ai/open-source/usage/search/geosearch)
-- [Facets](https://docs.askorama.ai/open-source/usage/search/facets)
-- [Fields Boosting](https://docs.askorama.ai/open-source/usage/search/fields-boosting)
-- [Typo Tolerance](https://docs.askorama.ai/open-source/usage/search/introduction#typo-tolerance)
-- [Exact Match](https://docs.askorama.ai/open-source/usage/search/introduction#exact-match)
-- [BM25](https://docs.askorama.ai/open-source/usage/search/bm25-algorithm)
-- [Stemming and tokenization in 30 languages](https://docs.askorama.ai/open-source/text-analysis/stemming)
-- [Plugin System](https://docs.askorama.ai/open-source/plugins/introduction)
+- [Vector Search](https://docs.orama.com/open-source/usage/search/vector-search)
+- [Hybrid Search](https://docs.orama.com/open-source/usage/search/hybrid-search)
+- [Search Filters](https://docs.orama.com/open-source/usage/search/filters)
+- [Geosearch](https://docs.orama.com/open-source/usage/search/geosearch)
+- [Facets](https://docs.orama.com/open-source/usage/search/facets)
+- [Fields Boosting](https://docs.orama.com/open-source/usage/search/fields-boosting)
+- [Typo Tolerance](https://docs.orama.com/open-source/usage/search/introduction#typo-tolerance)
+- [Exact Match](https://docs.orama.com/open-source/usage/search/introduction#exact-match)
+- [BM25](https://docs.orama.com/open-source/usage/search/bm25-algorithm)
+- [Stemming and tokenization in 30 languages](https://docs.orama.com/open-source/text-analysis/stemming)
+- [Plugin System](https://docs.orama.com/open-source/plugins/introduction)
 
 # Installation
 
@@ -43,9 +34,7 @@ Or import it directly in a browser module:
 <html>
   <body>
     <script type="module">
-      import { create, search, insert } from 'https://unpkg.com/@orama/orama@latest/dist/index.js'
-
-      // ...
+      import { create, insert, search } from 'https://cdn.jsdelivr.net/npm/@orama/orama@latest/+esm'
     </script>
   </body>
 </html>
@@ -57,7 +46,7 @@ With Deno, you can just use the same CDN URL or use npm specifiers:
 import { create, search, insert } from 'npm:@orama/orama'
 ```
 
-Read the complete documentation at [https://docs.askorama.ai](https://docs.askorama.ai).
+Read the complete documentation at [https://docs.orama.com](https://docs.orama.com).
 
 # Usage
 
@@ -78,11 +67,48 @@ const db = create({
     },
   },
 })
+
+insert(db, {
+  name: 'Noise cancelling headphones',
+  description: 'Best noise cancelling headphones on the market',
+  price: 99.99,
+  embedding: [0.2432, 0.9431, 0.5322, 0.4234, ...],
+  meta: {
+    rating: 4.5
+  }
+})
+
+const results = search(db, {
+  term: 'Best headphones'
+})
+
+// {
+//   elapsed: {
+//     raw: 21492,
+//     formatted: '21μs',
+//   },
+//   hits: [
+//     {
+//       id: '41013877-56',
+//       score: 0.925085832971998432,
+//       document: {
+//         name: 'Noise cancelling headphones',
+//         description: 'Best noise cancelling headphones on the market',
+//         price: 99.99,
+//         embedding: [0.2432, 0.9431, 0.5322, 0.4234, ...],
+//         meta: {
+//           rating: 4.5
+//         }
+//       }
+//     }
+//   ],
+//   count: 1
+// }
 ```
 
 Orama currently supports 10 different data types:
 
-| Type             | Description                                                                 | example                                                                     |
+| Type             | Description                                                               example                                                                     |
 | ---------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | `string`         | A string of characters.                                                     | `'Hello world'`                                                             |
 | `number`         | A numeric value, either float or integer.                                   | `42`                                                                        |
@@ -95,242 +121,21 @@ Orama currently supports 10 different data types:
 | `enum[]`         | An array of enums.                                                          | `['comedy', 'action', 'romance']`                                           |
 | `vector[<size>]` | A vector of numbers to perform vector search on.                            | `[0.403, 0.192, 0.830]`                                                     |
 
-
-Orama will only index properties specified in the schema but will allow you to set and store additional data if needed.
-
-Once the db instance is created, you can start adding some documents:
-
-```js
-insert(db, {
-  name: 'Wireless Headphones',
-  description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
-  price: 99.99,
-  embedding: [...],
-  meta: {
-    rating: 4.5,
-  },
-})
-
-insert(db, {
-  name: 'Smart LED Bulb',
-  description: 'Control the lighting in your home with this energy-efficient smart LED bulb, compatible with most smart home systems.',
-  price: 24.99,
-  embedding: [...],
-  meta: {
-    rating: 4.3,
-  },
-})
-
-insert(db, {
-  name: 'Portable Charger',
-  description: 'Never run out of power on-the-go with this compact and fast-charging portable charger for your devices.',
-  price: 29.99,
-  embedding: [...],
-  meta: {
-    rating: 3.6,
-  },
-})
-```
-
-After the data has been inserted, you can finally start to query the database.
-
-```js
-const searchResult = search(db, {
-  term: 'headphones',
-})
-```
-
-In the case above, you will be searching for all the documents containing the
-word `"headphones"`, looking up in every `string` property specified in the schema:
-
-```js
-{
-  elapsed: {
-    raw: 99512,
-    formatted: '99μs',
-  },
-  hits: [
-    {
-      id: '41013877-56',
-      score: 0.925085832971998432,
-      document: {
-        name: 'Wireless Headphones',
-        description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
-        price: 99.99,
-        meta: {
-          rating: 4.5
-        }
-      }
-    }
-  ],
-  count: 1
-}
-```
-
-You can also restrict the lookup to a specific property:
-
-```js
-const searchResult = search(db, {
-  term: 'immersive sound quality',
-  properties: ['description'],
-})
-```
-
-Result:
-
-```js
-{
-  elapsed: {
-    raw: 21492,
-    formatted: '21μs',
-  },
-  hits: [
-    {
-      id: '41013877-56',
-      score: 0.925085832971998432,
-      document: {
-        name: 'Wireless Headphones',
-        description: 'Experience immersive sound quality with these noise-cancelling wireless headphones.',
-        price: 99.99,
-        meta: {
-          rating: 4.5
-        }
-      }
-    }
-  ],
-  count: 1
-}
-```
-
-You can use non-string data to [filter](https://docs.askorama.ai/open-source/usage/search/filters), [group](https://docs.askorama.ai/open-source/usage/search/grouping), and create [facets](https://docs.askorama.ai/open-source/usage/search/facets):
-
-```js
-const searchResult = search(db, {
-  term: 'immersive sound quality',
-  where: {
-    price: {
-      lte: 199.99
-    },
-    rating: {
-      gt: 4
-    }
-  },
-})
-```
-
-# Performing hybrid and vector search
-
-Orama is a full-text and vector search engine. This allows you to adopt different kinds of search paradigms depending on your specific use case.
-
-To perform vector or hybrid search, you can use the same `search` method used for full-text search.
-
-You'll just have to specify which property you want to perform vector search on, and a vector to be used to perform vector similarity:
-
-```js
-const searchResult = search(db, {
-  mode: 'vector', // or 'hybrid'
-  vector: {
-    value: [...], // OpenAI embedding or similar vector to be used as an input
-    property: 'embedding' // Property to search through. Mandatory for vector search
-  }
-})
-```
-
-If you're using the [Orama Secure AI Proxy](https://askorama.ai/blog/announcing-the-orama-secure-ai-proxy) (highly recommended), you can skip the vector configuration at search time, since the official [Orama Secure AI Proxy plugin](https://www.npmjs.com/package/@orama/plugin-secure-proxy) will take care of it automatically for you:
-
-```js
-import { create } from '@orama/orama'
-import { pluginSecureProxy } from '@orama/plugin-secure-proxy'
-
-const secureProxy = await secureProxyPlugin({
-  apiKey: '<YOUR-PUBLIC-API-KEY>',
-  defaultProperty: 'embedding', // the default property to perform vector and hybrid search on
-  model: 'openai/text-embedding-ada-002' // the model to use to generate embeddings
-})
-
-const db = create({
-  schema: {
-    name: 'string',
-    description: 'string',
-    price: 'number',
-    embedding: 'vector[1536]',
-    meta: {
-      rating: 'number',
-    },
-  },
-  plugins: [secureProxy]
-})
-
-const resultsHybrid = search(db, {
-  mode: 'vector', // or 'hybrid'
-  term: 'Videogame for little kids with a passion about ice cream',
-  where: {
-    price: {
-      lte: 19.99
-    },
-    'meta.rating': {
-      gte: 4.5
-    }
-  }
-})
-```
-
-# Performing Geosearch
-
-Orama supports Geosearch as a search filter. It will search through all the properties specified as `geopoint` in the schema:
-
-```js
-import { create, insert } from '@orama/orama'
-
-const db = create({
-  schema: {
-    name: 'string',
-    location: 'geopoint'
-  }
-})
-
-insert(db, { name: 'Duomo di Milano', location: { lat: 45.46409, lon: 9.19192 } })
-insert(db, { name: 'Piazza Duomo',    location: { lat: 45.46416, lon: 9.18945 } })
-insert(db, { name: 'Piazzetta Reale', location: { lat: 45.46339, lon: 9.19092 } })
-
-const searchResult = search(db, {
-  term: 'Duomo',
-  where: {
-    location: {           // The property we want to filter by
-      radius: {           // The filter we want to apply (in that case: "radius")
-        coordinates: {    // The central coordinate
-          lat: 45.4648, 
-          lon: 9.18998
-        },
-        unit: 'm',        // The unit of measurement. The default is "m" (meters)
-        value: 1000,      // The radius length. In that case, 1km
-        inside: true      // Whether we want to return the documents inside or outside the radius. The default is "true"
-      }
-    }
-  }
-})
-```
-
-Orama Geosearch APIs support distance-based search (via `radius`), or polygon-based search (via `polygon`).
-
-By default, Orama will use the [**Haversine formula**](https://en.wikipedia.org/wiki/Haversine_formula) to perform Geosearch, but high-precision search can be enabled by passing the `highPrecision` option in your `radius` or `polygon` configuration. This will tell Orama to use the [**Vicenty Formulae**](https://en.wikipedia.org/wiki/Vincenty%27s_formulae) instead, which is more precise for longer distances.
-
-Read more in the [official docs](https://docs.askorama.ai/open-source/usage/search/geosearch).
-
 # Official Docs
 
-Read the complete documentation at [https://docs.askorama.ai](https://docs.askorama.ai).
+Read the complete documentation at [https://docs.orama.com/open-source](https://docs.orama.com/open-source).
 
 # Official Orama Plugins
 
-- [Plugin Vitepress](https://docs.askorama.ai/open-source/plugins/plugin-vitepress)
-- [Plugin Docusaurus](https://docs.askorama.ai/open-source/plugins/plugin-docusaurus)
-- [Plugin Analytics](https://docs.askorama.ai/open-source/plugins/plugin-analytics)
-- [Plugin Astro](https://docs.askorama.ai/open-source/plugins/plugin-astro)
-- [Plugin Data Persistence](https://docs.askorama.ai/open-source/plugins/plugin-data-persistence)
-- [Plugin Nextra](https://docs.askorama.ai/open-source/plugins/plugin-nextra)
+- [Plugin Vitepress](https://docs.orama.com/open-source/plugins/plugin-vitepress)
+- [Plugin Docusaurus](https://docs.orama.com/open-source/plugins/plugin-docusaurus)
+- [Plugin Secure Proxy](https://docs.orama.com/open-source/plugins/plugin-secure-proxy)
+- [Plugin Analytics](https://docs.orama.com/open-source/plugins/plugin-analytics)
+- [Plugin Astro](https://docs.orama.com/open-source/plugins/plugin-astro)
+- [Plugin Data Persistence](https://docs.orama.com/open-source/plugins/plugin-data-persistence)
+- [Plugin Nextra](https://docs.orama.com/open-source/plugins/plugin-nextra)
 
-Write your own plugin: [https://docs.askorama.ai/open-source/plugins/writing-your-own-plugins](https://docs.askorama.ai/open-source/plugins/writing-your-own-plugins)
+Write your own plugin: [https://docs.orama.com/open-source/plugins/writing-your-own-plugins](https://docs.orama.com/open-source/plugins/writing-your-own-plugins)
 
 # License
 
