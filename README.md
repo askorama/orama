@@ -1,6 +1,6 @@
 <p align="center">
-  <img src="/misc/readme/orama-readme-hero-dark#gh-dark-mode-only" />
-  <img src="/misc/readme/orama-readme-hero-light.png#gh-light-mode-only" />
+  <img src="https://raw.githubusercontent.com/askorama/orama/refs/heads/main/misc/readme/orama-readme-hero-dark.png#gh-dark-mode-only" />
+  <img src="https://raw.githubusercontent.com/askorama/orama/refs/heads/main/misc/readme/orama-readme-hero-light.png#gh-light-mode-only" />
 </p>
 
 [![Tests](https://github.com/oramasearch/orama/actions/workflows/turbo.yml/badge.svg)](https://github.com/oramasearch/orama/actions/workflows/turbo.yml)
@@ -52,8 +52,8 @@ Read the complete documentation at [https://docs.orama.com](https://docs.orama.c
 # Orama Features
 
 <p align="center">
-  <img src="/misc/features-dark.png#gh-dark-mode-only" />
-  <img src="/misc/features-light.png#gh-light-mode-only" />
+  <img src="https://raw.githubusercontent.com/askorama/orama/refs/heads/main/misc/readme/features-dark.png#gh-dark-mode-only" />
+  <img src="https://raw.githubusercontent.com/askorama/orama/refs/heads/main/misc/readme/features-light.png#gh-light-mode-only" />
 </p>
 
 # Usage
@@ -116,7 +116,7 @@ const results = search(db, {
 
 Orama currently supports 10 different data types:
 
-| Type             | Description                                                               example                                                                     |
+| Type             | Description                                                                 | example                                                                     |
 | ---------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | `string`         | A string of characters.                                                     | `'Hello world'`                                                             |
 | `number`         | A numeric value, either float or integer.                                   | `42`                                                                        |
