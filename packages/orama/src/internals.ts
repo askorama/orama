@@ -5,6 +5,8 @@ export {
   getNanosecondsTime,
   uniqueId,
   convertDistanceToMeters,
-  safeArrayPush
+  safeArrayPush,
+  setIntersection,
+  setUnion,
 } from './utils.js'
 export { normalizeToken } from './components/tokenizer/index.js'

@@ -1,5 +1,5 @@
 import t from 'tap'
-import { formatBytes, formatNanoseconds, getOwnProperty, getNested, flattenObject } from '../src/utils.js'
+import { formatBytes, formatNanoseconds, getOwnProperty, getNested, flattenObject, setUnion, setIntersection } from '../src/utils.js'
 
 t.test('utils', async (t) => {
   t.test('should correctly format bytes', async (t) => {
@@ -95,4 +95,37 @@ t.test('utils', async (t) => {
     t.equal((flattened as Record<string, string>).foo, 'bar')
     t.equal(flattened['nested.nested2.nested3.bar'], 'baz')
   })
+})
+
+t.test('setUnion', async t => {
+  const set1 = new Set([1, 2, 3])
+  const set2 = new Set([2, 3, 4])
+
+  t.strictSame(setUnion(undefined, set2), set2)
+  t.strictSame(setUnion(set1, set2), new Set([1, 2, 3, 4]))
+  t.strictSame(setUnion(set2, set1), new Set([1, 2, 3, 4]))
+})
+
+t.test('setIntersection', async t => {
+  const set1 = new Set([1, 2, 3])
+  const set2 = new Set([2, 3, 4])
+  const set3 = new Set([2, 3, 5])
+
+  // empty set
+  t.strictSame(setIntersection(), new Set())
+
+  // single set
+  t.strictSame(setIntersection(set1), set1)
+
+  // two sets
+  t.strictSame(setIntersection(set1, set2), new Set([2, 3]))
+  t.strictSame(setIntersection(set2, set1), new Set([2, 3]))
+
+  // three sets
+  t.strictSame(setIntersection(set1, set2, set3), new Set([2, 3]))
+  t.strictSame(setIntersection(set1, set3, set2), new Set([2, 3]))
+  t.strictSame(setIntersection(set2, set1, set3), new Set([2, 3]))
+  t.strictSame(setIntersection(set2, set3, set1), new Set([2, 3]))
+  t.strictSame(setIntersection(set3, set1, set2), new Set([2, 3]))
+  t.strictSame(setIntersection(set3, set2, set1), new Set([2, 3]))
 })

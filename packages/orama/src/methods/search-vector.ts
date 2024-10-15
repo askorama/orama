@@ -1,14 +1,13 @@
 import type { AnyOrama, Results, SearchParamsVector, TypedDocument, Result } from '../types.js'
 import type { InternalDocumentID } from '../components/internal-document-id-store.js'
-import { getNanosecondsTime, formatNanoseconds } from '../utils.js'
+import { getNanosecondsTime, formatNanoseconds, sortTokenScorePredicate } from '../utils.js'
 import { getFacets } from '../components/facets.js'
 import { createError } from '../errors.js'
-import { findSimilarVectors } from '../components/cosine-similarity.js'
-import { intersectFilteredIDs } from '../components/filters.js'
 import { getGroups } from '../components/groups.js'
-import { getInternalDocumentId, getDocumentIdFromInternalId } from '../components/internal-document-id-store.js'
+import { getDocumentIdFromInternalId } from '../components/internal-document-id-store.js'
 import { Language } from '../index.js'
 import { runBeforeSearch, runAfterSearch } from '../components/hooks.js'
+import { DEFAULT_SIMILARITY } from '../trees/vector.js'
 
 export function innerVectorSearch<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
   orama: T,
@@ -22,7 +21,7 @@ export function innerVectorSearch<T extends AnyOrama, ResultDocument = TypedDocu
   }
 
   const vectorIndex = orama.data.index.vectorIndexes[vector!.property]
-  const vectorSize = vectorIndex.size
+  const vectorSize = vectorIndex.node.size
   if (vector?.value.length !== vectorSize) {
     if (vector?.property === undefined || vector?.value.length === undefined) {
       throw createError('INVALID_INPUT_VECTOR', 'undefined', vectorSize, 'undefined')
@@ -30,41 +29,14 @@ export function innerVectorSearch<T extends AnyOrama, ResultDocument = TypedDocu
     throw createError('INVALID_INPUT_VECTOR', vector.property, vectorSize, vector.value.length)
   }
 
-  if (!(vector instanceof Float32Array)) {
-    vector.value = new Float32Array(vector.value)
-  }
-
-  const vectors = vectorIndex.vectors
-
-  let results = findSimilarVectors(vector.value as Float32Array, vectors, vectorSize, params.similarity).map(
-    ([id, score]) => [getInternalDocumentId(orama.internalDocumentIDStore, id), score]
-  ) as [number, number][]
-
-
-  let propertiesToSearch = orama.caches['propertiesToSearch'] as string[]
-
   const index = orama.data.index
-  if (!propertiesToSearch) {
-    const propertiesToSearchWithTypes = orama.index.getSearchablePropertiesWithTypes(index)
-
-    propertiesToSearch = orama.index.getSearchableProperties(index)
-    propertiesToSearch = propertiesToSearch.filter((prop: string) =>
-      propertiesToSearchWithTypes[prop].startsWith('string')
-    )
-
-    orama.caches['propertiesToSearch'] = propertiesToSearch
-  }
-
-
-  let whereFiltersIDs: InternalDocumentID[] = []
-
+  let whereFiltersIDs: Set<InternalDocumentID> | undefined
   const hasFilters = Object.keys(params.where ?? {}).length > 0
   if (hasFilters) {
     whereFiltersIDs = orama.index.searchByWhereClause(index, orama.tokenizer, params.where!, language)
-    results = intersectFilteredIDs(whereFiltersIDs, results)
   }
 
-  return results
+  return vectorIndex.node.find(vector.value as Float32Array, params.similarity ?? DEFAULT_SIMILARITY, whereFiltersIDs)
 }
 
 export function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<T>>(
@@ -76,6 +48,7 @@ export function searchVector<T extends AnyOrama, ResultDocument = TypedDocument<
 
   function performSearchLogic(): Results<ResultDocument> {
     const results = innerVectorSearch(orama, params, language)
+      .sort(sortTokenScorePredicate)
 
     let facetsResults: any = []
 

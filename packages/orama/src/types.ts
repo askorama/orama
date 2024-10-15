@@ -1,11 +1,12 @@
 import type { InsertOptions } from './methods/insert.js'
 import { MODE_FULLTEXT_SEARCH, MODE_HYBRID_SEARCH, MODE_VECTOR_SEARCH } from './constants.js'
 import { DocumentsStore } from './components/documents-store.js'
-import { Index } from './components/index.js'
+import { Index, TTree } from './components/index.js'
 import { DocumentID, InternalDocumentID, InternalDocumentIDStore } from './components/internal-document-id-store.js'
 import { Sorter } from './components/sorter.js'
 import { Language } from './components/tokenizer/languages.js'
 import { Point } from './trees/bkd.js'
+import { VectorIndex, VectorType } from './trees/vector.js'
 
 export type {
   IAnswerSessionConfig,
@@ -123,9 +124,7 @@ export type PartialSchemaDeep<T> = {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Document extends Record<string, SearchableValue | Document | unknown> {}
 
-export type Magnitude = number
 export type Vector = `vector[${number}]`
-export type VectorType = Float32Array
 
 export type ScalarSearchableType = 'string' | 'number' | 'boolean' | 'enum' | 'geopoint'
 export type ArraySearchableType = 'string[]' | 'number[]' | 'boolean[]' | 'enum[]' | Vector
@@ -138,13 +137,6 @@ export type SearchableValue = ScalarSearchableValue | ArraySearchableValue
 
 export type SortType = 'string' | 'number' | 'boolean'
 export type SortValue = string | number | boolean
-
-export type VectorIndex = {
-  size: number
-  vectors: {
-    [docID: string]: [Magnitude, VectorType]
-  }
-}
 
 export type BM25Params = {
   k?: number
@@ -918,7 +910,7 @@ export type IIndexInsertOrRemoveHookFunction = <R = void>(
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface AnyIndexStore {
-  vectorIndexes: Record<string, VectorIndex>
+  vectorIndexes: Record<string, TTree<'Vector', VectorIndex>>
 }
 export type AnyIndex = IIndex<AnyIndexStore>
 
@@ -973,6 +965,7 @@ export interface IIndex<I extends AnyIndexStore> {
     bm25Relevance: Required<BM25Params>,
     resultsMap: Map<number, number>,
     boostPerProperty: number,
+    whereFiltersIDs: Set<InternalDocumentID> | undefined,
   )
 
   search<T extends AnyOrama>(
@@ -985,7 +978,8 @@ export interface IIndex<I extends AnyIndexStore> {
     tolerance: number,
     boost: Partial<Record<OnlyStrings<FlattenSchemaProperty<T>[]>, number>>,
     relevance: Required<BM25Params>,
-    docsCount: number
+    docsCount: number,
+    whereFiltersIDs: Set<InternalDocumentID> | undefined,
   ): TokenScore[]
 
   searchByWhereClause<T extends AnyOrama>(
@@ -993,7 +987,7 @@ export interface IIndex<I extends AnyIndexStore> {
     tokenizer: Tokenizer,
     filters: Partial<WhereCondition<T['schema']>>,
     language: string | undefined
-  ): InternalDocumentID[]
+  ): Set<InternalDocumentID>
 
   getSearchableProperties(index: I): string[]
   getSearchablePropertiesWithTypes(index: I): Record<string, SearchableType>

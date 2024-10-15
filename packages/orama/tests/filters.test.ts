@@ -1,16 +1,15 @@
 import t from 'tap'
-import { create, insert, search, remove } from '../src/index.js'
+import { create, insert, search, remove, insertMultiple, AnyOrama } from '../src/index.js'
 
 t.test('filters', async (t) => {
   t.test('should throw on unknown field', async (t) => {
-    const db = await createSimpleDB()
+    const [db] = await createSimpleDB()
 
     t.throws(
       () =>
         search(db, {
           term: 'coffee',
           where: {
-            // @ts-expect-error - unknown field
             unknownField: '5'
           }
         }),
@@ -25,7 +24,6 @@ t.test('filters', async (t) => {
         search(db, {
           term: 'coffee',
           where: {
-            // @ts-expect-error - unknown field
             unknownField: { gt: '5' } as unknown as string
           }
         }),
@@ -40,7 +38,6 @@ t.test('filters', async (t) => {
         search(db, {
           term: 'coffee',
           where: {
-            // @ts-expect-error - unknown field
             unknownField: true as unknown as string
           }
         }),
@@ -54,7 +51,7 @@ t.test('filters', async (t) => {
   })
 
   t.test('greater than', async (t) => {
-    const db = await createSimpleDB()
+    const [db, [id1]] = await createSimpleDB()
 
     const r1_gt = await search(db, {
       term: 'coffee',
@@ -66,11 +63,11 @@ t.test('filters', async (t) => {
     })
 
     t.equal(r1_gt.count, 1)
-    t.equal(r1_gt.hits[0].id, '__3')
+    t.equal(r1_gt.hits[0].id, id1)
   })
 
   t.test('greater than or equal to', async (t) => {
-    const db = await createSimpleDB()
+    const [db, [id1,,id3]] = await createSimpleDB()
 
     const r1_gte = await search(db, {
       term: 'coffee',
@@ -82,12 +79,12 @@ t.test('filters', async (t) => {
     })
 
     t.equal(r1_gte.count, 2)
-    t.equal(r1_gte.hits[0].id, '__2')
-    t.equal(r1_gte.hits[1].id, '__3')
+    t.equal(r1_gte.hits[0].id, id3)
+    t.equal(r1_gte.hits[1].id, id1)
   })
 
   t.test('less than', async (t) => {
-    const db = await createSimpleDB()
+    const [db, [,,id3]] = await createSimpleDB()
 
     const r1_lt = await search(db, {
       term: 'coffee',
@@ -99,11 +96,11 @@ t.test('filters', async (t) => {
     })
 
     t.equal(r1_lt.count, 1)
-    t.equal(r1_lt.hits[0].id, '__2')
+    t.equal(r1_lt.hits[0].id, id3)
   })
 
   t.test('less than or equal to', async (t) => {
-    const db = await createSimpleDB()
+    const [db, [,,id3]] = await createSimpleDB()
 
     const r1_lte = await search(db, {
       term: 'coffee',
@@ -115,11 +112,11 @@ t.test('filters', async (t) => {
     })
 
     t.equal(r1_lte.count, 1)
-    t.equal(r1_lte.hits[0].id, '__2')
+    t.equal(r1_lte.hits[0].id, id3)
   })
 
   t.test('equal', async (t) => {
-    const db = await createSimpleDB()
+    const [db, [,,id3]] = await createSimpleDB()
 
     const r1_lte = await search(db, {
       term: 'coffee',
@@ -131,11 +128,11 @@ t.test('filters', async (t) => {
     })
 
     t.equal(r1_lte.count, 1)
-    t.equal(r1_lte.hits[0].id, '__2')
+    t.equal(r1_lte.hits[0].id, id3)
   })
 
   t.test('between', async (t) => {
-    const db = await createSimpleDB()
+    const [db, [,,id3]] = await createSimpleDB()
 
     const r1_lte = await search(db, {
       term: 'coffee',
@@ -147,11 +144,11 @@ t.test('filters', async (t) => {
     })
 
     t.equal(r1_lte.count, 1)
-    t.equal(r1_lte.hits[0].id, '__2')
+    t.equal(r1_lte.hits[0].id, id3)
   })
 
   t.test('multiple filters', async (t) => {
-    const db = await createSimpleDB()
+    const [db, [,,id3]] = await createSimpleDB()
 
     const r1_lte = await search(db, {
       term: 'coffee',
@@ -166,11 +163,11 @@ t.test('filters', async (t) => {
     })
 
     t.equal(r1_lte.count, 1)
-    t.equal(r1_lte.hits[0].id, '__2')
+    t.equal(r1_lte.hits[0].id, id3)
   })
 
   t.test('multiple filters, and operation', async (t) => {
-    const db = await createSimpleDB()
+    const [db, [,, id3]] = await createSimpleDB()
 
     const r1_lte = await search(db, {
       term: 'coffee',
@@ -181,7 +178,6 @@ t.test('filters', async (t) => {
         price: {
           lte: 40
         },
-        // @ts-expect-error - unknown field
         'meta.sales': {
           eq: 25
         }
@@ -189,12 +185,12 @@ t.test('filters', async (t) => {
     })
 
     t.equal(r1_lte.count, 1)
-    t.equal(r1_lte.hits[0].id, '__2')
+    t.equal(r1_lte.hits[0].id, id3)
   })
 })
 
 t.test('should throw when using multiple operators', async (t) => {
-  const db = await createSimpleDB()
+  const [db] = await createSimpleDB()
 
   t.throws(
     () =>
@@ -408,7 +404,7 @@ t.test('string filters with stemming', async (t) => {
   t.equal(r2.hits[1].id, '2')
 })
 
-async function createSimpleDB() {
+async function createSimpleDB(): Promise<[AnyOrama, string[]]> {
   let i = 0
   const db = await create({
     schema: {
@@ -426,32 +422,32 @@ async function createSimpleDB() {
     }
   })
 
-  await insert(db, {
-    name: 'washing machine',
-    rating: 5,
-    price: 900,
-    meta: {
-      sales: 100
+  const ids = await insertMultiple(db, [
+    {
+      name: 'super coffee maker',
+      rating: 5,
+      price: 900,
+      meta: {
+        sales: 100
+      }
+    },
+    {
+      name: 'washing machine',
+      rating: 5,
+      price: 900,
+      meta: {
+        sales: 100
+      }
+    },
+    {
+      name: 'coffee maker',
+      rating: 3,
+      price: 30,
+      meta: {
+        sales: 25
+      }
     }
-  })
+  ])
 
-  await insert(db, {
-    name: 'coffee maker',
-    rating: 3,
-    price: 30,
-    meta: {
-      sales: 25
-    }
-  })
-
-  await insert(db, {
-    name: 'coffee maker deluxe',
-    rating: 5,
-    price: 45,
-    meta: {
-      sales: 25
-    }
-  })
-
-  return db
+  return [db, ids]
 }

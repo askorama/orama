@@ -15,13 +15,11 @@ import type {
   SearchableValue,
   Tokenizer,
   TokenScore,
-  VectorIndex,
-  VectorType,
   WhereCondition
 } from '../types.js'
 import type { InsertOptions } from '../methods/insert.js'
 import type { Point as BKDGeoPoint } from '../trees/bkd.js'
-import { RadixNode } from '../trees/radix.js'
+import { FindResult, RadixNode } from '../trees/radix.js'
 import { createError } from '../errors.js'
 import { AVLTree } from '../trees/avl.js'
 import { FlatTree } from '../trees/flat.js'
@@ -29,9 +27,8 @@ import { RadixTree } from '../trees/radix.js'
 import { BKDTree } from '../trees/bkd.js'
 import { BoolNode } from '../trees/bool.js'
 
-import { convertDistanceToMeters, intersect, safeArrayPush } from '../utils.js'
+import { convertDistanceToMeters, setIntersection, setUnion } from '../utils.js'
 import { BM25 } from './algorithms.js'
-import { getMagnitude } from './cosine-similarity.js'
 import { getInnerType, getVectorSize, isArrayType, isVectorType } from './defaults.js'
 import {
   DocumentID,
@@ -39,6 +36,7 @@ import {
   InternalDocumentID,
   InternalDocumentIDStore
 } from './internal-document-id-store.js'
+import { VectorIndex, VectorType } from '../trees/vector.js'
 
 export type FrequencyMap = {
   [property: string]: {
@@ -60,15 +58,15 @@ export type TTree<T = TreeType, N = unknown> = {
 
 export type Tree =
   | TTree<'Radix', RadixNode>
-  | TTree<'AVL', AVLTree<number, InternalDocumentID[]>>
-  | TTree<'Bool', BoolNode>
+  | TTree<'AVL', AVLTree<number, InternalDocumentID>>
+  | TTree<'Bool', BoolNode<InternalDocumentID>>
   | TTree<'Flat', FlatTree>
   | TTree<'BKD', BKDTree>
 
 export interface Index extends AnyIndexStore {
   sharedInternalDocumentStore: InternalDocumentIDStore
   indexes: Record<string, Tree>
-  vectorIndexes: Record<string, VectorIndex>
+  // vectorIndexes: Record<string, TTree<'Vector', VectorIndex>>
   searchableProperties: string[]
   searchablePropertiesWithTypes: Record<string, SearchableType>
   frequencies: FrequencyMap
@@ -170,8 +168,9 @@ export function create<T extends AnyOrama, TSchema extends T['schema']>(
       index.searchableProperties.push(path)
       index.searchablePropertiesWithTypes[path] = type
       index.vectorIndexes[path] = {
-        size: getVectorSize(type),
-        vectors: {}
+        type: 'Vector',
+        node: new VectorIndex(getVectorSize(type)),
+        isArray: false,
       }
     } else {
       const isArray = /\[/.test(type as string)
@@ -182,7 +181,7 @@ export function create<T extends AnyOrama, TSchema extends T['schema']>(
           break
         case 'number':
         case 'number[]':
-          index.indexes[path] = { type: 'AVL', node: new AVLTree<number, InternalDocumentID[]>(0, []), isArray }
+          index.indexes[path] = { type: 'AVL', node: new AVLTree<number, InternalDocumentID>(0, []), isArray }
           break
         case 'string':
         case 'string[]':
@@ -230,7 +229,7 @@ function insertScalarBuilder(
       }
       case 'AVL': {
         const avlRebalanceThreshold = options?.avlRebalanceThreshold ?? 1
-        node.insert(value as number, [internalId], avlRebalanceThreshold)
+        node.insert(value as number, internalId, avlRebalanceThreshold)
         break
       }
       case 'Radix': {
@@ -271,7 +270,7 @@ export function insert(
   options?: InsertOptions
 ): void {
   if (isVectorType(schemaType)) {
-    return insertVector(index, prop, value as number[] | Float32Array, id)
+    return insertVector(index, prop, value as number[] | Float32Array, id, internalId)
   }
 
   const insertScalar = insertScalarBuilder(implementation, index, prop, internalId, language, tokenizer, docsCount, options)
@@ -287,15 +286,8 @@ export function insert(
   }
 }
 
-export function insertVector(index: AnyIndexStore, prop: string, value: number[] | VectorType, id: DocumentID): void {
-  if (!(value instanceof Float32Array)) {
-    value = new Float32Array(value)
-  }
-
-  const size = index.vectorIndexes[prop].size
-  const magnitude = getMagnitude(value, size)
-
-  index.vectorIndexes[prop].vectors[id] = [magnitude, value]
+export function insertVector(index: AnyIndexStore, prop: string, value: number[] | VectorType, id: DocumentID, internalDocumentId: InternalDocumentID): void {
+  index.vectorIndexes[prop].node.add(internalDocumentId, value)
 }
 
 function removeScalar(
@@ -311,14 +303,14 @@ function removeScalar(
   docsCount: number
 ): boolean {
   if (isVectorType(schemaType)) {
-    delete index.vectorIndexes[prop].vectors[id]
+    index.vectorIndexes[prop].node.remove(internalId)
     return true
   }
 
   const { type, node } = index.indexes[prop]
   switch (type) {
     case 'AVL': {
-      node.removeDocument(internalId, value as number[])
+      node.removeDocument(value as number, internalId)
       return true
     }
     case 'Bool': {
@@ -395,6 +387,7 @@ export function calculateResultScores(
   bm25Relevance: Required<BM25Params>,
   resultsMap: Map<number, number>,
   boostPerProperty: number,
+  whereFiltersIDs: Set<InternalDocumentID> | undefined
 ) {
   const documentIDs = Array.from(ids)
 
@@ -411,6 +404,10 @@ export function calculateResultScores(
   const documentIDsLength = documentIDs.length
   for (let k = 0; k < documentIDsLength; k++) {
     const internalId = documentIDs[k]
+    if (whereFiltersIDs && !whereFiltersIDs.has(internalId)) {
+      continue
+    }
+
     const tf = oramaFrequencies?.[internalId]?.[term] ?? 0
 
     const bm25 = BM25(
@@ -441,6 +438,7 @@ function searchInProperty(
   boostPerProperty: number,
   bm25Relevance: Required<BM25Params>,
   docsCount: number,
+  whereFiltersIDs: Set<InternalDocumentID> | undefined
 ) {
   const tokenLength = tokens.length;
   for (let i = 0; i < tokenLength; i++) {
@@ -462,6 +460,7 @@ function searchInProperty(
         bm25Relevance,
         resultsMap,
         boostPerProperty,
+        whereFiltersIDs,
       )
     }
   }
@@ -477,7 +476,8 @@ export function search(
   tolerance: number,
   boost: Record<string, number>,
   relevance: Required<BM25Params>,
-  docsCount: number
+  docsCount: number,
+  whereFiltersIDs: Set<InternalDocumentID> | undefined,
 ): TokenScore[] {
   const tokens = tokenizer.tokenize(term, language)
 
@@ -512,7 +512,8 @@ export function search(
       resultsMap,
       boostPerProperty,
       relevance,
-      docsCount
+      docsCount,
+      whereFiltersIDs,
     )
   }
 
@@ -524,12 +525,12 @@ export function searchByWhereClause<T extends AnyOrama>(
   tokenizer: Tokenizer,
   filters: Partial<WhereCondition<T['schema']>>,
   language: string | undefined
-): number[] {
+): Set<InternalDocumentID> {
   const filterKeys = Object.keys(filters)
 
-  const filtersMap: Record<string, InternalDocumentID[]> = filterKeys.reduce(
+  const filtersMap: Record<string, Set<InternalDocumentID>> = filterKeys.reduce(
     (acc, key) => ({
-      [key]: [],
+      [key]: new Set(),
       ...acc
     }),
     {}
@@ -546,8 +547,8 @@ export function searchByWhereClause<T extends AnyOrama>(
 
     if (type === 'Bool') {
       const idx = node
-      const filteredIDs = Array.from(operation ? idx.true : idx.false)
-      safeArrayPush(filtersMap[param], filteredIDs)
+      const filteredIDs = operation ? idx.true : idx.false
+      filtersMap[param] = setUnion(filtersMap[param], filteredIDs)
       continue
     }
 
@@ -572,11 +573,7 @@ export function searchByWhereClause<T extends AnyOrama>(
         } = operation[reqOperation] as GeosearchRadiusOperator['radius']
         const distanceInMeters = convertDistanceToMeters(value, unit)
         const ids = node.searchByRadius(coordinates as BKDGeoPoint, distanceInMeters, inside, undefined, highPrecision)
-        // @todo: convert this into a for loop
-        safeArrayPush(
-          filtersMap[param],
-          ids.flatMap(({ docIDs }) => docIDs)
-        )
+        filtersMap[param] = addGeoResult(filtersMap[param], ids)
       } else {
         const {
           coordinates,
@@ -584,11 +581,7 @@ export function searchByWhereClause<T extends AnyOrama>(
           highPrecision = false
         } = operation[reqOperation] as GeosearchPolygonOperator['polygon']
         const ids = node.searchByPolygon(coordinates as BKDGeoPoint[], inside, undefined, highPrecision)
-        // @todo: convert this into a for loop
-        safeArrayPush(
-          filtersMap[param],
-          ids.flatMap(({ docIDs }) => docIDs)
-        )
+        filtersMap[param] = addGeoResult(filtersMap[param], ids)
       }
 
       continue
@@ -599,7 +592,7 @@ export function searchByWhereClause<T extends AnyOrama>(
         const term = tokenizer.tokenize(raw, language, param)
         for (const t of term) {
           const filteredIDsResults = node.find({ term: t, exact: true })
-          safeArrayPush(filtersMap[param], Object.values(filteredIDsResults).flat())
+          filtersMap[param] = addFindResult(filtersMap[param], filteredIDsResults)
         }
       }
 
@@ -613,53 +606,57 @@ export function searchByWhereClause<T extends AnyOrama>(
     }
 
     if (type === 'Flat') {
-      const results = isArray
+      const results = new Set(isArray
         ? node.filterArr(operation as EnumArrComparisonOperator)
-        : node.filter(operation as EnumComparisonOperator)
+        : node.filter(operation as EnumComparisonOperator))
 
-      safeArrayPush(filtersMap[param], results)
+      filtersMap[param] = setUnion(filtersMap[param], results)
+
       continue
     }
 
     if (type === 'AVL') {
       const operationOpt = operationKeys[0] as keyof ComparisonOperator
       const operationValue = (operation as ComparisonOperator)[operationOpt]
-      let filteredIDs: InternalDocumentID[] = []
+      let filteredIDs: Set<InternalDocumentID> 
 
       switch (operationOpt) {
         case 'gt': {
-          filteredIDs = node.greaterThan(operationValue as number, false) as unknown as number[]
+          filteredIDs = node.greaterThan(operationValue as number, false)
           break
         }
         case 'gte': {
-          filteredIDs = node.greaterThan(operationValue as number, true) as unknown as number[]
+          filteredIDs = node.greaterThan(operationValue as number, true)
           break
         }
         case 'lt': {
-          filteredIDs = node.lessThan(operationValue as number, false) as unknown as number[]
+          filteredIDs = node.lessThan(operationValue as number, false)
           break
         }
         case 'lte': {
-          filteredIDs = node.lessThan(operationValue as number, true) as unknown as number[]
+          filteredIDs = node.lessThan(operationValue as number, true)
           break
         }
         case 'eq': {
-          filteredIDs = node.find(operationValue as number) ?? []
+          const ret = node.find(operationValue as number)
+          filteredIDs = ret ?? new Set()
           break
         }
         case 'between': {
           const [min, max] = operationValue as number[]
-          filteredIDs = node.rangeSearch(min, max) as unknown as number[]
+          filteredIDs = node.rangeSearch(min, max)
           break
         }
+        default:
+          throw createError('INVALID_FILTER_OPERATION', operationOpt)
       }
 
-      safeArrayPush(filtersMap[param], filteredIDs)
+      filtersMap[param] = setUnion(filtersMap[param], filteredIDs)
     }
   }
 
   // AND operation: calculate the intersection between all the IDs in filterMap
-  return intersect(Object.values(filtersMap))
+  return setIntersection(...Object.values(filtersMap))
 }
 
 export function getSearchableProperties(index: Index): string[] {
@@ -730,15 +727,10 @@ export function load<R = unknown>(sharedInternalDocumentStore: InternalDocumentI
   }
 
   for (const idx of Object.keys(rawVectorIndexes)) {
-    const vectors = rawVectorIndexes[idx].vectors
-
-    for (const vec in vectors) {
-      vectors[vec] = [vectors[vec][0], new Float32Array(vectors[vec][1])]
-    }
-
     vectorIndexes[idx] = {
-      size: rawVectorIndexes[idx].size,
-      vectors
+      type: 'Vector',
+      isArray: false,
+      node: VectorIndex.fromJSON(rawVectorIndexes[idx])
     }
   }
 
@@ -767,26 +759,21 @@ export function save<R = unknown>(index: Index): R {
     fieldLengths
   } = index
 
-  const vectorIndexesAsArrays: Index['vectorIndexes'] = {}
-
+  const dumpVectorIndexes: Record<string, unknown> = {}
   for (const idx of Object.keys(vectorIndexes)) {
-    const vectors = vectorIndexes[idx].vectors
-
-    for (const vec in vectors) {
-      vectors[vec] = [vectors[vec][0], Array.from(vectors[vec][1]) as unknown as Float32Array]
-    }
-
-    vectorIndexesAsArrays[idx] = {
-      size: vectorIndexes[idx].size,
-      vectors
-    }
+    dumpVectorIndexes[idx] = vectorIndexes[idx].node.toJSON()
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const savedIndexes: any = {}
   for (const name of Object.keys(indexes)) {
     const { type, node, isArray } = indexes[name]
-    if (type === 'Flat' || type === 'Radix' || type === 'AVL' || type === 'BKD' || type === 'Bool') {
+    if (type === 'Flat'
+        || type === 'Radix'
+        || type === 'AVL'
+        || type === 'BKD'
+        || type === 'Bool'
+    ) {
       savedIndexes[name] = {
         type,
         node: node.toJSON(),
@@ -800,7 +787,7 @@ export function save<R = unknown>(index: Index): R {
 
   return {
     indexes: savedIndexes,
-    vectorIndexes: vectorIndexesAsArrays,
+    vectorIndexes: dumpVectorIndexes,
     searchableProperties,
     searchablePropertiesWithTypes,
     frequencies,
@@ -827,4 +814,39 @@ export function createIndex(): IIndex<Index> {
     load,
     save
   }
+}
+
+function addGeoResult(set: Set<InternalDocumentID> | undefined, ids: Array<{ docIDs: InternalDocumentID[] }>): Set<InternalDocumentID> {
+  if (!set) {
+    set = new Set()
+  }
+
+  const idsLength = ids.length
+  for (let i = 0; i < idsLength; i++) {
+    const entry = ids[i].docIDs
+    const idsLength = entry.length
+    for (let j = 0; j < idsLength; j++) {
+      set.add(entry[j])
+    }
+  }
+
+  return set
+}
+
+function addFindResult(set: Set<InternalDocumentID> | undefined, filteredIDsResults: FindResult): Set<InternalDocumentID> {
+  if (!set) {
+    set = new Set()
+  }
+
+  const keys = Object.keys(filteredIDsResults)
+  const keysLength = keys.length
+  for (let i = 0; i < keysLength; i++) {
+    const ids = filteredIDsResults[keys[i]]
+    const idsLength = ids.length
+    for (let j = 0; j < idsLength; j++) {
+      set.add(ids[j])
+    }
+  }
+
+  return set
 }

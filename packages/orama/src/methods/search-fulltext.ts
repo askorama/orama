@@ -1,5 +1,4 @@
 import { getFacets } from '../components/facets.js'
-import { intersectFilteredIDs } from '../components/filters.js'
 import { getGroups } from '../components/groups.js'
 import { runAfterSearch, runBeforeSearch } from '../components/hooks.js'
 import { getInternalDocumentId } from '../components/internal-document-id-store.js'
@@ -50,6 +49,15 @@ export function innerFullTextSearch<T extends AnyOrama>(
     propertiesToSearch = propertiesToSearch.filter((prop: string) => (properties as string[]).includes(prop))
   }
 
+
+  // If filters are enabled, we need to get the IDs of the documents that match the filters.
+  const hasFilters = Object.keys(params.where ?? {}).length > 0
+  let whereFiltersIDs: Set<number> | undefined
+  if (hasFilters) {
+    whereFiltersIDs = orama.index.searchByWhereClause(index, orama.tokenizer, params.where!, language)
+  }
+
+
   let uniqueDocsIDs: TokenScore[]
   // We need to perform the search if:
   // - we have a search term
@@ -69,18 +77,13 @@ export function innerFullTextSearch<T extends AnyOrama>(
       params.boost || {},
       applyDefault(params.relevance),
       docsCount,
+      whereFiltersIDs,
     )
   } else {
     // Tokenizer returns empty array and the search term is empty as well.
     // We return all the documents.
-    uniqueDocsIDs = Object.keys(orama.documentsStore.getAll(orama.data.docs)).map((k) => [+k, 0] as TokenScore)
-  }
-
-  // If filters are enabled, we need to get the IDs of the documents that match the filters.
-  const hasFilters = Object.keys(params.where ?? {}).length > 0
-  if (hasFilters) {
-    const whereFiltersIDs = orama.index.searchByWhereClause(index, orama.tokenizer, params.where!, language)
-    uniqueDocsIDs = intersectFilteredIDs(whereFiltersIDs, uniqueDocsIDs)
+    const docIds = whereFiltersIDs ? Array.from(whereFiltersIDs) : Object.keys(orama.documentsStore.getAll(orama.data.docs))
+    uniqueDocsIDs = docIds.map((k) => [+k, 0] as TokenScore)
   }
 
   return uniqueDocsIDs
