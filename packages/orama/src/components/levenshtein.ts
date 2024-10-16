@@ -23,7 +23,7 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
   b = b.toLowerCase()
 
   // Special case for prefixes
-  if (b.startsWith(a) || a.startsWith(b)) return 0
+  if (b.startsWith(a)) return 0
 
   // If the length difference is greater than the tolerance, return early
   if (Math.abs(m - n) > tolerance) return -1

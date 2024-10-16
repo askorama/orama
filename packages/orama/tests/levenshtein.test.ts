@@ -208,6 +208,6 @@ t.test('Issue #744', async (t) => {
   })
 
   t.equal(s1.count, 2)
-  t.equal(s2.count, 1)
+  t.equal(s2.count, 2)
   t.equal(s3.count, 4)
 })
