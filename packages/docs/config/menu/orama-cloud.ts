@@ -83,6 +83,16 @@ const oramaCloudMenu = [
         ]
       },
       {
+        label: 'Custom system prompts',
+        collapsed: true,
+        items: [
+          {
+            label: 'Customizing the system prompts',
+            link: '/cloud/custom-system-prompts/customizing-the-system-prompts'
+          }
+        ]
+      },
+      {
         label: 'Audience management',
         collapsed: true,
         items: [
