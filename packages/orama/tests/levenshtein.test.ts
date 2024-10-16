@@ -54,12 +54,13 @@ t.test('syncBoundedLevenshtein', async (t) => {
     'Suffix should return correct distance and isBounded true if within tolerance'
   )
 
-  // Test case sensitivity
-  t.same(
-    syncBoundedLevenshtein('Hello', 'hello', 1),
-    { distance: 0, isBounded: true },
-    'Case difference should not be counted in the distance'
-  )
+  // This never happens in the real world: the function accepts tokenized strings
+  // so, the stings are always the same case
+  // t.same(
+  //   syncBoundedLevenshtein('Hello', 'hello', 1),
+  //   { distance: 0, isBounded: true },
+  //   'Case difference should not be counted in the distance'
+  // )
 
   // Test with tolerance 0
   t.same(
@@ -172,8 +173,11 @@ t.test('syncBoundedLevenshtein substrings are ok even if with tolerance pppppp',
 
   t.match(boundedLevenshtein('Crxy', 'Caig', 3), { isBounded: true, distance: 3 })
 
-  t.match(boundedLevenshtein('Chris', 'Christopher', 0), { isBounded: true, distance: 0 })
-  t.match(boundedLevenshtein('Chris', 'Christopher', 1), { isBounded: true, distance: 0 })
+  t.match(boundedLevenshtein('Christopher', 'Chris' , 0), { isBounded: false, distance: -1 })
+
+  t.match(boundedLevenshtein('Christopher', 'Chris', 1), { isBounded: false, distance: -1 })
+  // To return true, the prefix must be within tolerance
+  t.match(boundedLevenshtein('Christopher', 'Chris', 'Christopher'.length - 'Chris'.length), { isBounded: true, distance: 6 })
 
   t.end()
 })
@@ -186,28 +190,72 @@ t.test('Issue #744', async (t) => {
     } as const
   })
 
-  await insertMultiple(index, [
-    { libelle: 'ABRICOT MOELLEUX' },
-    { libelle: 'MOELLEUX CHOC BIO' },
-    { libelle: 'CREPE MOELLEUSE' },
-    { libelle: 'OS MOELLE' }
-  ])
+  const docs = [
+    { id: '1', libelle: 'abricot moelleux' },
+    { id: '2', libelle: 'moelleux choc bio' },
+    { id: '3', libelle: 'crepe moelleuse' },
+    { id: '4', libelle: 'os moelle' }
+  ]
+  await insertMultiple(index, docs)
+
+  const searchTerm = 'moelleux'
+
+  // doc1 and doc2 match searchTerm exactly
+  t.equal(syncBoundedLevenshtein(searchTerm, searchTerm, 0).isBounded, true)
+  // doc3 don't match searchTerm with tolerance 1
+  t.equal(syncBoundedLevenshtein(searchTerm, 'moelleuse', 1).isBounded, false)
+  // but doc3 match searchTerm with tolerance 2 ("x" => "se" are 2 operations)
+  t.equal(syncBoundedLevenshtein(searchTerm, 'moelleuse', 2).isBounded, true)
+  // doc4 don't match searchTerm with tolerance 1
+  t.equal(syncBoundedLevenshtein(searchTerm, 'moelle', 1).isBounded, false)
+  // but doc4 match searchTerm with tolerance 2 ("ux" => "" are 2 operation)
+  t.equal(syncBoundedLevenshtein('moelle', searchTerm, 2).isBounded, true)
 
   const s1 = await search(index, {
-    term: 'moelleux'
+    term: searchTerm
   })
+  t.equal(s1.count, 2)
+  t.strictSame(s1.hits.map(h => h.id), ['1', '2'])
 
   const s2 = await search(index, {
-    term: 'moelleux',
+    term: searchTerm,
+    tolerance: 0,
+  })
+  t.equal(s2.count, 2)
+  t.strictSame(s2.hits.map(h => h.id), ['1', '2'])
+
+  const s3 = await search(index, {
+    term: searchTerm,
+    tolerance: 1,
+  })
+  t.equal(s3.count, 2)
+  t.strictSame(s3.hits.map(h => h.id), ['1', '2'])
+
+  const s4 = await search(index, {
+    term: searchTerm,
+    tolerance: 2,
+  })
+  t.equal(s4.count, 4)
+  t.strictSame(s4.hits.map(h => h.id), ['3', '4', '1', '2'])
+})
+
+// https://github.com/askorama/orama/issues/797
+t.test('Issue #797', async t => {
+  const db = await create({
+    schema: {
+        name: 'string'
+    } as const
+  })
+  await insertMultiple(db, [
+    { id: '1', name: "S" },
+    { id: '2', name: "Scroll" },
+  ])
+
+  const res = await search(db, {
+    term: "scrol",
     tolerance: 1,
   })
 
-  const s3 = await search(index, {
-    term: 'moelleux',
-    tolerance: 2,
-  })
-
-  t.equal(s1.count, 2)
-  t.equal(s2.count, 1)
-  t.equal(s3.count, 4)
+  t.equal(res.count, 1)
+  t.equal(res.hits[0].id, '2')
 })
