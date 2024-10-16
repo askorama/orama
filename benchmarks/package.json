@@ -15,7 +15,9 @@
     "orama_300_rc_2": "npm:@orama/orama@3.0.0-rc-2",
     "orama_latest": "file:../packages/orama",
     "@orama/stopwords": "file:../packages/stopwords",
-    "@orama/plugin-pt15": "file:../packages/plugin-pt15"
+    "@orama/plugin-pt15": "file:../packages/plugin-pt15",
+    "@orama/plugin-qps": "file:../packages/plugin-qps",
+    "@orama/plugin-data-persistence": "file:../packages/plugin-data-persistence"
   },
   "devDependencies": {
     "benny": "^3.7.1"

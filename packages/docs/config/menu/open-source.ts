@@ -93,11 +93,11 @@ const openSourceMenu = [
             ]
           },
           {
-            label: 'Answer Engine',
+            label: 'GenAI Answer Engine',
             collapsed: false,
             items: [
               {
-                label: 'Orama Answer Engine',
+                label: 'Orama GenAI Answer Engine',
                 link: '/open-source/usage/answer-engine/introduction'
               }
             ]

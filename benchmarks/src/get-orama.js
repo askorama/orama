@@ -2,6 +2,7 @@ import * as orama211 from 'orama_211'
 import * as orama300rc2 from 'orama_300_rc_2'
 import * as oramaLatest from 'orama_latest'
 import { pluginPT15 } from '@orama/plugin-pt15'
+import { pluginQPS } from '@orama/plugin-qps'
 import dataset from './dataset.json' assert { type: 'json' }
 
 export const schema = {
@@ -15,13 +16,15 @@ const create = {
   orama211: () => orama211.create({ schema }),
   orama300rc2: () => orama300rc2.create({ schema }),
   oramaLatest: () => oramaLatest.create({ schema }),
-  oramaLatestPT15: () => oramaLatest.create({ schema, plugins: [pluginPT15()] })
+  oramaLatestPT15: () => oramaLatest.create({ schema, plugins: [pluginPT15()] }),
+  oramaLatestQPS: () => oramaLatest.create({ schema, plugins: [pluginQPS()] })
 }
 
-const db211 = await create.orama211()
-const db300rc2 = create.orama300rc2()
-const dbLatest = create.oramaLatest()
-const dbLatestPT15 = create.oramaLatestPT15()
+export const db211 = await create.orama211()
+export const db300rc2 = create.orama300rc2()
+export const dbLatest = create.oramaLatest()
+export const dbLatestPT15 = create.oramaLatestPT15()
+export const dbLatestQPS = create.oramaLatestQPS()
 
 export const insert = {
   orama211: async () => {
@@ -47,7 +50,13 @@ export const insert = {
     for (const record of dataset) {
       oramaLatest.insert(db, record)
     }
-  }
+  },
+  oramaLatestQPS: () => {
+    const db = create.oramaLatestQPS()
+    for (const record of dataset) {
+      oramaLatest.insert(db, record)
+    }
+  },
 }
 
 export const insertMultiple = {
@@ -62,7 +71,10 @@ export const insertMultiple = {
   },
   oramaLatestPT15: () => {
     oramaLatest.insertMultiple(dbLatestPT15, dataset, 50)
-  }
+  },
+  oramaLatestQPS: () => {
+    oramaLatest.insertMultiple(dbLatestQPS, dataset, 50)
+  },
 }
 
 export const searchPlain = {
@@ -77,7 +89,10 @@ export const searchPlain = {
   },
   oramaLatestPT15: () => {
     oramaLatest.search(dbLatestPT15, { term: 'Legend of Zelda' })
-  }
+  },
+  oramaLatestQPS: () => {
+    oramaLatest.search(dbLatestQPS, { term: 'Legend of Zelda' })
+  },
 }
 
 export const searchWithFilters = {
@@ -92,7 +107,10 @@ export const searchWithFilters = {
   },
   oramaLatestPT15: () => {
     oramaLatest.search(dbLatestPT15, { term: 'Super Hero', where: { rating: { gte: 4 } } })
-  }
+  },
+  oramaLatestQPS: () => {
+    oramaLatest.search(dbLatestQPS, { term: 'Super Hero', where: { rating: { gte: 4 } } })
+  },
 }
 
 export const searchWithLongTextAndComplexFilters = {
@@ -107,5 +125,8 @@ export const searchWithLongTextAndComplexFilters = {
   },
   oramaLatestPT15: () => {
     oramaLatest.search(dbLatestPT15, { term: 'classic run gun, action game focused on boss battles', where: { rating: { gte: 4 }, genres: { containsAll: ['Shooter'] } } })
-  }
+  },
+  oramaLatestQPS: () => {
+    oramaLatest.search(dbLatestQPS, { term: 'classic run gun, action game focused on boss battles', where: { rating: { gte: 4 }, genres: { containsAll: ['Shooter'] } } })
+  },
 }
