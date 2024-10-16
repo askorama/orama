@@ -183,12 +183,12 @@ export class RadixNode {
     while (stack.length > 0) {
       const { node, index, tolerance } = stack.pop()!
 
-      if (tolerance < 0) {
+      if (node.w.startsWith(term)) {
+        node.findAllWords(output, term, false, 0)
         continue
       }
 
-      if (node.w.startsWith(term)) {
-        node.findAllWords(output, term, false, 0)
+      if (tolerance < 0) {
         continue
       }
 
@@ -198,7 +198,7 @@ export class RadixNode {
           if (syncBoundedLevenshtein(term, w, originalTolerance).isBounded) {
             output[w] = []
           }
-          if (getOwnProperty(output, w) != null && docIDs.size > 0) {
+          if (getOwnProperty(output, w) !== undefined && docIDs.size > 0) {
             const docs = new Set(output[w])
 
             for (const docID of docIDs) {

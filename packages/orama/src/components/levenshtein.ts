@@ -7,26 +7,36 @@ export type BoundedMetric = {
  * Inspired by:
  * https://github.com/Yomguithereal/talisman/blob/86ae55cbd040ff021d05e282e0e6c71f2dde21f8/src/metrics/levenshtein.js#L218-L340
  */
-function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
+function _boundedLevenshtein(term: string, word: string, tolerance: number): number {
   // Handle base cases
   if (tolerance < 0) return -1
-  if (a === b) return 0
+  if (term === word) return 0
 
-  const m = a.length
-  const n = b.length
+  const m = term.length
+  const n = word.length
 
   // Special case for empty strings
   if (m === 0) return n <= tolerance ? n : -1
   if (n === 0) return m <= tolerance ? m : -1
 
-  a = a.toLowerCase()
-  b = b.toLowerCase()
+  // term = term.toLowerCase()
+  // word = word.toLowerCase()
 
+  const diff = Math.abs(m - n)
   // Special case for prefixes
-  if (b.startsWith(a) || a.startsWith(b)) return 0
+  // If the searching word starts with the indexed word, return early.
+  if (term.startsWith(word)) {
+    // We just check if the remaining characters are within the tolerance
+    return diff <= tolerance ? diff : -1
+  }
+  // If the indexed word starts with the searching word, return early.
+  if (word.startsWith(term)) {
+    // any prefixed word is within the tolerance
+    return 0
+  }
 
   // If the length difference is greater than the tolerance, return early
-  if (Math.abs(m - n) > tolerance) return -1
+  if (diff > tolerance) return -1
 
   // Initialize the matrix
   const matrix: number[][] = []
@@ -41,7 +51,7 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
   for (let i = 1; i <= m; i++) {
     let rowMin = Infinity
     for (let j = 1; j <= n; j++) {
-      if (a[i - 1] === b[j - 1]) {
+      if (term[i - 1] === word[j - 1]) {
         matrix[i][j] = matrix[i - 1][j - 1]
       } else {
         matrix[i][j] = Math.min(
@@ -68,8 +78,8 @@ function _boundedLevenshtein(a: string, b: string, tolerance: number): number {
  * It assumes that:
  * - tolerance >= ||a| - |b|| >= 0
  */
-export function boundedLevenshtein(a: string, b: string, tolerance: number): BoundedMetric {
-  const distance = _boundedLevenshtein(a, b, tolerance)
+export function boundedLevenshtein(term: string, w: string, tolerance: number): BoundedMetric {
+  const distance = _boundedLevenshtein(term, w, tolerance)
   return {
     distance,
     isBounded: distance >= 0
@@ -77,8 +87,8 @@ export function boundedLevenshtein(a: string, b: string, tolerance: number): Bou
 }
 
 // This is only used internally, keep in sync with the previous one
-export function syncBoundedLevenshtein(a: string, b: string, tolerance: number): BoundedMetric {
-  const distance = _boundedLevenshtein(a, b, tolerance)
+export function syncBoundedLevenshtein(term: string, w: string, tolerance: number): BoundedMetric {
+  const distance = _boundedLevenshtein(term, w, tolerance)
   return {
     distance,
     isBounded: distance >= 0
