@@ -87,6 +87,10 @@ const oramaCloudMenu = [
         collapsed: true,
         items: [
           {
+            label: 'Introduction to Custom System Prompts',
+            link: '/cloud/custom-system-prompts/'
+          },
+          {
             label: 'Customizing the system prompts',
             link: '/cloud/custom-system-prompts/customizing-the-system-prompts'
           }
