@@ -3,6 +3,7 @@ import starlight from '@astrojs/starlight'
 import react from '@astrojs/react'
 import tailwind from '@astrojs/tailwind'
 import cookieconsent from '@jop-software/astro-cookieconsent'
+import starlightImageZoom from 'starlight-image-zoom'
 import {openSourceMenu, oramaCloudMenu, head, cookieConsentConfig } from './config'
 
 // https://astro.build/config
@@ -27,7 +28,7 @@ export default defineConfig({
   integrations: [
     starlight({
       pagefind: false,
-      plugins: [],
+      plugins: [starlightImageZoom()],
       title: 'Orama Docs',
       description: 'Your product answer engine. Unlimited full-text search, embeddings generations and more. Help your users find the right answers, faster.',
       favicon: '/favicon.png',

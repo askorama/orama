@@ -122,6 +122,9 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      starlight-image-zoom:
+        specifier: ^0.8.0
+        version: 0.8.0(@astrojs/starlight@0.26.4(astro@4.16.3(@types/node@22.7.5)(rollup@4.24.0)(terser@5.34.1)(typescript@5.6.3)))
       starlight-showcases:
         specifier: ^0.2.0
         version: 0.2.0(@astrojs/starlight@0.26.4(astro@4.16.3(@types/node@22.7.5)(rollup@4.24.0)(terser@5.34.1)(typescript@5.6.3)))(astro@4.16.3(@types/node@22.7.5)(rollup@4.24.0)(terser@5.34.1)(typescript@5.6.3))
@@ -11242,6 +11245,12 @@ packages:
   standard-engine@15.1.0:
     resolution: {integrity: sha512-VHysfoyxFu/ukT+9v49d4BRXIokFRZuH3z1VRxzFArZdjSCFpro6rEIU3ji7e4AoAtuSfKBkiOmsrDqKW5ZSRw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+
+  starlight-image-zoom@0.8.0:
+    resolution: {integrity: sha512-+YDqCyihQescGs9hJoyTQt+KHEq9s6zIv8ksBMjPjwOrVicXtY0pM4hHj8yO1r2znud4gTytyGt25kAOmRyP9A==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@astrojs/starlight': '>=0.22.0'
 
   starlight-showcases@0.2.0:
     resolution: {integrity: sha512-YWJuTqArkUdVJV85VKZJ0BvKCQRu1SKtH/Cr5t6G/oIfI4IptWc92E7BmiuNnpuQ2U7TczTRidCYurPrbgQQVA==}
@@ -27025,6 +27034,13 @@ snapshots:
       minimist: 1.2.8
       pkg-conf: 3.1.0
       xdg-basedir: 4.0.0
+
+  starlight-image-zoom@0.8.0(@astrojs/starlight@0.26.4(astro@4.16.3(@types/node@22.7.5)(rollup@4.24.0)(terser@5.34.1)(typescript@5.6.3))):
+    dependencies:
+      '@astrojs/starlight': 0.26.4(astro@4.16.3(@types/node@22.7.5)(rollup@4.24.0)(terser@5.34.1)(typescript@5.6.3))
+      rehype-raw: 7.0.0
+      unist-util-visit: 5.0.0
+      unist-util-visit-parents: 6.0.1
 
   starlight-showcases@0.2.0(@astrojs/starlight@0.26.4(astro@4.16.3(@types/node@22.7.5)(rollup@4.24.0)(terser@5.34.1)(typescript@5.6.3)))(astro@4.16.3(@types/node@22.7.5)(rollup@4.24.0)(terser@5.34.1)(typescript@5.6.3)):
     dependencies:
