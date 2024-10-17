@@ -9,6 +9,7 @@ If you need more info, help, or want to provide general feedback on Orama, join 
 
 # Highlighted features
 
+- [Full-Text search](https://docs.orama.com/open-source/usage/search/introduction)
 - [Vector Search](https://docs.orama.com/open-source/usage/search/vector-search)
 - [Hybrid Search](https://docs.orama.com/open-source/usage/search/hybrid-search)
 - [Search Filters](https://docs.orama.com/open-source/usage/search/filters)
@@ -128,6 +129,91 @@ Orama currently supports 10 different data types:
 | `boolean[]`      | An array of booleans.                                                       | `[true, false, false]`                                                      |
 | `enum[]`         | An array of enums.                                                          | `['comedy', 'action', 'romance']`                                           |
 | `vector[<size>]` | A vector of numbers to perform vector search on.                            | `[0.403, 0.192, 0.830]`                                                     |
+
+## Vector and hybrid Search support
+
+Orama supports both vector and hybrid search by just setting `mode: 'vector'` when performing search.
+
+To perform this kind of search, you'll need to provide [text embeddings](https://en.wikipedia.org/wiki/Word_embedding) at search time:
+
+```js
+import { create, insertMultiple, search } from '@orama/orama'
+
+const db = create({
+  schema: {
+    title: 'string',
+    embedding: 'vector[5]'', // we are using a 5-dimensional vector.
+  },
+});
+
+insertMultiple(db, [
+  { title: 'The Prestige', embedding: [0.938293, 0.284951, 0.348264, 0.948276, 0.56472] },
+  { title: 'Barbie', embedding: [0.192839, 0.028471, 0.284738, 0.937463, 0.092827] },
+  { title: 'Oppenheimer', embedding: [0.827391, 0.927381, 0.001982, 0.983821, 0.294841] },
+])
+
+const results = search(db, {
+  // Search mode. Can be 'vector', 'hybrid', or 'fulltext'
+  mode: 'vector',
+  vector: {
+    // The vector (text embedding) to use for search
+    value: [0.938292, 0.284961, 0.248264, 0.748276, 0.26472],
+    // The schema property where Orama should compare embeddings
+    property: 'embedding',
+  },
+  // Minimum similarity to determine a match. Defaults to `0.8`
+  similarity: 0.85,
+  // Defaults to `false`. Setting to 'true' will return the embeddings in the response (which can be very large).
+  includeVectors: true,
+})
+```
+
+Have trouble generating embeddings for vector and hybrid search? Try our `@orama/plugin-embeddings` plugin!
+
+```js
+import { create } from '@orama/orama'
+import { pluginEmbeddings } from '@orama/plugin-embeddings'
+import '@tensorflow/tfjs-node' // Or any other appropriate TensorflowJS backend, like @tensorflow/tfjs-backend-webgl
+
+const plugin = await pluginEmbeddings({
+  embeddings: {
+    // Schema property used to store generated embeddings
+    defaultProperty: 'embeddings',
+    onInsert: {
+      // Generate embeddings at insert-time
+      generate: true,
+      // properties to use for generating embeddings at insert time.
+      // Will be concatenated to generate a unique embedding.
+      properties: ['description'],
+      verbose: true,
+    }
+  }
+})
+
+const db = create({
+  schema: {
+    description: 'string',
+    // Orama generates 512-dimensions vectors.
+    // When using @orama/plugin-embeddings, set the property where you want to store embeddings as `vector[512]`.
+    embeddings: 'vector[512]'
+  },
+  plugins: [plugin]
+})
+
+// Orama will generate and store embeddings at insert-time!
+await insert(db, { description: 'Classroom Headphones Bulk 5 Pack, Student On Ear Color Varieties' })
+await insert(db, { description: 'Kids Wired Headphones for School Students K-12' })
+await insert(db, { description: 'Kids Headphones Bulk 5-Pack for K-12 School' })
+await insert(db, { description: 'Bose QuietComfort Bluetooth Headphones' })
+
+// Orama will also generate and use embeddings at search time when search mode is set to "vector" or "hybrid"!
+const searchResults = await search(db, {
+  term: 'Headphones for 12th grade students',
+  mode: 'vector'
+})
+```
+
+Want to use OpenAI embedding models? Use our [Secure Proxy](https://docs.orama.com/open-source/plugins/plugin-secure-proxy) plugin to call OpenAI from the client-side securely.
 
 # Official Docs
 
