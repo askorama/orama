@@ -81,7 +81,7 @@ const oramaCloudMenu = [
             link: '/cloud/answer-engine/providing-additional-knowledge'
           },
           {
-            label: 'Customization',
+            label: 'Answers Customization',
             link: '/cloud/answer-engine/customizing-the-answers'
           }
         ]
