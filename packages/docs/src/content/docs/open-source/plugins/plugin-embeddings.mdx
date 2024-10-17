@@ -2,6 +2,7 @@
 title: Plugin Embeddings
 description: Generate embeddings for your documents offline and use them for vector search.
 ---
+import { Aside } from '@astrojs/starlight/components';
 import Install from '../../../../components/Install.astro'
 
 To perform vector and hybrid search, you need to convert your text data into embeddings.
@@ -34,6 +35,10 @@ If you're using Orama in Node.js, we recommend using `@tensorflow/tfjs-node`:
 <Install pkg="@tensorflow/tfjs-node" />
 
 ## Usage
+
+<Aside type='caution' title='Search and insert methods are now async!'>
+Since this plugin will need to generate embeddings for your documents, the search and insert methods are now async. Make sure to use `await` when calling them.
+</Aside>
 
 This plugin will generate text embeddings for you at insert and search time, allowing you to perform vector and hybrid searches on your documents.
 

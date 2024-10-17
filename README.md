@@ -12,6 +12,7 @@ If you need more info, help, or want to provide general feedback on Orama, join 
 - [Full-Text search](https://docs.orama.com/open-source/usage/search/introduction)
 - [Vector Search](https://docs.orama.com/open-source/usage/search/vector-search)
 - [Hybrid Search](https://docs.orama.com/open-source/usage/search/hybrid-search)
+- [GenAI Chat Sessions](https://docs.orama.com/open-source/usage/answer-engine/introduction)
 - [Search Filters](https://docs.orama.com/open-source/usage/search/filters)
 - [Geosearch](https://docs.orama.com/open-source/usage/search/geosearch)
 - [Facets](https://docs.orama.com/open-source/usage/search/facets)

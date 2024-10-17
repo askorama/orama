@@ -58,6 +58,10 @@ Right now, the Orama Secure Proxy Plugin supports two different models for gener
 
 ## Running queries
 
+<Aside type='caution' title='Search methods are now async!'>
+Since the plugin needs to call the OpenAI API to generate embeddings, the search methods are now async. Make sure to use `await` when calling them.
+</Aside>
+
 By telling on which property to perform search by default (in the example above, `'embeddings'`), the plugin will automatically translate your search term into a vector by calling the OpenAI API for you and setting the result into the `vector.value` property.
 
 This will finally allow you to perform hybrid and vector search with the exact same APIs used for full-text search.
@@ -65,12 +69,12 @@ This will finally allow you to perform hybrid and vector search with the exact s
 ```js
 import { search } from '@orama/orama'
 
-const resultsHybrid = search(db, {
+const resultsHybrid = await search(db, {
   mode: 'hybrid',
   term: 'Videogame for little kids with a passion about ice cream'
 })
 
-const resultsVector = search(db, {
+const resultsVector = await search(db, {
   mode: 'vector',
   term: 'Videogame for little kids with a passion about ice cream'
 })
@@ -81,9 +85,9 @@ const resultsVector = search(db, {
 If you have a more complex schema with multiple vector properties, you can always override the vector property to perform search on by using the default `vector` property:
 
 ```js
-const resultsVector = search(db, {
+const resultsVector = await search(db, {
   mode: 'vector',
-  term: 'Videogame for little kids with a passion about ice cream'
+  term: 'Videogame for little kids with a passion about ice cream',
   vector: {
     property: 'myAlternativeProperty'
   }
