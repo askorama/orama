@@ -1,7 +1,7 @@
 {
   "name": "orama-monorepo",
-  "version": "3.0.0-rc-4",
-  "description": "A complete RAG pipeline in your browser, server, or edge network with support for full-text, vector, and hybrid search in less than 2kb.",
+  "version": "3.0.0",
+  "description": "A complete search engine and RAG pipeline in your browser, server, or edge network with support for full-text, vector, and hybrid search in less than 2kb.",
   "workspaces": [
     "packages/*",
     "sandboxes/*"
