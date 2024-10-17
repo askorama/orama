@@ -131,6 +131,9 @@ export function Search() {
         suggestions={suggestions}
         searchPlaceholder={`Search ${currentCategory === 'Open Source' ? 'Open Source' : 'Orama Cloud'}`}
         chatPlaceholder='Ask me anything about Orama'
+        highlight={{
+          HTMLTag: 'b'
+        }}
       />
 
       <OramaSearchButton
