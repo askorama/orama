@@ -130,7 +130,7 @@ Orama currently supports 10 different data types:
 | `enum[]`         | An array of enums.                                                          | `['comedy', 'action', 'romance']`                                           |
 | `vector[<size>]` | A vector of numbers to perform vector search on.                            | `[0.403, 0.192, 0.830]`                                                     |
 
-## Vector and hybrid Search support
+# Vector and Hybrid Search Support
 
 Orama supports both vector and hybrid search by just setting `mode: 'vector'` when performing search.
 
@@ -215,6 +215,51 @@ const searchResults = await search(db, {
 
 Want to use OpenAI embedding models? Use our [Secure Proxy](https://docs.orama.com/open-source/plugins/plugin-secure-proxy) plugin to call OpenAI from the client-side securely.
 
+# RAG and Chat Experiences with Orama
+
+Since `v3.0.0`, Orama allows you to create your own ChatGPT/Perplexity/SearchGPT-like experience. You will need to call the OpenAI APIs, so we strongly recommend using the [Secure Proxy Plugin](https://docs.orama.com/open-source/plugins/plugin-secure-proxy) to do that securely from your client side. It's free!
+
+```js
+import { create, insert } from '@orama/orama'
+import { pluginSecureProxy } from '@orama/plugin-secure-proxy'
+
+const secureProxy = await pluginSecureProxy({
+  apiKey: 'my-api-key',
+  defaultProperty: 'embeddings',
+  models: {
+    // The chat model to use to generate the chat answer
+    chat: 'openai/gpt-4o-mini'
+  }
+})
+
+const db = create({
+  schema: {
+    name: 'string'
+  },
+  plugins: [secureProxy]
+})
+
+insert(db, { name: 'John Doe' })
+insert(db, { name: 'Jane Doe' })
+
+const session = new AnswerSession(db, {
+  // Customize the prompt for the system
+  systemPrompt: 'You will get a name as context, please provide a greeting message',
+  events: {
+    // Log all state changes. Useful to reactively update a UI on a new message chunk, sources, etc.
+    onStateChange: console.log,
+  }
+})
+
+const response = await session.ask({
+  term: 'john'
+})
+
+console.log(response) // Hello, John Doe! How are you doing?
+```
+
+Read the complete documentation [here](https://docs.orama.com/open-source/usage/answer-engine/introduction).
+
 # Official Docs
 
 Read the complete documentation at [https://docs.orama.com/open-source](https://docs.orama.com/open-source).
@@ -222,13 +267,13 @@ Read the complete documentation at [https://docs.orama.com/open-source](https://
 # Official Orama Plugins
 
 - [Plugin Embeddings](https://docs.orama.com/open-source/plugins/plugin-embeddings)
+- [Plugin Secure Proxy](https://docs.orama.com/open-source/plugins/plugin-secure-proxy)
 - [Plugin Analytics](https://docs.orama.com/open-source/plugins/plugin-analytics)
 - [Plugin Data Persistence](https://docs.orama.com/open-source/plugins/plugin-data-persistence)
 - [Plugin QPS](https://docs.orama.com/open-source/plugins/plugin-qps)
 - [Plugin PT15](https://docs.orama.com/open-source/plugins/plugin-pt15)
 - [Plugin Vitepress](https://docs.orama.com/open-source/plugins/plugin-vitepress)
 - [Plugin Docusaurus](https://docs.orama.com/open-source/plugins/plugin-docusaurus)
-- [Plugin Secure Proxy](https://docs.orama.com/open-source/plugins/plugin-secure-proxy)
 - [Plugin Astro](https://docs.orama.com/open-source/plugins/plugin-astro)
 - [Plugin Nextra](https://docs.orama.com/open-source/plugins/plugin-nextra)
 
