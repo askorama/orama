@@ -1,5 +1,4 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/askorama/orama/refs/heads/main/misc/readme/orama-readme-hero-dark.png#gh-dark-mode-only" />
   <img src="https://raw.githubusercontent.com/askorama/orama/refs/heads/main/misc/readme/orama-readme-hero-light.png#gh-light-mode-only" />
 </p>
 
@@ -54,7 +53,6 @@ Read the complete documentation at [https://docs.orama.com](https://docs.orama.c
 # Orama Features
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/askorama/orama/refs/heads/main/misc/readme/features-dark.png#gh-dark-mode-only" />
   <img src="https://raw.githubusercontent.com/askorama/orama/refs/heads/main/misc/readme/features-light.png#gh-light-mode-only" />
 </p>
 
