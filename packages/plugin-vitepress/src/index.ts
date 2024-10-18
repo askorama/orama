@@ -7,6 +7,7 @@ import { AnySchema, create, insertMultiple, OramaPlugin } from '@orama/orama'
 import { persist } from '@orama/plugin-data-persistence'
 import { pluginPT15 } from '@orama/plugin-pt15'
 import { pluginQPS } from '@orama/plugin-qps'
+import { ComponentLibrary } from '@orama/vue-components'
 import slugify from 'slugify'
 import { readFileSync } from 'fs'
 
@@ -144,11 +145,30 @@ export function OramaPlugin(pluginOptions: OramaPluginOptions = { scoringAlgorit
       }
 
       const selfBuildEnd = vitepressConfig.buildEnd
+      const originalTransformHead = vitepressConfig.transformHead
 
       vitepressConfig.buildEnd = (siteConfig: any) => {
         selfBuildEnd?.(siteConfig)
         siteConfig = Object.assign(siteConfig || {})
         pluginSiteConfig?.buildEnd?.(siteConfig)
+      }
+
+      vitepressConfig.transformHead = async (ctx) => {
+        const head = await originalTransformHead?.(ctx) || []
+        
+        // Add your custom head elements here if needed
+        head.push(['script', {}, `
+          import { createApp } from 'vue'
+          import { ComponentLibrary } from '@orama/vue-components'
+          
+          if (typeof window !== 'undefined') {
+            window.__VUE_PROD_DEVTOOLS__ = true
+            const app = createApp({})
+            app.use(ComponentLibrary)
+          }
+        `])
+
+        return head
       }
 
       const selfTransformHead = vitepressConfig.transformHead
@@ -159,6 +179,7 @@ export function OramaPlugin(pluginOptions: OramaPluginOptions = { scoringAlgorit
         return selfHead.concat(pluginHead)
       }
     },
+   
     config: () => ({
       resolve: {
         alias: {
