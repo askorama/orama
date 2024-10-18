@@ -79,20 +79,10 @@ const oramaCloudMenu = [
           {
             label: 'Providing more context',
             link: '/cloud/answer-engine/providing-additional-knowledge'
-          }
-        ]
-      },
-      {
-        label: 'Custom system prompts',
-        collapsed: true,
-        items: [
-          {
-            label: 'Introduction to Custom System Prompts',
-            link: '/cloud/custom-system-prompts/'
           },
           {
-            label: 'Customizing the system prompts',
-            link: '/cloud/custom-system-prompts/customizing-the-system-prompts'
+            label: 'Answers Customization',
+            link: '/cloud/answer-engine/customizing-the-answers'
           }
         ]
       },
