@@ -1,7 +1,7 @@
 <script lang='ts' setup>
 import { onMounted } from 'vue'
 import { useData } from 'vitepress'
-import { RegisterSearchBox, presets, signals as $ } from '@orama/searchbox'
+import { ComponentLibrary} from '@orama/vue-components'
 
 const VPData = useData()
 
@@ -12,19 +12,15 @@ onMounted(async () => {
   const oramaPluginData = await import('virtual:search-data')
   const oramaInstance = oramaPluginData.default.data
   const oramaAnalytics = oramaPluginData.default.analytics
-
-  RegisterSearchBox({
-    oramaInstance: oramaInstance,
-    preset: presets.docs.name,
-    show: false,
-    analytics: oramaAnalytics
-  })
 })
 </script>
 
 <template>
   <ClientOnly>
-    <orama-searchbox />
+    <!-- should implement the searchbox here -->
+    <orama-chat-box
+      :orama-instance="oramaInstance"
+    />
 
     <div class="VPNavBarSearch search">
       <div id="docsearch">
