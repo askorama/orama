@@ -145,30 +145,11 @@ export function OramaPlugin(pluginOptions: OramaPluginOptions = { scoringAlgorit
       }
 
       const selfBuildEnd = vitepressConfig.buildEnd
-      const originalTransformHead = vitepressConfig.transformHead
 
       vitepressConfig.buildEnd = (siteConfig: any) => {
         selfBuildEnd?.(siteConfig)
         siteConfig = Object.assign(siteConfig || {})
         pluginSiteConfig?.buildEnd?.(siteConfig)
-      }
-
-      vitepressConfig.transformHead = async (ctx) => {
-        const head = await originalTransformHead?.(ctx) || []
-        
-        // Add your custom head elements here if needed
-        head.push(['script', {}, `
-          import { createApp } from 'vue'
-          import { ComponentLibrary } from '@orama/vue-components'
-          
-          if (typeof window !== 'undefined') {
-            window.__VUE_PROD_DEVTOOLS__ = true
-            const app = createApp({})
-            app.use(ComponentLibrary)
-          }
-        `])
-
-        return head
       }
 
       const selfTransformHead = vitepressConfig.transformHead

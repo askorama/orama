@@ -7,6 +7,11 @@ const VPData = useData()
 // $.colorScheme.value = VPData.isDark.value ? 'dark' : 'light'
 
 onMounted(async () => {
+  (async () => {
+    await import('https://cdn.jsdelivr.net/npm/@orama/wc-components@latest/dist/orama-ui/orama-ui.esm.js')
+    await import('https://cdn.jsdelivr.net/npm/@orama/wc-components@latest/dist/orama-ui/orama-ui.css')
+  })()
+
   // @ts-expect-error - virtual:search-data is not globally defined
   const oramaPluginData = await import('virtual:search-data')
   const oramaInstance = oramaPluginData.default.data
@@ -24,6 +29,7 @@ onMounted(async () => {
     <div class="VPNavBarSearch search">
       <div id="docsearch">
         <!-- should implement search button here -->
+        <orama-search-button />
       </div>
     </div>
   </ClientOnly>
